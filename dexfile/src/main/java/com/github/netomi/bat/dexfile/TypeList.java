@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -29,7 +28,8 @@ import java.util.Arrays;
 )
 public class TypeList extends DataItem
 {
-    private static final int[] EMPTY_ARRAY = new int[0];
+    private static final int[]    EMPTY_ARRAY = new int[0];
+    public  static final TypeList EMPTY       = new TypeList();
 
     public int   size; // uint
     public int[] typeList;

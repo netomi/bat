@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory;
@@ -56,7 +55,7 @@ public class ClassDef extends DataItem
         classDataOffset    = 0;
         staticValuesOffset = 0;
 
-        interfaces           = null;
+        interfaces           = TypeList.EMPTY;
         annotationsDirectory = null;
         classData            = null;
         staticValues         = null;
@@ -80,8 +79,8 @@ public class ClassDef extends DataItem
 
     public String getSourceFile(DexFile dexFile) {
         return sourceFileIndex == NO_INDEX ?
-                "unknown" :
-                dexFile.getStringID(sourceFileIndex).getStringValue();
+            "unknown" :
+            dexFile.getStringID(sourceFileIndex).getStringValue();
     }
 
     @Override

@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_STRING_DATA_ITEM,
@@ -59,8 +60,8 @@ public class StringData extends DataItem
 
     private static String asString(byte[] data, int len) {
         return len >= 0 ?
-                new String(data, 0, data.length, Charset.forName("UTF-8")) :
-                null;
+            new String(data, 0, data.length, StandardCharsets.UTF_8) :
+            null;
     }
 
     @Override

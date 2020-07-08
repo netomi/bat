@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import java.io.IOException;
@@ -164,7 +163,14 @@ implements   DexDataOutput
 
     @Override
     public void writeUleb128(int value) {
-        writePadding(5);
+        do {
+            byte b = (byte) (value & 0x7f);
+            value >>>= 7;
+            if (value != 0) {
+                b |= 0x80;
+            }
+            byteBuffer.put(b);
+        } while (value != 0);
     }
 
     @Override
@@ -174,7 +180,17 @@ implements   DexDataOutput
 
     @Override
     public void writeSleb128(int value) {
-        writePadding(5);
+        while (true) {
+            byte b = (byte) (value & 0x7f);
+            value >>= 7;
+            if (value ==  0 && ((b & 0x40) == 0) ||
+                value == -1 && ((b & 0x40) != 0)) {
+                byteBuffer.put(b);
+                break;
+            }
+
+            byteBuffer.put((byte) (b | 0x80));
+        }
     }
 
     @Override

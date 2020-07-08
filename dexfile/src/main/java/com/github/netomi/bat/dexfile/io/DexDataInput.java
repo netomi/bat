@@ -193,7 +193,7 @@ public class DexDataInput
     public int readUleb128() {
         int b;
 
-        int value = 0;
+        int value  = 0;
         int length = 0;
         do {
             b = readUnsignedByte();
@@ -210,8 +210,9 @@ public class DexDataInput
 
     public int readSleb128() {
         int value = 0;
-        byte b;
         int shift = 0;
+        byte b;
+
         do {
             b = byteBuffer.get();
             value |= (b & (byte) 0x7f) << shift;

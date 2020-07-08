@@ -13,19 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.debug.DebugInfo;
-import com.github.netomi.bat.dexfile.visitor.DefaultDataItemVisitor;
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 /**
  * @author Thomas Neidhart
  */
-class   DataItemOffsetUpdater
-extends DefaultDataItemVisitor
+class      DataItemOffsetUpdater
+implements DataItemVisitor
 {
     DexFileWriter.DataItemMap dataItemMap;
 

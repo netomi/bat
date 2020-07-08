@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.util;
 
 import java.util.ArrayList;
@@ -21,12 +20,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import static java.util.Collections.EMPTY_LIST;
-
 /**
  * @author Thomas Neidhart
  */
-abstract class RegexStringMatcher extends StringMatcher
+abstract class RegexStringMatcher implements StringMatcher
 {
     private final List<Pattern> patterns;
 

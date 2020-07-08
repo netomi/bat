@@ -14,19 +14,20 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.util.Primitives;
+import com.github.netomi.bat.dexfile.visitor.*;
 
 import java.io.PrintStream;
 
 public class DexFilePrinter
 extends DefaultDexVisitor
-implements   DexFileVisitor,
-             DexHeaderVisitor,
-             ClassDefVisitor,
-             ClassDataVisitor,
+implements DexFileVisitor,
+        DexHeaderVisitor,
+        ClassDefVisitor,
+        ClassDataVisitor,
              EncodedFieldVisitor,
              EncodedMethodVisitor,
              TypeListVisitor,

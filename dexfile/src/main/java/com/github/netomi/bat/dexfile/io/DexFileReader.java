@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.util.Primitives;
-import com.github.netomi.bat.dexfile.visitor.DefaultDataItemVisitor;
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor;
 
 import java.io.IOException;
@@ -168,7 +168,7 @@ implements DexFileVisitor
     }
 
     private void readLinkedDataItems(DexFile dexFile) {
-        dexFile.dataItemsAccept(new DefaultDataItemVisitor() {
+        dexFile.dataItemsAccept(new DataItemVisitor() {
             @Override
             public void visitAnyDataItem(DexFile dexFile, DataItem dataItem) {
                 dataItem.readLinkedDataItems(input);

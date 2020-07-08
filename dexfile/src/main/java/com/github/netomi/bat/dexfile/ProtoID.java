@@ -29,8 +29,6 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 )
 public class ProtoID extends DataItem
 {
-    private static final TypeList EMPTY_TYPE_LIST = new TypeList();
-
     public int shortyIndex;      // uint
     public int returnTypeIndex;  // uint
     public int parametersOffset; // uint
@@ -41,7 +39,7 @@ public class ProtoID extends DataItem
         shortyIndex      = NO_INDEX;
         returnTypeIndex  = NO_INDEX;
         parametersOffset = 0;
-        parameters       = EMPTY_TYPE_LIST;
+        parameters       = TypeList.EMPTY;
     }
 
     public String getShorty(DexFile dexFile) {

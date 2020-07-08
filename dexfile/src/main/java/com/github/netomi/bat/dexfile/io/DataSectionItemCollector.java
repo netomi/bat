@@ -19,13 +19,13 @@ package com.github.netomi.bat.dexfile.io;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.debug.DebugInfo;
-import com.github.netomi.bat.dexfile.visitor.DefaultDataItemVisitor;
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 /**
  * @author Thomas Neidhart
  */
 public class DataSectionItemCollector
-extends DefaultDataItemVisitor
+implements   DataItemVisitor
 {
     private DexFileWriter.DataItemMap dataItemMap;
 

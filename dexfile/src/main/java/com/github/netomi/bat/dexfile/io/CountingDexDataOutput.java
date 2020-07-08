@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import java.nio.ByteOrder;
@@ -148,17 +147,38 @@ implements   DexDataOutput
 
     @Override
     public void writeUleb128(int value) {
-        offset += 2;
+        int bytesWritten = 0;
+
+        do {
+            value >>= 7;
+            bytesWritten++;
+        } while (value != 0);
+
+        offset += bytesWritten;
     }
 
     @Override
     public void writeUleb128p1(int value) {
-        offset += 2;
+        writeUleb128(value + 1);
     }
 
     @Override
     public void writeSleb128(int value) {
-        offset += 2;
+        int bytesWritten = 0;
+
+        while (true) {
+            byte b = (byte) (value & 0x7f);
+            value >>= 7;
+            if (value ==  0 && ((b & 0x40) == 0) ||
+                    value == -1 && ((b & 0x40) != 0)) {
+                bytesWritten++;
+                break;
+            }
+
+            bytesWritten++;
+        }
+
+        offset += bytesWritten;
     }
 
     @Override

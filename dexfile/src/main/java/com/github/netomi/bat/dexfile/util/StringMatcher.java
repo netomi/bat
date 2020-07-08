@@ -13,37 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.util;
 
 /**
  * @author Thomas Neidhart
  */
-public abstract class StringMatcher
+public interface StringMatcher
 {
-    public abstract boolean matches(String input);
+    boolean matches(String input);
 
-    public StringMatcher or(StringMatcher other) {
-        final StringMatcher first  = this;
-        final StringMatcher second = other;
-
-        return new StringMatcher()
-        {
-            public boolean matches(String input) {
-                return first.matches(input) || second.matches(input);
-            }
-        };
+    default StringMatcher or(StringMatcher other) {
+        return (input) -> StringMatcher.this.matches(input) || other.matches(input);
     }
 
-    public StringMatcher and(StringMatcher other) {
-        final StringMatcher first  = this;
-        final StringMatcher second = other;
-
-        return new StringMatcher()
-        {
-            public boolean matches(String input) {
-                return first.matches(input) && second.matches(input);
-            }
-        };
+    default StringMatcher and(StringMatcher other) {
+        return (input) -> StringMatcher.this.matches(input) && other.matches(input);
     }
 }
