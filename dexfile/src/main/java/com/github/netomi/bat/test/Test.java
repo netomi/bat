@@ -16,5 +16,32 @@
 
 package com.github.netomi.bat.test;
 
+import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.io.DexFileReader;
+import com.github.netomi.bat.dexfile.io.DexFileWriter;
+import com.github.netomi.bat.dexfile.io.DexFilePrinter;
+
+import java.io.*;
+
 public class Test {
+
+    public static void main(String[] args) {
+        DexFile dexFile = new DexFile();
+
+        try (InputStream  is = new FileInputStream("classes.dex");
+             OutputStream os = new FileOutputStream("classes2.dex")) {
+
+            DexFileReader reader = new DexFileReader(is);
+
+            reader.visitDexFile(dexFile);
+
+            dexFile.accept(new DexFilePrinter());
+
+            DexFileWriter writer = new DexFileWriter(os);
+
+            dexFile.accept(writer);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
