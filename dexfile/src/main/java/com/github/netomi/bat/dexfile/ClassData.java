@@ -97,14 +97,20 @@ implements   DataItem
     public void readLinkedDataItems(DexDataInput input) {
         for (EncodedMethod method : directMethods) {
             if (method.codeOffset != 0) {
+                input.setOffset(method.codeOffset);
+
                 method.code = new Code();
+                method.code.read(input);
                 method.code.readLinkedDataItems(input);
             }
         }
 
         for (EncodedMethod method : virtualMethods) {
             if (method.codeOffset != 0) {
+                input.setOffset(method.codeOffset);
+
                 method.code = new Code();
+                method.code.read(input);
                 method.code.readLinkedDataItems(input);
             }
         }

@@ -13,10 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.debug;
 
 import com.github.netomi.bat.dexfile.DexContent;
+import com.github.netomi.bat.dexfile.io.DexDataInput;
 
 /**
  * @author Thomas Neidhart
@@ -47,5 +47,31 @@ implements            DexContent
 
     public byte getOpcode() {
         return opcode;
+    }
+
+    public static DebugInstruction readInstruction(DexDataInput input) {
+        byte opCode = input.readByte();
+
+        DebugInstruction debugInstruction = create(opCode);
+
+        debugInstruction.read(input);
+        return debugInstruction;
+    }
+
+    private static DebugInstruction create(byte opCode) {
+        switch (opCode) {
+            case DebugInstruction.DBG_END_SEQUENCE:         return new DebugEndSequence();
+            case DebugInstruction.DBG_ADVANCE_PC  :         return new DebugAdvancePC();
+            case DebugInstruction.DBG_ADVANCE_LINE:         return new DebugAdvanceLine();
+            case DebugInstruction.DBG_START_LOCAL:          return new DebugStartLocal();
+            case DebugInstruction.DBG_START_LOCAL_EXTENDED: return new DebugStartLocalExtended();
+            case DebugInstruction.DBG_END_LOCAL:            return new DebugEndLocal();
+            case DebugInstruction.DBG_RESTART_LOCAL:        return new DebugRestartLocal();
+            case DebugInstruction.DBG_SET_PROLOGUE_END:     return new DebugSetPrologueEnd();
+            case DebugInstruction.DBG_SET_EPILOGUE_BEGIN:   return new DebugSetEpilogueBegin();
+            case DebugInstruction.DBG_SET_FILE:             return new DebugSetFile();
+            default:                       return new DebugAdvanceLineAndPC(opCode);
+        }
+
     }
 }

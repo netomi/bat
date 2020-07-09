@@ -63,7 +63,7 @@ implements   DataItem
         debugSequence = new ArrayList<>();
         DebugInstruction debugInstruction;
         do {
-            debugInstruction = DebugInstructionFactory.read(input);
+            debugInstruction = DebugInstruction.readInstruction(input);
             debugSequence.add(debugInstruction);
         } while (debugInstruction.getOpcode() != DebugInstruction.DBG_END_SEQUENCE);
     }
