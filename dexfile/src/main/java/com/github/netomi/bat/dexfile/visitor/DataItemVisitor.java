@@ -32,7 +32,7 @@ public interface DataItemVisitor
         visitAnyDataItem(dexFile, header);
     }
 
-    default void visitMapList(DexFile dexFile, DexHeader header, MapList mapList) {
+    default void visitMapList(DexFile dexFile, MapList mapList) {
         visitAnyDataItem(dexFile, mapList);
     }
 

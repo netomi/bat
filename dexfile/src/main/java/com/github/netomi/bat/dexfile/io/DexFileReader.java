@@ -43,6 +43,7 @@ implements DexFileVisitor
     @Override
     public void visitDexFile(DexFile dexFile) {
         readHeader(dexFile);
+        readMapList(dexFile);
 
         readStringIDs(dexFile);
         readTypeIDs(dexFile);
@@ -67,6 +68,14 @@ implements DexFileVisitor
         dexFile.header.read(input);
         // also read the MapList now as it is needed for other DataItems.
         dexFile.header.readLinkedDataItems(input);
+    }
+
+    private void readMapList(DexFile dexFile) {
+        input.setOffset(dexFile.header.mapOffset);
+        input.skipAlignmentPadding(4);
+
+        dexFile.mapList = new MapList();
+        dexFile.mapList.read(input);
     }
 
     private void readStringIDs(DexFile dexFile) {
@@ -136,7 +145,7 @@ implements DexFileVisitor
     }
 
     private void readCallSiteIDs(DexFile dexFile) {
-        MapItem mapItem = dexFile.header.mapList.getMapItem(DexConstants.TYPE_CALL_SITE_ID_ITEM);
+        MapItem mapItem = dexFile.mapList.getMapItem(DexConstants.TYPE_CALL_SITE_ID_ITEM);
         if (mapItem != null) {
             input.setOffset(mapItem.getOffset());
 
@@ -152,7 +161,7 @@ implements DexFileVisitor
     }
 
     private void readMethodHandles(DexFile dexFile) {
-        MapItem mapItem = dexFile.header.mapList.getMapItem(DexConstants.TYPE_METHOD_HANDLE_ITEM);
+        MapItem mapItem = dexFile.mapList.getMapItem(DexConstants.TYPE_METHOD_HANDLE_ITEM);
         if (mapItem != null) {
             input.setOffset(mapItem.getOffset());
 

@@ -23,6 +23,8 @@ import com.github.netomi.bat.dexfile.visitor.DexHeaderVisitor;
 public class DexFile
 {
     public DexHeader      header;
+    public MapList        mapList;
+
     public StringID[]     stringIDs;
     public TypeID[]       typeIDs;
     public ProtoID[]      protoIDs;
@@ -31,6 +33,7 @@ public class DexFile
     public ClassDef[]     classDefs;
     public CallSiteID[]   callSiteIDs;
     public MethodHandle[] methodHandles;
+
     public byte[]         linkData;
 
     public DexFile() {
@@ -86,6 +89,9 @@ public class DexFile
     public void dataItemsAccept(DataItemVisitor visitor) {
         visitor.visitHeader(this, header);
         header.dataItemsAccept(this, visitor);
+
+        visitor.visitMapList(this, mapList);
+        mapList.dataItemsAccept(this, visitor);
 
         for (StringID stringIDItem : stringIDs) {
             visitor.visitStringID(this, stringIDItem);

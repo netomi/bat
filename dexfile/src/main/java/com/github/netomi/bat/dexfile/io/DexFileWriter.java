@@ -188,13 +188,13 @@ implements DexFileVisitor
     }
 
     private void updateMapList(DexFile dexFile, int type, int size, int offset) {
-        MapList mapList = dexFile.header.mapList;
+        MapList mapList = dexFile.mapList;
         mapList.updateMapItem(type, size, offset);
     }
 
     private void writeMapList(DexFile dexFile, DexDataOutput output) {
         dexFile.header.mapOffset = output.getOffset();
-        dexFile.header.mapList.write(output);
+        dexFile.mapList.write(output);
     }
 
     private void writeLinkData(DexFile dexFile, DexDataOutput output) {
@@ -247,7 +247,7 @@ implements DexFileVisitor
             if (dataItemSet != null && dataItemSet.size() > 0) {
                 int align = dataItemSet.iterator().next().getDataAlignment();
                 output.writeAlignmentPadding(align);
-                dexFile.header.mapList.updateMapItem(type, dataItemSet.size(), output.getOffset());
+                dexFile.mapList.updateMapItem(type, dataItemSet.size(), output.getOffset());
                 for (DataItem dataItem : dataItemSet) {
                     int dataItemOffset = output.getOffset();
                     dataItem.write(output);

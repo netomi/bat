@@ -66,12 +66,9 @@ implements   DataItem
     public int     dataSize;         // uint
     public int     dataOffset;       // uint
 
-    public MapList mapList;
-
     public DexHeader() {
         magic     = EMPTY_ARRAY;
         signature = EMPTY_ARRAY;
-        mapList   = null;
     }
 
     @Override
@@ -136,22 +133,6 @@ implements   DataItem
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
-        // Prevent reading the MapList twice.
-        if (mapList == null) {
-            int offset = input.getOffset();
-
-            input.setOffset(mapOffset);
-            input.skipAlignmentPadding(4);
-
-            mapList = new MapList();
-            mapList.read(input);
-
-            input.setOffset(offset);
-        }
-    }
-
-    @Override
     public void write(DexDataOutput output) {
         output.writeBytes(magic);
         output.writeUnsignedInt(checksum);
@@ -182,12 +163,6 @@ implements   DataItem
         output.writeUnsignedInt(classDefsOffset);
         output.writeUnsignedInt(dataSize);
         output.writeUnsignedInt(dataOffset);
-    }
-
-    @Override
-    public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
-        visitor.visitMapList(dexFile, this, mapList);
-        mapList.dataItemsAccept(dexFile, visitor);
     }
 
     @Override
@@ -228,9 +203,6 @@ implements   DataItem
         sb.append("  dataSize        : " + dataSize + "\n");
         sb.append("  dataOffset      : " + dataOffset + "\n");
 
-        if (mapList != null) {
-            sb.append(mapList.toString());
-        }
         return sb.toString();
     }
 }
