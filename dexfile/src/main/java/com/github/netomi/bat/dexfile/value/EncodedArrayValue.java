@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.value;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -21,7 +20,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import java.util.Arrays;
 
-public class EncodedArrayValue extends EncodedValue
+public class EncodedArrayValue
+extends      EncodedValue
 {
     public int            size; // uleb128
     public EncodedValue[] values;
@@ -36,7 +36,7 @@ public class EncodedArrayValue extends EncodedValue
         size   = input.readUleb128();
         values = new EncodedValue[size];
         for (int i = 0; i < size; i++) {
-            values[i] = EncodedValueFactory.readValue(input);
+            values[i] = EncodedValue.read(input);
         }
     }
 

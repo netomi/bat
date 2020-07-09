@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -27,7 +26,8 @@ import java.util.List;
     dataAlignment = 4,
     dataSection   = true
 )
-public class MapList extends DataItem
+public class MapList
+implements   DataItem
 {
     //public int size; // uint, use mapItems.size().
     private List<MapItem> mapItems;

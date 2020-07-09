@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.annotation;
 
 import com.github.netomi.bat.dexfile.DexContent;
@@ -22,7 +21,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
-public class MethodAnnotation implements DexContent
+public class MethodAnnotation
+implements   DexContent
 {
     public int           methodIndex;       // uint
     public int           annotationsOffset; // uint

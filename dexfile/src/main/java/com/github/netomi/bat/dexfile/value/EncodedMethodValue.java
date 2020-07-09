@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.value;
 
 import com.github.netomi.bat.dexfile.DexFile;
@@ -21,12 +20,13 @@ import com.github.netomi.bat.dexfile.MethodID;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
-public class EncodedMethodValue extends EncodedValue
+public class EncodedMethodValue
+extends      EncodedValue
 {
-    public int value;
+    public int methodIndex;
 
     public MethodID getMethod(DexFile dexFile) {
-        return dexFile.methodIDs[value];
+        return dexFile.methodIDs[methodIndex];
     }
 
     @Override
@@ -36,16 +36,16 @@ public class EncodedMethodValue extends EncodedValue
 
     @Override
     public void read(DexDataInput input, int valueArg) {
-        value = (int) input.readUnsignedInt(valueArg + 1);
+        methodIndex = input.readUnsignedInt(valueArg + 1);
     }
 
     @Override
     public void write(DexDataOutput output) {
         writeType(output, 3);
-        output.writeInt(value, 4);
+        output.writeInt(methodIndex, 4);
     }
 
     public String toString() {
-        return String.format("EncodedMethodValue[methodIdx=%d]", value);
+        return String.format("EncodedMethodValue[methodIdx=%d]", methodIndex);
     }
 }

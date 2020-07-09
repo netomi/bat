@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -26,7 +25,8 @@ import java.util.List;
 /**
  * @author Thomas Neidhart
  */
-public class EncodedCatchHandler implements DexContent
+public class EncodedCatchHandler
+implements   DexContent
 {
     //public int              size;         // sleb128, use handlers.size()
     public List<TypeAddrPair> handlers;

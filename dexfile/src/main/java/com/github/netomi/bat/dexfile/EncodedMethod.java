@@ -13,14 +13,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor;
 
-public class EncodedMethod implements DexContent
+public class EncodedMethod
+implements   DexContent
 {
     public int methodIndex; // uleb128
     public int accessFlags; // uleb128

@@ -13,14 +13,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.annotation;
 
 import com.github.netomi.bat.dexfile.DexContent;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
-public class AnnotationSetRef implements DexContent
+public class AnnotationSetRef
+implements   DexContent
 {
     public int           annotationsOffset; // uint
     public AnnotationSet annotationSet;

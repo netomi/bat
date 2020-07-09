@@ -13,13 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.value;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
-public class EncodedCharValue extends EncodedValue
+public class EncodedCharValue
+extends      EncodedValue
 {
     public char value;
 

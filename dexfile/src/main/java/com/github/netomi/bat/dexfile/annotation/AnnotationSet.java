@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.annotation;
 
 import com.github.netomi.bat.dexfile.DataItem;
@@ -34,7 +33,8 @@ import java.util.ListIterator;
     dataAlignment = 4,
     dataSection   = true
 )
-public class AnnotationSet extends DataItem
+public class AnnotationSet
+implements   DataItem
 {
     private static final int[] EMPTY_ENTRIES = new int[0];
 

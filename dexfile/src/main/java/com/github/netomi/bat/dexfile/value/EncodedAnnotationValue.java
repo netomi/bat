@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.value;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -25,7 +24,8 @@ import java.util.List;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
-public class EncodedAnnotationValue extends EncodedValue
+public class EncodedAnnotationValue
+extends      EncodedValue
 {
     public int typeIndex; // uleb128
     // public int size;      // uleb128

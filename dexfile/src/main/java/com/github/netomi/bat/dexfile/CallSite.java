@@ -23,7 +23,8 @@ import com.github.netomi.bat.dexfile.value.EncodedStringValue;
 /**
  * @author Thomas Neidhart
  */
-public class CallSite extends EncodedArray
+public class CallSite
+extends      EncodedArray
 {
     public EncodedMethodHandleValue getMethodHandle() {
         return (EncodedMethodHandleValue) encodedArrayValue.values[0];

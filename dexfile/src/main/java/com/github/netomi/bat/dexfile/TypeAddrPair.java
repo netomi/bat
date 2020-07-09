@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -24,7 +23,8 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 /**
  * @author Thomas Neidhart
  */
-public class TypeAddrPair implements DexContent
+public class TypeAddrPair
+implements   DexContent
 {
     public int typeIndex; // uleb128
     public int addr;      // uleb128

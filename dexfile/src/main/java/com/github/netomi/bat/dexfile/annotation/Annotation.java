@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.annotation;
 
 import com.github.netomi.bat.dexfile.DataItem;
@@ -28,7 +27,8 @@ import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
     dataAlignment = 1,
     dataSection   = true
 )
-public class Annotation extends DataItem
+public class Annotation
+implements   DataItem
 {
     public short                  visibility; // ubyte
     public EncodedAnnotationValue annotation;

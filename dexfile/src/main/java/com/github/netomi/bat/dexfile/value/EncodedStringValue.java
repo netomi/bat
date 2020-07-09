@@ -13,19 +13,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.value;
 
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
-public class EncodedStringValue extends EncodedValue
+public class EncodedStringValue
+extends      EncodedValue
 {
-    public int value;
+    public int stringIndex;
 
     public String getString(DexFile dexFile) {
-        return dexFile.getStringID(value).getStringValue();
+        return dexFile.getStringID(stringIndex).getStringValue();
     }
 
     @Override
@@ -35,16 +35,16 @@ public class EncodedStringValue extends EncodedValue
 
     @Override
     public void read(DexDataInput input, int valueArg) {
-        value = input.readUnsignedInt(valueArg + 1);
+        stringIndex = input.readUnsignedInt(valueArg + 1);
     }
 
     @Override
     public void write(DexDataOutput output) {
         writeType(output, 3);
-        output.writeInt(value, 4);
+        output.writeInt(stringIndex, 4);
     }
 
     public String toString() {
-        return String.format("EncodedStringValue[stringIdx=%d]", value);
+        return String.format("EncodedStringValue[stringIdx=%d]", stringIndex);
     }
 }

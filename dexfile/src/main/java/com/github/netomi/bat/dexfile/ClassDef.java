@@ -29,7 +29,8 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
     dataAlignment = 4,
     dataSection   = false
 )
-public class ClassDef extends DataItem
+public class ClassDef
+implements   DataItem
 {
     public int classIndex;         // uint
     public int accessFlags;        // uint

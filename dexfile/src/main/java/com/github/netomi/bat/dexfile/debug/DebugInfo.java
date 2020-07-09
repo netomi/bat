@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.debug;
 
 import com.github.netomi.bat.dexfile.DataItem;
@@ -34,7 +33,8 @@ import java.util.List;
     dataAlignment = 1,
     dataSection   = true
 )
-public class DebugInfo extends DataItem
+public class DebugInfo
+implements   DataItem
 {
     private static final int[] EMPTY_ARRAY = new int[0];
 

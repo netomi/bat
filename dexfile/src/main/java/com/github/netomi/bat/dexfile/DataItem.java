@@ -18,22 +18,32 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
-public abstract class DataItem implements DexContent
+/**
+ * Represents a data item contained in a dex file.
+ *
+ * @author Thomas Neidhart
+ */
+public interface DataItem
+extends          DexContent
 {
     /**
      * Returns the type of this {@code DataItem} instance.
      *
      * @return the type of this DataItem.
      */
-    public final int getType() {
+    default int getType() {
         return this.getClass().getAnnotation(DataItemAnn.class).type();
     }
 
-    public final int getDataAlignment() {
+    default int getDataAlignment() {
         return this.getClass().getAnnotation(DataItemAnn.class).dataAlignment();
     }
 
-    public void readLinkedDataItems(DexDataInput input) {}
+    default boolean containedInDataSection() {
+        return this.getClass().getAnnotation(DataItemAnn.class).dataSection();
+    }
 
-    public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
+    default void readLinkedDataItems(DexDataInput input) {}
+
+    default void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
 }

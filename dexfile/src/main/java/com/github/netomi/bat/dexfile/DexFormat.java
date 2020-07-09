@@ -13,18 +13,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import java.util.Arrays;
 
 public enum DexFormat
 {
-    DEX_FORMAT_009(new byte[] { 0x30, 0x30, 0x39, 0x00 }, "009"),
-    DEX_FORMAT_013(new byte[] { 0x30, 0x31, 0x33, 0x00 }, "013"),
-    DEX_FORMAT_035(new byte[] { 0x30, 0x33, 0x35, 0x00 }, "035"),
-    DEX_FORMAT_037(new byte[] { 0x30, 0x33, 0x37, 0x00 }, "037"),
-    DEX_FORMAT_038(new byte[] { 0x30, 0x33, 0x38, 0x00 }, "038");
+    FORMAT_009(new byte[] { 0x30, 0x30, 0x39, 0x00 }, "009"),
+    FORMAT_013(new byte[] { 0x30, 0x31, 0x33, 0x00 }, "013"),
+    FORMAT_035(new byte[] { 0x30, 0x33, 0x35, 0x00 }, "035"),
+    FORMAT_037(new byte[] { 0x30, 0x33, 0x37, 0x00 }, "037"),
+    FORMAT_038(new byte[] { 0x30, 0x33, 0x38, 0x00 }, "038");
 
     private final byte[] pattern;
     private final String version;

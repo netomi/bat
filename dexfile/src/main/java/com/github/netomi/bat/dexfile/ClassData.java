@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -33,7 +32,8 @@ import java.util.ListIterator;
     dataAlignment = 1,
     dataSection   = true
 )
-public class ClassData extends DataItem
+public class ClassData
+implements   DataItem
 {
     public List<EncodedField>  staticFields;
     public List<EncodedField>  instanceFields;

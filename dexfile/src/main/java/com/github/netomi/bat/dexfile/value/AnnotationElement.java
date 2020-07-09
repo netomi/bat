@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.value;
 
 import com.github.netomi.bat.dexfile.DexContent;
@@ -23,7 +22,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
-public class AnnotationElement implements DexContent
+public class AnnotationElement
+implements   DexContent
 {
     public int          nameIndex; // uleb128
     public EncodedValue value;
@@ -40,7 +40,7 @@ public class AnnotationElement implements DexContent
     @Override
     public void read(DexDataInput input) {
         nameIndex = input.readUleb128();
-        value     = EncodedValueFactory.readValue(input);
+        value     = EncodedValue.read(input);
     }
 
     @Override

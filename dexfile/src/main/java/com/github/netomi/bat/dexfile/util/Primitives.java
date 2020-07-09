@@ -15,7 +15,7 @@
  */
 package com.github.netomi.bat.dexfile.util;
 
-public class Primitives
+public final class Primitives
 {
     private Primitives() {}
 

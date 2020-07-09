@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.debug.DebugInfo;
@@ -35,7 +34,8 @@ import java.util.List;
     dataAlignment = 4,
     dataSection   = true
 )
-public class Code extends DataItem
+public class Code
+implements   DataItem
 {
     private static final short[]   EMPTY_INSTRUCTIONS = new short[0];
 

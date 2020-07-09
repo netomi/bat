@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -25,7 +24,8 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
     dataAlignment = 4,
     dataSection   = false
 )
-public class StringID extends DataItem
+public class StringID
+implements   DataItem
 {
     public int        stringDataOffset; // uint
     public StringData stringData;

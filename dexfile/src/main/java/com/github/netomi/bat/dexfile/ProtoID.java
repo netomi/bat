@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
@@ -27,7 +26,8 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
     dataAlignment = 4,
     dataSection   = false
 )
-public class ProtoID extends DataItem
+public class ProtoID
+implements   DataItem
 {
     public int shortyIndex;      // uint
     public int returnTypeIndex;  // uint

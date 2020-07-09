@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -21,7 +20,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
-public class EncodedField implements DexContent
+public class EncodedField
+implements   DexContent
 {
     public int fieldIndex;  // uleb128
     public int accessFlags; // uleb128

@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.annotation;
 
 import com.github.netomi.bat.dexfile.DataItem;
@@ -33,7 +32,8 @@ import java.util.List;
     dataAlignment = 4,
     dataSection   = true
 )
-public class AnnotationSetRefList extends DataItem
+public class AnnotationSetRefList
+implements   DataItem
 {
     //public int                  size; // uint, use annotationSetRefs.size()
     public List<AnnotationSetRef> annotationSetRefs;

@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -25,7 +24,8 @@ import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
     dataAlignment = 1,
     dataSection   = true
 )
-public class EncodedArray extends DataItem
+public class EncodedArray
+implements   DataItem
 {
     private static final EncodedArrayValue EMPTY_ARRAY = new EncodedArrayValue();
 

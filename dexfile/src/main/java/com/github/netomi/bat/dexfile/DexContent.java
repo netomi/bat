@@ -13,18 +13,30 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 /**
+ * The common base interface for any structure contained
+ * in a dex file.
+ *
  * @author Thomas Neidhart
  */
 public interface DexContent
 {
+    /**
+     * De-serializes this structure from the given input stream.
+     *
+     * @param input the input stream to read from.
+     */
     void read(DexDataInput input);
 
+    /**
+     * Serializes this structure to the given output stream.
+     *
+     * @param output the output stream to write to.
+     */
     void write(DexDataOutput output);
 }

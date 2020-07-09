@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -22,7 +21,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 /**
  * @author Thomas Neidhart
  */
-public class Try implements DexContent
+public class Try
+implements   DexContent
 {
     public int startAddr;     // uint
     public int insnCount;     // ushort

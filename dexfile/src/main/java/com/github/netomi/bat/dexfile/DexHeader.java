@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -30,7 +29,8 @@ import java.util.Arrays;
         dataAlignment = 4,
         dataSection   = false
 )
-public class DexHeader extends DataItem
+public class DexHeader
+implements   DataItem
 {
     private static final byte[] EMPTY_ARRAY = new byte[0];
 

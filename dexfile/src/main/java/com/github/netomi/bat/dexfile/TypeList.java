@@ -26,7 +26,8 @@ import java.util.Arrays;
     dataAlignment = 4,
     dataSection   = false
 )
-public class TypeList extends DataItem
+public class TypeList
+implements   DataItem
 {
     private static final int[]    EMPTY_ARRAY = new int[0];
     public  static final TypeList EMPTY       = new TypeList();

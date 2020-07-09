@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -27,7 +26,8 @@ import java.nio.charset.StandardCharsets;
     dataAlignment = 1,
     dataSection   = true
 )
-public class StringData extends DataItem
+public class StringData
+implements   DataItem
 {
     private static final byte[] EMPTY_ARRAY = new byte[0];
 
