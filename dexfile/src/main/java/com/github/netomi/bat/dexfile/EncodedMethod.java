@@ -18,15 +18,16 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor;
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 public class EncodedMethod
 implements   DexContent
 {
-    public int methodIndex; // uleb128
-    public int accessFlags; // uleb128
-    public int codeOffset;  // uleb128
+    public  int methodIndex; // uleb128
+    public  int accessFlags; // uleb128
+    private int codeOffset;  // uleb128
 
-    public Code code;
+    public  Code code;
 
     public EncodedMethod() {
         methodIndex = DexConstants.NO_INDEX;
@@ -37,6 +38,10 @@ implements   DexContent
 
     public EncodedMethod(int methodIndex) {
         this.methodIndex = methodIndex;
+    }
+
+    public int getCodeOffset() {
+        return codeOffset;
     }
 
     public MethodID getMethodIDItem(DexFile dexFile) {
@@ -62,6 +67,22 @@ implements   DexContent
     }
 
     @Override
+    public void readLinkedDataItems(DexDataInput input) {
+        if (codeOffset != 0) {
+            input.setOffset(codeOffset);
+
+            code = new Code();
+            code.read(input);
+            code.readLinkedDataItems(input);
+        }
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        codeOffset = dataItemMap.getOffset(code);
+    }
+
+    @Override
     public void write(DexDataOutput output) {
         int methodIndexDiff = methodIndex - output.getLastMemberIndex();
         output.writeUleb128(methodIndexDiff);
@@ -72,5 +93,13 @@ implements   DexContent
 
     public void codeAccept(DexFile dexFile, ClassDef classDef, ClassData classData, CodeVisitor visitor) {
         visitor.visitCode(dexFile, classDef, classData, this, code);
+    }
+
+    @Override
+    public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
+        if (code != null) {
+            visitor.visitCode(dexFile, this, code);
+            code.dataItemsAccept(dexFile, visitor);
+        }
     }
 }

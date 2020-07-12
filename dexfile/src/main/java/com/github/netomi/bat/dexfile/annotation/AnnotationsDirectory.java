@@ -35,7 +35,7 @@ import java.util.List;
 public class AnnotationsDirectory
 implements   DataItem
 {
-    public int classAnnotationsOffset;  // uint
+    private int classAnnotationsOffset;  // uint
     //public int fieldsSize;              // uint
     //public int annotatedMethodsSize;    // uint
     //public int annotatedParametersSize; // uint
@@ -50,6 +50,10 @@ implements   DataItem
         fieldAnnotations     = Collections.emptyList();
         methodAnnotations    = Collections.emptyList();
         parameterAnnotations = Collections.emptyList();
+    }
+
+    public int getClassAnnotationsOffset() {
+        return classAnnotationsOffset;
     }
 
     @Override
@@ -108,6 +112,11 @@ implements   DataItem
             parameterAnnotation.annotationSetRefList = new AnnotationSetRefList();
             parameterAnnotation.annotationSetRefList.read(input);
         }
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        classAnnotationsOffset = dataItemMap.getOffset(classAnnotations);
     }
 
     @Override

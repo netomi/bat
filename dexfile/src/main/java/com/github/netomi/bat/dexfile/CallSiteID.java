@@ -30,12 +30,16 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 public class CallSiteID
 implements   DataItem
 {
-    public int      callSiteOffset; // uint
-    public CallSite callSite;
+    private int      callSiteOffset; // uint
+    public  CallSite callSite;
 
     public CallSiteID() {
         callSiteOffset = 0;
         callSite       = null;
+    }
+
+    public int getCallSiteOffset() {
+        return callSiteOffset;
     }
 
     @Override
@@ -49,6 +53,11 @@ implements   DataItem
         input.setOffset(callSiteOffset);
         callSite = new CallSite();
         callSite.read(input);
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        callSiteOffset = dataItemMap.getOffset(callSite);
     }
 
     @Override

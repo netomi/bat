@@ -59,11 +59,14 @@ implements   DataItem
     @Override
     public void readLinkedDataItems(DexDataInput input) {
         for (AnnotationSetRef annotationSetRef : annotationSetRefs) {
-            if (annotationSetRef.annotationsOffset != 0) {
-                input.setOffset(annotationSetRef.annotationsOffset);
-                annotationSetRef.annotationSet = new AnnotationSet();
-                annotationSetRef.annotationSet.read(input);
-            }
+            annotationSetRef.readLinkedDataItems(input);
+        }
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        for (AnnotationSetRef annotationSetRef : annotationSetRefs) {
+            annotationSetRef.updateOffsets(dataItemMap);
         }
     }
 

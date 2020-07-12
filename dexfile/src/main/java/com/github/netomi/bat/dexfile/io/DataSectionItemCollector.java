@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
@@ -24,12 +23,12 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 /**
  * @author Thomas Neidhart
  */
-public class DataSectionItemCollector
-implements   DataItemVisitor
+class      DataSectionItemCollector
+implements DataItemVisitor
 {
-    private DexFileWriter.DataItemMap dataItemMap;
+    private DataItemMapImpl dataItemMap;
 
-    public DataSectionItemCollector(DexFileWriter.DataItemMap dataItemMap) {
+    public DataSectionItemCollector(DataItemMapImpl dataItemMap) {
         this.dataItemMap = dataItemMap;
     }
 

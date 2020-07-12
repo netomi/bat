@@ -39,14 +39,14 @@ implements   DataItem
 {
     private static final short[]   EMPTY_INSTRUCTIONS = new short[0];
 
-    public int     registersSize;   // ushort
-    public int     insSize;         // ushort
-    public int     outsSize;        // ushort
-    //public int     triesSize;       // ushort
-    public int     debugInfoOffset; // uint
-    public int     insnsSize;       // uint
-    public short[] insns;           // ushort[]
-    public int     padding;         // ushort (optional)
+    public  int     registersSize;   // ushort
+    public  int     insSize;         // ushort
+    public  int     outsSize;        // ushort
+    //public  int     triesSize;       // ushort
+    private int     debugInfoOffset; // uint
+    public  int     insnsSize;       // uint
+    public  short[] insns;           // ushort[]
+    public  int     padding;         // ushort (optional)
 
     public List<Try>                 tries;
     //public int                       catchHandlerSize;  // uleb128
@@ -64,6 +64,10 @@ implements   DataItem
         tries            = Collections.emptyList();
         catchHandlerList = Collections.emptyList();
         debugInfo        = null;
+    }
+
+    public int getDebugInfoOffset() {
+        return debugInfoOffset;
     }
 
     @Override
@@ -111,6 +115,11 @@ implements   DataItem
             debugInfo = new DebugInfo();
             debugInfo.read(input);
         }
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        debugInfoOffset = dataItemMap.getOffset(debugInfo);
     }
 
     @Override

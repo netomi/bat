@@ -29,8 +29,7 @@ import java.util.Arrays;
 public class TypeList
 implements   DataItem
 {
-    private static final int[]    EMPTY_ARRAY = new int[0];
-    public  static final TypeList EMPTY       = new TypeList();
+    private static final int[] EMPTY_ARRAY = new int[0];
 
     public int   size; // uint
     public int[] typeList;

@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 /**
  * The common base interface for any structure contained
@@ -39,4 +40,10 @@ public interface DexContent
      * @param output the output stream to write to.
      */
     void write(DexDataOutput output);
+
+    default void readLinkedDataItems(DexDataInput input) {}
+
+    default void updateOffsets(DataItem.Map dataItemMap) {}
+
+    default void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
 }

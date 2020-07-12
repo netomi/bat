@@ -27,12 +27,16 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 public class StringID
 implements   DataItem
 {
-    public int        stringDataOffset; // uint
-    public StringData stringData;
+    private int        stringDataOffset; // uint
+    public  StringData stringData;
 
     public StringID() {
         stringDataOffset = 0;
         stringData       = null;
+    }
+
+    public int getStringDataOffset() {
+        return stringDataOffset;
     }
 
     public String getStringValue() {
@@ -50,6 +54,11 @@ implements   DataItem
         input.setOffset(stringDataOffset);
         stringData = new StringData();
         stringData.read(input);
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        stringDataOffset = dataItemMap.getOffset(stringData);
     }
 
     @Override

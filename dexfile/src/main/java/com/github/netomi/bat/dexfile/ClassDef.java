@@ -32,14 +32,14 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 public class ClassDef
 implements   DataItem
 {
-    public int classIndex;         // uint
-    public int accessFlags;        // uint
-    public int superClassIndex;    // uint
-    public int interfacesOffset;   // uint
-    public int sourceFileIndex;    // uint
-    public int annotationsOffset;  // uint
-    public int classDataOffset;    // uint
-    public int staticValuesOffset; // uint
+    public  int classIndex;         // uint
+    public  int accessFlags;        // uint
+    public  int superClassIndex;    // uint
+    private int interfacesOffset;   // uint
+    public  int sourceFileIndex;    // uint
+    private int annotationsOffset;  // uint
+    private int classDataOffset;    // uint
+    private int staticValuesOffset; // uint
 
     public TypeList             interfaces;
     public AnnotationsDirectory annotationsDirectory;
@@ -56,10 +56,26 @@ implements   DataItem
         classDataOffset    = 0;
         staticValuesOffset = 0;
 
-        interfaces           = TypeList.EMPTY;
+        interfaces           = null;
         annotationsDirectory = null;
         classData            = null;
         staticValues         = null;
+    }
+
+    public int getInterfacesOffset() {
+        return interfacesOffset;
+    }
+
+    public int getAnnotationsOffset() {
+        return annotationsOffset;
+    }
+
+    public int getClassDataOffset() {
+        return classDataOffset;
+    }
+
+    public int getStaticValuesOffset() {
+        return staticValuesOffset;
     }
 
     public String getClassName(DexFile dexFile) {
@@ -122,6 +138,14 @@ implements   DataItem
             staticValues = new EncodedArray();
             staticValues.read(input);
         }
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        interfacesOffset   = dataItemMap.getOffset(interfaces);
+        annotationsOffset  = dataItemMap.getOffset(annotationsDirectory);
+        classDataOffset    = dataItemMap.getOffset(classData);
+        staticValuesOffset = dataItemMap.getOffset(staticValues);
     }
 
     @Override

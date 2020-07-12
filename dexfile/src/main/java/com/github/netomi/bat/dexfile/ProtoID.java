@@ -29,17 +29,21 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 public class ProtoID
 implements   DataItem
 {
-    public int shortyIndex;      // uint
-    public int returnTypeIndex;  // uint
-    public int parametersOffset; // uint
+    public  int shortyIndex;      // uint
+    public  int returnTypeIndex;  // uint
+    private int parametersOffset; // uint
 
-    public TypeList parameters;
+    public  TypeList parameters;
 
     public ProtoID() {
         shortyIndex      = NO_INDEX;
         returnTypeIndex  = NO_INDEX;
         parametersOffset = 0;
-        parameters       = TypeList.EMPTY;
+        parameters       = null;
+    }
+
+    public int getParametersOffset() {
+        return parametersOffset;
     }
 
     public String getShorty(DexFile dexFile) {
@@ -65,6 +69,11 @@ implements   DataItem
             parameters = new TypeList();
             parameters.read(input);
         }
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        parametersOffset = dataItemMap.getOffset(parameters);
     }
 
     @Override

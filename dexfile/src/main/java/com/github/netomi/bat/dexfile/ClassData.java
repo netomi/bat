@@ -96,23 +96,22 @@ implements   DataItem
     @Override
     public void readLinkedDataItems(DexDataInput input) {
         for (EncodedMethod method : directMethods) {
-            if (method.codeOffset != 0) {
-                input.setOffset(method.codeOffset);
-
-                method.code = new Code();
-                method.code.read(input);
-                method.code.readLinkedDataItems(input);
-            }
+            method.readLinkedDataItems(input);
         }
 
         for (EncodedMethod method : virtualMethods) {
-            if (method.codeOffset != 0) {
-                input.setOffset(method.codeOffset);
+            method.readLinkedDataItems(input);
+        }
+    }
 
-                method.code = new Code();
-                method.code.read(input);
-                method.code.readLinkedDataItems(input);
-            }
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        for (EncodedMethod method : directMethods) {
+            method.updateOffsets(dataItemMap);
+        }
+
+        for (EncodedMethod method : virtualMethods) {
+            method.updateOffsets(dataItemMap);
         }
     }
 
@@ -194,17 +193,11 @@ implements   DataItem
     @Override
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         for (EncodedMethod method : directMethods) {
-            if (method.code != null) {
-                visitor.visitCode(dexFile, method, method.code);
-                method.code.dataItemsAccept(dexFile, visitor);
-            }
+            method.dataItemsAccept(dexFile, visitor);
         }
 
         for (EncodedMethod method : virtualMethods) {
-            if (method.code != null) {
-                visitor.visitCode(dexFile, method, method.code);
-                method.code.dataItemsAccept(dexFile, visitor);
-            }
+            method.dataItemsAccept(dexFile, visitor);
         }
     }
 }

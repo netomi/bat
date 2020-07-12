@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
+import com.github.netomi.bat.dexfile.DataItem;
 import com.github.netomi.bat.dexfile.DexContent;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
@@ -22,17 +23,35 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 public class AnnotationSetRef
 implements   DexContent
 {
-    public int           annotationsOffset; // uint
-    public AnnotationSet annotationSet;
+    private int           annotationsOffset; // uint
+    public  AnnotationSet annotationSet;
 
     public AnnotationSetRef() {
         annotationsOffset = 0;
         annotationSet     = null;
     }
 
+    public int getAnnotationsOffset() {
+        return annotationsOffset;
+    }
+
     @Override
     public void read(DexDataInput input) {
         annotationsOffset = input.readInt();
+    }
+
+    @Override
+    public void readLinkedDataItems(DexDataInput input) {
+        if (annotationsOffset != 0) {
+            input.setOffset(annotationsOffset);
+            annotationSet = new AnnotationSet();
+            annotationSet.read(input);
+        }
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        annotationsOffset = dataItemMap.getOffset(annotationSet);
     }
 
     @Override

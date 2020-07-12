@@ -82,10 +82,10 @@ implements DexFileVisitor,
         ps.println("class_idx           : " + classDefItem.classIndex);
         ps.println("access_flags        : " + formatNumber(classDefItem.accessFlags));
         ps.println("superclass_idx      : " + classDefItem.superClassIndex);
-        ps.println("interfaces_off      : " + formatNumber(classDefItem.interfacesOffset));
+        ps.println("interfaces_off      : " + formatNumber(classDefItem.getInterfacesOffset()));
         ps.println("source_file_idx     : " + classDefItem.sourceFileIndex);
-        ps.println("annotations_off     : " + formatNumber(classDefItem.annotationsOffset));
-        ps.println("class_data_off      : " + formatNumber(classDefItem.classDataOffset));
+        ps.println("annotations_off     : " + formatNumber(classDefItem.getAnnotationsOffset()));
+        ps.println("class_data_off      : " + formatNumber(classDefItem.getClassDataOffset()));
         ps.println("static_fields_size  : " + classDefItem.classData.staticFields.size());
         ps.println("instance_fields_size: " + classDefItem.classData.instanceFields.size());
         ps.println("direct_methods_size : " + classDefItem.classData.directMethods.size());
@@ -135,7 +135,9 @@ implements DexFileVisitor,
 
     @Override
     public void visitInterfaces(DexFile dexFile, ClassDef classDefItem, TypeList typeList) {
-        typeList.typesAccept(dexFile, this);
+        if (typeList != null) {
+            typeList.typesAccept(dexFile, this);
+        }
     }
 
     @Override

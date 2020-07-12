@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
@@ -21,17 +20,16 @@ import com.github.netomi.bat.dexfile.visitor.DexFileVisitor;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
 
 public class DexFileWriter
 implements DexFileVisitor
 {
-    private final OutputStream outputStream;
-    private final DataItemMap  dataItemMap;
+    private final OutputStream    outputStream;
+    private final DataItemMapImpl dataItemMap;
 
     public DexFileWriter(OutputStream out) {
         this.outputStream = out;
-        this.dataItemMap  = new DataItemMap();
+        this.dataItemMap  = new DataItemMapImpl();
     }
 
     @Override
@@ -201,65 +199,5 @@ implements DexFileVisitor
         dexFile.header.linkSize   = dexFile.linkData.length;
         dexFile.header.linkOffset = output.getOffset();
         output.writeBytes(dexFile.linkData);
-    }
-
-    // Helper classes.
-
-    static class DataItemMap
-    {
-        private final Map<Integer, Set<DataItem>> dataItemMap = new HashMap<>();
-        private final Map<DataItem, Integer>      offsetMap   = new HashMap<>();
-
-        void collectDataItems(DexFile dexFile) {
-            dexFile.dataItemsAccept(new DataSectionItemCollector(this));
-        }
-
-        void writeDataItems(DexFile dexFile, DexDataOutput output) {
-            // write in the same order as dx does it.
-            writeDataItems(dexFile, output, DexConstants.TYPE_ANNOTATION_SET_ITEM);
-            writeDataItems(dexFile, output, DexConstants.TYPE_CODE_ITEM);
-            writeDataItems(dexFile, output, DexConstants.TYPE_ANNOTATIONS_DIRECTORY_ITEM);
-            writeDataItems(dexFile, output, DexConstants.TYPE_TYPE_LIST);
-            writeDataItems(dexFile, output, DexConstants.TYPE_STRING_DATA_ITEM);
-            writeDataItems(dexFile, output, DexConstants.TYPE_DEBUG_INFO_ITEM);
-            writeDataItems(dexFile, output, DexConstants.TYPE_ANNOTATION_ITEM);
-            writeDataItems(dexFile, output, DexConstants.TYPE_ENCODED_ARRAY_ITEM);
-            writeDataItems(dexFile, output, DexConstants.TYPE_CLASS_DATA_ITEM);
-        }
-
-        void updateOffsets(DexFile dexFile) {
-            dexFile.dataItemsAccept(new DataItemOffsetUpdater(this));
-        }
-
-        void addDataItem(DataItem dataItem) {
-            Set<DataItem> dataItemSet = getDataItems(dataItem.getType());
-            dataItemSet.add(dataItem);
-        }
-
-        Set<DataItem> getDataItems(int type) {
-            Set<DataItem> dataItemSet = dataItemMap.getOrDefault(type, new LinkedHashSet<>());
-            dataItemMap.putIfAbsent(type, dataItemSet);
-            return dataItemSet;
-        }
-
-        void writeDataItems(DexFile dexFile, DexDataOutput output, int type) {
-            Set<DataItem> dataItemSet = dataItemMap.get(type);
-            if (dataItemSet != null && dataItemSet.size() > 0) {
-                int align = dataItemSet.iterator().next().getDataAlignment();
-                output.writeAlignmentPadding(align);
-                dexFile.mapList.updateMapItem(type, dataItemSet.size(), output.getOffset());
-                for (DataItem dataItem : dataItemSet) {
-                    int dataItemOffset = output.getOffset();
-                    dataItem.write(output);
-
-                    offsetMap.put(dataItem, dataItemOffset);
-                }
-            }
-        }
-
-        int getOffset(DataItem dataItem) {
-            Integer offset = offsetMap.get(dataItem);
-            return offset != null ? offset.intValue() : 0;
-        }
     }
 }

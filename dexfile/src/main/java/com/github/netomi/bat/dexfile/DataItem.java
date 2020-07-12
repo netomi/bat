@@ -15,9 +15,6 @@
  */
 package com.github.netomi.bat.dexfile;
 
-import com.github.netomi.bat.dexfile.io.DexDataInput;
-import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
-
 /**
  * Represents a data item contained in a dex file.
  *
@@ -43,7 +40,7 @@ extends          DexContent
         return this.getClass().getAnnotation(DataItemAnn.class).dataSection();
     }
 
-    default void readLinkedDataItems(DexDataInput input) {}
-
-    default void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
+    interface Map {
+        int getOffset(DataItem item);
+    }
 }
