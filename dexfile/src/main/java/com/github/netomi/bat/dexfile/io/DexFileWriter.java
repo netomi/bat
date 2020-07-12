@@ -46,7 +46,6 @@ implements DexFileVisitor
         int size = output.getOffset();
         System.out.println(dexFile);
 
-
         ByteBufferBackedDexDataOutput realOutput = new ByteBufferBackedDexDataOutput(size);
         writeDexFile(dexFile, realOutput);
 

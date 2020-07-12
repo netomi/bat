@@ -96,27 +96,33 @@ implements   DataItem
         }
 
         for (FieldAnnotation fieldAnnotation : fieldAnnotations) {
-            input.setOffset(fieldAnnotation.annotationsOffset);
-            fieldAnnotation.annotationSet = new AnnotationSet();
-            fieldAnnotation.annotationSet.read(input);
+            fieldAnnotation.readLinkedDataItems(input);
         }
 
         for (MethodAnnotation methodAnnotation : methodAnnotations) {
-            input.setOffset(methodAnnotation.annotationsOffset);
-            methodAnnotation.annotationSet = new AnnotationSet();
-            methodAnnotation.annotationSet.read(input);
+            methodAnnotation.readLinkedDataItems(input);
         }
 
         for (ParameterAnnotation parameterAnnotation : parameterAnnotations) {
-            input.setOffset(parameterAnnotation.annotationsOffset);
-            parameterAnnotation.annotationSetRefList = new AnnotationSetRefList();
-            parameterAnnotation.annotationSetRefList.read(input);
+            parameterAnnotation.readLinkedDataItems(input);
         }
     }
 
     @Override
     public void updateOffsets(DataItem.Map dataItemMap) {
         classAnnotationsOffset = dataItemMap.getOffset(classAnnotations);
+
+        for (FieldAnnotation fieldAnnotation : fieldAnnotations) {
+            fieldAnnotation.updateOffsets(dataItemMap);
+        }
+
+        for (MethodAnnotation methodAnnotation : methodAnnotations) {
+            methodAnnotation.updateOffsets(dataItemMap);
+        }
+
+        for (ParameterAnnotation parameterAnnotation : parameterAnnotations) {
+            parameterAnnotation.updateOffsets(dataItemMap);
+        }
     }
 
     @Override
@@ -149,15 +155,15 @@ implements   DataItem
         }
 
         for (FieldAnnotation fieldAnnotation : fieldAnnotations) {
-            visitor.visitFieldAnnotations(dexFile, fieldAnnotation, fieldAnnotation.annotationSet);
+            fieldAnnotation.dataItemsAccept(dexFile, visitor);
         }
 
         for (MethodAnnotation methodAnnotation : methodAnnotations) {
-            visitor.visitMethodAnnotations(dexFile, methodAnnotation, methodAnnotation.annotationSet);
+            methodAnnotation.dataItemsAccept(dexFile, visitor);
         }
 
         for (ParameterAnnotation parameterAnnotation : parameterAnnotations) {
-            visitor.visitParameterAnnotations(dexFile, parameterAnnotation, parameterAnnotation.annotationSetRefList);
+            parameterAnnotation.dataItemsAccept(dexFile, visitor);
         }
     }
 }

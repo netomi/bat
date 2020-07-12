@@ -15,17 +15,20 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
+import com.github.netomi.bat.dexfile.DataItem;
 import com.github.netomi.bat.dexfile.DexContent;
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class ParameterAnnotation
 implements   DexContent
 {
-    public int methodIndex;       // uint
-    public int annotationsOffset; // uint
+    public  int methodIndex;       // uint
+    private int annotationsOffset; // uint
 
     public AnnotationSetRefList annotationSetRefList;
 
@@ -35,6 +38,10 @@ implements   DexContent
         annotationSetRefList = null;
     }
 
+    public int getAnnotationsOffset() {
+        return annotationsOffset;
+    }
+
     @Override
     public void read(DexDataInput input) {
         methodIndex       = input.readInt();
@@ -42,8 +49,25 @@ implements   DexContent
     }
 
     @Override
+    public void readLinkedDataItems(DexDataInput input) {
+        input.setOffset(annotationsOffset);
+        annotationSetRefList = new AnnotationSetRefList();
+        annotationSetRefList.read(input);
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        annotationsOffset = dataItemMap.getOffset(annotationSetRefList);
+    }
+
+    @Override
     public void write(DexDataOutput output) {
         output.writeInt(methodIndex);
         output.writeInt(annotationsOffset);
+    }
+
+    @Override
+    public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
+        visitor.visitParameterAnnotations(dexFile, this, annotationSetRefList);
     }
 }

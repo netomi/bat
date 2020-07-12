@@ -15,23 +15,30 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
+import com.github.netomi.bat.dexfile.DataItem;
 import com.github.netomi.bat.dexfile.DexContent;
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class FieldAnnotation
 implements   DexContent
 {
-    public int           fieldIndex;        // uint
-    public int           annotationsOffset; // uint
-    public AnnotationSet annotationSet;
+    public  int           fieldIndex;        // uint
+    private int           annotationsOffset; // uint
+    public  AnnotationSet annotationSet;
 
     public FieldAnnotation() {
         fieldIndex        = NO_INDEX;
         annotationsOffset = 0;
         annotationSet     = null;
+    }
+
+    public int getAnnotationsOffset() {
+        return annotationsOffset;
     }
 
     @Override
@@ -41,8 +48,25 @@ implements   DexContent
     }
 
     @Override
+    public void readLinkedDataItems(DexDataInput input) {
+        input.setOffset(annotationsOffset);
+        annotationSet = new AnnotationSet();
+        annotationSet.read(input);
+    }
+
+    @Override
+    public void updateOffsets(DataItem.Map dataItemMap) {
+        annotationsOffset = dataItemMap.getOffset(annotationSet);
+    }
+
+    @Override
     public void write(DexDataOutput output) {
         output.writeInt(fieldIndex);
         output.writeInt(annotationsOffset);
+    }
+
+    @Override
+    public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
+        visitor.visitFieldAnnotations(dexFile, this, annotationSet);
     }
 }
