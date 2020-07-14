@@ -137,7 +137,7 @@ implements   DexFileVisitor,
     public void visitAnyMethod(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedMethod encodedMethod) {
         ps.println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
         ps.println("      name          : '" + encodedMethod.getName(dexFile) + "'");
-        ps.println("      type          : '" + encodedMethod.getShortyType(dexFile) + "'");
+        ps.println("      type          : '" + encodedMethod.getTypeSignature(dexFile) + "'");
         ps.println("      access        : " + formatAccessFlags(encodedMethod.accessFlags));
         encodedMethod.codeAccept(dexFile, classDef, classData, this);
     }
