@@ -188,7 +188,7 @@ implements   DexFileVisitor,
         sb.append(asHexValue(codeOffset, 4));
         sb.append(": ");
 
-        sb.append(instruction.toString());
+        sb.append(instruction.getMnemonic());
 
         ps.println(sb.toString());
 

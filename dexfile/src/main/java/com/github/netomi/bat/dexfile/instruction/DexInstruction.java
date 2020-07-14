@@ -44,6 +44,10 @@ public class DexInstruction
         throw new IllegalArgumentException("unknown opcode " + Primitives.toHexString(opcode));
     }
 
+    public String getMnemonic() {
+        return opcode.getMnemonic();
+    }
+
     public String toString() {
         return opcode.getMnemonic();
     }
