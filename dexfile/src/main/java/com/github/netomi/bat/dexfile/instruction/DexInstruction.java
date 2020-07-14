@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
+import com.github.netomi.bat.dexfile.util.Primitives;
+
 /**
  * @author Thomas Neidhart
  */
@@ -38,7 +40,8 @@ public class DexInstruction
         if (opCode != null) {
             return new DexInstruction(opCode);
         }
-        return null;
+
+        throw new IllegalArgumentException("unknown opcode " + Primitives.toHexString(opcode));
     }
 
     public String toString() {

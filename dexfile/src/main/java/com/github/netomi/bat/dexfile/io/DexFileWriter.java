@@ -41,10 +41,7 @@ implements DexFileVisitor
         writeDexFile(dexFile, output);
         // TODO: sort maplist based on offset
 
-        System.out.println("Last offset: " + output.getOffset());
-
         int size = output.getOffset();
-        System.out.println(dexFile);
 
         ByteBufferBackedDexDataOutput realOutput = new ByteBufferBackedDexDataOutput(size);
         writeDexFile(dexFile, realOutput);

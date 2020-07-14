@@ -17,9 +17,12 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.util.PrimitiveIterable;
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.BiFunction;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_LIST,
@@ -37,6 +40,12 @@ implements   DataItem
     public TypeList() {
         this.size     = 0;
         this.typeList = EMPTY_ARRAY;
+    }
+
+    public Iterable<String> getTypes(DexFile dexFile) {
+        return PrimitiveIterable.of(dexFile,
+                                    (df, idx) -> df.getStringID(idx).getStringValue(),
+                                    typeList);
     }
 
     @Override

@@ -37,4 +37,11 @@ public final class DexUtil
     public static String externalClassNameFromInternalName(String className) {
         return className.replaceAll("/", ".");
     }
+
+    public static String fullExternalMethodSignature(DexFile dexFile, ClassDef classDef, EncodedMethod method) {
+        return String.format("%s.%s:%s",
+                externalClassNameFromInternalName(classDef.getClassName(dexFile)),
+                method.getName(dexFile),
+                method.getTypeSignature(dexFile));
+    }
 }

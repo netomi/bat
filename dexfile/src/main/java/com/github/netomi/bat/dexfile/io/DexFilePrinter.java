@@ -17,21 +17,24 @@
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
+import com.github.netomi.bat.dexfile.instruction.DexInstruction;
 import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.*;
 
 import java.io.PrintStream;
 
 public class DexFilePrinter
-extends DefaultDexVisitor
-implements DexFileVisitor,
-        DexHeaderVisitor,
-        ClassDefVisitor,
-        ClassDataVisitor,
+extends      DefaultDexVisitor
+implements   DexFileVisitor,
+             DexHeaderVisitor,
+             ClassDefVisitor,
+             ClassDataVisitor,
              EncodedFieldVisitor,
              EncodedMethodVisitor,
              TypeListVisitor,
-             TypeVisitor
+             TypeVisitor,
+             CodeVisitor,
+             InstructionVisitor
 {
     private final PrintStream ps;
 
@@ -129,8 +132,37 @@ implements DexFileVisitor,
     public void visitAnyMethod(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedMethod encodedMethod) {
         ps.println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
         ps.println("      name          : '" + encodedMethod.getName(dexFile) + "'");
-        ps.println("      type          : '" + encodedMethod.getType(dexFile) + "'");
+        ps.println("      type          : '" + encodedMethod.getShortyType(dexFile) + "'");
         ps.println("      access        : " + formatAccessFlags(encodedMethod.accessFlags));
+        encodedMethod.codeAccept(dexFile, classDef, classData, this);
+    }
+
+    @Override
+    public void visitCode(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code) {
+        ps.println("      code          -");
+        ps.println("      registers     : " + code.registersSize);
+        ps.println("      ins           : " + code.insSize);
+        ps.println("      outs          : " + code.outsSize);
+        ps.println("      insns size    : " + code.insnsSize + " 16-bit code units");
+
+        int codeOffset = method.getCodeOffset();
+
+        ps.println(asHexValue(codeOffset) + ":                                        |[" +
+                   asHexValue(codeOffset) + "] " +
+                   DexUtil.fullExternalMethodSignature(dexFile, classDef, method));
+
+        code.instructionsAccept(dexFile, classDef, classData, method, code, this);
+//0003a0:                                        |[0003a0] com.example.HelloWorldActivity.<clinit>:()V
+//0003b0: 0e00                                   |0000: return-void
+//      catches       : (none)
+//      positions     :
+//      locals        :
+
+    }
+
+    @Override
+    public void visitInstruction(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
+        ps.println(instruction.toString());
     }
 
     @Override
@@ -147,17 +179,22 @@ implements DexFileVisitor,
 
     // Private utility methods.
 
-    private String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
+    private static String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
         return classDefItem.sourceFileIndex == DexConstants.NO_INDEX ?
                 classDefItem.sourceFileIndex + " (unknown)" :
                 classDefItem.getSourceFile(dexFile);
     }
 
-    private String formatNumber(long number) {
+    private static String formatNumber(long number) {
         return String.format("%d (0x%04x)", number, number);
     }
 
-    private String formatAccessFlags(int accessFlags) {
+    private static String formatAccessFlags(int accessFlags) {
         return String.format("0x%04x (%s)", accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags));
     }
+
+    private static String asHexValue(int value) {
+        return String.format("%06x", value);
+    }
+
 }

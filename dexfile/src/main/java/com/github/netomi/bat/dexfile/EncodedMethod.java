@@ -48,12 +48,40 @@ implements   DexContent
         return dexFile.getMethodID(methodIndex);
     }
 
+    public ProtoID getProtoIDItem(DexFile dexFile) {
+        return getMethodIDItem(dexFile).getProtoID(dexFile);
+    }
+
     public String getName(DexFile dexFile) {
         return getMethodIDItem(dexFile).getName(dexFile);
     }
 
-    public String getType(DexFile dexFile) {
+    public String getShortyType(DexFile dexFile) {
         return getMethodIDItem(dexFile).getProtoID(dexFile).getShorty(dexFile);
+    }
+
+    public String getTypeSignature(DexFile dexFile) {
+        ProtoID protoID = getProtoIDItem(dexFile);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append('(');
+
+        if (protoID.parameters != null) {
+            boolean deleteFinalSeparator = false;
+
+            for (String type : protoID.parameters.getTypes(dexFile)) {
+                sb.append(type);
+                sb.append(',');
+                deleteFinalSeparator = true;
+            }
+
+            if (deleteFinalSeparator) {
+                sb.deleteCharAt(sb.length() - 1);
+            }
+        }
+        sb.append(')');
+        sb.append(protoID.getReturnType(dexFile));
+        return sb.toString();
     }
 
     @Override
