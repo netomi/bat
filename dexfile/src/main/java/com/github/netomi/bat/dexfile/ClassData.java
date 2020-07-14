@@ -155,14 +155,14 @@ implements   DataItem
     public void staticFieldsAccept(DexFile dexFile, ClassDef classDef, EncodedFieldVisitor visitor) {
         ListIterator<EncodedField> it = staticFields.listIterator();
         while (it.hasNext()) {
-            visitor.visitStaticField(dexFile, classDef, this, it.nextIndex(), it.next());
+            visitor.visitStaticField(dexFile, classDef, it.nextIndex(), it.next());
         }
     }
 
     public void instanceFieldsAccept(DexFile dexFile, ClassDef classDef, EncodedFieldVisitor visitor) {
         ListIterator<EncodedField> it = instanceFields.listIterator();
         while (it.hasNext()) {
-            visitor.visitInstanceField(dexFile, classDef, this, it.nextIndex(), it.next());
+            visitor.visitInstanceField(dexFile, classDef, it.nextIndex(), it.next());
         }
     }
 
@@ -174,14 +174,14 @@ implements   DataItem
     public void directMethodsAccept(DexFile dexFile, ClassDef classDef, EncodedMethodVisitor visitor) {
         ListIterator<EncodedMethod> it = directMethods.listIterator();
         while (it.hasNext()) {
-            visitor.visitDirectMethod(dexFile, classDef, this, it.nextIndex(), it.next());
+            visitor.visitDirectMethod(dexFile, classDef, it.nextIndex(), it.next());
         }
     }
 
     public void virtualMethodsAccept(DexFile dexFile, ClassDef classDef, EncodedMethodVisitor visitor) {
         ListIterator<EncodedMethod> it = virtualMethods.listIterator();
         while (it.hasNext()) {
-            visitor.visitVirtualMethod(dexFile, classDef, this, it.nextIndex(), it.next());
+            visitor.visitVirtualMethod(dexFile, classDef, it.nextIndex(), it.next());
         }
     }
 

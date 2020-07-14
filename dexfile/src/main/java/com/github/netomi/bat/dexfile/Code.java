@@ -167,20 +167,18 @@ implements   DataItem
 
     public void instructionsAccept(DexFile            dexFile,
                                    ClassDef           classDef,
-                                   ClassData          classData,
                                    EncodedMethod      method,
                                    Code               code,
                                    InstructionVisitor visitor) {
         for (int offset = 0; offset < insnsSize;) {
             DexInstruction instruction = DexInstruction.create(insns, offset);
-            visitor.visitInstruction(dexFile, classDef, classData, method, code, offset, instruction);
+            visitor.visitInstruction(dexFile, classDef, method, code, offset, instruction);
             offset += instruction.getLength();
         }
     }
 
     public void triesAccept(DexFile       dexFile,
                             ClassDef      classDef,
-                            ClassData     classData,
                             EncodedMethod method,
                             Code          code,
                             TryVisitor    visitor) {
@@ -190,8 +188,12 @@ implements   DataItem
             int index = it.nextIndex();
             Try currentTry = it.next();
 
-            visitor.visitTry(dexFile, classDef, classData, method, code, index, currentTry);
+            visitor.visitTry(dexFile, classDef, method, code, index, currentTry);
         }
+    }
+
+    public void debugInstructionsAccept() {
+
     }
 
     @Override

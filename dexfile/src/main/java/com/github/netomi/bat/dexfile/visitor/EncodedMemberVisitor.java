@@ -13,9 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
-public interface EncodedMemberVisitor extends EncodedFieldVisitor, EncodedMethodVisitor
-{
-}
+public interface EncodedMemberVisitor extends EncodedFieldVisitor, EncodedMethodVisitor {}

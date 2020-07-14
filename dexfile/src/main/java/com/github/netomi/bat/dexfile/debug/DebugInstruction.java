@@ -15,8 +15,9 @@
  */
 package com.github.netomi.bat.dexfile.debug;
 
-import com.github.netomi.bat.dexfile.DexContent;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
+import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
  * @author Thomas Neidhart
@@ -48,6 +49,10 @@ implements            DexContent
     public byte getOpcode() {
         return opcode;
     }
+
+    public abstract void accept(DexFile              dexFile,
+                                DebugInfo            debugInfo,
+                                DebugSequenceVisitor visitor);
 
     public static DebugInstruction readInstruction(DexDataInput input) {
         byte opCode = input.readByte();

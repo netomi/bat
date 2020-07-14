@@ -24,7 +24,6 @@ import com.github.netomi.bat.dexfile.visitor.*;
 import java.io.PrintStream;
 
 public class DexFilePrinter
-extends      DefaultDexVisitor
 implements   DexFileVisitor,
              DexHeaderVisitor,
              ClassDefVisitor,
@@ -126,7 +125,7 @@ implements   DexFileVisitor,
     }
 
     @Override
-    public void visitAnyField(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedField encodedField) {
+    public void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField encodedField) {
         ps.println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
         ps.println("      name          : '" + encodedField.getName(dexFile) + "'");
         ps.println("      type          : '" + encodedField.getType(dexFile) + "'");
@@ -134,16 +133,16 @@ implements   DexFileVisitor,
     }
 
     @Override
-    public void visitAnyMethod(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedMethod encodedMethod) {
+    public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod encodedMethod) {
         ps.println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
         ps.println("      name          : '" + encodedMethod.getName(dexFile) + "'");
         ps.println("      type          : '" + encodedMethod.getTypeSignature(dexFile) + "'");
         ps.println("      access        : " + formatAccessFlags(encodedMethod.accessFlags));
-        encodedMethod.codeAccept(dexFile, classDef, classData, this);
+        encodedMethod.codeAccept(dexFile, classDef, this);
     }
 
     @Override
-    public void visitCode(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code) {
+    public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
         ps.println("      code          -");
         ps.println("      registers     : " + code.registersSize);
         ps.println("      ins           : " + code.insSize);
@@ -161,15 +160,15 @@ implements   DexFileVisitor,
 
         codeOffset = 0;
 
-        code.instructionsAccept(dexFile, classDef, classData, method, code, this);
+        code.instructionsAccept(dexFile, classDef, method, code, this);
 
         ps.println(String.format("      catches       : %d", code.tries.size()));
 
-        code.triesAccept(dexFile, classDef, classData, method, code, this);
+        code.triesAccept(dexFile, classDef, method, code, this);
     }
 
     @Override
-    public void visitInstruction(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
+    public void visitInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(asHexValue(fileOffset, 6));
@@ -196,7 +195,7 @@ implements   DexFileVisitor,
     }
 
     @Override
-    public void visitTry(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code, int index, Try tryObject) {
+    public void visitTry(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int index, Try tryObject) {
         String startAddr = Primitives.toHexString((short) tryObject.startAddr);
         String endAddr   = Primitives.toHexString((short) (tryObject.startAddr + tryObject.insnCount));
 

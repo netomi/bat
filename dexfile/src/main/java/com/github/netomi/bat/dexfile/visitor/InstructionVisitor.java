@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction;
 /**
  * @author Thomas Neidhart
  */
-public interface InstructionVisitor
-{
-    void visitInstruction(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code, int offset, DexInstruction instruction);
+public interface InstructionVisitor {
+    void visitInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction);
 }

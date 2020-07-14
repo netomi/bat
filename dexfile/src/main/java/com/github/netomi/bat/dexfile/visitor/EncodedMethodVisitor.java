@@ -13,18 +13,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
-import com.github.netomi.bat.dexfile.ClassData;
-import com.github.netomi.bat.dexfile.ClassDef;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.*;
 
-public interface EncodedMethodVisitor
-{
-    void visitDirectMethod(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedMethod encodedMethod);
+public interface EncodedMethodVisitor {
+    default void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+        throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
+    }
 
-    void visitVirtualMethod(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedMethod encodedMethod);
+    default void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+        visitAnyMethod(dexFile, classDef, index, method);
+    }
 
+    default void visitVirtualMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+        visitAnyMethod(dexFile, classDef, index, method);
+    }
 }

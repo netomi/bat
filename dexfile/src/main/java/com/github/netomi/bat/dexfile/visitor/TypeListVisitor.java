@@ -13,14 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.TypeList;
 
-public interface TypeListVisitor
-{
+public interface TypeListVisitor {
     void visitInterfaces(DexFile dexFile, ClassDef classDefItem, TypeList typeList);
 }

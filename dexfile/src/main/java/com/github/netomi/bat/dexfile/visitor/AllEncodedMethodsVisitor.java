@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.ClassData;
@@ -21,8 +20,7 @@ import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 
 public class AllEncodedMethodsVisitor
-implements   ClassDataVisitor
-{
+implements   ClassDataVisitor {
     private final EncodedMethodVisitor visitor;
 
     public AllEncodedMethodsVisitor(EncodedMethodVisitor visitor) {

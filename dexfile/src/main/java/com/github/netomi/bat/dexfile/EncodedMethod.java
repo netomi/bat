@@ -119,8 +119,8 @@ implements   DexContent
         output.writeUleb128(codeOffset);
     }
 
-    public void codeAccept(DexFile dexFile, ClassDef classDef, ClassData classData, CodeVisitor visitor) {
-        visitor.visitCode(dexFile, classDef, classData, this, code);
+    public void codeAccept(DexFile dexFile, ClassDef classDef, CodeVisitor visitor) {
+        visitor.visitCode(dexFile, classDef, this, code);
     }
 
     @Override

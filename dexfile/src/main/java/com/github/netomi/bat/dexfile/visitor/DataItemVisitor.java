@@ -22,8 +22,7 @@ import com.github.netomi.bat.dexfile.debug.DebugInfo;
 /**
  * @author Thomas Neidhart
  */
-public interface DataItemVisitor
-{
+public interface DataItemVisitor {
     default void visitAnyDataItem(DexFile dexFile, DataItem dataItem) {
         throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
     }

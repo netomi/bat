@@ -16,7 +16,6 @@
 
 package com.github.netomi.bat.dexfile.visitor;
 
-import com.github.netomi.bat.dexfile.ClassData;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.EncodedMethod;
@@ -31,12 +30,12 @@ implements   EncodedMethodVisitor
     }
 
     @Override
-    public void visitDirectMethod(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedMethod encodedMethod) {
-        encodedMethod.codeAccept(dexFile, classDef, classData, visitor);
+    public void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod encodedMethod) {
+        encodedMethod.codeAccept(dexFile, classDef, visitor);
     }
 
     @Override
-    public void visitVirtualMethod(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedMethod encodedMethod) {
-        encodedMethod.codeAccept(dexFile, classDef, classData, visitor);
+    public void visitVirtualMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod encodedMethod) {
+        encodedMethod.codeAccept(dexFile, classDef, visitor);
     }
 }

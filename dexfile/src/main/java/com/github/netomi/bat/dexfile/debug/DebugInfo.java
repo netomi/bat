@@ -15,15 +15,15 @@
  */
 package com.github.netomi.bat.dexfile.debug;
 
-import com.github.netomi.bat.dexfile.DataItem;
-import com.github.netomi.bat.dexfile.DataItemAnn;
-import com.github.netomi.bat.dexfile.DexConstants;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * @author Thomas Neidhart
@@ -78,6 +78,13 @@ implements   DataItem
 
         for (DebugInstruction debugInstruction : debugSequence) {
             debugInstruction.write(output);
+        }
+    }
+
+    public void debugSequenceAccept(DexFile              dexFile,
+                                    DebugSequenceVisitor visitor) {
+        for (DebugInstruction debugInstruction : debugSequence) {
+            debugInstruction.accept(dexFile, this, visitor);
         }
     }
 }

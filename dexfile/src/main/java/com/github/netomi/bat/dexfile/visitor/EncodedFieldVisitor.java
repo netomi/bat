@@ -13,18 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
-import com.github.netomi.bat.dexfile.ClassData;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.EncodedField;
 
-public interface EncodedFieldVisitor
-{
-    void visitStaticField(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedField encodedField);
+public interface EncodedFieldVisitor {
+    default void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+        throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
+    }
 
-    void visitInstanceField(DexFile dexFile, ClassDef classDef, ClassData classData, int index, EncodedField encodedField);
+    default void visitStaticField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+        visitAnyField(dexFile, classDef, index, field);
+    }
 
+    default void visitInstanceField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+        visitAnyField(dexFile, classDef, index, field);
+    }
 }

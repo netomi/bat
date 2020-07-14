@@ -13,14 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.*;
 
 public class AllInstructionsVisitor
-implements   CodeVisitor
-{
+implements   CodeVisitor {
     private final InstructionVisitor visitor;
 
     public AllInstructionsVisitor(InstructionVisitor visitor) {
@@ -28,7 +26,7 @@ implements   CodeVisitor
     }
 
     @Override
-    public void visitCode(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code) {
-        code.instructionsAccept(dexFile, classDef, classData, method, code, visitor);
+    public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
+        code.instructionsAccept(dexFile, classDef, method, code, visitor);
     }
 }

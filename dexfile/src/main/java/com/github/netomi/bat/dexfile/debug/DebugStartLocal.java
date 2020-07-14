@@ -15,8 +15,10 @@
  */
 package com.github.netomi.bat.dexfile.debug;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
  * @author Thomas Neidhart
@@ -49,5 +51,10 @@ extends      DebugInstruction
         output.writeUleb128(registerNum);
         output.writeUleb128p1(nameIndex);
         output.writeUleb128p1(typeIndex);
+    }
+
+    @Override
+    public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
+        visitor.visitStartLocal(dexFile, debugInfo, registerNum, nameIndex, typeIndex);
     }
 }

@@ -15,8 +15,10 @@
  */
 package com.github.netomi.bat.dexfile.debug;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
  * @author Thomas Neidhart
@@ -34,5 +36,10 @@ extends      DebugInstruction
     @Override
     public void write(DexDataOutput output) {
         output.writeByte(getOpcode());
+    }
+
+    @Override
+    public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
+        visitor.visitSetPrologueEnd(dexFile, debugInfo);
     }
 }

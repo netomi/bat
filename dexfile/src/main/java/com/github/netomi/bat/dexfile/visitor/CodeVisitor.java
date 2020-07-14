@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.*;
@@ -21,7 +20,6 @@ import com.github.netomi.bat.dexfile.*;
 /**
  * @author Thomas Neidhart
  */
-public interface CodeVisitor
-{
-    void visitCode(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code);
+public interface CodeVisitor {
+    void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code);
 }

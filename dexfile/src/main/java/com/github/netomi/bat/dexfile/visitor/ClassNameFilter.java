@@ -23,8 +23,7 @@ import com.github.netomi.bat.dexfile.util.ClassNameMatcher;
 import com.github.netomi.bat.dexfile.util.StringMatcher;
 
 public class ClassNameFilter
-implements   ClassDefVisitor
-{
+implements   ClassDefVisitor {
     private final StringMatcher matcher;
     private final ClassDefVisitor visitor;
 
