@@ -44,7 +44,7 @@ implements   DataItem
 
     public Iterable<String> getTypes(DexFile dexFile) {
         return PrimitiveIterable.of(dexFile,
-                                    (df, idx) -> df.getStringID(idx).getStringValue(),
+                                    (df, idx) -> df.getTypeID(idx).getType(df),
                                     typeList);
     }
 
