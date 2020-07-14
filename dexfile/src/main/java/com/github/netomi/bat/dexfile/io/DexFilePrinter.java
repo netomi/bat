@@ -34,9 +34,13 @@ implements   DexFileVisitor,
              TypeListVisitor,
              TypeVisitor,
              CodeVisitor,
-             InstructionVisitor
+             InstructionVisitor,
+             TryVisitor
 {
     private final PrintStream ps;
+
+    private int fileOffset;
+    private int codeOffset;
 
     public DexFilePrinter() {
         this(System.out);
@@ -104,6 +108,7 @@ implements   DexFileVisitor,
 
         classDefItem.classDataAccept(dexFile, this);
 
+        ps.println();
         ps.println("  source_file_idx   : " + getSourceFileIndex(dexFile, classDefItem));
         ps.println();
     }
@@ -145,24 +150,67 @@ implements   DexFileVisitor,
         ps.println("      outs          : " + code.outsSize);
         ps.println("      insns size    : " + code.insnsSize + " 16-bit code units");
 
-        int codeOffset = method.getCodeOffset();
+        fileOffset = method.getCodeOffset();
 
-        ps.println(asHexValue(codeOffset) + ":                                        |[" +
-                   asHexValue(codeOffset) + "] " +
+        ps.println(asHexValue(fileOffset, 6) + ":                                        |[" +
+                   asHexValue(fileOffset, 6) + "] " +
                    DexUtil.fullExternalMethodSignature(dexFile, classDef, method));
 
-        code.instructionsAccept(dexFile, classDef, classData, method, code, this);
-//0003a0:                                        |[0003a0] com.example.HelloWorldActivity.<clinit>:()V
-//0003b0: 0e00                                   |0000: return-void
-//      catches       : (none)
-//      positions     :
-//      locals        :
+        fileOffset = align(fileOffset, 4);
+        fileOffset += 16;
 
+        codeOffset = 0;
+
+        code.instructionsAccept(dexFile, classDef, classData, method, code, this);
+
+        ps.println(String.format("      catches       : %d", code.tries.size()));
+
+        code.triesAccept(dexFile, classDef, classData, method, code, this);
     }
 
     @Override
     public void visitInstruction(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
-        ps.println(instruction.toString());
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(asHexValue(fileOffset, 6));
+        sb.append(": ");
+
+        for (int i = 0; i < instruction.getLength(); i++) {
+            sb.append(asHexValue(code.insns[offset++], 4));
+            sb.append(' ');
+        }
+
+        for (int i = sb.length(); i < 47; i++) {
+            sb.append(' ');
+        }
+
+        sb.append('|');
+        sb.append(asHexValue(codeOffset, 4));
+        sb.append(": ");
+
+        sb.append(instruction.toString());
+
+        ps.println(sb.toString());
+
+        codeOffset += instruction.getLength();
+    }
+
+    @Override
+    public void visitTry(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code, int index, Try tryObject) {
+        String startAddr = Primitives.toHexString((short) tryObject.startAddr);
+        String endAddr   = Primitives.toHexString((short) (tryObject.startAddr + tryObject.insnCount));
+
+        ps.println(String.format("        %s - %s", startAddr, endAddr));
+
+        EncodedCatchHandler catchHandler = tryObject.catchHandler;
+
+        for (TypeAddrPair addrPair : catchHandler.handlers) {
+            ps.println(String.format("          %s -> %s", addrPair.getType(dexFile), Primitives.toHexString((short) addrPair.addr)));
+        }
+
+        if (catchHandler.catchAllAddr != -1) {
+            ps.println(String.format("          %s -> %s", "<any>", Primitives.toHexString((short) catchHandler.catchAllAddr)));
+        }
     }
 
     @Override
@@ -180,9 +228,7 @@ implements   DexFileVisitor,
     // Private utility methods.
 
     private static String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
-        return classDefItem.sourceFileIndex == DexConstants.NO_INDEX ?
-                classDefItem.sourceFileIndex + " (unknown)" :
-                classDefItem.getSourceFile(dexFile);
+        return classDefItem.sourceFileIndex + " (" + classDefItem.getSourceFile(dexFile) + ")";
     }
 
     private static String formatNumber(long number) {
@@ -193,8 +239,17 @@ implements   DexFileVisitor,
         return String.format("0x%04x (%s)", accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags));
     }
 
-    private static String asHexValue(int value) {
-        return String.format("%06x", value);
+    private static String asHexValue(int value, int digits) {
+        return String.format("%0" + digits + "x", value);
     }
 
+    private static int align(int offset, int alignment) {
+        if (alignment > 1) {
+            int currentAligment = offset % alignment;
+            int padding = (alignment - currentAligment) % alignment;
+            return offset + padding;
+        } else {
+            return offset;
+        }
+    }
 }

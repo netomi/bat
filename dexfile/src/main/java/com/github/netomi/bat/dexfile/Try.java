@@ -24,15 +24,20 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 public class Try
 implements   DexContent
 {
-    public int startAddr;     // uint
-    public int insnCount;     // ushort
-    // TODO: convert to index
-    public int handlerOffset; // ushort
+    public  int startAddr;     // uint
+    public  int insnCount;     // ushort
+    private int handlerOffset; // ushort
+
+    public EncodedCatchHandler catchHandler;
 
     public Try() {
         startAddr     = 0;
         insnCount     = 0;
         handlerOffset = 0;
+    }
+
+    public int getHandlerOffset() {
+        return handlerOffset;
     }
 
     @Override

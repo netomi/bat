@@ -34,6 +34,10 @@ implements   DexContent
         addr      = 0;
     }
 
+    public String getType(DexFile dexFile) {
+        return dexFile.getTypeID(typeIndex).getType(dexFile);
+    }
+
     @Override
     public void read(DexDataInput input) {
         typeIndex = input.readUleb128();

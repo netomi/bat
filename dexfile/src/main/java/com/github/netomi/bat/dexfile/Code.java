@@ -21,10 +21,9 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
+import com.github.netomi.bat.dexfile.visitor.TryVisitor;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Thomas Neidhart
@@ -46,12 +45,12 @@ implements   DataItem
     private int     debugInfoOffset; // uint
     public  int     insnsSize;       // uint
     public  short[] insns;           // ushort[]
-    public  int     padding;         // ushort (optional)
+    //public  int     padding;         // ushort (optional)
 
     public List<Try>                 tries;
     //public int                       catchHandlerSize;  // uleb128
     public List<EncodedCatchHandler> catchHandlerList;
-    public DebugInfo debugInfo;
+    public DebugInfo                 debugInfo;
 
     public Code() {
         registersSize    = 0;
@@ -60,7 +59,6 @@ implements   DataItem
         debugInfoOffset  = 0;
         insnsSize        = 0;
         insns            = EMPTY_INSTRUCTIONS;
-        padding          = 0;
         tries            = Collections.emptyList();
         catchHandlerList = Collections.emptyList();
         debugInfo        = null;
@@ -87,7 +85,8 @@ implements   DataItem
         }
 
         if (triesSize > 0 && (insnsSize % 2) == 1) {
-            padding = input.readUnsignedShort();
+            // read padding
+            input.readUnsignedShort();
         }
 
         if (triesSize > 0) {
@@ -98,12 +97,24 @@ implements   DataItem
                 tries.add(tryItem);
             }
 
+            int startOffset = input.getOffset();
+
             int catchHandlerSize = input.readUleb128();
             catchHandlerList = new ArrayList<>(catchHandlerSize);
+            HashMap<Integer, EncodedCatchHandler> offsetMap = new HashMap<>();
+
             for (int i = 0; i < catchHandlerSize; i++) {
+                int currentOffset = input.getOffset();
+
                 EncodedCatchHandler encodedCatchHandler = new EncodedCatchHandler();
                 encodedCatchHandler.read(input);
                 catchHandlerList.add(encodedCatchHandler);
+                offsetMap.put(currentOffset - startOffset, encodedCatchHandler);
+            }
+
+            // initialize the associated catch handlers for each try
+            for (Try currentTry : tries) {
+                currentTry.catchHandler = offsetMap.get(currentTry.getHandlerOffset());
             }
         }
     }
@@ -142,6 +153,7 @@ implements   DataItem
         }
 
         if (tries.size() > 0) {
+            // TODO: correctly update handler offset in Try
             for (Try tryItem : tries) {
                 tryItem.write(output);
             }
@@ -153,12 +165,32 @@ implements   DataItem
         }
     }
 
-    public void instructionsAccept(DexFile dexFile, ClassDef classDef, ClassData classData, EncodedMethod method, Code code, InstructionVisitor visitor)
-    {
+    public void instructionsAccept(DexFile            dexFile,
+                                   ClassDef           classDef,
+                                   ClassData          classData,
+                                   EncodedMethod      method,
+                                   Code               code,
+                                   InstructionVisitor visitor) {
         for (int offset = 0; offset < insnsSize;) {
             DexInstruction instruction = DexInstruction.create(insns, offset);
             visitor.visitInstruction(dexFile, classDef, classData, method, code, offset, instruction);
             offset += instruction.getLength();
+        }
+    }
+
+    public void triesAccept(DexFile       dexFile,
+                            ClassDef      classDef,
+                            ClassData     classData,
+                            EncodedMethod method,
+                            Code          code,
+                            TryVisitor    visitor) {
+        ListIterator<Try> it = tries.listIterator();
+
+        while (it.hasNext()) {
+            int index = it.nextIndex();
+            Try currentTry = it.next();
+
+            visitor.visitTry(dexFile, classDef, classData, method, code, index, currentTry);
         }
     }
 

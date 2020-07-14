@@ -46,44 +46,6 @@ public class Test {
     }
 }
 
-//Processing 'classes.dex'...
-//Opened 'classes.dex', DEX version '035'
-//DEX file header:
-//magic               : 'dex\n035\0'
-//checksum            : e6638088
-//signature           : 3433...4c46
-//file_size           : 2432
-//header_size         : 112
-//link_size           : 0
-//link_off            : 0 (0x000000)
-//string_ids_size     : 52
-//string_ids_off      : 112 (0x000070)
-//type_ids_size       : 20
-//type_ids_off        : 320 (0x000140)
-//proto_ids_size       : 15
-//proto_ids_off        : 400 (0x000190)
-//field_ids_size      : 3
-//field_ids_off       : 580 (0x000244)
-//method_ids_size     : 22
-//method_ids_off      : 604 (0x00025c)
-//class_defs_size     : 1
-//class_defs_off      : 780 (0x00030c)
-//data_size           : 1620
-//data_off            : 812 (0x00032c)
-//
-//Class #0 header:
-//class_idx           : 10
-//access_flags        : 1 (0x0001)
-//superclass_idx      : 2
-//interfaces_off      : 0 (0x000000)
-//source_file_idx     : 0
-//annotations_off     : 0 (0x000000)
-//class_data_off      : 2209 (0x0008a1)
-//static_fields_size  : 3
-//instance_fields_size: 0
-//direct_methods_size : 3
-//virtual_methods_size: 1
-//
 //Class #0            -
 //  Class descriptor  : 'Lcom/example/HelloWorldActivity;'
 //  Access flags      : 0x0001 (PUBLIC)
