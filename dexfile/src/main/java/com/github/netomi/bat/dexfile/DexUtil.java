@@ -42,6 +42,6 @@ public final class DexUtil
         return String.format("%s.%s:%s",
                 externalClassNameFromInternalName(classDef.getClassName(dexFile)),
                 method.getName(dexFile),
-                method.getTypeSignature(dexFile));
+                method.getDescriptor(dexFile));
     }
 }

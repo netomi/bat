@@ -60,7 +60,7 @@ implements   DexContent
         return getMethodIDItem(dexFile).getProtoID(dexFile).getShorty(dexFile);
     }
 
-    public String getTypeSignature(DexFile dexFile) {
+    public String getDescriptor(DexFile dexFile) {
         ProtoID protoID = getProtoIDItem(dexFile);
 
         StringBuilder sb = new StringBuilder();
