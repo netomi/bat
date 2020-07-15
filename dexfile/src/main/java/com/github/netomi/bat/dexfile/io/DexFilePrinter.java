@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
@@ -36,8 +35,8 @@ implements   DexFileVisitor,
              CodeVisitor,
              InstructionVisitor,
              TryVisitor,
-             DebugSequenceVisitor
-{
+             DebugSequenceVisitor {
+
     private final PrintStream ps;
 
     private int fileOffset;

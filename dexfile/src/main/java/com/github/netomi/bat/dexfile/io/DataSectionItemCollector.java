@@ -26,7 +26,7 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 class      DataSectionItemCollector
 implements DataItemVisitor
 {
-    private DataItemMapImpl dataItemMap;
+    private final DataItemMapImpl dataItemMap;
 
     public DataSectionItemCollector(DataItemMapImpl dataItemMap) {
         this.dataItemMap = dataItemMap;

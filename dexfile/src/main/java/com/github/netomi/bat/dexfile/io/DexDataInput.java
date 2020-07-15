@@ -27,7 +27,7 @@ import java.util.zip.Checksum;
 public class DexDataInput
 {
     private final ByteBuffer byteBuffer;
-    private int lastMemberIndex;
+    private       int        lastMemberIndex;
 
     public DexDataInput(InputStream inputStream) throws IOException {
         byteBuffer = toByteBuffer(inputStream);
