@@ -94,10 +94,18 @@ implements   DexFileVisitor,
         ps.println("source_file_idx     : " + classDefItem.sourceFileIndex);
         ps.println("annotations_off     : " + formatNumber(classDefItem.getAnnotationsOffset()));
         ps.println("class_data_off      : " + formatNumber(classDefItem.getClassDataOffset()));
-        ps.println("static_fields_size  : " + classDefItem.classData.staticFields.size());
-        ps.println("instance_fields_size: " + classDefItem.classData.instanceFields.size());
-        ps.println("direct_methods_size : " + classDefItem.classData.directMethods.size());
-        ps.println("virtual_methods_size: " + classDefItem.classData.virtualMethods.size());
+
+        if (classDefItem.classData != null) {
+            ps.println("static_fields_size  : " + classDefItem.classData.staticFields.size());
+            ps.println("instance_fields_size: " + classDefItem.classData.instanceFields.size());
+            ps.println("direct_methods_size : " + classDefItem.classData.directMethods.size());
+            ps.println("virtual_methods_size: " + classDefItem.classData.virtualMethods.size());
+        } else {
+            ps.println("static_fields_size  : ");
+            ps.println("instance_fields_size: ");
+            ps.println("direct_methods_size : ");
+            ps.println("virtual_methods_size: ");
+        }
         ps.println();
 
         ps.println("Class #" + index);
@@ -171,7 +179,12 @@ implements   DexFileVisitor,
         if (code.debugInfo != null) {
             ps.println("      positions     :");
             code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(ps, code.debugInfo.lineStart));
+
+            ps.println("      locals        :");
+            code.debugInfo.debugSequenceAccept(dexFile, new LocalVariablePrinter(ps, code.registersSize));
         }
+
+        ps.println();
     }
 
     @Override
@@ -296,6 +309,92 @@ implements   DexFileVisitor,
 
         private void printPosition() {
             ps.println(String.format("        %s line=%d", Primitives.toHexString(codeOffset), lineNumber));
+        }
+    }
+
+    private static class LocalVariablePrinter
+    implements           DebugSequenceVisitor {
+
+        private final PrintStream         ps;
+        private final LocalVariableInfo[] variableInfos;
+
+        private short codeOffset;
+
+        LocalVariablePrinter(PrintStream printStream, int numRegisters) {
+            this.ps            = printStream;
+            this.variableInfos = new LocalVariableInfo[numRegisters];
+        }
+
+        @Override
+        public void visitAnyDebugInstruction(DexFile dexFile, DebugInfo debugInfo, DebugInstruction instruction) {}
+
+        @Override
+        public void visitAdvanceLineAndPC(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLineAndPC instruction) {
+            codeOffset += instruction.addrDiff;
+        }
+
+        @Override
+        public void visitAdvancePC(DexFile dexFile, DebugInfo debugInfo, DebugAdvancePC instruction) {
+            codeOffset += instruction.addrDiff;
+        }
+
+        @Override
+        public void visitStartLocal(DexFile dexFile, DebugInfo debugInfo, DebugStartLocal instruction) {
+            String name = dexFile.getString(instruction.nameIndex);
+            String type = dexFile.getType(instruction.typeIndex);
+
+            LocalVariableInfo variableInfo = new LocalVariableInfo(name, type, null);
+            variableInfo.startAddr = codeOffset;
+
+            variableInfos[instruction.registerNum] = variableInfo;
+        }
+
+        @Override
+        public void visitStartLocalExtended(DexFile dexFile, DebugInfo debugInfo, DebugStartLocalExtended instruction) {
+            String name = dexFile.getString(instruction.nameIndex);
+            String type = dexFile.getType(instruction.typeIndex);
+            String sig  = dexFile.getString(instruction.sigIndex);
+
+            LocalVariableInfo variableInfo = new LocalVariableInfo(name, type, sig);
+            variableInfo.startAddr = codeOffset;
+
+            variableInfos[instruction.registerNum] = variableInfo;
+        }
+
+        @Override
+        public void visitEndLocal(DexFile dexFile, DebugInfo debugInfo, DebugEndLocal instruction) {
+            LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
+            variableInfo.endAddr = codeOffset;
+
+            printLocal(instruction.registerNum, variableInfo);
+        }
+
+        @Override
+        public void visitRestartLocal(DexFile dexFile, DebugInfo debugInfo, DebugRestartLocal instruction) {
+        }
+
+        private void printLocal(int registerNum, LocalVariableInfo variableInfo) {
+            ps.println(String.format("        %s - %s reg=%d %s %s",
+                    Primitives.toHexString((short) variableInfo.startAddr),
+                    Primitives.toHexString((short) variableInfo.endAddr),
+                    registerNum,
+                    variableInfo.name,
+                    variableInfo.type));
+        }
+    }
+
+    private static class LocalVariableInfo {
+        private final String name;
+        private final String type;
+        private final String signature;
+
+        private int startAddr;
+        private int endAddr;
+
+        LocalVariableInfo(String name, String type, String signature) {
+            this.name      = name;
+            this.type      = type;
+            this.signature = signature;
         }
     }
 }

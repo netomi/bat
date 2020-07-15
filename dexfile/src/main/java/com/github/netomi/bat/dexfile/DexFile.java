@@ -44,8 +44,20 @@ public class DexFile
         return stringIDs[index];
     }
 
+    public String getString(int index) {
+        return index == DexConstants.NO_INDEX ?
+            null :
+            getStringID(index).getStringValue();
+    }
+
     public TypeID getTypeID(int index) {
         return typeIDs[index];
+    }
+
+    public String getType(int index) {
+        return index == DexConstants.NO_INDEX ?
+            null :
+            getTypeID(index).getType(this);
     }
 
     public ProtoID getProtoID(int index) {

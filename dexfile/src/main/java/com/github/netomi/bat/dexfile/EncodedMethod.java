@@ -120,7 +120,9 @@ implements   DexContent
     }
 
     public void codeAccept(DexFile dexFile, ClassDef classDef, CodeVisitor visitor) {
-        visitor.visitCode(dexFile, classDef, this, code);
+        if (code != null) {
+            visitor.visitCode(dexFile, classDef, this, code);
+        }
     }
 
     @Override

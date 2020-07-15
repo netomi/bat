@@ -166,7 +166,9 @@ implements   DataItem
     }
 
     public void classDataAccept(DexFile dexFile, ClassDataVisitor visitor) {
-        visitor.visitClassData(dexFile, this, classData);
+        if (classData != null) {
+            visitor.visitClassData(dexFile, this, classData);
+        }
     }
 
     @Override
