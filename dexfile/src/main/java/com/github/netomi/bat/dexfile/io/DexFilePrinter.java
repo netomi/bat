@@ -17,6 +17,7 @@
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
+import com.github.netomi.bat.dexfile.debug.*;
 import com.github.netomi.bat.dexfile.instruction.DexInstruction;
 import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.*;
@@ -34,7 +35,8 @@ implements   DexFileVisitor,
              TypeVisitor,
              CodeVisitor,
              InstructionVisitor,
-             TryVisitor
+             TryVisitor,
+             DebugSequenceVisitor
 {
     private final PrintStream ps;
 
@@ -165,6 +167,11 @@ implements   DexFileVisitor,
         ps.println(String.format("      catches       : %d", code.tries.size()));
 
         code.triesAccept(dexFile, classDef, method, code, this);
+
+        if (code.debugInfo != null) {
+            ps.println("      positions     :");
+            code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(ps, code.debugInfo.lineStart));
+        }
     }
 
     @Override
@@ -249,6 +256,46 @@ implements   DexFileVisitor,
             return offset + padding;
         } else {
             return offset;
+        }
+    }
+
+    // inner helper classes
+
+    private static class SourceLinePrinter
+    implements           DebugSequenceVisitor {
+
+        private final PrintStream ps;
+
+        private int   lineNumber;
+        private short codeOffset;
+
+        SourceLinePrinter(PrintStream printStream, int lineStart) {
+            this.ps         = printStream;
+            this.lineNumber = lineStart;
+        }
+
+        @Override
+        public void visitAnyDebugInstruction(DexFile dexFile, DebugInfo debugInfo, DebugInstruction instruction) {}
+
+        @Override
+        public void visitAdvanceLine(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLine instruction) {
+            lineNumber += instruction.lineDiff;
+        }
+
+        @Override
+        public void visitAdvanceLineAndPC(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLineAndPC instruction) {
+            lineNumber += instruction.lineDiff;
+            codeOffset += instruction.addrDiff;
+            printPosition();
+        }
+
+        @Override
+        public void visitAdvancePC(DexFile dexFile, DebugInfo debugInfo, DebugAdvancePC instruction) {
+            codeOffset += instruction.addrDiff;
+        }
+
+        private void printPosition() {
+            ps.println(String.format("        %s line=%d", Primitives.toHexString(codeOffset), lineNumber));
         }
     }
 }

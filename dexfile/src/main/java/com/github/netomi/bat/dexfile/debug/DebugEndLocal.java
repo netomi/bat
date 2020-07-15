@@ -45,6 +45,6 @@ extends      DebugInstruction
 
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
-        visitor.visitEndLocal(dexFile, debugInfo, registerNum);
+        visitor.visitEndLocal(dexFile, debugInfo, this);
     }
 }

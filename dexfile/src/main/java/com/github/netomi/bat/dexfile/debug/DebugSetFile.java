@@ -32,6 +32,10 @@ extends      DebugInstruction
         super(DBG_SET_FILE);
     }
 
+    public String getName(DexFile dexFile) {
+        return dexFile.getStringID(nameIndex).getStringValue();
+    }
+
     @Override
     public void read(DexDataInput input) {
         nameIndex = input.readUleb128p1();
@@ -45,6 +49,6 @@ extends      DebugInstruction
 
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
-        visitor.visitSetFile(dexFile, debugInfo, nameIndex);
+        visitor.visitSetFile(dexFile, debugInfo, this);
     }
 }

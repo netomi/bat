@@ -45,6 +45,6 @@ extends      DebugInstruction
 
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
-        visitor.visitAdvanceLine(dexFile, debugInfo, lineDiff);
+        visitor.visitAdvanceLine(dexFile, debugInfo, this);
     }
 }

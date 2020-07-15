@@ -16,29 +16,55 @@
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.*;
-import com.github.netomi.bat.dexfile.debug.DebugInfo;
+import com.github.netomi.bat.dexfile.debug.*;
 
 public interface DebugSequenceVisitor
 {
-    void visitAdvanceLine(DexFile dexFile, DebugInfo debugInfo, int lineDiff);
+    default void visitAnyDebugInstruction(DexFile dexFile, DebugInfo debugInfo, DebugInstruction instruction) {
+        throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
+    }
 
-    void visitAdvanceLineAndPC(DexFile dexFile, DebugInfo debugInfo, int lineDiff, int addrDiff);
+    default void visitAdvanceLine(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLine instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitAdvancePC(DexFile dexFile, DebugInfo debugInfo, int addrDiff);
+    default void visitAdvanceLineAndPC(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLineAndPC instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitEndLocal(DexFile dexFile, DebugInfo debugInfo, int registerNum);
+    default void visitAdvancePC(DexFile dexFile, DebugInfo debugInfo, DebugAdvancePC instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitEndSequence(DexFile dexFile, DebugInfo debugInfo);
+    default void visitEndLocal(DexFile dexFile, DebugInfo debugInfo, DebugEndLocal instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitRestartLocal(DexFile dexFile, DebugInfo debugInfo, int registerNum);
+    default void visitEndSequence(DexFile dexFile, DebugInfo debugInfo, DebugEndSequence instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitSetEpilogueBegin(DexFile dexFile, DebugInfo debugInfo);
+    default void visitRestartLocal(DexFile dexFile, DebugInfo debugInfo, DebugRestartLocal instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitSetFile(DexFile dexFile, DebugInfo debugInfo, int nameIndex);
+    default void visitSetEpilogueBegin(DexFile dexFile, DebugInfo debugInfo, DebugSetEpilogueBegin instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitSetPrologueEnd(DexFile dexFile, DebugInfo debugInfo);
+    default void visitSetFile(DexFile dexFile, DebugInfo debugInfo, DebugSetFile instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitStartLocal(DexFile dexFile, DebugInfo debugInfo, int registerNum, int nameIndex, int typeIndex);
+    default void visitSetPrologueEnd(DexFile dexFile, DebugInfo debugInfo, DebugSetPrologueEnd instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 
-    void visitStartLocalExtended(DexFile dexFile, DebugInfo debugInfo, int registerNum, int nameIndex, int typeIndex, int sigIndex);
+    default void visitStartLocal(DexFile dexFile, DebugInfo debugInfo, DebugStartLocal instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
+
+    default void visitStartLocalExtended(DexFile dexFile, DebugInfo debugInfo, DebugStartLocalExtended instruction) {
+        visitAnyDebugInstruction(dexFile, debugInfo, instruction);
+    }
 }

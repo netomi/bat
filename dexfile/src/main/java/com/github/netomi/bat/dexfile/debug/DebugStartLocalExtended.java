@@ -46,6 +46,6 @@ extends      DebugStartLocal
 
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
-        visitor.visitStartLocalExtended(dexFile, debugInfo, registerNum, nameIndex, typeIndex, sigIndex);
+        visitor.visitStartLocalExtended(dexFile, debugInfo, this);
     }
 }

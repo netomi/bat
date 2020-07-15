@@ -38,6 +38,14 @@ extends      DebugInstruction
         super(opCode);
     }
 
+    public String getName(DexFile dexFile) {
+        return dexFile.getStringID(nameIndex).getStringValue();
+    }
+
+    public String getType(DexFile dexFile) {
+        return dexFile.getTypeID(typeIndex).getType(dexFile);
+    }
+
     @Override
     public void read(DexDataInput input) {
         registerNum = input.readUleb128();
@@ -55,6 +63,6 @@ extends      DebugInstruction
 
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
-        visitor.visitStartLocal(dexFile, debugInfo, registerNum, nameIndex, typeIndex);
+        visitor.visitStartLocal(dexFile, debugInfo, this);
     }
 }

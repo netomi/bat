@@ -35,7 +35,7 @@ extends      DebugInstruction
 
     @Override
     public void read(DexDataInput input) {
-        int adjustedOpCode = getOpcode() - DBG_FIRST_SPECIAL;
+        int adjustedOpCode = (getOpcode() & 0xff) - DBG_FIRST_SPECIAL;
 
         lineDiff = DBG_LINE_BASE + (adjustedOpCode % DBG_LINE_RANGE);
         addrDiff = (adjustedOpCode / DBG_LINE_RANGE);
@@ -48,6 +48,6 @@ extends      DebugInstruction
 
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
-        visitor.visitAdvanceLineAndPC(dexFile, debugInfo, lineDiff, addrDiff);
+        visitor.visitAdvanceLineAndPC(dexFile, debugInfo, this);
     }
 }

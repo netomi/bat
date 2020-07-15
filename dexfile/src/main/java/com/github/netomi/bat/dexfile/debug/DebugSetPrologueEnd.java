@@ -40,6 +40,6 @@ extends      DebugInstruction
 
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
-        visitor.visitSetPrologueEnd(dexFile, debugInfo);
+        visitor.visitSetPrologueEnd(dexFile, debugInfo, this);
     }
 }
