@@ -23,7 +23,8 @@ public enum DexFormat
     FORMAT_013(new byte[] { 0x30, 0x31, 0x33, 0x00 }, "013"),
     FORMAT_035(new byte[] { 0x30, 0x33, 0x35, 0x00 }, "035"),
     FORMAT_037(new byte[] { 0x30, 0x33, 0x37, 0x00 }, "037"),
-    FORMAT_038(new byte[] { 0x30, 0x33, 0x38, 0x00 }, "038");
+    FORMAT_038(new byte[] { 0x30, 0x33, 0x38, 0x00 }, "038"),
+    FORMAT_039(new byte[] { 0x30, 0x33, 0x39, 0x00 }, "039");
 
     private final byte[] pattern;
     private final String version;
