@@ -63,7 +63,7 @@ extends      DexInstruction
 
         sb.append(", ");
 
-        FieldID fieldID = dexFile.getFieldID(fieldIndex);
+        FieldID fieldID = getField(dexFile);
 
         sb.append(fieldID.getClassName(dexFile));
         sb.append('.');
