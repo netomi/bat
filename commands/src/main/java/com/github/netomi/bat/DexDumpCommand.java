@@ -18,6 +18,7 @@ package com.github.netomi.bat;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexFilePrinter;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
+import com.github.netomi.bat.dexfile.visitor.ClassNameFilter;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 
@@ -35,8 +36,8 @@ public class DexDumpCommand implements Runnable
     @Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = "inputfile to process (*.dex)")
     private File inputFile;
 
-//    @Option(names = { "-h", "--help"}, description = "print help")
-//    private boolean printHelp;
+    @Option(names = "-c", description = "class to dump")
+    private String classNameFilter = null;
 
     public void run()
     {
@@ -47,7 +48,13 @@ public class DexDumpCommand implements Runnable
             DexFile dexFile = new DexFile();
             reader.visitDexFile(dexFile);
 
-            dexFile.accept(new DexFilePrinter());
+            if (classNameFilter != null) {
+                dexFile.classDefsAccept(
+                    new ClassNameFilter(classNameFilter,
+                    new DexFilePrinter()));
+            } else {
+                dexFile.accept(new DexFilePrinter());
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
