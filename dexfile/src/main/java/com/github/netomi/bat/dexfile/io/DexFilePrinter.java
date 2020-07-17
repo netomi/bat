@@ -35,8 +35,8 @@ implements   DexFileVisitor,
              CodeVisitor,
              InstructionVisitor,
              TryVisitor,
-             DebugSequenceVisitor {
-
+             DebugSequenceVisitor
+{
     private final PrintStream ps;
 
     private int fileOffset;
@@ -160,8 +160,8 @@ implements   DexFileVisitor,
 
         fileOffset = method.getCodeOffset();
 
-        ps.println(asHexValue(fileOffset, 6) + ":                                        |[" +
-                   asHexValue(fileOffset, 6) + "] " +
+        ps.println(Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
+                   Primitives.asHexValue(fileOffset, 6) + "] " +
                    DexUtil.fullExternalMethodSignature(dexFile, classDef, method));
 
         fileOffset = align(fileOffset, 4);
@@ -190,12 +190,16 @@ implements   DexFileVisitor,
     public void visitInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(asHexValue(fileOffset, 6));
+        sb.append(Primitives.asHexValue(fileOffset, 6));
         sb.append(": ");
 
-        for (int i = 0; i < instruction.getLength(); i++) {
-            sb.append(asHexValue(code.insns[offset++], 4));
+        for (int i = 0; i < instruction.getLength() && i < 7; i++) {
+            sb.append(Primitives.asHexValue(code.insns[offset++], 4));
             sb.append(' ');
+        }
+
+        if (instruction.getLength() >= 7) {
+            sb.append("...");
         }
 
         for (int i = sb.length(); i < 47; i++) {
@@ -203,10 +207,10 @@ implements   DexFileVisitor,
         }
 
         sb.append('|');
-        sb.append(asHexValue(codeOffset, 4));
+        sb.append(Primitives.asHexValue(codeOffset, 4));
         sb.append(": ");
 
-        sb.append(instruction.getMnemonic());
+        sb.append(instruction.toString(dexFile));
 
         ps.println(sb.toString());
 
@@ -255,10 +259,6 @@ implements   DexFileVisitor,
 
     private static String formatAccessFlags(int accessFlags) {
         return String.format("0x%04x (%s)", accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags));
-    }
-
-    private static String asHexValue(int value, int digits) {
-        return String.format("%0" + digits + "x", value);
     }
 
     private static int align(int offset, int alignment) {

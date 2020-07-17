@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
+import com.github.netomi.bat.dexfile.DexConstants;
+
 /**
  * @author Thomas Neidhart
  */
@@ -68,10 +70,5 @@ public enum DexInstructionFormat
 
     public int getArgumentCount() {
         return arguments;
-    }
-
-    public byte opCode(short[] instructions, int offset) {
-        byte opCode = (byte) (instructions[offset] & 0xFF);
-        return opCode;
     }
 }

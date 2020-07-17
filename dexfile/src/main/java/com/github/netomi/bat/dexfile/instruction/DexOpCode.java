@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.instruction;
 
 /**
@@ -21,24 +20,27 @@ package com.github.netomi.bat.dexfile.instruction;
  */
 public enum DexOpCode
 {
-    NOP((byte) 0x00, DexInstructionFormat.FORMAT_10x, "nop"),
-    MOVE((byte) 0x01, DexInstructionFormat.FORMAT_12x, "move"),
-    MOVE_FROM16((byte) 0x02, DexInstructionFormat.FORMAT_22x, "move/from16"),
-    MOVE_16((byte) 0x03, DexInstructionFormat.FORMAT_32x, "move/16"),
-    MOVE_WIDE((byte) 0x04, DexInstructionFormat.FORMAT_12x, "move-wide"),
-    MOVE_WIDE_FROM16((byte) 0x05, DexInstructionFormat.FORMAT_22x, "move-wide/from16"),
-    MOVE_WIDE_16((byte) 0x06, DexInstructionFormat.FORMAT_32x, "move-wide/16"),
-    MOVE_OBJECT((byte) 0x07, DexInstructionFormat.FORMAT_12x, "move-object"),
-    MOVE_OBJECT_FROM16((byte) 0x08, DexInstructionFormat.FORMAT_22x, "move-object/from16"),
-    MOVE_OBJECT_16((byte) 0x09, DexInstructionFormat.FORMAT_32x, "move-object/16"),
-    MOVE_RESULT((byte) 0x0a, DexInstructionFormat.FORMAT_11x, "move-result"),
-    MOVE_RESULT_WIDE((byte) 0x0b, DexInstructionFormat.FORMAT_11x, "move-result-wide"),
-    MOVE_RESULT_OBJECT((byte) 0x0c, DexInstructionFormat.FORMAT_11x, "move-result-object"),
-    MOVE_EXCEPTION((byte) 0x0d, DexInstructionFormat.FORMAT_11x, "move-exception"),
-    RETURN_VOID((byte) 0x0e, DexInstructionFormat.FORMAT_10x, "return-void"),
-    RETURN((byte) 0x0f, DexInstructionFormat.FORMAT_11x, "return"),
-    RETURN_WIDE((byte) 0x10, DexInstructionFormat.FORMAT_11x, "return-wide"),
-    RETURN_OBJECT((byte) 0x11, DexInstructionFormat.FORMAT_11x, "return-object"),
+    // basic instructions.
+
+    NOP(               (byte) 0x00, DexInstructionFormat.FORMAT_10x, BasicInstruction::create, "nop"),
+    MOVE(              (byte) 0x01, DexInstructionFormat.FORMAT_12x, BasicInstruction::create, "move"),
+    MOVE_FROM16(       (byte) 0x02, DexInstructionFormat.FORMAT_22x, BasicInstruction::create, "move/from16"),
+    MOVE_16(           (byte) 0x03, DexInstructionFormat.FORMAT_32x, BasicInstruction::create, "move/16"),
+    MOVE_WIDE(         (byte) 0x04, DexInstructionFormat.FORMAT_12x, BasicInstruction::create, "move-wide"),
+    MOVE_WIDE_FROM16(  (byte) 0x05, DexInstructionFormat.FORMAT_22x, BasicInstruction::create, "move-wide/from16"),
+    MOVE_WIDE_16(      (byte) 0x06, DexInstructionFormat.FORMAT_32x, BasicInstruction::create, "move-wide/16"),
+    MOVE_OBJECT(       (byte) 0x07, DexInstructionFormat.FORMAT_12x, BasicInstruction::create, "move-object"),
+    MOVE_OBJECT_FROM16((byte) 0x08, DexInstructionFormat.FORMAT_22x, BasicInstruction::create, "move-object/from16"),
+    MOVE_OBJECT_16(    (byte) 0x09, DexInstructionFormat.FORMAT_32x, BasicInstruction::create, "move-object/16"),
+    MOVE_RESULT(       (byte) 0x0a, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result"),
+    MOVE_RESULT_WIDE(  (byte) 0x0b, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result-wide"),
+    MOVE_RESULT_OBJECT((byte) 0x0c, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result-object"),
+    MOVE_EXCEPTION(    (byte) 0x0d, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-exception"),
+    RETURN_VOID(       (byte) 0x0e, DexInstructionFormat.FORMAT_10x, BasicInstruction::create, "return-void"),
+    RETURN(            (byte) 0x0f, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "return"),
+    RETURN_WIDE(       (byte) 0x10, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "return-wide"),
+    RETURN_OBJECT(     (byte) 0x11, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "return-object"),
+
     CONST_4((byte) 0x12, DexInstructionFormat.FORMAT_11n, "const/4"),
     CONST_16((byte) 0x13, DexInstructionFormat.FORMAT_21s, "const/16"),
     CONST((byte) 0x14, DexInstructionFormat.FORMAT_31i, "const"),
@@ -50,6 +52,7 @@ public enum DexOpCode
     CONST_STRING((byte) 0x1a, DexInstructionFormat.FORMAT_21c, "const-string"),
     CONST_STRING_JUMBO((byte) 0x1b, DexInstructionFormat.FORMAT_31c, "const-string/jumbo"),
     CONST_CLASS((byte) 0x1c, DexInstructionFormat.FORMAT_21c, "const-class"),
+
     MONITOR_ENTER((byte) 0x1d, DexInstructionFormat.FORMAT_11x, "monitor-enter"),
     MONITOR_EXIT((byte) 0x1e, DexInstructionFormat.FORMAT_11x, "monitor-exit"),
     CHECK_CAST((byte) 0x1f, DexInstructionFormat.FORMAT_21c, "check-cast"),
@@ -84,50 +87,56 @@ public enum DexOpCode
     IF_GTZ((byte) 0x3c, DexInstructionFormat.FORMAT_21t, "if-gtz"),
     IF_LEZ((byte) 0x3d, DexInstructionFormat.FORMAT_21t, "if-lez"),
 
-    AGET((byte) 0x44, DexInstructionFormat.FORMAT_23x, "aget"),
-    AGET_WIDE((byte) 0x45, DexInstructionFormat.FORMAT_23x, "aget-wide"),
-    AGET_OBJECT((byte) 0x46, DexInstructionFormat.FORMAT_23x, "aget-object"),
-    AGET_BOOLEAN((byte) 0x47, DexInstructionFormat.FORMAT_23x, "aget-boolean"),
-    AGET_BYTE((byte) 0x48, DexInstructionFormat.FORMAT_23x, "aget-byte"),
-    AGET_CHAR((byte) 0x49, DexInstructionFormat.FORMAT_23x, "aget-char"),
-    AGET_SHORT((byte) 0x4a, DexInstructionFormat.FORMAT_23x, "aget-short"),
-    APUT((byte) 0x4b, DexInstructionFormat.FORMAT_23x, "aput"),
-    APUT_WIDE((byte) 0x4c, DexInstructionFormat.FORMAT_23x, "aput-wide"),
-    APUT_OBJECT((byte) 0x4d, DexInstructionFormat.FORMAT_23x, "aput-object"),
-    APUT_BOOLEAN((byte) 0x4e, DexInstructionFormat.FORMAT_23x, "aput-boolean"),
-    APUT_BYTE((byte) 0x4f, DexInstructionFormat.FORMAT_23x, "aput-byte"),
-    APUT_CHAR((byte) 0x50, DexInstructionFormat.FORMAT_23x, "aput-char"),
-    APUT_SHORT((byte) 0x51, DexInstructionFormat.FORMAT_23x, "aput-short"),
+    // array instructions.
 
-    IGET((byte) 0x52, DexInstructionFormat.FORMAT_22c, "iget"),
-    IGET_WIDE((byte) 0x53, DexInstructionFormat.FORMAT_22c, "iget-wide"),
-    IGET_OBJECT((byte) 0x54, DexInstructionFormat.FORMAT_22c, "iget-object"),
-    IGET_BOOLEAN((byte) 0x55, DexInstructionFormat.FORMAT_22c, "iget-boolean"),
-    IGET_BYTE((byte) 0x56, DexInstructionFormat.FORMAT_22c, "iget-byte"),
-    IGET_CHAR((byte) 0x57, DexInstructionFormat.FORMAT_22c, "iget-char"),
-    IGET_SHORT((byte) 0x58, DexInstructionFormat.FORMAT_22c, "iget-short"),
-    IPUT((byte) 0x59, DexInstructionFormat.FORMAT_22c, "iput"),
-    IPUT_WIDE((byte) 0x5a, DexInstructionFormat.FORMAT_22c, "iput-wide"),
-    IPUT_OBJECT((byte) 0x5b, DexInstructionFormat.FORMAT_22c, "iput-object"),
-    IPUT_BOOLEAN((byte) 0x5c, DexInstructionFormat.FORMAT_22c, "iput-boolean"),
-    IPUT_BYTE((byte) 0x5d, DexInstructionFormat.FORMAT_22c, "iput-byte"),
-    IPUT_CHAR((byte) 0x5e, DexInstructionFormat.FORMAT_22c, "iput-char"),
-    IPUT_SHORT((byte) 0x5f, DexInstructionFormat.FORMAT_22c, "iput-short"),
+    AGET(        (byte) 0x44, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget"),
+    AGET_WIDE(   (byte) 0x45, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-wide"),
+    AGET_OBJECT( (byte) 0x46, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-object"),
+    AGET_BOOLEAN((byte) 0x47, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-boolean"),
+    AGET_BYTE(   (byte) 0x48, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-byte"),
+    AGET_CHAR(   (byte) 0x49, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-char"),
+    AGET_SHORT(  (byte) 0x4a, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-short"),
+    APUT(        (byte) 0x4b, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput"),
+    APUT_WIDE(   (byte) 0x4c, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-wide"),
+    APUT_OBJECT( (byte) 0x4d, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-object"),
+    APUT_BOOLEAN((byte) 0x4e, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-boolean"),
+    APUT_BYTE(   (byte) 0x4f, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-byte"),
+    APUT_CHAR(   (byte) 0x50, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-char"),
+    APUT_SHORT(  (byte) 0x51, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-short"),
 
-    SGET((byte) 0x60, DexInstructionFormat.FORMAT_21c, "sget"),
-    SGET_WIDE((byte) 0x61, DexInstructionFormat.FORMAT_21c, "sget-wide"),
-    SGET_OBJECT((byte) 0x62, DexInstructionFormat.FORMAT_21c, "sget-object"),
-    SGET_BOOLEAN((byte) 0x63, DexInstructionFormat.FORMAT_21c, "sget-boolean"),
-    SGET_BYTE((byte) 0x64, DexInstructionFormat.FORMAT_21c, "sget-byte"),
-    SGET_CHAR((byte) 0x65, DexInstructionFormat.FORMAT_21c, "sget-char"),
-    SGET_SHORT((byte) 0x66, DexInstructionFormat.FORMAT_21c, "sget-short"),
-    SPUT((byte) 0x67, DexInstructionFormat.FORMAT_21c, "sput"),
-    SPUT_WIDE((byte) 0x68, DexInstructionFormat.FORMAT_21c, "sput-wide"),
-    SPUT_OBJECT((byte) 0x69, DexInstructionFormat.FORMAT_21c, "sput-object"),
-    SPUT_BOOLEAN((byte) 0x6a, DexInstructionFormat.FORMAT_21c, "sput-boolean"),
-    SPUT_BYTE((byte) 0x6b, DexInstructionFormat.FORMAT_21c, "sput-byte"),
-    SPUT_CHAR((byte) 0x6c, DexInstructionFormat.FORMAT_21c, "sput-char"),
-    SPUT_SHORT((byte) 0x6d, DexInstructionFormat.FORMAT_21c, "sput-short"),
+    // field instructions.
+
+    IGET(        (byte) 0x52, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget"),
+    IGET_WIDE(   (byte) 0x53, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-wide"),
+    IGET_OBJECT( (byte) 0x54, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-object"),
+    IGET_BOOLEAN((byte) 0x55, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-boolean"),
+    IGET_BYTE(   (byte) 0x56, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-byte"),
+    IGET_CHAR(   (byte) 0x57, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-char"),
+    IGET_SHORT(  (byte) 0x58, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-short"),
+    IPUT(        (byte) 0x59, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput"),
+    IPUT_WIDE(   (byte) 0x5a, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-wide"),
+    IPUT_OBJECT( (byte) 0x5b, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-object"),
+    IPUT_BOOLEAN((byte) 0x5c, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-boolean"),
+    IPUT_BYTE(   (byte) 0x5d, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-byte"),
+    IPUT_CHAR(   (byte) 0x5e, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-char"),
+    IPUT_SHORT(  (byte) 0x5f, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-short"),
+
+    SGET        ((byte) 0x60, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget"),
+    SGET_WIDE   ((byte) 0x61, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-wide"),
+    SGET_OBJECT ((byte) 0x62, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-object"),
+    SGET_BOOLEAN((byte) 0x63, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-boolean"),
+    SGET_BYTE   ((byte) 0x64, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-byte"),
+    SGET_CHAR   ((byte) 0x65, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-char"),
+    SGET_SHORT  ((byte) 0x66, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-short"),
+    SPUT        ((byte) 0x67, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput"),
+    SPUT_WIDE   ((byte) 0x68, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-wide"),
+    SPUT_OBJECT ((byte) 0x69, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-object"),
+    SPUT_BOOLEAN((byte) 0x6a, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-boolean"),
+    SPUT_BYTE   ((byte) 0x6b, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-byte"),
+    SPUT_CHAR   ((byte) 0x6c, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-char"),
+    SPUT_SHORT  ((byte) 0x6d, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-short"),
+
+    // method instructions.
 
     INVOKE_VIRTUAL((byte) 0x6e, DexInstructionFormat.FORMAT_35c, "invoke-virtual"),
     INVOKE_SUPER((byte) 0x6f, DexInstructionFormat.FORMAT_35c, "invoke-super"),
@@ -260,9 +269,10 @@ public enum DexOpCode
     CONST_METHOD_TYPE((byte) 0xff, DexInstructionFormat.FORMAT_21c, "const-method-type");
 
 
-    private final byte opCode;
+    private final byte                 opCode;
     private final DexInstructionFormat format;
-    private final String mnemonic;
+    private final InstructionSupplier  supplier;
+    private final String               mnemonic;
 
     private static final DexOpCode[] opcodes;
 
@@ -271,13 +281,18 @@ public enum DexOpCode
         opcodes = new DexOpCode[0x100];
         for (DexOpCode opCode : values())
         {
-            opcodes[opCode.opCode & 0xFF] = opCode;
+            opcodes[opCode.opCode & 0xff] = opCode;
         }
     }
 
     DexOpCode(byte opcode, DexInstructionFormat format, String mnemonic) {
-        this.opCode = opcode;
-        this.format = format;
+        this(opcode, format, DexInstruction::createGeneric, mnemonic);
+    }
+
+    DexOpCode(byte opcode, DexInstructionFormat format, InstructionSupplier supplier, String mnemonic) {
+        this.opCode   = opcode;
+        this.format   = format;
+        this.supplier = supplier;
         this.mnemonic = mnemonic;
     }
 
@@ -285,16 +300,33 @@ public enum DexOpCode
         return opCode;
     }
 
+    public DexInstructionFormat getFormat() {
+        return format;
+    }
+
     public int getLength() {
         return format.getInstructionLength();
+    }
+
+    public int getArguments() {
+        return format.getArgumentCount();
     }
 
     public String getMnemonic() {
         return mnemonic;
     }
 
+    public DexInstruction createInstruction(byte ident) {
+        return supplier.get(this, ident);
+    }
+
     public static DexOpCode get(byte opcode)
     {
-        return opcodes[opcode & 0xFF];
+        return opcodes[opcode & 0xff];
+    }
+
+    @FunctionalInterface
+    private interface InstructionSupplier {
+        DexInstruction get(DexOpCode opCode, byte ident);
     }
 }

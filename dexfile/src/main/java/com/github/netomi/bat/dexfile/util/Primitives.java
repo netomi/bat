@@ -71,4 +71,8 @@ public final class Primitives
     public static String toHexString(long value) {
         return String.format("0x%08x", value);
     }
+
+    public static String asHexValue(int value, int digits) {
+        return String.format("%0" + digits + "x", value);
+    }
 }

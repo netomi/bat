@@ -17,7 +17,8 @@ package com.github.netomi.bat.dexfile;
 
 import static com.github.netomi.bat.dexfile.DexConstants.*;
 
-public enum DexAccessFlags {
+public enum DexAccessFlags
+{
     PUBLIC               (ACC_PUBLIC),
     PRIVATE              (ACC_PRIVATE),
     PROTECTED            (ACC_PROTECTED),

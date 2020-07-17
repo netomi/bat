@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class DexFileWriter
-implements   DexFileVisitor {
-
+implements   DexFileVisitor
+{
     private final OutputStream    outputStream;
     private final DataItemMapImpl dataItemMap;
 

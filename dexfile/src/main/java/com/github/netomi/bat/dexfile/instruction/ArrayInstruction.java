@@ -13,12 +13,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.io;
+package com.github.netomi.bat.dexfile.instruction;
 
-public class DexFormatException
-extends      RuntimeException
+public class ArrayInstruction
+extends      DexInstruction
 {
-    public DexFormatException(String message) {
-        super(message);
+    static ArrayInstruction create(DexOpCode opCode, byte ident) {
+        return new ArrayInstruction(opCode);
+    }
+
+    ArrayInstruction(DexOpCode opcode) {
+        super(opcode);
+    }
+
+    @Override
+    public void read(short[] instructions, int offset) {
+        super.read(instructions, offset);
+
+        if (opcode.getFormat() != DexInstructionFormat.FORMAT_23x) {
+            throw new IllegalStateException("unexpected format for opcode " + opcode.getMnemonic());
+        }
     }
 }

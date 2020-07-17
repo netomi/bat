@@ -21,8 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 
-public class PrimitiveIterable<E> implements Iterable<E> {
-
+public class PrimitiveIterable<E>
+implements   Iterable<E>
+{
     private final DexFile                         dexFile;
     private final BiFunction<DexFile, Integer, E> accessorFunction;
     private final int[]                           array;

@@ -13,12 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.io;
+package com.github.netomi.bat.dexfile.instruction;
 
-public class DexFormatException
-extends      RuntimeException
+public abstract class SwitchPayload
+extends               DexInstruction
 {
-    public DexFormatException(String message) {
-        super(message);
+    SwitchPayload(DexOpCode opcode) {
+        super(opcode);
     }
 }

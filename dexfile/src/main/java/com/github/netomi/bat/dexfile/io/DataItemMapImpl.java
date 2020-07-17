@@ -25,7 +25,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-class DataItemMapImpl implements DataItem.Map
+class      DataItemMapImpl
+implements DataItem.Map
 {
     private final Map<Integer, Set<DataItem>> dataItemMap = new HashMap<>();
     private final Map<DataItem, Integer>      offsetMap   = new HashMap<>();

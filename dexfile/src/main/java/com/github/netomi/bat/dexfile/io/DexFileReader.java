@@ -26,8 +26,8 @@ import java.io.InputStream;
 import java.util.zip.Adler32;
 
 public class DexFileReader
-implements   DexFileVisitor {
-
+implements   DexFileVisitor
+{
     private final DexDataInput input;
     private final boolean      strictParsing;
 

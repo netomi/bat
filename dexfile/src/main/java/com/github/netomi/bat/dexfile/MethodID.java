@@ -36,12 +36,12 @@ implements   DataItem
         nameIndex  = DexConstants.NO_INDEX;
     }
 
-    public ClassDef getClassDef(DexFile dexFile) {
-        return dexFile.getClassDef(classIndex);
+    public TypeID getClassType(DexFile dexFile) {
+        return dexFile.getTypeID(classIndex);
     }
 
     public String getClassName(DexFile dexFile) {
-        return getClassDef(dexFile).getClassName(dexFile);
+        return getClassType(dexFile).getType(dexFile);
     }
 
     public ProtoID getProtoID(DexFile dexFile) {

@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.util.Primitives;
 
 /**
@@ -22,10 +23,33 @@ import com.github.netomi.bat.dexfile.util.Primitives;
  */
 public class DexInstruction
 {
-    public DexOpCode opcode;
+    private static final int[] EMPTY_REGISTERS = new int[0];
+
+    protected final DexOpCode opcode;
+    public          int[]     registers;
+
+    public static DexInstruction create(short[] instructions, int offset) {
+        byte opcode = (byte) (instructions[offset]         & 0xff);
+        byte ident  = (byte) ((instructions[offset] >>> 8) & 0xff);
+
+        DexOpCode opCode = DexOpCode.get(opcode);
+
+        if (opCode != null) {
+            DexInstruction instruction = opCode.createInstruction(ident);
+            instruction.read(instructions, offset);
+            return instruction;
+        } else {
+            throw new IllegalArgumentException("unknown opcode " + Primitives.toHexString(opcode));
+        }
+    }
+
+    static DexInstruction createGeneric(DexOpCode opCode, byte ident) {
+        return new DexInstruction(opCode);
+    }
 
     public DexInstruction(DexOpCode opcode) {
-        this.opcode = opcode;
+        this.opcode    = opcode;
+        this.registers = EMPTY_REGISTERS;
     }
 
     public int getLength() {
@@ -36,16 +60,54 @@ public class DexInstruction
         return opcode.getMnemonic();
     }
 
-    public static DexInstruction create(short[] instructions, int offset) {
-        byte opcode = (byte) (instructions[offset] & 0xff);
+    public void read(short[] instructions, int offset) {
+        switch (opcode.getFormat()) {
+            case FORMAT_00x:
+            case FORMAT_10x:
+                registers = EMPTY_REGISTERS;
+                break;
 
-        DexOpCode opCode = DexOpCode.get(opcode);
+            case FORMAT_12x:
+            case FORMAT_22c:
+                registers = new int[] {
+                    instructions[offset] >>> 8  & 0xf,
+                    instructions[offset] >>> 12 & 0xf,
+                };
+                break;
 
-        if (opCode != null) {
-            return new DexInstruction(opCode);
+            case FORMAT_21c:
+                registers = new int[] {
+                    instructions[offset] >>> 8  & 0xff,
+                };
+                break;
+
+            case FORMAT_23x:
+                registers = new int[] {
+                    instructions[offset] >>> 8      & 0xff,
+                    instructions[offset + 1]        & 0xff,
+                    instructions[offset + 1] >>> 8  & 0xff
+                };
+                break;
+        }
+    }
+
+    public String toString(DexFile dexFile) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getMnemonic());
+
+        if (registers.length > 0) {
+            sb.append(' ');
+            for (int idx = 0; idx < registers.length; idx++) {
+                if (idx > 0) {
+                    sb.append(", ");
+                }
+                sb.append('v');
+                sb.append(registers[idx]);
+            }
         }
 
-        throw new IllegalArgumentException("unknown opcode " + Primitives.toHexString(opcode));
+        return sb.toString();
     }
 
     public String toString() {
