@@ -58,8 +58,8 @@ extends      DexInstruction
     }
 
     @Override
-    public String toString(DexFile dexFile) {
-        StringBuilder sb = new StringBuilder(super.toString(dexFile));
+    public String toString(DexFile dexFile, int offset) {
+        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
 
         sb.append(", ");
 

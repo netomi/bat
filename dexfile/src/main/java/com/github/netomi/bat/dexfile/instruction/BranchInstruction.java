@@ -15,32 +15,25 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.FieldID;
-import com.github.netomi.bat.dexfile.MethodID;
 import com.github.netomi.bat.dexfile.util.Primitives;
 
-public class MethodInstruction
+public class BranchInstruction
 extends      DexInstruction
 {
-    private int methodIndex;
+    private int branchOffset;
 
-    static MethodInstruction create(DexOpCode opCode, byte ident) {
-        return new MethodInstruction(opCode);
+    static BranchInstruction create(DexOpCode opCode, byte ident) {
+        return new BranchInstruction(opCode);
     }
 
-    MethodInstruction(DexOpCode opcode) {
+    BranchInstruction(DexOpCode opcode) {
         super(opcode);
-        methodIndex = DexConstants.NO_INDEX;
+        branchOffset = 0;
     }
 
-    public int getMethodIndex() {
-        return methodIndex;
-    }
-
-    public MethodID getMethod(DexFile dexFile) {
-        return dexFile.getMethodID(methodIndex);
+    public int getBranchOffset() {
+        return branchOffset;
     }
 
     @Override
@@ -48,8 +41,9 @@ extends      DexInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
-            case FORMAT_35c:
-                methodIndex = instructions[offset + 1] & 0xffff;
+            case FORMAT_21t:
+            case FORMAT_22t:
+                branchOffset = instructions[offset + 1];
                 break;
 
             default:
@@ -62,17 +56,15 @@ extends      DexInstruction
         StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
 
         sb.append(", ");
+        sb.append(Primitives.asHexValue(offset + branchOffset, 4));
+        sb.append(" // ");
 
-        MethodID methodID = getMethod(dexFile);
-
-        sb.append(methodID.getClassName(dexFile));
-        sb.append('.');
-        sb.append(methodID.getName(dexFile));
-        sb.append(':');
-        sb.append(methodID.getProtoID(dexFile).getDescriptor(dexFile));
-
-        sb.append(" // method@");
-        sb.append(Primitives.asHexValue(methodIndex, 4));
+        if (branchOffset < 0) {
+            sb.append('-');
+            sb.append(Primitives.asHexValue(-branchOffset, 4));
+        } else {
+            sb.append(Primitives.asHexValue(branchOffset, 4));
+        }
 
         return sb.toString();
     }

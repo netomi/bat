@@ -59,7 +59,7 @@ extends      SwitchPayload
     }
 
     @Override
-    public String toString(DexFile dexFile) {
+    public String toString(DexFile dexFile, int offset) {
         return toString();
     }
 

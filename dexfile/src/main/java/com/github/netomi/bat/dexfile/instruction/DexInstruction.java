@@ -69,6 +69,7 @@ public class DexInstruction
 
             case FORMAT_12x:
             case FORMAT_22c:
+            case FORMAT_22t:
                 registers = new int[] {
                     instructions[offset] >>> 8  & 0xf,
                     instructions[offset] >>> 12 & 0xf,
@@ -76,6 +77,7 @@ public class DexInstruction
                 break;
 
             case FORMAT_21c:
+            case FORMAT_21t:
                 registers = new int[] {
                     instructions[offset] >>> 8  & 0xff,
                 };
@@ -145,7 +147,7 @@ public class DexInstruction
         }
     }
 
-    public String toString(DexFile dexFile) {
+    public String toString(DexFile dexFile, int offset) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(getMnemonic());

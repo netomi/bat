@@ -193,8 +193,9 @@ implements   DexFileVisitor,
         sb.append(Primitives.asHexValue(fileOffset, 6));
         sb.append(": ");
 
+        int codeUnitOffset = offset;
         for (int i = 0; i < instruction.getLength() && i < 7; i++) {
-            short codeUnit = code.insns[offset++];
+            short codeUnit = code.insns[codeUnitOffset++];
             // print code units in little endian format.
             sb.append(Primitives.asHexValue(codeUnit        & 0xff, 2));
             sb.append(Primitives.asHexValue((codeUnit >> 8) & 0xff, 2));
@@ -213,7 +214,7 @@ implements   DexFileVisitor,
         sb.append(Primitives.asHexValue(codeOffset, 4));
         sb.append(": ");
 
-        sb.append(instruction.toString(dexFile));
+        sb.append(instruction.toString(dexFile, offset));
 
         ps.println(sb.toString());
 
