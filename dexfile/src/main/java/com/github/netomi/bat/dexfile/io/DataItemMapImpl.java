@@ -52,7 +52,7 @@ implements DataItem.Map
         dexFile.dataItemsAccept(new DataItemVisitor() {
             @Override
             public void visitAnyDataItem(DexFile dexFile, DataItem dataItem) {
-                dataItem.updateOffsets(DataItemMapImpl.this);
+            dataItem.updateOffsets(DataItemMapImpl.this);
             }
         });
     }
