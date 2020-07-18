@@ -50,6 +50,28 @@ implements   DataItem
         return dexFile.getStringID(shortyIndex).getStringValue();
     }
 
+    public String getDescriptor(DexFile dexFile) {
+        StringBuilder sb = new StringBuilder();
+        sb.append('(');
+
+        if (parameters != null) {
+            boolean deleteFinalSeparator = false;
+
+            for (String type : parameters.getTypes(dexFile)) {
+                sb.append(type);
+                sb.append(',');
+                deleteFinalSeparator = true;
+            }
+
+            if (deleteFinalSeparator) {
+                sb.deleteCharAt(sb.length() - 1);
+            }
+        }
+        sb.append(')');
+        sb.append(getReturnType(dexFile));
+        return sb.toString();
+    }
+
     public String getReturnType(DexFile dexFile) {
         return dexFile.getTypeID(returnTypeIndex).getType(dexFile);
     }

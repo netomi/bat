@@ -28,7 +28,7 @@ extends          DexContent
      *
      * @return the type of this DataItem.
      */
-    default int getType() {
+    default int getItemType() {
         return this.getClass().getAnnotation(DataItemAnn.class).type();
     }
 

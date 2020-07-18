@@ -58,7 +58,7 @@ implements DataItem.Map
     }
 
     void addDataItem(DataItem dataItem) {
-        Set<DataItem> dataItemSet = getDataItems(dataItem.getType());
+        Set<DataItem> dataItemSet = getDataItems(dataItem.getItemType());
         dataItemSet.add(dataItem);
     }
 

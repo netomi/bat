@@ -44,44 +44,25 @@ implements   DexContent
         return codeOffset;
     }
 
-    public MethodID getMethodIDItem(DexFile dexFile) {
+    public MethodID getMethodID(DexFile dexFile) {
         return dexFile.getMethodID(methodIndex);
     }
 
-    public ProtoID getProtoIDItem(DexFile dexFile) {
-        return getMethodIDItem(dexFile).getProtoID(dexFile);
+    public ProtoID getProtoID(DexFile dexFile) {
+        return getMethodID(dexFile).getProtoID(dexFile);
     }
 
     public String getName(DexFile dexFile) {
-        return getMethodIDItem(dexFile).getName(dexFile);
+        return getMethodID(dexFile).getName(dexFile);
     }
 
     public String getShortyType(DexFile dexFile) {
-        return getMethodIDItem(dexFile).getProtoID(dexFile).getShorty(dexFile);
+        return getMethodID(dexFile).getProtoID(dexFile).getShorty(dexFile);
     }
 
     public String getDescriptor(DexFile dexFile) {
-        ProtoID protoID = getProtoIDItem(dexFile);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append('(');
-
-        if (protoID.parameters != null) {
-            boolean deleteFinalSeparator = false;
-
-            for (String type : protoID.parameters.getTypes(dexFile)) {
-                sb.append(type);
-                sb.append(',');
-                deleteFinalSeparator = true;
-            }
-
-            if (deleteFinalSeparator) {
-                sb.deleteCharAt(sb.length() - 1);
-            }
-        }
-        sb.append(')');
-        sb.append(protoID.getReturnType(dexFile));
-        return sb.toString();
+        ProtoID protoID = getProtoID(dexFile);
+        return protoID.getDescriptor(dexFile);
     }
 
     @Override

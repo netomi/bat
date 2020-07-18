@@ -52,6 +52,10 @@ implements   DataItem
         return dexFile.getStringID(nameIndex).getStringValue();
     }
 
+    public String getShortyType(DexFile dexFile) {
+        return dexFile.getProtoID(protoIndex).getShorty(dexFile);
+    }
+
     @Override
     public void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());

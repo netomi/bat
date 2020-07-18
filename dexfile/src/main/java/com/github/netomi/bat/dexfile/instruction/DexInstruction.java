@@ -88,6 +88,60 @@ public class DexInstruction
                     instructions[offset + 1] >>> 8  & 0xff
                 };
                 break;
+
+            case FORMAT_35c:
+                {
+                    int registerCount = (instructions[offset] >>> 12) & 0xf;
+                    switch (registerCount) {
+                        case 0:
+                            registers = EMPTY_REGISTERS;
+                            break;
+
+                        case 1:
+                            registers = new int[] {
+                                instructions[offset + 2] & 0xf
+                            };
+                            break;
+
+                        case 2:
+                            registers = new int[] {
+                                instructions[offset + 2] & 0xf,
+                                (instructions[offset + 2] >>> 4) & 0xf
+                            };
+                            break;
+
+                        case 3:
+                            registers = new int[] {
+                                instructions[offset + 2]         & 0xf,
+                                (instructions[offset + 2] >>> 4) & 0xf,
+                                (instructions[offset + 2] >>> 8) & 0xf,
+                            };
+                            break;
+
+                        case 4:
+                            registers = new int[] {
+                                instructions[offset + 2]          & 0xf,
+                                (instructions[offset + 2] >>>  4) & 0xf,
+                                (instructions[offset + 2] >>>  8) & 0xf,
+                                (instructions[offset + 2] >>> 12) & 0xf
+                            };
+                            break;
+
+                        case 5:
+                            registers = new int[] {
+                                instructions[offset + 2]          & 0xf,
+                                (instructions[offset + 2] >>>  4) & 0xf,
+                                (instructions[offset + 2] >>>  8) & 0xf,
+                                (instructions[offset + 2] >>> 12) & 0xf,
+                                (instructions[offset]     >>>  8) & 0xf
+                            };
+                            break;
+
+                        default:
+                            throw new IllegalArgumentException("unexpected value for A when readinng instruction with opcode " + opcode);
+                    }
+                }
+                break;
         }
     }
 

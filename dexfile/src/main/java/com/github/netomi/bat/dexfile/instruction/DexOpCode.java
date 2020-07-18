@@ -140,11 +140,11 @@ public enum DexOpCode
 
     // method instructions.
 
-    INVOKE_VIRTUAL((byte) 0x6e, DexInstructionFormat.FORMAT_35c, "invoke-virtual"),
-    INVOKE_SUPER((byte) 0x6f, DexInstructionFormat.FORMAT_35c, "invoke-super"),
-    INVOKE_DIRECT((byte) 0x70, DexInstructionFormat.FORMAT_35c, "invoke-direct"),
-    INVOKE_STATIC((byte) 0x71, DexInstructionFormat.FORMAT_35c, "invoke-static"),
-    INVOKE_INTERFACE((byte) 0x72, DexInstructionFormat.FORMAT_35c, "invoke-interface"),
+    INVOKE_VIRTUAL(  (byte) 0x6e, DexInstructionFormat.FORMAT_35c, MethodInstruction::create, "invoke-virtual"),
+    INVOKE_SUPER(    (byte) 0x6f, DexInstructionFormat.FORMAT_35c, MethodInstruction::create, "invoke-super"),
+    INVOKE_DIRECT(   (byte) 0x70, DexInstructionFormat.FORMAT_35c, MethodInstruction::create, "invoke-direct"),
+    INVOKE_STATIC(   (byte) 0x71, DexInstructionFormat.FORMAT_35c, MethodInstruction::create, "invoke-static"),
+    INVOKE_INTERFACE((byte) 0x72, DexInstructionFormat.FORMAT_35c, MethodInstruction::create, "invoke-interface"),
 
     INVOKE_VIRTUAL_RANGE((byte) 0x74, DexInstructionFormat.FORMAT_3rc, "invoke-virtual/range"),
     INVOKE_SUPER_RANGE((byte) 0x75, DexInstructionFormat.FORMAT_3rc, "invoke-super/range"),
