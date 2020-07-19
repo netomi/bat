@@ -64,6 +64,9 @@ public class DexInstruction
         switch (opcode.getFormat()) {
             case FORMAT_00x:
             case FORMAT_10x:
+            case FORMAT_10t:
+            case FORMAT_20t:
+            case FORMAT_30t:
                 registers = EMPTY_REGISTERS;
                 break;
 

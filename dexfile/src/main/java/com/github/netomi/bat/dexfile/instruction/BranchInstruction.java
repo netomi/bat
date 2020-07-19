@@ -41,9 +41,21 @@ extends      DexInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
+            case FORMAT_10t:
+                branchOffset = instructions[offset] >> 8;
+                break;
+
+            case FORMAT_20t:
             case FORMAT_21t:
             case FORMAT_22t:
                 branchOffset = instructions[offset + 1];
+                break;
+
+            case FORMAT_30t:
+            case FORMAT_31t:
+                branchOffset =
+                    instructions[offset + 1] |
+                    (instructions[offset + 2] << 16);
                 break;
 
             default:

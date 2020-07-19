@@ -66,16 +66,23 @@ public enum DexOpCode
     FILLED_NEW_ARRAY_RANGE((byte) 0x25, DexInstructionFormat.FORMAT_3rc, "filled-new-array/range"),
     FILL_ARRAY_DATA((byte) 0x26, DexInstructionFormat.FORMAT_31t, "fill-array-data"),
     THROW((byte) 0x27, DexInstructionFormat.FORMAT_11x, "throw"),
-    GOTO((byte) 0x28, DexInstructionFormat.FORMAT_10t, "goto"),
-    GOTO_16((byte) 0x29, DexInstructionFormat.FORMAT_20t, "goto/16"),
-    GOTO_32((byte) 0x2a, DexInstructionFormat.FORMAT_30t, "goto/32"),
-    PACKED_SWITCH((byte) 0x2b, DexInstructionFormat.FORMAT_31t, "packed-switch"),
-    SPARSE_SWITCH((byte) 0x2c, DexInstructionFormat.FORMAT_31t, "sparse-switch"),
-    CMPL_FLOAT((byte) 0x2d, DexInstructionFormat.FORMAT_23x, "cmpl-float"),
-    CMPG_FLOAT((byte) 0x2e, DexInstructionFormat.FORMAT_23x, "cmpg-float"),
-    CMPL_DOUBLE((byte) 0x2f, DexInstructionFormat.FORMAT_23x, "cmpl-double"),
-    CMPG_DOUBLE((byte) 0x30, DexInstructionFormat.FORMAT_23x, "cmpg-double"),
-    CMP_LONG((byte) 0x31, DexInstructionFormat.FORMAT_23x, "cmp-long"),
+
+    // branch instructions.
+
+    GOTO(   (byte) 0x28, DexInstructionFormat.FORMAT_10t, BranchInstruction::create, "goto"),
+    GOTO_16((byte) 0x29, DexInstructionFormat.FORMAT_20t, BranchInstruction::create, "goto/16"),
+    GOTO_32((byte) 0x2a, DexInstructionFormat.FORMAT_30t, BranchInstruction::create, "goto/32"),
+
+    PACKED_SWITCH((byte) 0x2b, DexInstructionFormat.FORMAT_31t, BranchInstruction::create, "packed-switch"),
+    SPARSE_SWITCH((byte) 0x2c, DexInstructionFormat.FORMAT_31t, BranchInstruction::create, "sparse-switch"),
+
+    // basic instructions.
+
+    CMPL_FLOAT( (byte) 0x2d, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpl-float"),
+    CMPG_FLOAT( (byte) 0x2e, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpg-float"),
+    CMPL_DOUBLE((byte) 0x2f, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpl-double"),
+    CMPG_DOUBLE((byte) 0x30, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpg-double"),
+    CMP_LONG(   (byte) 0x31, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmp-long"),
 
     // branch instructions.
 
