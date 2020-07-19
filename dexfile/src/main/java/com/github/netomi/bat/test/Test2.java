@@ -18,8 +18,15 @@ package com.github.netomi.bat.test;
 public class Test2 {
 
     public static void main(String[] args) {
-        byte b = (byte) 0xff;
+        short value1 = (short) 0xf000;
+        short value2 = 0x0001;
 
-        System.out.println(Integer.toHexString(b & 0xff));
+        System.out.println(Integer.toHexString(value1));
+        System.out.println(Integer.toHexString(value2));
+
+        int intValue = (value1 & 0xffff) | (value2 << 16);
+
+        System.out.println(intValue);
+
     }
 }

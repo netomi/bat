@@ -26,29 +26,31 @@ public enum DexOpCode
     MOVE(              (byte) 0x01, DexInstructionFormat.FORMAT_12x, BasicInstruction::create, "move"),
     MOVE_FROM16(       (byte) 0x02, DexInstructionFormat.FORMAT_22x, BasicInstruction::create, "move/from16"),
     MOVE_16(           (byte) 0x03, DexInstructionFormat.FORMAT_32x, BasicInstruction::create, "move/16"),
-    MOVE_WIDE(         (byte) 0x04, DexInstructionFormat.FORMAT_12x, BasicInstruction::create, "move-wide"),
-    MOVE_WIDE_FROM16(  (byte) 0x05, DexInstructionFormat.FORMAT_22x, BasicInstruction::create, "move-wide/from16"),
-    MOVE_WIDE_16(      (byte) 0x06, DexInstructionFormat.FORMAT_32x, BasicInstruction::create, "move-wide/16"),
+    MOVE_WIDE(         (byte) 0x04, DexInstructionFormat.FORMAT_12x, BasicInstruction::create, "move-wide",        true),
+    MOVE_WIDE_FROM16(  (byte) 0x05, DexInstructionFormat.FORMAT_22x, BasicInstruction::create, "move-wide/from16", true),
+    MOVE_WIDE_16(      (byte) 0x06, DexInstructionFormat.FORMAT_32x, BasicInstruction::create, "move-wide/16",     true),
     MOVE_OBJECT(       (byte) 0x07, DexInstructionFormat.FORMAT_12x, BasicInstruction::create, "move-object"),
     MOVE_OBJECT_FROM16((byte) 0x08, DexInstructionFormat.FORMAT_22x, BasicInstruction::create, "move-object/from16"),
     MOVE_OBJECT_16(    (byte) 0x09, DexInstructionFormat.FORMAT_32x, BasicInstruction::create, "move-object/16"),
     MOVE_RESULT(       (byte) 0x0a, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result"),
-    MOVE_RESULT_WIDE(  (byte) 0x0b, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result-wide"),
+    MOVE_RESULT_WIDE(  (byte) 0x0b, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result-wide", true),
     MOVE_RESULT_OBJECT((byte) 0x0c, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result-object"),
     MOVE_EXCEPTION(    (byte) 0x0d, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "move-exception"),
     RETURN_VOID(       (byte) 0x0e, DexInstructionFormat.FORMAT_10x, BasicInstruction::create, "return-void"),
     RETURN(            (byte) 0x0f, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "return"),
-    RETURN_WIDE(       (byte) 0x10, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "return-wide"),
+    RETURN_WIDE(       (byte) 0x10, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "return-wide",      true),
     RETURN_OBJECT(     (byte) 0x11, DexInstructionFormat.FORMAT_11x, BasicInstruction::create, "return-object"),
 
-    CONST_4((byte) 0x12, DexInstructionFormat.FORMAT_11n, "const/4"),
-    CONST_16((byte) 0x13, DexInstructionFormat.FORMAT_21s, "const/16"),
-    CONST((byte) 0x14, DexInstructionFormat.FORMAT_31i, "const"),
-    CONST_HIGH16((byte) 0x15, DexInstructionFormat.FORMAT_21h, "const/high16"),
-    CONST_WIDE_16((byte) 0x16, DexInstructionFormat.FORMAT_21s, "const-wide/high16"),
-    CONST_WIDE_32((byte) 0x17, DexInstructionFormat.FORMAT_31i, "const-wide/32"),
-    CONST_WIDE((byte) 0x18, DexInstructionFormat.FORMAT_51l, "const-wide"),
-    CONST_WIDE_HIGH16((byte) 0x19, DexInstructionFormat.FORMAT_21h, "const-wide/high16"),
+    // literal instructions.
+
+    CONST_4(          (byte) 0x12, DexInstructionFormat.FORMAT_11n, LiteralInstruction::create, "const/4"),
+    CONST_16(         (byte) 0x13, DexInstructionFormat.FORMAT_21s, LiteralInstruction::create, "const/16"),
+    CONST(            (byte) 0x14, DexInstructionFormat.FORMAT_31i, LiteralInstruction::create, "const"),
+    CONST_HIGH16(     (byte) 0x15, DexInstructionFormat.FORMAT_21h, LiteralInstruction::create, "const/high16"),
+    CONST_WIDE_16(    (byte) 0x16, DexInstructionFormat.FORMAT_21s, LiteralInstruction::create, "const-wide/high16", true),
+    CONST_WIDE_32(    (byte) 0x17, DexInstructionFormat.FORMAT_31i, LiteralInstruction::create, "const-wide/32",     true),
+    CONST_WIDE(       (byte) 0x18, DexInstructionFormat.FORMAT_51l, LiteralInstruction::create, "const-wide",        true),
+    CONST_WIDE_HIGH16((byte) 0x19, DexInstructionFormat.FORMAT_21h, LiteralInstruction::create, "const-wide/high16", true),
 
     CONST_STRING((byte) 0x1a, DexInstructionFormat.FORMAT_21c, "const-string"),
     CONST_STRING_JUMBO((byte) 0x1b, DexInstructionFormat.FORMAT_31c, "const-string/jumbo"),
@@ -80,9 +82,9 @@ public enum DexOpCode
 
     CMPL_FLOAT( (byte) 0x2d, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpl-float"),
     CMPG_FLOAT( (byte) 0x2e, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpg-float"),
-    CMPL_DOUBLE((byte) 0x2f, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpl-double"),
-    CMPG_DOUBLE((byte) 0x30, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpg-double"),
-    CMP_LONG(   (byte) 0x31, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmp-long"),
+    CMPL_DOUBLE((byte) 0x2f, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpl-double", true),
+    CMPG_DOUBLE((byte) 0x30, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpg-double", true),
+    CMP_LONG(   (byte) 0x31, DexInstructionFormat.FORMAT_23x, BasicInstruction::create, "cmp-long",    true),
 
     // branch instructions.
 
@@ -102,14 +104,14 @@ public enum DexOpCode
     // array instructions.
 
     AGET(        (byte) 0x44, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget"),
-    AGET_WIDE(   (byte) 0x45, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-wide"),
+    AGET_WIDE(   (byte) 0x45, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-wide", true),
     AGET_OBJECT( (byte) 0x46, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-object"),
     AGET_BOOLEAN((byte) 0x47, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-boolean"),
     AGET_BYTE(   (byte) 0x48, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-byte"),
     AGET_CHAR(   (byte) 0x49, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-char"),
     AGET_SHORT(  (byte) 0x4a, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aget-short"),
     APUT(        (byte) 0x4b, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput"),
-    APUT_WIDE(   (byte) 0x4c, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-wide"),
+    APUT_WIDE(   (byte) 0x4c, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-wide", true),
     APUT_OBJECT( (byte) 0x4d, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-object"),
     APUT_BOOLEAN((byte) 0x4e, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-boolean"),
     APUT_BYTE(   (byte) 0x4f, DexInstructionFormat.FORMAT_23x, ArrayInstruction::create, "aput-byte"),
@@ -119,14 +121,14 @@ public enum DexOpCode
     // field instructions.
 
     IGET(        (byte) 0x52, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget"),
-    IGET_WIDE(   (byte) 0x53, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-wide"),
+    IGET_WIDE(   (byte) 0x53, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-wide", true),
     IGET_OBJECT( (byte) 0x54, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-object"),
     IGET_BOOLEAN((byte) 0x55, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-boolean"),
     IGET_BYTE(   (byte) 0x56, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-byte"),
     IGET_CHAR(   (byte) 0x57, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-char"),
     IGET_SHORT(  (byte) 0x58, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iget-short"),
     IPUT(        (byte) 0x59, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput"),
-    IPUT_WIDE(   (byte) 0x5a, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-wide"),
+    IPUT_WIDE(   (byte) 0x5a, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-wide", true),
     IPUT_OBJECT( (byte) 0x5b, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-object"),
     IPUT_BOOLEAN((byte) 0x5c, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-boolean"),
     IPUT_BYTE(   (byte) 0x5d, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-byte"),
@@ -134,14 +136,14 @@ public enum DexOpCode
     IPUT_SHORT(  (byte) 0x5f, DexInstructionFormat.FORMAT_22c, FieldInstruction::create, "iput-short"),
 
     SGET        ((byte) 0x60, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget"),
-    SGET_WIDE   ((byte) 0x61, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-wide"),
+    SGET_WIDE   ((byte) 0x61, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-wide", true),
     SGET_OBJECT ((byte) 0x62, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-object"),
     SGET_BOOLEAN((byte) 0x63, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-boolean"),
     SGET_BYTE   ((byte) 0x64, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-byte"),
     SGET_CHAR   ((byte) 0x65, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-char"),
     SGET_SHORT  ((byte) 0x66, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sget-short"),
     SPUT        ((byte) 0x67, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput"),
-    SPUT_WIDE   ((byte) 0x68, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-wide"),
+    SPUT_WIDE   ((byte) 0x68, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-wide", true),
     SPUT_OBJECT ((byte) 0x69, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-object"),
     SPUT_BOOLEAN((byte) 0x6a, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-boolean"),
     SPUT_BYTE   ((byte) 0x6b, DexInstructionFormat.FORMAT_21c, FieldInstruction::create, "sput-byte"),
@@ -166,21 +168,21 @@ public enum DexOpCode
 
     NEG_INT(        (byte) 0x7b, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "neg-int"),
     NOT_INT(        (byte) 0x7c, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "not-int"),
-    NEG_LONG(       (byte) 0x7d, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "neg-long"),
-    NOT_LONG(       (byte) 0x7e, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "not-long"),
+    NEG_LONG(       (byte) 0x7d, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "neg-long",        true),
+    NOT_LONG(       (byte) 0x7e, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "not-long",        true),
     NEG_FLOAT(      (byte) 0x7f, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "neg-float"),
-    NEG_DOUBLE(     (byte) 0x80, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "neg-double"),
-    INT_TO_LONG(    (byte) 0x81, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "int-to-long"),
+    NEG_DOUBLE(     (byte) 0x80, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "neg-double",      true),
+    INT_TO_LONG(    (byte) 0x81, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "int-to-long",     true),
     INT_TO_FLOAT(   (byte) 0x82, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "int-to-float"),
-    INT_TO_DOUBLE(  (byte) 0x83, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "int-to-double"),
+    INT_TO_DOUBLE(  (byte) 0x83, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "int-to-double",   true),
     LONG_TO_INT(    (byte) 0x84, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "long-to-int"),
     LONG_TO_FLOAT(  (byte) 0x85, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "long-to-float"),
-    LONG_TO_DOUBLE( (byte) 0x86, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "long-to-double"),
+    LONG_TO_DOUBLE( (byte) 0x86, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "long-to-double",  true),
     FLOAT_TO_INT(   (byte) 0x87, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "float-to-int"),
-    FLOAT_TO_LONG(  (byte) 0x88, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "float-to-long"),
-    FLOAT_TO_DOUBLE((byte) 0x89, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "float-to-double"),
+    FLOAT_TO_LONG(  (byte) 0x88, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "float-to-long",   true),
+    FLOAT_TO_DOUBLE((byte) 0x89, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "float-to-double", true),
     DOUBLE_TO_INT(  (byte) 0x8a, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "double-to-int"),
-    DOUBLE_TO_LONG( (byte) 0x8b, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "double-to-long"),
+    DOUBLE_TO_LONG( (byte) 0x8b, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "double-to-long",  true),
     DOUBLE_TO_FLOAT((byte) 0x8c, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "double-to-float"),
     INT_TO_BYTE(    (byte) 0x8d, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "int-to-byte"),
     INT_TO_CHAR(    (byte) 0x8e, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "int-to-char"),
@@ -197,27 +199,27 @@ public enum DexOpCode
     SHL_INT(   (byte) 0x98, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "shl-int"),
     SHR_INT(   (byte) 0x99, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "shr-int"),
     USHR_INT(  (byte) 0x9a, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "ushr-int"),
-    ADD_LONG(  (byte) 0x9b, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "add-long"),
-    SUB_LONG(  (byte) 0x9c, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "sub-long"),
-    MUL_LONG(  (byte) 0x9d, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "mul-long"),
-    DIV_LONG(  (byte) 0x9e, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "div-long"),
-    REM_LONG(  (byte) 0x9f, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "rem-long"),
-    AND_LONG(  (byte) 0xa0, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "and-long"),
-    OR_LONG(   (byte) 0xa1, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "or-long"),
-    XOR_LONG(  (byte) 0xa2, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "xor-long"),
-    SHL_LONG(  (byte) 0xa3, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "shl-long"),
-    SHR_LONG(  (byte) 0xa4, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "shr-long"),
-    USHR_LONG( (byte) 0xa5, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "ushr-long"),
+    ADD_LONG(  (byte) 0x9b, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "add-long",  true),
+    SUB_LONG(  (byte) 0x9c, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "sub-long",  true),
+    MUL_LONG(  (byte) 0x9d, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "mul-long",  true),
+    DIV_LONG(  (byte) 0x9e, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "div-long",  true),
+    REM_LONG(  (byte) 0x9f, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "rem-long",  true),
+    AND_LONG(  (byte) 0xa0, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "and-long",  true),
+    OR_LONG(   (byte) 0xa1, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "or-long",   true),
+    XOR_LONG(  (byte) 0xa2, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "xor-long",  true),
+    SHL_LONG(  (byte) 0xa3, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "shl-long",  true),
+    SHR_LONG(  (byte) 0xa4, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "shr-long",  true),
+    USHR_LONG( (byte) 0xa5, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "ushr-long", true),
     ADD_FLOAT( (byte) 0xa6, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "add-float"),
     SUB_FLOAT( (byte) 0xa7, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "sub-float"),
     MUL_FLOAT( (byte) 0xa8, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "mul-float"),
     DIV_FLOAT( (byte) 0xa9, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "div-float"),
     REM_FLOAT( (byte) 0xaa, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "rem-float"),
-    ADD_DOUBLE((byte) 0xab, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "add-double"),
-    SUB_DOUBLE((byte) 0xac, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "sub-double"),
-    MUL_DOUBLE((byte) 0xad, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "mul-double"),
-    DIV_DOUBLE((byte) 0xae, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "div-double"),
-    REM_DOUBLE((byte) 0xaf, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "rem-double"),
+    ADD_DOUBLE((byte) 0xab, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "add-double", true),
+    SUB_DOUBLE((byte) 0xac, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "sub-double", true),
+    MUL_DOUBLE((byte) 0xad, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "mul-double", true),
+    DIV_DOUBLE((byte) 0xae, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "div-double", true),
+    REM_DOUBLE((byte) 0xaf, DexInstructionFormat.FORMAT_23x, ArithmeticInstruction::create, "rem-double", true),
 
     ADD_INT_2ADDR(   (byte) 0xb0, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "add-int/2addr"),
     SUB_INT_2ADDR(   (byte) 0xb1, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "sub-int/2addr"),
@@ -230,27 +232,27 @@ public enum DexOpCode
     SHL_INT_2ADDR(   (byte) 0xb8, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "shl-int/2addr"),
     SHR_INT_2ADDR(   (byte) 0xb9, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "shr-int/2addr"),
     USHR_INT_2ADDR(  (byte) 0xba, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "ushr-int/2addr"),
-    ADD_LONG_2ADDR(  (byte) 0xbb, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "add-long/2addr"),
-    SUB_LONG_2ADDR(  (byte) 0xbc, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "sub-long/2addr"),
-    MUL_LONG_2ADDR(  (byte) 0xbd, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "mul-long/2addr"),
-    DIV_LONG_2ADDR(  (byte) 0xbe, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "div-long/2addr"),
-    REM_LONG_2ADDR(  (byte) 0xbf, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "rem-long/2addr"),
-    AND_LONG_2ADDR(  (byte) 0xc0, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "and-long/2addr"),
-    OR_LONG_2ADDR(   (byte) 0xc1, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "or-long/2addr"),
-    XOR_LONG_2ADDR(  (byte) 0xc2, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "xor-long/2addr"),
-    SHL_LONG_2ADDR(  (byte) 0xc3, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "shl-long/2addr"),
-    SHR_LONG_2ADDR(  (byte) 0xc4, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "shr-long/2addr"),
-    USHR_LONG_2ADDR( (byte) 0xc5, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "ushr-long/2addr"),
+    ADD_LONG_2ADDR(  (byte) 0xbb, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "add-long/2addr",  true),
+    SUB_LONG_2ADDR(  (byte) 0xbc, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "sub-long/2addr",  true),
+    MUL_LONG_2ADDR(  (byte) 0xbd, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "mul-long/2addr",  true),
+    DIV_LONG_2ADDR(  (byte) 0xbe, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "div-long/2addr",  true),
+    REM_LONG_2ADDR(  (byte) 0xbf, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "rem-long/2addr",  true),
+    AND_LONG_2ADDR(  (byte) 0xc0, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "and-long/2addr",  true),
+    OR_LONG_2ADDR(   (byte) 0xc1, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "or-long/2addr",   true),
+    XOR_LONG_2ADDR(  (byte) 0xc2, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "xor-long/2addr",  true),
+    SHL_LONG_2ADDR(  (byte) 0xc3, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "shl-long/2addr",  true),
+    SHR_LONG_2ADDR(  (byte) 0xc4, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "shr-long/2addr",  true),
+    USHR_LONG_2ADDR( (byte) 0xc5, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "ushr-long/2addr", true),
     ADD_FLOAT_2ADDR( (byte) 0xc6, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "add-float/2addr"),
     SUB_FLOAT_2ADDR( (byte) 0xc7, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "sub-float/2addr"),
     MUL_FLOAT_2ADDR( (byte) 0xc8, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "mul-float/2addr"),
     DIV_FLOAT_2ADDR( (byte) 0xc9, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "div-float/2addr"),
     REM_FLOAT_2ADDR( (byte) 0xca, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "rem-float/2addr"),
-    ADD_DOUBLE_2ADDR((byte) 0xcb, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "add-double/2addr"),
-    SUB_DOUBLE_2ADDR((byte) 0xcc, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "sub-double/2addr"),
-    MUL_DOUBLE_2ADDR((byte) 0xcd, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "mul-double/2addr"),
-    DIV_DOUBLE_2ADDR((byte) 0xce, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "div-double/2addr"),
-    REM_DOUBLE_2ADDR((byte) 0xcf, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "rem-double/2addr"),
+    ADD_DOUBLE_2ADDR((byte) 0xcb, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "add-double/2addr", true),
+    SUB_DOUBLE_2ADDR((byte) 0xcc, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "sub-double/2addr", true),
+    MUL_DOUBLE_2ADDR((byte) 0xcd, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "mul-double/2addr", true),
+    DIV_DOUBLE_2ADDR((byte) 0xce, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "div-double/2addr", true),
+    REM_DOUBLE_2ADDR((byte) 0xcf, DexInstructionFormat.FORMAT_12x, ArithmeticInstruction::create, "rem-double/2addr", true),
 
     ADD_INT_LIT16((byte) 0xd0, DexInstructionFormat.FORMAT_22s, "add-int/lit16"),
     RSUB_INT((byte) 0xd1, DexInstructionFormat.FORMAT_22s, "rsub-int"),
@@ -284,6 +286,7 @@ public enum DexOpCode
 
 
     private final byte                 opCode;
+    private final boolean              wide;
     private final DexInstructionFormat format;
     private final InstructionSupplier  supplier;
     private final String               mnemonic;
@@ -300,14 +303,19 @@ public enum DexOpCode
     }
 
     DexOpCode(byte opcode, DexInstructionFormat format, String mnemonic) {
-        this(opcode, format, DexInstruction::createGeneric, mnemonic);
+        this(opcode, format, DexInstruction::createGeneric, mnemonic, false);
     }
 
     DexOpCode(byte opcode, DexInstructionFormat format, InstructionSupplier supplier, String mnemonic) {
+        this(opcode, format, supplier, mnemonic, false);
+    }
+
+    DexOpCode(byte opcode, DexInstructionFormat format, InstructionSupplier supplier, String mnemonic, boolean wide) {
         this.opCode   = opcode;
         this.format   = format;
         this.supplier = supplier;
         this.mnemonic = mnemonic;
+        this.wide     = wide;
     }
 
     public byte getOpCode() {
@@ -328,6 +336,10 @@ public enum DexOpCode
 
     public String getMnemonic() {
         return mnemonic;
+    }
+
+    public boolean isWide() {
+        return wide;
     }
 
     public DexInstruction createInstruction(byte ident) {

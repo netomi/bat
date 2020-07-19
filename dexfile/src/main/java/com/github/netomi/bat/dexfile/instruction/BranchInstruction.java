@@ -54,7 +54,7 @@ extends      DexInstruction
             case FORMAT_30t:
             case FORMAT_31t:
                 branchOffset =
-                    instructions[offset + 1] |
+                    (instructions[offset + 1] & 0xffff) |
                     (instructions[offset + 2] << 16);
                 break;
 

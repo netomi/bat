@@ -70,6 +70,12 @@ public class DexInstruction
                 registers = EMPTY_REGISTERS;
                 break;
 
+            case FORMAT_11n:
+                registers = new int[] {
+                    instructions[offset] >>> 8  & 0xf,
+                };
+                break;
+
             case FORMAT_12x:
             case FORMAT_22c:
             case FORMAT_22t:
@@ -81,6 +87,10 @@ public class DexInstruction
 
             case FORMAT_21c:
             case FORMAT_21t:
+            case FORMAT_21s:
+            case FORMAT_21h:
+            case FORMAT_31i:
+            case FORMAT_51l:
                 registers = new int[] {
                     instructions[offset] >>> 8  & 0xff,
                 };
@@ -143,7 +153,7 @@ public class DexInstruction
                             break;
 
                         default:
-                            throw new IllegalArgumentException("unexpected value for A when readinng instruction with opcode " + opcode);
+                            throw new IllegalArgumentException("unexpected value when reading instruction with opcode " + opcode);
                     }
                 }
                 break;
