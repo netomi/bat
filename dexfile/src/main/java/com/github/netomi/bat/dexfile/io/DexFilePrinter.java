@@ -62,26 +62,26 @@ implements   DexFileVisitor,
     public void visitHeader(DexFile dexFile, DexHeader header) {
         println("DEX file header:");
         println("magic               : '" + Primitives.toAsciiString(header.magic) + "'");
-        println("checksum            : " + Primitives.toHexString(header.checksum));
+        println("checksum            : " + Primitives.asHexValue(header.checksum, 8));
         println("signature           : " + formatSignatureByteArray(header.signature));
         println("file_size           : " + header.fileSize);
         println("header_size         : " + header.headerSize);
         println("link_size           : " + header.linkSize);
-        println("link_off            : " + formatNumber(header.linkOffset));
+        println("link_off            : " + formatNumber((long) header.linkOffset));
         println("string_ids_size     : " + header.stringIDsSize);
-        println("string_ids_off      : " + formatNumber(header.stringIDsOffsets));
+        println("string_ids_off      : " + formatNumber((long) header.stringIDsOffsets));
         println("type_ids_size       : " + header.typeIDsSize);
-        println("type_ids_off        : " + formatNumber(header.typeIDsOffset));
+        println("type_ids_off        : " + formatNumber((long) header.typeIDsOffset));
         println("proto_ids_size      : " + header.protoIDsSize);
-        println("proto_ids_off       : " + formatNumber(header.protoIDsOffset));
+        println("proto_ids_off       : " + formatNumber((long) header.protoIDsOffset));
         println("field_ids_size      : " + header.fieldIDsSize);
-        println("field_ids_off       : " + formatNumber(header.fieldIDsOffset));
+        println("field_ids_off       : " + formatNumber((long) header.fieldIDsOffset));
         println("method_ids_size     : " + header.methodIDsSize);
-        println("method_ids_off      : " + formatNumber(header.methodIDsOffset));
+        println("method_ids_off      : " + formatNumber((long) header.methodIDsOffset));
         println("class_defs_size     : " + header.classDefsSize);
-        println("class_defs_off      : " + formatNumber(header.classDefsOffset));
+        println("class_defs_off      : " + formatNumber((long) header.classDefsOffset));
         println("data_size           : " + header.dataSize);
-        println("data_off            : " + formatNumber(header.dataOffset));
+        println("data_off            : " + formatNumber((long) header.dataOffset));
         println();
     }
 
@@ -173,7 +173,8 @@ implements   DexFileVisitor,
 
         code.instructionsAccept(dexFile, classDef, method, code, this);
 
-        println(String.format("      catches       : %d", code.tries.size()));
+        String catchCount = code.tries.size() == 0 ? "(none)" : String.valueOf(code.tries.size());
+        println(String.format("      catches       : %s", catchCount));
 
         code.triesAccept(dexFile, classDef, method, code, this);
 
@@ -291,6 +292,10 @@ implements   DexFileVisitor,
     }
 
     private static String formatNumber(long number) {
+        return String.format("%d (0x%06x)", number, number);
+    }
+
+    private static String formatNumber(int number) {
         return String.format("%d (0x%04x)", number, number);
     }
 

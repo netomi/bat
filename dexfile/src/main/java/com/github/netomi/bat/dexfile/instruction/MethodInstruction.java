@@ -17,7 +17,6 @@ package com.github.netomi.bat.dexfile.instruction;
 
 import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.FieldID;
 import com.github.netomi.bat.dexfile.MethodID;
 import com.github.netomi.bat.dexfile.util.Primitives;
 
@@ -59,7 +58,22 @@ extends      DexInstruction
 
     @Override
     public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(getMnemonic());
+
+        if (registers.length > 0) {
+            sb.append(' ');
+            sb.append('{');
+            for (int idx = 0; idx < registers.length; idx++) {
+                if (idx > 0) {
+                    sb.append(", ");
+                }
+                sb.append('v');
+                sb.append(registers[idx]);
+            }
+            sb.append('}');
+        }
 
         sb.append(", ");
 

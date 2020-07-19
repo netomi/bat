@@ -91,4 +91,16 @@ public final class Primitives
         sb.append(hexValue);
         return sb.toString();
     }
+
+    public static String asHexValue(long value, int digits) {
+        StringBuilder sb = new StringBuilder();
+
+        String hexValue = Long.toHexString(value);
+        int leadingZeros = digits - hexValue.length();
+        for (int i = 0; i < leadingZeros; i++) {
+            sb.append('0');
+        }
+        sb.append(hexValue);
+        return sb.toString();
+    }
 }
