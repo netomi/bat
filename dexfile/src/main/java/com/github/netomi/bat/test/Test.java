@@ -34,7 +34,8 @@ public class Test {
 
             reader.visitDexFile(dexFile);
 
-            dexFile.accept(new DexFilePrinter());
+            dexFile.accept(new DexFilePrinter(new FileOutputStream("test.log")));
+            //dexFile.accept(new DexFilePrinter());
 
             DexFileWriter writer = new DexFileWriter(os);
 

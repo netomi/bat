@@ -21,7 +21,8 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction;
 import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.*;
 
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class DexFilePrinter
 implements   DexFileVisitor,
@@ -37,7 +38,7 @@ implements   DexFileVisitor,
              TryVisitor,
              DebugSequenceVisitor
 {
-    private final PrintStream ps;
+    private final BufferedWriter out;
 
     private int fileOffset;
     private int codeOffset;
@@ -46,8 +47,9 @@ implements   DexFileVisitor,
         this(System.out);
     }
 
-    public DexFilePrinter(PrintStream ps) {
-        this.ps               = ps;
+    public DexFilePrinter(OutputStream outputStream) {
+        out = new BufferedWriter(
+              new OutputStreamWriter(outputStream, StandardCharsets.US_ASCII), 4096);
     }
 
     @Override
@@ -58,109 +60,109 @@ implements   DexFileVisitor,
 
     @Override
     public void visitHeader(DexFile dexFile, DexHeader header) {
-        ps.println("DEX file header:");
-        ps.println("magic               : '" + Primitives.toAsciiString(header.magic) + "'");
-        ps.println("checksum            : " + Primitives.toHexString(header.checksum));
-        ps.println("signature           : " + Primitives.toHexString(header.signature));
-        ps.println("file_size           : " + header.fileSize);
-        ps.println("header_size         : " + header.headerSize);
-        ps.println("link_size           : " + header.linkSize);
-        ps.println("link_off            : " + formatNumber(header.linkOffset));
-        ps.println("string_ids_size     : " + header.stringIDsSize);
-        ps.println("string_ids_off      : " + formatNumber(header.stringIDsOffsets));
-        ps.println("type_ids_size       : " + header.typeIDsSize);
-        ps.println("type_ids_off        : " + formatNumber(header.typeIDsOffset));
-        ps.println("proto_ids_size      : " + header.protoIDsSize);
-        ps.println("proto_ids_off       : " + formatNumber(header.protoIDsOffset));
-        ps.println("field_ids_size      : " + header.fieldIDsSize);
-        ps.println("field_ids_off       : " + formatNumber(header.fieldIDsOffset));
-        ps.println("method_ids_size     : " + header.methodIDsSize);
-        ps.println("method_ids_off      : " + formatNumber(header.methodIDsOffset));
-        ps.println("class_defs_size     : " + header.classDefsSize);
-        ps.println("class_defs_off      : " + formatNumber(header.classDefsOffset));
-        ps.println("data_size           : " + header.dataSize);
-        ps.println("data_off            : " + formatNumber(header.dataOffset));
-        ps.println();
+        println("DEX file header:");
+        println("magic               : '" + Primitives.toAsciiString(header.magic) + "'");
+        println("checksum            : " + Primitives.toHexString(header.checksum));
+        println("signature           : " + formatSignatureByteArray(header.signature));
+        println("file_size           : " + header.fileSize);
+        println("header_size         : " + header.headerSize);
+        println("link_size           : " + header.linkSize);
+        println("link_off            : " + formatNumber(header.linkOffset));
+        println("string_ids_size     : " + header.stringIDsSize);
+        println("string_ids_off      : " + formatNumber(header.stringIDsOffsets));
+        println("type_ids_size       : " + header.typeIDsSize);
+        println("type_ids_off        : " + formatNumber(header.typeIDsOffset));
+        println("proto_ids_size      : " + header.protoIDsSize);
+        println("proto_ids_off       : " + formatNumber(header.protoIDsOffset));
+        println("field_ids_size      : " + header.fieldIDsSize);
+        println("field_ids_off       : " + formatNumber(header.fieldIDsOffset));
+        println("method_ids_size     : " + header.methodIDsSize);
+        println("method_ids_off      : " + formatNumber(header.methodIDsOffset));
+        println("class_defs_size     : " + header.classDefsSize);
+        println("class_defs_off      : " + formatNumber(header.classDefsOffset));
+        println("data_size           : " + header.dataSize);
+        println("data_off            : " + formatNumber(header.dataOffset));
+        println();
     }
 
     @Override
     public void visitClassDef(DexFile dexFile, int index, ClassDef classDefItem) {
-        ps.println("Class #" + index + " header:");
-        ps.println("class_idx           : " + classDefItem.classIndex);
-        ps.println("access_flags        : " + formatNumber(classDefItem.accessFlags));
-        ps.println("superclass_idx      : " + classDefItem.superClassIndex);
-        ps.println("interfaces_off      : " + formatNumber(classDefItem.getInterfacesOffset()));
-        ps.println("source_file_idx     : " + classDefItem.sourceFileIndex);
-        ps.println("annotations_off     : " + formatNumber(classDefItem.getAnnotationsOffset()));
-        ps.println("class_data_off      : " + formatNumber(classDefItem.getClassDataOffset()));
+        println("Class #" + index + " header:");
+        println("class_idx           : " + classDefItem.classIndex);
+        println("access_flags        : " + formatNumber(classDefItem.accessFlags));
+        println("superclass_idx      : " + classDefItem.superClassIndex);
+        println("interfaces_off      : " + formatNumber(classDefItem.getInterfacesOffset()));
+        println("source_file_idx     : " + classDefItem.sourceFileIndex);
+        println("annotations_off     : " + formatNumber(classDefItem.getAnnotationsOffset()));
+        println("class_data_off      : " + formatNumber(classDefItem.getClassDataOffset()));
 
         if (classDefItem.classData != null) {
-            ps.println("static_fields_size  : " + classDefItem.classData.staticFields.size());
-            ps.println("instance_fields_size: " + classDefItem.classData.instanceFields.size());
-            ps.println("direct_methods_size : " + classDefItem.classData.directMethods.size());
-            ps.println("virtual_methods_size: " + classDefItem.classData.virtualMethods.size());
+            println("static_fields_size  : " + classDefItem.classData.staticFields.size());
+            println("instance_fields_size: " + classDefItem.classData.instanceFields.size());
+            println("direct_methods_size : " + classDefItem.classData.directMethods.size());
+            println("virtual_methods_size: " + classDefItem.classData.virtualMethods.size());
         } else {
-            ps.println("static_fields_size  : ");
-            ps.println("instance_fields_size: ");
-            ps.println("direct_methods_size : ");
-            ps.println("virtual_methods_size: ");
+            println("static_fields_size  : ");
+            println("instance_fields_size: ");
+            println("direct_methods_size : ");
+            println("virtual_methods_size: ");
         }
-        ps.println();
+        println();
 
-        ps.println("Class #" + index);
-        ps.println("  Class descriptor  : '" + classDefItem.getType(dexFile) + "'");
-        ps.println("  Access flags      : " + formatAccessFlags(classDefItem.accessFlags));
-        ps.println("  Superclass        : '" + classDefItem.getSuperClassType(dexFile) + "'");
-        ps.println("  Interfaces        -");
+        println("Class #" + index);
+        println("  Class descriptor  : '" + classDefItem.getType(dexFile) + "'");
+        println("  Access flags      : " + formatAccessFlags(classDefItem.accessFlags));
+        println("  Superclass        : '" + classDefItem.getSuperClassType(dexFile) + "'");
+        println("  Interfaces        -");
         classDefItem.interfacesAccept(dexFile, this);
 
         classDefItem.classDataAccept(dexFile, this);
 
-        ps.println();
-        ps.println("  source_file_idx   : " + getSourceFileIndex(dexFile, classDefItem));
-        ps.println();
+        println();
+        println("  source_file_idx   : " + getSourceFileIndex(dexFile, classDefItem));
+        println();
     }
 
     @Override
     public void visitClassData(DexFile dexFile, ClassDef classDef, ClassData classData) {
-        ps.println("  Static fields     -");
+        println("  Static fields     -");
         classData.staticFieldsAccept(dexFile, classDef, this);
-        ps.println("  Instance fields   -");
+        println("  Instance fields   -");
         classData.instanceFieldsAccept(dexFile, classDef, this);
-        ps.println("  Direct methods    -");
+        println("  Direct methods    -");
         classData.directMethodsAccept(dexFile, classDef, this);
-        ps.println("  Virtual methods   -");
+        println("  Virtual methods   -");
         classData.virtualMethodsAccept(dexFile, classDef, this);
     }
 
     @Override
     public void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField encodedField) {
-        ps.println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
-        ps.println("      name          : '" + encodedField.getName(dexFile) + "'");
-        ps.println("      type          : '" + encodedField.getType(dexFile) + "'");
-        ps.println("      access        : " + formatAccessFlags(encodedField.accessFlags));
+        println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
+        println("      name          : '" + encodedField.getName(dexFile) + "'");
+        println("      type          : '" + encodedField.getType(dexFile) + "'");
+        println("      access        : " + formatAccessFlags(encodedField.accessFlags));
     }
 
     @Override
     public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod encodedMethod) {
-        ps.println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
-        ps.println("      name          : '" + encodedMethod.getName(dexFile) + "'");
-        ps.println("      type          : '" + encodedMethod.getDescriptor(dexFile) + "'");
-        ps.println("      access        : " + formatAccessFlags(encodedMethod.accessFlags));
+        println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
+        println("      name          : '" + encodedMethod.getName(dexFile) + "'");
+        println("      type          : '" + encodedMethod.getDescriptor(dexFile) + "'");
+        println("      access        : " + formatAccessFlags(encodedMethod.accessFlags));
         encodedMethod.codeAccept(dexFile, classDef, this);
     }
 
     @Override
     public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
-        ps.println("      code          -");
-        ps.println("      registers     : " + code.registersSize);
-        ps.println("      ins           : " + code.insSize);
-        ps.println("      outs          : " + code.outsSize);
-        ps.println("      insns size    : " + code.insnsSize + " 16-bit code units");
+        println("      code          -");
+        println("      registers     : " + code.registersSize);
+        println("      ins           : " + code.insSize);
+        println("      outs          : " + code.outsSize);
+        println("      insns size    : " + code.insnsSize + " 16-bit code units");
 
         fileOffset = method.getCodeOffset();
 
-        ps.println(Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
+        println(Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
                    Primitives.asHexValue(fileOffset, 6) + "] " +
                    DexUtil.fullExternalMethodSignature(dexFile, classDef, method));
 
@@ -171,19 +173,19 @@ implements   DexFileVisitor,
 
         code.instructionsAccept(dexFile, classDef, method, code, this);
 
-        ps.println(String.format("      catches       : %d", code.tries.size()));
+        println(String.format("      catches       : %d", code.tries.size()));
 
         code.triesAccept(dexFile, classDef, method, code, this);
 
         if (code.debugInfo != null) {
-            ps.println("      positions     :");
-            code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(ps, code.debugInfo.lineStart));
+            println("      positions     :");
+            code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(code.debugInfo.lineStart));
 
-            ps.println("      locals        :");
-            code.debugInfo.debugSequenceAccept(dexFile, new LocalVariablePrinter(ps, code.registersSize));
+            println("      locals        :");
+            code.debugInfo.debugSequenceAccept(dexFile, new LocalVariablePrinter(code.registersSize));
         }
 
-        ps.println();
+        println();
     }
 
     @Override
@@ -216,7 +218,7 @@ implements   DexFileVisitor,
 
         sb.append(instruction.toString(dexFile, offset));
 
-        ps.println(sb.toString());
+        println(sb.toString());
 
         codeOffset += instruction.getLength();
     }
@@ -226,16 +228,16 @@ implements   DexFileVisitor,
         String startAddr = Primitives.toHexString((short) tryObject.startAddr);
         String endAddr   = Primitives.toHexString((short) (tryObject.startAddr + tryObject.insnCount));
 
-        ps.println(String.format("        %s - %s", startAddr, endAddr));
+        println(String.format("        %s - %s", startAddr, endAddr));
 
         EncodedCatchHandler catchHandler = tryObject.catchHandler;
 
         for (TypeAddrPair addrPair : catchHandler.handlers) {
-            ps.println(String.format("          %s -> %s", addrPair.getType(dexFile), Primitives.toHexString((short) addrPair.addr)));
+            println(String.format("          %s -> %s", addrPair.getType(dexFile), Primitives.toHexString((short) addrPair.addr)));
         }
 
         if (catchHandler.catchAllAddr != -1) {
-            ps.println(String.format("          %s -> %s", "<any>", Primitives.toHexString((short) catchHandler.catchAllAddr)));
+            println(String.format("          %s -> %s", "<any>", Primitives.toHexString((short) catchHandler.catchAllAddr)));
         }
     }
 
@@ -248,13 +250,44 @@ implements   DexFileVisitor,
 
     @Override
     public void visitType(DexFile dexFile, TypeList typeList, int index, String type) {
-        ps.println(String.format("    #%-14d : '%s'", index, type));
+        println(String.format("    #%-14d : '%s'", index, type));
     }
 
     // Private utility methods.
 
+    private void println(String s) {
+        try {
+            out.write(s);
+            out.write('\n');
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void println() {
+        try {
+            out.write('\n');
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     private static String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
         return classDefItem.sourceFileIndex + " (" + classDefItem.getSourceFile(dexFile) + ")";
+    }
+
+    private static String formatSignatureByteArray(byte[] array) {
+        StringBuilder sb = new StringBuilder();
+
+        int len = array.length;
+
+        sb.append(Primitives.asHexValue(array[0]));
+        sb.append(Primitives.asHexValue(array[1]));
+        sb.append("...");
+        sb.append(Primitives.asHexValue(array[len - 2]));
+        sb.append(Primitives.asHexValue(array[len - 1]));
+
+        return sb.toString();
     }
 
     private static String formatNumber(long number) {
@@ -277,16 +310,13 @@ implements   DexFileVisitor,
 
     // inner helper classes
 
-    private static class SourceLinePrinter
-    implements           DebugSequenceVisitor {
-
-        private final PrintStream ps;
-
+    private class SourceLinePrinter
+    implements    DebugSequenceVisitor
+    {
         private int   lineNumber;
         private short codeOffset;
 
-        SourceLinePrinter(PrintStream printStream, int lineStart) {
-            this.ps         = printStream;
+        SourceLinePrinter(int lineStart) {
             this.lineNumber = lineStart;
         }
 
@@ -311,20 +341,18 @@ implements   DexFileVisitor,
         }
 
         private void printPosition() {
-            ps.println(String.format("        %s line=%d", Primitives.toHexString(codeOffset), lineNumber));
+            println(String.format("        %s line=%d", Primitives.toHexString(codeOffset), lineNumber));
         }
     }
 
-    private static class LocalVariablePrinter
-    implements           DebugSequenceVisitor {
-
-        private final PrintStream         ps;
+    private class LocalVariablePrinter
+    implements    DebugSequenceVisitor
+    {
         private final LocalVariableInfo[] variableInfos;
 
         private short codeOffset;
 
-        LocalVariablePrinter(PrintStream printStream, int numRegisters) {
-            this.ps            = printStream;
+        LocalVariablePrinter(int numRegisters) {
             this.variableInfos = new LocalVariableInfo[numRegisters];
         }
 
@@ -377,7 +405,7 @@ implements   DexFileVisitor,
         }
 
         private void printLocal(int registerNum, LocalVariableInfo variableInfo) {
-            ps.println(String.format("        %s - %s reg=%d %s %s",
+            println(String.format("        %s - %s reg=%d %s %s",
                     Primitives.toHexString((short) variableInfo.startAddr),
                     Primitives.toHexString((short) variableInfo.endAddr),
                     registerNum,

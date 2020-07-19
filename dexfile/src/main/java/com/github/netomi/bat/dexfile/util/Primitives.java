@@ -57,22 +57,38 @@ public final class Primitives
     }
 
     public static String toHexString(byte value) {
-        return String.format("0x%02x, ", value);
+        return "0x" + asHexValue(value);
     }
 
     public static String toHexString(short value) {
-        return String.format("0x%04x", value);
+        return "0x" + asHexValue(value);
     }
 
     public static String toHexString(int value) {
-        return String.format("0x%08x", value);
+        return "0x" + asHexValue(value, 8);
     }
 
     public static String toHexString(long value) {
         return String.format("0x%08x", value);
     }
 
+    public static String asHexValue(byte value) {
+        return asHexValue(value & 0xff, 2);
+    }
+
+    public static String asHexValue(short value) {
+        return asHexValue(value & 0xffff, 4);
+    }
+
     public static String asHexValue(int value, int digits) {
-        return String.format("%0" + digits + "x", value);
+        StringBuilder sb = new StringBuilder();
+
+        String hexValue = Integer.toHexString(value);
+        int leadingZeros = digits - hexValue.length();
+        for (int i = 0; i < leadingZeros; i++) {
+            sb.append('0');
+        }
+        sb.append(hexValue);
+        return sb.toString();
     }
 }
