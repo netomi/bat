@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.*;
 /**
  * @author Thomas Neidhart
  */
-public interface TryVisitor {
+public interface TryVisitor
+{
     void visitTry(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int index, Try tryObject);
 }

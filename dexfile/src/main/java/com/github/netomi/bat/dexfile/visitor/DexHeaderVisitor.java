@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.visitor;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.DexHeader;
 
-public interface DexHeaderVisitor {
+public interface DexHeaderVisitor
+{
     void visitHeader(DexFile dexFile, DexHeader header);
 }

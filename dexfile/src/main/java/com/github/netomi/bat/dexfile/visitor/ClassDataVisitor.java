@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.ClassData;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 
-public interface ClassDataVisitor {
+public interface ClassDataVisitor
+{
     void visitClassData(DexFile dexFile, ClassDef classDef, ClassData classData);
 }

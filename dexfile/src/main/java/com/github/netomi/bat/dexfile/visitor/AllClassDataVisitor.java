@@ -19,7 +19,8 @@ import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 
 public class AllClassDataVisitor
-implements   ClassDefVisitor {
+implements   ClassDefVisitor
+{
     private final ClassDataVisitor visitor;
 
     public AllClassDataVisitor(ClassDataVisitor visitor) {

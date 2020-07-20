@@ -15,7 +15,11 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
+import com.github.netomi.bat.dexfile.ClassDef;
+import com.github.netomi.bat.dexfile.Code;
 import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
 public class PackedSwitchPayload
 extends      SwitchPayload
@@ -51,6 +55,11 @@ extends      SwitchPayload
                 (instructions[++offset] & 0xffff) |
                 (instructions[++offset] << 16);
         }
+    }
+
+    @Override
+    public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
+        visitor.visitPackedSwitchPayload(dexFile, classDef, method, code, offset, this);
     }
 
     @Override

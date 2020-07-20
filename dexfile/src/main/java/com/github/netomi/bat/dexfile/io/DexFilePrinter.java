@@ -190,7 +190,7 @@ implements   DexFileVisitor,
     }
 
     @Override
-    public void visitInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
+    public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(Primitives.asHexValue(fileOffset, 6));

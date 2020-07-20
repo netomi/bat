@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.*;
 /**
  * @author Thomas Neidhart
  */
-public interface CodeVisitor {
+public interface CodeVisitor
+{
     void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code);
 }

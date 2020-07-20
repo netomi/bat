@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.ClassDef;
@@ -23,8 +22,9 @@ import com.github.netomi.bat.dexfile.util.ClassNameMatcher;
 import com.github.netomi.bat.dexfile.util.StringMatcher;
 
 public class ClassNameFilter
-implements   ClassDefVisitor {
-    private final StringMatcher matcher;
+implements   ClassDefVisitor
+{
+    private final StringMatcher   matcher;
     private final ClassDefVisitor visitor;
 
     public ClassNameFilter(String regularExpression,

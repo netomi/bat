@@ -18,7 +18,8 @@ package com.github.netomi.bat.dexfile.visitor;
 import com.github.netomi.bat.dexfile.*;
 
 public class AllInstructionsVisitor
-implements   CodeVisitor {
+implements   CodeVisitor
+{
     private final InstructionVisitor visitor;
 
     public AllInstructionsVisitor(InstructionVisitor visitor) {

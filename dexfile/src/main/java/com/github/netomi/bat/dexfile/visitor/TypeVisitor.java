@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.visitor;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.TypeList;
 
-public interface TypeVisitor {
+public interface TypeVisitor
+{
     void visitType(DexFile dexFile, TypeList typeList, int index, String type);
 }

@@ -15,10 +15,9 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-import com.github.netomi.bat.dexfile.DexConstants;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.MethodID;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.util.Primitives;
+import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
 public class MethodInstruction
 extends      DexInstruction
@@ -54,6 +53,11 @@ extends      DexInstruction
             default:
                 throw new IllegalStateException("unexpected format for opcode " + opcode.getMnemonic());
         }
+    }
+
+    @Override
+    public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
+        visitor.visitMethodInstruction(dexFile, classDef, method, code, offset, this);
     }
 
     @Override

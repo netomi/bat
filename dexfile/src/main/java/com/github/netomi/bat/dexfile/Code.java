@@ -172,7 +172,7 @@ implements   DataItem
                                    InstructionVisitor visitor) {
         for (int offset = 0; offset < insnsSize;) {
             DexInstruction instruction = DexInstruction.create(insns, offset);
-            visitor.visitInstruction(dexFile, classDef, method, code, offset, instruction);
+            instruction.accept(dexFile, classDef, method, code, offset, visitor);
             offset += instruction.getLength();
         }
     }

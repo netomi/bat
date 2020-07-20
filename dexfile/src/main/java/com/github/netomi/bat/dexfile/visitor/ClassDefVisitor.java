@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.visitor;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 
-public interface ClassDefVisitor {
-    void visitClassDef(DexFile dexFile, int index, ClassDef classDefItem);
+public interface ClassDefVisitor
+{
+    void visitClassDef(DexFile dexFile, int index, ClassDef classDef);
 }

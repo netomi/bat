@@ -20,7 +20,8 @@ import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 
 public class AllEncodedFieldsVisitor
-implements   ClassDataVisitor {
+implements   ClassDataVisitor
+{
     private final EncodedFieldVisitor visitor;
 
     public AllEncodedFieldsVisitor(EncodedFieldVisitor visitor) {

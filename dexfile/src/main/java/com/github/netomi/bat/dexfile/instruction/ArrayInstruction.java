@@ -15,6 +15,12 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
+import com.github.netomi.bat.dexfile.ClassDef;
+import com.github.netomi.bat.dexfile.Code;
+import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
+
 public class ArrayInstruction
 extends      DexInstruction
 {
@@ -33,5 +39,10 @@ extends      DexInstruction
         if (opcode.getFormat() != DexInstructionFormat.FORMAT_23x) {
             throw new IllegalStateException("unexpected format for opcode " + opcode.getMnemonic());
         }
+    }
+
+    @Override
+    public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
+        visitor.visitArrayInstruction(dexFile, classDef, method, code, offset, this);
     }
 }

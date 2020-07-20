@@ -17,7 +17,8 @@ package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.*;
 
-public interface EncodedMethodVisitor {
+public interface EncodedMethodVisitor
+{
     default void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
         throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
     }

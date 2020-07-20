@@ -16,11 +16,54 @@
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.*;
-import com.github.netomi.bat.dexfile.instruction.DexInstruction;
+import com.github.netomi.bat.dexfile.instruction.*;
 
 /**
  * @author Thomas Neidhart
  */
-public interface InstructionVisitor {
-    void visitInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction);
+public interface InstructionVisitor
+{
+    default void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
+        throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
+    }
+
+    default void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitArrayInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitBasicInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BasicInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitBranchInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BranchInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, LiteralInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, payload);
+    }
+
+    default void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, payload);
+    }
+
+    default void visitSparseSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, SparseSwitchPayload payload) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, payload);
+    }
 }
