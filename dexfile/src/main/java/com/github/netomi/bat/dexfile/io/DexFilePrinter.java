@@ -49,13 +49,19 @@ implements   DexFileVisitor,
 
     public DexFilePrinter(OutputStream outputStream) {
         out = new BufferedWriter(
-              new OutputStreamWriter(outputStream, StandardCharsets.US_ASCII), 4096);
+              new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), 8192);
     }
 
     @Override
     public void visitDexFile(DexFile dexFile) {
         dexFile.headerAccept(this);
         dexFile.classDefsAccept(this);
+
+        try {
+            out.flush();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
