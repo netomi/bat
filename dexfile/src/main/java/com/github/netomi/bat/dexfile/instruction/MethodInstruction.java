@@ -46,6 +46,7 @@ extends      DexInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
+            case FORMAT_3rc:
             case FORMAT_35c:
                 methodIndex = instructions[offset + 1] & 0xffff;
                 break;

@@ -163,11 +163,11 @@ public enum DexOpCode
     INVOKE_STATIC(   (byte) 0x71, FORMAT_35c, MethodInstruction::create, "invoke-static"),
     INVOKE_INTERFACE((byte) 0x72, FORMAT_35c, MethodInstruction::create, "invoke-interface"),
 
-    INVOKE_VIRTUAL_RANGE((byte) 0x74, FORMAT_3rc, "invoke-virtual/range"),
-    INVOKE_SUPER_RANGE((byte) 0x75, FORMAT_3rc, "invoke-super/range"),
-    INVOKE_DIRECT_RANGE((byte) 0x76, FORMAT_3rc, "invoke-direct/range"),
-    INVOKE_STATIC_RANGE((byte) 0x77, FORMAT_3rc, "invoke-static/range"),
-    INVOKE_INTERFACE_RANGE((byte) 0x78, FORMAT_3rc, "invoke-interface/range"),
+    INVOKE_VIRTUAL_RANGE(  (byte) 0x74, FORMAT_3rc, MethodInstruction::create, "invoke-virtual/range"),
+    INVOKE_SUPER_RANGE(    (byte) 0x75, FORMAT_3rc, MethodInstruction::create, "invoke-super/range"),
+    INVOKE_DIRECT_RANGE(   (byte) 0x76, FORMAT_3rc, MethodInstruction::create, "invoke-direct/range"),
+    INVOKE_STATIC_RANGE(   (byte) 0x77, FORMAT_3rc, MethodInstruction::create, "invoke-static/range"),
+    INVOKE_INTERFACE_RANGE((byte) 0x78, FORMAT_3rc, MethodInstruction::create, "invoke-interface/range"),
 
     // arithmetic instructions.
 

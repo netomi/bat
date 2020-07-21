@@ -55,16 +55,8 @@ implements   DataItem
         sb.append('(');
 
         if (parameters != null) {
-            boolean deleteFinalSeparator = false;
-
             for (String type : parameters.getTypes(dexFile)) {
                 sb.append(type);
-                sb.append(',');
-                deleteFinalSeparator = true;
-            }
-
-            if (deleteFinalSeparator) {
-                sb.deleteCharAt(sb.length() - 1);
             }
         }
         sb.append(')');

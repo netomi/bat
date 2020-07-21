@@ -227,6 +227,7 @@ implements   DexFileVisitor,
 
         println(sb.toString());
 
+        fileOffset += instruction.getLength() * 2;
         codeOffset += instruction.getLength();
     }
 
