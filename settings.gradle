@@ -3,4 +3,5 @@ rootProject.name = 'bat-parent'
 include 'classfile'
 include 'dexfile'
 include 'commands'
+include 'smali'
 

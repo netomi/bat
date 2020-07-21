@@ -40,8 +40,22 @@ public final class DexUtil
 
     public static String fullExternalMethodSignature(DexFile dexFile, ClassDef classDef, EncodedMethod method) {
         return String.format("%s.%s:%s",
-                externalClassNameFromInternalName(classDef.getClassName(dexFile)),
-                method.getName(dexFile),
-                method.getDescriptor(dexFile));
+            externalClassNameFromInternalName(classDef.getClassName(dexFile)),
+            method.getName(dexFile),
+            method.getDescriptor(dexFile));
+    }
+
+    public static String simpleClassNameFromInternalName(String className) {
+        int idx = className.lastIndexOf('/');
+        return idx == -1 ?
+            className :
+            className.substring(idx + 1);
+    }
+
+    public static String internalPackageNameFromInternalName(String className) {
+        int idx = className.lastIndexOf('/');
+        return idx == -1 ?
+            "" :
+            className.substring(0, idx);
     }
 }
