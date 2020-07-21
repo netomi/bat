@@ -36,7 +36,8 @@ extends      DexInstruction
     public void read(short[] instructions, int offset) {
         super.read(instructions, offset);
 
-        if (opcode.getFormat() != DexInstructionFormat.FORMAT_23x) {
+        if (opcode.getFormat() != DexInstructionFormat.FORMAT_23x &&
+            opcode.getFormat() != DexInstructionFormat.FORMAT_12x) {
             throw new IllegalStateException("unexpected format for opcode " + opcode.getMnemonic());
         }
     }

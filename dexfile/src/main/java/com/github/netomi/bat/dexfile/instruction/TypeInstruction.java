@@ -15,29 +15,30 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-import com.github.netomi.bat.dexfile.ClassDef;
-import com.github.netomi.bat.dexfile.Code;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
-public class BranchInstruction
+public class TypeInstruction
 extends      DexInstruction
 {
-    private int branchOffset;
+    private int typeIndex;
 
-    static BranchInstruction create(DexOpCode opCode, byte ident) {
-        return new BranchInstruction(opCode);
+    static TypeInstruction create(DexOpCode opCode, byte ident) {
+        return new TypeInstruction(opCode);
     }
 
-    BranchInstruction(DexOpCode opcode) {
+    TypeInstruction(DexOpCode opcode) {
         super(opcode);
-        branchOffset = 0;
+        typeIndex = DexConstants.NO_INDEX;
     }
 
-    public int getBranchOffset() {
-        return branchOffset;
+    public int getTypeIndex() {
+        return typeIndex;
+    }
+
+    public TypeID getTypeID(DexFile dexFile) {
+        return dexFile.getTypeID(typeIndex);
     }
 
     @Override
@@ -45,21 +46,9 @@ extends      DexInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
-            case FORMAT_10t:
-                branchOffset = instructions[offset] >> 8;
-                break;
-
-            case FORMAT_20t:
-            case FORMAT_21t:
-            case FORMAT_22t:
-                branchOffset = instructions[offset + 1];
-                break;
-
-            case FORMAT_30t:
-            case FORMAT_31t:
-                branchOffset =
-                    (instructions[offset + 1] & 0xffff) |
-                    (instructions[offset + 2] << 16);
+            case FORMAT_21c:
+            case FORMAT_22c:
+                typeIndex = instructions[offset + 1] & 0xffff;
                 break;
 
             default:
@@ -69,29 +58,20 @@ extends      DexInstruction
 
     @Override
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
-        visitor.visitBranchInstruction(dexFile, classDef, method, code, offset, this);
+        visitor.visitTypeInstruction(dexFile, classDef, method, code, offset, this);
     }
 
     @Override
     public String toString(DexFile dexFile, int offset) {
         StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
 
-        if (registers.length > 0) {
-            sb.append(", ");
-        } else {
-            sb.append(' ');
-        }
+        sb.append(", ");
 
-        sb.append(Primitives.asHexValue(offset + branchOffset, 4));
-        sb.append(" // ");
+        TypeID typeID = getTypeID(dexFile);
+        sb.append(typeID.getType(dexFile));
 
-        if (branchOffset < 0) {
-            sb.append('-');
-            sb.append(Primitives.asHexValue(-branchOffset, 4));
-        } else {
-            sb.append('+');
-            sb.append(Primitives.asHexValue(branchOffset, 4));
-        }
+        sb.append(" // type@");
+        sb.append(Primitives.asHexValue(typeIndex, 4));
 
         return sb.toString();
     }

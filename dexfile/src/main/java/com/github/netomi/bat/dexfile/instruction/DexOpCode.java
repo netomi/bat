@@ -64,15 +64,27 @@ public enum DexOpCode
     MONITOR_ENTER((byte) 0x1d, FORMAT_11x, BasicInstruction::create, "monitor-enter"),
     MONITOR_EXIT( (byte) 0x1e, FORMAT_11x, BasicInstruction::create, "monitor-exit"),
 
-    CHECK_CAST((byte) 0x1f, FORMAT_21c, "check-cast"),
-    INSTANCE_OF((byte) 0x20, FORMAT_22c, "instance-of"),
-    ARRAY_LENGTH((byte) 0x21, FORMAT_12x, "array-length"),
-    NEW_INSTANCE((byte) 0x22, FORMAT_21c, "new-instance"),
-    NEW_ARRAY((byte) 0x23, FORMAT_22c, "new-array"),
+    // type instructions.
+
+    CHECK_CAST( (byte) 0x1f, FORMAT_21c, TypeInstruction::create, "check-cast"),
+    INSTANCE_OF((byte) 0x20, FORMAT_22c, TypeInstruction::create, "instance-of"),
+
+    // array instructions.
+
+    ARRAY_LENGTH((byte) 0x21, FORMAT_12x, ArrayInstruction::create, "array-length"),
+
+    // type instructions.
+
+    NEW_INSTANCE((byte) 0x22, FORMAT_21c, TypeInstruction::create, "new-instance"),
+    NEW_ARRAY(   (byte) 0x23, FORMAT_22c, TypeInstruction::create, "new-array"),
+
     FILLED_NEW_ARRAY((byte) 0x24, FORMAT_35c, "filled-new-array"),
     FILLED_NEW_ARRAY_RANGE((byte) 0x25, FORMAT_3rc, "filled-new-array/range"),
     FILL_ARRAY_DATA((byte) 0x26, FORMAT_31t, "fill-array-data"),
-    THROW((byte) 0x27, FORMAT_11x, "throw"),
+
+    // basic instructions.
+
+    THROW((byte) 0x27, FORMAT_11x, BasicInstruction::create, "throw"),
 
     // branch instructions.
 
