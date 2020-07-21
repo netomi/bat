@@ -418,7 +418,9 @@ implements   DexFileVisitor,
                     String parameterName = debugInfo.getParameterName(dexFile, i);
                     String parameterType = parameters.getType(dexFile, i);
 
-                    variableInfos[register] = new LocalVariableInfo(parameterName, parameterType, null);
+                    if (parameterName != null && parameterType != null) {
+                        variableInfos[register] = new LocalVariableInfo(parameterName, parameterType, null);
+                    }
 
                     // TODO: extract into util class.
                     if (parameterType.equals("J") || parameterType.equals("D")) {
@@ -480,7 +482,9 @@ implements   DexFileVisitor,
             LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
             variableInfo.endAddr = codeOffset;
 
-            printLocal(instruction.registerNum, variableInfo);
+            if (variableInfo.name != null) {
+                printLocal(instruction.registerNum, variableInfo);
+            }
         }
 
         @Override

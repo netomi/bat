@@ -54,10 +54,14 @@ public enum DexOpCode
     CONST_WIDE(       (byte) 0x18, FORMAT_51l, LiteralInstruction::create, "const-wide",        true),
     CONST_WIDE_HIGH16((byte) 0x19, FORMAT_21h, LiteralInstruction::create, "const-wide/high16", true),
 
-    CONST_STRING((byte) 0x1a, FORMAT_21c, "const-string"),
-    CONST_STRING_JUMBO((byte) 0x1b, FORMAT_31c, "const-string/jumbo"),
+    // string instructions.
 
-    CONST_CLASS((byte) 0x1c, FORMAT_21c, "const-class"),
+    CONST_STRING(      (byte) 0x1a, FORMAT_21c, StringInstruction::create, "const-string"),
+    CONST_STRING_JUMBO((byte) 0x1b, FORMAT_31c, StringInstruction::create, "const-string/jumbo"),
+
+    // type instructions.
+
+    CONST_CLASS((byte) 0x1c, FORMAT_21c, TypeInstruction::create, "const-class"),
 
     // basic instructions.
 

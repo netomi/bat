@@ -70,6 +70,6 @@ extends      DexInstruction
 
     @Override
     public String toString() {
-        return String.format("fill-array-data (%d units)", getLength());
+        return String.format("array-data (%d units)", getLength());
     }
 }

@@ -19,26 +19,26 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
-public class MethodInstruction
+public class StringInstruction
 extends      DexInstruction
 {
-    private int methodIndex;
+    private int stringIndex;
 
-    static MethodInstruction create(DexOpCode opCode, byte ident) {
-        return new MethodInstruction(opCode);
+    static StringInstruction create(DexOpCode opCode, byte ident) {
+        return new StringInstruction(opCode);
     }
 
-    MethodInstruction(DexOpCode opcode) {
+    StringInstruction(DexOpCode opcode) {
         super(opcode);
-        methodIndex = DexConstants.NO_INDEX;
+        stringIndex = DexConstants.NO_INDEX;
     }
 
-    public int getMethodIndex() {
-        return methodIndex;
+    public int getStringIndex() {
+        return stringIndex;
     }
 
-    public MethodID getMethod(DexFile dexFile) {
-        return dexFile.getMethodID(methodIndex);
+    public String getString(DexFile dexFile) {
+        return dexFile.getStringID(stringIndex).getStringValue();
     }
 
     @Override
@@ -46,9 +46,14 @@ extends      DexInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
-            case FORMAT_3rc:
-            case FORMAT_35c:
-                methodIndex = instructions[offset + 1] & 0xffff;
+            case FORMAT_21c:
+                stringIndex = instructions[offset + 1] & 0xffff;
+                break;
+
+            case FORMAT_31c:
+                stringIndex =
+                    (instructions[offset + 1] & 0xffff) |
+                    (instructions[offset + 2] << 16);
                 break;
 
             default:
@@ -58,42 +63,21 @@ extends      DexInstruction
 
     @Override
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
-        visitor.visitMethodInstruction(dexFile, classDef, method, code, offset, this);
+        visitor.visitStringInstruction(dexFile, classDef, method, code, offset, this);
     }
 
     @Override
     public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(getMnemonic());
-
-        if (registers.length > 0) {
-            sb.append(' ');
-            sb.append('{');
-            for (int idx = 0; idx < registers.length; idx++) {
-                if (idx > 0) {
-                    sb.append(", ");
-                }
-                sb.append('v');
-                sb.append(registers[idx]);
-            }
-            sb.append('}');
-        } else {
-            sb.append("{}");
-        }
+        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
 
         sb.append(", ");
 
-        MethodID methodID = getMethod(dexFile);
+        sb.append('"');
+        sb.append(getString(dexFile));
+        sb.append('"');
 
-        sb.append(methodID.getClassName(dexFile));
-        sb.append('.');
-        sb.append(methodID.getName(dexFile));
-        sb.append(':');
-        sb.append(methodID.getProtoID(dexFile).getDescriptor(dexFile));
-
-        sb.append(" // method@");
-        sb.append(Primitives.asHexValue(methodIndex, 4));
+        sb.append(" // string@");
+        sb.append(Primitives.asHexValue(stringIndex, 4));
 
         return sb.toString();
     }
