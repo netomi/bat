@@ -82,6 +82,7 @@ public class DexInstruction
 
             case FORMAT_12x:
             case FORMAT_22c:
+            case FORMAT_22s:
             case FORMAT_22t:
                 registers = new int[] {
                     instructions[offset] >>> 8  & 0xf,
@@ -97,6 +98,13 @@ public class DexInstruction
             case FORMAT_51l:
                 registers = new int[] {
                     instructions[offset] >>> 8  & 0xff,
+                };
+                break;
+
+            case FORMAT_22b:
+                registers = new int[] {
+                    instructions[offset] >>> 8 & 0xff,
+                    instructions[offset + 1]   & 0xff
                 };
                 break;
 
