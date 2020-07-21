@@ -180,12 +180,4 @@ implements   DexDataOutput
 
         offset += bytesWritten;
     }
-
-    @Override
-    public void setLastMemberIndex(int index) {}
-
-    @Override
-    public int getLastMemberIndex() {
-        return 0;
-    }
 }

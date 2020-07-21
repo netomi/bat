@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import java.nio.ByteOrder;
@@ -73,10 +72,4 @@ public interface DexDataOutput
     void writeUleb128p1(int value);
 
     void writeSleb128(int value);
-
-    // HACK
-
-    void setLastMemberIndex(int index);
-
-    int getLastMemberIndex();
 }

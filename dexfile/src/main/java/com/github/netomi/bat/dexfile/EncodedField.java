@@ -23,40 +23,46 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 public class EncodedField
 implements   DexContent
 {
-    public int fieldIndex;  // uleb128
-    public int accessFlags; // uleb128
+    private int deltaFieldIndex; // uleb128
+    public  int fieldIndex;
+    public  int accessFlags;     // uleb128
 
     public EncodedField() {
         fieldIndex  = NO_INDEX;
         accessFlags = 0;
     }
 
-    public FieldID getFieldIDItem(DexFile dexFile) {
+    public FieldID getFieldID(DexFile dexFile) {
         return dexFile.getFieldID(fieldIndex);
     }
 
     public String getName(DexFile dexFile) {
-        return getFieldIDItem(dexFile).getName(dexFile);
+        return getFieldID(dexFile).getName(dexFile);
     }
 
     public String getType(DexFile dexFile) {
-        return getFieldIDItem(dexFile).getType(dexFile);
+        return getFieldID(dexFile).getType(dexFile);
     }
 
     @Override
     public void read(DexDataInput input) {
-        int fieldIndexDiff = input.readUleb128();
-        fieldIndex  = fieldIndexDiff + input.getLastMemberIndex();
-        input.setLastMemberIndex(fieldIndex);
+        deltaFieldIndex = input.readUleb128();
+        accessFlags     = input.readUleb128();
+    }
 
-        accessFlags = input.readUleb128();
+    public int updateFieldIndex(int lastIndex) {
+        fieldIndex = deltaFieldIndex + lastIndex;
+        return fieldIndex;
+    }
+
+    public int updateDeltaFieldIndex(int lastIndex) {
+        deltaFieldIndex = fieldIndex - lastIndex;
+        return fieldIndex;
     }
 
     @Override
     public void write(DexDataOutput output) {
-        int fieldIndexDiff = fieldIndex - output.getLastMemberIndex();
-        output.writeUleb128(fieldIndexDiff);
-
+        output.writeUleb128(deltaFieldIndex);
         output.writeUleb128(accessFlags);
     }
 }

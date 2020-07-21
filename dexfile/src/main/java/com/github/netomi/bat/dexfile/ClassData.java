@@ -57,38 +57,39 @@ implements   DataItem
         int virtualMethodsSize = input.readUleb128();
 
         staticFields = new ArrayList<>(staticFieldsSize);
-        input.setLastMemberIndex(0);
+
+        int lastIndex = 0;
         for (int i = 0; i < staticFieldsSize; i++) {
             EncodedField encodedField = new EncodedField();
             encodedField.read(input);
-            input.setLastMemberIndex(encodedField.fieldIndex);
+            lastIndex = encodedField.updateFieldIndex(lastIndex);
             staticFields.add(encodedField);
         }
 
         instanceFields = new ArrayList<>(instanceFieldsSize);
-        input.setLastMemberIndex(0);
+        lastIndex = 0;
         for (int i = 0; i < instanceFieldsSize; i++) {
             EncodedField encodedField = new EncodedField();
             encodedField.read(input);
-            input.setLastMemberIndex(encodedField.fieldIndex);
+            lastIndex = encodedField.updateFieldIndex(lastIndex);
             instanceFields.add(encodedField);
         }
 
         directMethods = new ArrayList<>(directMethodsSize);
-        input.setLastMemberIndex(0);
+        lastIndex = 0;
         for (int i = 0; i < directMethodsSize; i++) {
             EncodedMethod encodedMethod = new EncodedMethod();
             encodedMethod.read(input);
-            input.setLastMemberIndex(encodedMethod.methodIndex);
+            lastIndex = encodedMethod.updateMethodIndex(lastIndex);
             directMethods.add(encodedMethod);
         }
 
         virtualMethods = new ArrayList<>(virtualMethodsSize);
-        input.setLastMemberIndex(0);
+        lastIndex = 0;
         for (int i = 0; i < virtualMethodsSize; i++) {
             EncodedMethod encodedMethod = new EncodedMethod();
             encodedMethod.read(input);
-            input.setLastMemberIndex(encodedMethod.methodIndex);
+            lastIndex = encodedMethod.updateMethodIndex(lastIndex);
             virtualMethods.add(encodedMethod);
         }
     }
@@ -122,28 +123,28 @@ implements   DataItem
         output.writeUleb128(directMethods.size());
         output.writeUleb128(virtualMethods.size());
 
-        output.setLastMemberIndex(0);
+        int lastIndex = 0;
         for (EncodedField field : staticFields) {
+            lastIndex = field.updateDeltaFieldIndex(lastIndex);
             field.write(output);
-            output.setLastMemberIndex(field.fieldIndex);
         }
 
-        output.setLastMemberIndex(0);
+        lastIndex = 0;
         for (EncodedField field : instanceFields) {
+            lastIndex = field.updateDeltaFieldIndex(lastIndex);
             field.write(output);
-            output.setLastMemberIndex(field.fieldIndex);
         }
 
-        output.setLastMemberIndex(0);
+        lastIndex = 0;
         for (EncodedMethod method : directMethods) {
+            lastIndex = method.updateDeltaMethodIndex(lastIndex);
             method.write(output);
-            output.setLastMemberIndex(method.methodIndex);
         }
 
-        output.setLastMemberIndex(0);
+        lastIndex = 0;
         for (EncodedMethod method : virtualMethods) {
+            lastIndex = method.updateDeltaMethodIndex(lastIndex);
             method.write(output);
-            output.setLastMemberIndex(method.methodIndex);
         }
     }
 

@@ -13,7 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import java.io.ByteArrayOutputStream;
@@ -104,9 +103,6 @@ public class DexDataInput
     }
 
     public int readInt() {
-        if (getOffset() == 0x32a03c)
-            System.out.println(getOffset());
-
         return byteBuffer.getInt();
     }
 
@@ -240,16 +236,6 @@ public class DexDataInput
         while (byteBuffer.hasRemaining()) {
             checksum.update(byteBuffer.get());
         }
-    }
-
-    // HACK
-
-    public void setLastMemberIndex(int index) {
-        lastMemberIndex = index;
-    }
-
-    public int getLastMemberIndex() {
-        return lastMemberIndex;
     }
 
     // Private utility methods.

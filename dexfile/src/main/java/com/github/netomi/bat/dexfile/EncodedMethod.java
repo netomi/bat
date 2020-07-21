@@ -23,9 +23,10 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 public class EncodedMethod
 implements   DexContent
 {
-    public  int methodIndex; // uleb128
-    public  int accessFlags; // uleb128
-    private int codeOffset;  // uleb128
+    private int deltaMethodIndex; // uleb128
+    public  int methodIndex;
+    public  int accessFlags;      // uleb128
+    private int codeOffset;       // uleb128
 
     public  Code code;
 
@@ -67,12 +68,9 @@ implements   DexContent
 
     @Override
     public void read(DexDataInput input) {
-        int methodIndexDiff = input.readUleb128();
-        methodIndex = methodIndexDiff + input.getLastMemberIndex();
-        input.setLastMemberIndex(methodIndex);
-
-        accessFlags = input.readUleb128();
-        codeOffset  = input.readUleb128();
+        deltaMethodIndex = input.readUleb128();
+        accessFlags      = input.readUleb128();
+        codeOffset       = input.readUleb128();
     }
 
     @Override
@@ -86,6 +84,16 @@ implements   DexContent
         }
     }
 
+    public int updateMethodIndex(int lastIndex) {
+        methodIndex = deltaMethodIndex + lastIndex;
+        return methodIndex;
+    }
+
+    public int updateDeltaMethodIndex(int lastIndex) {
+        deltaMethodIndex = methodIndex - lastIndex;
+        return methodIndex;
+    }
+
     @Override
     public void updateOffsets(DataItem.Map dataItemMap) {
         codeOffset = dataItemMap.getOffset(code);
@@ -93,9 +101,7 @@ implements   DexContent
 
     @Override
     public void write(DexDataOutput output) {
-        int methodIndexDiff = methodIndex - output.getLastMemberIndex();
-        output.writeUleb128(methodIndexDiff);
-
+        output.writeUleb128(deltaMethodIndex);
         output.writeUleb128(accessFlags);
         output.writeUleb128(codeOffset);
     }

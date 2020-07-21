@@ -193,16 +193,6 @@ implements   DexDataOutput
         }
     }
 
-    @Override
-    public void setLastMemberIndex(int index) {
-        this.lastMemberIndex = index;
-    }
-
-    @Override
-    public int getLastMemberIndex() {
-        return lastMemberIndex;
-    }
-
     public void copy(OutputStream output) throws IOException {
         byteBuffer.position(0);
         WritableByteChannel channel = Channels.newChannel(output);
