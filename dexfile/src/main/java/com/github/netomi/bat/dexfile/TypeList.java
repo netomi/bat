@@ -42,6 +42,14 @@ implements   DataItem
         this.typeList = EMPTY_ARRAY;
     }
 
+    public int getTypeCount() {
+        return typeList.length;
+    }
+
+    public String getType(DexFile dexFile, int typeIndex) {
+        return dexFile.getTypeID(typeList[typeIndex]).getType(dexFile);
+    }
+
     public Iterable<String> getTypes(DexFile dexFile) {
         return PrimitiveIterable.of(dexFile,
                                     (df, idx) -> df.getTypeID(idx).getType(df),

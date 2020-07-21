@@ -51,6 +51,14 @@ implements   DataItem
         debugSequence  = Collections.emptyList();
     }
 
+    public int getParameterCount() {
+        return parameterNames.length;
+    }
+
+    public String getParameterName(DexFile dexFile, int parameterIndex) {
+        return dexFile.getString(parameterNames[parameterIndex]);
+    }
+
     @Override
     public void read(DexDataInput input) {
         lineStart      = input.readUleb128();

@@ -99,16 +99,12 @@ extends      DexInstruction
         if (opcode.isWide()) {
             sb.append("#long ");
             sb.append(value);
-            sb.append(" #double ");
-            sb.append(asDouble());
 
             sb.append(" // #");
             sb.append(Long.toHexString(value));
         } else {
             sb.append("#int ");
             sb.append(value);
-            sb.append(" #float ");
-            sb.append(asFloat());
 
             sb.append(" // #");
             sb.append(Long.toHexString(value));

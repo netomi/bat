@@ -53,6 +53,10 @@ implements   DexContent
         return getMethodID(dexFile).getProtoID(dexFile);
     }
 
+    public String getClassType(DexFile dexFile) {
+        return dexFile.getMethodID(methodIndex).getClassType(dexFile).getType(dexFile);
+    }
+
     public String getName(DexFile dexFile) {
         return getMethodID(dexFile).getName(dexFile);
     }
@@ -64,6 +68,10 @@ implements   DexContent
     public String getDescriptor(DexFile dexFile) {
         ProtoID protoID = getProtoID(dexFile);
         return protoID.getDescriptor(dexFile);
+    }
+
+    public boolean isStatic() {
+        return (accessFlags & DexConstants.ACC_STATIC) != 0;
     }
 
     @Override
