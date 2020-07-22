@@ -27,6 +27,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class DexFilePrinter
 implements   DexFileVisitor,
@@ -106,6 +107,8 @@ implements   DexFileVisitor,
         if (printAnnotations && classDef.annotationsDirectory != null) {
             println(String.format("Class #%d annotations:", index));
             classDef.annotationSetsAccept(dexFile, impl);
+
+            println();
         }
 
         println(String.format("Class #%-5d        -", index));
@@ -257,6 +260,12 @@ implements   DexFileVisitor,
             println("      name          : '" + encodedField.getName(dexFile) + "'");
             println("      type          : '" + encodedField.getType(dexFile) + "'");
             println("      access        : " + formatAccessFlags(encodedField.accessFlags));
+
+            if (classDef.staticValues != null) {
+                print("      value         : ");
+                classDef.staticValues.encodedArrayValue.valueAccept(dexFile, index, this);
+                println();
+            }
         }
 
         @Override
@@ -286,21 +295,9 @@ implements   DexFileVisitor,
 
             fileOffset = method.getCodeOffset();
 
-            String externalClassName =
-                    DexUtil.externalClassNameFromInternalName(classDef.getClassName(dexFile));
-
-            // dexdump uses '.' as separator for inner classes.
-            externalClassName = externalClassName.replaceAll("\\$", "\\.");
-
-            String externalSignature =
-                    String.format("%s.%s:%s",
-                            externalClassName,
-                            method.getName(dexFile),
-                            method.getDescriptor(dexFile));
-
             println(Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
                     Primitives.asHexValue(fileOffset, 6) + "] " +
-                    externalSignature);
+                    DexUtil.fullExternalMethodSignature(dexFile, classDef, method));
 
             fileOffset = align(fileOffset, 4);
             fileOffset += 16;
@@ -314,7 +311,7 @@ implements   DexFileVisitor,
 
             code.triesAccept(dexFile, classDef, method, code, this);
 
-            if (code.debugInfo != null) {
+            if (code.debugInfo != null && !code.debugInfo.debugSequence.isEmpty()) {
                 println("      positions     :");
                 code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(code.debugInfo.lineStart));
 
@@ -403,14 +400,29 @@ implements   DexFileVisitor,
 
         @Override
         public void visitFieldAnnotationSet(DexFile dexFile, ClassDef classDef, FieldAnnotation fieldAnnotation, AnnotationSet annotationSet) {
+            FieldID fieldID = fieldAnnotation.getFieldID(dexFile);
+            println("Annotations on field #" + fieldAnnotation.fieldIndex + " '" + fieldID.getName(dexFile) + "'");
+            annotationSet.accept(dexFile, classDef, this);
         }
 
         @Override
         public void visitMethodAnnotationSet(DexFile dexFile, ClassDef classDef, MethodAnnotation methodAnnotation, AnnotationSet annotationSet) {
+            MethodID methodID = methodAnnotation.getMethodID(dexFile);
+            println("Annotations on method #" + methodAnnotation.methodIndex + " '" + methodID.getName(dexFile) + "'");
+            annotationSet.accept(dexFile, classDef, this);
         }
 
         @Override
         public void visitParameterAnnotationSet(DexFile dexFile, ClassDef classDef, ParameterAnnotation parameterAnnotation, AnnotationSetRefList annotationSetRefList) {
+            MethodID methodID = parameterAnnotation.getMethodID(dexFile);
+            println("Annotations on method #" + parameterAnnotation.methodIndex + " '" + methodID.getName(dexFile) + "' parameters");
+
+            List<AnnotationSetRef> list = annotationSetRefList.annotationSetRefs;
+            for (int i = 0; i < list.size(); i++) {
+                println("#" + i);
+                AnnotationSetRef annotationSetRef = list.get(i);
+                annotationSetRef.annotationSet.accept(dexFile, classDef, this);
+            }
         }
 
         @Override

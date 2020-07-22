@@ -86,6 +86,12 @@ extends      EncodedValue
         }
     }
 
+    public void valueAccept(DexFile dexFile, int index, EncodedValueVisitor visitor) {
+        if (index >= 0 && index < values.size()) {
+            values.get(index).accept(dexFile, visitor);
+        }
+    }
+
     @Override
     public String toString() {
         return String.format("EncodedArrayValue[size=%d,value=%s]", values.size(), values);

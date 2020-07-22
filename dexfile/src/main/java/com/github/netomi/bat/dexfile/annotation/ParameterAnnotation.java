@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.annotation;
 import com.github.netomi.bat.dexfile.DataItem;
 import com.github.netomi.bat.dexfile.DexContent;
 import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.MethodID;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
@@ -40,6 +41,10 @@ implements   DexContent
 
     public int getAnnotationsOffset() {
         return annotationsOffset;
+    }
+
+    public MethodID getMethodID(DexFile dexFile) {
+        return dexFile.getMethodID(methodIndex);
     }
 
     @Override
