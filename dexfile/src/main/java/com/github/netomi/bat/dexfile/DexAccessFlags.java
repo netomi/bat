@@ -15,47 +15,63 @@
  */
 package com.github.netomi.bat.dexfile;
 
+import static com.github.netomi.bat.dexfile.DexAccessFlags.Target.*;
 import static com.github.netomi.bat.dexfile.DexConstants.*;
 
 public enum DexAccessFlags
 {
-    PUBLIC               (ACC_PUBLIC),
-    PRIVATE              (ACC_PRIVATE),
-    PROTECTED            (ACC_PROTECTED),
-    STATIC               (ACC_STATIC),
-    FINAL                (ACC_FINAL),
-    SYNCHRONIZED         (ACC_SYNCHRONIZED),
-    VOLATILE             (ACC_VOLATILE),
-    BRIDGE               (ACC_BRIDGE),
-    TRANSIENT            (ACC_TRANSIENT),
-    VARARGS              (ACC_VARARGS),
-    NATIVE               (ACC_NATIVE),
-    INTERFACE            (ACC_INTERFACE),
-    ABSTRACT             (ACC_ABSTRACT),
-    STRICT               (ACC_STRICT),
-    SYNTHETIC            (ACC_SYNTHETIC),
-    ANNOTATION           (ACC_ANNOTATION),
-    ENUM                 (ACC_ENUM),
-    CONSTRUCTOR          (ACC_CONSTRUCTOR),
-    DECLARED_SYNCHRONIZED(ACC_DECLARED_SYNCHRONIZED);
+    PUBLIC               (ACC_PUBLIC,                CLASS | FIELD | METHOD),
+    PRIVATE              (ACC_PRIVATE,               CLASS | FIELD | METHOD),
+    PROTECTED            (ACC_PROTECTED,             CLASS | FIELD | METHOD),
+    STATIC               (ACC_STATIC,                CLASS | FIELD | METHOD),
+    FINAL                (ACC_FINAL,                 CLASS | FIELD | METHOD),
+    SYNCHRONIZED         (ACC_SYNCHRONIZED,          METHOD),
+    VOLATILE             (ACC_VOLATILE,              FIELD),
+    BRIDGE               (ACC_BRIDGE,                METHOD),
+    TRANSIENT            (ACC_TRANSIENT,             FIELD),
+    VARARGS              (ACC_VARARGS,               METHOD),
+    NATIVE               (ACC_NATIVE,                METHOD),
+    INTERFACE            (ACC_INTERFACE,             CLASS),
+    ABSTRACT             (ACC_ABSTRACT,              CLASS | METHOD),
+    STRICT               (ACC_STRICT,                METHOD),
+    SYNTHETIC            (ACC_SYNTHETIC,             CLASS | FIELD | METHOD),
+    ANNOTATION           (ACC_ANNOTATION,            CLASS),
+    ENUM                 (ACC_ENUM,                  CLASS | FIELD),
+    CONSTRUCTOR          (ACC_CONSTRUCTOR,           METHOD),
+    DECLARED_SYNCHRONIZED(ACC_DECLARED_SYNCHRONIZED, METHOD);
 
     private final int value;
+    private final int target;
 
-    DexAccessFlags(int value) {
-        this.value = value;
+    DexAccessFlags(int value, int target)
+    {
+        this.value  = value;
+        this.target = target;
     }
 
-    public static String formatAsHumanReadable(int accessFlags) {
+    public static String formatAsHumanReadable(int accessFlags, int target)
+    {
         StringBuilder sb = new StringBuilder();
-        for (DexAccessFlags accessFlag : values()) {
-            if ((accessFlag.value & accessFlags) != 0) {
+        for (DexAccessFlags accessFlag : values())
+        {
+            if ((accessFlag.target & target)      != 0 &&
+                (accessFlag.value  & accessFlags) != 0)
+            {
                 sb.append(accessFlag.name());
                 sb.append(' ');
             }
         }
-        if (sb.length() > 0) {
+        if (sb.length() > 0)
+        {
             sb.setLength(sb.length() - 1);
         }
         return sb.toString();
+    }
+
+    public static class Target
+    {
+        public static final int CLASS  = 0x1;
+        public static final int FIELD  = 0x2;
+        public static final int METHOD = 0x4;
     }
 }

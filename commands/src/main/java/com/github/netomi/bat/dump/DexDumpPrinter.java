@@ -114,7 +114,7 @@ implements   DexFileVisitor,
 
         println(String.format("Class #%-5d        -", index));
         println("  Class descriptor  : '" + classDef.getType(dexFile) + "'");
-        println("  Access flags      : " + formatAccessFlags(classDef.accessFlags));
+        println("  Access flags      : " + formatAccessFlags(classDef.accessFlags, DexAccessFlags.Target.CLASS));
         println("  Superclass        : '" + classDef.getSuperClassType(dexFile) + "'");
         println("  Interfaces        -");
         classDef.interfacesAccept(dexFile, impl);
@@ -185,8 +185,8 @@ implements   DexFileVisitor,
         return String.format("%d (0x%04x)", number, number);
     }
 
-    private static String formatAccessFlags(int accessFlags) {
-        return String.format("0x%04x (%s)", accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags));
+    private static String formatAccessFlags(int accessFlags, int target) {
+        return String.format("0x%04x (%s)", accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags, target));
     }
 
     private static int align(int offset, int alignment) {
@@ -260,7 +260,7 @@ implements   DexFileVisitor,
             println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
             println("      name          : '" + encodedField.getName(dexFile) + "'");
             println("      type          : '" + encodedField.getType(dexFile) + "'");
-            println("      access        : " + formatAccessFlags(encodedField.accessFlags));
+            println("      access        : " + formatAccessFlags(encodedField.accessFlags, DexAccessFlags.Target.FIELD));
 
             if (encodedField.isStatic()       &&
                 classDef.staticValues != null &&
@@ -277,7 +277,7 @@ implements   DexFileVisitor,
             println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
             println("      name          : '" + encodedMethod.getName(dexFile) + "'");
             println("      type          : '" + encodedMethod.getDescriptor(dexFile) + "'");
-            println("      access        : " + formatAccessFlags(encodedMethod.accessFlags));
+            println("      access        : " + formatAccessFlags(encodedMethod.accessFlags, DexAccessFlags.Target.METHOD));
 
             if (encodedMethod.code != null) {
                 encodedMethod.codeAccept(dexFile, classDef, this);
@@ -474,6 +474,11 @@ implements   DexFileVisitor,
         @Override
         public void visitStringValue(DexFile dexFile, EncodedStringValue value) {
             print(String.format("\"%s\"", value.getString(dexFile)));
+        }
+
+        @Override
+        public void visitCharValue(DexFile dexFile, EncodedCharValue value) {
+            print(Character.toString(value.getValue()));
         }
 
         @Override
