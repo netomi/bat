@@ -13,10 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat;
+package com.github.netomi.bat.dump;
 
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.io.DexFilePrinter;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.visitor.ClassNameFilter;
 import picocli.CommandLine;
@@ -60,9 +59,9 @@ public class DexDumpCommand implements Runnable
             if (classNameFilter != null) {
                 dexFile.classDefsAccept(
                     new ClassNameFilter(classNameFilter,
-                    new DexFilePrinter(System.out, printFileSummary, printHeaders, printAnnotations)));
+                    new DexDumpPrinter(System.out, printFileSummary, printHeaders, printAnnotations)));
             } else {
-                dexFile.accept(new DexFilePrinter());
+                dexFile.accept(new DexDumpPrinter(System.out, printFileSummary, printHeaders, printAnnotations));
             }
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -16,7 +16,6 @@
 package com.github.netomi.bat.test;
 
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.io.DexFilePrinter;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.util.ClassDefPool;
 import com.github.netomi.bat.dexfile.util.ClassDefPoolFiller;

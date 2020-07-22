@@ -13,12 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.test;
+package com.github.netomi.bat.dump;
 
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
-import com.github.netomi.bat.dexfile.io.DexFileWriter;
-import com.github.netomi.bat.dexfile.io.DexFilePrinter;
 
 import java.io.*;
 
@@ -34,8 +32,7 @@ public class Test {
 
             reader.visitDexFile(dexFile);
 
-            dexFile.accept(new DexFilePrinter(new FileOutputStream("test.log")));
-            //dexFile.accept(new DexFilePrinter());
+            dexFile.accept(new DexDumpPrinter(new FileOutputStream("test.log")));
 
 //            DexFileWriter writer = new DexFileWriter(os);
 //

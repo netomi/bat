@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.io;
+package com.github.netomi.bat.dump;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
@@ -23,13 +23,14 @@ import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.*;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-public class DexFilePrinter
+public class DexDumpPrinter
 implements   DexFileVisitor,
              ClassDefVisitor
 {
@@ -43,15 +44,15 @@ implements   DexFileVisitor,
     private int fileOffset;
     private int codeOffset;
 
-    public DexFilePrinter() {
+    public DexDumpPrinter() {
         this(System.out);
     }
 
-    public DexFilePrinter(OutputStream outputStream) {
+    public DexDumpPrinter(OutputStream outputStream) {
         this(outputStream, true, true, true);
     }
 
-    public DexFilePrinter(OutputStream outputStream,
+    public DexDumpPrinter(OutputStream outputStream,
                           boolean printFileSummary,
                           boolean printHeaders,
                           boolean printAnnotations) {
