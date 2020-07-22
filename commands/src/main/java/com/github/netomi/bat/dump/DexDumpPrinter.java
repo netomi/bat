@@ -262,7 +262,10 @@ implements   DexFileVisitor,
             println("      type          : '" + encodedField.getType(dexFile) + "'");
             println("      access        : " + formatAccessFlags(encodedField.accessFlags));
 
-            if (classDef.staticValues != null) {
+            if (encodedField.isStatic()       &&
+                classDef.staticValues != null &&
+                index < classDef.staticValues.encodedArrayValue.getValueCount())
+            {
                 print("      value         : ");
                 classDef.staticValues.encodedArrayValue.valueAccept(dexFile, index, this);
                 println();
@@ -312,12 +315,13 @@ implements   DexFileVisitor,
 
             code.triesAccept(dexFile, classDef, method, code, this);
 
-            if (code.debugInfo != null && !code.debugInfo.debugSequence.isEmpty()) {
-                println("      positions     :");
+            println("      positions     :");
+            if (code.debugInfo != null) {
                 code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(code.debugInfo.lineStart));
+            }
 
-                println("      locals        :");
-
+            println("      locals        :");
+            if (code.debugInfo != null) {
                 LocalVariablePrinter localVariablePrinter =
                         new LocalVariablePrinter(dexFile, method, code);
 
@@ -423,6 +427,10 @@ implements   DexFileVisitor,
                 println("#" + i);
                 AnnotationSetRef annotationSetRef = list.get(i);
                 annotationSetRef.annotationSet.accept(dexFile, classDef, this);
+
+                if (annotationSetRef.annotationSet.getAnnotationCount() == 0) {
+                    println("   empty-annotation-set");
+                }
             }
         }
 
@@ -451,6 +459,16 @@ implements   DexFileVisitor,
         @Override
         public void visitEnumValue(DexFile dexFile, EncodedEnumValue value) {
             print(value.getEnumField(dexFile).getName(dexFile));
+        }
+
+        @Override
+        public void visitMethodValue(DexFile dexFile, EncodedMethodValue value) {
+            print(value.getMethod(dexFile).getName(dexFile));
+        }
+
+        @Override
+        public void visitFieldValue(DexFile dexFile, EncodedFieldValue value) {
+            print(value.getField(dexFile).getName(dexFile));
         }
 
         @Override
@@ -635,9 +653,7 @@ implements   DexFileVisitor,
             LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
             variableInfo.endAddr = codeOffset;
 
-            if (variableInfo.name != null) {
-                printLocal(instruction.registerNum, variableInfo);
-            }
+            printLocal(instruction.registerNum, variableInfo);
         }
 
         @Override
@@ -676,7 +692,7 @@ implements   DexFileVisitor,
             sb.append(" reg=");
             sb.append(registerNum);
             sb.append(' ');
-            sb.append(name);
+            sb.append(name == null ? "(null)" : name);
             sb.append(' ');
             sb.append(type);
 

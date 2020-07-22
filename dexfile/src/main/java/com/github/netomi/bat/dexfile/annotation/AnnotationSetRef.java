@@ -46,6 +46,7 @@ implements   DexContent
             input.setOffset(annotationsOffset);
             annotationSet = new AnnotationSet();
             annotationSet.read(input);
+            annotationSet.readLinkedDataItems(input);
         }
     }
 

@@ -41,6 +41,10 @@ extends      EncodedValue
         values = Collections.emptyList();
     }
 
+    public int getValueCount() {
+        return values.size();
+    }
+
     public EncodedValue getValue(int index) {
         return values.get(index);
     }

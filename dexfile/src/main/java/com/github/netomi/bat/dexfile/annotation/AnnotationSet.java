@@ -36,7 +36,7 @@ implements   DataItem
 {
     private static final int[] EMPTY_ENTRIES = new int[0];
 
-    public int              size;                    // uint
+    //private int              size;                    // uint
     public int[]            annotationOffsetEntries; // uint[]
     public List<Annotation> annotations;
 
@@ -45,11 +45,15 @@ implements   DataItem
         annotations             = Collections.emptyList();
     }
 
+    public int getAnnotationCount() {
+        return annotations.size();
+    }
+
     @Override
     public void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
-        size = input.readInt();
+        int size = input.readInt();
 
         annotationOffsetEntries = new int[size];
         for (int i = 0; i < size; i++) {
@@ -59,8 +63,8 @@ implements   DataItem
 
     @Override
     public void readLinkedDataItems(DexDataInput input) {
-        annotations = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
+        annotations = new ArrayList<>(annotationOffsetEntries.length);
+        for (int i = 0; i < annotationOffsetEntries.length; i++) {
             Annotation annotation = new Annotation();
 
             input.setOffset(annotationOffsetEntries[i]);
@@ -74,7 +78,7 @@ implements   DataItem
     public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
-        output.writeInt(size);
+        output.writeInt(annotationOffsetEntries.length);
         for (int annotationOffset : annotationOffsetEntries) {
             output.writeInt(annotationOffset);
         }

@@ -44,6 +44,10 @@ implements   DexContent
         return getFieldID(dexFile).getType(dexFile);
     }
 
+    public boolean isStatic() {
+        return (accessFlags & DexConstants.ACC_STATIC) != 0;
+    }
+
     @Override
     public void read(DexDataInput input) {
         deltaFieldIndex = input.readUleb128();
