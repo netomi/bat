@@ -15,15 +15,29 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.MethodID;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedMethodValue
 extends      EncodedValue
 {
-    public int methodIndex;
+    private int methodIndex;
+
+    public EncodedMethodValue(int methodIndex) {
+        this.methodIndex = methodIndex;
+    }
+
+    EncodedMethodValue() {
+        this.methodIndex = DexConstants.NO_INDEX;
+    }
+
+    public int getMethodIndex() {
+        return methodIndex;
+    }
 
     public MethodID getMethod(DexFile dexFile) {
         return dexFile.methodIDs[methodIndex];
@@ -45,6 +59,12 @@ extends      EncodedValue
         output.writeInt(methodIndex, 4);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitMethodValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedMethodValue[methodIdx=%d]", methodIndex);
     }

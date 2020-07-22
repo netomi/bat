@@ -15,15 +15,29 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.FieldID;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedEnumValue
 extends      EncodedValue
 {
-    public int fieldIndex;
+    private int fieldIndex;
+
+    public EncodedEnumValue(int fieldIndex) {
+        this.fieldIndex = fieldIndex;
+    }
+
+    EncodedEnumValue() {
+        this.fieldIndex = DexConstants.NO_INDEX;
+    }
+
+    public int getFieldIndex() {
+        return fieldIndex;
+    }
 
     public FieldID getEnumField(DexFile dexFile) {
         return dexFile.fieldIDs[fieldIndex];
@@ -45,6 +59,12 @@ extends      EncodedValue
         output.writeInt(fieldIndex, 4);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitEnumValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedEnumValue[fieldIdx=%d]", fieldIndex);
     }

@@ -77,13 +77,13 @@ public class DexDataInput
         for (int i = 0; i < bytes; i++) {
             int b = readUnsignedByte();
             result |= b << (8*i);
-
-            // sign-extend
-            if ((b & 0x80) != 0) {
-                result |= 0x8000;
-            }
         }
-        return result;
+
+        // sign-extend (using an intermediate int)
+        int shift = 32 - 8 * bytes;
+        return bytes < 2 ?
+            result :
+            (short) (result << shift >> shift);
     }
 
     public int readUnsignedShort() {
@@ -111,13 +111,13 @@ public class DexDataInput
         for (int i = 0; i < bytes; i++) {
             int b = readUnsignedByte();
             result |= b << (8*i);
-
-            // sign-extend
-            if ((b & 0x80) != 0) {
-                result |= 0x80000000;
-            }
         }
-        return result;
+
+        // sign-extend
+        int shift = 32 - 8 * bytes;
+        return shift == 0 ?
+            result :
+            result << shift >> shift;
     }
 
     public long readUnsignedInt() {
@@ -141,13 +141,13 @@ public class DexDataInput
         for (int i = 0; i < bytes; i++) {
             int b = readUnsignedByte();
             result |= ((long) b) << (8*i);
-
-            // sign-extend
-            if ((b & 0x80) != 0) {
-                result |= 0x8000000000000000l;
-            }
         }
-        return result;
+
+        // sign-extend
+        int shift = 64 - 8 * bytes;
+        return shift == 0 ?
+            result :
+            result << shift >> shift;
     }
 
     public float readFloat() {

@@ -27,14 +27,14 @@ public class CallSite
 extends      EncodedArray
 {
     public EncodedMethodHandleValue getMethodHandle() {
-        return (EncodedMethodHandleValue) encodedArrayValue.values[0];
+        return (EncodedMethodHandleValue) encodedArrayValue.getValue(0);
     }
 
     public EncodedStringValue getMethodName() {
-        return (EncodedStringValue) encodedArrayValue.values[1];
+        return (EncodedStringValue) encodedArrayValue.getValue(1);
     }
 
     public EncodedMethodTypeValue getMethodType() {
-        return (EncodedMethodTypeValue) encodedArrayValue.values[2];
+        return (EncodedMethodTypeValue) encodedArrayValue.getValue(2);
     }
 }

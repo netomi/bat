@@ -15,14 +15,28 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedTypeValue
 extends      EncodedValue
 {
-    public int typeIndex;
+    private int typeIndex;
+
+    public EncodedTypeValue(int typeIndex) {
+        this.typeIndex = typeIndex;
+    }
+
+    EncodedTypeValue() {
+        this.typeIndex = DexConstants.NO_INDEX;
+    }
+
+    public int getTypeIndex() {
+        return typeIndex;
+    }
 
     public String getType(DexFile dexFile) {
         return dexFile.getTypeID(typeIndex).getType(dexFile);
@@ -44,6 +58,12 @@ extends      EncodedValue
         output.writeInt(typeIndex, 4);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitTypeValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedTypeValue[typeIdx=%d]", typeIndex);
     }

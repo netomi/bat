@@ -15,13 +15,25 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedShortValue
 extends      EncodedValue
 {
-    public short value;
+    private short value;
+
+    public EncodedShortValue(short value) {
+        this.value = value;
+    }
+
+    EncodedShortValue() {}
+
+    public short getValue() {
+        return value;
+    }
 
     @Override
     public int getValueType() {
@@ -39,6 +51,12 @@ extends      EncodedValue
         output.writeShort(value, 2);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitShortValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedShortValue[value=%d]", value);
     }

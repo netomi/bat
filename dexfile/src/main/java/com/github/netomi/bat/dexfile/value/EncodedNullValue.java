@@ -15,12 +15,18 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedNullValue
 extends      EncodedValue
 {
+    public static final EncodedNullValue INSTANCE = new EncodedNullValue();
+
+    private EncodedNullValue() {}
+
     @Override
     public int getValueType() {
         return VALUE_NULL;
@@ -34,6 +40,12 @@ extends      EncodedValue
         writeType(output, 0);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitNullValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedNullValue[]");
     }

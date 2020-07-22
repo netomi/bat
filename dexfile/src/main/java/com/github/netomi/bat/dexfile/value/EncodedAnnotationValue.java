@@ -15,10 +15,13 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,14 +30,40 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 public class EncodedAnnotationValue
 extends      EncodedValue
 {
-    public int typeIndex; // uleb128
+    private int typeIndex; // uleb128
     // public int size;      // uleb128
 
-    public List<AnnotationElement> elements;
+    private List<AnnotationElement> elements;
 
-    public EncodedAnnotationValue() {
+    public EncodedAnnotationValue(int typeIndex, AnnotationElement... elements) {
+        this.typeIndex = typeIndex;
+        this.elements  = new ArrayList<>(elements.length);
+        this.elements.addAll(Arrays.asList(elements));
+    }
+
+    EncodedAnnotationValue() {
         typeIndex = NO_INDEX;
         elements  = Collections.emptyList();
+    }
+
+    public int getTypeIndex() {
+        return typeIndex;
+    }
+
+    public String getType(DexFile dexFile) {
+        return dexFile.getTypeID(typeIndex).getType(dexFile);
+    }
+
+    public int getAnnotationElementCount() {
+        return elements.size();
+    }
+
+    public AnnotationElement getAnnotationElement(int index) {
+        return elements.get(index);
+    }
+
+    public Iterable<AnnotationElement> getAnnotationElements() {
+        return elements;
     }
 
     @Override
@@ -65,6 +94,12 @@ extends      EncodedValue
         }
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitAnnotationValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedAnnotationValue[typeIndex=%d,elements=%s]", typeIndex, elements);
     }

@@ -15,12 +15,10 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
-import com.github.netomi.bat.dexfile.DataItem;
-import com.github.netomi.bat.dexfile.DataItemAnn;
-import com.github.netomi.bat.dexfile.DexConstants;
-import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.AnnotationVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import java.util.ArrayList;
@@ -79,6 +77,15 @@ implements   DataItem
         output.writeInt(size);
         for (int annotationOffset : annotationOffsetEntries) {
             output.writeInt(annotationOffset);
+        }
+    }
+
+    public void accept(DexFile dexFile, ClassDef classDef, AnnotationVisitor visitor) {
+        ListIterator<Annotation> it = annotations.listIterator();
+        while (it.hasNext()) {
+            int        index      = it.nextIndex();
+            Annotation annotation = it.next();
+            visitor.visitAnnotation(dexFile, classDef, this, index, annotation);
         }
     }
 

@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
+import com.github.netomi.bat.dexfile.value.EncodedValue;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_ANNOTATION_ITEM,
@@ -30,20 +31,26 @@ import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
 public class Annotation
 implements   DataItem
 {
-    public short                  visibility; // ubyte
-    public EncodedAnnotationValue annotation;
+    private short                  visibility; // ubyte
+    private EncodedAnnotationValue annotation;
 
     public Annotation() {
         visibility = 0;
         annotation = null;
     }
 
+    public AnnotationVisibility getVisibility() {
+        return AnnotationVisibility.of(visibility);
+    }
+
+    public EncodedAnnotationValue getAnnotationValue() {
+        return annotation;
+    }
+
     @Override
     public void read(DexDataInput input) {
         visibility = input.readUnsignedByte();
-
-        annotation = new EncodedAnnotationValue();
-        annotation.read(input, 0);
+        annotation = EncodedValue.readAnnotationValue(input);
     }
 
     @Override
@@ -52,6 +59,7 @@ implements   DataItem
         annotation.write(output);
     }
 
+    @Override
     public String toString() {
         return String.format("Annotation[visibility=%d,value=%s]", visibility, annotation);
     }

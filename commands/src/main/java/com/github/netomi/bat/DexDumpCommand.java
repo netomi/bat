@@ -36,6 +36,15 @@ public class DexDumpCommand implements Runnable
     @Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = "inputfile to process (*.dex)")
     private File inputFile;
 
+    @Option(names = "-a", description = "print annotations")
+    private boolean printAnnotations = false;
+
+    @Option(names = "-f", description = "print file summary")
+    private boolean printFileSummary = false;
+
+    @Option(names = "-h", description = "print headers")
+    private boolean printHeaders = false;
+
     @Option(names = "-c", description = "class to dump")
     private String classNameFilter = null;
 
@@ -51,7 +60,7 @@ public class DexDumpCommand implements Runnable
             if (classNameFilter != null) {
                 dexFile.classDefsAccept(
                     new ClassNameFilter(classNameFilter,
-                    new DexFilePrinter()));
+                    new DexFilePrinter(System.out, printFileSummary, printHeaders, printAnnotations)));
             } else {
                 dexFile.accept(new DexFilePrinter());
             }

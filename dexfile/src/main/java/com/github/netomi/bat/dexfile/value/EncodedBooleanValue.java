@@ -15,13 +15,25 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedBooleanValue
 extends      EncodedValue
 {
-    public boolean value;
+    private boolean value;
+
+    public EncodedBooleanValue(boolean value) {
+        this.value = value;
+    }
+
+    EncodedBooleanValue() {}
+
+    public boolean getValue() {
+        return value;
+    }
 
     @Override
     public int getValueType() {
@@ -38,6 +50,12 @@ extends      EncodedValue
         writeType(output, value ? 1 : 0);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitBooleanValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedBooleanValue[value=%s]", Boolean.toString(value));
     }

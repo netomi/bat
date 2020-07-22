@@ -15,12 +15,10 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
-import com.github.netomi.bat.dexfile.DataItem;
-import com.github.netomi.bat.dexfile.DataItemAnn;
-import com.github.netomi.bat.dexfile.DexConstants;
-import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.AnnotationSetVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import java.util.ArrayList;
@@ -144,6 +142,46 @@ implements   DataItem
 
         for (ParameterAnnotation parameterAnnotation : parameterAnnotations) {
             parameterAnnotation.write(output);
+        }
+    }
+
+    public void accept(DexFile dexFile, ClassDef classDef, AnnotationSetVisitor visitor) {
+        classAnnotationSetAccept(dexFile, classDef, visitor);
+
+        for (FieldAnnotation annotation : fieldAnnotations) {
+            visitor.visitFieldAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+        }
+
+        for (MethodAnnotation annotation : methodAnnotations) {
+            visitor.visitMethodAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+        }
+
+        for (ParameterAnnotation annotation : parameterAnnotations) {
+            visitor.visitParameterAnnotationSet(dexFile, classDef, annotation, annotation.annotationSetRefList);
+        }
+    }
+
+    public void classAnnotationSetAccept(DexFile dexFile, ClassDef classDef, AnnotationSetVisitor visitor) {
+        if (classAnnotations != null) {
+            visitor.visitClassAnnotationSet(dexFile, classDef, classAnnotations);
+        }
+    }
+
+    public void fieldAnnotationSetAccept(DexFile dexFile, ClassDef classDef, EncodedField field, AnnotationSetVisitor visitor) {
+        for (FieldAnnotation annotation : fieldAnnotations) {
+            if (annotation.fieldIndex == field.fieldIndex) {
+                visitor.visitFieldAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+                break;
+            }
+        }
+    }
+
+    public void methodAnnotationSetAccept(DexFile dexFile, ClassDef classDef, EncodedMethod method, AnnotationSetVisitor visitor) {
+        for (MethodAnnotation annotation : methodAnnotations) {
+            if (annotation.methodIndex == method.methodIndex) {
+                visitor.visitMethodAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+                break;
+            }
         }
     }
 

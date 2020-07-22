@@ -18,11 +18,22 @@ package com.github.netomi.bat.dexfile.value;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedStringValue
 extends      EncodedValue
 {
-    public int stringIndex;
+    private int stringIndex;
+
+    public EncodedStringValue(int stringIndex) {
+        this.stringIndex = stringIndex;
+    }
+
+    EncodedStringValue() {}
+
+    public int getStringIndex() {
+        return stringIndex;
+    }
 
     public String getString(DexFile dexFile) {
         return dexFile.getStringID(stringIndex).getStringValue();
@@ -44,6 +55,12 @@ extends      EncodedValue
         output.writeInt(stringIndex, 4);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitStringValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedStringValue[stringIdx=%d]", stringIndex);
     }

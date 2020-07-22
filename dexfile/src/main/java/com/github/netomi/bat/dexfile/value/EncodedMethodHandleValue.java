@@ -15,15 +15,29 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.MethodHandle;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public class EncodedMethodHandleValue
 extends      EncodedValue
 {
-    public int handleIndex;
+    private int handleIndex;
+
+    public EncodedMethodHandleValue(int handleIndex) {
+        this.handleIndex = handleIndex;
+    }
+
+    EncodedMethodHandleValue() {
+        this.handleIndex = DexConstants.NO_INDEX;
+    }
+
+    public int getHandleIndex() {
+        return handleIndex;
+    }
 
     public MethodHandle getMethodHandle(DexFile dexFile) {
         return dexFile.getMethodHandle(handleIndex);
@@ -45,6 +59,12 @@ extends      EncodedValue
         output.writeInt(handleIndex, 4);
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitMethodHandleValue(dexFile, this);
+    }
+
+    @Override
     public String toString() {
         return String.format("EncodedMethodHandleValue[methodHandleIdx=%d]", handleIndex);
     }

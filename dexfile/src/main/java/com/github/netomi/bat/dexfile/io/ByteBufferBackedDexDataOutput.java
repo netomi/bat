@@ -84,6 +84,8 @@ implements   DexDataOutput
 
     @Override
     public void writeUnsignedByte(short b) {
+        // TODO: implement
+        throw new RuntimeException("need to implement.");
     }
 
     @Override

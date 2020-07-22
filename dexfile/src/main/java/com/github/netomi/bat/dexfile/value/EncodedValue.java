@@ -15,10 +15,12 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexFormatException;
 import com.github.netomi.bat.dexfile.util.Primitives;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 public abstract class EncodedValue
 {
@@ -54,6 +56,8 @@ public abstract class EncodedValue
 
     public abstract void write(DexDataOutput output);
 
+    public abstract void accept(DexFile dexFile, EncodedValueVisitor visitor);
+
     public static EncodedValue read(DexDataInput input) {
         int typeAndArg = input.readUnsignedByte();
 
@@ -84,9 +88,15 @@ public abstract class EncodedValue
             case VALUE_ENUM:          return new EncodedEnumValue();
             case VALUE_ARRAY:         return new EncodedArrayValue();
             case VALUE_ANNOTATION:    return new EncodedAnnotationValue();
-            case VALUE_NULL:          return new EncodedNullValue();
+            case VALUE_NULL:          return EncodedNullValue.INSTANCE;
             case VALUE_BOOLEAN:       return new EncodedBooleanValue();
             default: throw new DexFormatException("Unexpected EncodedValue type: " + Primitives.toHexString((short) valueType));
         }
+    }
+
+    public static EncodedAnnotationValue readAnnotationValue(DexDataInput input) {
+        EncodedAnnotationValue annotation = new EncodedAnnotationValue();
+        annotation.read(input, 0);
+        return annotation;
     }
 }

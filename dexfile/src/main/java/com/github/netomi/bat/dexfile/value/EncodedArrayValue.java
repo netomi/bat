@@ -15,16 +15,35 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
+import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class EncodedArrayValue
 extends      EncodedValue
 {
-    public int            size; // uleb128
-    public EncodedValue[] values;
+    //public int            size; // uleb128
+    private List<EncodedValue> values;
+
+    public EncodedArrayValue(EncodedValue... values) {
+        this.values = new ArrayList<>(values.length);
+        this.values.addAll(Arrays.asList(values));
+    }
+
+    EncodedArrayValue() {
+        values = Collections.emptyList();
+    }
+
+    public EncodedValue getValue(int index) {
+        return values.get(index);
+    }
 
     @Override
     public int getValueType() {
@@ -33,23 +52,42 @@ extends      EncodedValue
 
     @Override
     public void read(DexDataInput input, int valueArg) {
-        size   = input.readUleb128();
-        values = new EncodedValue[size];
+        int size = input.readUleb128();
+        values = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            values[i] = EncodedValue.read(input);
+            values.add(EncodedValue.read(input));
         }
     }
 
     @Override
     public void write(DexDataOutput output) {
         writeType(output, 0);
-        output.writeUleb128(size);
+        output.writeUleb128(values.size());
         for (EncodedValue value : values) {
             value.write(output);
         }
     }
 
+    @Override
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        visitor.visitArrayValue(dexFile, this);
+    }
+
+    public void valuesAccept(DexFile dexFile, EncodedValueVisitor visitor) {
+        for (EncodedValue value : values) {
+            value.accept(dexFile, visitor);
+        }
+    }
+
+    public void valuesAccept(DexFile dexFile, EncodedValueVisitor visitor, BiConsumer<DexFile, EncodedValue> separator) {
+        for (EncodedValue value : values) {
+            value.accept(dexFile, visitor);
+            separator.accept(dexFile, value);
+        }
+    }
+
+    @Override
     public String toString() {
-        return String.format("EncodedArrayValue[size=%d,value=%s]", size, Arrays.toString(values));
+        return String.format("EncodedArrayValue[size=%d,value=%s]", values.size(), values);
     }
 }
