@@ -90,20 +90,21 @@ implements   DexFileVisitor,
             println("source_file_idx     : " + classDef.sourceFileIndex);
             println("annotations_off     : " + formatNumber((long) classDef.getAnnotationsOffset()));
             println("class_data_off      : " + formatNumber((long) classDef.getClassDataOffset()));
-        }
 
-        if (classDef.classData != null) {
-            println("static_fields_size  : " + classDef.classData.staticFields.size());
-            println("instance_fields_size: " + classDef.classData.instanceFields.size());
-            println("direct_methods_size : " + classDef.classData.directMethods.size());
-            println("virtual_methods_size: " + classDef.classData.virtualMethods.size());
-        } else {
-            println("static_fields_size  : 0");
-            println("instance_fields_size: 0");
-            println("direct_methods_size : 0");
-            println("virtual_methods_size: 0");
+            if (classDef.classData != null) {
+                println("static_fields_size  : " + classDef.classData.staticFields.size());
+                println("instance_fields_size: " + classDef.classData.instanceFields.size());
+                println("direct_methods_size : " + classDef.classData.directMethods.size());
+                println("virtual_methods_size: " + classDef.classData.virtualMethods.size());
+            }
+            else {
+                println("static_fields_size  : 0");
+                println("instance_fields_size: 0");
+                println("direct_methods_size : 0");
+                println("virtual_methods_size: 0");
+            }
+            println();
         }
-        println();
 
         if (printAnnotations && classDef.annotationsDirectory != null) {
             println(String.format("Class #%d annotations:", index));
