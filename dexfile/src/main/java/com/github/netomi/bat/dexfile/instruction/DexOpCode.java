@@ -84,9 +84,12 @@ public enum DexOpCode
 
     FILLED_NEW_ARRAY((byte) 0x24, FORMAT_35c, "filled-new-array"),
     FILLED_NEW_ARRAY_RANGE((byte) 0x25, FORMAT_3rc, "filled-new-array/range"),
-    FILL_ARRAY_DATA((byte) 0x26, FORMAT_31t, "fill-array-data"),
 
-    // basic instructions.
+    // payload instruction.
+
+    FILL_ARRAY_DATA((byte) 0x26, FORMAT_31t, PayloadInstruction::create, "fill-array-data"),
+
+    // basic instruction.
 
     THROW((byte) 0x27, FORMAT_11x, BasicInstruction::create, "throw"),
 
@@ -96,8 +99,10 @@ public enum DexOpCode
     GOTO_16((byte) 0x29, FORMAT_20t, BranchInstruction::create, "goto/16"),
     GOTO_32((byte) 0x2a, FORMAT_30t, BranchInstruction::create, "goto/32"),
 
-    PACKED_SWITCH((byte) 0x2b, FORMAT_31t, BranchInstruction::create, "packed-switch"),
-    SPARSE_SWITCH((byte) 0x2c, FORMAT_31t, BranchInstruction::create, "sparse-switch"),
+    // payload instructions.
+
+    PACKED_SWITCH((byte) 0x2b, FORMAT_31t, PayloadInstruction::create, "packed-switch"),
+    SPARSE_SWITCH((byte) 0x2c, FORMAT_31t, PayloadInstruction::create, "sparse-switch"),
 
     // basic instructions.
 

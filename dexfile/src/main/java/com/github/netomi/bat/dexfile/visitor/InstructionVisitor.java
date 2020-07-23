@@ -59,6 +59,10 @@ public interface InstructionVisitor
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
+    default void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
     default void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }
@@ -67,15 +71,19 @@ public interface InstructionVisitor
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
-    default void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
+    default void visitAnyPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, Payload payload) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, payload);
+    }
+
+    default void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
+        visitAnyPayload(dexFile, classDef, method, code, offset, payload);
     }
 
     default void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, payload);
+        visitAnyPayload(dexFile, classDef, method, code, offset, payload);
     }
 
     default void visitSparseSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, SparseSwitchPayload payload) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, payload);
+        visitAnyPayload(dexFile, classDef, method, code, offset, payload);
     }
 }

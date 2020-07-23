@@ -15,10 +15,10 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-public abstract class SwitchPayload
-extends               Payload
+public abstract class Payload
+extends               DexInstruction
 {
-    SwitchPayload(DexOpCode opcode) {
+    Payload(DexOpCode opcode) {
         super(opcode);
     }
 }

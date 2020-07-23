@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
 public class FillArrayPayload
-extends      DexInstruction
+extends      Payload
 {
     private static final byte[] EMPTY_VALUES = new byte[0];
 
