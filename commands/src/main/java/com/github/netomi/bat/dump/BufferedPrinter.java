@@ -16,6 +16,8 @@
 
 package com.github.netomi.bat.dump;
 
+import com.github.netomi.bat.dexfile.util.Mutf8;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,15 +28,35 @@ class      BufferedPrinter
 implements AutoCloseable
 {
     private final BufferedWriter out;
+    private final OutputStream   outputStream;
 
     public BufferedPrinter(OutputStream outputStream) {
-        out = new BufferedWriter(
-              new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), 8192);
+        this.out = new BufferedWriter(
+                   new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), 8192);
+
+        this.outputStream = outputStream;
     }
 
     @Override
     public void close() throws Exception {
         out.close();
+    }
+
+    public void printAsMutf8(String s, boolean escapeControlChars) {
+        try {
+            if (escapeControlChars) {
+                s = s.replaceAll("\r", "\\\\r");
+                s = s.replaceAll("\n", "\\\\n");
+                s = s.replaceAll("\t", "\\\\t");
+            }
+
+            byte[] arr = Mutf8.encode(s);
+
+            out.flush();
+            outputStream.write(arr, 0, arr.length);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public void print(String s) {

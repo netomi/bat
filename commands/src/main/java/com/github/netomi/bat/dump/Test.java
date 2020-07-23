@@ -25,7 +25,7 @@ public class Test {
     public static void main(String[] args) {
         DexFile dexFile = new DexFile();
 
-        try (InputStream  is = new FileInputStream("classes.dex");
+        try (InputStream  is = new FileInputStream("classes-io.dex");
              OutputStream os = new FileOutputStream("classes2.dex")) {
 
             DexFileReader reader = new DexFileReader(is);

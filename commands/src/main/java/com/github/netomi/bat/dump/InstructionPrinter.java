@@ -17,6 +17,7 @@ package com.github.netomi.bat.dump;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
+import com.github.netomi.bat.dexfile.util.Mutf8;
 import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
@@ -220,23 +221,13 @@ implements InstructionVisitor
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
         printGeneric(instruction);
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(", ");
-
-        sb.append('"');
-        sb.append(instruction.getString(dexFile));
-        sb.append('"');
-
-        sb.append(" // string@");
+        printer.printAsMutf8(", \"" + instruction.getString(dexFile) + "\" // string@", false);
 
         if (instruction.getOpcode() == DexOpCode.CONST_STRING) {
-            sb.append(Primitives.asHexValue(instruction.getStringIndex(), 4));
+            printer.print(Primitives.asHexValue(instruction.getStringIndex(), 4));
         } else {
-            sb.append(Primitives.asHexValue(instruction.getStringIndex(), 8));
+            printer.print(Primitives.asHexValue(instruction.getStringIndex(), 8));
         }
-
-        printer.print(sb.toString());
     }
 
     @Override

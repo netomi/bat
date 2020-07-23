@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.debug.*;
 import com.github.netomi.bat.dexfile.instruction.DexInstruction;
+import com.github.netomi.bat.dexfile.util.Mutf8;
 import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.*;
@@ -462,7 +463,7 @@ implements   DexFileVisitor,
 
         @Override
         public void visitStringValue(DexFile dexFile, EncodedStringValue value) {
-            print(String.format("\"%s\"", value.getString(dexFile)));
+            printer.printAsMutf8(String.format("\"%s\"", value.getString(dexFile)), true);
         }
 
         @Override
@@ -473,6 +474,11 @@ implements   DexFileVisitor,
         @Override
         public void visitByteValue(DexFile dexFile, EncodedByteValue value) {
             print(Integer.toString(value.getValue()));
+        }
+
+        @Override
+        public void visitShortValue(DexFile dexFile, EncodedShortValue value) {
+            print(Short.toString(value.getValue()));
         }
 
         @Override
