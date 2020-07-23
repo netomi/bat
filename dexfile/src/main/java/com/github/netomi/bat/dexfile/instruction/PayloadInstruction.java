@@ -60,28 +60,4 @@ extends      DexInstruction
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         visitor.visitPayloadInstruction(dexFile, classDef, method, code, offset, this);
     }
-
-    @Override
-    public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
-
-        if (registers.length > 0) {
-            sb.append(", ");
-        } else {
-            sb.append(' ');
-        }
-
-        sb.append(Primitives.asHexValue(offset + payloadOffset, 8));
-        sb.append(" // ");
-
-        if (payloadOffset < 0) {
-            sb.append('-');
-            sb.append(Primitives.asHexValue(-payloadOffset, 8));
-        } else {
-            sb.append('+');
-            sb.append(Primitives.asHexValue(payloadOffset, 8));
-        }
-
-        return sb.toString();
-    }
 }

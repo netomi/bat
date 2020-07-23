@@ -64,11 +64,6 @@ extends      Payload
     }
 
     @Override
-    public String toString(DexFile dexFile, int offset) {
-        return toString();
-    }
-
-    @Override
     public String toString() {
         return String.format("array-data (%d units)", getLength());
     }

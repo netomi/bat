@@ -17,7 +17,11 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.util.Mutf8;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -49,7 +53,7 @@ implements   DataItem
     public void read(DexDataInput input) {
         utf16Size   = input.readUleb128();
         data        = input.readMUTF8Bytes(utf16Size);
-        stringValue = asString(data, utf16Size);
+        stringValue = Mutf8.decode(data, utf16Size);
     }
 
     @Override

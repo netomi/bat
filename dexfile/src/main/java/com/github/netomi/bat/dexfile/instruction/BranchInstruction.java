@@ -71,28 +71,4 @@ extends      DexInstruction
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         visitor.visitBranchInstruction(dexFile, classDef, method, code, offset, this);
     }
-
-    @Override
-    public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
-
-        if (registers.length > 0) {
-            sb.append(", ");
-        } else {
-            sb.append(' ');
-        }
-
-        sb.append(Primitives.asHexValue(offset + branchOffset, 4));
-        sb.append(" // ");
-
-        if (branchOffset < 0) {
-            sb.append('-');
-            sb.append(Primitives.asHexValue(-branchOffset, 4));
-        } else {
-            sb.append('+');
-            sb.append(Primitives.asHexValue(branchOffset, 4));
-        }
-
-        return sb.toString();
-    }
 }

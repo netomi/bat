@@ -60,19 +60,4 @@ extends      DexInstruction
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         visitor.visitTypeInstruction(dexFile, classDef, method, code, offset, this);
     }
-
-    @Override
-    public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
-
-        sb.append(", ");
-
-        TypeID typeID = getTypeID(dexFile);
-        sb.append(typeID.getType(dexFile));
-
-        sb.append(" // type@");
-        sb.append(Primitives.asHexValue(typeIndex, 4));
-
-        return sb.toString();
-    }
 }

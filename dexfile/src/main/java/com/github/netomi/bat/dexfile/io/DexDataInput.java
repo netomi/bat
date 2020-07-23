@@ -15,11 +15,14 @@
  */
 package com.github.netomi.bat.dexfile.io;
 
+import com.github.netomi.bat.dexfile.util.Mutf8;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.Checksum;
 
@@ -219,13 +222,12 @@ public class DexDataInput
     }
 
     public byte[] readMUTF8Bytes(int len) {
-        byte buf[] = new byte[len * 3];
+        byte buf[] = new byte[len * 3 + 1];
         int readBytes = 0;
         while (readBytes < buf.length) {
             byte b = readByte();
-            if (b != 0x00) {
-                buf[readBytes++] = b;
-            } else {
+            buf[readBytes++] = b;
+            if (b == 0x00) {
                 break;
             }
         }

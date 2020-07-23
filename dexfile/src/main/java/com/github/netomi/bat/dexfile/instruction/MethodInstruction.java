@@ -60,41 +60,4 @@ extends      DexInstruction
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         visitor.visitMethodInstruction(dexFile, classDef, method, code, offset, this);
     }
-
-    @Override
-    public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(getMnemonic());
-
-        if (registers.length > 0) {
-            sb.append(' ');
-            sb.append('{');
-            for (int idx = 0; idx < registers.length; idx++) {
-                if (idx > 0) {
-                    sb.append(", ");
-                }
-                sb.append('v');
-                sb.append(registers[idx]);
-            }
-            sb.append('}');
-        } else {
-            sb.append("{}");
-        }
-
-        sb.append(", ");
-
-        MethodID methodID = getMethod(dexFile);
-
-        sb.append(methodID.getClassName(dexFile));
-        sb.append('.');
-        sb.append(methodID.getName(dexFile));
-        sb.append(':');
-        sb.append(methodID.getProtoID(dexFile).getDescriptor(dexFile));
-
-        sb.append(" // method@");
-        sb.append(Primitives.asHexValue(methodIndex, 4));
-
-        return sb.toString();
-    }
 }

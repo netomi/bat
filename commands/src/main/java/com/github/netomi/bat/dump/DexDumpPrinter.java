@@ -23,23 +23,19 @@ import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.*;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class DexDumpPrinter
 implements   DexFileVisitor,
              ClassDefVisitor
 {
-    private final VisitorImpl impl = new VisitorImpl();
+    private final BufferedPrinter printer;
+    private final boolean         printFileSummary;
+    private final boolean         printHeaders;
+    private final boolean         printAnnotations;
 
-    private final BufferedWriter out;
-    private final boolean        printFileSummary;
-    private final boolean        printHeaders;
-    private final boolean        printAnnotations;
+    private final VisitorImpl     visitorImpl;
 
     private int fileOffset;
     private int codeOffset;
@@ -56,25 +52,26 @@ implements   DexFileVisitor,
                           boolean printFileSummary,
                           boolean printHeaders,
                           boolean printAnnotations) {
-        out = new BufferedWriter(
-              new OutputStreamWriter(outputStream, StandardCharsets.UTF_8), 8192);
+        printer = new BufferedPrinter(outputStream);
 
         this.printFileSummary = printFileSummary;
         this.printHeaders     = printHeaders;
         this.printAnnotations = printAnnotations;
+
+        visitorImpl = new VisitorImpl();
     }
 
     @Override
     public void visitDexFile(DexFile dexFile) {
         if (printFileSummary) {
-            dexFile.headerAccept(impl);
+            dexFile.headerAccept(visitorImpl);
         }
 
         dexFile.classDefsAccept(this);
 
         try {
-            out.flush();
-        } catch (IOException ex) {
+            printer.close();
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -108,7 +105,7 @@ implements   DexFileVisitor,
 
         if (printAnnotations && classDef.annotationsDirectory != null) {
             println(String.format("Class #%d annotations:", index));
-            classDef.annotationSetsAccept(dexFile, impl);
+            classDef.annotationSetsAccept(dexFile, visitorImpl);
 
             println();
         }
@@ -118,10 +115,10 @@ implements   DexFileVisitor,
         println("  Access flags      : " + formatAccessFlags(classDef.accessFlags, DexAccessFlags.Target.CLASS));
         println("  Superclass        : '" + classDef.getSuperClassType(dexFile) + "'");
         println("  Interfaces        -");
-        classDef.interfacesAccept(dexFile, impl);
+        classDef.interfacesAccept(dexFile, visitorImpl);
 
         if (classDef.classData != null) {
-            classDef.classDataAccept(dexFile, impl);
+            classDef.classDataAccept(dexFile, visitorImpl);
         } else {
             println("  Static fields     -");
             println("  Instance fields   -");
@@ -134,31 +131,6 @@ implements   DexFileVisitor,
     }
 
     // Private utility methods.
-
-    private void print(String s) {
-        try {
-            out.write(s);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private void println(String s) {
-        try {
-            out.write(s);
-            out.write('\n');
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private void println() {
-        try {
-            out.write('\n');
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
 
     private static String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
         return classDefItem.sourceFileIndex + " (" + classDefItem.getSourceFile(dexFile) + ")";
@@ -192,12 +164,24 @@ implements   DexFileVisitor,
 
     private static int align(int offset, int alignment) {
         if (alignment > 1) {
-            int currentAligment = offset % alignment;
-            int padding = (alignment - currentAligment) % alignment;
+            int currentAlignment = offset % alignment;
+            int padding = (alignment - currentAlignment) % alignment;
             return offset + padding;
         } else {
             return offset;
         }
+    }
+
+    private void print(String value) {
+        printer.print(value);
+    }
+
+    private void println(String value) {
+        printer.println(value);
+    }
+
+    private void println() {
+        printer.println();
     }
 
     // inner helper classes
@@ -217,6 +201,10 @@ implements   DexFileVisitor,
                   AnnotationVisitor,
                   EncodedValueVisitor
     {
+        private final InstructionVisitor instructionPrinter = new InstructionPrinter(printer);
+
+        private final PrintfFormat FLOATING_FORMAT = new PrintfFormat("%g");
+
         @Override
         public void visitHeader(DexFile dexFile, DexHeader header) {
             println("DEX file header:");
@@ -360,9 +348,9 @@ implements   DexFileVisitor,
             sb.append(Primitives.asHexValue(codeOffset, 4));
             sb.append(": ");
 
-            sb.append(instruction.toString(dexFile, offset));
-
-            println(sb.toString());
+            print(sb.toString());
+            instruction.accept(dexFile, classDef, method, code, offset, instructionPrinter);
+            println();
 
             fileOffset += instruction.getLength() * 2;
             codeOffset += instruction.getLength();
@@ -479,7 +467,12 @@ implements   DexFileVisitor,
 
         @Override
         public void visitCharValue(DexFile dexFile, EncodedCharValue value) {
-            print(Character.toString(value.getValue()));
+            print(Integer.toString(value.getValue()));
+        }
+
+        @Override
+        public void visitByteValue(DexFile dexFile, EncodedByteValue value) {
+            print(Integer.toString(value.getValue()));
         }
 
         @Override
@@ -499,12 +492,12 @@ implements   DexFileVisitor,
 
         @Override
         public void visitDoubleValue(DexFile dexFile, EncodedDoubleValue value) {
-            print(Double.toString(value.getValue()));
+            print(FLOATING_FORMAT.sprintf(value.getValue()));
         }
 
         @Override
         public void visitFloatValue(DexFile dexFile, EncodedFloatValue value) {
-            print(Float.toString(value.getValue()));
+            print(FLOATING_FORMAT.sprintf(value.getValue()));
         }
 
         @Override

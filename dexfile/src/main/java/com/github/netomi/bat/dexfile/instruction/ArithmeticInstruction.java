@@ -73,28 +73,4 @@ extends      DexInstruction
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         visitor.visitArithmeticInstruction(dexFile, classDef, method, code, offset, this);
     }
-
-    @Override
-    public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
-
-        if (containsLiteral())  {
-            sb.append(", ");
-            sb.append("#int ");
-            sb.append(value);
-            sb.append(" // #");
-
-            switch (opcode.getFormat()) {
-                case FORMAT_22s:
-                    sb.append(Primitives.asHexValue((short) value));
-                    break;
-
-                case FORMAT_22b:
-                    sb.append(Primitives.asHexValue((byte) value));
-                    break;
-            }
-        }
-
-        return sb.toString();
-    }
 }

@@ -68,11 +68,6 @@ extends      SwitchPayload
     }
 
     @Override
-    public String toString(DexFile dexFile, int offset) {
-        return toString();
-    }
-
-    @Override
     public String toString() {
         return String.format("sparse-switch-data (%d units)", getLength());
     }

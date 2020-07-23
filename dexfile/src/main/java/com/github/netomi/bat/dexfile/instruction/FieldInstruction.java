@@ -60,24 +60,4 @@ extends      DexInstruction
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         visitor.visitFieldInstruction(dexFile, classDef, method, code, offset, this);
     }
-
-    @Override
-    public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder(super.toString(dexFile, offset));
-
-        sb.append(", ");
-
-        FieldID fieldID = getField(dexFile);
-
-        sb.append(fieldID.getClassName(dexFile));
-        sb.append('.');
-        sb.append(fieldID.getName(dexFile));
-        sb.append(':');
-        sb.append(fieldID.getType(dexFile));
-
-        sb.append(" // field@");
-        sb.append(Primitives.asHexValue(fieldIndex, 4));
-
-        return sb.toString();
-    }
 }

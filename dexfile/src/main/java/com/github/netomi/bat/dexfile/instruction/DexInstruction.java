@@ -56,6 +56,10 @@ public class DexInstruction
         this.registers = EMPTY_REGISTERS;
     }
 
+    public DexOpCode getOpcode() {
+        return opcode;
+    }
+
     public int getLength() {
         return opcode.getLength();
     }
@@ -198,25 +202,6 @@ public class DexInstruction
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         // hack till all instructions are correctly added.
         visitor.visitAnyInstruction(dexFile, classDef, method, code, offset, this);
-    }
-
-    public String toString(DexFile dexFile, int offset) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(getMnemonic());
-
-        if (registers.length > 0) {
-            sb.append(' ');
-            for (int idx = 0; idx < registers.length; idx++) {
-                if (idx > 0) {
-                    sb.append(", ");
-                }
-                sb.append('v');
-                sb.append(registers[idx]);
-            }
-        }
-
-        return sb.toString();
     }
 
     public String toString() {
