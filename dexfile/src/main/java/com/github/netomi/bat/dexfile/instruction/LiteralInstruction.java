@@ -101,15 +101,50 @@ extends      DexInstruction
             sb.append(value);
 
             sb.append(" // #");
-            sb.append(Long.toHexString(value));
+            sb.append(valueAsHexString());
         } else {
             sb.append("#int ");
             sb.append(value);
 
             sb.append(" // #");
-            sb.append(Long.toHexString(value));
+            sb.append(valueAsHexString());
         }
 
         return sb.toString();
+    }
+
+    private String valueAsHexString() {
+
+        String hexString = Long.toHexString(value);
+
+        switch (opcode.getFormat()) {
+            case FORMAT_11n:
+                {
+                    int startIndex = Math.max(0, hexString.length() - 2);
+                    return hexString.substring(startIndex);
+                }
+
+            case FORMAT_21s:
+                {
+                    int startIndex = Math.max(0, hexString.length() - 4);
+                    return hexString.substring(startIndex);
+                }
+
+            case FORMAT_21h:
+                return opcode.isWide() ?
+                    Long.toHexString((value >>> 48) & 0xffff) :
+                    Long.toHexString((value >>> 16) & 0xffff);
+
+            case FORMAT_31i:
+                {
+                    int startIndex = Math.max(0, hexString.length() - 8);
+                    return hexString.substring(startIndex);
+                }
+
+            case FORMAT_51l:
+                return hexString;
+        }
+
+        throw new IllegalStateException("unexpected format for opcode " + opcode.getMnemonic());
     }
 }

@@ -595,9 +595,7 @@ implements   DexFileVisitor,
                     String parameterName = debugInfo.getParameterName(dexFile, i);
                     String parameterType = parameters.getType(dexFile, i);
 
-                    if (parameterName != null && parameterType != null) {
-                        variableInfos[register] = new LocalVariableInfo(parameterName, parameterType, null);
-                    }
+                    variableInfos[register] = new LocalVariableInfo(parameterName, parameterType, null);
 
                     // TODO: extract into util class.
                     if (parameterType.equals("J") || parameterType.equals("D")) {
@@ -633,10 +631,20 @@ implements   DexFileVisitor,
 
         @Override
         public void visitStartLocal(DexFile dexFile, DebugInfo debugInfo, DebugStartLocal instruction) {
+            LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
+            // only for compatibility with dexdump:
+            // print the method parameters potentially twice
+            if (variableInfo != null &&
+                variableInfo.endAddr == -1)
+            {
+                variableInfo.endAddr = codeOffset;
+                printLocal(instruction.registerNum, variableInfo);
+            }
+
             String name = dexFile.getString(instruction.nameIndex);
             String type = dexFile.getType(instruction.typeIndex);
 
-            LocalVariableInfo variableInfo = new LocalVariableInfo(name, type, null);
+            variableInfo = new LocalVariableInfo(name, type, null);
             variableInfo.startAddr = codeOffset;
 
             variableInfos[instruction.registerNum] = variableInfo;
@@ -644,11 +652,21 @@ implements   DexFileVisitor,
 
         @Override
         public void visitStartLocalExtended(DexFile dexFile, DebugInfo debugInfo, DebugStartLocalExtended instruction) {
+            LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
+            // only for compatibility with dexdump:
+            // print the method parameters potentially twice
+            if (variableInfo != null &&
+                variableInfo.endAddr == -1)
+            {
+                variableInfo.endAddr = codeOffset;
+                printLocal(instruction.registerNum, variableInfo);
+            }
+
             String name = dexFile.getString(instruction.nameIndex);
             String type = dexFile.getType(instruction.typeIndex);
             String sig  = dexFile.getString(instruction.sigIndex);
 
-            LocalVariableInfo variableInfo = new LocalVariableInfo(name, type, sig);
+            variableInfo = new LocalVariableInfo(name, type, sig);
             variableInfo.startAddr = codeOffset;
 
             variableInfos[instruction.registerNum] = variableInfo;

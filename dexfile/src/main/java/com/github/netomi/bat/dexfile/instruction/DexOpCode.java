@@ -49,7 +49,7 @@ public enum DexOpCode
     CONST_16(         (byte) 0x13, FORMAT_21s, LiteralInstruction::create, "const/16"),
     CONST(            (byte) 0x14, FORMAT_31i, LiteralInstruction::create, "const"),
     CONST_HIGH16(     (byte) 0x15, FORMAT_21h, LiteralInstruction::create, "const/high16"),
-    CONST_WIDE_16(    (byte) 0x16, FORMAT_21s, LiteralInstruction::create, "const-wide/high16", true),
+    CONST_WIDE_16(    (byte) 0x16, FORMAT_21s, LiteralInstruction::create, "const-wide/16",     true),
     CONST_WIDE_32(    (byte) 0x17, FORMAT_31i, LiteralInstruction::create, "const-wide/32",     true),
     CONST_WIDE(       (byte) 0x18, FORMAT_51l, LiteralInstruction::create, "const-wide",        true),
     CONST_WIDE_HIGH16((byte) 0x19, FORMAT_21h, LiteralInstruction::create, "const-wide/high16", true),
