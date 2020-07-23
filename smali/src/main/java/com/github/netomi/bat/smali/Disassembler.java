@@ -15,10 +15,10 @@
  */
 package com.github.netomi.bat.smali;
 
-import com.github.netomi.bat.dexfile.ClassDef;
-import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.*;
+import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
-import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor;
+import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.smali.io.FileOutputStreamFactory;
 import com.github.netomi.bat.smali.io.OutputStreamFactory;
 
@@ -49,7 +49,10 @@ implements   ClassDefVisitor
     // Inner helper classes.
 
     private class SmaliPrinter
-    implements ClassDefVisitor
+    implements    ClassDefVisitor,
+                  ClassDataVisitor,
+                  EncodedFieldVisitor,
+                  TypeListVisitor
     {
         private final Writer writer;
 
@@ -59,11 +62,55 @@ implements   ClassDefVisitor
 
         @Override
         public void visitClassDef(DexFile dexFile, int index, ClassDef classDef) {
-            println(".class " + classDef.getClassName(dexFile));
-            println(".super " + classDef.getSuperClassName(dexFile));
-            println(".source \"" + classDef.getSourceFile(dexFile));
+            println(".class " +
+                    DexAccessFlags.formatAsHumanReadable(classDef.accessFlags, DexAccessFlags.Target.CLASS).toLowerCase() + " " +
+                    DexUtil.internalTypeFromClassName(classDef.getClassName(dexFile)));
+            println(".super " + classDef.getSuperClassType(dexFile));
+            println(".source \"" + classDef.getSourceFile(dexFile) + "\"");
             println();
+
+            classDef.interfacesAccept(dexFile, this);
+
+            classDef.classDataAccept(dexFile, this);
+        }
+
+        @Override
+        public void visitClassData(DexFile dexFile, ClassDef classDef, ClassData classData) {
+            if (!classData.staticFields.isEmpty()) {
+                println("# static fields");
+                classData.staticFieldsAccept(dexFile, classDef, this);
+            }
+
+            if (!classData.instanceFields.isEmpty()) {
+                println("# instance fields");
+                classData.instanceFieldsAccept(dexFile, classDef, this);
+            }
+            println();
+        }
+
+        @Override
+        public void visitInterfaces(DexFile dexFile, ClassDef classDefItem, TypeList typeList) {
             println("# interfaces");
+            typeList.typesAccept(dexFile, (dexFile1, typeList1, index, type) -> println(".implements " + type));
+            println();
+        }
+
+        @Override
+        public void visitInstanceField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+            println(String.format(".field %s %s:%s",
+                                  DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD).toLowerCase(),
+                                  field.getName(dexFile),
+                                  field.getType(dexFile)));
+            println();
+        }
+
+        @Override
+        public void visitStaticField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+            println(String.format(".field %s %s:%s",
+                    DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD).toLowerCase(),
+                    field.getName(dexFile),
+                    field.getType(dexFile)));
+            println();
         }
 
         // Private utility methods.

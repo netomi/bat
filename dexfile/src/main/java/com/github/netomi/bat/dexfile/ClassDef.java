@@ -164,7 +164,9 @@ implements   DataItem
     }
 
     public void interfacesAccept(DexFile dexFile, TypeListVisitor visitor) {
-        visitor.visitInterfaces(dexFile, this, interfaces);
+        if (interfaces != null) {
+            visitor.visitInterfaces(dexFile, this, interfaces);
+        }
     }
 
     public void classDataAccept(DexFile dexFile, ClassDataVisitor visitor) {

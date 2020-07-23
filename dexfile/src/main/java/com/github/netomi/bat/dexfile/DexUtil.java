@@ -30,6 +30,10 @@ public final class DexUtil
         return type;
     }
 
+    public static String internalTypeFromClassName(String className) {
+        return "L" + className + ";";
+    }
+
     public static String internalClassNameFromExternalName(String className) {
         return className.replaceAll(".", "/");
     }
