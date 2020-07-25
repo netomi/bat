@@ -16,7 +16,6 @@
 package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.*;
-import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.smali.io.FileOutputStreamFactory;
@@ -106,14 +105,27 @@ implements   ClassDefVisitor
 
         @Override
         public void visitStaticField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
-            println(String.format(".field %s %s:%s",
+            print(String.format(".field %s %s:%s",
                     DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD).toLowerCase(),
                     field.getName(dexFile),
                     field.getType(dexFile)));
+
+            StringBuilder sb = new StringBuilder();
+            field.staticValueAccept(dexFile, classDef, index, new InitialValuePrinter(sb, " = "));
+
+            println(sb.toString());
             println();
         }
 
         // Private utility methods.
+
+        private void print(String s) {
+            try {
+                writer.write(s);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
 
         private void println(String s) {
             try {

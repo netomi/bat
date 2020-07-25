@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_ENCODED_ARRAY_ITEM,
@@ -44,5 +45,17 @@ implements   DataItem
     @Override
     public void write(DexDataOutput output) {
         encodedArrayValue.write(output);
+    }
+
+    public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
+        for (int i = 0; i < encodedArrayValue.getValueCount(); i++) {
+            encodedArrayValue.getValue(i).accept(dexFile, visitor);
+        }
+    }
+
+    public void accept(DexFile dexFile, int index, EncodedValueVisitor visitor) {
+        if (index >= 0 && index < encodedArrayValue.getValueCount()) {
+            encodedArrayValue.getValue(index).accept(dexFile, visitor);
+        }
     }
 }

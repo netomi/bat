@@ -17,10 +17,7 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.annotation.AnnotationSetRef;
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory;
-import com.github.netomi.bat.dexfile.visitor.AnnotationSetVisitor;
-import com.github.netomi.bat.dexfile.visitor.ClassDataVisitor;
-import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
-import com.github.netomi.bat.dexfile.visitor.TypeListVisitor;
+import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
@@ -178,6 +175,12 @@ implements   DataItem
     public void annotationSetsAccept(DexFile dexFile, AnnotationSetVisitor visitor) {
         if (annotationsDirectory != null) {
             annotationsDirectory.accept(dexFile, this, visitor);
+        }
+    }
+
+    public void staticValueAccept(DexFile dexFile, int index, EncodedValueVisitor visitor) {
+        if (staticValues != null) {
+            staticValues.accept(dexFile, index, visitor);
         }
     }
 

@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -68,5 +69,11 @@ implements   DexContent
     public void write(DexDataOutput output) {
         output.writeUleb128(deltaFieldIndex);
         output.writeUleb128(accessFlags);
+    }
+
+    public void staticValueAccept(DexFile dexFile, ClassDef classDef, int index, EncodedValueVisitor visitor) {
+        if (isStatic()) {
+            classDef.staticValueAccept(dexFile, index, visitor);
+        }
     }
 }
