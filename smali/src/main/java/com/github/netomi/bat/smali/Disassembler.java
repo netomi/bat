@@ -212,6 +212,8 @@ implements   ClassDefVisitor
                     printer.println();
                 }
             }
+
+            code.instructionsAccept(dexFile, classDef, method, code, new InstructionPrinter(printer));
         }
 
         @Override
