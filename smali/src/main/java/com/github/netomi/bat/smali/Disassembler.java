@@ -58,6 +58,7 @@ implements   ClassDefVisitor
                   AnnotationVisitor,
                   AnnotationElementVisitor,
                   EncodedFieldVisitor,
+                  EncodedMethodVisitor,
                   TypeListVisitor
     {
         private final IndentingPrinter printer;
@@ -73,8 +74,8 @@ implements   ClassDefVisitor
             printer.print(".class");
 
             String accessFlags =
-                    DexAccessFlags.formatAsHumanReadable(classDef.accessFlags, DexAccessFlags.Target.CLASS)
-                                  .toLowerCase();
+                DexAccessFlags.formatAsHumanReadable(classDef.accessFlags, DexAccessFlags.Target.CLASS)
+                              .toLowerCase();
 
             if (!accessFlags.isEmpty()) {
                 printer.print(" " + accessFlags);
@@ -112,7 +113,16 @@ implements   ClassDefVisitor
                 printer.println("# instance fields");
                 classData.instanceFieldsAccept(dexFile, classDef, this);
             }
-            printer.println();
+
+            if (!classData.directMethods.isEmpty()) {
+                printer.println("# direct methods");
+                classData.directMethodsAccept(dexFile, classDef, this);
+            }
+
+            if (!classData.virtualMethods.isEmpty()) {
+                printer.println("# virtual methods");
+                classData.virtualMethodsAccept(dexFile, classDef, this);
+            }
         }
 
         @Override
@@ -127,8 +137,8 @@ implements   ClassDefVisitor
             printer.print(".field");
 
             String accessFlags =
-                    DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD)
-                                  .toLowerCase();
+                DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD)
+                              .toLowerCase();
 
             if (!accessFlags.isEmpty()) {
                 printer.print(" " + accessFlags);
@@ -143,8 +153,8 @@ implements   ClassDefVisitor
             printer.print(".field");
 
             String accessFlags =
-                    DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD)
-                            .toLowerCase();
+                DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD)
+                              .toLowerCase();
 
             if (!accessFlags.isEmpty()) {
                 printer.print(" " + accessFlags);
@@ -152,9 +162,29 @@ implements   ClassDefVisitor
 
             printer.print(" " + field.getName(dexFile) + ":" + field.getType(dexFile));
 
-            field.staticValueAccept(dexFile, classDef, index, new EncodedValuePrinter(printer, " = "));
+            field.staticValueAccept(dexFile, classDef, index, new EncodedValuePrinter(printer, null, " = "));
 
             printer.println();
+            printer.println();
+        }
+
+        @Override
+        public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+            printer.print(".method");
+
+            String accessFlags =
+                DexAccessFlags.formatAsHumanReadable(method.accessFlags, DexAccessFlags.Target.METHOD)
+                              .toLowerCase();
+
+            if (!accessFlags.isEmpty()) {
+                printer.print(" " + accessFlags);
+            }
+
+            printer.println(" " + method.getName(dexFile) + ":" + method.getDescriptor(dexFile));
+
+            // print instructions.
+
+            printer.println(".end method");
             printer.println();
         }
 
@@ -163,6 +193,7 @@ implements   ClassDefVisitor
             if (annotationSet.getAnnotationCount() > 0) {
                 printer.println("# annotations");
                 annotationSet.accept(dexFile, classDef, this);
+                printer.println();
             }
         }
 
@@ -212,7 +243,7 @@ implements   ClassDefVisitor
         public void visitAnnotationElement(DexFile dexFile, AnnotationElement element) {
             printer.print(element.getName(dexFile));
             printer.print(" = ");
-            element.value.accept(dexFile, new EncodedValuePrinter(printer));
+            element.value.accept(dexFile, new EncodedValuePrinter(printer, this));
             printer.println();
         }
     }
