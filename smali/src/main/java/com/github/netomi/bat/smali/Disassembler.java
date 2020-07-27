@@ -204,12 +204,13 @@ implements   ClassDefVisitor
                 if (protoID.parameters != null) {
                     for (String parameterType : protoID.parameters.getTypes(dexFile)) {
                         String parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex++);
-                        printer.println(String.format(".param p%d, \"%s\"    # %s",
-                                        registerIndex++,
-                                        parameterName,
-                                        parameterType));
+                        if (parameterName != null) {
+                            printer.println(String.format(".param p%d, \"%s\"    # %s",
+                                                          registerIndex++,
+                                                          parameterName,
+                                                          parameterType));
+                        }
                     }
-                    printer.println();
                 }
             }
 

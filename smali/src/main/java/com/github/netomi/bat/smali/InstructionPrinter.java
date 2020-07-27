@@ -32,12 +32,14 @@ implements InstructionVisitor
 
     @Override
     public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
-        printGeneric(instruction);
+        printer.println();
+        printGeneric(code, instruction, true);
     }
 
     @Override
     public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
-        printGeneric(instruction);
+        printer.println();
+        printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
 
@@ -65,7 +67,8 @@ implements InstructionVisitor
 
     @Override
     public void visitBranchInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BranchInstruction instruction) {
-        printGeneric(instruction);
+        printer.println();
+        printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
 
@@ -91,28 +94,24 @@ implements InstructionVisitor
 
     @Override
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
-        printGeneric(instruction);
+        printer.println();
+        printGeneric(code, instruction, false);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(", ");
+        printer.print(", ");
 
         FieldID fieldID = instruction.getField(dexFile);
 
-        sb.append(fieldID.getClassName(dexFile));
-        sb.append('.');
-        sb.append(fieldID.getName(dexFile));
-        sb.append(':');
-        sb.append(fieldID.getType(dexFile));
-
-        sb.append(" // field@");
-        sb.append(Primitives.asHexValue(instruction.getFieldIndex(), 4));
-
-        printer.println(sb.toString());
+        printer.print(fieldID.getClassName(dexFile));
+        printer.print("->");
+        printer.print(fieldID.getName(dexFile));
+        printer.print(":");
+        printer.println(fieldID.getType(dexFile));
     }
 
     @Override
     public void visitLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, LiteralInstruction instruction) {
-        printGeneric(instruction);
+        printer.println();
+        printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
         sb.append(", ");
@@ -156,44 +155,32 @@ implements InstructionVisitor
 
     @Override
     public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
-        StringBuilder sb = new StringBuilder();
+        printer.println();
 
-        sb.append(instruction.getMnemonic());
+        printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
-            sb.append(' ');
-            sb.append('{');
-            for (int idx = 0; idx < instruction.registers.length; idx++) {
-                if (idx > 0) {
-                    sb.append(", ");
-                }
-                sb.append('v');
-                sb.append(instruction.registers[idx]);
-            }
-            sb.append('}');
+            printer.print(" {");
+            printRegisters(code, instruction);
+            printer.print("}");
         } else {
-            sb.append("{}");
+            printer.print(" {}");
         }
 
-        sb.append(", ");
+        printer.print(", ");
 
         MethodID methodID = instruction.getMethod(dexFile);
 
-        sb.append(methodID.getClassName(dexFile));
-        sb.append('.');
-        sb.append(methodID.getName(dexFile));
-        sb.append(':');
-        sb.append(methodID.getProtoID(dexFile).getDescriptor(dexFile));
-
-        sb.append(" // method@");
-        sb.append(Primitives.asHexValue(instruction.getMethodIndex(), 4));
-
-        printer.println(sb.toString());
+        printer.print(methodID.getClassName(dexFile));
+        printer.print("->");
+        printer.print(methodID.getName(dexFile));
+        printer.println(methodID.getProtoID(dexFile).getDescriptor(dexFile));
     }
 
     @Override
     public void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
-        printGeneric(instruction);
+        printer.println();
+        printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
 
@@ -219,69 +206,67 @@ implements InstructionVisitor
 
     @Override
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
-        printGeneric(instruction);
-
-        printer.print(", \"" + instruction.getString(dexFile) + "\" // string@");
-
-        if (instruction.getOpcode() == DexOpCode.CONST_STRING) {
-            printer.println(Primitives.asHexValue(instruction.getStringIndex(), 4));
-        } else {
-            printer.println(Primitives.asHexValue(instruction.getStringIndex(), 8));
-        }
+        printer.println();
+        printGeneric(code, instruction, false);
+        printer.println(", \"" + instruction.getString(dexFile) + "\"");
     }
 
     @Override
     public void visitTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, TypeInstruction instruction) {
-        printGeneric(instruction);
+        printer.println();
+        printGeneric(code, instruction, false);
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(", ");
+        printer.print(", ");
 
         TypeID typeID = instruction.getTypeID(dexFile);
-        sb.append(typeID.getType(dexFile));
-
-        sb.append(" // type@");
-        sb.append(Primitives.asHexValue(instruction.getTypeIndex(), 4));
-
-        printer.println(sb.toString());
+        printer.println(typeID.getType(dexFile));
     }
 
     @Override
     public void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
+        printer.println();
         printer.println(payload.toString());
     }
 
     @Override
-    public void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {
+    public void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {        printer.println();
+        printer.println();
         printer.println(payload.toString());
     }
 
     @Override
     public void visitSparseSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, SparseSwitchPayload payload) {
+        printer.println();
         printer.println(payload.toString());
     }
 
-    private void printGeneric(DexInstruction instruction) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(instruction.getMnemonic());
-
-        if (instruction.getOpcode() == DexOpCode.NOP) {
-            sb.append(" // spacer");
-        }
+    private void printGeneric(Code code, DexInstruction instruction, boolean appendNewLine) {
+        printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
-            sb.append(' ');
-            for (int idx = 0; idx < instruction.registers.length; idx++) {
-                if (idx > 0) {
-                    sb.append(", ");
-                }
-                sb.append('v');
-                sb.append(instruction.registers[idx]);
-            }
+            printer.print(" ");
+            printRegisters(code, instruction);
         }
 
-        printer.print(sb.toString());
+        if (appendNewLine) {
+            printer.println();
+        }
+    }
+
+    private void printRegisters(Code code, DexInstruction instruction) {
+        int localVars = code.registersSize - code.insSize;
+
+        for (int idx = 0; idx < instruction.registers.length; idx++) {
+            if (idx > 0) {
+                printer.print(", ");
+            }
+
+            String registerPrefix = idx < localVars ? "v" : "p";
+            int    registerIndex  = idx < localVars ?
+                instruction.registers[idx] :
+                instruction.registers[idx] - localVars;
+
+            printer.print(registerPrefix + registerIndex);
+        }
     }
 }
