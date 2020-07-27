@@ -16,25 +16,61 @@
 package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.FieldID;
+import com.github.netomi.bat.dexfile.MethodID;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+import com.github.netomi.bat.smali.io.IndentingPrinter;
 
-import java.io.IOException;
-
-class InitialValuePrinter
+class      EncodedValuePrinter
 implements EncodedValueVisitor
 {
-    private final Appendable appendable;
-    private final String     prefix;
+    private final IndentingPrinter printer;
+    private final String           prefix;
 
-    public InitialValuePrinter(Appendable appendable, String prefix) {
-        this.appendable = appendable;
-        this.prefix     = prefix;
+    public EncodedValuePrinter(IndentingPrinter printer) {
+        this(printer, null);
+    }
+
+    public EncodedValuePrinter(IndentingPrinter printer, String prefix) {
+        this.printer = printer;
+        this.prefix  = prefix;
     }
 
     @Override
     public void visitAnyValue(DexFile dexFile, EncodedValue value) {
-        throw new RuntimeException("unexpected value " + value);
+        //throw new RuntimeException("unexpected value " + value);
+    }
+
+    @Override
+    public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
+        append("{");
+        printer.println();
+        printer.levelUp();
+        value.valuesAccept(dexFile, this, (df, v) -> printer.println());
+        printer.levelDown();
+        printer.print("}");
+    }
+
+    @Override
+    public void visitTypeValue(DexFile dexFile, EncodedTypeValue value) {
+        append(value.getType(dexFile));
+    }
+
+    @Override
+    public void visitFieldValue(DexFile dexFile, EncodedFieldValue value) {
+        FieldID fieldID = value.getField(dexFile);
+        append(fieldID.getClassType(dexFile).getType(dexFile) + "->" +
+               fieldID.getName(dexFile) + ":" +
+               fieldID.getType(dexFile));
+    }
+
+    @Override
+    public void visitMethodValue(DexFile dexFile, EncodedMethodValue value) {
+        MethodID methodID = value.getMethod(dexFile);
+        append(methodID.getClassType(dexFile).getType(dexFile) + "->" +
+               methodID.getName(dexFile) +
+               methodID.getProtoID(dexFile).getDescriptor(dexFile));
     }
 
     @Override
@@ -95,10 +131,10 @@ implements EncodedValueVisitor
     // private utility methods.
 
     private void append(String text) {
-        try {
-            appendable.append(prefix + text);
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+        if (prefix != null) {
+            printer.print(prefix + text);
+        } else {
+            printer.print(text);
         }
     }
 }

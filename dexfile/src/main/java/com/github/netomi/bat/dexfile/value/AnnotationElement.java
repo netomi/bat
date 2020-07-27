@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.DexContent;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -47,6 +48,10 @@ implements   DexContent
     public void write(DexDataOutput output) {
         output.writeUleb128(nameIndex);
         value.write(output);
+    }
+
+    public void accept(DexFile dexFile, AnnotationElementVisitor visitor) {
+        visitor.visitAnnotationElement(dexFile, this);
     }
 
     @Override

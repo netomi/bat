@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.value;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 import java.util.ArrayList;
@@ -97,6 +98,12 @@ extends      EncodedValue
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitAnnotationValue(dexFile, this);
+    }
+
+    public void annotationElementsAccept(DexFile dexFile, AnnotationElementVisitor visitor) {
+        for (AnnotationElement element : elements) {
+            element.accept(dexFile, visitor);
+        }
     }
 
     @Override
