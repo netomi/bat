@@ -18,6 +18,7 @@ package com.github.netomi.bat.smali;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.FieldID;
 import com.github.netomi.bat.dexfile.MethodID;
+import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
@@ -103,7 +104,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitByteValue(DexFile dexFile, EncodedByteValue value) {
-        append(Byte.toString(value.getValue()));
+        append(Primitives.toHexString(value.getValue()));
     }
 
     @Override
@@ -132,12 +133,12 @@ implements EncodedValueVisitor
 
     @Override
     public void visitIntValue(DexFile dexFile, EncodedIntValue value) {
-        append(Integer.toString(value.getValue()));
+        append(Primitives.toHexString(value.getValue()));
     }
 
     @Override
     public void visitLongValue(DexFile dexFile, EncodedLongValue value) {
-        append(Long.toString(value.getValue()));
+        append(Primitives.toHexString(value.getValue()));
     }
 
     @Override
@@ -147,7 +148,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitShortValue(DexFile dexFile, EncodedShortValue value) {
-        append(Short.toString(value.getValue()));
+        append(Primitives.toHexString(value.getValue()));
     }
 
     @Override

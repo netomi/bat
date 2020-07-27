@@ -59,6 +59,7 @@ implements   ClassDefVisitor
                   AnnotationElementVisitor,
                   EncodedFieldVisitor,
                   EncodedMethodVisitor,
+                  CodeVisitor,
                   TypeListVisitor
     {
         private final IndentingPrinter printer;
@@ -182,10 +183,35 @@ implements   ClassDefVisitor
 
             printer.println(" " + method.getName(dexFile) + ":" + method.getDescriptor(dexFile));
 
-            // print instructions.
+            // print code.
+            printer.levelUp();
+            method.codeAccept(dexFile, classDef, this);
+            printer.levelDown();
 
             printer.println(".end method");
             printer.println();
+        }
+
+        @Override
+        public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
+            printer.println(".registers " + code.registersSize);
+
+            if (code.debugInfo != null) {
+                int parameterIndex = 0;
+                int registerIndex = method.isStatic() ? 0 : 1;
+
+                ProtoID protoID = method.getProtoID(dexFile);
+                if (protoID.parameters != null) {
+                    for (String parameterType : protoID.parameters.getTypes(dexFile)) {
+                        String parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex++);
+                        printer.println(String.format(".param p%d, \"%s\"    # %s",
+                                        registerIndex++,
+                                        parameterName,
+                                        parameterType));
+                    }
+                    printer.println();
+                }
+            }
         }
 
         @Override
