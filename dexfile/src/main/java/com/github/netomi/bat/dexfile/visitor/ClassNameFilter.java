@@ -18,8 +18,8 @@ package com.github.netomi.bat.dexfile.visitor;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.DexUtil;
-import com.github.netomi.bat.dexfile.util.ClassNameMatcher;
-import com.github.netomi.bat.dexfile.util.StringMatcher;
+import com.github.netomi.bat.util.ClassNameMatcher;
+import com.github.netomi.bat.util.StringMatcher;
 
 public class ClassNameFilter
 implements   ClassDefVisitor

@@ -18,8 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexFormatException;
-import com.github.netomi.bat.dexfile.util.Primitives;
-import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
+import com.github.netomi.bat.util.Primitives;
 
 import java.nio.ByteOrder;
 import java.util.Arrays;

@@ -16,7 +16,6 @@
 package com.github.netomi.bat.dexfile.instruction;
 
 import com.github.netomi.bat.dexfile.*;
-import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
 public class StringInstruction

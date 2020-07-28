@@ -13,19 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile;
+package com.github.netomi.bat.io;
 
-import com.github.netomi.bat.util.ClassUtil;
+import java.io.IOException;
+import java.io.OutputStream;
 
-public class DexUtil
-extends      ClassUtil
+public interface OutputStreamFactory
 {
-    private DexUtil() {}
-
-    public static String fullExternalMethodSignature(DexFile dexFile, ClassDef classDef, EncodedMethod method) {
-        return String.format("%s.%s:%s",
-            externalClassNameFromInternalName(classDef.getClassName(dexFile)),
-            method.getName(dexFile),
-            method.getDescriptor(dexFile));
-    }
+    OutputStream createOutputStream(String className) throws IOException;
 }

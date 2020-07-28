@@ -13,12 +13,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.smali.io;
+package com.github.netomi.bat.util;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-public interface OutputStreamFactory
+/**
+ * @author Thomas Neidhart
+ */
+public interface StringMatcher
 {
-    OutputStream createOutputStream(String className) throws IOException;
+    boolean matches(String input);
+
+    default StringMatcher or(StringMatcher other) {
+        return (input) -> StringMatcher.this.matches(input) || other.matches(input);
+    }
+
+    default StringMatcher and(StringMatcher other) {
+        return (input) -> StringMatcher.this.matches(input) && other.matches(input);
+    }
 }

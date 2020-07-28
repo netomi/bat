@@ -4,4 +4,5 @@ include 'classfile'
 include 'dexfile'
 include 'commands'
 include 'smali'
+include 'core'
 

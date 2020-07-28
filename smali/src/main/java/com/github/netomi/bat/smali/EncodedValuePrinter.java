@@ -18,11 +18,11 @@ package com.github.netomi.bat.smali;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.FieldID;
 import com.github.netomi.bat.dexfile.MethodID;
-import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
-import com.github.netomi.bat.smali.io.IndentingPrinter;
+import com.github.netomi.bat.io.IndentingPrinter;
+import com.github.netomi.bat.util.Primitives;
 
 class      EncodedValuePrinter
 implements EncodedValueVisitor

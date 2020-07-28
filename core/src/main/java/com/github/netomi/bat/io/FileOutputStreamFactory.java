@@ -13,9 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.smali.io;
+package com.github.netomi.bat.io;
 
-import com.github.netomi.bat.dexfile.DexUtil;
+import com.github.netomi.bat.util.ClassUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,7 +33,7 @@ implements   OutputStreamFactory
 
     @Override
     public OutputStream createOutputStream(String className) throws IOException {
-        String[] packageComponents = DexUtil.internalPackageNameFromInternalName(className).split("/");
+        String[] packageComponents = ClassUtil.internalPackageNameFromInternalName(className).split("/");
 
         Path currentPath = baseDir;
         for (String component : packageComponents) {
@@ -42,7 +42,7 @@ implements   OutputStreamFactory
 
         Files.createDirectories(currentPath);
 
-        currentPath = currentPath.resolve(DexUtil.simpleClassNameFromInternalName(className) + ".smali");
+        currentPath = currentPath.resolve(ClassUtil.simpleClassNameFromInternalName(className) + ".smali");
         return Files.newOutputStream(currentPath);
     }
 }

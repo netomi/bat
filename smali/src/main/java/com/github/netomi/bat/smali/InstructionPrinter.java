@@ -17,9 +17,9 @@ package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
-import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
-import com.github.netomi.bat.smali.io.IndentingPrinter;
+import com.github.netomi.bat.io.IndentingPrinter;
+import com.github.netomi.bat.util.Primitives;
 
 class      InstructionPrinter
 implements InstructionVisitor

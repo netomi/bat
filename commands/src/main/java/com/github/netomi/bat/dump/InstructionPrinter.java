@@ -17,9 +17,8 @@ package com.github.netomi.bat.dump;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
-import com.github.netomi.bat.dexfile.util.Mutf8;
-import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
+import com.github.netomi.bat.util.Primitives;
 
 class      InstructionPrinter
 implements InstructionVisitor

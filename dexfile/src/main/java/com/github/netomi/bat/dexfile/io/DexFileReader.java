@@ -17,9 +17,9 @@
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
-import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor;
+import com.github.netomi.bat.util.Primitives;
 
 import java.io.IOException;
 import java.io.InputStream;

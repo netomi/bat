@@ -21,9 +21,9 @@ import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.value.AnnotationElement;
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
 import com.github.netomi.bat.dexfile.visitor.*;
-import com.github.netomi.bat.smali.io.FileOutputStreamFactory;
-import com.github.netomi.bat.smali.io.IndentingPrinter;
-import com.github.netomi.bat.smali.io.OutputStreamFactory;
+import com.github.netomi.bat.io.FileOutputStreamFactory;
+import com.github.netomi.bat.io.IndentingPrinter;
+import com.github.netomi.bat.io.OutputStreamFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

@@ -19,10 +19,9 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.debug.*;
 import com.github.netomi.bat.dexfile.instruction.DexInstruction;
-import com.github.netomi.bat.dexfile.util.Mutf8;
-import com.github.netomi.bat.dexfile.util.Primitives;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.*;
+import com.github.netomi.bat.util.Primitives;
 
 import java.io.OutputStream;
 import java.util.List;

@@ -26,6 +26,8 @@ jacocoTestReport {
 }
 
 dependencies {
+    compile project(':core')
+
     testCompile "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     testCompile "org.junit.jupiter:junit-jupiter-params:$junitVersion"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
