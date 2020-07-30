@@ -70,7 +70,7 @@ implements DataItem.Map
 
     void writeDataItems(DexFile dexFile, DexDataOutput output, int type) {
         Set<DataItem> dataItemSet = dataItemMap.get(type);
-        if (dataItemSet != null && dataItemSet.size() > 0) {
+        if (dataItemSet != null && !dataItemSet.isEmpty()) {
             int align = dataItemSet.iterator().next().getDataAlignment();
             output.writeAlignmentPadding(align);
             dexFile.mapList.updateMapItem(type, dataItemSet.size(), output.getOffset());

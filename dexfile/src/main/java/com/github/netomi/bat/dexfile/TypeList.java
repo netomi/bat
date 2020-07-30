@@ -19,10 +19,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.util.PrimitiveIterable;
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor;
-
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.function.BiFunction;
+import com.github.netomi.bat.util.IntArray;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_LIST,
@@ -32,22 +29,23 @@ import java.util.function.BiFunction;
 public class TypeList
 implements   DataItem
 {
-    private static final int[] EMPTY_ARRAY = new int[0];
+    //private int   size; // uint
+    private IntArray typeList;
 
-    public int   size; // uint
-    public int[] typeList;
+    public static TypeList empty() {
+        return new TypeList();
+    }
 
-    public TypeList() {
-        this.size     = 0;
-        this.typeList = EMPTY_ARRAY;
+    private TypeList() {
+        this.typeList = new IntArray(0);
     }
 
     public int getTypeCount() {
-        return typeList.length;
+        return typeList.size();
     }
 
     public String getType(DexFile dexFile, int typeIndex) {
-        return dexFile.getTypeID(typeList[typeIndex]).getType(dexFile);
+        return dexFile.getTypeID(typeList.get(typeIndex)).getType(dexFile);
     }
 
     public Iterable<String> getTypes(DexFile dexFile) {
@@ -60,11 +58,11 @@ implements   DataItem
     public void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
-        size     = input.readInt();
-        typeList = new int[size];
+        int size = (int) input.readUnsignedInt();
+        typeList.resize(size);
         for (int i = 0; i < size; i++) {
             int typeIndex = input.readUnsignedShort();
-            typeList[i] = typeIndex;
+            typeList.set(i, typeIndex);
         }
     }
 
@@ -72,20 +70,22 @@ implements   DataItem
     public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
+        int size = typeList.size();
         output.writeInt(size);
         for (int i = 0; i < size; i++) {
-            output.writeUnsignedShort(typeList[i]);
+            output.writeUnsignedShort(typeList.get(i));
         }
     }
 
     public void typesAccept(DexFile dexFile, TypeVisitor visitor) {
-        for (int i = 0; i < typeList.length; i++) {
-            visitor.visitType(dexFile, this, i, dexFile.getTypeID(typeList[i]).getType(dexFile));
+        int size = typeList.size();
+        for (int i = 0; i < size; i++) {
+            visitor.visitType(dexFile, this, i, dexFile.getTypeID(typeList.get(i)).getType(dexFile));
         }
     }
 
     @Override
     public String toString() {
-        return String.format("TypeList[size=%d,types=%s]", size, Arrays.toString(typeList));
+        return String.format("TypeList[size=%d,types=%s]", typeList.size(), typeList);
     }
 }

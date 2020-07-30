@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile.util;
 
 import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.util.IntArray;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -26,17 +27,17 @@ implements   Iterable<E>
 {
     private final DexFile                         dexFile;
     private final BiFunction<DexFile, Integer, E> accessorFunction;
-    private final int[]                           array;
+    private final IntArray                        array;
 
     public static <E> Iterable<E> of(DexFile                         dexFile,
                                      BiFunction<DexFile, Integer, E> accessorFunction,
-                                     int[]                           array) {
+                                     IntArray                        array) {
         return new PrimitiveIterable<E>(dexFile, accessorFunction, array);
     }
 
     private PrimitiveIterable(DexFile                         dexFile,
                               BiFunction<DexFile, Integer, E> accessorFunction,
-                              int[]                           array) {
+                              IntArray                        array) {
         this.dexFile          = dexFile;
         this.accessorFunction = accessorFunction;
         this.array            = array;
@@ -50,12 +51,12 @@ implements   Iterable<E>
 
             @Override
             public boolean hasNext() {
-                return index < array.length;
+                return index < array.size();
             }
 
             @Override
             public E next() {
-                return accessorFunction.apply(dexFile, array[index++]);
+                return accessorFunction.apply(dexFile, array.get(index++));
             }
         };
     }

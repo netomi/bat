@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile;
 
-import com.github.netomi.bat.dexfile.annotation.AnnotationSetRef;
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
@@ -116,7 +115,7 @@ implements   DataItem
     public void readLinkedDataItems(DexDataInput input) {
         if (interfacesOffset != 0) {
             input.setOffset(interfacesOffset);
-            interfaces = new TypeList();
+            interfaces = TypeList.empty();
             interfaces.read(input);
         }
 
