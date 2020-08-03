@@ -16,6 +16,7 @@
 package com.github.netomi.bat.util;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Implements a growing array of int primitives.
@@ -25,12 +26,12 @@ implements   Cloneable
 {
     private static final int MIN_CAPACITY_INCREMENT = 12;
 
-    private int[] values;
     private int   size;
+    private int[] values;
 
     private  IntArray(int[] array, int size) {
-        this.values = array;
         this.size   = Preconditions.checkArgumentInRange(size, 0, array.length, "size");
+        this.values = array;
     }
 
     /**
@@ -44,12 +45,12 @@ implements   Cloneable
      * Creates an empty IntArray with the specified initial capacity.
      */
     public IntArray(int initialCapacity) {
+        size = 0;
         if (initialCapacity == 0) {
             values = EmptyArray.INT;
         } else {
             values = new int[initialCapacity];
         }
-        size = 0;
     }
 
     /**
@@ -67,7 +68,7 @@ implements   Cloneable
     }
 
     /**
-     * Changes the size of this IntArray. If this IntArray is shrinked, the backing array capacity
+     * Changes the size of this IntArray. If this IntArray is shrunk, the backing array capacity
      * is unchanged. If the new size is larger than backing array capacity, a new backing array is
      * created from the current content of this IntArray padded with 0s.
      */
@@ -79,6 +80,22 @@ implements   Cloneable
             ensureCapacity(newSize - size);
         }
         size = newSize;
+    }
+
+    /**
+     * Inserts the given value into this array in sorted order.
+     * If the value is already present, it is not added.
+     * <p>
+     * If the array is not sorted, the behaviour is undefined.
+     *
+     * @param value  the value to be added
+     */
+    public void insert(int value) {
+        int index = Arrays.binarySearch(values, 0, size, value);
+        if (index < 0) {
+            int insertionPoint = -(index + 1);
+            add(insertionPoint, value);
+        }
     }
 
     /**
@@ -197,6 +214,36 @@ implements   Cloneable
      */
     public int[] toArray() {
         return Arrays.copyOf(values, size);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IntArray other = (IntArray) o;
+
+        if (size != other.size) {
+            return false;
+        }
+
+        for (int i = 0; i < size; i++) {
+            if (values[i] != other.values[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 31 * Objects.hash(size);
+
+        for (int i = 0; i < size; i++) {
+            result = 31 * result + values[i];
+        }
+
+        return result;
     }
 
     @Override

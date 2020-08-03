@@ -366,7 +366,7 @@ implements   DexFileVisitor,
             EncodedCatchHandler catchHandler = tryObject.catchHandler;
 
             for (TypeAddrPair addrPair : catchHandler.handlers) {
-                println(String.format("          %s -> %s", addrPair.getType(dexFile), Primitives.toHexString((short) addrPair.addr)));
+                println(String.format("          %s -> %s", addrPair.getType(dexFile), Primitives.toHexString((short) addrPair.getOffset())));
             }
 
             if (catchHandler.catchAllAddr != -1) {

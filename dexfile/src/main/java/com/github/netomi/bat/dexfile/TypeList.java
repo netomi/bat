@@ -21,6 +21,8 @@ import com.github.netomi.bat.dexfile.util.PrimitiveIterable;
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor;
 import com.github.netomi.bat.util.IntArray;
 
+import java.util.Objects;
+
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_LIST,
     dataAlignment = 4,
@@ -54,6 +56,10 @@ implements   DataItem
                                     typeList);
     }
 
+    public void addType(int typeIndex) {
+        typeList.insert(typeIndex);
+    }
+
     @Override
     public void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
@@ -82,6 +88,19 @@ implements   DataItem
         for (int i = 0; i < size; i++) {
             visitor.visitType(dexFile, this, i, dexFile.getTypeID(typeList.get(i)).getType(dexFile));
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypeList typeList1 = (TypeList) o;
+        return Objects.equals(typeList, typeList1.typeList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(typeList);
     }
 
     @Override

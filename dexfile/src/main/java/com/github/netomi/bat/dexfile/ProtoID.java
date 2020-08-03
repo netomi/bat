@@ -80,7 +80,7 @@ implements   DataItem
     public void readLinkedDataItems(DexDataInput input) {
         if (parametersOffset != 0) {
             input.setOffset(parametersOffset);
-            parameters = new TypeList();
+            parameters = TypeList.empty();
             parameters.read(input);
         }
     }

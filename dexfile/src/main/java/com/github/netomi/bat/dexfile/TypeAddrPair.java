@@ -26,16 +26,24 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 public class TypeAddrPair
 implements   DexContent
 {
-    public int typeIndex; // uleb128
-    public int addr;      // uleb128
+    private int typeIndex; // uleb128
+    private int addr;      // uleb128
 
     public TypeAddrPair() {
         typeIndex = NO_INDEX;
         addr      = 0;
     }
 
+    public int getTypeIndex() {
+        return typeIndex;
+    }
+
     public String getType(DexFile dexFile) {
         return dexFile.getTypeID(typeIndex).getType(dexFile);
+    }
+
+    public int getOffset() {
+        return addr;
     }
 
     @Override
