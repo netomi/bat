@@ -85,22 +85,22 @@ implements   DexFileVisitor
 
     private void writeStringIDs(DexFile dexFile, DexDataOutput output) {
         writePadding(StringID.class, output);
-        dexFile.header.stringIDsSize    = dexFile.stringIDs.length;
+        dexFile.header.stringIDsSize    = dexFile.getStringIDCount();
         dexFile.header.stringIDsOffsets = output.getOffset();
-        updateMapList(dexFile, DexConstants.TYPE_STRING_ID_ITEM, dexFile.stringIDs.length, output.getOffset());
+        updateMapList(dexFile, DexConstants.TYPE_STRING_ID_ITEM, dexFile.getStringIDCount(), output.getOffset());
 
-        for (StringID stringID : dexFile.stringIDs) {
+        for (StringID stringID : dexFile.getStringIDs()) {
             stringID.write(output);
         }
     }
 
     private void writeTypeIDs(DexFile dexFile, DexDataOutput output) {
         writePadding(TypeID.class, output);
-        dexFile.header.typeIDsSize   = dexFile.typeIDs.length;
+        dexFile.header.typeIDsSize   = dexFile.getTypeIDCount();
         dexFile.header.typeIDsOffset = output.getOffset();
-        updateMapList(dexFile, DexConstants.TYPE_TYPE_ID_ITEM, dexFile.typeIDs.length, output.getOffset());
+        updateMapList(dexFile, DexConstants.TYPE_TYPE_ID_ITEM, dexFile.getTypeIDCount(), output.getOffset());
 
-        for (TypeID typeID : dexFile.typeIDs) {
+        for (TypeID typeID : dexFile.getTypeIDs()) {
             typeID.write(output);
         }
     }

@@ -30,9 +30,22 @@ implements   DataItem
     private int        stringDataOffset; // uint
     public  StringData stringData;
 
-    public StringID() {
-        stringDataOffset = 0;
-        stringData       = null;
+    public static StringID empty() {
+        return new StringID();
+    }
+
+    public static StringID of(String value) {
+        return new StringID(StringData.of(value));
+    }
+
+    private StringID() {
+        this.stringDataOffset = 0;
+        this.stringData       = null;
+    }
+
+    private StringID(StringData data) {
+        this.stringDataOffset = 0;
+        this.stringData       = data;
     }
 
     public int getStringDataOffset() {
@@ -52,7 +65,7 @@ implements   DataItem
     @Override
     public void readLinkedDataItems(DexDataInput input) {
         input.setOffset(stringDataOffset);
-        stringData = new StringData();
+        stringData = StringData.empty();
         stringData.read(input);
     }
 
@@ -77,6 +90,6 @@ implements   DataItem
 
     @Override
     public String toString() {
-        return String.format("StringID[offset=0x%04x]", stringDataOffset);
+        return String.format("StringID[offset=0x%04x,value=%s]", stringDataOffset, stringData.getString());
     }
 }

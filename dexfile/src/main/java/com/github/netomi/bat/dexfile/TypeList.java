@@ -57,7 +57,7 @@ implements   DataItem
     }
 
     public void addType(int typeIndex) {
-        typeList.insert(typeIndex);
+        typeList.add(typeIndex);
     }
 
     @Override

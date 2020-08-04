@@ -26,10 +26,26 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 public class TypeID
 implements   DataItem
 {
-    public int descriptorIndex; // uint
+    private int descriptorIndex; // uint
 
-    public TypeID() {
+    public static TypeID empty() {
+        return new TypeID();
+    }
+
+    public static TypeID of(int descriptorIndex) {
+        return new TypeID(descriptorIndex);
+    }
+
+    private TypeID() {
         this.descriptorIndex = DexConstants.NO_INDEX;
+    }
+
+    private TypeID(int descriptorIndex) {
+        this.descriptorIndex = descriptorIndex;
+    }
+
+    public int getDescriptorIndex() {
+        return descriptorIndex;
     }
 
     public String getType(DexFile dexFile) {

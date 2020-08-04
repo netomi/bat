@@ -33,16 +33,24 @@ import java.nio.charset.StandardCharsets;
 public class StringData
 implements   DataItem
 {
-    private static final byte[] EMPTY_ARRAY = new byte[0];
+    // private int    utf16Size; // uleb128
+    // private byte[] data;      // ubyte[]
+    private String stringValue;
 
-    public int    utf16Size; // uleb128
-    public byte[] data;      // ubyte[]
-    public String stringValue;
+    public static StringData empty() {
+        return new StringData();
+    }
 
-    public StringData() {
-        utf16Size   = 0;
-        data        = EMPTY_ARRAY;
-        stringValue = null;
+    public static StringData of(String value) {
+        return new StringData(value);
+    }
+
+    private StringData() {
+        stringValue = "";
+    }
+
+    private StringData(String value) {
+        this.stringValue = value;
     }
 
     public String getString() {
@@ -51,21 +59,19 @@ implements   DataItem
 
     @Override
     public void read(DexDataInput input) {
-        utf16Size   = input.readUleb128();
-        data        = input.readMUTF8Bytes(utf16Size);
+        int    utf16Size = input.readUleb128();
+        byte[] data      = input.readMUTF8Bytes(utf16Size);
+
         stringValue = Mutf8.decode(data, utf16Size);
     }
 
     @Override
     public void write(DexDataOutput output) {
+        int utf16Size = stringValue.length();
         output.writeUleb128(utf16Size);
-        output.writeBytes(data);
-    }
 
-    private static String asString(byte[] data, int len) {
-        return len >= 0 ?
-            new String(data, 0, data.length, StandardCharsets.UTF_8) :
-            null;
+        byte[] data = Mutf8.encode(stringValue);
+        output.writeBytes(data);
     }
 
     @Override

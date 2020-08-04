@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexFormatException;
+import com.github.netomi.bat.util.EmptyArray;
 import com.github.netomi.bat.util.Primitives;
 
 import java.nio.ByteOrder;
@@ -31,8 +32,6 @@ import java.util.Arrays;
 public class DexHeader
 implements   DataItem
 {
-    private static final byte[] EMPTY_ARRAY = new byte[0];
-
     public byte[]  magic;           // ubyte[8]
     public long    checksum;        // uint
     public byte[]  signature;       // ubyte[20]
@@ -66,8 +65,8 @@ implements   DataItem
     public int     dataOffset;       // uint
 
     public DexHeader() {
-        magic     = EMPTY_ARRAY;
-        signature = EMPTY_ARRAY;
+        magic     = EmptyArray.BYTE;
+        signature = EmptyArray.BYTE;
     }
 
     @Override

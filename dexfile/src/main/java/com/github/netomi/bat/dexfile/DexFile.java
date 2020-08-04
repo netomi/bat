@@ -15,18 +15,22 @@
  */
 package com.github.netomi.bat.dexfile;
 
+import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor;
 import com.github.netomi.bat.dexfile.visitor.DexHeaderVisitor;
+
+import java.util.*;
 
 public class DexFile
 {
     public DexHeader      header;
     public MapList        mapList;
 
-    public StringID[]     stringIDs;
-    public TypeID[]       typeIDs;
+    private List<StringID> stringIDs;
+    private List<TypeID>   typeIDs;
+
     public ProtoID[]      protoIDs;
     public FieldID[]      fieldIDs;
     public MethodID[]     methodIDs;
@@ -36,12 +40,26 @@ public class DexFile
 
     public byte[]         linkData;
 
+    private Map<String, Integer> stringMap;
+    private Map<String, Integer> typeMap;
+
     public DexFile() {
-        this.header   = new DexHeader();
+        this.header = new DexHeader();
+
+        this.stringMap = new HashMap<>();
+        this.typeMap   = new HashMap<>();
+    }
+
+    public int getStringIDCount() {
+        return stringIDs.size();
+    }
+
+    public Iterable<StringID> getStringIDs() {
+        return stringIDs;
     }
 
     public StringID getStringID(int index) {
-        return stringIDs[index];
+        return stringIDs.get(index);
     }
 
     public String getString(int index) {
@@ -50,14 +68,40 @@ public class DexFile
             getStringID(index).getStringValue();
     }
 
+    public int addOrGetString(String string) {
+        Integer index = stringMap.get(string);
+        if (index == null) {
+            stringIDs.add(StringID.of(string));
+            index = stringIDs.size() - 1;
+        }
+        return index;
+    }
+
+    public int getTypeIDCount() {
+        return typeIDs.size();
+    }
+
+    public Iterable<TypeID> getTypeIDs() {
+        return typeIDs;
+    }
+
     public TypeID getTypeID(int index) {
-        return typeIDs[index];
+        return typeIDs.get(index);
     }
 
     public String getType(int index) {
         return index == DexConstants.NO_INDEX ?
             null :
             getTypeID(index).getType(this);
+    }
+
+    public int addOrGetType(String type) {
+        Integer index = typeMap.get(type);
+        if (index == null) {
+            typeIDs.add(TypeID.of(addOrGetString(type)));
+            index = typeIDs.size() - 1;
+        }
+        return index;
     }
 
     public ProtoID getProtoID(int index) {
@@ -146,12 +190,189 @@ public class DexFile
         }
     }
 
+    public void read(DexDataInput input) {
+        new IO(input).read();
+
+        // update caches:
+        stringMap = new HashMap<>(getStringIDCount());
+        ListIterator<StringID> stringIterator = stringIDs.listIterator();
+        while (stringIterator.hasNext()) {
+            int index = stringIterator.nextIndex();
+            stringMap.put(stringIterator.next().getStringValue(), index);
+        }
+
+        typeMap = new HashMap<>(getTypeIDCount());
+        ListIterator<TypeID> typeIterator = typeIDs.listIterator();
+        while (typeIterator.hasNext()) {
+            int index = typeIterator.nextIndex();
+            typeMap.put(typeIterator.next().getType(this), index);
+        }
+    }
+
     @Override
     public String toString() {
+        // TODO: implement a proper version.
+
         StringBuilder sb = new StringBuilder();
 
         sb.append(header);
 
         return sb.toString();
+    }
+
+    // helper class for IO operations.
+
+    private class IO {
+        private final DexDataInput input;
+
+        public IO(DexDataInput input) {
+            this.input = input;
+        }
+
+        public void read() {
+            readHeader();
+            readMapList();
+
+            readStringIDs();
+            readTypeIDs();
+            readProtoIDs();
+            readFieldIDs();
+            readMethodIDs();
+            readClassDefs();
+
+            readCallSiteIDs();
+            readMethodHandles();
+
+            readLinkedDataItems();
+
+            readLinkData();
+        }
+
+        private void readHeader() {
+            header.read(input);
+            // also read the MapList now as it is needed for other DataItems.
+            header.readLinkedDataItems(input);
+        }
+
+        private void readMapList() {
+            input.setOffset(header.mapOffset);
+            input.skipAlignmentPadding(4);
+
+            mapList = new MapList();
+            mapList.read(input);
+        }
+
+        private void readStringIDs() {
+            input.setOffset(header.stringIDsOffsets);
+
+            stringIDs = new ArrayList<>(header.stringIDsSize);
+            for (int i = 0; i < header.stringIDsSize; i++) {
+                StringID stringIDItem = StringID.empty();
+                stringIDItem.read(input);
+                stringIDs.add(i, stringIDItem);
+            }
+        }
+
+        private void readTypeIDs() {
+            input.setOffset(header.typeIDsOffset);
+
+            typeIDs = new ArrayList<>(header.typeIDsSize);
+            for (int i = 0; i < header.typeIDsSize; i++) {
+                TypeID typeIDItem = TypeID.empty();
+                typeIDItem.read(input);
+                typeIDs.add(i, typeIDItem);
+            }
+        }
+
+        private void readProtoIDs() {
+            input.setOffset(header.protoIDsOffset);
+
+            protoIDs = new ProtoID[header.protoIDsSize];
+            for (int i = 0; i < header.protoIDsSize; i++) {
+                ProtoID protoIDItem = new ProtoID();
+                protoIDItem.read(input);
+                protoIDs[i] = protoIDItem;
+            }
+        }
+
+        private void readFieldIDs() {
+            input.setOffset(header.fieldIDsOffset);
+
+            fieldIDs = new FieldID[header.fieldIDsSize];
+            for (int i = 0; i < header.fieldIDsSize; i++) {
+                FieldID fieldIDItem = new FieldID();
+                fieldIDItem.read(input);
+                fieldIDs[i] = fieldIDItem;
+            }
+        }
+
+        private void readMethodIDs() {
+            input.setOffset(header.methodIDsOffset);
+
+            methodIDs = new MethodID[header.methodIDsSize];
+            for (int i = 0; i < header.methodIDsSize; i++) {
+                MethodID methodIDItem = new MethodID();
+                methodIDItem.read(input);
+                methodIDs[i] = methodIDItem;
+            }
+        }
+
+        private void readClassDefs() {
+            input.setOffset(header.classDefsOffset);
+
+            classDefs = new ClassDef[header.classDefsSize];
+            for (int i = 0; i < header.classDefsSize; i++) {
+                ClassDef classDefItem = new ClassDef();
+                classDefItem.read(input);
+                classDefs[i] = classDefItem;
+            }
+        }
+
+        private void readCallSiteIDs() {
+            MapItem mapItem = mapList.getMapItem(DexConstants.TYPE_CALL_SITE_ID_ITEM);
+            if (mapItem != null) {
+                input.setOffset(mapItem.getOffset());
+
+                callSiteIDs = new CallSiteID[mapItem.getSize()];
+                for (int i = 0; i < mapItem.getSize(); i++) {
+                    CallSiteID callSiteIDItem = new CallSiteID();
+                    callSiteIDItem.read(input);
+                    callSiteIDs[i] = callSiteIDItem;
+                }
+            } else {
+                callSiteIDs = new CallSiteID[0];
+            }
+        }
+
+        private void readMethodHandles() {
+            MapItem mapItem = mapList.getMapItem(DexConstants.TYPE_METHOD_HANDLE_ITEM);
+            if (mapItem != null) {
+                input.setOffset(mapItem.getOffset());
+
+                methodHandles = new MethodHandle[mapItem.getSize()];
+                for (int i = 0; i < mapItem.getSize(); i++) {
+                    MethodHandle methodHandleItem = new MethodHandle();
+                    methodHandleItem.read(input);
+                    methodHandles[i] = methodHandleItem;
+                }
+            } else {
+                methodHandles = new MethodHandle[0];
+            }
+        }
+
+        private void readLinkedDataItems() {
+            dataItemsAccept(new DataItemVisitor() {
+                @Override
+                public void visitAnyDataItem(DexFile dexFile, DataItem dataItem) {
+                    dataItem.readLinkedDataItems(input);
+                }
+            });
+        }
+
+        private void readLinkData() {
+            linkData = new byte[header.linkSize];
+            input.setOffset(header.linkOffset);
+            input.readFully(linkData);
+        }
     }
 }

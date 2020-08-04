@@ -16,7 +16,7 @@
 
 package com.github.netomi.bat.util;
 
-final class EmptyArray
+public final class EmptyArray
 {
     private EmptyArray() {}
 
