@@ -41,7 +41,7 @@ public class Shrinker {
 
         System.out.println("loaded " + pool.size() + " ClassDef(s) into pool.");
 
-        int index = dexFile.addOrGetType("Lcom/github/netomi/bat/Blabla;");
+        int index = dexFile.addOrGetTypeID("Lcom/github/netomi/bat/Blabla;");
         System.out.println("index = " + index);
     }
 }

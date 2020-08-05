@@ -68,7 +68,7 @@ public class DexFile
             getStringID(index).getStringValue();
     }
 
-    public int addOrGetString(String string) {
+    public int addOrGetStringID(String string) {
         Integer index = stringMap.get(string);
         if (index == null) {
             stringIDs.add(StringID.of(string));
@@ -95,10 +95,10 @@ public class DexFile
             getTypeID(index).getType(this);
     }
 
-    public int addOrGetType(String type) {
+    public int addOrGetTypeID(String type) {
         Integer index = typeMap.get(type);
         if (index == null) {
-            typeIDs.add(TypeID.of(addOrGetString(type)));
+            typeIDs.add(TypeID.of(addOrGetStringID(type)));
             index = typeIDs.size() - 1;
         }
         return index;
