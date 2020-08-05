@@ -466,18 +466,18 @@ public class DexFile
             dataItemMap.collectDataItems(DexFile.this);
 
             // In the first pass we update all the offsets.
-            DexDataOutput output = new CountingDexDataOutput();
-            writeDexFile(output);
+            DexDataOutput countingOutput = new CountingDexDataOutput();
+            writeDexFile(countingOutput);
 
-            int size = output.getOffset();
+            int size = countingOutput.getOffset();
 
-            ByteBufferBackedDexDataOutput realOutput = new ByteBufferBackedDexDataOutput(size);
-            MapList newMapList = writeDexFile(realOutput);
+            ByteBufferBackedDexDataOutput output = new ByteBufferBackedDexDataOutput(size);
+            MapList newMapList = writeDexFile(output);
 
             // set the newly created MapList.
             mapList = newMapList;
 
-            realOutput.copy(os);
+            output.copy(os);
         }
 
         private MapList writeDexFile(DexDataOutput output) {

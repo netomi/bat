@@ -29,7 +29,6 @@ public class ByteBufferBackedDexDataOutput
 implements   DexDataOutput
 {
     private ByteBuffer byteBuffer;
-    private int lastMemberIndex;
 
     public ByteBufferBackedDexDataOutput(int bytes) {
         byteBuffer = ByteBuffer.allocate(bytes);
