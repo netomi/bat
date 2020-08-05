@@ -13,11 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile.io;
 
 import com.github.netomi.bat.dexfile.*;
-import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor;
 import com.github.netomi.bat.util.Primitives;
 
@@ -35,9 +33,9 @@ implements   DexFileVisitor
         this(in, true);
     }
 
-    public DexFileReader(InputStream in, boolean strict) throws IOException {
-        input         = new DexDataInput(in);
-        strictParsing = strict;
+    public DexFileReader(InputStream is, boolean strict) throws IOException {
+        this.input         = new DexDataInput(is);
+        this.strictParsing = strict;
     }
 
     @Override
@@ -57,10 +55,10 @@ implements   DexFileVisitor
         input.update(adler32);
 
         long checksum = adler32.getValue();
-        if (checksum != dexFile.header.checksum) {
+        if (checksum != dexFile.getHeader().checksum) {
             throw new DexFormatException(String.format("Calculated checksum [%s] does not match [%s].",
                                                        Primitives.toHexString(checksum),
-                                                       Primitives.toHexString(dexFile.header.checksum)));
+                                                       Primitives.toHexString(dexFile.getHeader().checksum)));
         }
     }
 }

@@ -48,7 +48,7 @@ implements   DataItem
     public void updateMapItem(int type, int size, int offset) {
         MapItem mapItem = getMapItem(type);
         if (mapItem == null) {
-            mapItem = new MapItem();
+            mapItem = MapItem.of(type);
             mapItems.add(mapItem);
         }
 
@@ -63,7 +63,7 @@ implements   DataItem
         int size = input.readInt();
         mapItems = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            MapItem mapItem = new MapItem();
+            MapItem mapItem = MapItem.empty();
             mapItem.read(input);
             mapItems.add(mapItem);
         }

@@ -15,18 +15,17 @@
  */
 package com.github.netomi.bat.dexfile.io;
 
-import com.github.netomi.bat.dexfile.util.Mutf8;
-
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.zip.Checksum;
 
 public class DexDataInput
+implements   Closeable
 {
     private final ByteBuffer byteBuffer;
     private       int        lastMemberIndex;
@@ -239,6 +238,9 @@ public class DexDataInput
             checksum.update(byteBuffer.get());
         }
     }
+
+    @Override
+    public void close() throws IOException {}
 
     // Private utility methods.
 

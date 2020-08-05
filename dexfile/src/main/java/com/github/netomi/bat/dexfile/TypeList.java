@@ -23,6 +23,11 @@ import com.github.netomi.bat.util.IntArray;
 
 import java.util.Objects;
 
+/**
+ * Represents a list of TypeIDs.
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_LIST,
     dataAlignment = 4,
@@ -34,6 +39,9 @@ implements   DataItem
     //private int   size; // uint
     private IntArray typeList;
 
+    /**
+     * Returns an empty TypeList instance.
+     */
     public static TypeList empty() {
         return new TypeList();
     }
@@ -42,6 +50,9 @@ implements   DataItem
         this.typeList = new IntArray(0);
     }
 
+    /**
+     * Returns the number of types contained in this TypeList.
+     */
     public int getTypeCount() {
         return typeList.size();
     }
@@ -56,8 +67,8 @@ implements   DataItem
                                     typeList);
     }
 
-    public void addType(int typeIndex) {
-        typeList.add(typeIndex);
+    public void addType(int typeIDIndex) {
+        typeList.add(typeIDIndex);
     }
 
     @Override

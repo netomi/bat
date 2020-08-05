@@ -41,7 +41,7 @@ extends      EncodedValue
     }
 
     public FieldID getField(DexFile dexFile) {
-        return dexFile.fieldIDs[fieldIndex];
+        return dexFile.getFieldID(fieldIndex);
     }
 
     @Override

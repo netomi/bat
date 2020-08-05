@@ -17,6 +17,7 @@ package com.github.netomi.bat.dump;
 
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
+import com.github.netomi.bat.dexfile.io.DexFileWriter;
 
 import java.io.*;
 
@@ -34,9 +35,9 @@ public class Test {
 
             dexFile.accept(new DexDumpPrinter(new FileOutputStream("test.log")));
 
-//            DexFileWriter writer = new DexFileWriter(os);
-//
-//            dexFile.accept(writer);
+            DexFileWriter writer = new DexFileWriter(os);
+
+            dexFile.accept(writer);
         } catch (IOException ex) {
             ex.printStackTrace();
         }

@@ -40,7 +40,7 @@ extends      EncodedValue
     }
 
     public MethodID getMethod(DexFile dexFile) {
-        return dexFile.methodIDs[methodIndex];
+        return dexFile.getMethodID(methodIndex);
     }
 
     @Override

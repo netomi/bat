@@ -35,38 +35,119 @@ implements   DataItem
     public byte[]  magic;           // ubyte[8]
     public long    checksum;        // uint
     public byte[]  signature;       // ubyte[20]
-    public long    fileSize;        // uint
-    public long    headerSize;      // uint
-    public long    endianTag;       // uint
 
-    public int     linkSize;         // uint
-    public int     linkOffset;       // uint
-    public int     mapOffset;        // uint
+    long fileSize;        // uint
+    long headerSize;      // uint
+    long endianTag;       // uint
 
-    public int     stringIDsSize;    // uint
-    public int     stringIDsOffsets; // uint
+    int linkSize;         // uint
+    int linkOffset;       // uint
+    int mapOffset;        // uint
 
-    public int     typeIDsSize;      // uint
-    public int     typeIDsOffset;    // uint
+    int stringIDsSize;    // uint
+    int stringIDsOffsets; // uint
 
-    public int     protoIDsSize;     // uint
-    public int     protoIDsOffset;   // uint
+    int typeIDsSize;      // uint
+    int typeIDsOffset;    // uint
 
-    public int     fieldIDsSize;     // uint
-    public int     fieldIDsOffset;   // uint
+    int protoIDsSize;     // uint
+    int protoIDsOffset;   // uint
 
-    public int     methodIDsSize;    // uint
-    public int     methodIDsOffset;  // uint
+    int fieldIDsSize;     // uint
+    int fieldIDsOffset;   // uint
 
-    public int     classDefsSize;    // uint
-    public int     classDefsOffset;  // uint
+    int methodIDsSize;    // uint
+    int methodIDsOffset;  // uint
 
-    public int     dataSize;         // uint
-    public int     dataOffset;       // uint
+    int classDefsSize;    // uint
+    int classDefsOffset;  // uint
+
+    int dataSize;         // uint
+    int dataOffset;       // uint
 
     public DexHeader() {
         magic     = EmptyArray.BYTE;
         signature = EmptyArray.BYTE;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public long getHeaderSize() {
+        return headerSize;
+    }
+
+    public long getEndianTag() {
+        return endianTag;
+    }
+
+    public int getLinkSize() {
+        return linkSize;
+    }
+
+    public int getLinkOffset() {
+        return linkOffset;
+    }
+
+    public int getMapOffset() {
+        return mapOffset;
+    }
+
+    public int getStringIDsSize() {
+        return stringIDsSize;
+    }
+
+    public int getStringIDsOffsets() {
+        return stringIDsOffsets;
+    }
+
+    public int getTypeIDsSize() {
+        return typeIDsSize;
+    }
+
+    public int getTypeIDsOffset() {
+        return typeIDsOffset;
+    }
+
+    public int getProtoIDsSize() {
+        return protoIDsSize;
+    }
+
+    public int getProtoIDsOffset() {
+        return protoIDsOffset;
+    }
+
+    public int getFieldIDsSize() {
+        return fieldIDsSize;
+    }
+
+    public int getFieldIDsOffset() {
+        return fieldIDsOffset;
+    }
+
+    public int getMethodIDsSize() {
+        return methodIDsSize;
+    }
+
+    public int getMethodIDsOffset() {
+        return methodIDsOffset;
+    }
+
+    public int getClassDefsSize() {
+        return classDefsSize;
+    }
+
+    public int getClassDefsOffset() {
+        return classDefsOffset;
+    }
+
+    public int getDataSize() {
+        return dataSize;
+    }
+
+    public int getDataOffset() {
+        return dataOffset;
     }
 
     @Override
@@ -161,6 +242,52 @@ implements   DataItem
         output.writeUnsignedInt(classDefsOffset);
         output.writeUnsignedInt(dataSize);
         output.writeUnsignedInt(dataOffset);
+    }
+
+    public void updateDataItem(int type, int count, int offset) {
+        switch (type) {
+            case DexConstants.TYPE_STRING_ID_ITEM:
+                this.stringIDsSize    = count;
+                this.stringIDsOffsets = offset;
+                break;
+
+            case DexConstants.TYPE_TYPE_ID_ITEM:
+                this.typeIDsSize   = count;
+                this.typeIDsOffset = offset;
+                break;
+
+            case DexConstants.TYPE_PROTO_ID_ITEM:
+                this.protoIDsSize   = count;
+                this.protoIDsOffset = offset;
+                break;
+
+            case DexConstants.TYPE_FIELD_ID_ITEM:
+                this.fieldIDsSize   = count;
+                this.fieldIDsOffset = offset;
+                break;
+
+            case DexConstants.TYPE_METHOD_ID_ITEM:
+                this.methodIDsSize   = count;
+                this.methodIDsOffset = offset;
+                break;
+
+            case DexConstants.TYPE_CLASS_DEF_ITEM:
+                this.classDefsSize   = count;
+                this.classDefsOffset = offset;
+                break;
+
+            case DexConstants.TYPE_MAP_LIST:
+                this.mapOffset = offset;
+                break;
+
+            default:
+                throw new IllegalArgumentException("unexpected DataItem type: " + type);
+        }
+    }
+
+    public void updateLinkData(int size, int offset) {
+        this.linkSize   = size;
+        this.linkOffset = offset;
     }
 
     @Override
