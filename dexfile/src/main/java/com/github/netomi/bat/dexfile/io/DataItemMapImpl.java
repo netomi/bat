@@ -15,10 +15,7 @@
  */
 package com.github.netomi.bat.dexfile.io;
 
-import com.github.netomi.bat.dexfile.DataItem;
-import com.github.netomi.bat.dexfile.DexConstants;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.MapList;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import java.util.HashMap;
@@ -40,8 +37,12 @@ implements   DataItem.Map
         writeDataItems(mapList, output, DexConstants.TYPE_TYPE_LIST);
         writeDataItems(mapList, output, DexConstants.TYPE_ANNOTATION_SET_REF_LIST);
         writeDataItems(mapList, output, DexConstants.TYPE_ANNOTATION_SET_ITEM);
-        writeDataItems(mapList, output, DexConstants.TYPE_CLASS_DATA_ITEM);
+        // write the code items before the class data as it references its offset
+        // using uleb128 encoding which is a variable length encoding. If the code
+        // items would be written afterwards, its exact offset would not be known
+        // and thus the size of the class data items may vary.
         writeDataItems(mapList, output, DexConstants.TYPE_CODE_ITEM);
+        writeDataItems(mapList, output, DexConstants.TYPE_CLASS_DATA_ITEM);
         writeDataItems(mapList, output, DexConstants.TYPE_STRING_DATA_ITEM);
         writeDataItems(mapList, output, DexConstants.TYPE_DEBUG_INFO_ITEM);
         writeDataItems(mapList, output, DexConstants.TYPE_ANNOTATION_ITEM);
@@ -77,6 +78,8 @@ implements   DataItem.Map
             mapList.updateMapItem(type, dataItemSet.size(), output.getOffset());
             for (DataItem dataItem : dataItemSet) {
                 int dataItemOffset = output.getOffset();
+
+                dataItem.updateOffsets(this);
                 dataItem.write(output);
 
                 offsetMap.put(dataItem, dataItemOffset);
