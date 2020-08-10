@@ -46,7 +46,7 @@ extends      DataItem
         return new TypeList();
     }
 
-    public static TypeList readItem(DexDataInput input) {
+    public static TypeList readContent(DexDataInput input) {
         TypeList typeList = new TypeList();
         typeList.read(input);
         return typeList;

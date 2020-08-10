@@ -137,7 +137,7 @@ extends      DataItem
     public void readLinkedDataItems(DexDataInput input) {
         if (interfacesOffset != 0) {
             input.setOffset(interfacesOffset);
-            interfaces = TypeList.readItem(input);
+            interfaces = TypeList.readContent(input);
         }
 
         if (annotationsOffset != 0) {

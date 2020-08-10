@@ -96,7 +96,7 @@ extends      DataItem
     protected void readLinkedDataItems(DexDataInput input) {
         if (parametersOffset != 0) {
             input.setOffset(parametersOffset);
-            parameters = TypeList.readItem(input);
+            parameters = TypeList.readContent(input);
         }
     }
 
