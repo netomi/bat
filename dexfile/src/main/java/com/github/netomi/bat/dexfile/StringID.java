@@ -18,7 +18,17 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
+import com.github.netomi.bat.util.Preconditions;
 
+import java.util.Objects;
+
+/**
+ * A class representing a string id item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#string-item">string id item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_STRING_ID_ITEM,
     dataAlignment = 4,
@@ -30,19 +40,19 @@ extends      DataItem
     private int        stringDataOffset; // uint
     private StringData stringData;
 
+    public static StringID of(String value) {
+        Objects.requireNonNull(value, "value must not be null");
+        return new StringID(StringData.of(value));
+    }
+
     public static StringID readContent(DexDataInput input) {
         StringID stringID = new StringID();
         stringID.read(input);
         return stringID;
     }
 
-    public static StringID of(String value) {
-        return new StringID(StringData.of(value));
-    }
-
     private StringID() {
-        this.stringDataOffset = 0;
-        this.stringData       = null;
+        this(null);
     }
 
     private StringID(StringData data) {
@@ -91,6 +101,19 @@ extends      DataItem
             visitor.visitStringData(dexFile, this, stringData);
             stringData.dataItemsAccept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringID other = (StringID) o;
+        return Objects.equals(stringData, other.stringData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stringData);
     }
 
     @Override
