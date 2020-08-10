@@ -21,6 +21,8 @@ import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
+
 /**
  * A class representing a type id item inside a dex file.
  *
@@ -50,7 +52,7 @@ extends      DataItem
     }
 
     private TypeID() {
-        this.descriptorIndex = DexConstants.NO_INDEX;
+        this(NO_INDEX);
     }
 
     private TypeID(int descriptorIndex) {

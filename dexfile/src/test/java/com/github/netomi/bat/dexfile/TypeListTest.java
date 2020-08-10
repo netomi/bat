@@ -31,13 +31,23 @@ extends      DexContentTest<TypeList>
         return new TypeList[] {
             TypeList.empty(),
             TypeList.of(1, 2, 3),
-            TypeList.of(6, 5, 4, 3, 2, 1)
+            TypeList.of(6, 5, 4, 3, 2, 1),
+            TypeList.of(65535),
         };
     }
 
     @Override
     public Function<DexDataInput, TypeList> getFactoryMethod() {
         return TypeList::readContent;
+    }
+
+    @Test
+    public void getter() {
+        TypeList[] data = getTestInstances();
+
+        assertEquals(0, data[0].getTypeCount());
+        assertEquals(3, data[1].getTypeCount());
+        assertEquals(6, data[2].getTypeCount());
     }
 
     @Test

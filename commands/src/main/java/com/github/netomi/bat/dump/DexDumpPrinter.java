@@ -359,14 +359,14 @@ implements   DexFileVisitor,
         @Override
         public void visitTry(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int index, Try tryObject) {
             String startAddr = Primitives.toHexString((short) tryObject.startAddr);
-            String endAddr = Primitives.toHexString((short) (tryObject.startAddr + tryObject.insnCount));
+            String endAddr   = Primitives.toHexString((short) (tryObject.startAddr + tryObject.insnCount));
 
             println(String.format("        %s - %s", startAddr, endAddr));
 
             EncodedCatchHandler catchHandler = tryObject.catchHandler;
 
             for (TypeAddrPair addrPair : catchHandler.handlers) {
-                println(String.format("          %s -> %s", addrPair.getType(dexFile), Primitives.toHexString((short) addrPair.getOffset())));
+                println(String.format("          %s -> %s", addrPair.getType(dexFile), Primitives.toHexString((short) addrPair.getAddress())));
             }
 
             if (catchHandler.catchAllAddr != -1) {

@@ -17,12 +17,17 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 /**
+ * A class representing an encoded type address pair inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-type-addr-pair">type addr pair @ dex format</a>
+ *
  * @author Thomas Neidhart
  */
 public class TypeAddrPair
@@ -31,6 +36,12 @@ extends      DexContent
     private int typeIndex; // uleb128
     private int addr;      // uleb128
 
+    public static TypeAddrPair of(int typeIndex, int addr) {
+        Preconditions.checkArgument(typeIndex >= 0, "typeIndex must be non-negative");
+        Preconditions.checkArgument(addr >= 0,      "addr must be non-negative");
+        return new TypeAddrPair(typeIndex, addr);
+    }
+
     public static TypeAddrPair readContent(DexDataInput input) {
         TypeAddrPair typeAddrPair = new TypeAddrPair();
         typeAddrPair.read(input);
@@ -38,8 +49,12 @@ extends      DexContent
     }
 
     private TypeAddrPair() {
-        typeIndex = NO_INDEX;
-        addr      = 0;
+        this(NO_INDEX, 0);
+    }
+
+    private TypeAddrPair(int typeIndex, int addr) {
+        this.typeIndex = typeIndex;
+        this.addr      = addr;
     }
 
     public int getTypeIndex() {
@@ -50,7 +65,7 @@ extends      DexContent
         return dexFile.getTypeID(typeIndex).getType(dexFile);
     }
 
-    public int getOffset() {
+    public int getAddress() {
         return addr;
     }
 

@@ -16,53 +16,58 @@
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TypeIDTest
-extends      DexContentTest<TypeID>
+public class TypeAddrPairTest
+extends      DexContentTest<TypeAddrPair>
 {
     @Override
-    public TypeID[] getTestInstances() {
-        return new TypeID[] {
-            TypeID.of(10),
-            TypeID.of(20),
-            TypeID.of(65535)
+    public TypeAddrPair[] getTestInstances() {
+        return new TypeAddrPair[] {
+            TypeAddrPair.of(1, 20),
+            TypeAddrPair.of(2, 0),
+            TypeAddrPair.of(65535, 65535)
         };
     }
 
     @Override
-    public Function<DexDataInput, TypeID> getFactoryMethod() {
-        return TypeID::readContent;
+    public Function<DexDataInput, TypeAddrPair> getFactoryMethod() {
+        return TypeAddrPair::readContent;
     }
 
     @Test
     public void inputChecking() {
         assertThrows(IllegalArgumentException.class, () -> {
-            TypeID.of(-1);
+            TypeAddrPair.of(-1, 0);
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            TypeAddrPair.of(10, -5);
         });
     }
 
     @Test
     public void getter() {
-        TypeID[] data = getTestInstances();
+        TypeAddrPair[] data = getTestInstances();
 
-        assertEquals(10, data[0].getDescriptorIndex());
-        assertEquals(20, data[1].getDescriptorIndex());
+        assertEquals(1,  data[0].getTypeIndex());
+        assertEquals(20, data[0].getAddress());
     }
 
     @Test
     public void equals() {
-        TypeID t1 = TypeID.of(1);
-        TypeID t2 = TypeID.of(2);
-        TypeID t3 = TypeID.of(1);
+        TypeAddrPair p1 = TypeAddrPair.of(1, 0);
+        TypeAddrPair p2 = TypeAddrPair.of(2, 0);
+        TypeAddrPair p3 = TypeAddrPair.of(2, 10);
+        TypeAddrPair p4 = TypeAddrPair.of(1, 0);
 
-        assertEquals(t1, t1);
-        assertNotEquals(t1, t2);
-        assertEquals(t1, t3);
+        assertEquals(p1, p1);
+        assertNotEquals(p1, p2);
+        assertNotEquals(p2, p3);
+        assertEquals(p1, p4);
     }
 }
