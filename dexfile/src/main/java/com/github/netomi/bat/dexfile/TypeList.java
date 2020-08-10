@@ -34,7 +34,7 @@ import java.util.Objects;
     dataSection   = false
 )
 public class TypeList
-implements   DataItem
+extends      DataItem
 {
     //private int   size; // uint
     private IntArray typeList;
@@ -82,7 +82,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = (int) input.readUnsignedInt();
@@ -94,7 +94,7 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         int size = typeList.size();
@@ -115,8 +115,8 @@ implements   DataItem
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TypeList typeList1 = (TypeList) o;
-        return Objects.equals(typeList, typeList1.typeList);
+        TypeList other = (TypeList) o;
+        return Objects.equals(typeList, other.typeList);
     }
 
     @Override
@@ -126,6 +126,6 @@ implements   DataItem
 
     @Override
     public String toString() {
-        return String.format("TypeList[size=%d,types=%s]", typeList.size(), typeList);
+        return String.format("TypeList[types=%s]", typeList);
     }
 }

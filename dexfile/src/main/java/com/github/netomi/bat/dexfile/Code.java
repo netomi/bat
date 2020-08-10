@@ -34,7 +34,7 @@ import java.util.*;
     dataSection   = true
 )
 public class Code
-implements   DataItem
+extends      DataItem
 {
     private static final short[]   EMPTY_INSTRUCTIONS = new short[0];
 
@@ -75,7 +75,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
         registersSize   = input.readUnsignedShort();
@@ -126,21 +126,20 @@ implements   DataItem
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         if (debugInfoOffset != 0) {
             input.setOffset(debugInfoOffset);
-            debugInfo = new DebugInfo();
-            debugInfo.read(input);
+            debugInfo = DebugInfo.readContent(input);
         }
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         debugInfoOffset = dataItemMap.getOffset(debugInfo);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeUnsignedShort(registersSize);
@@ -196,10 +195,6 @@ implements   DataItem
 
             visitor.visitTry(dexFile, classDef, method, code, index, currentTry);
         }
-    }
-
-    public void debugInstructionsAccept() {
-
     }
 
     @Override

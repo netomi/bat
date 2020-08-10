@@ -18,19 +18,21 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
+import java.util.Objects;
+
 @DataItemAnn(
     type          = DexConstants.TYPE_FIELD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false
 )
 public class FieldID
-implements   DataItem
+extends      DataItem
 {
     private int classIndex; // ushort
     private int typeIndex;  // ushort
     private int nameIndex;  // uint;
 
-    public static FieldID readItem(DexDataInput input) {
+    public static FieldID readContent(DexDataInput input) {
         FieldID fieldID = new FieldID();
         fieldID.read(input);
         return fieldID;
@@ -71,7 +73,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
         classIndex = input.readUnsignedShort();
         typeIndex  = input.readUnsignedShort();
@@ -79,11 +81,26 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeUnsignedShort(classIndex);
         output.writeUnsignedShort(typeIndex);
         output.writeInt(nameIndex);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldID other = (FieldID) o;
+        return classIndex == other.classIndex &&
+               typeIndex  == other.typeIndex &&
+               nameIndex  == other.nameIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(classIndex, typeIndex, nameIndex);
     }
 
     @Override

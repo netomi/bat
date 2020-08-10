@@ -24,6 +24,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_STRING_DATA_ITEM,
@@ -31,13 +32,13 @@ import java.nio.charset.StandardCharsets;
     dataSection   = true
 )
 public class StringData
-implements   DataItem
+extends      DataItem
 {
     // private int    utf16Size; // uleb128
     // private byte[] data;      // ubyte[]
     private String stringValue;
 
-    public static StringData readItem(DexDataInput input) {
+    public static StringData readContent(DexDataInput input) {
         StringData stringData = new StringData();
         stringData.read(input);
         return stringData;
@@ -48,7 +49,7 @@ implements   DataItem
     }
 
     private StringData() {
-        stringValue = "";
+        stringValue = null;
     }
 
     private StringData(String value) {
@@ -60,7 +61,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         int    utf16Size = input.readUleb128();
         byte[] data      = input.readMUTF8Bytes(utf16Size);
 
@@ -68,12 +69,25 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         int utf16Size = stringValue.length();
         output.writeUleb128(utf16Size);
 
         byte[] data = Mutf8.encode(stringValue);
         output.writeBytes(data);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringData other = (StringData) o;
+        return Objects.equals(stringValue, other.stringValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stringValue);
     }
 
     @Override

@@ -19,6 +19,8 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
+import java.util.Objects;
+
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 @DataItemAnn(
@@ -27,7 +29,7 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
     dataSection   = false
 )
 public class ProtoID
-implements   DataItem
+extends      DataItem
 {
     private int shortyIndex;      // uint
     private int returnTypeIndex;  // uint
@@ -35,7 +37,7 @@ implements   DataItem
 
     public  TypeList parameters;
 
-    public static ProtoID readItem(DexDataInput input) {
+    public static ProtoID readContent(DexDataInput input) {
         ProtoID protoID = new ProtoID();
         protoID.read(input);
         return protoID;
@@ -83,7 +85,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
         shortyIndex      = input.readInt();
         returnTypeIndex  = input.readInt();
@@ -91,7 +93,7 @@ implements   DataItem
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         if (parametersOffset != 0) {
             input.setOffset(parametersOffset);
             parameters = TypeList.readItem(input);
@@ -99,12 +101,12 @@ implements   DataItem
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         parametersOffset = dataItemMap.getOffset(parameters);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(shortyIndex);
         output.writeInt(returnTypeIndex);
@@ -117,6 +119,21 @@ implements   DataItem
             visitor.visitParameterTypes(dexFile, this, parameters);
             parameters.dataItemsAccept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProtoID other = (ProtoID) o;
+        return shortyIndex     == other.shortyIndex &&
+               returnTypeIndex == other.returnTypeIndex &&
+               Objects.equals(parameters, other.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shortyIndex, returnTypeIndex, parameters);
     }
 
     @Override

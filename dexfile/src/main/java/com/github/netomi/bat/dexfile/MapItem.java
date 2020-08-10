@@ -18,15 +18,17 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
+import java.util.Objects;
+
 public class MapItem
-implements   DexContent
+extends      DexContent
 {
     int type;     // ushort
     //int unused; // ushort
     int size;     // uint
     int offset;   // uint
 
-    public static MapItem readItem(DexDataInput input) {
+    public static MapItem readContent(DexDataInput input) {
         MapItem mapItem = new MapItem();
         mapItem.read(input);
         return mapItem;
@@ -55,7 +57,7 @@ implements   DexContent
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         type   = input.readUnsignedShort();
         input.readUnsignedShort();
         size   = input.readInt();
@@ -63,11 +65,25 @@ implements   DexContent
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeUnsignedShort(type);
         output.writeUnsignedShort(0x0);
         output.writeInt(size);
         output.writeInt(offset);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MapItem other = (MapItem) o;
+        return type   == other.type &&
+               size   == other.size;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, size);
     }
 
     @Override

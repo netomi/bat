@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
  * @author Thomas Neidhart
  */
 public class Try
-implements   DexContent
+extends      DexContent
 {
     public  int startAddr;     // uint
     public  int insnCount;     // ushort
@@ -41,16 +41,21 @@ implements   DexContent
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         startAddr     = input.readInt();
         insnCount     = input.readUnsignedShort();
         handlerOffset = input.readUnsignedShort();
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeInt(startAddr);
         output.writeUnsignedShort(insnCount);
         output.writeUnsignedShort(handlerOffset);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Try[startAddr=%d,insnCount=%d,handler=%s]", startAddr, insnCount, catchHandler);
     }
 }

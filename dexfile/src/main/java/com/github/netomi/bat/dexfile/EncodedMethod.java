@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.visitor.CodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 public class EncodedMethod
-implements   DexContent
+extends      DexContent
 {
     private int deltaMethodIndex; // uleb128
     private int methodIndex;
@@ -30,7 +30,7 @@ implements   DexContent
 
     public  Code code;
 
-    public static EncodedMethod readItem(DexDataInput input, int lastIndex) {
+    public static EncodedMethod readContent(DexDataInput input, int lastIndex) {
         EncodedMethod encodedMethod = new EncodedMethod();
         encodedMethod.read(input);
         encodedMethod.updateMethodIndex(lastIndex);
@@ -90,14 +90,14 @@ implements   DexContent
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         deltaMethodIndex = input.readUleb128();
         accessFlags      = input.readUleb128();
         codeOffset       = input.readUleb128();
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         if (codeOffset != 0) {
             input.setOffset(codeOffset);
 
@@ -115,18 +115,18 @@ implements   DexContent
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         codeOffset = dataItemMap.getOffset(code);
     }
 
-    public int write(DexDataOutput output, int lastIndex) {
+    protected int write(DexDataOutput output, int lastIndex) {
         updateDeltaMethodIndex(lastIndex);
         write(output);
         return methodIndex;
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeUleb128(deltaMethodIndex);
         output.writeUleb128(accessFlags);
         output.writeUleb128(codeOffset);
@@ -144,5 +144,10 @@ implements   DexContent
             visitor.visitCode(dexFile, this, code);
             code.dataItemsAccept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EncodedMethod[methodIndex=%d,accessFlags=%04x]", methodIndex, accessFlags);
     }
 }

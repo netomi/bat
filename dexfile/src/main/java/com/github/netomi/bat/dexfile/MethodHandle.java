@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
+import java.util.Objects;
+
 /**
  * @author Thomas Neidhart
  */
@@ -27,14 +29,14 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
     dataSection   = false
 )
 public class MethodHandle
-implements   DataItem
+extends      DataItem
 {
-    public int methodHandleType; // ushort
+    private int methodHandleType; // ushort
     // unused - ushort
-    public int fieldOrMethodId;  // ushort
+    private int fieldOrMethodId;  // ushort
     // unused - ushort
 
-    public static MethodHandle readItem(DexDataInput input) {
+    public static MethodHandle readContent(DexDataInput input) {
         MethodHandle methodHandle = new MethodHandle();
         methodHandle.read(input);
         return methodHandle;
@@ -42,8 +44,16 @@ implements   DataItem
 
     private MethodHandle() {}
 
+    public int getMethodHandleType() {
+        return methodHandleType;
+    }
+
+    public int getFieldOrMethodId() {
+        return fieldOrMethodId;
+    }
+
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
         methodHandleType = input.readUnsignedShort();
@@ -53,12 +63,31 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeUnsignedShort(methodHandleType);
         output.writeUnsignedShort(0x0);
         output.writeUnsignedShort(fieldOrMethodId);
         output.writeUnsignedShort(0x0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MethodHandle other = (MethodHandle) o;
+        return methodHandleType == other.methodHandleType &&
+               fieldOrMethodId  == other.fieldOrMethodId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(methodHandleType, fieldOrMethodId);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("MethodHandle[type=%d,fieldOrMethodId=%d]", methodHandleType, fieldOrMethodId);
     }
 }

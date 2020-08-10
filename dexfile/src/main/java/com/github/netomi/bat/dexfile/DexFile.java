@@ -345,7 +345,7 @@ public class DexFile
 
             stringIDs.ensureCapacity(header.stringIDsSize);
             for (int i = 0; i < header.stringIDsSize; i++) {
-                StringID stringIDItem = StringID.readItem(input);
+                StringID stringIDItem = StringID.readContent(input);
                 stringIDs.add(i, stringIDItem);
             }
         }
@@ -355,7 +355,7 @@ public class DexFile
 
             typeIDs.ensureCapacity(header.typeIDsSize);
             for (int i = 0; i < header.typeIDsSize; i++) {
-                TypeID typeIDItem = TypeID.readItem(input);
+                TypeID typeIDItem = TypeID.readContent(input);
                 typeIDs.add(i, typeIDItem);
             }
         }
@@ -365,7 +365,7 @@ public class DexFile
 
             protoIDs.ensureCapacity(header.protoIDsSize);
             for (int i = 0; i < header.protoIDsSize; i++) {
-                ProtoID protoIDItem = ProtoID.readItem(input);
+                ProtoID protoIDItem = ProtoID.readContent(input);
                 protoIDs.add(i, protoIDItem);
             }
         }
@@ -375,7 +375,7 @@ public class DexFile
 
             fieldIDs.ensureCapacity(header.fieldIDsSize);
             for (int i = 0; i < header.fieldIDsSize; i++) {
-                FieldID fieldIDItem = FieldID.readItem(input);
+                FieldID fieldIDItem = FieldID.readContent(input);
                 fieldIDs.add(i, fieldIDItem);
             }
         }
@@ -385,7 +385,7 @@ public class DexFile
 
             methodIDs.ensureCapacity(header.methodIDsSize);
             for (int i = 0; i < header.methodIDsSize; i++) {
-                MethodID methodIDItem = MethodID.readItem(input);
+                MethodID methodIDItem = MethodID.readContent(input);
                 methodIDs.add(i, methodIDItem);
             }
         }
@@ -395,7 +395,7 @@ public class DexFile
 
             classDefs.ensureCapacity(header.classDefsSize);
             for (int i = 0; i < header.classDefsSize; i++) {
-                ClassDef classDefItem = ClassDef.readItem(input);
+                ClassDef classDefItem = ClassDef.readContent(input);
                 classDefs.add(i, classDefItem);
             }
         }
@@ -407,7 +407,7 @@ public class DexFile
 
                 callSiteIDs.ensureCapacity(mapItem.getSize());
                 for (int i = 0; i < mapItem.getSize(); i++) {
-                    CallSiteID callSiteIDItem = CallSiteID.readItem(input);
+                    CallSiteID callSiteIDItem = CallSiteID.readContent(input);
                     callSiteIDs.add(i, callSiteIDItem);
                 }
             }
@@ -420,7 +420,7 @@ public class DexFile
 
                 methodHandles.ensureCapacity(mapItem.getSize());
                 for (int i = 0; i < mapItem.getSize(); i++) {
-                    MethodHandle methodHandleItem = MethodHandle.readItem(input);
+                    MethodHandle methodHandleItem = MethodHandle.readContent(input);
                     methodHandles.add(i, methodHandleItem);
                 }
             }

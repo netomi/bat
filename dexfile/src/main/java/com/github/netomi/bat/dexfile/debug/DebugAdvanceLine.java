@@ -33,12 +33,12 @@ extends      DebugInstruction
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         lineDiff = input.readSleb128();
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeByte(getOpcode());
         output.writeSleb128(lineDiff);
     }

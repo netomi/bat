@@ -31,7 +31,7 @@ import java.util.List;
     dataSection   = true
 )
 public class AnnotationsDirectory
-implements   DataItem
+extends      DataItem
 {
     private int classAnnotationsOffset;  // uint
     //public int fieldsSize;              // uint
@@ -43,7 +43,13 @@ implements   DataItem
     public List<MethodAnnotation>    methodAnnotations;
     public List<ParameterAnnotation> parameterAnnotations;
 
-    public AnnotationsDirectory() {
+    public static AnnotationsDirectory readContent(DexDataInput input) {
+        AnnotationsDirectory annotationsDirectory = new AnnotationsDirectory();
+        annotationsDirectory.read(input);
+        return annotationsDirectory;
+    }
+
+    private AnnotationsDirectory() {
         classAnnotations     = null;
         fieldAnnotations     = Collections.emptyList();
         methodAnnotations    = Collections.emptyList();
@@ -55,7 +61,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
         classAnnotationsOffset      = input.readInt();
@@ -86,7 +92,7 @@ implements   DataItem
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         if (classAnnotationsOffset != 0) {
             input.setOffset(classAnnotationsOffset);
             classAnnotations = new AnnotationSet();
@@ -107,7 +113,7 @@ implements   DataItem
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         classAnnotationsOffset = dataItemMap.getOffset(classAnnotations);
 
         for (FieldAnnotation fieldAnnotation : fieldAnnotations) {
@@ -124,7 +130,7 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeInt(classAnnotationsOffset);

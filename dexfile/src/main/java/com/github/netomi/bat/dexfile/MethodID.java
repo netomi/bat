@@ -18,19 +18,21 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
+import java.util.Objects;
+
 @DataItemAnn(
     type          = DexConstants.TYPE_METHOD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false
 )
 public class MethodID
-implements   DataItem
+extends      DataItem
 {
     private int classIndex; // ushort
     private int protoIndex; // ushort
     private int nameIndex;  // uint;
 
-    public static MethodID readItem(DexDataInput input) {
+    public static MethodID readContent(DexDataInput input) {
         MethodID methodID = new MethodID();
         methodID.read(input);
         return methodID;
@@ -75,7 +77,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
         classIndex = input.readUnsignedShort();
         protoIndex = input.readUnsignedShort();
@@ -83,11 +85,26 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeUnsignedShort(classIndex);
         output.writeUnsignedShort(protoIndex);
         output.writeInt(nameIndex);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MethodID other = (MethodID) o;
+        return classIndex == other.classIndex &&
+               protoIndex == other.protoIndex &&
+               nameIndex  == other.nameIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(classIndex, protoIndex, nameIndex);
     }
 
     @Override

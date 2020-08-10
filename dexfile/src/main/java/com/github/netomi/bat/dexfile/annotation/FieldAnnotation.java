@@ -26,7 +26,7 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class FieldAnnotation
-implements   DexContent
+extends      DexContent
 {
     public  int           fieldIndex;        // uint
     private int           annotationsOffset; // uint
@@ -47,25 +47,25 @@ implements   DexContent
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         fieldIndex        = input.readInt();
         annotationsOffset = input.readInt();
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         input.setOffset(annotationsOffset);
         annotationSet = new AnnotationSet();
         annotationSet.read(input);
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         annotationsOffset = dataItemMap.getOffset(annotationSet);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeInt(fieldIndex);
         output.writeInt(annotationsOffset);
     }

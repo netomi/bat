@@ -518,7 +518,7 @@ implements   DexFileVisitor,
                 AnnotationElement element = value.getAnnotationElement(i);
 
                 print(" " + element.getName(dexFile) + "=");
-                element.value.accept(dexFile, this);
+                element.getValue().accept(dexFile, this);
             }
         }
 

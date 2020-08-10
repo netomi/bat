@@ -28,7 +28,7 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
     dataSection   = false
 )
 public class ClassDef
-implements   DataItem
+extends      DataItem
 {
     private int classIndex;         // uint
     private int accessFlags;        // uint
@@ -44,7 +44,7 @@ implements   DataItem
     public ClassData            classData;
     public EncodedArray         staticValues;
 
-    public static ClassDef readItem(DexDataInput input) {
+    public static ClassDef readContent(DexDataInput input) {
         ClassDef classDef = new ClassDef();
         classDef.read(input);
         return classDef;
@@ -142,13 +142,12 @@ implements   DataItem
 
         if (annotationsOffset != 0) {
             input.setOffset(annotationsOffset);
-            annotationsDirectory = new AnnotationsDirectory();
-            annotationsDirectory.read(input);
+            annotationsDirectory = AnnotationsDirectory.readContent(input);
         }
 
         if (classDataOffset != 0) {
             input.setOffset(classDataOffset);
-            classData = ClassData.readItem(input);
+            classData = ClassData.readContent(input);
         }
 
         if (staticValuesOffset != 0) {

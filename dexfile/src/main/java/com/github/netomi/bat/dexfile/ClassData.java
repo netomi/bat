@@ -31,14 +31,14 @@ import java.util.ListIterator;
     dataSection   = true
 )
 public class ClassData
-implements   DataItem
+extends      DataItem
 {
     private ArrayList<EncodedField>  staticFields   = new ArrayList<>(0);
     private ArrayList<EncodedField>  instanceFields = new ArrayList<>(0);
     private ArrayList<EncodedMethod> directMethods  = new ArrayList<>(0);
     private ArrayList<EncodedMethod> virtualMethods = new ArrayList<>(0);
 
-    public static ClassData readItem(DexDataInput input) {
+    public static ClassData readContent(DexDataInput input) {
         ClassData classData = new ClassData();
         classData.read(input);
         return classData;
@@ -79,7 +79,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         // field/method sizes are not stored explicitly,
         // use the size() method of the corresponding list instead.
         int staticFieldsSize   = input.readUleb128();
@@ -90,7 +90,7 @@ implements   DataItem
         int lastIndex = 0;
         staticFields.ensureCapacity(staticFieldsSize);
         for (int i = 0; i < staticFieldsSize; i++) {
-            EncodedField encodedField = EncodedField.readItem(input, lastIndex);
+            EncodedField encodedField = EncodedField.readContent(input, lastIndex);
             lastIndex = encodedField.getFieldIndex();
             staticFields.add(encodedField);
         }
@@ -98,7 +98,7 @@ implements   DataItem
         lastIndex = 0;
         instanceFields.ensureCapacity(instanceFieldsSize);
         for (int i = 0; i < instanceFieldsSize; i++) {
-            EncodedField encodedField = EncodedField.readItem(input, lastIndex);
+            EncodedField encodedField = EncodedField.readContent(input, lastIndex);
             lastIndex = encodedField.getFieldIndex();
             instanceFields.add(encodedField);
         }
@@ -106,7 +106,7 @@ implements   DataItem
         directMethods.ensureCapacity(directMethodsSize);
         lastIndex = 0;
         for (int i = 0; i < directMethodsSize; i++) {
-            EncodedMethod encodedMethod = EncodedMethod.readItem(input, lastIndex);
+            EncodedMethod encodedMethod = EncodedMethod.readContent(input, lastIndex);
             lastIndex = encodedMethod.getMethodIndex();
             directMethods.add(encodedMethod);
         }
@@ -114,14 +114,14 @@ implements   DataItem
         virtualMethods.ensureCapacity(virtualMethodsSize);
         lastIndex = 0;
         for (int i = 0; i < virtualMethodsSize; i++) {
-            EncodedMethod encodedMethod = EncodedMethod.readItem(input, lastIndex);
+            EncodedMethod encodedMethod = EncodedMethod.readContent(input, lastIndex);
             lastIndex = encodedMethod.getMethodIndex();
             virtualMethods.add(encodedMethod);
         }
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         for (EncodedMethod method : directMethods) {
             method.readLinkedDataItems(input);
         }
@@ -132,7 +132,7 @@ implements   DataItem
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         for (EncodedMethod method : directMethods) {
             method.updateOffsets(dataItemMap);
         }
@@ -143,7 +143,7 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeUleb128(staticFields.size());
         output.writeUleb128(instanceFields.size());
         output.writeUleb128(directMethods.size());

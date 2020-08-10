@@ -37,12 +37,12 @@ extends      DebugInstruction
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         nameIndex = input.readUleb128p1();
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeByte(getOpcode());
         output.writeUleb128p1(nameIndex);
     }

@@ -17,13 +17,14 @@ package com.github.netomi.bat.dexfile.debug;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
+import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
  * @author Thomas Neidhart
  */
 public abstract class DebugInstruction
-implements            DexContent
+extends               DexContent
 {
     static final byte DBG_END_SEQUENCE         = 0x00;
     static final byte DBG_ADVANCE_PC           = 0x01;
@@ -48,6 +49,10 @@ implements            DexContent
 
     public byte getOpcode() {
         return opcode;
+    }
+
+    void writeInternal(DexDataOutput output) {
+        write(output);
     }
 
     public abstract void accept(DexFile              dexFile,

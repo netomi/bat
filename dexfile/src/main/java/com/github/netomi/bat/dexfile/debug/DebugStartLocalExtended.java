@@ -33,13 +33,13 @@ extends      DebugStartLocal
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         super.read(input);
         sigIndex = input.readUleb128p1();
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         super.write(output);
         output.writeUleb128p1(sigIndex);
     }

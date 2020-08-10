@@ -22,13 +22,13 @@ import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class EncodedField
-implements   DexContent
+extends      DexContent
 {
     private int deltaFieldIndex; // uleb128
     private int fieldIndex;
     private int accessFlags;     // uleb128
 
-    public static EncodedField readItem(DexDataInput input, int lastIndex) {
+    public static EncodedField readContent(DexDataInput input, int lastIndex) {
         EncodedField encodedField = new EncodedField();
         encodedField.read(input);
         encodedField.updateFieldIndex(lastIndex);
@@ -65,7 +65,7 @@ implements   DexContent
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         deltaFieldIndex = input.readUleb128();
         accessFlags     = input.readUleb128();
     }
@@ -78,14 +78,14 @@ implements   DexContent
         deltaFieldIndex = fieldIndex - lastIndex;
     }
 
-    public int write(DexDataOutput output, int lastIndex) {
+    protected int write(DexDataOutput output, int lastIndex) {
         updateDeltaFieldIndex(lastIndex);
         write(output);
         return fieldIndex;
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeUleb128(deltaFieldIndex);
         output.writeUleb128(accessFlags);
     }
@@ -94,5 +94,10 @@ implements   DexContent
         if (isStatic()) {
             classDef.staticValueAccept(dexFile, index, visitor);
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EncodedMethod[fieldIndex=%d,accessFlags=%04x]", fieldIndex, accessFlags);
     }
 }

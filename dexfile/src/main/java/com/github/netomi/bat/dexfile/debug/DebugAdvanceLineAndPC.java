@@ -34,7 +34,7 @@ extends      DebugInstruction
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         int adjustedOpCode = (getOpcode() & 0xff) - DBG_FIRST_SPECIAL;
 
         lineDiff = DBG_LINE_BASE + (adjustedOpCode % DBG_LINE_RANGE);
@@ -42,7 +42,7 @@ extends      DebugInstruction
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeByte(getOpcode());
     }
 

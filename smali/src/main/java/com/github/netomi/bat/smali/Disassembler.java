@@ -270,7 +270,7 @@ implements   ClassDefVisitor
         public void visitAnnotationElement(DexFile dexFile, AnnotationElement element) {
             printer.print(element.getName(dexFile));
             printer.print(" = ");
-            element.value.accept(dexFile, new EncodedValuePrinter(printer, this));
+            element.getValue().accept(dexFile, new EncodedValuePrinter(printer, this));
             printer.println();
         }
     }

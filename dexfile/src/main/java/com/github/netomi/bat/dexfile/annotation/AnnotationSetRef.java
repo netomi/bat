@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 public class AnnotationSetRef
-implements   DexContent
+extends      DexContent
 {
     private int           annotationsOffset; // uint
     public  AnnotationSet annotationSet;
@@ -36,12 +36,12 @@ implements   DexContent
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         annotationsOffset = input.readInt();
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         if (annotationsOffset != 0) {
             input.setOffset(annotationsOffset);
             annotationSet = new AnnotationSet();
@@ -51,12 +51,17 @@ implements   DexContent
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         annotationsOffset = dataItemMap.getOffset(annotationSet);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeInt(annotationsOffset);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("AnnotationSetRef[annotationSet=%s]", annotationSet);
     }
 }

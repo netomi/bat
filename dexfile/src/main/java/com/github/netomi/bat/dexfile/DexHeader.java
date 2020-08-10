@@ -30,7 +30,7 @@ import java.util.Arrays;
         dataSection   = false
 )
 public class DexHeader
-implements   DataItem
+extends      DataItem
 {
     public byte[]  magic;           // ubyte[8]
     public long    checksum;        // uint
@@ -151,7 +151,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         magic = new byte[8];
         input.readFully(magic);
 
@@ -212,7 +212,7 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeBytes(magic);
         output.writeUnsignedInt(checksum);
         output.writeBytes(signature);
@@ -244,7 +244,7 @@ implements   DataItem
         output.writeUnsignedInt(dataOffset);
     }
 
-    public void updateDataItem(int type, int count, int offset) {
+    void updateDataItem(int type, int count, int offset) {
         switch (type) {
             case DexConstants.TYPE_STRING_ID_ITEM:
                 this.stringIDsSize    = count;
@@ -285,7 +285,7 @@ implements   DataItem
         }
     }
 
-    public void updateLinkData(int size, int offset) {
+    void updateLinkData(int size, int offset) {
         this.linkSize   = size;
         this.linkOffset = offset;
     }

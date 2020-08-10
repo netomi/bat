@@ -25,25 +25,25 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
  *
  * @author Thomas Neidhart
  */
-public interface DexContent
+public abstract class DexContent
 {
     /**
      * De-serializes this structure from the given input stream.
      *
      * @param input the input stream to read from.
      */
-    void read(DexDataInput input);
+    protected abstract void read(DexDataInput input);
 
     /**
      * Serializes this structure to the given output stream.
      *
      * @param output the output stream to write to.
      */
-    void write(DexDataOutput output);
+    protected abstract void write(DexDataOutput output);
 
-    default void readLinkedDataItems(DexDataInput input) {}
+    protected void readLinkedDataItems(DexDataInput input) {}
 
-    default void updateOffsets(DataItem.Map dataItemMap) {}
+    protected void updateOffsets(DataItem.Map dataItemMap) {}
 
-    default void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
+    public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
 }

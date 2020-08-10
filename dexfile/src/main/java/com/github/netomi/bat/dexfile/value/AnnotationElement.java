@@ -24,28 +24,36 @@ import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class AnnotationElement
-implements   DexContent
+extends      DexContent
 {
-    public int          nameIndex; // uleb128
-    public EncodedValue value;
+    private int          nameIndex; // uleb128
+    private EncodedValue value;
 
     public AnnotationElement() {
         nameIndex = NO_INDEX;
         value     = null;
     }
 
+    public int getNameIndex() {
+        return nameIndex;
+    }
+
     public String getName(DexFile dexFile) {
         return dexFile.getStringID(nameIndex).getStringValue();
     }
 
+    public EncodedValue getValue() {
+        return value;
+    }
+
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         nameIndex = input.readUleb128();
         value     = EncodedValue.read(input);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeUleb128(nameIndex);
         value.write(output);
     }

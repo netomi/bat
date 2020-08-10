@@ -34,7 +34,7 @@ import java.util.ListIterator;
     dataSection   = true
 )
 public class DebugInfo
-implements   DataItem
+extends      DataItem
 {
     private static final int[] EMPTY_ARRAY = new int[0];
 
@@ -44,7 +44,13 @@ implements   DataItem
 
     public List<DebugInstruction> debugSequence;
 
-    public DebugInfo() {
+    public static DebugInfo readContent(DexDataInput input) {
+        DebugInfo debugInfo = new DebugInfo();
+        debugInfo.read(input);
+        return debugInfo;
+    }
+
+    private DebugInfo() {
         lineStart      = 0;
         parametersSize = 0;
         parameterNames = EMPTY_ARRAY;
@@ -60,7 +66,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         lineStart      = input.readUleb128();
         parametersSize = input.readUleb128();
         parameterNames = new int[parametersSize];
@@ -77,7 +83,7 @@ implements   DataItem
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeUleb128(lineStart);
         output.writeUleb128(parametersSize);
         for (int parameterIndex : parameterNames) {
@@ -85,7 +91,7 @@ implements   DataItem
         }
 
         for (DebugInstruction debugInstruction : debugSequence) {
-            debugInstruction.write(output);
+            debugInstruction.writeInternal(output);
         }
     }
 

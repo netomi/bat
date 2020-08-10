@@ -20,27 +20,27 @@ package com.github.netomi.bat.dexfile;
  *
  * @author Thomas Neidhart
  */
-public interface DataItem
-extends          DexContent
+public abstract class DataItem
+extends               DexContent
 {
     /**
      * Returns the type of this {@code DataItem} instance.
      *
      * @return the type of this DataItem.
      */
-    default int getItemType() {
+    protected int getItemType() {
         return this.getClass().getAnnotation(DataItemAnn.class).type();
     }
 
-    default int getDataAlignment() {
+    protected int getDataAlignment() {
         return this.getClass().getAnnotation(DataItemAnn.class).dataAlignment();
     }
 
-    default boolean containedInDataSection() {
+    protected boolean containedInDataSection() {
         return this.getClass().getAnnotation(DataItemAnn.class).dataSection();
     }
 
-    interface Map {
+    public interface Map {
         int getOffset(DataItem item);
     }
 }

@@ -32,7 +32,7 @@ import java.util.ListIterator;
     dataSection   = true
 )
 public class AnnotationSet
-implements   DataItem
+extends      DataItem
 {
     private static final int[] EMPTY_ENTRIES = new int[0];
 
@@ -50,7 +50,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
@@ -62,20 +62,18 @@ implements   DataItem
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         annotations = new ArrayList<>(annotationOffsetEntries.length);
         for (int i = 0; i < annotationOffsetEntries.length; i++) {
-            Annotation annotation = new Annotation();
-
             input.setOffset(annotationOffsetEntries[i]);
 
-            annotation.read(input);
+            Annotation annotation = Annotation.readContent(input);
             annotations.add(annotation);
         }
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeInt(annotationOffsetEntries.length);
@@ -102,5 +100,10 @@ implements   DataItem
             visitor.visitAnnotation(dexFile, this, index, annotation);
             annotation.dataItemsAccept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("AnnotationSet[annotations=%s]", annotations);
     }
 }

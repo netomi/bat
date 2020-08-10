@@ -29,12 +29,18 @@ import com.github.netomi.bat.dexfile.value.EncodedValue;
     dataSection   = true
 )
 public class Annotation
-implements   DataItem
+extends      DataItem
 {
     private short                  visibility; // ubyte
     private EncodedAnnotationValue annotation;
 
-    public Annotation() {
+    public static Annotation readContent(DexDataInput input) {
+        Annotation annotation = new Annotation();
+        annotation.read(input);
+        return annotation;
+    }
+
+    private Annotation() {
         visibility = 0;
         annotation = null;
     }
@@ -48,13 +54,13 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         visibility = input.readUnsignedByte();
         annotation = EncodedValue.readAnnotationValue(input);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeUnsignedByte(visibility);
         annotation.write(output);
     }

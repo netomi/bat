@@ -18,17 +18,19 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
+import java.util.Objects;
+
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false
 )
 public class TypeID
-implements   DataItem
+extends      DataItem
 {
     private int descriptorIndex; // uint
 
-    public static TypeID readItem(DexDataInput input) {
+    public static TypeID readContent(DexDataInput input) {
         TypeID typeID = new TypeID();
         typeID.read(input);
         return typeID;
@@ -55,19 +57,32 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
         descriptorIndex = input.readInt();
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(descriptorIndex);
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypeID other = (TypeID) o;
+        return descriptorIndex == other.descriptorIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(descriptorIndex);
+    }
+
+    @Override
     public String toString() {
-        return String.format("TypeID[index=%d]", descriptorIndex);
+        return String.format("TypeID[descriptorIndex=%d]", descriptorIndex);
     }
 }

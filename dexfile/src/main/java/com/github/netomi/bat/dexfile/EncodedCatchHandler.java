@@ -26,7 +26,7 @@ import java.util.List;
  * @author Thomas Neidhart
  */
 public class EncodedCatchHandler
-implements   DexContent
+extends      DexContent
 {
     //public int              size;         // sleb128, use handlers.size()
     public List<TypeAddrPair> handlers;
@@ -38,14 +38,13 @@ implements   DexContent
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         int readSize = input.readSleb128();
         int size     = Math.abs(readSize);
 
         handlers = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            TypeAddrPair typeAddrPair = new TypeAddrPair();
-            typeAddrPair.read(input);
+            TypeAddrPair typeAddrPair = TypeAddrPair.readContent(input);
             handlers.add(typeAddrPair);
         }
 
@@ -55,7 +54,7 @@ implements   DexContent
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         int writtenSize = handlers.size();
         if (catchAllAddr != -1) {
             writtenSize = -writtenSize;

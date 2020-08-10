@@ -33,7 +33,7 @@ import java.util.List;
     dataSection   = true
 )
 public class AnnotationSetRefList
-implements   DataItem
+extends      DataItem
 {
     //public int                  size; // uint, use annotationSetRefs.size()
     public List<AnnotationSetRef> annotationSetRefs;
@@ -43,7 +43,7 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
@@ -57,21 +57,21 @@ implements   DataItem
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         for (AnnotationSetRef annotationSetRef : annotationSetRefs) {
             annotationSetRef.readLinkedDataItems(input);
         }
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         for (AnnotationSetRef annotationSetRef : annotationSetRefs) {
             annotationSetRef.updateOffsets(dataItemMap);
         }
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeInt(annotationSetRefs.size());

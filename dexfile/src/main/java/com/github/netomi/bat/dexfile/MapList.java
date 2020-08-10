@@ -27,10 +27,10 @@ import java.util.List;
     dataSection   = true
 )
 public class MapList
-implements   DataItem
+extends      DataItem
 {
     //public int size; // uint, use mapItems.size().
-    private ArrayList<MapItem> mapItems = new ArrayList<>(1);
+    private ArrayList<MapItem> mapItems = new ArrayList<>(0);
 
     public static MapList readItem(DexDataInput input) {
         MapList mapList = new MapList();
@@ -65,19 +65,19 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
         mapItems.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
-            MapItem mapItem = MapItem.readItem(input);
+            MapItem mapItem = MapItem.readContent(input);
             mapItems.add(mapItem);
         }
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeInt(mapItems.size());

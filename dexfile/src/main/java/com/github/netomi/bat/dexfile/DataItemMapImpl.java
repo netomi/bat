@@ -13,9 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.io;
+package com.github.netomi.bat.dexfile;
 
-import com.github.netomi.bat.dexfile.*;
+import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import java.util.HashMap;
@@ -23,8 +23,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class DataItemMapImpl
-implements   DataItem.Map
+class      DataItemMapImpl
+implements DataItem.Map
 {
     private final Map<Integer, Set<DataItem>> dataItemMap = new HashMap<>();
     private final Map<DataItem, Integer>      offsetMap   = new HashMap<>();

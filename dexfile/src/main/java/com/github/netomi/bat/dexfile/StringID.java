@@ -25,12 +25,12 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
     dataSection   = false
 )
 public class StringID
-implements   DataItem
+extends      DataItem
 {
     private int        stringDataOffset; // uint
-    public  StringData stringData;
+    private StringData stringData;
 
-    public static StringID readItem(DexDataInput input) {
+    public static StringID readContent(DexDataInput input) {
         StringID stringID = new StringID();
         stringID.read(input);
         return stringID;
@@ -54,29 +54,33 @@ implements   DataItem
         return stringDataOffset;
     }
 
+    public StringData getStringData() {
+        return stringData;
+    }
+
     public String getStringValue() {
         return stringData.getString();
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
         stringDataOffset = input.readInt();
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         input.setOffset(stringDataOffset);
-        stringData = StringData.readItem(input);
+        stringData = StringData.readContent(input);
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         stringDataOffset = dataItemMap.getOffset(stringData);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(stringDataOffset);
     }
@@ -91,6 +95,6 @@ implements   DataItem
 
     @Override
     public String toString() {
-        return String.format("StringID[offset=0x%04x,value=%s]", stringDataOffset, stringData.getString());
+        return String.format("StringID[data=%s]", stringData);
     }
 }

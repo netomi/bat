@@ -28,12 +28,12 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
     dataSection   = false
 )
 public class CallSiteID
-implements   DataItem
+extends      DataItem
 {
     private int      callSiteOffset; // uint
     public  CallSite callSite;
 
-    public static CallSiteID readItem(DexDataInput input) {
+    public static CallSiteID readContent(DexDataInput input) {
         CallSiteID callSiteID = new CallSiteID();
         callSiteID.read(input);
         return callSiteID;
@@ -49,25 +49,25 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
         callSiteOffset = input.readInt();
     }
 
     @Override
-    public void readLinkedDataItems(DexDataInput input) {
+    protected void readLinkedDataItems(DexDataInput input) {
         input.setOffset(callSiteOffset);
         callSite = new CallSite();
         callSite.read(input);
     }
 
     @Override
-    public void updateOffsets(DataItem.Map dataItemMap) {
+    protected void updateOffsets(DataItem.Map dataItemMap) {
         callSiteOffset = dataItemMap.getOffset(callSite);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(callSiteOffset);
     }

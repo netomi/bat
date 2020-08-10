@@ -26,7 +26,7 @@ import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
     dataSection   = true
 )
 public class EncodedArray
-implements   DataItem
+extends      DataItem
 {
     private static final EncodedArrayValue EMPTY_ARRAY = new EncodedArrayValue();
 
@@ -37,13 +37,13 @@ implements   DataItem
     }
 
     @Override
-    public void read(DexDataInput input) {
+    protected void read(DexDataInput input) {
         encodedArrayValue = new EncodedArrayValue();
         encodedArrayValue.read(input, 0);
     }
 
     @Override
-    public void write(DexDataOutput output) {
+    protected void write(DexDataOutput output) {
         encodedArrayValue.write(output);
     }
 
