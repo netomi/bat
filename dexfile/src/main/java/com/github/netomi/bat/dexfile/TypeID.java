@@ -17,9 +17,17 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
+/**
+ * A class representing a type id item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-id-item">type id item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_ID_ITEM,
     dataAlignment = 4,
@@ -30,14 +38,15 @@ extends      DataItem
 {
     private int descriptorIndex; // uint
 
+    public static TypeID of(int descriptorIndex) {
+        Preconditions.checkArgument(descriptorIndex >= 0, "descriptor index must be non-negative");
+        return new TypeID(descriptorIndex);
+    }
+
     public static TypeID readContent(DexDataInput input) {
         TypeID typeID = new TypeID();
         typeID.read(input);
         return typeID;
-    }
-
-    public static TypeID of(int descriptorIndex) {
-        return new TypeID(descriptorIndex);
     }
 
     private TypeID() {
@@ -83,6 +92,6 @@ extends      DataItem
 
     @Override
     public String toString() {
-        return String.format("TypeID[descriptorIndex=%d]", descriptorIndex);
+        return String.format("TypeID[descriptorIdx=%d]", descriptorIndex);
     }
 }

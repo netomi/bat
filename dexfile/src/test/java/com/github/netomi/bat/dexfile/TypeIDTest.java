@@ -16,44 +16,44 @@
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TypeListTest
-extends      DexContentTest<TypeList>
+public class TypeIDTest
+extends      DexContentTest<TypeID>
 {
     @Override
-    public TypeList[] getTestInstances() {
-        return new TypeList[] {
-            TypeList.empty(),
-            TypeList.of(1, 2, 3),
-            TypeList.of(6, 5, 4, 3, 2, 1)
+    public TypeID[] getTestInstances() {
+        return new TypeID[] {
+            TypeID.of(10),
+            TypeID.of(20)
         };
     }
 
     @Override
-    public Function<DexDataInput, TypeList> getFactoryMethod() {
-        return TypeList::readContent;
+    public Function<DexDataInput, TypeID> getFactoryMethod() {
+        return TypeID::readContent;
+    }
+
+    @Test
+    public void inputChecking() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            TypeID.of(-1);
+        });
     }
 
     @Test
     public void equals() {
-        TypeList l1 = TypeList.empty();
-        TypeList l2 = TypeList.empty();
+        TypeID t1 = TypeID.of(1);
+        TypeID t2 = TypeID.of(2);
+        TypeID t3 = TypeID.of(1);
 
-        assertEquals(l1, l2);
-
-        l1.addType(1);
-        assertNotEquals(l1, l2);
-
-        l2.addType(1);
-        assertEquals(l1, l2);
-
-        l1.addType(2);
-        assertNotEquals(l1, l2);
+        assertEquals(t1, t1);
+        assertNotEquals(t1, t2);
+        assertEquals(t1, t3);
     }
 }

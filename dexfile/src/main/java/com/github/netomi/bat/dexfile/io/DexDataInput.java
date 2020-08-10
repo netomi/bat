@@ -28,10 +28,10 @@ public class DexDataInput
 implements   Closeable
 {
     private final ByteBuffer byteBuffer;
-    private       int        lastMemberIndex;
 
     public DexDataInput(InputStream inputStream) throws IOException {
         byteBuffer = toByteBuffer(inputStream);
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
     }
 
     public void order(ByteOrder byteOrder) {
@@ -248,7 +248,7 @@ implements   Closeable
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         int read;
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[8192];
         while ((read = inputStream.read(buf, 0, buf.length)) != -1) {
             baos.write(buf, 0, read);
         }

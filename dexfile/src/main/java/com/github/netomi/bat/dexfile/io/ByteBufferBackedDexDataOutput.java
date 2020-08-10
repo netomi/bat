@@ -198,4 +198,12 @@ implements   DexDataOutput
         WritableByteChannel channel = Channels.newChannel(output);
         channel.write(byteBuffer);
     }
+
+    public byte[] toArray() {
+        int size = byteBuffer.position();
+        byte[] array = new byte[size];
+        byteBuffer.position(0);
+        byteBuffer.get(array);
+        return array;
+    }
 }

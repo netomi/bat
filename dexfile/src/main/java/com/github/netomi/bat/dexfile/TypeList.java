@@ -24,7 +24,9 @@ import com.github.netomi.bat.util.IntArray;
 import java.util.Objects;
 
 /**
- * Represents a list of TypeIDs.
+ * A class representing a list of type ids inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-list">type list @ dex format</a>
  *
  * @author Thomas Neidhart
  */
@@ -40,10 +42,24 @@ extends      DataItem
     private IntArray typeList;
 
     /**
-     * Returns an empty TypeList instance.
+     * Returns a new empty TypeList instance.
      */
     public static TypeList empty() {
         return new TypeList();
+    }
+
+    /**
+     * Returns a new TypeList instance containing the given type indices.
+     *
+     * @param typeIndices the type indices that the list should contain.
+     * @return a new TypeList instance containing the type indices.
+     */
+    public static TypeList of(int... typeIndices) {
+        TypeList typeList = new TypeList();
+        for (int typeIndex : typeIndices) {
+            typeList.addType(typeIndex);
+        }
+        return typeList;
     }
 
     public static TypeList readContent(DexDataInput input) {
