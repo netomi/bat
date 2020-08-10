@@ -30,8 +30,10 @@ implements   DataItem
     private int        stringDataOffset; // uint
     public  StringData stringData;
 
-    public static StringID empty() {
-        return new StringID();
+    public static StringID readItem(DexDataInput input) {
+        StringID stringID = new StringID();
+        stringID.read(input);
+        return stringID;
     }
 
     public static StringID of(String value) {
@@ -65,8 +67,7 @@ implements   DataItem
     @Override
     public void readLinkedDataItems(DexDataInput input) {
         input.setOffset(stringDataOffset);
-        stringData = StringData.empty();
-        stringData.read(input);
+        stringData = StringData.readItem(input);
     }
 
     @Override

@@ -169,7 +169,7 @@ implements   DataItem
 
     public void fieldAnnotationSetAccept(DexFile dexFile, ClassDef classDef, EncodedField field, AnnotationSetVisitor visitor) {
         for (FieldAnnotation annotation : fieldAnnotations) {
-            if (annotation.fieldIndex == field.fieldIndex) {
+            if (annotation.fieldIndex == field.getFieldIndex()) {
                 visitor.visitFieldAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
                 break;
             }
@@ -178,7 +178,7 @@ implements   DataItem
 
     public void methodAnnotationSetAccept(DexFile dexFile, ClassDef classDef, EncodedMethod method, AnnotationSetVisitor visitor) {
         for (MethodAnnotation annotation : methodAnnotations) {
-            if (annotation.methodIndex == method.methodIndex) {
+            if (annotation.methodIndex == method.getMethodIndex()) {
                 visitor.visitMethodAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
                 break;
             }

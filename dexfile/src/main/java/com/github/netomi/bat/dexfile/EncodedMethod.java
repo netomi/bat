@@ -24,13 +24,20 @@ public class EncodedMethod
 implements   DexContent
 {
     private int deltaMethodIndex; // uleb128
-    public  int methodIndex;
-    public  int accessFlags;      // uleb128
+    private int methodIndex;
+    private int accessFlags;      // uleb128
     private int codeOffset;       // uleb128
 
     public  Code code;
 
-    public EncodedMethod() {
+    public static EncodedMethod readItem(DexDataInput input, int lastIndex) {
+        EncodedMethod encodedMethod = new EncodedMethod();
+        encodedMethod.read(input);
+        encodedMethod.updateMethodIndex(lastIndex);
+        return encodedMethod;
+    }
+
+    private EncodedMethod() {
         methodIndex = DexConstants.NO_INDEX;
         accessFlags = 0;
         codeOffset  = 0;
@@ -43,6 +50,14 @@ implements   DexContent
 
     public int getCodeOffset() {
         return codeOffset;
+    }
+
+    public int getAccessFlags() {
+        return accessFlags;
+    }
+
+    public int getMethodIndex() {
+        return methodIndex;
     }
 
     public MethodID getMethodID(DexFile dexFile) {
@@ -86,25 +101,28 @@ implements   DexContent
         if (codeOffset != 0) {
             input.setOffset(codeOffset);
 
-            code = new Code();
-            code.read(input);
+            code = Code.readItem(input);
             code.readLinkedDataItems(input);
         }
     }
 
-    public int updateMethodIndex(int lastIndex) {
+    private void updateMethodIndex(int lastIndex) {
         methodIndex = deltaMethodIndex + lastIndex;
-        return methodIndex;
     }
 
-    public int updateDeltaMethodIndex(int lastIndex) {
+    private void updateDeltaMethodIndex(int lastIndex) {
         deltaMethodIndex = methodIndex - lastIndex;
-        return methodIndex;
     }
 
     @Override
     public void updateOffsets(DataItem.Map dataItemMap) {
         codeOffset = dataItemMap.getOffset(code);
+    }
+
+    public int write(DexDataOutput output, int lastIndex) {
+        updateDeltaMethodIndex(lastIndex);
+        write(output);
+        return methodIndex;
     }
 
     @Override

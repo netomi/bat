@@ -46,6 +46,12 @@ implements   DataItem
         return new TypeList();
     }
 
+    public static TypeList readItem(DexDataInput input) {
+        TypeList typeList = new TypeList();
+        typeList.read(input);
+        return typeList;
+    }
+
     private TypeList() {
         this.typeList = new IntArray(0);
     }
@@ -69,6 +75,10 @@ implements   DataItem
 
     public void addType(int typeIDIndex) {
         typeList.add(typeIDIndex);
+    }
+
+    public void addType(DexFile dexFile, String type) {
+        addType(dexFile.addOrGetTypeID(type));
     }
 
     @Override

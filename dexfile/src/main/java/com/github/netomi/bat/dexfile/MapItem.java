@@ -26,8 +26,10 @@ implements   DexContent
     int size;     // uint
     int offset;   // uint
 
-    public static MapItem empty() {
-        return new MapItem();
+    public static MapItem readItem(DexDataInput input) {
+        MapItem mapItem = new MapItem();
+        mapItem.read(input);
+        return mapItem;
     }
 
     public static MapItem of(int type) {

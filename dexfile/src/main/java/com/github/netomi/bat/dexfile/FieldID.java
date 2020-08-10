@@ -26,14 +26,24 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 public class FieldID
 implements   DataItem
 {
-    public int classIndex; // ushort
-    public int typeIndex;  // ushort
-    public int nameIndex;  // uint;
+    private int classIndex; // ushort
+    private int typeIndex;  // ushort
+    private int nameIndex;  // uint;
 
-    public FieldID() {
+    public static FieldID readItem(DexDataInput input) {
+        FieldID fieldID = new FieldID();
+        fieldID.read(input);
+        return fieldID;
+    }
+
+    private FieldID() {
         classIndex = DexConstants.NO_INDEX;
         typeIndex  = DexConstants.NO_INDEX;
         nameIndex  = DexConstants.NO_INDEX;
+    }
+
+    public int getClassIndex() {
+        return classIndex;
     }
 
     public TypeID getClassType(DexFile dexFile) {
@@ -44,8 +54,16 @@ implements   DataItem
         return getClassType(dexFile).getType(dexFile);
     }
 
+    public int getTypeIndex() {
+        return typeIndex;
+    }
+
     public String getType(DexFile dexFile) {
         return dexFile.getTypeID(typeIndex).getType(dexFile);
+    }
+
+    public int getNameIndex() {
+        return nameIndex;
     }
 
     public String getName(DexFile dexFile) {

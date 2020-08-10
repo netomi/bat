@@ -29,13 +29,19 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 public class ProtoID
 implements   DataItem
 {
-    public  int shortyIndex;      // uint
-    public  int returnTypeIndex;  // uint
+    private int shortyIndex;      // uint
+    private int returnTypeIndex;  // uint
     private int parametersOffset; // uint
 
     public  TypeList parameters;
 
-    public ProtoID() {
+    public static ProtoID readItem(DexDataInput input) {
+        ProtoID protoID = new ProtoID();
+        protoID.read(input);
+        return protoID;
+    }
+
+    private ProtoID() {
         shortyIndex      = NO_INDEX;
         returnTypeIndex  = NO_INDEX;
         parametersOffset = 0;
@@ -44,6 +50,10 @@ implements   DataItem
 
     public int getParametersOffset() {
         return parametersOffset;
+    }
+
+    public int getShortyIndex() {
+        return shortyIndex;
     }
 
     public String getShorty(DexFile dexFile) {
@@ -64,6 +74,10 @@ implements   DataItem
         return sb.toString();
     }
 
+    public int getReturnTypeIndex() {
+        return returnTypeIndex;
+    }
+
     public String getReturnType(DexFile dexFile) {
         return dexFile.getTypeID(returnTypeIndex).getType(dexFile);
     }
@@ -80,8 +94,7 @@ implements   DataItem
     public void readLinkedDataItems(DexDataInput input) {
         if (parametersOffset != 0) {
             input.setOffset(parametersOffset);
-            parameters = TypeList.empty();
-            parameters.read(input);
+            parameters = TypeList.readItem(input);
         }
     }
 

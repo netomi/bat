@@ -80,19 +80,19 @@ implements   DexFileVisitor,
     public void visitClassDef(DexFile dexFile, int index, ClassDef classDef) {
         if (printHeaders) {
             println("Class #" + index + " header:");
-            println("class_idx           : " + classDef.classIndex);
-            println("access_flags        : " + formatNumber(classDef.accessFlags));
-            println("superclass_idx      : " + classDef.superClassIndex);
+            println("class_idx           : " + classDef.getClassIndex());
+            println("access_flags        : " + formatNumber(classDef.getAccessFlags()));
+            println("superclass_idx      : " + classDef.getSuperClassIndex());
             println("interfaces_off      : " + formatNumber((long) classDef.getInterfacesOffset()));
-            println("source_file_idx     : " + classDef.sourceFileIndex);
+            println("source_file_idx     : " + classDef.getSourceFileIndex());
             println("annotations_off     : " + formatNumber((long) classDef.getAnnotationsOffset()));
             println("class_data_off      : " + formatNumber((long) classDef.getClassDataOffset()));
 
             if (classDef.classData != null) {
-                println("static_fields_size  : " + classDef.classData.staticFields.size());
-                println("instance_fields_size: " + classDef.classData.instanceFields.size());
-                println("direct_methods_size : " + classDef.classData.directMethods.size());
-                println("virtual_methods_size: " + classDef.classData.virtualMethods.size());
+                println("static_fields_size  : " + classDef.classData.getStaticFieldCount());
+                println("instance_fields_size: " + classDef.classData.getInstanceFieldCount());
+                println("direct_methods_size : " + classDef.classData.getDirectMethodCount());
+                println("virtual_methods_size: " + classDef.classData.getVirtualMethodCount());
             }
             else {
                 println("static_fields_size  : 0");
@@ -112,7 +112,7 @@ implements   DexFileVisitor,
 
         println(String.format("Class #%-5d        -", index));
         println("  Class descriptor  : '" + classDef.getType(dexFile) + "'");
-        println("  Access flags      : " + formatAccessFlags(classDef.accessFlags, DexAccessFlags.Target.CLASS));
+        println("  Access flags      : " + formatAccessFlags(classDef.getAccessFlags(), DexAccessFlags.Target.CLASS));
         println("  Superclass        : '" + classDef.getSuperClassType(dexFile) + "'");
         println("  Interfaces        -");
         classDef.interfacesAccept(dexFile, visitorImpl);
@@ -133,7 +133,7 @@ implements   DexFileVisitor,
     // Private utility methods.
 
     private static String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
-        return classDefItem.sourceFileIndex + " (" + classDefItem.getSourceFile(dexFile) + ")";
+        return classDefItem.getSourceFileIndex() + " (" + classDefItem.getSourceFile(dexFile) + ")";
     }
 
     private static String formatSignatureByteArray(byte[] array) {
@@ -249,7 +249,7 @@ implements   DexFileVisitor,
             println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
             println("      name          : '" + encodedField.getName(dexFile) + "'");
             println("      type          : '" + encodedField.getType(dexFile) + "'");
-            println("      access        : " + formatAccessFlags(encodedField.accessFlags, DexAccessFlags.Target.FIELD));
+            println("      access        : " + formatAccessFlags(encodedField.getAccessFlags(), DexAccessFlags.Target.FIELD));
 
             if (encodedField.isStatic()       &&
                 classDef.staticValues != null &&
@@ -266,7 +266,7 @@ implements   DexFileVisitor,
             println(String.format("    #%-14d : (in %s)", index, classDef.getType(dexFile)));
             println("      name          : '" + encodedMethod.getName(dexFile) + "'");
             println("      type          : '" + encodedMethod.getDescriptor(dexFile) + "'");
-            println("      access        : " + formatAccessFlags(encodedMethod.accessFlags, DexAccessFlags.Target.METHOD));
+            println("      access        : " + formatAccessFlags(encodedMethod.getAccessFlags(), DexAccessFlags.Target.METHOD));
 
             if (encodedMethod.code != null) {
                 encodedMethod.codeAccept(dexFile, classDef, this);

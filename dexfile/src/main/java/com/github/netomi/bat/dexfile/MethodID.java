@@ -26,14 +26,24 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 public class MethodID
 implements   DataItem
 {
-    public int classIndex; // ushort
-    public int protoIndex; // ushort
-    public int nameIndex;  // uint;
+    private int classIndex; // ushort
+    private int protoIndex; // ushort
+    private int nameIndex;  // uint;
 
-    public MethodID() {
+    public static MethodID readItem(DexDataInput input) {
+        MethodID methodID = new MethodID();
+        methodID.read(input);
+        return methodID;
+    }
+
+    private MethodID() {
         classIndex = DexConstants.NO_INDEX;
         protoIndex = DexConstants.NO_INDEX;
         nameIndex  = DexConstants.NO_INDEX;
+    }
+
+    public int getClassIndex() {
+        return classIndex;
     }
 
     public TypeID getClassType(DexFile dexFile) {
@@ -44,8 +54,16 @@ implements   DataItem
         return getClassType(dexFile).getType(dexFile);
     }
 
+    public int getProtoIndex() {
+        return protoIndex;
+    }
+
     public ProtoID getProtoID(DexFile dexFile) {
         return dexFile.getProtoID(protoIndex);
+    }
+
+    public int getNameIndex() {
+        return nameIndex;
     }
 
     public String getName(DexFile dexFile) {

@@ -30,11 +30,11 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 public class ClassDef
 implements   DataItem
 {
-    public  int classIndex;         // uint
-    public  int accessFlags;        // uint
-    public  int superClassIndex;    // uint
+    private int classIndex;         // uint
+    private int accessFlags;        // uint
+    private int superClassIndex;    // uint
     private int interfacesOffset;   // uint
-    public  int sourceFileIndex;    // uint
+    private int sourceFileIndex;    // uint
     private int annotationsOffset;  // uint
     private int classDataOffset;    // uint
     private int staticValuesOffset; // uint
@@ -44,7 +44,13 @@ implements   DataItem
     public ClassData            classData;
     public EncodedArray         staticValues;
 
-    public ClassDef() {
+    public static ClassDef readItem(DexDataInput input) {
+        ClassDef classDef = new ClassDef();
+        classDef.read(input);
+        return classDef;
+    }
+
+    private ClassDef() {
         classIndex         = NO_INDEX;
         accessFlags        = 0;
         superClassIndex    = NO_INDEX;
@@ -76,6 +82,10 @@ implements   DataItem
         return staticValuesOffset;
     }
 
+    public int getClassIndex() {
+        return classIndex;
+    }
+
     public String getClassName(DexFile dexFile) {
         return DexUtil.internalClassNameFromType(getType(dexFile));
     }
@@ -84,12 +94,24 @@ implements   DataItem
         return dexFile.getTypeID(classIndex).getType(dexFile);
     }
 
+    public int getAccessFlags() {
+        return accessFlags;
+    }
+
+    public int getSuperClassIndex() {
+        return superClassIndex;
+    }
+
     public String getSuperClassName(DexFile dexFile) {
         return DexUtil.internalClassNameFromType(getSuperClassType(dexFile));
     }
 
     public String getSuperClassType(DexFile dexFile) {
         return dexFile.getTypeID(superClassIndex).getType(dexFile);
+    }
+
+    public int getSourceFileIndex() {
+        return sourceFileIndex;
     }
 
     public String getSourceFile(DexFile dexFile) {
@@ -115,8 +137,7 @@ implements   DataItem
     public void readLinkedDataItems(DexDataInput input) {
         if (interfacesOffset != 0) {
             input.setOffset(interfacesOffset);
-            interfaces = TypeList.empty();
-            interfaces.read(input);
+            interfaces = TypeList.readItem(input);
         }
 
         if (annotationsOffset != 0) {
@@ -127,8 +148,7 @@ implements   DataItem
 
         if (classDataOffset != 0) {
             input.setOffset(classDataOffset);
-            classData = new ClassData();
-            classData.read(input);
+            classData = ClassData.readItem(input);
         }
 
         if (staticValuesOffset != 0) {

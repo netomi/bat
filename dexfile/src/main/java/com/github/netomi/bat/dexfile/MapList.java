@@ -30,11 +30,19 @@ public class MapList
 implements   DataItem
 {
     //public int size; // uint, use mapItems.size().
-    private List<MapItem> mapItems;
+    private ArrayList<MapItem> mapItems = new ArrayList<>(1);
 
-    public MapList() {
-        this.mapItems = new ArrayList<>();
+    public static MapList readItem(DexDataInput input) {
+        MapList mapList = new MapList();
+        mapList.read(input);
+        return mapList;
     }
+
+    public static MapList empty() {
+        return new MapList();
+    }
+
+    private MapList() {}
 
     public MapItem getMapItem(int type) {
         for (MapItem mapItem : mapItems) {
@@ -61,10 +69,9 @@ implements   DataItem
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
-        mapItems = new ArrayList<>(size);
+        mapItems.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
-            MapItem mapItem = MapItem.empty();
-            mapItem.read(input);
+            MapItem mapItem = MapItem.readItem(input);
             mapItems.add(mapItem);
         }
     }

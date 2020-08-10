@@ -33,7 +33,13 @@ implements   DataItem
     private int      callSiteOffset; // uint
     public  CallSite callSite;
 
-    public CallSiteID() {
+    public static CallSiteID readItem(DexDataInput input) {
+        CallSiteID callSiteID = new CallSiteID();
+        callSiteID.read(input);
+        return callSiteID;
+    }
+
+    private CallSiteID() {
         callSiteOffset = 0;
         callSite       = null;
     }

@@ -37,8 +37,10 @@ implements   DataItem
     // private byte[] data;      // ubyte[]
     private String stringValue;
 
-    public static StringData empty() {
-        return new StringData();
+    public static StringData readItem(DexDataInput input) {
+        StringData stringData = new StringData();
+        stringData.read(input);
+        return stringData;
     }
 
     public static StringData of(String value) {

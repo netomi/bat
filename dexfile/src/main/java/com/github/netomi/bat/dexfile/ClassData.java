@@ -23,8 +23,6 @@ import com.github.netomi.bat.dexfile.visitor.EncodedMemberVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.ListIterator;
 
 @DataItemAnn(
@@ -35,16 +33,49 @@ import java.util.ListIterator;
 public class ClassData
 implements   DataItem
 {
-    public List<EncodedField>  staticFields;
-    public List<EncodedField>  instanceFields;
-    public List<EncodedMethod> directMethods;
-    public List<EncodedMethod> virtualMethods;
+    private ArrayList<EncodedField>  staticFields   = new ArrayList<>(0);
+    private ArrayList<EncodedField>  instanceFields = new ArrayList<>(0);
+    private ArrayList<EncodedMethod> directMethods  = new ArrayList<>(0);
+    private ArrayList<EncodedMethod> virtualMethods = new ArrayList<>(0);
 
-    public ClassData() {
-        staticFields   = Collections.emptyList();
-        instanceFields = Collections.emptyList();
-        directMethods  = Collections.emptyList();
-        virtualMethods = Collections.emptyList();
+    public static ClassData readItem(DexDataInput input) {
+        ClassData classData = new ClassData();
+        classData.read(input);
+        return classData;
+    }
+
+    private ClassData() {}
+
+    public int getStaticFieldCount() {
+        return staticFields.size();
+    }
+
+    public EncodedField getStaticField(int index) {
+        return staticFields.get(index);
+    }
+
+    public int getInstanceFieldCount() {
+        return instanceFields.size();
+    }
+
+    public EncodedField getInstanceField(int index) {
+        return instanceFields.get(index);
+    }
+
+    public int getDirectMethodCount() {
+        return directMethods.size();
+    }
+
+    public EncodedMethod getDirectMethod(int index) {
+        return directMethods.get(index);
+    }
+
+    public int getVirtualMethodCount() {
+        return virtualMethods.size();
+    }
+
+    public EncodedMethod getVirtualMethod(int index) {
+        return virtualMethods.get(index);
     }
 
     @Override
@@ -56,40 +87,35 @@ implements   DataItem
         int directMethodsSize  = input.readUleb128();
         int virtualMethodsSize = input.readUleb128();
 
-        staticFields = new ArrayList<>(staticFieldsSize);
-
         int lastIndex = 0;
+        staticFields.ensureCapacity(staticFieldsSize);
         for (int i = 0; i < staticFieldsSize; i++) {
-            EncodedField encodedField = new EncodedField();
-            encodedField.read(input);
-            lastIndex = encodedField.updateFieldIndex(lastIndex);
+            EncodedField encodedField = EncodedField.readItem(input, lastIndex);
+            lastIndex = encodedField.getFieldIndex();
             staticFields.add(encodedField);
         }
 
-        instanceFields = new ArrayList<>(instanceFieldsSize);
         lastIndex = 0;
+        instanceFields.ensureCapacity(instanceFieldsSize);
         for (int i = 0; i < instanceFieldsSize; i++) {
-            EncodedField encodedField = new EncodedField();
-            encodedField.read(input);
-            lastIndex = encodedField.updateFieldIndex(lastIndex);
+            EncodedField encodedField = EncodedField.readItem(input, lastIndex);
+            lastIndex = encodedField.getFieldIndex();
             instanceFields.add(encodedField);
         }
 
-        directMethods = new ArrayList<>(directMethodsSize);
+        directMethods.ensureCapacity(directMethodsSize);
         lastIndex = 0;
         for (int i = 0; i < directMethodsSize; i++) {
-            EncodedMethod encodedMethod = new EncodedMethod();
-            encodedMethod.read(input);
-            lastIndex = encodedMethod.updateMethodIndex(lastIndex);
+            EncodedMethod encodedMethod = EncodedMethod.readItem(input, lastIndex);
+            lastIndex = encodedMethod.getMethodIndex();
             directMethods.add(encodedMethod);
         }
 
-        virtualMethods = new ArrayList<>(virtualMethodsSize);
+        virtualMethods.ensureCapacity(virtualMethodsSize);
         lastIndex = 0;
         for (int i = 0; i < virtualMethodsSize; i++) {
-            EncodedMethod encodedMethod = new EncodedMethod();
-            encodedMethod.read(input);
-            lastIndex = encodedMethod.updateMethodIndex(lastIndex);
+            EncodedMethod encodedMethod = EncodedMethod.readItem(input, lastIndex);
+            lastIndex = encodedMethod.getMethodIndex();
             virtualMethods.add(encodedMethod);
         }
     }
@@ -125,26 +151,22 @@ implements   DataItem
 
         int lastIndex = 0;
         for (EncodedField field : staticFields) {
-            lastIndex = field.updateDeltaFieldIndex(lastIndex);
-            field.write(output);
+            lastIndex = field.write(output, lastIndex);
         }
 
         lastIndex = 0;
         for (EncodedField field : instanceFields) {
-            lastIndex = field.updateDeltaFieldIndex(lastIndex);
-            field.write(output);
+            lastIndex = field.write(output, lastIndex);
         }
 
         lastIndex = 0;
         for (EncodedMethod method : directMethods) {
-            lastIndex = method.updateDeltaMethodIndex(lastIndex);
-            method.write(output);
+            lastIndex = method.write(output, lastIndex);
         }
 
         lastIndex = 0;
         for (EncodedMethod method : virtualMethods) {
-            lastIndex = method.updateDeltaMethodIndex(lastIndex);
-            method.write(output);
+            lastIndex = method.write(output, lastIndex);
         }
     }
 

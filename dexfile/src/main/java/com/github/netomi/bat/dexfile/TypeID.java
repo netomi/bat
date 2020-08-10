@@ -28,8 +28,10 @@ implements   DataItem
 {
     private int descriptorIndex; // uint
 
-    public static TypeID empty() {
-        return new TypeID();
+    public static TypeID readItem(DexDataInput input) {
+        TypeID typeID = new TypeID();
+        typeID.read(input);
+        return typeID;
     }
 
     public static TypeID of(int descriptorIndex) {

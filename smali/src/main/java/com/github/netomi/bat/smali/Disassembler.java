@@ -70,12 +70,10 @@ implements   ClassDefVisitor
 
         @Override
         public void visitClassDef(DexFile dexFile, int index, ClassDef classDef) {
-            StringBuilder sb = new StringBuilder();
-
             printer.print(".class");
 
             String accessFlags =
-                DexAccessFlags.formatAsHumanReadable(classDef.accessFlags, DexAccessFlags.Target.CLASS)
+                DexAccessFlags.formatAsHumanReadable(classDef.getAccessFlags(), DexAccessFlags.Target.CLASS)
                               .toLowerCase();
 
             if (!accessFlags.isEmpty()) {
@@ -105,22 +103,22 @@ implements   ClassDefVisitor
 
         @Override
         public void visitClassData(DexFile dexFile, ClassDef classDef, ClassData classData) {
-            if (!classData.staticFields.isEmpty()) {
+            if (classData.getStaticFieldCount() > 0) {
                 printer.println("# static fields");
                 classData.staticFieldsAccept(dexFile, classDef, this);
             }
 
-            if (!classData.instanceFields.isEmpty()) {
+            if (classData.getInstanceFieldCount() > 0) {
                 printer.println("# instance fields");
                 classData.instanceFieldsAccept(dexFile, classDef, this);
             }
 
-            if (!classData.directMethods.isEmpty()) {
+            if (classData.getDirectMethodCount() > 0) {
                 printer.println("# direct methods");
                 classData.directMethodsAccept(dexFile, classDef, this);
             }
 
-            if (!classData.virtualMethods.isEmpty()) {
+            if (classData.getVirtualMethodCount() > 0) {
                 printer.println("# virtual methods");
                 classData.virtualMethodsAccept(dexFile, classDef, this);
             }
@@ -138,7 +136,7 @@ implements   ClassDefVisitor
             printer.print(".field");
 
             String accessFlags =
-                DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD)
+                DexAccessFlags.formatAsHumanReadable(field.getAccessFlags(), DexAccessFlags.Target.FIELD)
                               .toLowerCase();
 
             if (!accessFlags.isEmpty()) {
@@ -154,7 +152,7 @@ implements   ClassDefVisitor
             printer.print(".field");
 
             String accessFlags =
-                DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD)
+                DexAccessFlags.formatAsHumanReadable(field.getAccessFlags(), DexAccessFlags.Target.FIELD)
                               .toLowerCase();
 
             if (!accessFlags.isEmpty()) {
@@ -174,7 +172,7 @@ implements   ClassDefVisitor
             printer.print(".method");
 
             String accessFlags =
-                DexAccessFlags.formatAsHumanReadable(method.accessFlags, DexAccessFlags.Target.METHOD)
+                DexAccessFlags.formatAsHumanReadable(method.getAccessFlags(), DexAccessFlags.Target.METHOD)
                               .toLowerCase();
 
             if (!accessFlags.isEmpty()) {

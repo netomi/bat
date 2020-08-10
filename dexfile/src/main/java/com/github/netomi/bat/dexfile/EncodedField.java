@@ -25,12 +25,27 @@ public class EncodedField
 implements   DexContent
 {
     private int deltaFieldIndex; // uleb128
-    public  int fieldIndex;
-    public  int accessFlags;     // uleb128
+    private int fieldIndex;
+    private int accessFlags;     // uleb128
 
-    public EncodedField() {
+    public static EncodedField readItem(DexDataInput input, int lastIndex) {
+        EncodedField encodedField = new EncodedField();
+        encodedField.read(input);
+        encodedField.updateFieldIndex(lastIndex);
+        return encodedField;
+    }
+
+    private EncodedField() {
         fieldIndex  = NO_INDEX;
         accessFlags = 0;
+    }
+
+    public int getFieldIndex() {
+        return fieldIndex;
+    }
+
+    public int getAccessFlags() {
+        return accessFlags;
     }
 
     public FieldID getFieldID(DexFile dexFile) {
@@ -55,13 +70,17 @@ implements   DexContent
         accessFlags     = input.readUleb128();
     }
 
-    public int updateFieldIndex(int lastIndex) {
+    private void updateFieldIndex(int lastIndex) {
         fieldIndex = deltaFieldIndex + lastIndex;
-        return fieldIndex;
     }
 
-    public int updateDeltaFieldIndex(int lastIndex) {
+    private void updateDeltaFieldIndex(int lastIndex) {
         deltaFieldIndex = fieldIndex - lastIndex;
+    }
+
+    public int write(DexDataOutput output, int lastIndex) {
+        updateDeltaFieldIndex(lastIndex);
+        write(output);
         return fieldIndex;
     }
 

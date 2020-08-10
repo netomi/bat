@@ -52,7 +52,13 @@ implements   DataItem
     public List<EncodedCatchHandler> catchHandlerList;
     public DebugInfo                 debugInfo;
 
-    public Code() {
+    public static Code readItem(DexDataInput input) {
+        Code code = new Code();
+        code.read(input);
+        return code;
+    }
+
+    private Code() {
         registersSize    = 0;
         insSize          = 0;
         outsSize         = 0;

@@ -34,6 +34,14 @@ implements   DataItem
     public int fieldOrMethodId;  // ushort
     // unused - ushort
 
+    public static MethodHandle readItem(DexDataInput input) {
+        MethodHandle methodHandle = new MethodHandle();
+        methodHandle.read(input);
+        return methodHandle;
+    }
+
+    private MethodHandle() {}
+
     @Override
     public void read(DexDataInput input) {
         input.skipAlignmentPadding(getDataAlignment());
