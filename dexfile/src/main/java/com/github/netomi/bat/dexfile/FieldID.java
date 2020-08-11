@@ -17,9 +17,19 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
+
+/**
+ * A class representing a field id item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#field-id-item">field id item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_FIELD_ID_ITEM,
     dataAlignment = 4,
@@ -32,6 +42,13 @@ extends      DataItem
     private int typeIndex;  // ushort
     private int nameIndex;  // uint;
 
+    public static FieldID of(int classIndex, int typeIndex, int nameIndex) {
+        Preconditions.checkArgument(classIndex >= 0, "class index must be non negative");
+        Preconditions.checkArgument(typeIndex  >= 0, "type index must be non negative");
+        Preconditions.checkArgument(nameIndex  >= 0, "name index must be non negative");
+        return new FieldID(classIndex, typeIndex, nameIndex);
+    }
+
     public static FieldID readContent(DexDataInput input) {
         FieldID fieldID = new FieldID();
         fieldID.read(input);
@@ -39,9 +56,13 @@ extends      DataItem
     }
 
     private FieldID() {
-        classIndex = DexConstants.NO_INDEX;
-        typeIndex  = DexConstants.NO_INDEX;
-        nameIndex  = DexConstants.NO_INDEX;
+        this(NO_INDEX, NO_INDEX, NO_INDEX);
+    }
+
+    private FieldID(int classIndex, int typeIndex, int nameIndex) {
+        this.classIndex = classIndex;
+        this.typeIndex  = typeIndex;
+        this.nameIndex  = nameIndex;
     }
 
     public int getClassIndex() {

@@ -17,9 +17,19 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
+
+/**
+ * A class representing a method id item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-id-item">method id item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_METHOD_ID_ITEM,
     dataAlignment = 4,
@@ -32,6 +42,14 @@ extends      DataItem
     private int protoIndex; // ushort
     private int nameIndex;  // uint;
 
+    public static MethodID of(int classIndex, int protoIndex, int nameIndex) {
+        Preconditions.checkArgument(classIndex >= 0, "class index must be non negative");
+        Preconditions.checkArgument(protoIndex >= 0, "proto index must be non negative");
+        Preconditions.checkArgument(nameIndex  >= 0, "name index must be non negative");
+
+        return new MethodID(classIndex, protoIndex, nameIndex);
+    }
+
     public static MethodID readContent(DexDataInput input) {
         MethodID methodID = new MethodID();
         methodID.read(input);
@@ -39,9 +57,13 @@ extends      DataItem
     }
 
     private MethodID() {
-        classIndex = DexConstants.NO_INDEX;
-        protoIndex = DexConstants.NO_INDEX;
-        nameIndex  = DexConstants.NO_INDEX;
+        this(NO_INDEX, NO_INDEX, NO_INDEX);
+    }
+
+    private MethodID(int classIndex, int protoIndex, int nameIndex) {
+        this.classIndex = classIndex;
+        this.protoIndex = protoIndex;
+        this.nameIndex  = nameIndex;
     }
 
     public int getClassIndex() {
