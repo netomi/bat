@@ -28,8 +28,8 @@ extends      DexContentTest<FieldID>
     @Override
     public FieldID[] getTestInstances() {
         return new FieldID[] {
-                FieldID.of(1, 2, 3),
-                FieldID.of(65535, 65535, 65535)
+            FieldID.of(1, 2, 3),
+            FieldID.of(65535, 65535, 65535)
         };
     }
 
