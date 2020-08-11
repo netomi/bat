@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.util.Mutf8;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -26,6 +27,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+/**
+ * A class representing a string data item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#string-data-item">string data item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_STRING_DATA_ITEM,
     dataAlignment = 1,
@@ -38,14 +46,15 @@ extends      DataItem
     // private byte[] data;      // ubyte[]
     private String stringValue;
 
+    public static StringData of(String value) {
+        Objects.requireNonNull(value, "value must not be null");
+        return new StringData(value);
+    }
+
     public static StringData readContent(DexDataInput input) {
         StringData stringData = new StringData();
         stringData.read(input);
         return stringData;
-    }
-
-    public static StringData of(String value) {
-        return new StringData(value);
     }
 
     private StringData() {
@@ -75,6 +84,7 @@ extends      DataItem
 
         byte[] data = Mutf8.encode(stringValue);
         output.writeBytes(data);
+        output.writeByte((byte) 0x0);
     }
 
     @Override
