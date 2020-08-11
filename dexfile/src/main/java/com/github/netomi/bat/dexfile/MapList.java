@@ -20,7 +20,15 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+/**
+ * A class representing a map list item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#map-list">map list item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_MAP_LIST,
     dataAlignment = 4,
@@ -32,19 +40,27 @@ extends      DataItem
     //public int size; // uint, use mapItems.size().
     private ArrayList<MapItem> mapItems = new ArrayList<>(0);
 
-    public static MapList readItem(DexDataInput input) {
+    public static MapList empty() {
+        return new MapList();
+    }
+
+    public static MapList readContent(DexDataInput input) {
         MapList mapList = new MapList();
         mapList.read(input);
         return mapList;
     }
 
-    public static MapList empty() {
-        return new MapList();
-    }
-
     private MapList() {}
 
-    public MapItem getMapItem(int type) {
+    public int getMapItemCount() {
+        return mapItems.size();
+    }
+
+    public MapItem getMapItem(int index) {
+        return mapItems.get(index);
+    }
+
+    MapItem getMapItemByType(int type) {
         for (MapItem mapItem : mapItems) {
             if (mapItem.type == type) {
                 return mapItem;
@@ -53,8 +69,8 @@ extends      DataItem
         return null;
     }
 
-    public void updateMapItem(int type, int size, int offset) {
-        MapItem mapItem = getMapItem(type);
+    void updateMapItem(int type, int size, int offset) {
+        MapItem mapItem = getMapItemByType(type);
         if (mapItem == null) {
             mapItem = MapItem.of(type);
             mapItems.add(mapItem);
@@ -87,12 +103,20 @@ extends      DataItem
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MapList other = (MapList) o;
+        return Objects.equals(mapItems, other.mapItems);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(mapItems);
+    }
+
+    @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("MapList: \n");
-        for (MapItem mapItem : mapItems) {
-            sb.append("  " + mapItem + "\n");
-        }
-        return sb.toString();
+        return String.format("MapList[items=%d]", mapItems.size());
     }
 }

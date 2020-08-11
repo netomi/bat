@@ -20,28 +20,48 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import java.util.Objects;
 
+/**
+ * A class representing a map item inside a dex file.
+ * <p>
+ * Note: this class is not intended for general use, its automatically created when writing dex files.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#map-item">map item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 public class MapItem
 extends      DexContent
 {
+    // member fields are package private for convenience reasons.
+
     int type;     // ushort
     //int unused; // ushort
     int size;     // uint
     int offset;   // uint
 
-    public static MapItem readContent(DexDataInput input) {
+    static MapItem of(int type) {
+        return new MapItem(type);
+    }
+
+    static MapItem of(int type, int size) {
+        return new MapItem(type, size);
+    }
+
+    static MapItem readContent(DexDataInput input) {
         MapItem mapItem = new MapItem();
         mapItem.read(input);
         return mapItem;
     }
 
-    public static MapItem of(int type) {
-        return new MapItem(type);
-    }
-
     private MapItem() {}
 
     private MapItem(int type) {
+        this(type, 0);
+    }
+
+    private MapItem(int type, int size) {
         this.type = type;
+        this.size = size;
     }
 
     public int getType() {
@@ -77,8 +97,8 @@ extends      DexContent
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MapItem other = (MapItem) o;
-        return type   == other.type &&
-               size   == other.size;
+        return type == other.type &&
+               size == other.size;
     }
 
     @Override

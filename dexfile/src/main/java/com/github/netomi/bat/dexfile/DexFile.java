@@ -337,7 +337,7 @@ public class DexFile
 
         private void readMapList() {
             input.setOffset(header.mapOffset);
-            mapList = MapList.readItem(input);
+            mapList = MapList.readContent(input);
         }
 
         private void readStringIDs() {
@@ -401,7 +401,7 @@ public class DexFile
         }
 
         private void readCallSiteIDs() {
-            MapItem mapItem = mapList.getMapItem(DexConstants.TYPE_CALL_SITE_ID_ITEM);
+            MapItem mapItem = mapList.getMapItemByType(DexConstants.TYPE_CALL_SITE_ID_ITEM);
             if (mapItem != null) {
                 input.setOffset(mapItem.getOffset());
 
@@ -414,7 +414,7 @@ public class DexFile
         }
 
         private void readMethodHandles() {
-            MapItem mapItem = mapList.getMapItem(DexConstants.TYPE_METHOD_HANDLE_ITEM);
+            MapItem mapItem = mapList.getMapItemByType(DexConstants.TYPE_METHOD_HANDLE_ITEM);
             if (mapItem != null) {
                 input.setOffset(mapItem.getOffset());
 
