@@ -49,6 +49,9 @@ public abstract class DexContentTest<T extends DexContent>
             MyDataItemMap dataItemMap            = new MyDataItemMap();
             ByteBufferBackedDexDataOutput output = new ByteBufferBackedDexDataOutput(8096);
 
+            // write a dummy byte to avoid any data item starting at offset 0.
+            output.writeByte((byte) 0x0);
+
             // collect all linked data items and serialize them first.
             data.dataItemsAccept(null, new DataItemVisitor() {
                 @Override

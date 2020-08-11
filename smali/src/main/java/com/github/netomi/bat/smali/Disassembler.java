@@ -199,16 +199,15 @@ implements   ClassDefVisitor
                 int parameterIndex = 0;
                 int registerIndex = method.isStatic() ? 0 : 1;
 
-                ProtoID protoID = method.getProtoID(dexFile);
-                if (protoID.parameters != null) {
-                    for (String parameterType : protoID.parameters.getTypes(dexFile)) {
-                        String parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex++);
-                        if (parameterName != null) {
-                            printer.println(String.format(".param p%d, \"%s\"    # %s",
-                                                          registerIndex++,
-                                                          parameterName,
-                                                          parameterType));
-                        }
+                ProtoID protoID     = method.getProtoID(dexFile);
+                TypeList parameters = protoID.getParameters();
+                for (String parameterType : parameters.getTypes(dexFile)) {
+                    String parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex++);
+                    if (parameterName != null) {
+                        printer.println(String.format(".param p%d, \"%s\"    # %s",
+                                                      registerIndex++,
+                                                      parameterName,
+                                                      parameterType));
                     }
                 }
             }

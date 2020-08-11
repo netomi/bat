@@ -587,12 +587,12 @@ implements   DexFileVisitor,
 
             DebugInfo debugInfo  = code.debugInfo;
             ProtoID   protoID    = method.getProtoID(dexFile);
-            TypeList  parameters = protoID.parameters;
+            TypeList  parameters = protoID.getParameters();
 
-            if (debugInfo != null && parameters != null) {
+            if (debugInfo != null) {
                 for (int i = 0; i < debugInfo.getParameterCount() && register < code.registersSize; i++, register++) {
                     String parameterName = debugInfo.getParameterName(dexFile, i);
-                    String parameterType = parameters.getType(dexFile, i);
+                    String parameterType = i < parameters.getTypeCount() ? parameters.getType(dexFile, i) : null;
 
                     variableInfos[register] = new LocalVariableInfo(parameterName, parameterType, null);
 

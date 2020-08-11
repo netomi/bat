@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
@@ -35,7 +36,19 @@ extends      DataItem
     private int returnTypeIndex;  // uint
     private int parametersOffset; // uint
 
-    public  TypeList parameters;
+    private TypeList parameters;
+
+    public static ProtoID of(int shortyIndex, int returnTypeIndex, int... parameterTypeIndices) {
+        Preconditions.checkArgument(shortyIndex >= 0,     "shorty index must be non-negative");
+        Preconditions.checkArgument(returnTypeIndex >= 0, "return type index must be non-negative");
+
+        ProtoID protoID = new ProtoID(shortyIndex, returnTypeIndex);
+        for (int index : parameterTypeIndices) {
+            Preconditions.checkArgument(index >= 0, "parameter type index must be non-negative");
+            protoID.parameters.addType(index);
+        }
+        return protoID;
+    }
 
     public static ProtoID readContent(DexDataInput input) {
         ProtoID protoID = new ProtoID();
@@ -44,10 +57,14 @@ extends      DataItem
     }
 
     private ProtoID() {
-        shortyIndex      = NO_INDEX;
-        returnTypeIndex  = NO_INDEX;
-        parametersOffset = 0;
-        parameters       = null;
+        this(NO_INDEX, NO_INDEX);
+    }
+
+    private ProtoID(int shortyIndex, int returnTypeIndex) {
+        this.shortyIndex      = shortyIndex;
+        this.returnTypeIndex  = returnTypeIndex;
+        this.parametersOffset = 0;
+        this.parameters       = TypeList.empty();
     }
 
     public int getParametersOffset() {
@@ -82,6 +99,10 @@ extends      DataItem
 
     public String getReturnType(DexFile dexFile) {
         return dexFile.getTypeID(returnTypeIndex).getType(dexFile);
+    }
+
+    public TypeList getParameters() {
+        return parameters;
     }
 
     @Override

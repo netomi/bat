@@ -79,8 +79,12 @@ extends      DataItem
         return typeList.size();
     }
 
-    public String getType(DexFile dexFile, int typeIndex) {
-        return dexFile.getTypeID(typeList.get(typeIndex)).getType(dexFile);
+    public String getType(DexFile dexFile, int index) {
+        return dexFile.getTypeID(typeList.get(index)).getType(dexFile);
+    }
+
+    public int getTypeIndex(int index) {
+        return typeList.get(index);
     }
 
     public Iterable<String> getTypes(DexFile dexFile) {
