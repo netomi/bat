@@ -13,15 +13,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package com.github.netomi.bat.dexfile.util;
 
-package com.github.netomi.bat.util;
+import com.github.netomi.bat.dexfile.ClassDef;
+import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.util.Classes;
 
-/**
- * @author Thomas Neidhart
- */
-public class FileNameMatcher extends RegexStringMatcher
+public class DexClasses
+extends      Classes
 {
-    public FileNameMatcher(String regularExpression) {
-        super("\\/", regularExpression);
+    private DexClasses() {}
+
+    public static String fullExternalMethodSignature(DexFile dexFile, ClassDef classDef, EncodedMethod method) {
+        return String.format("%s.%s:%s",
+            externalClassNameFromInternalName(classDef.getClassName(dexFile)),
+            method.getName(dexFile),
+            method.getDescriptor(dexFile));
     }
 }

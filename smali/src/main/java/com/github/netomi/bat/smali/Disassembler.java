@@ -18,6 +18,7 @@ package com.github.netomi.bat.smali;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
+import com.github.netomi.bat.dexfile.util.DexClasses;
 import com.github.netomi.bat.dexfile.value.AnnotationElement;
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
 import com.github.netomi.bat.dexfile.visitor.*;
@@ -80,7 +81,7 @@ implements   ClassDefVisitor
                 printer.print(" " + accessFlags);
             }
 
-            printer.print(" " + DexUtil.internalTypeFromClassName(classDef.getClassName(dexFile)));
+            printer.print(" " + DexClasses.internalTypeFromClassName(classDef.getClassName(dexFile)));
             printer.println();
 
             printer.println(".super " + classDef.getSuperClassType(dexFile));

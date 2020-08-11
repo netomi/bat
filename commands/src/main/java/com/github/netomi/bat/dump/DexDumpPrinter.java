@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
 import com.github.netomi.bat.dexfile.debug.*;
 import com.github.netomi.bat.dexfile.instruction.DexInstruction;
+import com.github.netomi.bat.dexfile.util.DexClasses;
 import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.util.Primitives;
@@ -290,7 +291,7 @@ implements   DexFileVisitor,
 
             println(Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
                     Primitives.asHexValue(fileOffset, 6) + "] " +
-                    DexUtil.fullExternalMethodSignature(dexFile, classDef, method));
+                    DexClasses.fullExternalMethodSignature(dexFile, classDef, method));
 
             fileOffset = align(fileOffset, 4);
             fileOffset += 16;

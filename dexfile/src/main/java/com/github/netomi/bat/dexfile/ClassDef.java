@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory;
+import com.github.netomi.bat.dexfile.util.DexClasses;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
@@ -87,7 +88,7 @@ extends      DataItem
     }
 
     public String getClassName(DexFile dexFile) {
-        return DexUtil.internalClassNameFromType(getType(dexFile));
+        return DexClasses.internalClassNameFromType(getType(dexFile));
     }
 
     public String getType(DexFile dexFile) {
@@ -103,7 +104,7 @@ extends      DataItem
     }
 
     public String getSuperClassName(DexFile dexFile) {
-        return DexUtil.internalClassNameFromType(getSuperClassType(dexFile));
+        return DexClasses.internalClassNameFromType(getSuperClassType(dexFile));
     }
 
     public String getSuperClassType(DexFile dexFile) {

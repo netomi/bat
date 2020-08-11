@@ -15,9 +15,9 @@
  */
 package com.github.netomi.bat.util;
 
-public class ClassUtil
+public class Classes
 {
-    protected ClassUtil() {}
+    protected Classes() {}
 
     public static String internalClassNameFromType(String type) {
         if (type == null) {

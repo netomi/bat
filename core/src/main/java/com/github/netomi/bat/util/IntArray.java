@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.util;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -64,7 +63,7 @@ implements   Cloneable
      * Creates an IntArray from the given primitive int array, copying it.
      */
     public static IntArray fromArray(int[] array, int size) {
-        return wrap(Arrays.copyOf(array, size));
+        return wrap(java.util.Arrays.copyOf(array, size));
     }
 
     /**
@@ -75,7 +74,7 @@ implements   Cloneable
     public void resize(int newSize) {
         Preconditions.checkArgumentNonnegative(newSize);
         if (newSize <= values.length) {
-            Arrays.fill(values, newSize, values.length, 0);
+            java.util.Arrays.fill(values, newSize, values.length, 0);
         } else {
             ensureCapacity(newSize - size);
         }
@@ -91,7 +90,7 @@ implements   Cloneable
      * @param value  the value to be added
      */
     public void insert(int value) {
-        int index = Arrays.binarySearch(values, 0, size, value);
+        int index = java.util.Arrays.binarySearch(values, 0, size, value);
         if (index < 0) {
             int insertionPoint = -(index + 1);
             add(insertionPoint, value);
@@ -115,7 +114,7 @@ implements   Cloneable
         ensureCapacity(1);
         int rightSegment = size - index;
         size++;
-        ArrayUtil.checkBounds(size, index);
+        Arrays.checkBounds(size, index);
         if (rightSegment != 0) {
             // Move by 1 all values from the right of 'index'
             System.arraycopy(values, index, values, index + 1, rightSegment);
@@ -167,7 +166,7 @@ implements   Cloneable
      * Returns the value at the specified position in this array.
      */
     public int get(int index) {
-        ArrayUtil.checkBounds(size, index);
+        Arrays.checkBounds(size, index);
         return values[index];
     }
 
@@ -175,7 +174,7 @@ implements   Cloneable
      * Sets the value at the specified position in this array.
      */
     public void set(int index, int value) {
-        ArrayUtil.checkBounds(size, index);
+        Arrays.checkBounds(size, index);
         values[index] = value;
     }
 
@@ -197,7 +196,7 @@ implements   Cloneable
      * Removes the value at the specified index from this array.
      */
     public void remove(int index) {
-        ArrayUtil.checkBounds(size, index);
+        Arrays.checkBounds(size, index);
         System.arraycopy(values, index + 1, values, index, size - index - 1);
         size--;
     }
@@ -213,7 +212,7 @@ implements   Cloneable
      * Returns a new array with the contents of this IntArray.
      */
     public int[] toArray() {
-        return Arrays.copyOf(values, size);
+        return java.util.Arrays.copyOf(values, size);
     }
 
     @Override
@@ -248,6 +247,6 @@ implements   Cloneable
 
     @Override
     public String toString() {
-        return Arrays.toString(toArray());
+        return java.util.Arrays.toString(toArray());
     }
 }

@@ -15,10 +15,8 @@
  */
 package com.github.netomi.bat.util;
 
-import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -31,12 +29,12 @@ import java.util.function.Predicate;
  * ArrayUtils contains some methods that you can call to find out
  * the most efficient increments by which to grow arrays.
  */
-public final class ArrayUtil
+public final class Arrays
 {
     private static final int      CACHE_SIZE = 73;
     private static       Object[] sCache     = new Object[CACHE_SIZE];
 
-    private ArrayUtil() { /* cannot be instantiated */ }
+    private Arrays() { /* cannot be instantiated */ }
 
     /**
      * Checks if the beginnings of two byte arrays are equal.
@@ -505,7 +503,7 @@ public final class ArrayUtil
         } else if (array.length == size) {
             return array;
         } else {
-            return Arrays.copyOf(array, size);
+            return java.util.Arrays.copyOf(array, size);
         }
     }
 
@@ -639,23 +637,23 @@ public final class ArrayUtil
     public static String deepToString(Object value) {
         if (value != null && value.getClass().isArray()) {
             if (value.getClass() == boolean[].class) {
-                return Arrays.toString((boolean[]) value);
+                return java.util.Arrays.toString((boolean[]) value);
             } else if (value.getClass() == byte[].class) {
-                return Arrays.toString((byte[]) value);
+                return java.util.Arrays.toString((byte[]) value);
             } else if (value.getClass() == char[].class) {
-                return Arrays.toString((char[]) value);
+                return java.util.Arrays.toString((char[]) value);
             } else if (value.getClass() == double[].class) {
-                return Arrays.toString((double[]) value);
+                return java.util.Arrays.toString((double[]) value);
             } else if (value.getClass() == float[].class) {
-                return Arrays.toString((float[]) value);
+                return java.util.Arrays.toString((float[]) value);
             } else if (value.getClass() == int[].class) {
-                return Arrays.toString((int[]) value);
+                return java.util.Arrays.toString((int[]) value);
             } else if (value.getClass() == long[].class) {
-                return Arrays.toString((long[]) value);
+                return java.util.Arrays.toString((long[]) value);
             } else if (value.getClass() == short[].class) {
-                return Arrays.toString((short[]) value);
+                return java.util.Arrays.toString((short[]) value);
             } else {
-                return Arrays.deepToString((Object[]) value);
+                return java.util.Arrays.deepToString((Object[]) value);
             }
         } else {
             return String.valueOf(value);

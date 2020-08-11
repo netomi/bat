@@ -17,8 +17,8 @@ package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.DexUtil;
-import com.github.netomi.bat.util.ClassNameMatcher;
+import com.github.netomi.bat.dexfile.util.DexClasses;
+import com.github.netomi.bat.util.Matchers;
 import com.github.netomi.bat.util.StringMatcher;
 
 public class ClassNameFilter
@@ -29,14 +29,14 @@ implements   ClassDefVisitor
 
     public ClassNameFilter(String regularExpression,
                            ClassDefVisitor visitor) {
-        this.matcher = new ClassNameMatcher(regularExpression);
+        this.matcher = Matchers.classNameMatcher(regularExpression);
         this.visitor = visitor;
     }
 
     @Override
     public void visitClassDef(DexFile dexFile, int index, ClassDef classDefItem) {
         String className = classDefItem.getClassName(dexFile);
-        if (accepted(DexUtil.externalClassNameFromInternalName(className))) {
+        if (accepted(DexClasses.externalClassNameFromInternalName(className))) {
             visitor.visitClassDef(dexFile, index, classDefItem);
         }
     }

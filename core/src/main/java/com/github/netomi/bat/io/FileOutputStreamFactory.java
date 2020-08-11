@@ -15,7 +15,7 @@
  */
 package com.github.netomi.bat.io;
 
-import com.github.netomi.bat.util.ClassUtil;
+import com.github.netomi.bat.util.Classes;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -33,7 +33,7 @@ implements   OutputStreamFactory
 
     @Override
     public OutputStream createOutputStream(String className) throws IOException {
-        String[] packageComponents = ClassUtil.internalPackageNameFromInternalName(className).split("/");
+        String[] packageComponents = Classes.internalPackageNameFromInternalName(className).split("/");
 
         Path currentPath = baseDir;
         for (String component : packageComponents) {
@@ -42,7 +42,7 @@ implements   OutputStreamFactory
 
         Files.createDirectories(currentPath);
 
-        currentPath = currentPath.resolve(ClassUtil.simpleClassNameFromInternalName(className) + ".smali");
+        currentPath = currentPath.resolve(Classes.simpleClassNameFromInternalName(className) + ".smali");
         return Files.newOutputStream(currentPath);
     }
 }
