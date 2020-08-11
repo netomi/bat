@@ -15,25 +15,33 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
-import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.EncodedField;
 import com.github.netomi.bat.dexfile.FieldID;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+import com.github.netomi.bat.util.Preconditions;
+
+import java.util.Objects;
+
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class EncodedFieldValue
 extends      EncodedValue
 {
     private int fieldIndex;
 
-    public EncodedFieldValue(int fieldIndex) {
-        this.fieldIndex = fieldIndex;
+    public static EncodedFieldValue of(int fieldIndex) {
+        Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative");
+        return new EncodedFieldValue(fieldIndex);
     }
 
     EncodedFieldValue() {
-        this.fieldIndex = DexConstants.NO_INDEX;
+        this(NO_INDEX);
+    }
+
+    private EncodedFieldValue(int fieldIndex) {
+        this.fieldIndex = fieldIndex;
     }
 
     public int getFieldIndex() {
@@ -50,19 +58,36 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         fieldIndex = input.readUnsignedInt(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 3);
-        output.writeInt(fieldIndex, 4);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForUnsignedInt(fieldIndex) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeInt(fieldIndex, valueArg + 1);
     }
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitFieldValue(dexFile, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedFieldValue other = (EncodedFieldValue) o;
+        return fieldIndex == other.fieldIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fieldIndex);
     }
 
     @Override

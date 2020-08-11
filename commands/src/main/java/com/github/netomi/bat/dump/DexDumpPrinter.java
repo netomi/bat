@@ -254,10 +254,10 @@ implements   DexFileVisitor,
 
             if (encodedField.isStatic()       &&
                 classDef.staticValues != null &&
-                index < classDef.staticValues.encodedArrayValue.getValueCount())
+                index < classDef.staticValues.getArray().getValueCount())
             {
                 print("      value         : ");
-                classDef.staticValues.encodedArrayValue.valueAccept(dexFile, index, this);
+                classDef.staticValues.getArray().valueAccept(dexFile, index, this);
                 println();
             }
         }

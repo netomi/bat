@@ -20,6 +20,9 @@ import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
+import com.github.netomi.bat.util.Preconditions;
+
+import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -29,9 +32,25 @@ extends      DexContent
     private int          nameIndex; // uleb128
     private EncodedValue value;
 
-    public AnnotationElement() {
-        nameIndex = NO_INDEX;
-        value     = null;
+    public static AnnotationElement of(int nameIndex, EncodedValue value) {
+        Preconditions.checkArgument(nameIndex >= 0, "nameIndex must not be negative");
+        Objects.requireNonNull(value, "value must not be null");
+        return new AnnotationElement(nameIndex, value);
+    }
+
+    public static AnnotationElement readContent(DexDataInput input) {
+        AnnotationElement annotationElement = new AnnotationElement();
+        annotationElement.read(input);
+        return annotationElement;
+    }
+
+    private AnnotationElement() {
+        this(NO_INDEX, null);
+    }
+
+    private AnnotationElement(int nameIndex, EncodedValue value) {
+        this.nameIndex = nameIndex;
+        this.value     = value;
     }
 
     public int getNameIndex() {

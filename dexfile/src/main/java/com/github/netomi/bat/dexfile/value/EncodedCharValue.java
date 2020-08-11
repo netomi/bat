@@ -20,16 +20,24 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.Objects;
+
 public class EncodedCharValue
 extends      EncodedValue
 {
     private char value;
 
-    public EncodedCharValue(char value) {
-        this.value = value;
+    public static EncodedCharValue of(char value) {
+        return new EncodedCharValue(value);
     }
 
-    EncodedCharValue() {}
+    EncodedCharValue() {
+        this((char) 0);
+    }
+
+    private EncodedCharValue(char value) {
+        this.value = value;
+    }
 
     public char getValue() {
         return value;
@@ -41,14 +49,18 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         value = input.readChar(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 1);
-        output.writeChar(value, 2);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForUnsignedChar(value) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeChar(value, valueArg + 1);
     }
 
     @Override
@@ -57,7 +69,20 @@ extends      EncodedValue
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedCharValue other = (EncodedCharValue) o;
+        return value == other.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+
+    @Override
     public String toString() {
-        return String.format("EncodedCharValue[value=%c]", value);
+        return String.format("EncodedCharValue[value=%d,\'%c\']", (int) value, value);
     }
 }

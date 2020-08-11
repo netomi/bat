@@ -18,7 +18,10 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
+import com.github.netomi.bat.dexfile.value.EncodedValue;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+
+import java.util.Objects;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_ENCODED_ARRAY_ITEM,
@@ -28,23 +31,30 @@ import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 public class EncodedArray
 extends      DataItem
 {
-    private static final EncodedArrayValue EMPTY_ARRAY = new EncodedArrayValue();
+    protected EncodedArrayValue encodedArrayValue;
 
-    public EncodedArrayValue encodedArrayValue;
+    public static EncodedArray readContent(DexDataInput input) {
+        EncodedArray encodedArray = new EncodedArray();
+        encodedArray.read(input);
+        return encodedArray;
+    }
 
-    public EncodedArray() {
-        encodedArrayValue = EMPTY_ARRAY;
+    protected EncodedArray() {
+        encodedArrayValue = EncodedArrayValue.empty();
+    }
+
+    public EncodedArrayValue getArray() {
+        return encodedArrayValue;
     }
 
     @Override
     protected void read(DexDataInput input) {
-        encodedArrayValue = new EncodedArrayValue();
-        encodedArrayValue.read(input, 0);
+        encodedArrayValue.readValue(input, 0);
     }
 
     @Override
     protected void write(DexDataOutput output) {
-        encodedArrayValue.write(output);
+        encodedArrayValue.writeValue(output, 0);
     }
 
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
@@ -57,5 +67,23 @@ extends      DataItem
         if (index >= 0 && index < encodedArrayValue.getValueCount()) {
             encodedArrayValue.getValue(index).accept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedArray other = (EncodedArray) o;
+        return Objects.equals(encodedArrayValue, other.encodedArrayValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(encodedArrayValue);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EncodedArray[array=%s]", encodedArrayValue);
     }
 }

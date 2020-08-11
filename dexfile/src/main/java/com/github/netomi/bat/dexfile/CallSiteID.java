@@ -19,7 +19,13 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
+import java.util.Objects;
+
 /**
+ * A class representing a callsite id item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#call-site-id-item">callsite id item @ dex format</a>
+ *
  * @author Thomas Neidhart
  */
 @DataItemAnn(
@@ -31,7 +37,12 @@ public class CallSiteID
 extends      DataItem
 {
     private int      callSiteOffset; // uint
-    public  CallSite callSite;
+    private CallSite callSite;
+
+    public static CallSiteID of(CallSite callSite) {
+        Objects.requireNonNull(callSite, "callSite must not be null");
+        return new CallSiteID(callSite);
+    }
 
     public static CallSiteID readContent(DexDataInput input) {
         CallSiteID callSiteID = new CallSiteID();
@@ -40,12 +51,20 @@ extends      DataItem
     }
 
     private CallSiteID() {
-        callSiteOffset = 0;
-        callSite       = null;
+        this(null);
+    }
+
+    private CallSiteID(CallSite callSite) {
+        this.callSiteOffset = 0;
+        this.callSite       = callSite;
     }
 
     public int getCallSiteOffset() {
         return callSiteOffset;
+    }
+
+    public CallSite getCallSite() {
+        return callSite;
     }
 
     @Override
@@ -57,8 +76,7 @@ extends      DataItem
     @Override
     protected void readLinkedDataItems(DexDataInput input) {
         input.setOffset(callSiteOffset);
-        callSite = new CallSite();
-        callSite.read(input);
+        callSite = CallSite.readContent(input);
     }
 
     @Override
@@ -77,5 +95,23 @@ extends      DataItem
         if (callSite != null) {
             visitor.visitCallSite(dexFile, this, callSite);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CallSiteID other = (CallSiteID) o;
+        return Objects.equals(callSite, other.callSite);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(callSite);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("CallSiteID[callSite=%s]", callSite);
     }
 }

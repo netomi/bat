@@ -47,16 +47,30 @@ public abstract class EncodedValue
 
     public abstract int getValueType();
 
-    public abstract void read(DexDataInput input, int valueArg);
+    public abstract void readValue(DexDataInput input, int valueArg);
 
-    protected final void writeType(DexDataOutput output, int valueArg) {
+    protected final int writeType(DexDataOutput output, int valueArg) {
         int typeAndArg = (valueArg << 5) | getValueType();
         output.writeUnsignedByte((byte) typeAndArg);
+        return valueArg;
     }
 
-    public abstract void write(DexDataOutput output);
+    protected abstract int writeType(DexDataOutput output);
+
+    public final void write(DexDataOutput output) {
+        int valueArg = writeType(output);
+        writeValue(output, valueArg);
+    }
+
+    public abstract void writeValue(DexDataOutput output, int valueArg);
 
     public abstract void accept(DexFile dexFile, EncodedValueVisitor visitor);
+
+    @Override
+    public abstract int hashCode();
+
+    @Override
+    public abstract boolean equals(Object obj);
 
     public static EncodedValue read(DexDataInput input) {
         int typeAndArg = input.readUnsignedByte();
@@ -66,7 +80,7 @@ public abstract class EncodedValue
 
         EncodedValue encodedValue = create(valueType);
 
-        encodedValue.read(input, valueArg);
+        encodedValue.readValue(input, valueArg);
         return encodedValue;
     }
 
@@ -88,7 +102,7 @@ public abstract class EncodedValue
             case VALUE_ENUM:          return new EncodedEnumValue();
             case VALUE_ARRAY:         return new EncodedArrayValue();
             case VALUE_ANNOTATION:    return new EncodedAnnotationValue();
-            case VALUE_NULL:          return EncodedNullValue.INSTANCE;
+            case VALUE_NULL:          return EncodedNullValue.instance();
             case VALUE_BOOLEAN:       return new EncodedBooleanValue();
             default: throw new DexFormatException("Unexpected EncodedValue type: " + Primitives.toHexString((short) valueType));
         }
@@ -96,7 +110,57 @@ public abstract class EncodedValue
 
     public static EncodedAnnotationValue readAnnotationValue(DexDataInput input) {
         EncodedAnnotationValue annotation = new EncodedAnnotationValue();
-        annotation.read(input, 0);
+        annotation.readValue(input, 0);
         return annotation;
+    }
+
+    static int requiredBytesForSignedInt(int value) {
+        return (value << 24 >> 24 == value) ? 1 :
+               (value << 16 >> 16 == value) ? 2 :
+               (value << 8  >>  8 == value) ? 3 : 4;
+    }
+
+    static int requiredBytesForSignedLong(long value) {
+        return (value << 56 >> 56 == value) ? 1 :
+               (value << 48 >> 48 == value) ? 2 :
+               (value << 40 >> 40 == value) ? 3 :
+               (value << 32 >> 32 == value) ? 4 :
+               (value << 24 >> 24 == value) ? 5 :
+               (value << 16 >> 16 == value) ? 6 :
+               (value << 8  >>  8 == value) ? 7 : 8;
+    }
+
+    static int requiredBytesForSignedShort(short value) {
+        return (value << 8 >> 8 == value) ? 1 : 2;
+    }
+
+    static int requiredBytesForUnsignedChar(char value) {
+        return (value << 8 >>> 8 == value) ? 1 : 2;
+    }
+
+    static int requiredBytesForUnsignedInt(int value) {
+        return (value << 24 >>> 24 == value) ? 1 :
+               (value << 16 >>> 16 == value) ? 2 :
+               (value << 8  >>>  8 == value) ? 3 : 4;
+    }
+
+    static int requiredBytesForFloat(float value) {
+        int bits = Float.floatToIntBits(value);
+
+        return (bits <<  8 == 0) ? 1 :
+               (bits << 16 == 0) ? 2 :
+               (bits << 24 == 0) ? 3 : 4;
+    }
+
+    static int requiredBytesForDouble(double value) {
+        long bits = Double.doubleToLongBits(value);
+
+        return (bits <<  8 == 0) ? 1 :
+               (bits << 16 == 0) ? 2 :
+               (bits << 24 == 0) ? 3 :
+               (bits << 32 == 0) ? 4 :
+               (bits << 40 == 0) ? 5 :
+               (bits << 48 == 0) ? 6 :
+               (bits << 56 == 0) ? 7 : 8;
     }
 }

@@ -20,16 +20,24 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.Objects;
+
 public class EncodedDoubleValue
 extends      EncodedValue
 {
     private double value;
 
-    public EncodedDoubleValue(double value) {
-        this.value = value;
+    public static EncodedDoubleValue of(double value) {
+        return new EncodedDoubleValue(value);
     }
 
-    EncodedDoubleValue() {}
+    EncodedDoubleValue() {
+        this(0d);
+    }
+
+    private EncodedDoubleValue(double value) {
+        this.value = value;
+    }
 
     public double getValue() {
         return value;
@@ -41,19 +49,36 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         value = input.readDouble(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 7);
-        output.writeDouble(value, 8);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForDouble(value) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeDouble(value, valueArg + 1);
     }
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitDoubleValue(dexFile, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedDoubleValue other = (EncodedDoubleValue) o;
+        return Double.compare(other.value, value) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     @Override

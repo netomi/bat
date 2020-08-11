@@ -20,16 +20,24 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.Objects;
+
 public class EncodedFloatValue
 extends      EncodedValue
 {
     private float value;
 
-    public EncodedFloatValue(float value) {
-        this.value = value;
+    public static EncodedFloatValue of(float value) {
+        return new EncodedFloatValue(value);
     }
 
-    EncodedFloatValue() {}
+    EncodedFloatValue() {
+        this(0f);
+    }
+
+    private EncodedFloatValue(float value) {
+        this.value = value;
+    }
 
     public float getValue() {
         return value;
@@ -41,19 +49,36 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         value = input.readFloat(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 3);
-        output.writeFloat(value, 4);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForFloat(value) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeFloat(value, valueArg + 1);
     }
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitFloatValue(dexFile, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedFloatValue other = (EncodedFloatValue) o;
+        return Float.compare(other.value, value) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     @Override

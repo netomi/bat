@@ -19,17 +19,29 @@ import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+import com.github.netomi.bat.util.Preconditions;
+
+import java.util.Objects;
+
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class EncodedStringValue
 extends      EncodedValue
 {
     private int stringIndex;
 
-    public EncodedStringValue(int stringIndex) {
-        this.stringIndex = stringIndex;
+    public static EncodedStringValue of(int stringIndex) {
+        Preconditions.checkArgument(stringIndex >= 0, "stringIndex must not be negative");
+        return new EncodedStringValue(stringIndex);
     }
 
-    EncodedStringValue() {}
+    EncodedStringValue() {
+        this(NO_INDEX);
+    }
+
+    private EncodedStringValue(int stringIndex) {
+        this.stringIndex = stringIndex;
+    }
 
     public int getStringIndex() {
         return stringIndex;
@@ -45,19 +57,36 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         stringIndex = input.readUnsignedInt(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 3);
-        output.writeInt(stringIndex, 4);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForUnsignedInt(stringIndex) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeInt(stringIndex, valueArg + 1);
     }
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitStringValue(dexFile, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedStringValue other = (EncodedStringValue) o;
+        return stringIndex == other.stringIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stringIndex);
     }
 
     @Override

@@ -83,17 +83,11 @@ implements   Closeable
 
         // sign-extend (using an intermediate int)
         int shift = 32 - 8 * bytes;
-        return bytes < 2 ?
-            result :
-            (short) (result << shift >> shift);
+        return (short) (result << shift >> shift);
     }
 
     public int readUnsignedShort() {
         return byteBuffer.getShort() & 0xFFFF;
-    }
-
-    public char readChar() {
-        return byteBuffer.getChar();
     }
 
     public char readChar(int bytes) {
@@ -134,10 +128,6 @@ implements   Closeable
         return result;
     }
 
-    public long readLong() {
-        return byteBuffer.getLong();
-    }
-
     public long readLong(int bytes) {
         long result = 0;
         for (int i = 0; i < bytes; i++) {
@@ -152,26 +142,16 @@ implements   Closeable
             result << shift >> shift;
     }
 
-    public float readFloat() {
-        return byteBuffer.getFloat();
-    }
-
     public float readFloat(int bytes) {
         int value = 0;
 
         for (int i = 0; i < bytes; i++)
         {
             int b = readUnsignedByte();
-
-            // Prepend the byte.
             value = (value >>> 8) | (b << 24);
         }
 
         return Float.intBitsToFloat(value);
-    }
-
-    public double readDouble() {
-        return byteBuffer.getDouble();
     }
 
     public double readDouble(int bytes) {
@@ -180,8 +160,6 @@ implements   Closeable
         for (int i = 0; i < bytes; i++)
         {
             long b = readUnsignedByte();
-
-            // Prepend the byte.
             value = (value >>> 8) | (b << 56);
         }
 
@@ -221,7 +199,7 @@ implements   Closeable
     }
 
     public byte[] readMUTF8Bytes(int len) {
-        byte buf[] = new byte[len * 3 + 1];
+        byte[] buf = new byte[len * 3 + 1];
         int readBytes = 0;
         while (readBytes < buf.length) {
             byte b = readByte();

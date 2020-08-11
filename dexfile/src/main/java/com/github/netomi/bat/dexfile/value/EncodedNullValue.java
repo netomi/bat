@@ -23,7 +23,11 @@ import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 public class EncodedNullValue
 extends      EncodedValue
 {
-    public static final EncodedNullValue INSTANCE = new EncodedNullValue();
+    private static final EncodedNullValue INSTANCE = new EncodedNullValue();
+
+    public static EncodedNullValue instance() {
+        return INSTANCE;
+    }
 
     private EncodedNullValue() {}
 
@@ -33,16 +37,29 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {}
+    public void readValue(DexDataInput input, int valueArg) {}
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 0);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, 0);
     }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {}
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitNullValue(dexFile, this);
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(INSTANCE);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
     }
 
     @Override

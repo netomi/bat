@@ -15,24 +15,33 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
-import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.MethodHandle;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+import com.github.netomi.bat.util.Preconditions;
+
+import java.util.Objects;
+
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class EncodedMethodHandleValue
 extends      EncodedValue
 {
     private int handleIndex;
 
-    public EncodedMethodHandleValue(int handleIndex) {
-        this.handleIndex = handleIndex;
+    public static EncodedMethodHandleValue of(int handleIndex) {
+        Preconditions.checkArgument(handleIndex >= 0, "handleIndex must not be negative");
+        return new EncodedMethodHandleValue(handleIndex);
     }
 
     EncodedMethodHandleValue() {
-        this.handleIndex = DexConstants.NO_INDEX;
+        this(NO_INDEX);
+    }
+
+    private EncodedMethodHandleValue(int handleIndex) {
+        this.handleIndex = handleIndex;
     }
 
     public int getHandleIndex() {
@@ -49,19 +58,36 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         handleIndex = input.readUnsignedInt(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 3);
-        output.writeInt(handleIndex, 4);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForUnsignedInt(handleIndex) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeInt(handleIndex, valueArg + 1);
     }
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitMethodHandleValue(dexFile, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedMethodHandleValue other = (EncodedMethodHandleValue) o;
+        return handleIndex == other.handleIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(handleIndex);
     }
 
     @Override

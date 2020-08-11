@@ -21,10 +21,7 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -34,17 +31,21 @@ extends      EncodedValue
     private int typeIndex; // uleb128
     // public int size;      // uleb128
 
-    private List<AnnotationElement> elements;
+    private ArrayList<AnnotationElement> elements;
 
-    public EncodedAnnotationValue(int typeIndex, AnnotationElement... elements) {
-        this.typeIndex = typeIndex;
-        this.elements  = new ArrayList<>(elements.length);
-        this.elements.addAll(Arrays.asList(elements));
+    public static EncodedAnnotationValue of(int typeIndex, AnnotationElement... elements) {
+        return new EncodedAnnotationValue(typeIndex, elements);
     }
 
     EncodedAnnotationValue() {
-        typeIndex = NO_INDEX;
-        elements  = Collections.emptyList();
+        this.typeIndex = NO_INDEX;
+        this.elements  = new ArrayList<>(0);
+    }
+
+    private EncodedAnnotationValue(int typeIndex, AnnotationElement... elements) {
+        this.typeIndex = typeIndex;
+        this.elements  = new ArrayList<>(elements.length);
+        this.elements.addAll(Arrays.asList(elements));
     }
 
     public int getTypeIndex() {
@@ -73,21 +74,24 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         typeIndex = input.readUleb128();
         int size  = input.readUleb128();
 
-        elements = new ArrayList<>(size);
+        elements.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
-            AnnotationElement element = new AnnotationElement();
-            element.read(input);
+            AnnotationElement element = AnnotationElement.readContent(input);
             elements.add(element);
         }
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 0);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, 0);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
         output.writeUleb128(typeIndex);
         output.writeUleb128(elements.size());
         for (AnnotationElement element : elements) {
@@ -104,6 +108,20 @@ extends      EncodedValue
         for (AnnotationElement element : elements) {
             element.accept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedAnnotationValue other = (EncodedAnnotationValue) o;
+        return typeIndex == other.typeIndex &&
+               Objects.equals(elements, other.elements);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(typeIndex, elements);
     }
 
     @Override

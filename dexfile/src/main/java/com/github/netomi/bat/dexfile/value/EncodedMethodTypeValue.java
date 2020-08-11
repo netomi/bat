@@ -15,24 +15,33 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
-import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.ProtoID;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+import com.github.netomi.bat.util.Preconditions;
+
+import java.util.Objects;
+
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
 public class EncodedMethodTypeValue
 extends      EncodedValue
 {
     private int protoIndex;
 
-    public EncodedMethodTypeValue(int protoIndex) {
-        this.protoIndex = protoIndex;
+    public static EncodedMethodTypeValue of(int protoIndex) {
+        Preconditions.checkArgument(protoIndex >= 0, "protoIndex must not be negative");
+        return new EncodedMethodTypeValue(protoIndex);
     }
 
     EncodedMethodTypeValue() {
-        this.protoIndex = DexConstants.NO_INDEX;
+        this(NO_INDEX);
+    }
+
+    private EncodedMethodTypeValue(int protoIndex) {
+        this.protoIndex = protoIndex;
     }
 
     public int getProtoIndex() {
@@ -49,14 +58,18 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         protoIndex = input.readUnsignedInt(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 3);
-        output.writeInt(protoIndex, 4);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForUnsignedInt(protoIndex) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeInt(protoIndex, valueArg + 1);
     }
 
     @Override
@@ -65,7 +78,20 @@ extends      EncodedValue
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedMethodTypeValue other = (EncodedMethodTypeValue) o;
+        return protoIndex == other.protoIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(protoIndex);
+    }
+
+    @Override
     public String toString() {
-        return String.format("EncodedMethodTypeValue[typeIdx=%d]", protoIndex);
+        return String.format("EncodedMethodTypeValue[protoIdx=%d]", protoIndex);
     }
 }

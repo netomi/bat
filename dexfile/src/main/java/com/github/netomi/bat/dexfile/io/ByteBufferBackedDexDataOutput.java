@@ -93,7 +93,10 @@ implements   DexDataOutput
 
     @Override
     public void writeShort(short value, int bytes) {
-        writePadding(bytes);
+        for (int i = 0; i < bytes; i++) {
+            byteBuffer.put((byte) value);
+            value >>>= 8;
+        }
     }
 
     @Override
@@ -102,13 +105,11 @@ implements   DexDataOutput
     }
 
     @Override
-    public void writeChar(char value) {
-        byteBuffer.putChar(value);
-    }
-
-    @Override
     public void writeChar(char value, int bytes) {
-        writePadding(bytes);
+        for (int i = 0; i < bytes; i++) {
+            byteBuffer.put((byte) value);
+            value >>>= 8;
+        }
     }
 
     @Override
@@ -118,7 +119,10 @@ implements   DexDataOutput
 
     @Override
     public void writeInt(int value, int bytes) {
-        writePadding(bytes);
+        for (int i = 0; i < bytes; i++) {
+            byteBuffer.put((byte) value);
+            value >>>= 8;
+        }
     }
 
     @Override
@@ -127,38 +131,31 @@ implements   DexDataOutput
     }
 
     @Override
-    public void writeUnsignedInt(int value, int bytes) {
-        writePadding(bytes);
-    }
-
-    @Override
-    public void writeLong(long value) {
-        byteBuffer.putLong(value);
-    }
-
-    @Override
     public void writeLong(long value, int bytes) {
-        writePadding(bytes);
-    }
-
-    @Override
-    public void writeFloat(float value) {
-        byteBuffer.putFloat(value);
+        for (int i = 0; i < bytes; i++) {
+            byteBuffer.put((byte) value);
+            value >>>= 8;
+        }
     }
 
     @Override
     public void writeFloat(float value, int bytes) {
-        writePadding(bytes);
-    }
-
-    @Override
-    public void writeDouble(double value) {
-        byteBuffer.putDouble(value);
+        int bits = Float.floatToIntBits(value);
+        bits >>>= 32 - (8*bytes);
+        for (int i = 0; i < bytes; i++) {
+            byteBuffer.put((byte) bits);
+            bits >>>= 8;
+        }
     }
 
     @Override
     public void writeDouble(double value, int bytes) {
-        writePadding(bytes);
+        long bits = Double.doubleToLongBits(value);
+        bits >>>= 64 - (8*bytes);
+        for (int i = 0; i < bytes; i++) {
+            byteBuffer.put((byte) bits);
+            bits >>>= 8;
+        }
     }
 
     @Override

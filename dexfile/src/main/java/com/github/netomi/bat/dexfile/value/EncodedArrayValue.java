@@ -20,25 +20,30 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class EncodedArrayValue
 extends      EncodedValue
 {
     //public int            size; // uleb128
-    private List<EncodedValue> values;
+    private ArrayList<EncodedValue> values;
 
-    public EncodedArrayValue(EncodedValue... values) {
-        this.values = new ArrayList<>(values.length);
-        this.values.addAll(Arrays.asList(values));
+    public static EncodedArrayValue empty() {
+        return new EncodedArrayValue();
+    }
+
+    public static EncodedArrayValue of(EncodedValue... values) {
+        return new EncodedArrayValue(values);
     }
 
     EncodedArrayValue() {
-        values = Collections.emptyList();
+        values = new ArrayList<>(0);
+    }
+
+    private EncodedArrayValue(EncodedValue... values) {
+        this.values = new ArrayList<>(values.length);
+        this.values.addAll(Arrays.asList(values));
     }
 
     public int getValueCount() {
@@ -49,23 +54,31 @@ extends      EncodedValue
         return values.get(index);
     }
 
+    public void addValue(EncodedValue value) {
+        values.add(value);
+    }
+
     @Override
     public int getValueType() {
         return VALUE_ARRAY;
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         int size = input.readUleb128();
-        values = new ArrayList<>(size);
+        values.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
             values.add(EncodedValue.read(input));
         }
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 0);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, 0);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
         output.writeUleb128(values.size());
         for (EncodedValue value : values) {
             value.write(output);
@@ -78,9 +91,7 @@ extends      EncodedValue
     }
 
     public void valuesAccept(DexFile dexFile, EncodedValueVisitor visitor) {
-        for (EncodedValue value : values) {
-            value.accept(dexFile, visitor);
-        }
+        valuesAccept(dexFile, visitor, (DexFile df, EncodedValue ev) -> {});
     }
 
     public void valuesAccept(DexFile dexFile, EncodedValueVisitor visitor, BiConsumer<DexFile, EncodedValue> separator) {
@@ -97,7 +108,20 @@ extends      EncodedValue
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedArrayValue other = (EncodedArrayValue) o;
+        return Objects.equals(values, other.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(values);
+    }
+
+    @Override
     public String toString() {
-        return String.format("EncodedArrayValue[size=%d,value=%s]", values.size(), values);
+        return String.format("EncodedArrayValue[values=%s]", values);
     }
 }

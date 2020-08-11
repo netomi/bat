@@ -20,16 +20,24 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.Objects;
+
 public class EncodedLongValue
 extends      EncodedValue
 {
     private long value;
 
-    public EncodedLongValue(long value) {
-        this.value = value;
+    public static EncodedLongValue of(long value) {
+        return new EncodedLongValue(value);
     }
 
-    EncodedLongValue() {}
+    EncodedLongValue() {
+        this(0);
+    }
+
+    private EncodedLongValue(long value) {
+        this.value = value;
+    }
 
     public long getValue() {
         return value;
@@ -41,19 +49,36 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         value = input.readLong(valueArg + 1);
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 7);
-        output.writeLong(value, 8);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, requiredBytesForSignedLong(value) - 1);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
+        output.writeLong(value, valueArg + 1);
     }
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitLongValue(dexFile, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedLongValue other = (EncodedLongValue) o;
+        return value == other.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     @Override

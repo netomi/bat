@@ -13,28 +13,67 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package com.github.netomi.bat.dexfile;
 
+import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.value.EncodedMethodHandleValue;
 import com.github.netomi.bat.dexfile.value.EncodedMethodTypeValue;
 import com.github.netomi.bat.dexfile.value.EncodedStringValue;
 
 /**
+ * A class representing a callsite item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#call-site-item">callsite item @ dex format</a>
+ *
  * @author Thomas Neidhart
  */
 public class CallSite
 extends      EncodedArray
 {
+    public static CallSite of(int methodHandleIndex, int nameIndex, int protoIndex) {
+        CallSite callSite = new CallSite();
+
+        callSite.encodedArrayValue.addValue(EncodedMethodHandleValue.of(methodHandleIndex));
+        callSite.encodedArrayValue.addValue(EncodedStringValue.of(nameIndex));
+        callSite.encodedArrayValue.addValue(EncodedMethodTypeValue.of(protoIndex));
+
+        return callSite;
+    }
+
+    public static CallSite readContent(DexDataInput input) {
+        CallSite callSite = new CallSite();
+        callSite.read(input);
+        return callSite;
+    }
+
+    private CallSite() {}
+
     public EncodedMethodHandleValue getMethodHandle() {
         return (EncodedMethodHandleValue) encodedArrayValue.getValue(0);
+    }
+
+    public MethodHandle getMethodHandle(DexFile dexFile) {
+        return getMethodHandle().getMethodHandle(dexFile);
     }
 
     public EncodedStringValue getMethodName() {
         return (EncodedStringValue) encodedArrayValue.getValue(1);
     }
 
+    public String getMethodName(DexFile dexFile) {
+        return getMethodName().getString(dexFile);
+    }
+
     public EncodedMethodTypeValue getMethodType() {
         return (EncodedMethodTypeValue) encodedArrayValue.getValue(2);
+    }
+
+    public ProtoID getMethodType(DexFile dexFile) {
+        return getMethodType().getProtoID(dexFile);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("CallSite[values=%s]", encodedArrayValue);
     }
 }

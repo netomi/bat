@@ -153,8 +153,7 @@ extends      DataItem
 
         if (staticValuesOffset != 0) {
             input.setOffset(staticValuesOffset);
-            staticValues = new EncodedArray();
-            staticValues.read(input);
+            staticValues = EncodedArray.readContent(input);
         }
     }
 

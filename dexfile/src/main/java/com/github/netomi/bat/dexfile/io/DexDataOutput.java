@@ -43,8 +43,6 @@ public interface DexDataOutput
 
     void writeUnsignedShort(int value);
 
-    void writeChar(char value);
-
     void writeChar(char value, int bytes);
 
     void writeInt(int value);
@@ -53,17 +51,9 @@ public interface DexDataOutput
 
     void writeUnsignedInt(long value);
 
-    void writeUnsignedInt(int value, int bytes);
-
-    void writeLong(long value);
-
     void writeLong(long value, int bytes);
 
-    void writeFloat(float value);
-
     void writeFloat(float value, int bytes);
-
-    void writeDouble(double value);
 
     void writeDouble(double value, int bytes);
 

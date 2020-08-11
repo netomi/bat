@@ -86,11 +86,6 @@ implements   DexDataOutput
     }
 
     @Override
-    public void writeChar(char value) {
-        offset += 2;
-    }
-
-    @Override
     public void writeChar(char value, int bytes) {
         offset += bytes;
     }
@@ -111,33 +106,13 @@ implements   DexDataOutput
     }
 
     @Override
-    public void writeUnsignedInt(int value, int bytes) {
-        offset += bytes;
-    }
-
-    @Override
-    public void writeLong(long value) {
-        offset += 8;
-    }
-
-    @Override
     public void writeLong(long value, int bytes) {
         offset += bytes;
     }
 
     @Override
-    public void writeFloat(float value) {
-        offset += 4;
-    }
-
-    @Override
     public void writeFloat(float value, int bytes) {
         offset += bytes;
-    }
-
-    @Override
-    public void writeDouble(double value) {
-        offset += 8;
     }
 
     @Override
@@ -170,7 +145,7 @@ implements   DexDataOutput
             byte b = (byte) (value & 0x7f);
             value >>= 7;
             if (value ==  0 && ((b & 0x40) == 0) ||
-                    value == -1 && ((b & 0x40) != 0)) {
+                value == -1 && ((b & 0x40) != 0)) {
                 bytesWritten++;
                 break;
             }

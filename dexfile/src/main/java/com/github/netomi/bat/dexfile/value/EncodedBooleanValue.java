@@ -20,16 +20,24 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.Objects;
+
 public class EncodedBooleanValue
 extends      EncodedValue
 {
     private boolean value;
 
-    public EncodedBooleanValue(boolean value) {
-        this.value = value;
+    public static EncodedBooleanValue of(boolean value) {
+        return new EncodedBooleanValue(value);
     }
 
-    EncodedBooleanValue() {}
+    EncodedBooleanValue() {
+        this(false);
+    }
+
+    private EncodedBooleanValue(boolean value) {
+        this.value = value;
+    }
 
     public boolean getValue() {
         return value;
@@ -41,14 +49,17 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         value = (valueArg & 0x1) == 1;
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, value ? 1 : 0);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, value ? 1 : 0);
     }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {}
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
@@ -56,7 +67,20 @@ extends      EncodedValue
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedBooleanValue other = (EncodedBooleanValue) o;
+        return value == other.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+
+    @Override
     public String toString() {
-        return String.format("EncodedBooleanValue[value=%s]", Boolean.toString(value));
+        return String.format("EncodedBooleanValue[value=%s]", value);
     }
 }

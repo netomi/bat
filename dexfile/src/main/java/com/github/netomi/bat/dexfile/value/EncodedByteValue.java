@@ -20,16 +20,24 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.Objects;
+
 public class EncodedByteValue
 extends      EncodedValue
 {
     private byte value;
 
-    public EncodedByteValue(byte value) {
-        this.value = value;
+    public static EncodedByteValue of(byte value) {
+        return new EncodedByteValue(value);
     }
 
-    EncodedByteValue() {}
+    EncodedByteValue() {
+        this((byte) 0);
+    }
+
+    private EncodedByteValue(byte value) {
+        this.value = value;
+    }
 
     public byte getValue() {
         return value;
@@ -41,19 +49,36 @@ extends      EncodedValue
     }
 
     @Override
-    public void read(DexDataInput input, int valueArg) {
+    public void readValue(DexDataInput input, int valueArg) {
         value = input.readByte();
     }
 
     @Override
-    public void write(DexDataOutput output) {
-        writeType(output, 0);
+    protected int writeType(DexDataOutput output) {
+        return writeType(output, 0);
+    }
+
+    @Override
+    public void writeValue(DexDataOutput output, int valueArg) {
         output.writeByte(value);
     }
 
     @Override
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
         visitor.visitByteValue(dexFile, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedByteValue other = (EncodedByteValue) o;
+        return value == other.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     @Override
