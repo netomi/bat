@@ -15,23 +15,21 @@
  */
 package com.github.netomi.bat.dexfile.value;
 
-public class EncodedIntValueTest
-extends      EncodedValueTest<EncodedIntValue>
+public class EncodedLongValueTest
+extends      EncodedValueTest<EncodedLongValue>
 {
     @Override
-    protected EncodedIntValue[] getTestInstance() {
-        return new EncodedIntValue[] {
-            EncodedIntValue.of(0),
-            EncodedIntValue.of(1),
-            EncodedIntValue.of(-1),
-            EncodedIntValue.of(127),
-            EncodedIntValue.of(-127),
-            EncodedIntValue.of(128),
-            EncodedIntValue.of(-128),
-            EncodedIntValue.of(Short.MIN_VALUE),
-            EncodedIntValue.of(Short.MAX_VALUE),
-            EncodedIntValue.of(Integer.MIN_VALUE),
-            EncodedIntValue.of(Integer.MAX_VALUE)
+    protected EncodedLongValue[] getTestInstance() {
+        return new EncodedLongValue[] {
+            EncodedLongValue.of(0),
+            EncodedLongValue.of(1),
+            EncodedLongValue.of(-1),
+            EncodedLongValue.of(127),
+            EncodedLongValue.of(-127),
+            EncodedLongValue.of(128),
+            EncodedLongValue.of(-128),
+            EncodedLongValue.of(Long.MIN_VALUE),
+            EncodedLongValue.of(Long.MAX_VALUE)
         };
     }
 }
