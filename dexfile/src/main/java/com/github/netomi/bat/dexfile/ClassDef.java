@@ -206,7 +206,6 @@ extends      DataItem
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         if (interfaces != null) {
             visitor.visitInterfaceTypes(dexFile, this, interfaces);
-            interfaces.dataItemsAccept(dexFile, visitor);
         }
 
         if (annotationsDirectory != null) {
@@ -221,7 +220,6 @@ extends      DataItem
 
         if (staticValues != null) {
             visitor.visitStaticValuesArray(dexFile, this, staticValues);
-            staticValues.dataItemsAccept(dexFile, visitor);
         }
     }
 

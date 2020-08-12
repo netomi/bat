@@ -201,7 +201,6 @@ extends      DataItem
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         if (debugInfo != null) {
             visitor.visitDebugInfo(dexFile, this, debugInfo);
-            debugInfo.dataItemsAccept(dexFile, visitor);
         }
     }
 }

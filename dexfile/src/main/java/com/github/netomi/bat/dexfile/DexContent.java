@@ -45,5 +45,12 @@ public abstract class DexContent
 
     protected void updateOffsets(DataItem.Map dataItemMap) {}
 
+    /**
+     * Applies the given {@link DataItemVisitor} to all {@link DataItem}s
+     * contained in this {@link DexContent}.
+     *
+     * @param dexFile the {@link DexFile} associated with this instance.
+     * @param visitor the visitor to apply.
+     */
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
 }

@@ -99,7 +99,6 @@ extends      DataItem
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         if (stringData != null) {
             visitor.visitStringData(dexFile, this, stringData);
-            stringData.dataItemsAccept(dexFile, visitor);
         }
     }
 

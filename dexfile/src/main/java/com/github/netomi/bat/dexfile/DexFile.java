@@ -213,11 +213,9 @@ public class DexFile
 
     public void dataItemsAccept(DataItemVisitor visitor) {
         visitor.visitHeader(this, header);
-        header.dataItemsAccept(this, visitor);
 
         if (mapList != null) {
             visitor.visitMapList(this, mapList);
-            mapList.dataItemsAccept(this, visitor);
         }
 
         for (StringID stringIDItem : stringIDs) {
@@ -227,7 +225,6 @@ public class DexFile
 
         for (TypeID typeIDItem : typeIDs) {
             visitor.visitTypeID(this, typeIDItem);
-            typeIDItem.dataItemsAccept(this, visitor);
         }
 
         for (ProtoID protoIDItem : protoIDs) {
@@ -237,12 +234,10 @@ public class DexFile
 
         for (FieldID fieldIDItem : fieldIDs) {
             visitor.visitFieldID(this, fieldIDItem);
-            fieldIDItem.dataItemsAccept(this, visitor);
         }
 
         for (MethodID methodIDItem : methodIDs) {
             visitor.visitMethodID(this, methodIDItem);
-            methodIDItem.dataItemsAccept(this, visitor);
         }
 
         for (ClassDef classDefItem : classDefs) {

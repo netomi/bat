@@ -145,7 +145,6 @@ extends      DataItem
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         if (parameters != null) {
             visitor.visitParameterTypes(dexFile, this, parameters);
-            parameters.dataItemsAccept(dexFile, visitor);
         }
     }
 
