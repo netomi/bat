@@ -20,16 +20,33 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
+import java.util.Objects;
+
 /**
+ * Represents a debug instruction that advances the address register.
+ *
  * @author Thomas Neidhart
  */
 public class DebugAdvancePC
 extends      DebugInstruction
 {
-    public int addrDiff;
+    private int addrDiff;
 
-    public DebugAdvancePC() {
+    public static DebugAdvancePC of(int addrDiff) {
+        return new DebugAdvancePC(addrDiff);
+    }
+
+    DebugAdvancePC() {
+        this(0);
+    }
+
+    private DebugAdvancePC(int addrDiff) {
         super(DBG_ADVANCE_PC);
+        this.addrDiff = addrDiff;
+    }
+
+    public int getAddrDiff() {
+        return addrDiff;
     }
 
     @Override
@@ -46,5 +63,23 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitAdvancePC(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DebugAdvancePC other = (DebugAdvancePC) o;
+        return addrDiff == other.addrDiff;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(addrDiff);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugAdvancePC[addrDiff=%d]", addrDiff);
     }
 }

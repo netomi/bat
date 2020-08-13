@@ -21,12 +21,20 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
+ * Represents a debug instruction that sets the epilogue begin state machine register.
+ *
  * @author Thomas Neidhart
  */
 public class DebugSetEpilogueBegin
 extends      DebugInstruction
 {
-    public DebugSetEpilogueBegin() {
+    private static final DebugSetEpilogueBegin INSTANCE = new DebugSetEpilogueBegin();
+
+    public static DebugSetEpilogueBegin instance() {
+        return INSTANCE;
+    }
+
+    private DebugSetEpilogueBegin() {
         super(DBG_SET_EPILOGUE_BEGIN);
     }
 
@@ -41,5 +49,20 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitSetEpilogueBegin(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugSetEpilogueBegin[]");
     }
 }

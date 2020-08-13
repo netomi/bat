@@ -21,12 +21,20 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
+ * Represents a debug instruction that ends a debug sequence of a debug info item.
+ *
  * @author Thomas Neidhart
  */
 public class DebugEndSequence
 extends      DebugInstruction
 {
-    public DebugEndSequence() {
+    private static final DebugEndSequence INSTANCE = new DebugEndSequence();
+
+    public static DebugEndSequence instance() {
+        return INSTANCE;
+    }
+
+    private DebugEndSequence() {
         super(DBG_END_SEQUENCE);
     }
 
@@ -41,5 +49,20 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitEndSequence(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugEndSequence[]");
     }
 }

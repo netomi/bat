@@ -20,16 +20,34 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
+import java.util.Objects;
+
 /**
+ * Represents a debug instruction that restarts a previously defined local variable
+ * at the current address.
+ *
  * @author Thomas Neidhart
  */
 public class DebugRestartLocal
 extends      DebugInstruction
 {
-    public int registerNum;
+    private int registerNum;
 
-    public DebugRestartLocal() {
+    public static DebugRestartLocal of(int registerNum) {
+        return new DebugRestartLocal(registerNum);
+    }
+
+    DebugRestartLocal() {
+        this(0);
+    }
+
+    private DebugRestartLocal(int registerNum) {
         super(DBG_RESTART_LOCAL);
+        this.registerNum = registerNum;
+    }
+
+    public int getRegisterNum() {
+        return registerNum;
     }
 
     @Override
@@ -46,5 +64,23 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitRestartLocal(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DebugRestartLocal other = (DebugRestartLocal) o;
+        return registerNum == other.registerNum;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(registerNum);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugRestartLocal[registerNum=%d]", registerNum);
     }
 }

@@ -20,16 +20,33 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
+import java.util.Objects;
+
 /**
+ * Represents a debug instruction that sets associated source file for subsequent line number entries.
+ *
  * @author Thomas Neidhart
  */
 public class DebugSetFile
 extends      DebugInstruction
 {
-    public int nameIndex;
+    private int nameIndex;
 
-    public DebugSetFile() {
+    public static DebugSetFile of(int nameIndex) {
+        return new DebugSetFile(nameIndex);
+    }
+
+    DebugSetFile() {
+        this(0);
+    }
+
+    private DebugSetFile(int nameIndex) {
         super(DBG_SET_FILE);
+        this.nameIndex = nameIndex;
+    }
+
+    public int getNameIndex() {
+        return nameIndex;
     }
 
     public String getName(DexFile dexFile) {
@@ -50,5 +67,23 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitSetFile(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DebugSetFile other = (DebugSetFile) o;
+        return nameIndex == other.nameIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nameIndex);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugSetFile[nameIndex=%d]", nameIndex);
     }
 }

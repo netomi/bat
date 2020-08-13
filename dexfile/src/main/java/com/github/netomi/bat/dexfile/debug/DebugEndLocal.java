@@ -20,16 +20,33 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
+import java.util.Objects;
+
 /**
+ * Represents a debug instruction that ends a local variable at the current address.
+ *
  * @author Thomas Neidhart
  */
 public class DebugEndLocal
 extends      DebugInstruction
 {
-    public int registerNum;
+    private int registerNum;
 
-    public DebugEndLocal() {
+    public static DebugEndLocal of(int registerNum) {
+        return new DebugEndLocal(registerNum);
+    }
+
+    DebugEndLocal() {
+        this(0);
+    }
+
+    private DebugEndLocal(int registerNum) {
         super(DBG_END_LOCAL);
+        this.registerNum = registerNum;
+    }
+
+    public int getRegisterNum() {
+        return registerNum;
     }
 
     @Override
@@ -46,5 +63,23 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitEndLocal(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DebugEndLocal other = (DebugEndLocal) o;
+        return registerNum == other.registerNum;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(registerNum);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugEndLocal[registerNum=%d]", registerNum);
     }
 }

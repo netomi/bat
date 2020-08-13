@@ -21,12 +21,20 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
+ * Represents a debug instruction that sets the prologue end state machine register.
+ *
  * @author Thomas Neidhart
  */
 public class DebugSetPrologueEnd
 extends      DebugInstruction
 {
-    public DebugSetPrologueEnd() {
+    private static final DebugSetPrologueEnd INSTANCE = new DebugSetPrologueEnd();
+
+    public static DebugSetPrologueEnd instance() {
+        return INSTANCE;
+    }
+
+    private DebugSetPrologueEnd() {
         super(DBG_SET_PROLOGUE_END);
     }
 
@@ -41,5 +49,20 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitSetPrologueEnd(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugSetPrologueEnd[]");
     }
 }

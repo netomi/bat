@@ -307,7 +307,7 @@ implements   DexFileVisitor,
 
             println("      positions     :");
             if (code.debugInfo != null) {
-                code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(code.debugInfo.lineStart));
+                code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(code.debugInfo.getLineStart()));
             }
 
             println("      locals        :");
@@ -544,19 +544,19 @@ implements   DexFileVisitor,
 
         @Override
         public void visitAdvanceLine(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLine instruction) {
-            lineNumber += instruction.lineDiff;
+            lineNumber += instruction.getLineDiff();
         }
 
         @Override
         public void visitAdvanceLineAndPC(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLineAndPC instruction) {
-            lineNumber += instruction.lineDiff;
-            codeOffset += instruction.addrDiff;
+            lineNumber += instruction.getLineDiff();
+            codeOffset += instruction.getAddrDiff();
             printPosition();
         }
 
         @Override
         public void visitAdvancePC(DexFile dexFile, DebugInfo debugInfo, DebugAdvancePC instruction) {
-            codeOffset += instruction.addrDiff;
+            codeOffset += instruction.getAddrDiff();
         }
 
         private void printPosition() {
@@ -620,68 +620,68 @@ implements   DexFileVisitor,
 
         @Override
         public void visitAdvanceLineAndPC(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLineAndPC instruction) {
-            codeOffset += instruction.addrDiff;
+            codeOffset += instruction.getAddrDiff();
         }
 
         @Override
         public void visitAdvancePC(DexFile dexFile, DebugInfo debugInfo, DebugAdvancePC instruction) {
-            codeOffset += instruction.addrDiff;
+            codeOffset += instruction.getAddrDiff();
         }
 
         @Override
         public void visitStartLocal(DexFile dexFile, DebugInfo debugInfo, DebugStartLocal instruction) {
-            LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
+            LocalVariableInfo variableInfo = variableInfos[instruction.getRegisterNum()];
             // only for compatibility with dexdump:
             // print the method parameters potentially twice
             if (variableInfo != null &&
                 variableInfo.endAddr == -1)
             {
                 variableInfo.endAddr = codeOffset;
-                printLocal(instruction.registerNum, variableInfo);
+                printLocal(instruction.getRegisterNum(), variableInfo);
             }
 
-            String name = dexFile.getString(instruction.nameIndex);
-            String type = dexFile.getType(instruction.typeIndex);
+            String name = dexFile.getString(instruction.getNameIndex());
+            String type = dexFile.getType(instruction.getTypeIndex());
 
             variableInfo = new LocalVariableInfo(name, type, null);
             variableInfo.startAddr = codeOffset;
 
-            variableInfos[instruction.registerNum] = variableInfo;
+            variableInfos[instruction.getRegisterNum()] = variableInfo;
         }
 
         @Override
         public void visitStartLocalExtended(DexFile dexFile, DebugInfo debugInfo, DebugStartLocalExtended instruction) {
-            LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
+            LocalVariableInfo variableInfo = variableInfos[instruction.getRegisterNum()];
             // only for compatibility with dexdump:
             // print the method parameters potentially twice
             if (variableInfo != null &&
                 variableInfo.endAddr == -1)
             {
                 variableInfo.endAddr = codeOffset;
-                printLocal(instruction.registerNum, variableInfo);
+                printLocal(instruction.getRegisterNum(), variableInfo);
             }
 
-            String name = dexFile.getString(instruction.nameIndex);
-            String type = dexFile.getType(instruction.typeIndex);
-            String sig  = dexFile.getString(instruction.sigIndex);
+            String name = dexFile.getString(instruction.getNameIndex());
+            String type = dexFile.getType(instruction.getTypeIndex());
+            String sig  = dexFile.getString(instruction.getSigIndex());
 
             variableInfo = new LocalVariableInfo(name, type, sig);
             variableInfo.startAddr = codeOffset;
 
-            variableInfos[instruction.registerNum] = variableInfo;
+            variableInfos[instruction.getRegisterNum()] = variableInfo;
         }
 
         @Override
         public void visitEndLocal(DexFile dexFile, DebugInfo debugInfo, DebugEndLocal instruction) {
-            LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
+            LocalVariableInfo variableInfo = variableInfos[instruction.getRegisterNum()];
             variableInfo.endAddr = codeOffset;
 
-            printLocal(instruction.registerNum, variableInfo);
+            printLocal(instruction.getRegisterNum(), variableInfo);
         }
 
         @Override
         public void visitRestartLocal(DexFile dexFile, DebugInfo debugInfo, DebugRestartLocal instruction) {
-            LocalVariableInfo variableInfo = variableInfos[instruction.registerNum];
+            LocalVariableInfo variableInfo = variableInfos[instruction.getRegisterNum()];
             variableInfo.startAddr = codeOffset;
             variableInfo.endAddr   = -1;
         }

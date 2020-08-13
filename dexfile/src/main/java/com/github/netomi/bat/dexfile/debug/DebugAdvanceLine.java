@@ -20,16 +20,33 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
+import java.util.Objects;
+
 /**
+ * Represents a debug instruction that advances the line register.
+ *
  * @author Thomas Neidhart
  */
 public class DebugAdvanceLine
 extends      DebugInstruction
 {
-    public int lineDiff;
+    private int lineDiff;
 
-    public DebugAdvanceLine() {
+    public static DebugAdvanceLine of(int lineDiff) {
+        return new DebugAdvanceLine(lineDiff);
+    }
+
+    DebugAdvanceLine() {
+        this(0);
+    }
+
+    private DebugAdvanceLine(int lineDiff) {
         super(DBG_ADVANCE_LINE);
+        this.lineDiff = lineDiff;
+    }
+
+    public int getLineDiff() {
+        return lineDiff;
     }
 
     @Override
@@ -46,5 +63,23 @@ extends      DebugInstruction
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitAdvanceLine(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DebugAdvanceLine other = (DebugAdvanceLine) o;
+        return lineDiff == other.lineDiff;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lineDiff);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugAdvanceLine[lineDiff=%d]", lineDiff);
     }
 }

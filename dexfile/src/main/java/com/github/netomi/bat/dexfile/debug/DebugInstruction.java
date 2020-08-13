@@ -21,6 +21,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
 /**
+ * Represents a debug instruction as contained in the debug sequence of a debug info item.
+ *
  * @author Thomas Neidhart
  */
 public abstract class DebugInstruction
@@ -70,17 +72,17 @@ extends               DexContent
 
     private static DebugInstruction create(byte opCode) {
         switch (opCode) {
-            case DebugInstruction.DBG_END_SEQUENCE:         return new DebugEndSequence();
+            case DebugInstruction.DBG_END_SEQUENCE:         return DebugEndSequence.instance();
             case DebugInstruction.DBG_ADVANCE_PC  :         return new DebugAdvancePC();
             case DebugInstruction.DBG_ADVANCE_LINE:         return new DebugAdvanceLine();
             case DebugInstruction.DBG_START_LOCAL:          return new DebugStartLocal();
             case DebugInstruction.DBG_START_LOCAL_EXTENDED: return new DebugStartLocalExtended();
             case DebugInstruction.DBG_END_LOCAL:            return new DebugEndLocal();
             case DebugInstruction.DBG_RESTART_LOCAL:        return new DebugRestartLocal();
-            case DebugInstruction.DBG_SET_PROLOGUE_END:     return new DebugSetPrologueEnd();
-            case DebugInstruction.DBG_SET_EPILOGUE_BEGIN:   return new DebugSetEpilogueBegin();
+            case DebugInstruction.DBG_SET_PROLOGUE_END:     return DebugSetPrologueEnd.instance();
+            case DebugInstruction.DBG_SET_EPILOGUE_BEGIN:   return DebugSetEpilogueBegin.instance();
             case DebugInstruction.DBG_SET_FILE:             return new DebugSetFile();
-            default:                       return new DebugAdvanceLineAndPC(opCode);
+            default:                                        return new DebugAdvanceLineAndPC(opCode);
         }
 
     }

@@ -19,13 +19,15 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
+import com.github.netomi.bat.util.IntArray;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
+ * A class representing a debug info item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#debug-info-item">debug info item @ dex format</a>
+ *
  * @author Thomas Neidhart
  */
 @DataItemAnn(
@@ -36,13 +38,11 @@ import java.util.ListIterator;
 public class DebugInfo
 extends      DataItem
 {
-    private static final int[] EMPTY_ARRAY = new int[0];
+    private int      lineStart;      // uleb128
+    // private int   parametersSize; // uleb128
+    private IntArray parameterNames; // uleb128p1[]
 
-    public int   lineStart;      // uleb128
-    public int   parametersSize; // uleb128
-    public int[] parameterNames; // uleb128p1[]
-
-    public List<DebugInstruction> debugSequence;
+    private ArrayList<DebugInstruction> debugSequence;
 
     public static DebugInfo readContent(DexDataInput input) {
         DebugInfo debugInfo = new DebugInfo();
@@ -52,29 +52,31 @@ extends      DataItem
 
     private DebugInfo() {
         lineStart      = 0;
-        parametersSize = 0;
-        parameterNames = EMPTY_ARRAY;
-        debugSequence  = Collections.emptyList();
+        parameterNames = new IntArray(0);
+        debugSequence  = new ArrayList<>(0);
+    }
+
+    public int getLineStart() {
+        return lineStart;
     }
 
     public int getParameterCount() {
-        return parameterNames.length;
+        return parameterNames.size();
     }
 
     public String getParameterName(DexFile dexFile, int parameterIndex) {
-        return dexFile.getString(parameterNames[parameterIndex]);
+        return dexFile.getString(parameterNames.get(parameterIndex));
     }
 
     @Override
     protected void read(DexDataInput input) {
-        lineStart      = input.readUleb128();
-        parametersSize = input.readUleb128();
-        parameterNames = new int[parametersSize];
+        lineStart          = input.readUleb128();
+        int parametersSize = input.readUleb128();
+        parameterNames.resize(parametersSize);
         for (int i = 0; i < parametersSize; i++) {
-            parameterNames[i] = input.readUleb128p1();
+            parameterNames.add(i, input.readUleb128p1());
         }
 
-        debugSequence = new ArrayList<>();
         DebugInstruction debugInstruction;
         do {
             debugInstruction = DebugInstruction.readInstruction(input);
@@ -85,9 +87,9 @@ extends      DataItem
     @Override
     protected void write(DexDataOutput output) {
         output.writeUleb128(lineStart);
-        output.writeUleb128(parametersSize);
-        for (int parameterIndex : parameterNames) {
-            output.writeUleb128p1(parameterIndex);
+        output.writeUleb128(parameterNames.size());
+        for (int i = 0; i < parameterNames.size(); i++) {
+            output.writeUleb128p1(parameterNames.get(i));
         }
 
         for (DebugInstruction debugInstruction : debugSequence) {
@@ -100,5 +102,28 @@ extends      DataItem
         for (DebugInstruction debugInstruction : debugSequence) {
             debugInstruction.accept(dexFile, this, visitor);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DebugInfo other = (DebugInfo) o;
+        return lineStart == other.lineStart &&
+               Objects.equals(parameterNames, other.parameterNames) &&
+               Objects.equals(debugSequence,  other.debugSequence);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lineStart, parameterNames, debugSequence);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugInfo[lineStart=%d,parameterNames=%s,debugSequence=%d]",
+                             lineStart,
+                             parameterNames,
+                             debugSequence.size());
     }
 }

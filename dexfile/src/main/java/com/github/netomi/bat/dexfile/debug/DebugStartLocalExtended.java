@@ -20,16 +20,34 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
 
+import java.util.Objects;
+
 /**
+ * Represents a debug instruction that starts a local variable at the current address with
+ * extended information.
+ *
  * @author Thomas Neidhart
  */
 public class DebugStartLocalExtended
 extends      DebugStartLocal
 {
-    public int sigIndex;
+    private int sigIndex;
 
-    public DebugStartLocalExtended() {
+    public static DebugStartLocalExtended of(int registerNum, int nameIndex, int typeIndex, int sigIndex) {
+        return new DebugStartLocalExtended(registerNum, nameIndex, typeIndex, sigIndex);
+    }
+
+    DebugStartLocalExtended() {
         super(DBG_START_LOCAL_EXTENDED);
+    }
+
+    private DebugStartLocalExtended(int registerNum, int nameIndex, int typeIndex, int sigIndex) {
+        super(DBG_START_LOCAL_EXTENDED, registerNum, nameIndex, typeIndex);
+        this.sigIndex = sigIndex;
+    }
+
+    public int getSigIndex() {
+        return sigIndex;
     }
 
     @Override
@@ -47,5 +65,28 @@ extends      DebugStartLocal
     @Override
     public void accept(DexFile dexFile, DebugInfo debugInfo, DebugSequenceVisitor visitor) {
         visitor.visitStartLocalExtended(dexFile, debugInfo, this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        DebugStartLocalExtended other = (DebugStartLocalExtended) o;
+        return sigIndex == other.sigIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), sigIndex);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("DebugStartLocalExtended[registerNum=%d,nameIndex=%d,typeIndex=%d,sigIndex=%d]",
+                             registerNum,
+                             nameIndex,
+                             typeIndex,
+                             sigIndex);
     }
 }
