@@ -135,7 +135,7 @@ public abstract class EncodedValue
     }
 
     static int requiredBytesForUnsignedChar(char value) {
-        return (value << 8 >>> 8 == value) ? 1 : 2;
+        return (value << 24 >>> 24 == value) ? 1 : 2;
     }
 
     static int requiredBytesForUnsignedInt(int value) {
