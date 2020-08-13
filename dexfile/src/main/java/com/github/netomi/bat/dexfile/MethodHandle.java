@@ -17,10 +17,17 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
+
 /**
+ * A class representing a method handle item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-handle-item">method handle item @ dex format</a>
+ *
  * @author Thomas Neidhart
  */
 @DataItemAnn(
@@ -36,17 +43,39 @@ extends      DataItem
     private int fieldOrMethodId;  // ushort
     // unused - ushort
 
+    public static MethodHandle of(MethodHandleType methodHandleType, int fieldOrMethodId) {
+        Objects.requireNonNull(methodHandleType, "methodHandleType must not be null");
+        return of(methodHandleType.getValue(), fieldOrMethodId);
+    }
+
+    public static MethodHandle of(int methodHandleType, int fieldOrMethodId) {
+        Preconditions.checkArgument(fieldOrMethodId >= 0, "fieldOrMethodId must be non negative");
+        return new MethodHandle(methodHandleType, fieldOrMethodId);
+    }
+
     public static MethodHandle readContent(DexDataInput input) {
         MethodHandle methodHandle = new MethodHandle();
         methodHandle.read(input);
         return methodHandle;
     }
 
-    private MethodHandle() {}
+    private MethodHandle() {
+        this(0, NO_INDEX);
+    }
 
-    public int getMethodHandleType() {
+    private MethodHandle(int methodHandleType, int fieldOrMethodId) {
+        this.methodHandleType = methodHandleType;
+        this.fieldOrMethodId  = fieldOrMethodId;
+    }
+
+    public MethodHandleType getMethodHandleType() {
+        return MethodHandleType.of(methodHandleType);
+    }
+
+    public int getMethodHandleTypeValue() {
         return methodHandleType;
     }
+
 
     public int getFieldOrMethodId() {
         return fieldOrMethodId;
@@ -88,6 +117,6 @@ extends      DataItem
 
     @Override
     public String toString() {
-        return String.format("MethodHandle[type=%d,fieldOrMethodId=%d]", methodHandleType, fieldOrMethodId);
+        return String.format("MethodHandle[type=%02x,fieldOrMethodId=%d]", methodHandleType, fieldOrMethodId);
     }
 }

@@ -24,6 +24,7 @@ import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.Objects;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_CLASS_DATA_ITEM,
@@ -222,5 +223,30 @@ extends      DataItem
         for (EncodedMethod method : virtualMethods) {
             method.dataItemsAccept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClassData other = (ClassData) o;
+        return Objects.equals(staticFields,   other.staticFields)   &&
+               Objects.equals(instanceFields, other.instanceFields) &&
+               Objects.equals(directMethods,  other.directMethods)  &&
+               Objects.equals(virtualMethods, other.virtualMethods);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(staticFields, instanceFields, directMethods, virtualMethods);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ClassData[staticFields=%d,instanceFields=%d,directMethods=%d,virtualMethods=%d]",
+                             getStaticFieldCount(),
+                             getInstanceFieldCount(),
+                             getDirectMethodCount(),
+                             getVirtualMethodCount());
     }
 }

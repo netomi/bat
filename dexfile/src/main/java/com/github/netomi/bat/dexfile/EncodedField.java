@@ -19,8 +19,17 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.Objects;
+
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * A class representing an encoded field inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-field-format">encoded field @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedField
 extends      DexContent
 {
@@ -97,7 +106,21 @@ extends      DexContent
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedField other = (EncodedField) o;
+        return fieldIndex  == other.fieldIndex &&
+               accessFlags == other.accessFlags;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fieldIndex, accessFlags);
+    }
+
+    @Override
     public String toString() {
-        return String.format("EncodedMethod[fieldIndex=%d,accessFlags=%04x]", fieldIndex, accessFlags);
+        return String.format("EncodedField[fieldIndex=%d,accessFlags=%04x]", fieldIndex, accessFlags);
     }
 }

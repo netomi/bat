@@ -223,4 +223,8 @@ extends      DataItem
         }
     }
 
+    @Override
+    public String toString() {
+        return String.format("ClassDef[classIndex=%d,accessFlags=%04x]", classIndex, accessFlags);
+    }
 }

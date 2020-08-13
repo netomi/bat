@@ -20,6 +20,15 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
+import java.util.Objects;
+
+/**
+ * A class representing an encoded method inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-method-format">encoded method @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedMethod
 extends      DexContent
 {
@@ -144,6 +153,21 @@ extends      DexContent
             visitor.visitCode(dexFile, this, code);
             code.dataItemsAccept(dexFile, visitor);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedMethod other = (EncodedMethod) o;
+        return methodIndex == other.methodIndex &&
+               accessFlags == other.accessFlags &&
+               Objects.equals(code, other.code);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(methodIndex, accessFlags, code);
     }
 
     @Override
