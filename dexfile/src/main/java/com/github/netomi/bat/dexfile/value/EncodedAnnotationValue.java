@@ -29,7 +29,7 @@ public class EncodedAnnotationValue
 extends      EncodedValue
 {
     private int typeIndex; // uleb128
-    // public int size;      // uleb128
+    //public int size;      // uleb128
 
     private ArrayList<AnnotationElement> elements;
 

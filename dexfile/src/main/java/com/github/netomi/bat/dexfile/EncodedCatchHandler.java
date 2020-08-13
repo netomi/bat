@@ -18,10 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A class representing an encoded catch handler inside a dex file.
@@ -33,16 +30,12 @@ import java.util.Objects;
 public class EncodedCatchHandler
 extends      DexContent
 {
-    //public int                      size;       // sleb128, use handlers.size()
+    //public int                    size;       // sleb128, use handlers.size()
+    private ArrayList<TypeAddrPair> handlers;
     private int                     catchAllAddr; // uleb128
-    private ArrayList<TypeAddrPair> handlers = new ArrayList<>(0);
 
     public static EncodedCatchHandler of(int catchAllAddr, TypeAddrPair... handlers) {
-        EncodedCatchHandler encodedCatchHandler = new EncodedCatchHandler(catchAllAddr);
-        for (TypeAddrPair handler : handlers) {
-            encodedCatchHandler.addHandler(handler);
-        }
-        return encodedCatchHandler;
+        return new EncodedCatchHandler(catchAllAddr, handlers);
     }
 
     public static EncodedCatchHandler readContent(DexDataInput input) {
@@ -55,16 +48,14 @@ extends      DexContent
         this(-1);
     }
 
-    private EncodedCatchHandler(int catchAllAddr) {
+    private EncodedCatchHandler(int catchAllAddr, TypeAddrPair... handlers) {
         this.catchAllAddr = catchAllAddr;
+        this.handlers = new ArrayList<>(handlers.length);
+        this.handlers.addAll(Arrays.asList(handlers));
     }
 
     public int getCatchAllAddr() {
         return catchAllAddr;
-    }
-
-    public void addHandler(TypeAddrPair typeAddrPair) {
-        handlers.add(typeAddrPair);
     }
 
     public int getHandlerCount() {
@@ -73,6 +64,10 @@ extends      DexContent
 
     public TypeAddrPair getHandler(int index) {
         return handlers.get(index);
+    }
+
+    public Iterable<TypeAddrPair> getHandlers() {
+        return handlers;
     }
 
     @Override
@@ -124,6 +119,6 @@ extends      DexContent
 
     @Override
     public String toString() {
-        return String.format("EncodedCatchHandler[handlers=%d,catchAllAddr=%4x]", handlers.size(), catchAllAddr);
+        return String.format("EncodedCatchHandler[handlers=%d,catchAllAddr=%04x]", handlers.size(), catchAllAddr);
     }
 }

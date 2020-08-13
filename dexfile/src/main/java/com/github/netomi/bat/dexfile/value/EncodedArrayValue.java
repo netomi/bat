@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 public class EncodedArrayValue
 extends      EncodedValue
 {
-    //public int            size; // uleb128
+    //public int                    size; // uleb128
     private ArrayList<EncodedValue> values;
 
     public static EncodedArrayValue empty() {

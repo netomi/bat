@@ -98,8 +98,7 @@ extends      DataItem
         if (triesSize > 0) {
             tries = new ArrayList<>(triesSize);
             for (int i = 0; i < triesSize; i++) {
-                Try tryItem = new Try();
-                tryItem.read(input);
+                Try tryItem = Try.readContent(input);
                 tries.add(tryItem);
             }
 
