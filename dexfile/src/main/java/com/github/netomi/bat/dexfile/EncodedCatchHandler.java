@@ -21,20 +21,58 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
+ * A class representing an encoded catch handler inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-catch-handler">encoded catch handler @ dex format</a>
+ *
  * @author Thomas Neidhart
  */
 public class EncodedCatchHandler
 extends      DexContent
 {
-    //public int              size;         // sleb128, use handlers.size()
-    public List<TypeAddrPair> handlers;
-    public int                catchAllAddr; // uleb128
+    //public int                      size;       // sleb128, use handlers.size()
+    private int                     catchAllAddr; // uleb128
+    private ArrayList<TypeAddrPair> handlers = new ArrayList<>(0);
 
-    public EncodedCatchHandler() {
-        handlers     = Collections.emptyList();
-        catchAllAddr = -1;
+    public static EncodedCatchHandler of(int catchAllAddr, TypeAddrPair... handlers) {
+        EncodedCatchHandler encodedCatchHandler = new EncodedCatchHandler(catchAllAddr);
+        for (TypeAddrPair handler : handlers) {
+            encodedCatchHandler.addHandler(handler);
+        }
+        return encodedCatchHandler;
+    }
+
+    public static EncodedCatchHandler readContent(DexDataInput input) {
+        EncodedCatchHandler encodedCatchHandler = new EncodedCatchHandler();
+        encodedCatchHandler.read(input);
+        return encodedCatchHandler;
+    }
+
+    private EncodedCatchHandler() {
+        this(-1);
+    }
+
+    private EncodedCatchHandler(int catchAllAddr) {
+        this.catchAllAddr = catchAllAddr;
+    }
+
+    public int getCatchAllAddr() {
+        return catchAllAddr;
+    }
+
+    public void addHandler(TypeAddrPair typeAddrPair) {
+        handlers.add(typeAddrPair);
+    }
+
+    public int getHandlerCount() {
+        return handlers.size();
+    }
+
+    public TypeAddrPair getHandler(int index) {
+        return handlers.get(index);
     }
 
     @Override
@@ -42,7 +80,7 @@ extends      DexContent
         int readSize = input.readSleb128();
         int size     = Math.abs(readSize);
 
-        handlers = new ArrayList<>(size);
+        handlers.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
             TypeAddrPair typeAddrPair = TypeAddrPair.readContent(input);
             handlers.add(typeAddrPair);
@@ -68,5 +106,24 @@ extends      DexContent
         if (writtenSize <= 0) {
             output.writeUleb128(catchAllAddr);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EncodedCatchHandler other = (EncodedCatchHandler) o;
+        return catchAllAddr == other.catchAllAddr &&
+               Objects.equals(handlers, other.handlers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(catchAllAddr, handlers);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("EncodedCatchHandler[handlers=%d,catchAllAddr=%4x]", handlers.size(), catchAllAddr);
     }
 }

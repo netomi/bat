@@ -112,8 +112,7 @@ extends      DataItem
             for (int i = 0; i < catchHandlerSize; i++) {
                 int currentOffset = input.getOffset();
 
-                EncodedCatchHandler encodedCatchHandler = new EncodedCatchHandler();
-                encodedCatchHandler.read(input);
+                EncodedCatchHandler encodedCatchHandler = EncodedCatchHandler.readContent(input);
                 catchHandlerList.add(encodedCatchHandler);
                 offsetMap.put(currentOffset - startOffset, encodedCatchHandler);
             }
