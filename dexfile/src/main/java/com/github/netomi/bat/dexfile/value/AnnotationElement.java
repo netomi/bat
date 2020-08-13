@@ -82,6 +82,20 @@ extends      DexContent
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AnnotationElement other = (AnnotationElement) o;
+        return nameIndex == other.nameIndex &&
+               Objects.equals(value, other.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nameIndex, value);
+    }
+
+    @Override
     public String toString() {
         return String.format("AnnotationElement[nameIndex=%d,value=%s]", nameIndex, value);
     }
