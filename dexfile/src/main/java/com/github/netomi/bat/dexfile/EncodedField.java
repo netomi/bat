@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.EnumSet;
 import java.util.Objects;
@@ -39,6 +40,8 @@ extends      DexContent
     private int accessFlags;     // uleb128
 
     public static EncodedField of(int fieldIndex, Visibility visibility, FieldModifier... modifiers) {
+        Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative");
+
         int accessFlags = visibility.getFlagValue();
         for (FieldModifier modifier : modifiers) {
             accessFlags |= modifier.getFlagValue();

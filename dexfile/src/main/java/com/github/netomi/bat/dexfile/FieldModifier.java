@@ -21,6 +21,7 @@ import static com.github.netomi.bat.dexfile.DexConstants.*;
 
 public enum FieldModifier
 {
+    STATIC   (ACC_STATIC),
     FINAL    (ACC_FINAL),
     VOLATILE (ACC_VOLATILE),
     TRANSIENT(ACC_TRANSIENT),

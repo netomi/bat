@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.ByteBufferBackedDexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
+import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,6 +36,10 @@ public abstract class DexContentTest<T extends DexContent>
     public abstract T[] getTestInstances();
 
     public abstract Function<DexDataInput, T> getFactoryMethod();
+
+    public Consumer<DexDataOutput> getWriteMethod(T data) {
+        return data::write;
+    }
 
     @Test
     public void readWrite() {
@@ -64,7 +70,7 @@ public abstract class DexContentTest<T extends DexContent>
             // remember the offset of the actual item to be written.
             int startOffset = output.getOffset();
             data.updateOffsets(dataItemMap);
-            data.write(output);
+            getWriteMethod(data).accept(output);
 
             byte[] buffer = output.toArray();
 
