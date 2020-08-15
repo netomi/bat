@@ -203,7 +203,11 @@ implements   ClassDefVisitor
 
             // print code.
             printer.levelUp();
-            method.codeAccept(dexFile, classDef, this);
+            if (method.code != null) {
+                method.codeAccept(dexFile, classDef, this);
+            } else if (classDef.annotationsDirectory != null) {
+                classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this);
+            }
             printer.levelDown();
 
             printer.println(".end method");
@@ -267,12 +271,14 @@ implements   ClassDefVisitor
 
         @Override
         public void visitMethodAnnotationSet(DexFile dexFile, ClassDef classDef, MethodAnnotation methodAnnotation, AnnotationSet annotationSet) {
-            annotationSet.accept(dexFile, classDef, this);
+            int annotationCount = annotationSet.getAnnotationCount();
+            annotationSet.accept(dexFile, classDef,
+                                 AnnotationVisitor.concatenate(this,
+                                    (df, cd, as, idx, ann) -> { if ((idx + 1) < annotationCount) printer.println(); } ));
         }
 
         @Override
         public void visitParameterAnnotationSet(DexFile dexFile, ClassDef classDef, ParameterAnnotation parameterAnnotation, AnnotationSetRefList annotationSetRefList) {
-
         }
 
         @Override

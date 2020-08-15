@@ -121,7 +121,7 @@ implements InstructionVisitor
         switch (instruction.getOpcode().getFormat()) {
             case FORMAT_11n:
             case FORMAT_22b:
-                sb.append(String.format("0x%x", value, (byte) value));
+                sb.append(String.format("0x%x", value));
                 break;
 
             case FORMAT_21h:
@@ -254,17 +254,18 @@ implements InstructionVisitor
     }
 
     private void printRegisters(Code code, DexInstruction instruction) {
-        int localVars = code.registersSize - code.insSize;
+        int localRegisters = code.registersSize - code.insSize;
 
         for (int idx = 0; idx < instruction.registers.length; idx++) {
             if (idx > 0) {
                 printer.print(", ");
             }
 
-            String registerPrefix = idx < localVars ? "v" : "p";
-            int    registerIndex  = idx < localVars ?
+            int registerNum = instruction.registers[idx];
+            String registerPrefix = registerNum < localRegisters ? "v" : "p";
+            int    registerIndex  = registerNum < localRegisters ?
                 instruction.registers[idx] :
-                instruction.registers[idx] - localVars;
+                instruction.registers[idx] - localRegisters;
 
             printer.print(registerPrefix + registerIndex);
         }
