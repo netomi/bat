@@ -19,9 +19,7 @@ import com.github.netomi.bat.dexfile.*;
 
 public interface EncodedMethodVisitor
 {
-    default void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
-        throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
-    }
+    void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method);
 
     default void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
         visitAnyMethod(dexFile, classDef, index, method);
@@ -29,5 +27,30 @@ public interface EncodedMethodVisitor
 
     default void visitVirtualMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
         visitAnyMethod(dexFile, classDef, index, method);
+    }
+
+    static EncodedMethodVisitor concatenate(EncodedMethodVisitor... visitors) {
+        return new EncodedMethodVisitor() {
+            @Override
+            public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+                for (EncodedMethodVisitor visitor : visitors) {
+                    visitor.visitAnyMethod(dexFile, classDef, index, method);
+                }
+            }
+
+            @Override
+            public void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+                for (EncodedMethodVisitor visitor : visitors) {
+                    visitor.visitDirectMethod(dexFile, classDef, index, method);
+                }
+            }
+
+            @Override
+            public void visitVirtualMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+                for (EncodedMethodVisitor visitor : visitors) {
+                    visitor.visitVirtualMethod(dexFile, classDef, index, method);
+                }
+            }
+        };
     }
 }

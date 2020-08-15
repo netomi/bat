@@ -69,18 +69,21 @@ implements EncodedValueVisitor
     @Override
     public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
         append("{");
-        printer.println();
-        printer.levelUp();
         int count = value.getValueCount();
-        for (int i = 0; i < count; i++) {
-            EncodedValue v = value.getValue(i);
-            v.accept(dexFile, this);
-            if ((i + 1) < count) {
-                printer.print(",");
-            }
+        if (count > 0) {
             printer.println();
+            printer.levelUp();
+
+            for (int i = 0; i < count; i++) {
+                EncodedValue v = value.getValue(i);
+                v.accept(dexFile, this);
+                if ((i + 1) < count) {
+                    printer.print(",");
+                }
+                printer.println();
+            }
+            printer.levelDown();
         }
-        printer.levelDown();
         printer.print("}");
     }
 
@@ -112,7 +115,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitByteValue(DexFile dexFile, EncodedByteValue value) {
-        append(Primitives.toHexString(value.getValue()));
+        append(String.format("0x%x", value.getValue()));
     }
 
     @Override
@@ -141,12 +144,22 @@ implements EncodedValueVisitor
 
     @Override
     public void visitIntValue(DexFile dexFile, EncodedIntValue value) {
-        append(Primitives.toHexString(value.getValue()));
+        int v = value.getValue();
+        if (v < 0) {
+            append(String.format("-0x%x", -v));
+        } else {
+            append(String.format("0x%x", v));
+        }
     }
 
     @Override
     public void visitLongValue(DexFile dexFile, EncodedLongValue value) {
-        append(Primitives.toHexString(value.getValue()));
+        long v = value.getValue();
+        if (v < 0) {
+            append(String.format("-0x%xL", -v));
+        } else {
+            append(String.format("0x%xL", v));
+        }
     }
 
     @Override

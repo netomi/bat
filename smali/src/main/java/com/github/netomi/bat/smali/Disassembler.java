@@ -91,11 +91,10 @@ implements   ClassDefVisitor
                 printer.println(".source \"" + sourceFile + "\"");
             }
 
-            printer.println();
-
             classDef.interfacesAccept(dexFile, this);
 
             if (classDef.annotationsDirectory != null) {
+                printer.println();
                 classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, this);
             }
 
@@ -104,32 +103,42 @@ implements   ClassDefVisitor
 
         @Override
         public void visitClassData(DexFile dexFile, ClassDef classDef, ClassData classData) {
+            printer.println();
+
             if (classData.getStaticFieldCount() > 0) {
+                printer.println();
                 printer.println("# static fields");
                 classData.staticFieldsAccept(dexFile, classDef, this);
             }
 
             if (classData.getInstanceFieldCount() > 0) {
+                printer.println();
                 printer.println("# instance fields");
                 classData.instanceFieldsAccept(dexFile, classDef, this);
             }
 
-            if (classData.getDirectMethodCount() > 0) {
+            int directMethodCount = classData.getDirectMethodCount();
+            if (directMethodCount > 0) {
+                printer.println();
                 printer.println("# direct methods");
-                classData.directMethodsAccept(dexFile, classDef, this);
+                classData.directMethodsAccept(dexFile, classDef, EncodedMethodVisitor.concatenate(this,
+                        (df, cd, idx, m) -> { if (idx + 1 < directMethodCount) printer.println(); }));
             }
 
-            if (classData.getVirtualMethodCount() > 0) {
+            int virtualMethodCount = classData.getVirtualMethodCount();
+            if (virtualMethodCount > 0) {
+                printer.println();
                 printer.println("# virtual methods");
-                classData.virtualMethodsAccept(dexFile, classDef, this);
+                classData.virtualMethodsAccept(dexFile, classDef, EncodedMethodVisitor.concatenate(this,
+                        (df, cd, idx, m) -> { if (idx + 1 < virtualMethodCount) printer.println(); }));
             }
         }
 
         @Override
         public void visitInterfaces(DexFile dexFile, ClassDef classDefItem, TypeList typeList) {
+            printer.println();
             printer.println("# interfaces");
             typeList.typesAccept(dexFile, (dexFile1, typeList1, index, type) -> printer.println(".implements " + type));
-            printer.println();
         }
 
         @Override
@@ -198,7 +207,6 @@ implements   ClassDefVisitor
             printer.levelDown();
 
             printer.println(".end method");
-            printer.println();
         }
 
         @Override
@@ -237,10 +245,13 @@ implements   ClassDefVisitor
 
         @Override
         public void visitClassAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet) {
-            if (annotationSet.getAnnotationCount() > 0) {
-                printer.println("# annotations");
-                annotationSet.accept(dexFile, classDef, AnnotationVisitor.concatenate(this, (df, cd, as, idx, ann) -> printer.println()));
+            int annotationCount = annotationSet.getAnnotationCount();
+            if (annotationCount > 0) {
                 printer.println();
+                printer.println("# annotations");
+                annotationSet.accept(dexFile, classDef,
+                                     AnnotationVisitor.concatenate(this,
+                                             (df, cd, as, idx, ann) -> { if ((idx + 1) < annotationCount) printer.println(); } ));
             }
         }
 

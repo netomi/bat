@@ -25,12 +25,9 @@ public interface AnnotationVisitor
     void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation);
 
     static AnnotationVisitor concatenate(AnnotationVisitor... visitors) {
-        return new AnnotationVisitor() {
-            @Override
-            public void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation) {
-                for (AnnotationVisitor visitor : visitors) {
-                    visitor.visitAnnotation(dexFile, classDef, annotationSet, index, annotation);
-                }
+        return (dexFile, classDef, annotationSet, index, annotation) -> {
+            for (AnnotationVisitor visitor : visitors) {
+                visitor.visitAnnotation(dexFile, classDef, annotationSet, index, annotation);
             }
         };
     }

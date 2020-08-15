@@ -30,6 +30,9 @@ implements   EncodedMethodVisitor
     }
 
     @Override
+    public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {}
+
+    @Override
     public void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod encodedMethod) {
         encodedMethod.codeAccept(dexFile, classDef, visitor);
     }
