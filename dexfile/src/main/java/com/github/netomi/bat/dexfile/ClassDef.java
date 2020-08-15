@@ -117,7 +117,7 @@ extends      DataItem
 
     public String getSourceFile(DexFile dexFile) {
         return sourceFileIndex == NO_INDEX ?
-            "unknown" :
+            null :
             dexFile.getStringID(sourceFileIndex).getStringValue();
     }
 
