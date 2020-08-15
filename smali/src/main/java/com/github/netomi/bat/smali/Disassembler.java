@@ -190,7 +190,7 @@ implements   ClassDefVisitor
                 printer.print(" " + accessFlags);
             }
 
-            printer.println(" " + method.getName(dexFile) + ":" + method.getDescriptor(dexFile));
+            printer.println(" " + method.getName(dexFile) + method.getDescriptor(dexFile));
 
             // print code.
             printer.levelUp();

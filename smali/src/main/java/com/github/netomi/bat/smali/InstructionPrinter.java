@@ -121,7 +121,7 @@ implements InstructionVisitor
         switch (instruction.getOpcode().getFormat()) {
             case FORMAT_11n:
             case FORMAT_22b:
-                sb.append(String.format("#int %d // #%x", value, (byte) value));
+                sb.append(String.format("0x%x", value, (byte) value));
                 break;
 
             case FORMAT_21h:
