@@ -21,9 +21,7 @@ import com.github.netomi.bat.dexfile.EncodedField;
 
 public interface EncodedFieldVisitor
 {
-    default void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
-        throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
-    }
+    void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField field);
 
     default void visitStaticField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
         visitAnyField(dexFile, classDef, index, field);
@@ -31,5 +29,30 @@ public interface EncodedFieldVisitor
 
     default void visitInstanceField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
         visitAnyField(dexFile, classDef, index, field);
+    }
+
+    static EncodedFieldVisitor concatenate(EncodedFieldVisitor... visitors) {
+        return new EncodedFieldVisitor() {
+            @Override
+            public void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+                for (EncodedFieldVisitor visitor : visitors) {
+                    visitor.visitAnyField(dexFile, classDef, index, field);
+                }
+            }
+
+            @Override
+            public void visitStaticField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+                for (EncodedFieldVisitor visitor : visitors) {
+                    visitor.visitStaticField(dexFile, classDef, index, field);
+                }
+            }
+
+            @Override
+            public void visitInstanceField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
+                for (EncodedFieldVisitor visitor : visitors) {
+                    visitor.visitInstanceField(dexFile, classDef, index, field);
+                }
+            }
+        };
     }
 }

@@ -50,6 +50,10 @@ extends      DebugStartLocal
         return sigIndex;
     }
 
+    public String getSignature(DexFile dexFile) {
+        return dexFile.getString(sigIndex);
+    }
+
     @Override
     protected void read(DexDataInput input) {
         super.read(input);

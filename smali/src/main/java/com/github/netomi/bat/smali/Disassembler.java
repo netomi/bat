@@ -17,6 +17,7 @@ package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
+import com.github.netomi.bat.dexfile.instruction.DexInstruction;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.util.DexClasses;
 import com.github.netomi.bat.dexfile.value.AnnotationElement;
@@ -29,6 +30,9 @@ import com.github.netomi.bat.io.OutputStreamFactory;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Disassembler
 implements   ClassDefVisitor
@@ -103,33 +107,43 @@ implements   ClassDefVisitor
 
         @Override
         public void visitClassData(DexFile dexFile, ClassDef classDef, ClassData classData) {
-            printer.println();
-
-            if (classData.getStaticFieldCount() > 0) {
+            int staticFieldCount = classData.getStaticFieldCount();
+            if (staticFieldCount > 0) {
+                printer.println();
                 printer.println();
                 printer.println("# static fields");
-                classData.staticFieldsAccept(dexFile, classDef, this);
+                classData.staticFieldsAccept(dexFile, classDef,
+                    EncodedFieldVisitor.concatenate(this,
+                        (df, cd, idx, f) -> { if (idx + 1 < staticFieldCount) printer.println(); }));
             }
 
-            if (classData.getInstanceFieldCount() > 0) {
+            int instanceFieldCount = classData.getInstanceFieldCount();
+            if (instanceFieldCount > 0) {
+                printer.println();
                 printer.println();
                 printer.println("# instance fields");
-                classData.instanceFieldsAccept(dexFile, classDef, this);
+                classData.instanceFieldsAccept(dexFile, classDef,
+                    EncodedFieldVisitor.concatenate(this,
+                        (df, cd, idx, f) -> { if (idx + 1 < instanceFieldCount) printer.println(); }));
             }
 
             int directMethodCount = classData.getDirectMethodCount();
             if (directMethodCount > 0) {
                 printer.println();
+                printer.println();
                 printer.println("# direct methods");
-                classData.directMethodsAccept(dexFile, classDef, EncodedMethodVisitor.concatenate(this,
+                classData.directMethodsAccept(dexFile, classDef,
+                    EncodedMethodVisitor.concatenate(this,
                         (df, cd, idx, m) -> { if (idx + 1 < directMethodCount) printer.println(); }));
             }
 
             int virtualMethodCount = classData.getVirtualMethodCount();
             if (virtualMethodCount > 0) {
                 printer.println();
+                printer.println();
                 printer.println("# virtual methods");
-                classData.virtualMethodsAccept(dexFile, classDef, EncodedMethodVisitor.concatenate(this,
+                classData.virtualMethodsAccept(dexFile, classDef,
+                    EncodedMethodVisitor.concatenate(this,
                         (df, cd, idx, m) -> { if (idx + 1 < virtualMethodCount) printer.println(); }));
             }
         }
@@ -140,6 +154,9 @@ implements   ClassDefVisitor
             printer.println("# interfaces");
             typeList.typesAccept(dexFile, (dexFile1, typeList1, index, type) -> printer.println(".implements " + type));
         }
+
+        @Override
+        public void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {}
 
         @Override
         public void visitInstanceField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
@@ -158,8 +175,6 @@ implements   ClassDefVisitor
             if (classDef.annotationsDirectory != null) {
                 classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, this);
             }
-
-            printer.println();
         }
 
         @Override
@@ -183,8 +198,6 @@ implements   ClassDefVisitor
             if (classDef.annotationsDirectory != null) {
                 classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, this);
             }
-
-            printer.println();
         }
 
         @Override
@@ -244,7 +257,19 @@ implements   ClassDefVisitor
                 classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this);
             }
 
-            code.instructionsAccept(dexFile, classDef, method, code, new InstructionPrinter(printer));
+            RegisterPrinter            registerPrinter = new RegisterPrinter(code);
+            Map<Integer, List<String>> debugState      = new HashMap<>();
+
+            if (code.debugInfo != null) {
+                code.debugInfo.debugSequenceAccept(dexFile,
+                    new SourceLineCollector(debugState, code.debugInfo.getLineStart()));
+
+                code.debugInfo.debugSequenceAccept(dexFile,
+                    new LocalVariableCollector(debugState, code.debugInfo.getLineStart(), code.registersSize, registerPrinter));
+            }
+
+            code.instructionsAccept(dexFile, classDef, method, code,
+                                    new InstructionPrinter(printer, registerPrinter, debugState));
         }
 
         @Override

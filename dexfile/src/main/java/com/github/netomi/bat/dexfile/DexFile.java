@@ -95,6 +95,7 @@ public class DexFile
         if (index == null) {
             stringIDs.add(StringID.of(string));
             index = stringIDs.size() - 1;
+            stringMap.put(string, index);
         }
         return index;
     }
@@ -127,6 +128,7 @@ public class DexFile
         if (index == null) {
             typeIDs.add(TypeID.of(addOrGetStringIDIndex(type)));
             index = typeIDs.size() - 1;
+            typeMap.put(type, index);
         }
         return index;
     }

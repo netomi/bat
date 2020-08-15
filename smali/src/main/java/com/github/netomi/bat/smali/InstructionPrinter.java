@@ -21,24 +21,35 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
 import com.github.netomi.bat.util.Primitives;
 
+import java.util.List;
+import java.util.Map;
+
 class      InstructionPrinter
 implements InstructionVisitor
 {
-    private final IndentingPrinter printer;
+    private final IndentingPrinter           printer;
+    private final RegisterPrinter            registerPrinter;
+    private final Map<Integer, List<String>> debugState;
 
-    public InstructionPrinter(IndentingPrinter printer) {
-        this.printer = printer;
+    public InstructionPrinter(IndentingPrinter           printer,
+                              RegisterPrinter            registerPrinter,
+                              Map<Integer, List<String>> debugState) {
+        this.printer         = printer;
+        this.registerPrinter = registerPrinter;
+        this.debugState      = debugState;
     }
 
     @Override
     public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, true);
     }
 
     @Override
     public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
@@ -47,19 +58,7 @@ implements InstructionVisitor
 
         if (instruction.containsLiteral())  {
             sb.append(", ");
-            sb.append("#int ");
-            sb.append(literal);
-            sb.append(" // #");
-
-            switch (instruction.getOpcode().getFormat()) {
-                case FORMAT_22s:
-                    sb.append(Primitives.asHexValue((short) literal));
-                    break;
-
-                case FORMAT_22b:
-                    sb.append(Primitives.asHexValue((byte) literal));
-                    break;
-            }
+            sb.append(toHexString(literal));
         }
 
         printer.println(sb.toString());
@@ -68,6 +67,7 @@ implements InstructionVisitor
     @Override
     public void visitBranchInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BranchInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
@@ -79,15 +79,6 @@ implements InstructionVisitor
         }
 
         sb.append(Primitives.asHexValue(offset + instruction.getBranchOffset(), 4));
-        sb.append(" // ");
-
-        if (instruction.getBranchOffset() < 0) {
-            sb.append('-');
-            sb.append(Primitives.asHexValue(-instruction.getBranchOffset(), 4));
-        } else {
-            sb.append('+');
-            sb.append(Primitives.asHexValue(instruction.getBranchOffset(), 4));
-        }
 
         printer.println(sb.toString());
     }
@@ -95,6 +86,7 @@ implements InstructionVisitor
     @Override
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, false);
 
         printer.print(", ");
@@ -111,44 +103,14 @@ implements InstructionVisitor
     @Override
     public void visitLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, LiteralInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
         sb.append(", ");
 
         long value = instruction.getValue();
-
-        switch (instruction.getOpcode().getFormat()) {
-            case FORMAT_11n:
-            case FORMAT_22b:
-                sb.append(String.format("0x%x", value));
-                break;
-
-            case FORMAT_21h:
-                // The printed format varies a bit based on the actual opcode.
-                if (instruction.getOpcode() == DexOpCode.CONST_HIGH16) {
-                    short v = (short) (value >> 16);
-                    sb.append(String.format("#int %d // #%x", value, v));
-                } else {
-                    short v = (short) (value >> 48);
-                    sb.append(String.format("#long %d // #%x", value, v));
-                }
-                break;
-
-            case FORMAT_21s:
-            case FORMAT_22s:
-                sb.append(String.format("#int %d // #%x", value, (short) value));
-                break;
-
-            case FORMAT_31i:
-                sb.append(String.format("#float %g // #%08x", Float.intBitsToFloat((int) value), value ));
-                break;
-
-            case FORMAT_51l:
-                //sb.append(String.format("#double %g // #%016lx", Double.longBitsToDouble(value), value));
-                break;
-
-        }
+        sb.append(toHexString(value));
 
         printer.println(sb.toString());
     }
@@ -156,7 +118,7 @@ implements InstructionVisitor
     @Override
     public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
         printer.println();
-
+        printDebugInfo(offset);
         printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
@@ -180,6 +142,7 @@ implements InstructionVisitor
     @Override
     public void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
@@ -207,6 +170,7 @@ implements InstructionVisitor
     @Override
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, false);
         printer.println(", \"" + instruction.getString(dexFile) + "\"");
     }
@@ -214,6 +178,7 @@ implements InstructionVisitor
     @Override
     public void visitTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, TypeInstruction instruction) {
         printer.println();
+        printDebugInfo(offset);
         printGeneric(code, instruction, false);
 
         printer.print(", ");
@@ -240,6 +205,12 @@ implements InstructionVisitor
         printer.println(payload.toString());
     }
 
+    private String toHexString(long value) {
+        return value < 0 ?
+            String.format("-0x%x", -value) :
+            String.format("0x%x", value);
+    }
+
     private void printGeneric(Code code, DexInstruction instruction, boolean appendNewLine) {
         printer.print(instruction.getMnemonic());
 
@@ -254,20 +225,26 @@ implements InstructionVisitor
     }
 
     private void printRegisters(Code code, DexInstruction instruction) {
-        int localRegisters = code.registersSize - code.insSize;
-
         for (int idx = 0; idx < instruction.registers.length; idx++) {
             if (idx > 0) {
                 printer.print(", ");
             }
 
             int registerNum = instruction.registers[idx];
-            String registerPrefix = registerNum < localRegisters ? "v" : "p";
-            int    registerIndex  = registerNum < localRegisters ?
-                instruction.registers[idx] :
-                instruction.registers[idx] - localRegisters;
+            registerPrinter.printRegister(printer, registerNum);
+        }
+    }
 
-            printer.print(registerPrefix + registerIndex);
+    private void printDebugInfo(int offset) {
+        if (debugState == null) {
+            return;
+        }
+
+        List<String> debugInfos = debugState.get(offset);
+        if (debugInfos != null) {
+            for (String info : debugInfos) {
+                printer.println(info);
+            }
         }
     }
 }
