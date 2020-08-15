@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.BiConsumer;
 
 @DataItemAnn(
     type          = DexConstants.TYPE_ANNOTATION_SET_ITEM,

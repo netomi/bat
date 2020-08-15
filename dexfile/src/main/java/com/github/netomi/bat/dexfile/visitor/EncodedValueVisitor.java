@@ -18,11 +18,11 @@ package com.github.netomi.bat.dexfile.visitor;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.value.*;
 
+import java.util.function.BiConsumer;
+
 public interface EncodedValueVisitor
 {
-    default void visitAnyValue(DexFile dexFile, EncodedValue value) {
-        throw new RuntimeException("Need to implement in class '" + this.getClass().getName() + "'.");
-    }
+    void visitAnyValue(DexFile dexFile, EncodedValue value);
 
     default void visitAnnotationValue(DexFile dexFile, EncodedAnnotationValue value) {
         visitAnyValue(dexFile, value);
@@ -94,5 +94,142 @@ public interface EncodedValueVisitor
 
     default void visitTypeValue(DexFile dexFile, EncodedTypeValue value) {
         visitAnyValue(dexFile, value);
+    }
+
+    static EncodedValueVisitor concatenate(EncodedValueVisitor... visitors) {
+        return new EncodedValueVisitor() {
+            @Override
+            public void visitAnyValue(DexFile dexFile, EncodedValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitAnyValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitAnnotationValue(DexFile dexFile, EncodedAnnotationValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitAnnotationValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitArrayValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitBooleanValue(DexFile dexFile, EncodedBooleanValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitBooleanValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitByteValue(DexFile dexFile, EncodedByteValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitByteValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitCharValue(DexFile dexFile, EncodedCharValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitCharValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitDoubleValue(DexFile dexFile, EncodedDoubleValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitDoubleValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitEnumValue(DexFile dexFile, EncodedEnumValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitEnumValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitFieldValue(DexFile dexFile, EncodedFieldValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitFieldValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitFloatValue(DexFile dexFile, EncodedFloatValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitFloatValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitIntValue(DexFile dexFile, EncodedIntValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitIntValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitLongValue(DexFile dexFile, EncodedLongValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitLongValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitMethodHandleValue(DexFile dexFile, EncodedMethodHandleValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitMethodHandleValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitMethodTypeValue(DexFile dexFile, EncodedMethodTypeValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitMethodTypeValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitMethodValue(DexFile dexFile, EncodedMethodValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitMethodValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitNullValue(DexFile dexFile, EncodedNullValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitNullValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitShortValue(DexFile dexFile, EncodedShortValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitShortValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitStringValue(DexFile dexFile, EncodedStringValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitStringValue(dexFile, value);
+                }
+            }
+
+            @Override
+            public void visitTypeValue(DexFile dexFile, EncodedTypeValue value) {
+                for (EncodedValueVisitor visitor : visitors) {
+                    visitor.visitTypeValue(dexFile, value);
+                }
+            }
+        };
     }
 }

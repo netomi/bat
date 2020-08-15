@@ -145,6 +145,11 @@ implements   ClassDefVisitor
             }
 
             printer.println(" " + field.getName(dexFile) + ":" + field.getType(dexFile));
+
+            if (classDef.annotationsDirectory != null) {
+                classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, this);
+            }
+
             printer.println();
         }
 
@@ -165,6 +170,11 @@ implements   ClassDefVisitor
             field.staticValueAccept(dexFile, classDef, index, new EncodedValuePrinter(printer, null, " = "));
 
             printer.println();
+
+            if (classDef.annotationsDirectory != null) {
+                classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, this);
+            }
+
             printer.println();
         }
 
@@ -205,11 +215,21 @@ implements   ClassDefVisitor
                     String parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex++);
                     if (parameterName != null) {
                         printer.println(String.format(".param p%d, \"%s\"    # %s",
-                                                      registerIndex++,
+                                                      registerIndex,
                                                       parameterName,
                                                       parameterType));
                     }
+                    registerIndex++;
+
+                    // TODO: extract into util class.
+                    if (parameterType.equals("J") || parameterType.equals("D")) {
+                        registerIndex++;
+                    }
                 }
+            }
+
+            if (classDef.annotationsDirectory != null) {
+                classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this);
             }
 
             code.instructionsAccept(dexFile, classDef, method, code, new InstructionPrinter(printer));
@@ -219,19 +239,24 @@ implements   ClassDefVisitor
         public void visitClassAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet) {
             if (annotationSet.getAnnotationCount() > 0) {
                 printer.println("# annotations");
-                annotationSet.accept(dexFile, classDef, this);
+                annotationSet.accept(dexFile, classDef, AnnotationVisitor.concatenate(this, (df, cd, as, idx, ann) -> printer.println()));
                 printer.println();
             }
         }
 
         @Override
         public void visitFieldAnnotationSet(DexFile dexFile, ClassDef classDef, FieldAnnotation fieldAnnotation, AnnotationSet annotationSet) {
-
+            if (annotationSet.getAnnotationCount() > 0) {
+                printer.levelUp();
+                annotationSet.accept(dexFile, classDef, this);
+                printer.levelDown();
+                printer.println(".end field");
+            }
         }
 
         @Override
         public void visitMethodAnnotationSet(DexFile dexFile, ClassDef classDef, MethodAnnotation methodAnnotation, AnnotationSet annotationSet) {
-
+            annotationSet.accept(dexFile, classDef, this);
         }
 
         @Override
@@ -245,15 +270,15 @@ implements   ClassDefVisitor
 
             switch (annotation.getVisibility()) {
                 case VISIBILITY_BUILD:
-                    printer.print("build");
+                    printer.print("build ");
                     break;
 
                 case VISIBILITY_SYSTEM:
-                    printer.print("system");
+                    printer.print("system ");
                     break;
 
                 case VISIBILITY_RUNTIME:
-                    printer.print("runtime");
+                    printer.print("runtime ");
                     break;
             }
 
@@ -263,7 +288,6 @@ implements   ClassDefVisitor
             annotationValue.annotationElementsAccept(dexFile, this);
             printer.levelDown();
             printer.println(".end annotation");
-            printer.println();
         }
 
         @Override

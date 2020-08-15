@@ -91,13 +91,8 @@ extends      EncodedValue
     }
 
     public void valuesAccept(DexFile dexFile, EncodedValueVisitor visitor) {
-        valuesAccept(dexFile, visitor, (DexFile df, EncodedValue ev) -> {});
-    }
-
-    public void valuesAccept(DexFile dexFile, EncodedValueVisitor visitor, BiConsumer<DexFile, EncodedValue> separator) {
         for (EncodedValue value : values) {
             value.accept(dexFile, visitor);
-            separator.accept(dexFile, value);
         }
     }
 

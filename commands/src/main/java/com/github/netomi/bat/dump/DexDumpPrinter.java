@@ -442,7 +442,7 @@ implements   DexFileVisitor,
         @Override
         public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
             print("{ ");
-            value.valuesAccept(dexFile, this, (df, v) -> print(" "));
+            value.valuesAccept(dexFile, EncodedValueVisitor.concatenate(this, (df, v) -> print(" ")));
             print("}");
         }
 

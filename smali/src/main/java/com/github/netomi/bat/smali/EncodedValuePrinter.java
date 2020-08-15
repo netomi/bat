@@ -71,7 +71,7 @@ implements EncodedValueVisitor
         append("{");
         printer.println();
         printer.levelUp();
-        value.valuesAccept(dexFile, this, (df, v) -> printer.println());
+        value.valuesAccept(dexFile, EncodedValueVisitor.concatenate(this, (df, v) -> printer.println()));
         printer.levelDown();
         printer.print("}");
     }
