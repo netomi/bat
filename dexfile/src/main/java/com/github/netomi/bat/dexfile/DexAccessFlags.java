@@ -43,14 +43,12 @@ public enum DexAccessFlags
     private final int value;
     private final int target;
 
-    DexAccessFlags(int value, int target)
-    {
+    DexAccessFlags(int value, int target) {
         this.value  = value;
         this.target = target;
     }
 
-    public static String formatAsHumanReadable(int accessFlags, int target)
-    {
+    public static String formatAsHumanReadable(int accessFlags, int target) {
         StringBuilder sb = new StringBuilder();
         for (DexAccessFlags accessFlag : values())
         {

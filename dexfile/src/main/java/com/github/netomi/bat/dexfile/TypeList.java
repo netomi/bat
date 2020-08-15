@@ -98,7 +98,7 @@ extends      DataItem
     }
 
     public void addType(DexFile dexFile, String type) {
-        addType(dexFile.addOrGetTypeID(type));
+        addType(dexFile.addOrGetTypeIDIndex(type));
     }
 
     @Override

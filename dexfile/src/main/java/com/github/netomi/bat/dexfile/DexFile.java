@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
+import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
+
 public class DexFile
 {
     private DexHeader header;
@@ -78,12 +80,17 @@ public class DexFile
     }
 
     public String getString(int index) {
-        return index == DexConstants.NO_INDEX ?
+        return index == NO_INDEX ?
             null :
             getStringID(index).getStringValue();
     }
 
-    public int addOrGetStringID(String string) {
+    public int getStringIDIndex(String string) {
+        Integer index = stringMap.get(string);
+        return index == null ? NO_INDEX : index;
+    }
+
+    public int addOrGetStringIDIndex(String string) {
         Integer index = stringMap.get(string);
         if (index == null) {
             stringIDs.add(StringID.of(string));
@@ -105,15 +112,20 @@ public class DexFile
     }
 
     public String getType(int index) {
-        return index == DexConstants.NO_INDEX ?
+        return index == NO_INDEX ?
             null :
             getTypeID(index).getType(this);
     }
 
-    public int addOrGetTypeID(String type) {
+    public int getTypeIDIndex(String type) {
+        Integer index = typeMap.get(type);
+        return index == null ? NO_INDEX : index;
+    }
+
+    public int addOrGetTypeIDIndex(String type) {
         Integer index = typeMap.get(type);
         if (index == null) {
-            typeIDs.add(TypeID.of(addOrGetStringID(type)));
+            typeIDs.add(TypeID.of(addOrGetStringIDIndex(type)));
             index = typeIDs.size() - 1;
         }
         return index;

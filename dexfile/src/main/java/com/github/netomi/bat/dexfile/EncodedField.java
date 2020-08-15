@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+import java.util.EnumSet;
 import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
@@ -37,6 +38,14 @@ extends      DexContent
     private int fieldIndex;
     private int accessFlags;     // uleb128
 
+    public static EncodedField of(int fieldIndex, Visibility visibility, FieldModifier... modifiers) {
+        int accessFlags = visibility.getFlagValue();
+        for (FieldModifier modifier : modifiers) {
+            accessFlags |= modifier.getFlagValue();
+        }
+        return new EncodedField(fieldIndex, accessFlags);
+    }
+
     public static EncodedField readContent(DexDataInput input, int lastIndex) {
         EncodedField encodedField = new EncodedField();
         encodedField.read(input);
@@ -45,8 +54,12 @@ extends      DexContent
     }
 
     private EncodedField() {
-        fieldIndex  = NO_INDEX;
-        accessFlags = 0;
+        this(NO_INDEX, 0);
+    }
+
+    private EncodedField(int fieldIndex, int accessFlags) {
+        this.fieldIndex  = fieldIndex;
+        this.accessFlags = accessFlags;
     }
 
     public int getFieldIndex() {
@@ -55,6 +68,14 @@ extends      DexContent
 
     public int getAccessFlags() {
         return accessFlags;
+    }
+
+    public Visibility getVisibility() {
+        return Visibility.of(accessFlags);
+    }
+
+    public EnumSet<FieldModifier> getModifiers() {
+        return FieldModifier.setOf(accessFlags);
     }
 
     public FieldID getFieldID(DexFile dexFile) {
