@@ -15,27 +15,51 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
-import com.github.netomi.bat.dexfile.DataItem;
-import com.github.netomi.bat.dexfile.DexContent;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.MethodID;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.AnnotationSetVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
+
+import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * A class representing a method annotation format inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-annotation">method annotation format @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 public class MethodAnnotation
 extends      DexContent
 {
-    public  int           methodIndex;       // uint
+    private int           methodIndex;       // uint
     private int           annotationsOffset; // uint
-    public  AnnotationSet annotationSet;
+    private AnnotationSet annotationSet;
 
-    public MethodAnnotation() {
-        methodIndex       = NO_INDEX;
-        annotationsOffset = 0;
-        annotationSet     = null;
+    public static MethodAnnotation of(int methodIndex, AnnotationSet annotationSet) {
+        return new MethodAnnotation(methodIndex, annotationSet);
+    }
+
+    public static MethodAnnotation readContent(DexDataInput input) {
+        MethodAnnotation methodAnnotation = new MethodAnnotation();
+        methodAnnotation.read(input);
+        return methodAnnotation;
+    }
+
+    private MethodAnnotation() {
+        this(NO_INDEX, null);
+    }
+
+    private MethodAnnotation(int methodIndex, AnnotationSet annotationSet) {
+        this.methodIndex = methodIndex;
+        this.annotationSet = annotationSet;
+    }
+
+    public int getMethodIndex() {
+        return methodIndex;
     }
 
     public int getAnnotationsOffset() {
@@ -70,8 +94,31 @@ extends      DexContent
         output.writeInt(annotationsOffset);
     }
 
+    public void accept(DexFile dexFile, ClassDef classDef, AnnotationSetVisitor visitor) {
+        visitor.visitMethodAnnotationSet(dexFile, classDef, this, annotationSet);
+    }
+
     @Override
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         visitor.visitMethodAnnotations(dexFile, this, annotationSet);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MethodAnnotation other = (MethodAnnotation) o;
+        return methodIndex == other.methodIndex &&
+               Objects.equals(annotationSet, other.annotationSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(methodIndex, annotationSet);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("MethodAnnotation[methodIdx=%d]", methodIndex);
     }
 }

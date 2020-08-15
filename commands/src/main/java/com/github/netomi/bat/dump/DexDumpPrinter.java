@@ -396,7 +396,7 @@ implements   DexFileVisitor,
         @Override
         public void visitFieldAnnotationSet(DexFile dexFile, ClassDef classDef, FieldAnnotation fieldAnnotation, AnnotationSet annotationSet) {
             FieldID fieldID = fieldAnnotation.getFieldID(dexFile);
-            println("Annotations on field #" + fieldAnnotation.fieldIndex + " '" + fieldID.getName(dexFile) + "'");
+            println("Annotations on field #" + fieldAnnotation.getFieldIndex() + " '" + fieldID.getName(dexFile) + "'");
             annotationSet.accept(dexFile, classDef, this);
         }
 

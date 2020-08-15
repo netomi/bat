@@ -71,15 +71,13 @@ extends      DataItem
 
         fieldAnnotations = new ArrayList<>(fieldsSize);
         for (int i = 0; i < fieldsSize; i++) {
-            FieldAnnotation fieldAnnotation = new FieldAnnotation();
-            fieldAnnotation.read(input);
+            FieldAnnotation fieldAnnotation = FieldAnnotation.readContent(input);
             fieldAnnotations.add(fieldAnnotation);
         }
 
         methodAnnotations = new ArrayList<>(annotatedMethodsSize);
         for (int i = 0; i < annotatedMethodsSize; i++) {
-            MethodAnnotation methodAnnotation = new MethodAnnotation();
-            methodAnnotation.read(input);
+            MethodAnnotation methodAnnotation = MethodAnnotation.readContent(input);
             methodAnnotations.add(methodAnnotation);
         }
 
@@ -154,12 +152,12 @@ extends      DataItem
     public void accept(DexFile dexFile, ClassDef classDef, AnnotationSetVisitor visitor) {
         classAnnotationSetAccept(dexFile, classDef, visitor);
 
-        for (FieldAnnotation annotation : fieldAnnotations) {
-            visitor.visitFieldAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+        for (FieldAnnotation fieldAnnotation : fieldAnnotations) {
+            fieldAnnotation.accept(dexFile, classDef, visitor);
         }
 
-        for (MethodAnnotation annotation : methodAnnotations) {
-            visitor.visitMethodAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+        for (MethodAnnotation methodAnnotation : methodAnnotations) {
+            methodAnnotation.accept(dexFile, classDef, visitor);
         }
 
         for (ParameterAnnotation annotation : parameterAnnotations) {
@@ -174,18 +172,18 @@ extends      DataItem
     }
 
     public void fieldAnnotationSetAccept(DexFile dexFile, ClassDef classDef, EncodedField field, AnnotationSetVisitor visitor) {
-        for (FieldAnnotation annotation : fieldAnnotations) {
-            if (annotation.fieldIndex == field.getFieldIndex()) {
-                visitor.visitFieldAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+        for (FieldAnnotation fieldAnnotation : fieldAnnotations) {
+            if (fieldAnnotation.getFieldIndex() == field.getFieldIndex()) {
+                fieldAnnotation.accept(dexFile, classDef, visitor);
                 break;
             }
         }
     }
 
     public void methodAnnotationSetAccept(DexFile dexFile, ClassDef classDef, EncodedMethod method, AnnotationSetVisitor visitor) {
-        for (MethodAnnotation annotation : methodAnnotations) {
-            if (annotation.methodIndex == method.getMethodIndex()) {
-                visitor.visitMethodAnnotationSet(dexFile, classDef, annotation, annotation.annotationSet);
+        for (MethodAnnotation methodAnnotation : methodAnnotations) {
+            if (methodAnnotation.getMethodIndex() == method.getMethodIndex()) {
+                methodAnnotation.accept(dexFile, classDef, visitor);
                 break;
             }
         }

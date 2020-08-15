@@ -55,8 +55,7 @@ extends      DataItem
     }
 
     private CallSiteID(CallSite callSite) {
-        this.callSiteOffset = 0;
-        this.callSite       = callSite;
+        this.callSite = callSite;
     }
 
     public int getCallSiteOffset() {

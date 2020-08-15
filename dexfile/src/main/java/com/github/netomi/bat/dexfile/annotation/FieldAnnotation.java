@@ -15,27 +15,51 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
-import com.github.netomi.bat.dexfile.DataItem;
-import com.github.netomi.bat.dexfile.DexContent;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.FieldID;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.AnnotationSetVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
+
+import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * A class representing a field annotation format inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#field-annotation">field annotation format @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 public class FieldAnnotation
 extends      DexContent
 {
-    public  int           fieldIndex;        // uint
+    private int           fieldIndex;        // uint
     private int           annotationsOffset; // uint
-    public  AnnotationSet annotationSet;
+    private AnnotationSet annotationSet;
 
-    public FieldAnnotation() {
-        fieldIndex        = NO_INDEX;
-        annotationsOffset = 0;
-        annotationSet     = null;
+    public static FieldAnnotation of(int fieldIndex, AnnotationSet annotationSet) {
+        return new FieldAnnotation(fieldIndex, annotationSet);
+    }
+
+    public static FieldAnnotation readContent(DexDataInput input) {
+        FieldAnnotation fieldAnnotation = new FieldAnnotation();
+        fieldAnnotation.read(input);
+        return fieldAnnotation;
+    }
+
+    private FieldAnnotation() {
+        this(NO_INDEX, null);
+    }
+
+    private FieldAnnotation(int fieldIndex, AnnotationSet annotationSet) {
+        this.fieldIndex        = fieldIndex;
+        this.annotationSet     = annotationSet;
+    }
+
+    public int getFieldIndex() {
+        return fieldIndex;
     }
 
     public int getAnnotationsOffset() {
@@ -70,8 +94,31 @@ extends      DexContent
         output.writeInt(annotationsOffset);
     }
 
+    public void accept(DexFile dexFile, ClassDef classDef, AnnotationSetVisitor visitor) {
+        visitor.visitFieldAnnotationSet(dexFile, classDef, this, annotationSet);
+    }
+
     @Override
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         visitor.visitFieldAnnotations(dexFile, this, annotationSet);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldAnnotation other = (FieldAnnotation) o;
+        return fieldIndex == other.fieldIndex &&
+               Objects.equals(annotationSet, other.annotationSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fieldIndex, annotationSet);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("FieldAnnotation[fieldIdx=%d]", fieldIndex);
     }
 }

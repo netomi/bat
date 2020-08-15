@@ -49,7 +49,6 @@ extends      DexContent
     private EncodedMethod() {
         methodIndex = DexConstants.NO_INDEX;
         accessFlags = 0;
-        codeOffset  = 0;
         code        = null;
     }
 

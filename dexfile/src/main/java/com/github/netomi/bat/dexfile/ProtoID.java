@@ -70,7 +70,6 @@ extends      DataItem
     private ProtoID(int shortyIndex, int returnTypeIndex) {
         this.shortyIndex      = shortyIndex;
         this.returnTypeIndex  = returnTypeIndex;
-        this.parametersOffset = 0;
         this.parameters       = TypeList.empty();
     }
 

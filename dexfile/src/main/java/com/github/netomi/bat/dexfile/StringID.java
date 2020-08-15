@@ -56,8 +56,7 @@ extends      DataItem
     }
 
     private StringID(StringData data) {
-        this.stringDataOffset = 0;
-        this.stringData       = data;
+        this.stringData = data;
     }
 
     public int getStringDataOffset() {
