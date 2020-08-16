@@ -19,87 +19,61 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
-import com.github.netomi.bat.util.Primitives;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 class      InstructionPrinter
 implements InstructionVisitor
 {
     private final IndentingPrinter           printer;
     private final RegisterPrinter            registerPrinter;
-    private final Map<Integer, Set<String>>  labelInfos;
+    private final BranchTargetPrinter        branchTargetPrinter;
     private final Map<Integer, List<String>> debugState;
 
     public InstructionPrinter(IndentingPrinter           printer,
                               RegisterPrinter            registerPrinter,
-                              Map<Integer, Set<String>>  labelInfos,
+                              BranchTargetPrinter        branchTargetPrinter,
                               Map<Integer, List<String>> debugState) {
-        this.printer         = printer;
-        this.registerPrinter = registerPrinter;
-        this.labelInfos      = labelInfos;
-        this.debugState      = debugState;
+        this.printer             = printer;
+        this.registerPrinter     = registerPrinter;
+        this.branchTargetPrinter = branchTargetPrinter;
+        this.debugState          = debugState;
     }
 
     @Override
     public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, true);
+        printCommon(offset, code, instruction, true);
     }
 
     @Override
     public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, false);
-
-        StringBuilder sb = new StringBuilder();
-
-        int literal = instruction.getLiteral();
+        printCommon(offset, code, instruction, false);
 
         if (instruction.containsLiteral())  {
-            sb.append(", ");
-            sb.append(toHexString(literal));
+            printer.print(", ");
+            printer.print(toHexString(instruction.getLiteral()));
         }
 
-        printer.println(sb.toString());
+        printer.println();
     }
 
     @Override
     public void visitBranchInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BranchInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, false);
-
-        StringBuilder sb = new StringBuilder();
+        printCommon(offset, code, instruction, false);
 
         if (instruction.registers.length > 0) {
-            sb.append(", ");
+            printer.print(", ");
         } else {
-            sb.append(' ');
+            printer.print(" ");
         }
 
-        int target      = offset + instruction.getBranchOffset();
-        String mnemonic = instruction.getOpcode().getMnemonic();
-        String prefix   = mnemonic.startsWith("goto") ? "goto" : "cond";
-
-        sb.append(":" + prefix + "_" + Integer.toHexString(target));
-
-        printer.println(sb.toString());
+        printer.println(branchTargetPrinter.formatBranchInstructionTarget(offset, instruction));
     }
 
     @Override
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, false);
+        printCommon(offset, code, instruction, false);
 
         printer.print(", ");
 
@@ -114,18 +88,9 @@ implements InstructionVisitor
 
     @Override
     public void visitLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, LiteralInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, false);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(", ");
-
-        long value = instruction.getValue();
-        sb.append(toHexString(value));
-
-        printer.println(sb.toString());
+        printCommon(offset, code, instruction, false);
+        printer.print(", ");
+        printer.println(toHexString(instruction.getValue()));
     }
 
     @Override
@@ -155,49 +120,26 @@ implements InstructionVisitor
 
     @Override
     public void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, false);
-
-        StringBuilder sb = new StringBuilder();
+        printCommon(offset, code, instruction, false);
 
         if (instruction.registers.length > 0) {
-            sb.append(", ");
+            printer.print(", ");
         } else {
-            sb.append(' ');
+            printer.print(" ");
         }
 
-        sb.append(Primitives.asHexValue(offset + instruction.getPayloadOffset(), 8));
-        sb.append(" // ");
-
-        if (instruction.getPayloadOffset() < 0) {
-            sb.append('-');
-            sb.append(Primitives.asHexValue(-instruction.getPayloadOffset(), 8));
-        } else {
-            sb.append('+');
-            sb.append(Primitives.asHexValue(instruction.getPayloadOffset(), 8));
-        }
-
-        printer.println(sb.toString());
+        printer.println(branchTargetPrinter.formatPayloadInstructionTarget(offset, instruction));
     }
 
     @Override
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, false);
+        printCommon(offset, code, instruction, false);
         printer.println(", \"" + instruction.getString(dexFile) + "\"");
     }
 
     @Override
     public void visitTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, TypeInstruction instruction) {
-        printer.println();
-        printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, false);
-
+        printCommon(offset, code, instruction, false);
         printer.print(", ");
 
         TypeID typeID = instruction.getTypeID(dexFile);
@@ -232,6 +174,13 @@ implements InstructionVisitor
         return value < 0 ?
             String.format("-0x%x", -value) :
             String.format("0x%x", value);
+    }
+
+    private void printCommon(int offset, Code code, DexInstruction instruction, boolean appendNewLine) {
+        printer.println();
+        printDebugInfo(offset);
+        printLabels(offset);
+        printGeneric(code, instruction, appendNewLine);
     }
 
     private void printGeneric(Code code, DexInstruction instruction, boolean appendNewLine) {
@@ -272,11 +221,6 @@ implements InstructionVisitor
     }
 
     private void printLabels(int offset) {
-        Set<String> labels = labelInfos.get(offset);
-        if (labels != null) {
-            for (String label : labels) {
-                printer.println(label);
-            }
-        }
+        branchTargetPrinter.printLabels(offset, printer);
     }
 }

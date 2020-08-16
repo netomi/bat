@@ -17,7 +17,6 @@ package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
-import com.github.netomi.bat.dexfile.instruction.DexInstruction;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.util.DexClasses;
 import com.github.netomi.bat.dexfile.value.AnnotationElement;
@@ -258,9 +257,9 @@ implements   ClassDefVisitor
                 classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this);
             }
 
-            RegisterPrinter            registerPrinter = new RegisterPrinter(code);
-            Map<Integer, Set<String>>  labelInfos      = new HashMap<>();
-            Map<Integer, List<String>> debugState      = new HashMap<>();
+            RegisterPrinter            registerPrinter     = new RegisterPrinter(code);
+            BranchTargetPrinter        branchTargetPrinter = new BranchTargetPrinter();
+            Map<Integer, List<String>> debugState          = new HashMap<>();
 
             if (code.debugInfo != null) {
                 code.debugInfo.debugSequenceAccept(dexFile,
@@ -271,11 +270,11 @@ implements   ClassDefVisitor
             }
 
             // collect branch target / label infos.
-            code.instructionsAccept(dexFile, classDef, method, code, new BranchTargetCollector(labelInfos));
+            code.instructionsAccept(dexFile, classDef, method, code, branchTargetPrinter);
 
             // print the instructions.
             code.instructionsAccept(dexFile, classDef, method, code,
-                                    new InstructionPrinter(printer, registerPrinter, labelInfos, debugState));
+                                    new InstructionPrinter(printer, registerPrinter, branchTargetPrinter, debugState));
         }
 
         @Override

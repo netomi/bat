@@ -18,7 +18,6 @@ package com.github.netomi.bat.smali;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.debug.*;
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor;
-import com.github.netomi.bat.util.Primitives;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -403,7 +403,7 @@ implements   DexFileVisitor,
         @Override
         public void visitMethodAnnotationSet(DexFile dexFile, ClassDef classDef, MethodAnnotation methodAnnotation, AnnotationSet annotationSet) {
             MethodID methodID = methodAnnotation.getMethodID(dexFile);
-            println("Annotations on method #" + methodAnnotation.methodIndex + " '" + methodID.getName(dexFile) + "'");
+            println("Annotations on method #" + methodAnnotation.getMethodIndex() + " '" + methodID.getName(dexFile) + "'");
             annotationSet.accept(dexFile, classDef, this);
         }
 
