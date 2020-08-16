@@ -34,11 +34,10 @@ implements DebugSequenceVisitor
 
     private short codeOffset;
 
-    LocalVariableCollector(Map<Integer, List<String>> debugState, int registers, RegisterPrinter registerPrinter) {
+    LocalVariableCollector(Map<Integer, List<String>> debugState, LocalVariableInfo[] localVariableInfos, RegisterPrinter registerPrinter) {
         this.debugState         = debugState;
         this.registerPrinter    = registerPrinter;
-
-        this.localVariableInfos = new LocalVariableInfo[registers];
+        this.localVariableInfos = localVariableInfos;
     }
 
     @Override
@@ -159,7 +158,7 @@ implements DebugSequenceVisitor
         infos.add(info);
     }
 
-    private static class LocalVariableInfo
+    public static class LocalVariableInfo
     {
         final String name;
         final String type;

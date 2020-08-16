@@ -231,7 +231,12 @@ implements   ClassDefVisitor
         public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
             printer.println(".registers " + code.registersSize);
 
+            LocalVariableCollector.LocalVariableInfo[] localVariableInfos =
+                    new LocalVariableCollector.LocalVariableInfo[code.registersSize];
+
             if (code.debugInfo != null) {
+                int localVariables = code.registersSize - code.insSize;
+
                 int parameterIndex = 0;
                 int registerIndex = method.isStatic() ? 0 : 1;
 
@@ -246,6 +251,11 @@ implements   ClassDefVisitor
                                                       registerIndex,
                                                       parameterName,
                                                       parameterType));
+
+                        LocalVariableCollector.LocalVariableInfo localVariableInfo =
+                                new LocalVariableCollector.LocalVariableInfo(parameterName, parameterType, null);
+
+                        localVariableInfos[localVariables + registerIndex] = localVariableInfo;
 
                         if (classDef.annotationsDirectory != null) {
                             classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this);
@@ -273,7 +283,7 @@ implements   ClassDefVisitor
                     new SourceLineCollector(debugState, code.debugInfo.getLineStart()));
 
                 code.debugInfo.debugSequenceAccept(dexFile,
-                    new LocalVariableCollector(debugState, code.registersSize, registerPrinter));
+                    new LocalVariableCollector(debugState, localVariableInfos, registerPrinter));
             }
 
             // collect branch target / label infos.
