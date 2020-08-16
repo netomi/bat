@@ -155,7 +155,7 @@ implements InstructionVisitor
     }
 
     @Override
-    public void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {        printer.println();
+    public void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {
         printer.println();
         printDebugInfo(offset);
         printLabels(offset);
