@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Disassembler
 implements   ClassDefVisitor
@@ -258,6 +259,7 @@ implements   ClassDefVisitor
             }
 
             RegisterPrinter            registerPrinter = new RegisterPrinter(code);
+            Map<Integer, Set<String>>  labelInfos      = new HashMap<>();
             Map<Integer, List<String>> debugState      = new HashMap<>();
 
             if (code.debugInfo != null) {
@@ -268,8 +270,12 @@ implements   ClassDefVisitor
                     new LocalVariableCollector(debugState, code.debugInfo.getLineStart(), code.registersSize, registerPrinter));
             }
 
+            // collect branch target / label infos.
+            code.instructionsAccept(dexFile, classDef, method, code, new BranchTargetCollector(labelInfos));
+
+            // print the instructions.
             code.instructionsAccept(dexFile, classDef, method, code,
-                                    new InstructionPrinter(printer, registerPrinter, debugState));
+                                    new InstructionPrinter(printer, registerPrinter, labelInfos, debugState));
         }
 
         @Override

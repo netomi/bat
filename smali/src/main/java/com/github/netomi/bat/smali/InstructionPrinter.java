@@ -23,19 +23,23 @@ import com.github.netomi.bat.util.Primitives;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class      InstructionPrinter
 implements InstructionVisitor
 {
     private final IndentingPrinter           printer;
     private final RegisterPrinter            registerPrinter;
+    private final Map<Integer, Set<String>>  labelInfos;
     private final Map<Integer, List<String>> debugState;
 
     public InstructionPrinter(IndentingPrinter           printer,
                               RegisterPrinter            registerPrinter,
+                              Map<Integer, Set<String>>  labelInfos,
                               Map<Integer, List<String>> debugState) {
         this.printer         = printer;
         this.registerPrinter = registerPrinter;
+        this.labelInfos      = labelInfos;
         this.debugState      = debugState;
     }
 
@@ -43,6 +47,7 @@ implements InstructionVisitor
     public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, true);
     }
 
@@ -50,6 +55,7 @@ implements InstructionVisitor
     public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
@@ -68,6 +74,7 @@ implements InstructionVisitor
     public void visitBranchInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BranchInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
@@ -78,7 +85,11 @@ implements InstructionVisitor
             sb.append(' ');
         }
 
-        sb.append(Primitives.asHexValue(offset + instruction.getBranchOffset(), 4));
+        int target      = offset + instruction.getBranchOffset();
+        String mnemonic = instruction.getOpcode().getMnemonic();
+        String prefix   = mnemonic.startsWith("goto") ? "goto" : "cond";
+
+        sb.append(":" + prefix + "_" + Integer.toHexString(target));
 
         printer.println(sb.toString());
     }
@@ -87,6 +98,7 @@ implements InstructionVisitor
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, false);
 
         printer.print(", ");
@@ -104,6 +116,7 @@ implements InstructionVisitor
     public void visitLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, LiteralInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
@@ -119,6 +132,7 @@ implements InstructionVisitor
     public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
@@ -143,6 +157,7 @@ implements InstructionVisitor
     public void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, false);
 
         StringBuilder sb = new StringBuilder();
@@ -171,6 +186,7 @@ implements InstructionVisitor
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, false);
         printer.println(", \"" + instruction.getString(dexFile) + "\"");
     }
@@ -179,6 +195,7 @@ implements InstructionVisitor
     public void visitTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, TypeInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
+        printLabels(offset);
         printGeneric(code, instruction, false);
 
         printer.print(", ");
@@ -190,18 +207,24 @@ implements InstructionVisitor
     @Override
     public void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
         printer.println();
+        printDebugInfo(offset);
+        printLabels(offset);
         printer.println(payload.toString());
     }
 
     @Override
     public void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {        printer.println();
         printer.println();
+        printDebugInfo(offset);
+        printLabels(offset);
         printer.println(payload.toString());
     }
 
     @Override
     public void visitSparseSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, SparseSwitchPayload payload) {
         printer.println();
+        printDebugInfo(offset);
+        printLabels(offset);
         printer.println(payload.toString());
     }
 
@@ -244,6 +267,15 @@ implements InstructionVisitor
         if (debugInfos != null) {
             for (String info : debugInfos) {
                 printer.println(info);
+            }
+        }
+    }
+
+    private void printLabels(int offset) {
+        Set<String> labels = labelInfos.get(offset);
+        if (labels != null) {
+            for (String label : labels) {
+                printer.println(label);
             }
         }
     }
