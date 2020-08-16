@@ -410,15 +410,15 @@ implements   DexFileVisitor,
         @Override
         public void visitParameterAnnotationSet(DexFile dexFile, ClassDef classDef, ParameterAnnotation parameterAnnotation, AnnotationSetRefList annotationSetRefList) {
             MethodID methodID = parameterAnnotation.getMethodID(dexFile);
-            println("Annotations on method #" + parameterAnnotation.methodIndex + " '" + methodID.getName(dexFile) + "' parameters");
+            println("Annotations on method #" + parameterAnnotation.getMethodIndex() + " '" + methodID.getName(dexFile) + "' parameters");
 
-            List<AnnotationSetRef> list = annotationSetRefList.annotationSetRefs;
-            for (int i = 0; i < list.size(); i++) {
+            int annotationSetRefCount = annotationSetRefList.getAnnotationSetRefCount();
+            for (int i = 0; i < annotationSetRefCount; i++) {
                 println("#" + i);
-                AnnotationSetRef annotationSetRef = list.get(i);
-                annotationSetRef.annotationSet.accept(dexFile, classDef, this);
+                AnnotationSetRef annotationSetRef = annotationSetRefList.getAnnotationSetRef(i);
+                annotationSetRef.accept(dexFile, classDef, this);
 
-                if (annotationSetRef.annotationSet.getAnnotationCount() == 0) {
+                if (annotationSetRef.getAnnotationSet().getAnnotationCount() == 0) {
                     println("   empty-annotation-set");
                 }
             }

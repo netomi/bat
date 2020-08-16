@@ -21,11 +21,19 @@ import com.github.netomi.bat.dexfile.annotation.*;
 
 public interface AnnotationSetVisitor
 {
-    void visitClassAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet);
+    void visitAnyAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet);
 
-    void visitFieldAnnotationSet(DexFile dexFile, ClassDef classDef, FieldAnnotation fieldAnnotation, AnnotationSet annotationSet);
+    default void visitClassAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet) {
+        visitAnyAnnotationSet(dexFile, classDef, annotationSet);
+    }
 
-    void visitMethodAnnotationSet(DexFile dexFile, ClassDef classDef, MethodAnnotation methodAnnotation, AnnotationSet annotationSet);
+    default void visitFieldAnnotationSet(DexFile dexFile, ClassDef classDef, FieldAnnotation fieldAnnotation, AnnotationSet annotationSet) {
+        visitAnyAnnotationSet(dexFile, classDef, annotationSet);
+    }
+
+    default void visitMethodAnnotationSet(DexFile dexFile, ClassDef classDef, MethodAnnotation methodAnnotation, AnnotationSet annotationSet) {
+        visitAnyAnnotationSet(dexFile, classDef, annotationSet);
+    }
 
     void visitParameterAnnotationSet(DexFile dexFile, ClassDef classDef, ParameterAnnotation parameterAnnotation, AnnotationSetRefList annotationSetRefList);
 }

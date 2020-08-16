@@ -69,6 +69,8 @@ implements   ClassDefVisitor
     {
         private final IndentingPrinter printer;
 
+        private int currentParameterIndex;
+
         public SmaliPrinter(Writer writer) {
             this.printer = new IndentingPrinter(writer);
         }
@@ -98,7 +100,6 @@ implements   ClassDefVisitor
             classDef.interfacesAccept(dexFile, this);
 
             if (classDef.annotationsDirectory != null) {
-                printer.println();
                 classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, this);
             }
 
@@ -237,12 +238,18 @@ implements   ClassDefVisitor
                 ProtoID protoID     = method.getProtoID(dexFile);
                 TypeList parameters = protoID.getParameters();
                 for (String parameterType : parameters.getTypes(dexFile)) {
+                    currentParameterIndex = parameterIndex;
+
                     String parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex++);
                     if (parameterName != null) {
                         printer.println(String.format(".param p%d, \"%s\"    # %s",
                                                       registerIndex,
                                                       parameterName,
                                                       parameterType));
+
+                        if (classDef.annotationsDirectory != null) {
+                            classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this);
+                        }
                     }
                     registerIndex++;
 
@@ -278,14 +285,18 @@ implements   ClassDefVisitor
         }
 
         @Override
+        public void visitAnyAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet) {}
+
+        @Override
         public void visitClassAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet) {
             int annotationCount = annotationSet.getAnnotationCount();
             if (annotationCount > 0) {
                 printer.println();
+                printer.println();
                 printer.println("# annotations");
                 annotationSet.accept(dexFile, classDef,
-                                     AnnotationVisitor.concatenate(this,
-                                             (df, cd, as, idx, ann) -> { if ((idx + 1) < annotationCount) printer.println(); } ));
+                    AnnotationVisitor.concatenate(this,
+                        (df, cd, as, idx, ann) -> { if ((idx + 1) < annotationCount) printer.println(); } ));
             }
         }
 
@@ -303,12 +314,24 @@ implements   ClassDefVisitor
         public void visitMethodAnnotationSet(DexFile dexFile, ClassDef classDef, MethodAnnotation methodAnnotation, AnnotationSet annotationSet) {
             int annotationCount = annotationSet.getAnnotationCount();
             annotationSet.accept(dexFile, classDef,
-                                 AnnotationVisitor.concatenate(this,
-                                    (df, cd, as, idx, ann) -> { if ((idx + 1) < annotationCount) printer.println(); } ));
+                AnnotationVisitor.concatenate(this,
+                    (df, cd, as, idx, ann) -> { if ((idx + 1) < annotationCount) printer.println(); } ));
         }
 
         @Override
         public void visitParameterAnnotationSet(DexFile dexFile, ClassDef classDef, ParameterAnnotation parameterAnnotation, AnnotationSetRefList annotationSetRefList) {
+            if (currentParameterIndex < annotationSetRefList.getAnnotationSetRefCount()) {
+                AnnotationSetRef annotationSetRef = annotationSetRefList.getAnnotationSetRef(currentParameterIndex);
+                if (annotationSetRef != null) {
+                    AnnotationSet annotationSet = annotationSetRef.getAnnotationSet();
+                    if (annotationSet != null && annotationSet.getAnnotationCount() > 0) {
+                        printer.levelUp();
+                        annotationSet.accept(dexFile, classDef, this);
+                        printer.levelDown();
+                        printer.println(".end param");
+                    }
+                }
+            }
         }
 
         @Override

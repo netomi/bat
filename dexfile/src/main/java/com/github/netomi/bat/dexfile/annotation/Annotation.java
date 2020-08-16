@@ -23,6 +23,13 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
 import com.github.netomi.bat.dexfile.value.EncodedValue;
 
+/**
+ * A class representing an annotation item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#annotation-item">annotation item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_ANNOTATION_ITEM,
     dataAlignment = 1,

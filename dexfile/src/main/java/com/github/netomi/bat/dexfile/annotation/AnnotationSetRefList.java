@@ -15,18 +15,23 @@
  */
 package com.github.netomi.bat.dexfile.annotation;
 
-import com.github.netomi.bat.dexfile.DataItem;
-import com.github.netomi.bat.dexfile.DataItemAnn;
-import com.github.netomi.bat.dexfile.DexConstants;
-import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.AnnotationVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A class representing an annotation set ref list inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#set-ref-list">annotation set ref list @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_ANNOTATION_SET_REF_LIST,
     dataAlignment = 4,
@@ -36,10 +41,22 @@ public class AnnotationSetRefList
 extends      DataItem
 {
     //public int                  size; // uint, use annotationSetRefs.size()
-    public List<AnnotationSetRef> annotationSetRefs;
+    private ArrayList<AnnotationSetRef> annotationSetRefs = new ArrayList<>(0);
 
-    public AnnotationSetRefList() {
-        annotationSetRefs = Collections.emptyList();
+    public static AnnotationSetRefList readContent(DexDataInput input) {
+        AnnotationSetRefList annotationSetRefList = new AnnotationSetRefList();
+        annotationSetRefList.read(input);
+        return annotationSetRefList;
+    }
+
+    private AnnotationSetRefList() {}
+
+    public int getAnnotationSetRefCount() {
+        return annotationSetRefs.size();
+    }
+
+    public AnnotationSetRef getAnnotationSetRef(int index) {
+        return annotationSetRefs.get(index);
     }
 
     @Override
@@ -47,11 +64,9 @@ extends      DataItem
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
-
-        annotationSetRefs = new ArrayList<>(size);
+        annotationSetRefs.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
-            AnnotationSetRef annotationSetRef = new AnnotationSetRef();
-            annotationSetRef.read(input);
+            AnnotationSetRef annotationSetRef = AnnotationSetRef.readContent(input);
             annotationSetRefs.add(annotationSetRef);
         }
     }
@@ -80,10 +95,19 @@ extends      DataItem
         }
     }
 
+    public void accept(DexFile dexFile, ClassDef classDef, int index, AnnotationVisitor visitor) {
+        if (index >= 0 && index < getAnnotationSetRefCount()) {
+            AnnotationSetRef annotationSetRef = annotationSetRefs.get(index);
+            if (annotationSetRef != null) {
+                annotationSetRef.accept(dexFile, classDef, visitor);
+            }
+        }
+    }
+
     @Override
     public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {
         for (AnnotationSetRef annotationSetRef : annotationSetRefs) {
-            visitor.visitAnnotationSet(dexFile, annotationSetRef, annotationSetRef.annotationSet);
+            visitor.visitAnnotationSet(dexFile, annotationSetRef, annotationSetRef.getAnnotationSet());
         }
     }
 }

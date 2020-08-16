@@ -83,8 +83,7 @@ extends      DataItem
 
         parameterAnnotations = new ArrayList<>(annotatedParametersSize);
         for (int i = 0; i < annotatedParametersSize; i++) {
-            ParameterAnnotation parameterAnnotation = new ParameterAnnotation();
-            parameterAnnotation.read(input);
+            ParameterAnnotation parameterAnnotation = ParameterAnnotation.readContent(input);
             parameterAnnotations.add(parameterAnnotation);
         }
     }
@@ -160,8 +159,8 @@ extends      DataItem
             methodAnnotation.accept(dexFile, classDef, visitor);
         }
 
-        for (ParameterAnnotation annotation : parameterAnnotations) {
-            visitor.visitParameterAnnotationSet(dexFile, classDef, annotation, annotation.annotationSetRefList);
+        for (ParameterAnnotation parameterAnnotation : parameterAnnotations) {
+            parameterAnnotation.accept(dexFile, classDef, visitor);
         }
     }
 
@@ -184,6 +183,15 @@ extends      DataItem
         for (MethodAnnotation methodAnnotation : methodAnnotations) {
             if (methodAnnotation.getMethodIndex() == method.getMethodIndex()) {
                 methodAnnotation.accept(dexFile, classDef, visitor);
+                break;
+            }
+        }
+    }
+
+    public void parameterAnnotationSetAccept(DexFile dexFile, ClassDef classDef, EncodedMethod method, AnnotationSetVisitor visitor) {
+        for (ParameterAnnotation parameterAnnotation : parameterAnnotations) {
+            if (parameterAnnotation.getMethodIndex() == method.getMethodIndex()) {
+                parameterAnnotation.accept(dexFile, classDef, visitor);
                 break;
             }
         }

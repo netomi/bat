@@ -27,6 +27,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.BiConsumer;
 
+/**
+ * A class representing an annotation set item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#annotation-set-item">annotation set item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_ANNOTATION_SET_ITEM,
     dataAlignment = 4,

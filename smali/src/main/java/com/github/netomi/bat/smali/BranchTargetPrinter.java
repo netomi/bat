@@ -113,7 +113,11 @@ implements InstructionVisitor
 
     @Override
     public void visitSparseSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, SparseSwitchPayload payload) {
-
+        for (int branchTarget : payload.branchTargets) {
+            int switchOffset = reversePayloadLookup.get(offset);
+            int target = switchOffset + branchTarget;
+            addBranchInfo(target, formatSparseSwitchTarget(offset, branchTarget));
+        }
     }
 
     private void addBranchInfo(int offset, String info) {
