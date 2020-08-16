@@ -121,7 +121,7 @@ implements InstructionVisitor
     }
 
     private void addBranchInfo(int offset, String info) {
-        Set<String> infos = branchInfos.computeIfAbsent(offset, (key) -> new LinkedHashSet<>());
+        Set<String> infos = branchInfos.computeIfAbsent(offset, (key) -> new TreeSet<>());
         infos.add(info);
     }
 }

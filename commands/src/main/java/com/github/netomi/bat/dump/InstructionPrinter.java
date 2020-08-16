@@ -178,7 +178,7 @@ implements InstructionVisitor
 
         MethodID methodID = instruction.getMethod(dexFile);
 
-        sb.append(methodID.getClassTypeID(dexFile));
+        sb.append(methodID.getClassType(dexFile));
         sb.append('.');
         sb.append(methodID.getName(dexFile));
         sb.append(':');

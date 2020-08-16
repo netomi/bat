@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
 import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
-import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
 
@@ -46,12 +45,13 @@ implements InstructionVisitor
 
     @Override
     public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
-        printCommon(offset, code, instruction, true);
+        printCommon(code, offset, instruction, true);
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
-        printCommon(offset, code, instruction, false);
+        printCommon(code, offset, instruction, false);
 
         if (instruction.containsLiteral())  {
             printer.print(", ");
@@ -59,11 +59,12 @@ implements InstructionVisitor
         }
 
         printer.println();
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitBranchInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BranchInstruction instruction) {
-        printCommon(offset, code, instruction, false);
+        printCommon(code, offset, instruction, false);
 
         if (instruction.registers.length > 0) {
             printer.print(", ");
@@ -72,11 +73,12 @@ implements InstructionVisitor
         }
 
         printer.println(branchTargetPrinter.formatBranchInstructionTarget(offset, instruction));
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
-        printCommon(offset, code, instruction, false);
+        printCommon(code, offset, instruction, false);
 
         printer.print(", ");
 
@@ -87,20 +89,23 @@ implements InstructionVisitor
         printer.print(fieldID.getName(dexFile));
         printer.print(":");
         printer.println(fieldID.getType(dexFile));
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, LiteralInstruction instruction) {
-        printCommon(offset, code, instruction, false);
+        printCommon(code, offset, instruction, false);
         printer.print(", ");
-        printer.println(toHexString(instruction.getValue()));
+        printer.print(toHexString(instruction.getValue()));
+        printer.println();
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
         printer.println();
         printDebugInfo(offset);
-        printLabels(offset);
+        printLabels(code, offset);
 
         MethodID methodID = instruction.getMethod(dexFile);
 
@@ -133,11 +138,12 @@ implements InstructionVisitor
         printer.print("->");
         printer.print(methodID.getName(dexFile));
         printer.println(methodID.getProtoID(dexFile).getDescriptor(dexFile));
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
-        printCommon(offset, code, instruction, false);
+        printCommon(code, offset, instruction, false);
 
         if (instruction.registers.length > 0) {
             printer.print(", ");
@@ -146,28 +152,31 @@ implements InstructionVisitor
         }
 
         printer.println(branchTargetPrinter.formatPayloadInstructionTarget(offset, instruction));
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
-        printCommon(offset, code, instruction, false);
+        printCommon(code, offset, instruction, false);
         printer.println(", \"" + instruction.getString(dexFile) + "\"");
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, TypeInstruction instruction) {
-        printCommon(offset, code, instruction, false);
+        printCommon(code, offset, instruction, false);
         printer.print(", ");
 
         TypeID typeID = instruction.getTypeID(dexFile);
         printer.println(typeID.getType(dexFile));
+        printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
     @Override
     public void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
         printer.println();
         printDebugInfo(offset);
-        printLabels(offset);
+        printLabels(code, offset);
         printer.println(payload.toString());
     }
 
@@ -175,7 +184,7 @@ implements InstructionVisitor
     public void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {
         printer.println();
         printDebugInfo(offset);
-        printLabels(offset);
+        printLabels(code, offset);
         printer.println(".packed-switch " + toHexString(payload.firstKey));
         printer.levelUp();
         for (int branchTarget : payload.branchTargets) {
@@ -189,7 +198,7 @@ implements InstructionVisitor
     public void visitSparseSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, SparseSwitchPayload payload) {
         printer.println();
         printDebugInfo(offset);
-        printLabels(offset);
+        printLabels(code, offset);
         printer.println(".sparse-switch");
         printer.levelUp();
         for (int i = 0; i < payload.keys.length; i++) {
@@ -210,14 +219,14 @@ implements InstructionVisitor
             String.format("0x%x", value);
     }
 
-    private void printCommon(int offset, Code code, DexInstruction instruction, boolean appendNewLine) {
+    private void printCommon(Code code, int offset, DexInstruction instruction, boolean appendNewLine) {
         printer.println();
         printDebugInfo(offset);
-        printLabels(offset);
-        printGeneric(code, instruction, appendNewLine);
+        printLabels(code, offset);
+        printGeneric(instruction, appendNewLine);
     }
 
-    private void printGeneric(Code code, DexInstruction instruction, boolean appendNewLine) {
+    private void printGeneric(DexInstruction instruction, boolean appendNewLine) {
         printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
@@ -263,8 +272,13 @@ implements InstructionVisitor
         }
     }
 
-    private void printLabels(int offset) {
+    private void printLabels(Code code, int offset) {
         branchTargetPrinter.printLabels(offset, printer);
+        TryPrinter.printTryCatchLabels(code, offset, printer);
+    }
+
+    private void printEndLabels(DexFile dexFile, Code code, int offset, int instructionLength) {
+        TryPrinter.printTryEndLabel(dexFile, code, offset, instructionLength, printer);
     }
 
     private static class AccessMethodFollower

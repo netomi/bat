@@ -207,6 +207,7 @@ implements   ClassDefVisitor
 
             String accessFlags =
                 DexAccessFlags.formatAsHumanReadable(method.getAccessFlags(), DexAccessFlags.Target.METHOD)
+                              .replaceAll("_", "-")
                               .toLowerCase();
 
             if (!accessFlags.isEmpty()) {
