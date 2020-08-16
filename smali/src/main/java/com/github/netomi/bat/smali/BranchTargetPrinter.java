@@ -80,6 +80,12 @@ implements InstructionVisitor
         return ":pswitch_" + Integer.toHexString(target);
     }
 
+    public String formatSparseSwitchTarget(int payloadOffset, int branchTarget) {
+        int switchOffset = reversePayloadLookup.get(payloadOffset);
+        int target = switchOffset + branchTarget;
+        return ":sswitch_" + Integer.toHexString(target);
+    }
+
     @Override
     public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {}
 

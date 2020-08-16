@@ -55,7 +55,8 @@ public enum DexAccessFlags
             if ((accessFlag.target & target)      != 0 &&
                 (accessFlag.value  & accessFlags) != 0)
             {
-                sb.append(accessFlag.name());
+                String name = accessFlag.name().replaceAll("_", "-");
+                sb.append(name);
                 sb.append(' ');
             }
         }

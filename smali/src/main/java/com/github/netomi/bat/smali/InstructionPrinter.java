@@ -102,7 +102,7 @@ implements InstructionVisitor
 
         if (instruction.registers.length > 0) {
             printer.print(" {");
-            printRegisters(code, instruction);
+            printRegisters(instruction);
             printer.print("}");
         } else {
             printer.print(" {}");
@@ -173,7 +173,18 @@ implements InstructionVisitor
         printer.println();
         printDebugInfo(offset);
         printLabels(offset);
-        printer.println(payload.toString());
+        printer.println(".sparse-switch");
+        printer.levelUp();
+        for (int i = 0; i < payload.keys.length; i++) {
+            int key    = payload.keys[i];
+            int target = payload.branchTargets[i];
+
+            printer.print(toHexString(key));
+            printer.print(" -> ");
+            printer.println(branchTargetPrinter.formatSparseSwitchTarget(offset, target));
+        }
+        printer.levelDown();
+        printer.println(".end sparse-switch");
     }
 
     private String toHexString(long value) {
@@ -194,7 +205,7 @@ implements InstructionVisitor
 
         if (instruction.registers.length > 0) {
             printer.print(" ");
-            printRegisters(code, instruction);
+            printRegisters(instruction);
         }
 
         if (appendNewLine) {
@@ -202,14 +213,23 @@ implements InstructionVisitor
         }
     }
 
-    private void printRegisters(Code code, DexInstruction instruction) {
-        for (int idx = 0; idx < instruction.registers.length; idx++) {
-            if (idx > 0) {
-                printer.print(", ");
-            }
+    private void printRegisters(DexInstruction instruction) {
+        boolean isRangeInstruction = instruction.getMnemonic().contains("range");
+        if (isRangeInstruction) {
+            int firstRegister = instruction.registers[0];
+            int lastRegister  = instruction.registers[instruction.registers.length - 1];
+            registerPrinter.printRegister(printer, firstRegister);
+            printer.print(" .. ");
+            registerPrinter.printRegister(printer, lastRegister);
+        } else {
+            for (int idx = 0; idx < instruction.registers.length; idx++) {
+                if (idx > 0) {
+                    printer.print(", ");
+                }
 
-            int registerNum = instruction.registers[idx];
-            registerPrinter.printRegister(printer, registerNum);
+                int registerNum = instruction.registers[idx];
+                registerPrinter.printRegister(printer, registerNum);
+            }
         }
     }
 
