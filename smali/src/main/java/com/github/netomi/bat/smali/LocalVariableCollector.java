@@ -32,12 +32,10 @@ implements DebugSequenceVisitor
     private final RegisterPrinter            registerPrinter;
     private final LocalVariableInfo[]        localVariableInfos;
 
-    private int   lineNumber;
     private short codeOffset;
 
-    LocalVariableCollector(Map<Integer, List<String>> debugState, int lineStart, int registers, RegisterPrinter registerPrinter) {
+    LocalVariableCollector(Map<Integer, List<String>> debugState, int registers, RegisterPrinter registerPrinter) {
         this.debugState         = debugState;
-        this.lineNumber         = lineStart;
         this.registerPrinter    = registerPrinter;
 
         this.localVariableInfos = new LocalVariableInfo[registers];
@@ -47,13 +45,7 @@ implements DebugSequenceVisitor
     public void visitAnyDebugInstruction(DexFile dexFile, DebugInfo debugInfo, DebugInstruction instruction) {}
 
     @Override
-    public void visitAdvanceLine(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLine instruction) {
-        lineNumber += instruction.getLineDiff();
-    }
-
-    @Override
     public void visitAdvanceLineAndPC(DexFile dexFile, DebugInfo debugInfo, DebugAdvanceLineAndPC instruction) {
-        lineNumber += instruction.getLineDiff();
         codeOffset += instruction.getAddrDiff();
     }
 

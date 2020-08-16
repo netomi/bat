@@ -273,7 +273,7 @@ implements   ClassDefVisitor
                     new SourceLineCollector(debugState, code.debugInfo.getLineStart()));
 
                 code.debugInfo.debugSequenceAccept(dexFile,
-                    new LocalVariableCollector(debugState, code.debugInfo.getLineStart(), code.registersSize, registerPrinter));
+                    new LocalVariableCollector(debugState, code.registersSize, registerPrinter));
             }
 
             // collect branch target / label infos.

@@ -388,6 +388,9 @@ implements   DexFileVisitor,
         }
 
         @Override
+        public void visitAnyAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet) {}
+
+        @Override
         public void visitClassAnnotationSet(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet) {
             println("Annotations on class");
             annotationSet.accept(dexFile, classDef, this);
