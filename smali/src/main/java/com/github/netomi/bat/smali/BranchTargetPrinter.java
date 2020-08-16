@@ -29,9 +29,11 @@ class      BranchTargetPrinter
 implements InstructionVisitor
 {
     private final Map<Integer, Set<String>> branchInfos;
+    private final Map<Integer, Integer>     reversePayloadLookup;
 
     public BranchTargetPrinter() {
-        this.branchInfos = new HashMap<>();
+        this.branchInfos          = new HashMap<>();
+        this.reversePayloadLookup = new HashMap<>();
     }
 
     public void printLabels(int offset, IndentingPrinter printer) {
@@ -72,6 +74,12 @@ implements InstructionVisitor
         return ":" + prefix + "_" + Integer.toHexString(target);
     }
 
+    public String formatPackedSwitchTarget(int payloadOffset, int branchTarget) {
+        int switchOffset = reversePayloadLookup.get(payloadOffset);
+        int target = switchOffset + branchTarget;
+        return ":pswitch_" + Integer.toHexString(target);
+    }
+
     @Override
     public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {}
 
@@ -84,12 +92,17 @@ implements InstructionVisitor
     @Override
     public void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
         int target = offset + instruction.getPayloadOffset();
+        reversePayloadLookup.put(target, offset);
         addBranchInfo(target, formatPayloadInstructionTarget(offset, instruction));
     }
 
     @Override
     public void visitPackedSwitchPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PackedSwitchPayload payload) {
-
+        for (int branchTarget : payload.branchTargets) {
+            int switchOffset = reversePayloadLookup.get(offset);
+            int target = switchOffset + branchTarget;
+            addBranchInfo(target, formatPackedSwitchTarget(offset, branchTarget));
+        }
     }
 
     @Override

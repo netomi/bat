@@ -159,7 +159,13 @@ implements InstructionVisitor
         printer.println();
         printDebugInfo(offset);
         printLabels(offset);
-        printer.println(payload.toString());
+        printer.println(".packed-switch " + toHexString(payload.firstKey));
+        printer.levelUp();
+        for (int branchTarget : payload.branchTargets) {
+            printer.println(branchTargetPrinter.formatPackedSwitchTarget(offset, branchTarget));
+        }
+        printer.levelDown();
+        printer.println(".end packed-switch");
     }
 
     @Override
