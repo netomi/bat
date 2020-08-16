@@ -44,8 +44,9 @@ public class DexFile
 
     private byte[] linkData;
 
-    private Map<String, Integer> stringMap = new HashMap<>();
-    private Map<String, Integer> typeMap   = new HashMap<>();
+    private Map<String, Integer> stringMap   = new HashMap<>();
+    private Map<String, Integer> typeMap     = new HashMap<>();
+    private Map<String, Integer> classDefMap = new HashMap<>();
 
     public DexFile() {
         this.header = new DexHeader();
@@ -177,6 +178,11 @@ public class DexFile
         return classDefs;
     }
 
+    public ClassDef getClassDef(String className) {
+        Integer index = classDefMap.get(className);
+        return index == null ? null : classDefs.get(index);
+    }
+
     public ClassDef getClassDef(int classDefIndex) {
         return classDefs.get(classDefIndex);
     }
@@ -292,6 +298,13 @@ public class DexFile
         while (typeIterator.hasNext()) {
             int index = typeIterator.nextIndex();
             typeMap.put(typeIterator.next().getType(this), index);
+        }
+
+        classDefMap = new HashMap<>(getClassDefCount());
+        ListIterator<ClassDef> classDefIterator = classDefs.listIterator();
+        while (classDefIterator.hasNext()) {
+            int index = classDefIterator.nextIndex();
+            classDefMap.put(classDefIterator.next().getClassName(this), index);
         }
     }
 

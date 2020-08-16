@@ -69,12 +69,12 @@ extends      DataItem
         return classIndex;
     }
 
-    public TypeID getClassType(DexFile dexFile) {
+    public TypeID getClassTypeID(DexFile dexFile) {
         return dexFile.getTypeID(classIndex);
     }
 
-    public String getClassName(DexFile dexFile) {
-        return getClassType(dexFile).getType(dexFile);
+    public String getClassType(DexFile dexFile) {
+        return getClassTypeID(dexFile).getType(dexFile);
     }
 
     public int getTypeIndex() {

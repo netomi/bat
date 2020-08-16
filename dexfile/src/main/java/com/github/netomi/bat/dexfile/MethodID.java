@@ -17,6 +17,8 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.util.DexClasses;
+import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
@@ -70,12 +72,12 @@ extends      DataItem
         return classIndex;
     }
 
-    public TypeID getClassType(DexFile dexFile) {
+    public TypeID getClassTypeID(DexFile dexFile) {
         return dexFile.getTypeID(classIndex);
     }
 
-    public String getClassName(DexFile dexFile) {
-        return getClassType(dexFile).getType(dexFile);
+    public String getClassType(DexFile dexFile) {
+        return getClassTypeID(dexFile).getType(dexFile);
     }
 
     public int getProtoIndex() {
@@ -112,6 +114,18 @@ extends      DataItem
         output.writeUnsignedShort(classIndex);
         output.writeUnsignedShort(protoIndex);
         output.writeInt(nameIndex);
+    }
+
+    public void accept(DexFile dexFile, EncodedMethodVisitor visitor) {
+        String   className = DexClasses.internalClassNameFromType(getClassType(dexFile));
+        ClassDef classDef  = dexFile.getClassDef(className);
+
+        if (classDef != null) {
+            classDef.classDataAccept(dexFile,
+                new AllEncodedMethodsVisitor(
+                new MethodNameAndProtoFilter(getName(dexFile), getProtoID(dexFile),
+                visitor)));
+        }
     }
 
     @Override

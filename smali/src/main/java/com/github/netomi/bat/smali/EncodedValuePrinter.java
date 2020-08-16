@@ -95,7 +95,7 @@ implements EncodedValueVisitor
     @Override
     public void visitFieldValue(DexFile dexFile, EncodedFieldValue value) {
         FieldID fieldID = value.getField(dexFile);
-        append(fieldID.getClassType(dexFile).getType(dexFile) + "->" +
+        append(fieldID.getClassType(dexFile) + "->" +
                fieldID.getName(dexFile) + ":" +
                fieldID.getType(dexFile));
     }
@@ -103,7 +103,7 @@ implements EncodedValueVisitor
     @Override
     public void visitMethodValue(DexFile dexFile, EncodedMethodValue value) {
         MethodID methodID = value.getMethod(dexFile);
-        append(methodID.getClassType(dexFile).getType(dexFile) + "->" +
+        append(methodID.getClassTypeID(dexFile).getType(dexFile) + "->" +
                methodID.getName(dexFile) +
                methodID.getProtoID(dexFile).getDescriptor(dexFile));
     }
@@ -132,14 +132,14 @@ implements EncodedValueVisitor
     public void visitEnumValue(DexFile dexFile, EncodedEnumValue value) {
         FieldID fieldID = value.getEnumField(dexFile);
         append(".enum " +
-               fieldID.getClassType(dexFile).getType(dexFile) + "->" +
+               fieldID.getClassType(dexFile) + "->" +
                fieldID.getName(dexFile) + ":" +
                fieldID.getType(dexFile));
     }
 
     @Override
     public void visitFloatValue(DexFile dexFile, EncodedFloatValue value) {
-        append(Float.toString(value.getValue()));
+        append(value.getValue() + "f");
     }
 
     @Override

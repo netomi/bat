@@ -17,6 +17,9 @@ package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
+import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
+import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
+import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
 
@@ -79,7 +82,7 @@ implements InstructionVisitor
 
         FieldID fieldID = instruction.getField(dexFile);
 
-        printer.print(fieldID.getClassName(dexFile));
+        printer.print(fieldID.getClassType(dexFile));
         printer.print("->");
         printer.print(fieldID.getName(dexFile));
         printer.print(":");
@@ -98,6 +101,22 @@ implements InstructionVisitor
         printer.println();
         printDebugInfo(offset);
         printLabels(offset);
+
+        MethodID methodID = instruction.getMethod(dexFile);
+
+        if (methodID.getName(dexFile).startsWith("access$")) {
+            AccessMethodFollower methodFollower = new AccessMethodFollower();
+
+            methodID.accept(dexFile, new AllCodeVisitor(
+                new AllInstructionsVisitor(
+                methodFollower)));
+
+            String explanation = methodFollower.getExplanation();
+            if (explanation != null) {
+                printer.println("# " + explanation);
+            }
+        }
+
         printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
@@ -110,9 +129,7 @@ implements InstructionVisitor
 
         printer.print(", ");
 
-        MethodID methodID = instruction.getMethod(dexFile);
-
-        printer.print(methodID.getClassName(dexFile));
+        printer.print(methodID.getClassType(dexFile));
         printer.print("->");
         printer.print(methodID.getName(dexFile));
         printer.println(methodID.getProtoID(dexFile).getDescriptor(dexFile));
@@ -248,5 +265,33 @@ implements InstructionVisitor
 
     private void printLabels(int offset) {
         branchTargetPrinter.printLabels(offset, printer);
+    }
+
+    private static class AccessMethodFollower
+    implements           InstructionVisitor
+    {
+        private String explanation;
+
+        public String getExplanation() {
+            return explanation;
+        }
+
+        @Override
+        public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {}
+
+        @Override
+        public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
+            String mnemonic = instruction.getMnemonic();
+            String action   = mnemonic.contains("get") ? "getter" : "setter";
+
+            FieldID fieldID = instruction.getField(dexFile);
+            explanation = action + " for: " + fieldID.getClassType(dexFile) + "->" + fieldID.getName(dexFile) + ":" + fieldID.getType(dexFile);
+        }
+
+        @Override
+        public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
+            MethodID methodID = instruction.getMethod(dexFile);
+            explanation = "invokes: " + methodID.getClassType(dexFile) + "->" + methodID.getName(dexFile) + methodID.getProtoID(dexFile).getDescriptor(dexFile);
+        }
     }
 }

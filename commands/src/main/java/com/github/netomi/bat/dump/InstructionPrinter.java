@@ -97,7 +97,7 @@ implements InstructionVisitor
 
         FieldID fieldID = instruction.getField(dexFile);
 
-        sb.append(fieldID.getClassName(dexFile));
+        sb.append(fieldID.getClassType(dexFile));
         sb.append('.');
         sb.append(fieldID.getName(dexFile));
         sb.append(':');
@@ -178,7 +178,7 @@ implements InstructionVisitor
 
         MethodID methodID = instruction.getMethod(dexFile);
 
-        sb.append(methodID.getClassName(dexFile));
+        sb.append(methodID.getClassTypeID(dexFile));
         sb.append('.');
         sb.append(methodID.getName(dexFile));
         sb.append(':');

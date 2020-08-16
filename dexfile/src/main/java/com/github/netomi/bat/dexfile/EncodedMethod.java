@@ -77,7 +77,7 @@ extends      DexContent
     }
 
     public String getClassType(DexFile dexFile) {
-        return dexFile.getMethodID(methodIndex).getClassType(dexFile).getType(dexFile);
+        return dexFile.getMethodID(methodIndex).getClassTypeID(dexFile).getType(dexFile);
     }
 
     public String getName(DexFile dexFile) {
