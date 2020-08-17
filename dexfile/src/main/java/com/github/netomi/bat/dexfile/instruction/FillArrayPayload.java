@@ -36,17 +36,35 @@ extends      Payload
 
     @Override
     public int getLength() {
-        return (values.length * elementWidth + 1) / 2 + 4;
+        return (values.length + 1) / 2 + 4;
+    }
+
+    public int getElements() {
+        return values.length / elementWidth;
+    }
+
+    public long getElement(int index) {
+        int  currentIndex = index * elementWidth;
+        long result       = 0;
+
+        int shift = 0;
+        for (int i = 0; i < elementWidth; i++, currentIndex++) {
+            result |= (values[currentIndex] & 0xff) << shift;
+            shift += 8;
+        }
+
+        return result;
     }
 
     @Override
     public void read(short[] instructions, int offset) {
         elementWidth = instructions[++offset] & 0xffff;
 
-        int size =
+        int elements =
             (instructions[++offset] & 0xffff) |
             (instructions[++offset] << 16);
 
+        int size = elements * elementWidth;
         values = new byte[size];
 
         for (int idx = 0; idx < size;) {

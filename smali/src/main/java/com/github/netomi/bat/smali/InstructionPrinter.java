@@ -193,7 +193,22 @@ implements InstructionVisitor
         printer.println();
         printDebugInfo(offset);
         printLabels(code, offset);
-        printer.println(payload.toString());
+        printer.println(".array-data " + payload.elementWidth);
+        printer.levelUp();
+        for (int i = 0; i < payload.getElements(); i++) {
+            long value = payload.getElement(i);
+            printer.print(toHexString(value));
+
+            if (payload.elementWidth <= 4) {
+                printCommentIfLikelyFloat(printer, (int) value);
+            } else if (payload.elementWidth == 8) {
+                printCommentIfLikelyDouble(printer, value);
+            }
+
+            printer.println();
+        }
+        printer.levelDown();
+        printer.println(".end array-data");
     }
 
     @Override

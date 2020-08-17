@@ -18,26 +18,35 @@ package com.github.netomi.bat.smali;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.io.IndentingPrinter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 class TryPrinter
 {
     private TryPrinter() {}
 
     public static void printTryCatchLabels(Code code, int offset, IndentingPrinter printer) {
+        Set<String> labels = new HashSet<>();
+
         for (Try currentTry : code.tries) {
             if (currentTry.getStartAddr() == offset) {
-                printer.println(":try_start_" + Integer.toHexString(offset));
+                labels.add(":try_start_" + Integer.toHexString(offset));
             }
 
             EncodedCatchHandler catchHandler = currentTry.getCatchHandler();
             if (catchHandler.getCatchAllAddr() == offset) {
-                printer.println(":catchall_" + Integer.toHexString(offset));
+                labels.add(":catchall_" + Integer.toHexString(offset));
             }
 
             for (TypeAddrPair addrPair : catchHandler.getHandlers()) {
                 if (addrPair.getAddress() == offset) {
-                    printer.println(":catch_" + Integer.toHexString(offset));
+                    labels.add(":catch_" + Integer.toHexString(offset));
                 }
             }
+        }
+
+        for (String label : labels) {
+            printer.println(label);
         }
     }
 
