@@ -20,18 +20,15 @@ import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.EncodedMethod;
 import com.github.netomi.bat.dexfile.ProtoID;
 
-public class MethodNameAndProtoFilter
+public class MethodNameFilter
 implements   EncodedMethodVisitor
 {
     private final String               name;
-    private final ProtoID              protoID;
     private final EncodedMethodVisitor visitor;
 
-    public MethodNameAndProtoFilter(String               name,
-                                    ProtoID              protoID,
-                                    EncodedMethodVisitor visitor) {
+    public MethodNameFilter(String               name,
+                            EncodedMethodVisitor visitor) {
         this.name    = name;
-        this.protoID = protoID;
         this.visitor = visitor;
     }
 
@@ -55,6 +52,6 @@ implements   EncodedMethodVisitor
     // Private utility methods.
 
     private boolean accepted(String name, ProtoID protoID) {
-        return this.name.equals(name) && this.protoID.equals(protoID);
+        return this.name.equals(name);
     }
 }

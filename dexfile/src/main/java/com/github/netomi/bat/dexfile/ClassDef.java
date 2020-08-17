@@ -178,6 +178,13 @@ extends      DataItem
         output.writeInt(staticValuesOffset);
     }
 
+    public void methodAccept(DexFile dexFile, String name, EncodedMethodVisitor visitor) {
+        classDataAccept(dexFile,
+            new AllEncodedMethodsVisitor(
+            new MethodNameFilter(name,
+            visitor)));
+    }
+
     public void interfacesAccept(DexFile dexFile, TypeListVisitor visitor) {
         if (interfaces != null) {
             visitor.visitInterfaces(dexFile, this, interfaces);

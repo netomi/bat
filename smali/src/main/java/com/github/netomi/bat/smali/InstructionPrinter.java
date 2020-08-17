@@ -99,6 +99,15 @@ implements InstructionVisitor
         printer.print(", ");
         printer.print(toHexString(instruction.getValue()));
 
+        DexOpCode            opCode            = instruction.getOpcode();
+        DexInstructionFormat instructionFormat = opCode.getFormat();
+
+        // FIXME: this is a hack and should be made clean.
+        if (instructionFormat == DexInstructionFormat.FORMAT_21h && opCode.targetsWideRegister() ||
+            instructionFormat == DexInstructionFormat.FORMAT_51l) {
+            printer.print("L");
+        }
+
         if (instruction.getOpcode().targetsWideRegister()) {
             printCommentIfLikelyDouble(printer, instruction.getValue());
         } else {
