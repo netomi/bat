@@ -30,7 +30,7 @@ class TryPrinter
 
             EncodedCatchHandler catchHandler = currentTry.getCatchHandler();
             if (catchHandler.getCatchAllAddr() == offset) {
-                printer.println(":catch_" + Integer.toHexString(offset));
+                printer.println(":catchall_" + Integer.toHexString(offset));
             }
 
             for (TypeAddrPair addrPair : catchHandler.getHandlers()) {
@@ -53,6 +53,13 @@ class TryPrinter
                                     " {:try_start_" + Integer.toHexString(currentTry.getStartAddr()) + " .. " +
                                     ":try_end_" + Integer.toHexString(offset + instructionLength) + "} " +
                                     ":catch_" + Integer.toHexString(addrPair.getAddress()));
+                }
+
+                if (catchHandler.getCatchAllAddr() != -1) {
+                    printer.println(".catchall " +
+                                    "{:try_start_" + Integer.toHexString(currentTry.getStartAddr()) + " .. " +
+                                    ":try_end_" + Integer.toHexString(offset + instructionLength) + "} " +
+                                    ":catchall_" + Integer.toHexString(catchHandler.getCatchAllAddr()));
                 }
             }
         }
