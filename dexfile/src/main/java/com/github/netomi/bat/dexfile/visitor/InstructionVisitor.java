@@ -29,8 +29,16 @@ public interface InstructionVisitor
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
-    default void visitArrayInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayInstruction instruction) {
+    default void visitAnyArrayInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayInstruction instruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitArrayInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayInstruction instruction) {
+        visitAnyArrayInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitArrayTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayTypeInstruction instruction) {
+        visitAnyArrayInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
     default void visitBasicInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BasicInstruction instruction) {

@@ -82,8 +82,8 @@ public enum DexOpCode
     NEW_INSTANCE((byte) 0x22, FORMAT_21c, TypeInstruction::create, "new-instance"),
     NEW_ARRAY(   (byte) 0x23, FORMAT_22c, TypeInstruction::create, "new-array"),
 
-    FILLED_NEW_ARRAY((byte) 0x24, FORMAT_35c, "filled-new-array"),
-    FILLED_NEW_ARRAY_RANGE((byte) 0x25, FORMAT_3rc, "filled-new-array/range"),
+    FILLED_NEW_ARRAY(      (byte) 0x24, FORMAT_35c, ArrayTypeInstruction::create, "filled-new-array"),
+    FILLED_NEW_ARRAY_RANGE((byte) 0x25, FORMAT_3rc, ArrayTypeInstruction::create, "filled-new-array/range"),
 
     // payload instruction.
 

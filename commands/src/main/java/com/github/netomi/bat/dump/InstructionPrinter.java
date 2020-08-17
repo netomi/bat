@@ -247,6 +247,23 @@ implements InstructionVisitor
     }
 
     @Override
+    public void visitArrayTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayTypeInstruction instruction) {
+        printGeneric(instruction);
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(", ");
+
+        TypeID typeID = instruction.getTypeID(dexFile);
+        sb.append(typeID.getType(dexFile));
+
+        sb.append(" // type@");
+        sb.append(Primitives.asHexValue(instruction.getTypeIndex(), 4));
+
+        printer.print(sb.toString());
+    }
+
+    @Override
     public void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
         printer.print(payload.toString());
     }

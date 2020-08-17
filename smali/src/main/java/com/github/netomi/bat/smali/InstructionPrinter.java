@@ -195,6 +195,28 @@ implements InstructionVisitor
     }
 
     @Override
+    public void visitArrayTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayTypeInstruction instruction) {
+        printer.println();
+        printDebugInfo(offset);
+        printLabels(code, offset);
+        printer.print(instruction.getMnemonic());
+
+        if (instruction.registers.length > 0) {
+            printer.print(" {");
+            printRegisters(instruction);
+            printer.print("}");
+        } else {
+            printer.print(" {}");
+        }
+
+        printer.print(", ");
+
+        TypeID typeID = instruction.getTypeID(dexFile);
+        printer.println(typeID.getType(dexFile));
+        printEndLabels(dexFile, code, offset, instruction.getLength());
+    }
+
+    @Override
     public void visitFillArrayPayload(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FillArrayPayload payload) {
         printer.println();
         printDebugInfo(offset);
@@ -216,7 +238,9 @@ implements InstructionVisitor
                     break;
             }
 
-            if (hexString.length() > 10) {
+            // FIXME: make this hack clean.
+            int idx = hexString.indexOf("0x");
+            if (hexString.substring(idx + 2).length() > 10) {
                 printer.print("L");
             }
 

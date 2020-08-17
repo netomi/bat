@@ -15,36 +15,48 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-import com.github.netomi.bat.dexfile.ClassDef;
-import com.github.netomi.bat.dexfile.Code;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
-public class ArrayInstruction
-extends      DexInstruction
+public class ArrayTypeInstruction
+extends      ArrayInstruction
 {
-    static ArrayInstruction create(DexOpCode opCode, byte ident) {
-        return new ArrayInstruction(opCode);
+    private int typeIndex;
+
+    static ArrayTypeInstruction create(DexOpCode opCode, byte ident) {
+        return new ArrayTypeInstruction(opCode);
     }
 
-    ArrayInstruction(DexOpCode opcode) {
+    ArrayTypeInstruction(DexOpCode opcode) {
         super(opcode);
+        typeIndex = DexConstants.NO_INDEX;
+    }
+
+    public int getTypeIndex() {
+        return typeIndex;
+    }
+
+    public TypeID getTypeID(DexFile dexFile) {
+        return dexFile.getTypeID(typeIndex);
     }
 
     @Override
     public void read(short[] instructions, int offset) {
         super.read(instructions, offset);
 
-        if (this.getClass().equals(ArrayInstruction.class) &&
-            opcode.getFormat() != DexInstructionFormat.FORMAT_23x &&
-            opcode.getFormat() != DexInstructionFormat.FORMAT_12x) {
-            throw new IllegalStateException("unexpected format for opcode " + opcode.getMnemonic());
+        switch (opcode.getFormat()) {
+            case FORMAT_3rc:
+            case FORMAT_35c:
+                typeIndex = instructions[offset + 1] & 0xffff;
+                break;
+
+            default:
+                throw new IllegalStateException("unexpected format for opcode " + opcode.getMnemonic());
         }
     }
 
     @Override
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
-        visitor.visitArrayInstruction(dexFile, classDef, method, code, offset, this);
+        visitor.visitArrayTypeInstruction(dexFile, classDef, method, code, offset, this);
     }
 }
