@@ -291,16 +291,23 @@ implements   ClassDefVisitor
                                                       registerIndex,
                                                       parameterName,
                                                       parameterType));
-
-                        LocalVariableCollector.LocalVariableInfo localVariableInfo =
-                                new LocalVariableCollector.LocalVariableInfo(parameterName, parameterType, null);
-
-                        localVariableInfos[localVariables + registerIndex] = localVariableInfo;
-
-                        if (classDef.annotationsDirectory != null) {
-                            classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this);
-                        }
+                    } else {
+                        currentRegisterIndex = registerIndex;
+                        currentParameterType = parameterType;
+                        printParameterInfo   = true;
                     }
+
+                    LocalVariableCollector.LocalVariableInfo localVariableInfo =
+                        new LocalVariableCollector.LocalVariableInfo(parameterName, parameterType, null);
+
+                    localVariableInfos[localVariables + registerIndex] = localVariableInfo;
+
+                    if (classDef.annotationsDirectory != null) {
+                        classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this);
+                    }
+
+                    printParameterInfo = false;
+
                     registerIndex++;
 
                     // TODO: extract into util class.
@@ -352,9 +359,12 @@ implements   ClassDefVisitor
 
         @Override
         public void visitFieldAnnotationSet(DexFile dexFile, ClassDef classDef, FieldAnnotation fieldAnnotation, AnnotationSet annotationSet) {
-            if (annotationSet.getAnnotationCount() > 0) {
+            int annotationCount = annotationSet.getAnnotationCount();
+            if (annotationCount > 0) {
                 printer.levelUp();
-                annotationSet.accept(dexFile, classDef, this);
+                annotationSet.accept(dexFile, classDef,
+                    AnnotationVisitor.concatenate(this,
+                        (df, cd, as, idx, ann) -> { if ((idx + 1) < annotationCount) printer.println(); } ));
                 printer.levelDown();
                 printer.println(".end field");
             }

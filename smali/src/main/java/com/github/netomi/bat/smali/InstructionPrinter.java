@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
+import com.github.netomi.bat.util.Strings;
 
 import java.util.List;
 import java.util.Map;
@@ -178,10 +179,7 @@ implements InstructionVisitor
         String str = instruction.getString(dexFile);
 
         // escape some chars
-        // TODO: extract to util class
-        str = str.replaceAll("'",  "\\\\'");
-        str = str.replaceAll("\"", "\\\\\"");
-        str = str.replaceAll("\n", "\\\\n");
+        str = Strings.escapeString(str);
 
         printer.println(", \"" + str + "\"");
         printEndLabels(dexFile, code, offset, instruction.getLength());

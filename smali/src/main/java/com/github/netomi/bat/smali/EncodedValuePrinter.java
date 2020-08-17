@@ -23,6 +23,7 @@ import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
 import com.github.netomi.bat.util.Primitives;
+import com.github.netomi.bat.util.Strings;
 
 class      EncodedValuePrinter
 implements EncodedValueVisitor
@@ -115,12 +116,27 @@ implements EncodedValueVisitor
 
     @Override
     public void visitByteValue(DexFile dexFile, EncodedByteValue value) {
-        append(String.format("0x%x", value.getValue()));
+        int v = value.getValue();
+        if (v < 0) {
+            append(String.format("-0x%xt", -v));
+        } else {
+            append(String.format("0x%xt", v));
+        }
+    }
+
+    @Override
+    public void visitShortValue(DexFile dexFile, EncodedShortValue value) {
+        int v = value.getValue();
+        if (v < 0) {
+            append(String.format("-0x%xs", -v));
+        } else {
+            append(String.format("0x%xs", v));
+        }
     }
 
     @Override
     public void visitCharValue(DexFile dexFile, EncodedCharValue value) {
-        append(String.format("'\\u%x'", (int) value.getValue()));
+        append(String.format("'\\u%04x'", (int) value.getValue()));
     }
 
     @Override
@@ -168,13 +184,8 @@ implements EncodedValueVisitor
     }
 
     @Override
-    public void visitShortValue(DexFile dexFile, EncodedShortValue value) {
-        append(Primitives.toHexString(value.getValue()));
-    }
-
-    @Override
     public void visitStringValue(DexFile dexFile, EncodedStringValue value) {
-        append("\"" + value.getString(dexFile) + "\"");
+        append("\"" + Strings.escapeString(value.getString(dexFile)) + "\"");
     }
 
     // private utility methods.
