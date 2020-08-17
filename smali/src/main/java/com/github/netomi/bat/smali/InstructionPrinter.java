@@ -17,6 +17,7 @@ package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
+import com.github.netomi.bat.dexfile.util.Numbers;
 import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
@@ -97,6 +98,13 @@ implements InstructionVisitor
         printCommon(code, offset, instruction, false);
         printer.print(", ");
         printer.print(toHexString(instruction.getValue()));
+
+        if (instruction.getOpcode().targetsWideRegister()) {
+            printCommentIfLikelyDouble(printer, instruction.getValue());
+        } else {
+            printCommentIfLikelyFloat(printer, (int) instruction.getValue());
+        }
+
         printer.println();
         printEndLabels(dexFile, code, offset, instruction.getLength());
     }
@@ -166,7 +174,6 @@ implements InstructionVisitor
     public void visitTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, TypeInstruction instruction) {
         printCommon(code, offset, instruction, false);
         printer.print(", ");
-
         TypeID typeID = instruction.getTypeID(dexFile);
         printer.println(typeID.getType(dexFile));
         printEndLabels(dexFile, code, offset, instruction.getLength());
@@ -212,6 +219,8 @@ implements InstructionVisitor
         printer.levelDown();
         printer.println(".end sparse-switch");
     }
+
+    // private utility methods.
 
     private String toHexString(long value) {
         return value < 0 ?
@@ -280,6 +289,52 @@ implements InstructionVisitor
     private void printEndLabels(DexFile dexFile, Code code, int offset, int instructionLength) {
         TryPrinter.printTryEndLabel(dexFile, code, offset, instructionLength, printer);
     }
+
+    private void printCommentIfLikelyFloat(IndentingPrinter printer, int val) {
+        if (Numbers.isLikelyFloat(val)) {
+            printer.print("    # ");
+            float fVal = Float.intBitsToFloat(val);
+            if (fVal == Float.POSITIVE_INFINITY)
+                printer.print("Float.POSITIVE_INFINITY");
+            else if (fVal == Float.NEGATIVE_INFINITY)
+                printer.print("Float.NEGATIVE_INFINITY");
+            else if (Float.isNaN(fVal))
+                printer.print("Float.NaN");
+            else if (fVal == Float.MAX_VALUE)
+                printer.print("Float.MAX_VALUE");
+            else if (fVal == (float)Math.PI)
+                printer.print("(float)Math.PI");
+            else if (fVal == (float)Math.E)
+                printer.print("(float)Math.E");
+            else {
+                printer.print(Float.toString(fVal));
+                printer.print("f");
+            }
+        }
+    }
+
+    private void printCommentIfLikelyDouble(IndentingPrinter printer, long val) {
+        if (Numbers.isLikelyDouble(val)) {
+            printer.print("    # ");
+            double dVal = Double.longBitsToDouble(val);
+            if (dVal == Double.POSITIVE_INFINITY)
+                printer.print("Double.POSITIVE_INFINITY");
+            else if (dVal == Double.NEGATIVE_INFINITY)
+                printer.print("Double.NEGATIVE_INFINITY");
+            else if (Double.isNaN(dVal))
+                printer.print("Double.NaN");
+            else if (dVal == Double.MAX_VALUE)
+                printer.print("Double.MAX_VALUE");
+            else if (dVal == Math.PI)
+                printer.print("Math.PI");
+            else if (dVal == Math.E)
+                printer.print("Math.E");
+            else
+                printer.print(Double.toString(dVal));
+        }
+    }
+
+    // helper classes.
 
     private static class AccessMethodFollower
     implements           InstructionVisitor

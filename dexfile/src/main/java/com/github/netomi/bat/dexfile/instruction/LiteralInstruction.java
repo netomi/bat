@@ -39,11 +39,11 @@ extends      DexInstruction
         return value;
     }
 
-    public float asFloat() {
+    public float getValueAsFloat() {
         return Float.intBitsToFloat((int) value);
     }
 
-    public double asDouble() {
+    public double getValueAsDouble() {
         return Double.longBitsToDouble(value);
     }
 
@@ -67,7 +67,7 @@ extends      DexInstruction
                 break;
 
             case FORMAT_21h:
-                value = opcode.isWide() ?
+                value = opcode.targetsWideRegister() ?
                     ((long)instructions[offset + 1] << 48) :
                     (instructions[offset + 1] << 16);
                 break;

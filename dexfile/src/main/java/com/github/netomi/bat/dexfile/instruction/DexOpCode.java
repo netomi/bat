@@ -369,7 +369,7 @@ public enum DexOpCode
         return mnemonic;
     }
 
-    public boolean isWide() {
+    public boolean targetsWideRegister() {
         return wide;
     }
 
