@@ -175,7 +175,9 @@ implements InstructionVisitor
     @Override
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
         printCommon(code, offset, instruction, false);
-        printer.println(", \"" + instruction.getString(dexFile) + "\"");
+        String str = instruction.getString(dexFile);
+        str = str.replaceAll("'", "\\\\'");
+        printer.println(", \"" + str + "\"");
         printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
