@@ -43,17 +43,47 @@ extends      Payload
         return values.length / elementWidth;
     }
 
-    public long getElement(int index) {
+    public long getElementAsLong(int index) {
         int  currentIndex = index * elementWidth;
         long result       = 0;
 
         int shift = 0;
         for (int i = 0; i < elementWidth; i++, currentIndex++) {
-            result |= (values[currentIndex] & 0xff) << shift;
+            result |= (values[currentIndex] & 0xffL) << shift;
             shift += 8;
         }
 
         return result;
+    }
+
+    public int getElementAsInt(int index) {
+        int currentIndex = index * elementWidth;
+        int result       = 0;
+
+        int shift = 0;
+        for (int i = 0; i < elementWidth; i++, currentIndex++) {
+            result |= (values[currentIndex] & 0xffL) << shift;
+            shift += 8;
+        }
+
+        return result;
+    }
+
+    public short getElementAsShort(int index) {
+        int   currentIndex = index * elementWidth;
+        short result       = 0;
+
+        int shift = 0;
+        for (int i = 0; i < elementWidth; i++, currentIndex++) {
+            result |= (values[currentIndex] & 0xffL) << shift;
+            shift += 8;
+        }
+
+        return result;
+    }
+
+    public byte getElementAsByte(int index) {
+        return values[index];
     }
 
     @Override

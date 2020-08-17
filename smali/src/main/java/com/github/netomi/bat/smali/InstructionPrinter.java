@@ -224,30 +224,37 @@ implements InstructionVisitor
         printer.println(".array-data " + payload.elementWidth);
         printer.levelUp();
         for (int i = 0; i < payload.getElements(); i++) {
-            long value = payload.getElement(i);
-            String hexString = toHexString(value);
-            printer.print(hexString);
-
             switch (payload.elementWidth) {
                 case 1:
-                    printer.print("t");
+                    byte byteValue = payload.getElementAsByte(i);
+                    printer.print(toHexString(byteValue) + "t");
+                    printCommentIfLikelyFloat(printer, byteValue);
                     break;
 
                 case 2:
-                    printer.print("s");
+                    short shortValue = payload.getElementAsShort(i);
+                    printer.print(toHexString(shortValue) + "s");
+                    printCommentIfLikelyFloat(printer, shortValue);
                     break;
-            }
 
-            // FIXME: make this hack clean.
-            int idx = hexString.indexOf("0x");
-            if (hexString.substring(idx + 2).length() > 10) {
-                printer.print("L");
-            }
+                case 4:
+                    int intValue = payload.getElementAsInt(i);
+                    printer.print(toHexString(intValue));
+                    printCommentIfLikelyFloat(printer, intValue);
+                    break;
 
-            if (payload.elementWidth <= 4) {
-                printCommentIfLikelyFloat(printer, (int) value);
-            } else if (payload.elementWidth == 8) {
-                printCommentIfLikelyDouble(printer, value);
+                case 8:
+                    long longValue = payload.getElementAsLong(i);
+                    String hexString = toHexString(longValue);
+                    printer.print(hexString);
+
+                    if (longValue < Integer.MIN_VALUE ||
+                        longValue > Integer.MAX_VALUE) {
+                        printer.print("L");
+                    }
+
+                    printCommentIfLikelyDouble(printer, longValue);
+                    break;
             }
 
             printer.println();
@@ -292,6 +299,24 @@ implements InstructionVisitor
     // private utility methods.
 
     private String toHexString(long value) {
+        return value < 0 ?
+            String.format("-0x%x", -value) :
+            String.format("0x%x", value);
+    }
+
+    private String toHexString(int value) {
+        return value < 0 ?
+            String.format("-0x%x", -value) :
+            String.format("0x%x", value);
+    }
+
+    private String toHexString(short value) {
+        return value < 0 ?
+            String.format("-0x%x", -value) :
+            String.format("0x%x", value);
+    }
+
+    private String toHexString(byte value) {
         return value < 0 ?
             String.format("-0x%x", -value) :
             String.format("0x%x", value);
