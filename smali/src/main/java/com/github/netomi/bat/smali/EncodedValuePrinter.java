@@ -120,7 +120,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitCharValue(DexFile dexFile, EncodedCharValue value) {
-        append(Character.toString(value.getValue()));
+        append(String.format("'\\u%x'", (int) value.getValue()));
     }
 
     @Override

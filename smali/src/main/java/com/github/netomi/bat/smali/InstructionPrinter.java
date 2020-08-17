@@ -176,7 +176,13 @@ implements InstructionVisitor
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
         printCommon(code, offset, instruction, false);
         String str = instruction.getString(dexFile);
-        str = str.replaceAll("'", "\\\\'");
+
+        // escape some chars
+        // TODO: extract to util class
+        str = str.replaceAll("'",  "\\\\'");
+        str = str.replaceAll("\"", "\\\\\"");
+        str = str.replaceAll("\n", "\\\\n");
+
         printer.println(", \"" + str + "\"");
         printEndLabels(dexFile, code, offset, instruction.getLength());
     }

@@ -198,7 +198,7 @@ implements   ClassDefVisitor
             InitializationDetector detector = new InitializationDetector(field.getName(dexFile), field.getType(dexFile));
             classDef.methodAccept(dexFile, "<clinit>", new AllCodeVisitor(new AllInstructionsVisitor(detector)));
 
-            if (!detector.fieldIsSetInStaticInitializer()) {
+            if (!detector.fieldIsSetInStaticInitializer() || !field.getModifiers().contains(FieldModifier.FINAL)) {
                 field.staticValueAccept(dexFile, classDef, index, new EncodedValuePrinter(printer, null, " = "));
             }
 
