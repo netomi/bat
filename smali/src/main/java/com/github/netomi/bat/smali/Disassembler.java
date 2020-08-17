@@ -69,7 +69,10 @@ implements   ClassDefVisitor
     {
         private final IndentingPrinter printer;
 
-        private int currentParameterIndex;
+        private boolean printParameterInfo;
+        private int     currentParameterIndex;
+        private int     currentRegisterIndex;
+        private String  currentParameterType;
 
         public SmaliPrinter(Writer writer) {
             this.printer = new IndentingPrinter(writer);
@@ -226,6 +229,32 @@ implements   ClassDefVisitor
             if (method.code != null) {
                 method.codeAccept(dexFile, classDef, this);
             } else if (classDef.annotationsDirectory != null) {
+                int     parameterIndex = 0;
+                int     registerIndex  = method.isStatic() ? 0 : 1;
+
+                ProtoID protoID        = method.getProtoID(dexFile);
+                TypeList parameters    = protoID.getParameters();
+
+                for (String parameterType : parameters.getTypes(dexFile)) {
+                    printParameterInfo    = true;
+                    currentParameterIndex = parameterIndex++;
+                    currentParameterType  = parameterType;
+                    currentRegisterIndex  = registerIndex;
+
+                    if (classDef.annotationsDirectory != null) {
+                        classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this);
+                    }
+
+                    registerIndex++;
+
+                    // TODO: extract into util class.
+                    if (parameterType.equals("J") || parameterType.equals("D")) {
+                        registerIndex++;
+                    }
+                }
+
+                printParameterInfo = false;
+
                 classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this);
             }
             printer.levelDown();
@@ -245,6 +274,11 @@ implements   ClassDefVisitor
 
                 int parameterIndex = 0;
                 int registerIndex = method.isStatic() ? 0 : 1;
+
+                if (!method.isStatic()) {
+                    String classType = method.getClassType(dexFile);
+                    localVariableInfos[localVariables] = new LocalVariableCollector.LocalVariableInfo("this", classType, null);
+                }
 
                 ProtoID protoID     = method.getProtoID(dexFile);
                 TypeList parameters = protoID.getParameters();
@@ -341,6 +375,11 @@ implements   ClassDefVisitor
                 if (annotationSetRef != null) {
                     AnnotationSet annotationSet = annotationSetRef.getAnnotationSet();
                     if (annotationSet != null && annotationSet.getAnnotationCount() > 0) {
+                        if (printParameterInfo) {
+                            printer.println(String.format(".param p%d    # %s",
+                                    currentRegisterIndex,
+                                    currentParameterType));
+                        }
                         printer.levelUp();
                         annotationSet.accept(dexFile, classDef, this);
                         printer.levelDown();
