@@ -203,7 +203,22 @@ implements InstructionVisitor
         printer.levelUp();
         for (int i = 0; i < payload.getElements(); i++) {
             long value = payload.getElement(i);
-            printer.print(toHexString(value));
+            String hexString = toHexString(value);
+            printer.print(hexString);
+
+            switch (payload.elementWidth) {
+                case 1:
+                    printer.print("t");
+                    break;
+
+                case 2:
+                    printer.print("s");
+                    break;
+            }
+
+            if (hexString.length() > 10) {
+                printer.print("L");
+            }
 
             if (payload.elementWidth <= 4) {
                 printCommentIfLikelyFloat(printer, (int) value);
