@@ -32,9 +32,10 @@ public class FullDumpTest {
         "all.dex",
         "bytecodes.dex",
         "checkers.dex",
-//        "const-method-handle.dex",
-//        "invoke-custom.dex",
-//        "invoke-polymorphic.dex",
+        // TODO: finish support for missing instructions.
+        // "const-method-handle.dex",
+        // "invoke-custom.dex",
+        "invoke-polymorphic.dex",
         "staticfields.dex",
         "values.dex"
     };
