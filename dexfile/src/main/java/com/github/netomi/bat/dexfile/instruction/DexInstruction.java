@@ -130,6 +130,13 @@ public class DexInstruction
                 };
                 break;
 
+            case FORMAT_32x:
+                registers = new int[] {
+                        instructions[offset + 1] & 0xffff,
+                        instructions[offset + 2] & 0xffff
+                };
+                break;
+
             case FORMAT_35c:
                 {
                     int registerCount = (instructions[offset] >>> 12) & 0xf;

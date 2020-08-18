@@ -20,6 +20,8 @@ import com.github.netomi.bat.dexfile.instruction.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import com.github.netomi.bat.util.Primitives;
 
+import static com.github.netomi.bat.dexfile.instruction.DexOpCode.GOTO_32;
+
 class      InstructionPrinter
 implements InstructionVisitor
 {
@@ -38,182 +40,170 @@ implements InstructionVisitor
     public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
         printGeneric(instruction);
 
-        StringBuilder sb = new StringBuilder();
-
         int literal = instruction.getLiteral();
-
         if (instruction.containsLiteral())  {
-            sb.append(", ");
-            sb.append("#int ");
-            sb.append(literal);
-            sb.append(" // #");
+            printer.print(", ");
+            printer.print("#int ");
+            printer.print(Integer.toString(literal));
+            printer.print(" // #");
 
             switch (instruction.getOpcode().getFormat()) {
                 case FORMAT_22s:
-                    sb.append(Primitives.asHexValue((short) literal));
+                    printer.print(Primitives.asHexValue((short) literal));
                     break;
 
                 case FORMAT_22b:
-                    sb.append(Primitives.asHexValue((byte) literal));
+                    printer.print(Primitives.asHexValue((byte) literal));
                     break;
             }
         }
-
-        printer.print(sb.toString());
     }
 
     @Override
     public void visitBranchInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, BranchInstruction instruction) {
         printGeneric(instruction);
 
-        StringBuilder sb = new StringBuilder();
-
         if (instruction.registers.length > 0) {
-            sb.append(", ");
+            printer.print(", ");
         } else {
-            sb.append(' ');
+            printer.print(" ");
         }
 
-        sb.append(Primitives.asHexValue(offset + instruction.getBranchOffset(), 4));
-        sb.append(" // ");
-
-        if (instruction.getBranchOffset() < 0) {
-            sb.append('-');
-            sb.append(Primitives.asHexValue(-instruction.getBranchOffset(), 4));
+        if (instruction.getOpcode() == GOTO_32) {
+            printer.print("#");
+            if (instruction.getBranchOffset() < 0) {
+                printer.print("-");
+                printer.print(Primitives.asHexValue(-instruction.getBranchOffset(), 8));
+            }
+            else {
+                printer.print(Primitives.asHexValue(instruction.getBranchOffset(), 8));
+            }
         } else {
-            sb.append('+');
-            sb.append(Primitives.asHexValue(instruction.getBranchOffset(), 4));
-        }
+            printer.print(Primitives.asHexValue(offset + instruction.getBranchOffset(), 4));
+            printer.print(" // ");
 
-        printer.print(sb.toString());
+            if (instruction.getBranchOffset() < 0) {
+                printer.print("-");
+                printer.print(Primitives.asHexValue(-instruction.getBranchOffset(), 4));
+            }
+            else {
+                printer.print("+");
+                printer.print(Primitives.asHexValue(instruction.getBranchOffset(), 4));
+            }
+        }
     }
 
     @Override
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
         printGeneric(instruction);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(", ");
+        printer.print(", ");
 
         FieldID fieldID = instruction.getField(dexFile);
 
-        sb.append(fieldID.getClassType(dexFile));
-        sb.append('.');
-        sb.append(fieldID.getName(dexFile));
-        sb.append(':');
-        sb.append(fieldID.getType(dexFile));
+        printer.print(fieldID.getClassType(dexFile));
+        printer.print(".");
+        printer.print(fieldID.getName(dexFile));
+        printer.print(":");
+        printer.print(fieldID.getType(dexFile));
 
-        sb.append(" // field@");
-        sb.append(Primitives.asHexValue(instruction.getFieldIndex(), 4));
-
-        printer.print(sb.toString());
+        printer.print(" // field@");
+        printer.print(Primitives.asHexValue(instruction.getFieldIndex(), 4));
     }
 
     @Override
     public void visitLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, LiteralInstruction instruction) {
         printGeneric(instruction);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(", ");
+        printer.print(", ");
 
         long value = instruction.getValue();
 
         switch (instruction.getOpcode().getFormat()) {
             case FORMAT_11n:
             case FORMAT_22b:
-                sb.append(String.format("#int %d // #%x", value, (byte) value));
+                printer.print(String.format("#int %d // #%x", value, (byte) value));
                 break;
 
             case FORMAT_21h:
                 // The printed format varies a bit based on the actual opcode.
                 if (instruction.getOpcode() == DexOpCode.CONST_HIGH16) {
                     short v = (short) (value >> 16);
-                    sb.append(String.format("#int %d // #%x", value, v));
+                    printer.print(String.format("#int %d // #%x", value, v));
                 } else {
                     short v = (short) (value >> 48);
-                    sb.append(String.format("#long %d // #%x", value, v));
+                    printer.print(String.format("#long %d // #%x", value, v));
                 }
                 break;
 
             case FORMAT_21s:
             case FORMAT_22s:
-                sb.append(String.format("#int %d // #%x", value, (short) value));
+                printer.print(String.format("#int %d // #%x", value, (short) value));
                 break;
 
             case FORMAT_31i:
-                sb.append(new PrintfFormat("#float %g // #%08x").sprintf(new Object[] { Float.intBitsToFloat((int) value), value }));
+                printer.print(new PrintfFormat("#float %g // #%08x").sprintf(new Object[] { Float.intBitsToFloat((int) value), value }));
                 break;
 
             case FORMAT_51l:
-                sb.append(new PrintfFormat("#double %g // #%016lx").sprintf(new Object[] { Double.longBitsToDouble(value), value }));
+                printer.print(new PrintfFormat("#double %g // #%016lx").sprintf(new Object[] { Double.longBitsToDouble(value), value }));
                 break;
-
         }
-
-        printer.print(sb.toString());
     }
 
     @Override
     public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(instruction.getMnemonic());
+        printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
-            sb.append(' ');
-            sb.append('{');
+            printer.print(" ");
+            printer.print("{");
             for (int idx = 0; idx < instruction.registers.length; idx++) {
                 if (idx > 0) {
-                    sb.append(", ");
+                    printer.print(", ");
                 }
-                sb.append('v');
-                sb.append(instruction.registers[idx]);
+                printer.print("v");
+                printer.print(Integer.toString(instruction.registers[idx]));
             }
-            sb.append('}');
+            printer.print("}");
         } else {
-            sb.append("{}");
+            printer.print("{}");
         }
 
-        sb.append(", ");
+        printer.print(", ");
 
         MethodID methodID = instruction.getMethod(dexFile);
 
-        sb.append(methodID.getClassType(dexFile));
-        sb.append('.');
-        sb.append(methodID.getName(dexFile));
-        sb.append(':');
-        sb.append(methodID.getProtoID(dexFile).getDescriptor(dexFile));
+        printer.print(methodID.getClassType(dexFile));
+        printer.print(".");
+        printer.print(methodID.getName(dexFile));
+        printer.print(":");
+        printer.print(methodID.getProtoID(dexFile).getDescriptor(dexFile));
 
-        sb.append(" // method@");
-        sb.append(Primitives.asHexValue(instruction.getMethodIndex(), 4));
-
-        printer.print(sb.toString());
+        printer.print(" // method@");
+        printer.print(Primitives.asHexValue(instruction.getMethodIndex(), 4));
     }
 
     @Override
     public void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {
         printGeneric(instruction);
 
-        StringBuilder sb = new StringBuilder();
-
         if (instruction.registers.length > 0) {
-            sb.append(", ");
+            printer.print(", ");
         } else {
-            sb.append(' ');
+            printer.print(" ");
         }
 
-        sb.append(Primitives.asHexValue(offset + instruction.getPayloadOffset(), 8));
-        sb.append(" // ");
+        printer.print(Primitives.asHexValue(offset + instruction.getPayloadOffset(), 8));
+        printer.print(" // ");
 
         if (instruction.getPayloadOffset() < 0) {
-            sb.append('-');
-            sb.append(Primitives.asHexValue(-instruction.getPayloadOffset(), 8));
+            printer.print("-");
+            printer.print(Primitives.asHexValue(-instruction.getPayloadOffset(), 8));
         } else {
-            sb.append('+');
-            sb.append(Primitives.asHexValue(instruction.getPayloadOffset(), 8));
+            printer.print("+");
+            printer.print(Primitives.asHexValue(instruction.getPayloadOffset(), 8));
         }
-
-        printer.print(sb.toString());
     }
 
     @Override
@@ -233,34 +223,41 @@ implements InstructionVisitor
     public void visitTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, TypeInstruction instruction) {
         printGeneric(instruction);
 
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(", ");
+        printer.print(", ");
 
         TypeID typeID = instruction.getTypeID(dexFile);
-        sb.append(typeID.getType(dexFile));
+        printer.print(typeID.getType(dexFile));
 
-        sb.append(" // type@");
-        sb.append(Primitives.asHexValue(instruction.getTypeIndex(), 4));
-
-        printer.print(sb.toString());
+        printer.print(" // type@");
+        printer.print(Primitives.asHexValue(instruction.getTypeIndex(), 4));
     }
 
     @Override
     public void visitArrayTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayTypeInstruction instruction) {
-        printGeneric(instruction);
+        printer.print(instruction.getMnemonic());
 
-        StringBuilder sb = new StringBuilder();
+        if (instruction.registers.length > 0) {
+            printer.print(" ");
+            printer.print("{");
+            for (int idx = 0; idx < instruction.registers.length; idx++) {
+                if (idx > 0) {
+                    printer.print(", ");
+                }
+                printer.print("v");
+                printer.print(Integer.toString(instruction.registers[idx]));
+            }
+            printer.print("}");
+        } else {
+            printer.print("{}");
+        }
 
-        sb.append(", ");
+        printer.print(", ");
 
         TypeID typeID = instruction.getTypeID(dexFile);
-        sb.append(typeID.getType(dexFile));
+        printer.print(typeID.getType(dexFile));
 
-        sb.append(" // type@");
-        sb.append(Primitives.asHexValue(instruction.getTypeIndex(), 4));
-
-        printer.print(sb.toString());
+        printer.print(" // type@");
+        printer.print(Primitives.asHexValue(instruction.getTypeIndex(), 4));
     }
 
     @Override
@@ -279,25 +276,21 @@ implements InstructionVisitor
     }
 
     private void printGeneric(DexInstruction instruction) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(instruction.getMnemonic());
+        printer.print(instruction.getMnemonic());
 
         if (instruction.getOpcode() == DexOpCode.NOP) {
-            sb.append(" // spacer");
+            printer.print(" // spacer");
         }
 
         if (instruction.registers.length > 0) {
-            sb.append(' ');
+            printer.print(" ");
             for (int idx = 0; idx < instruction.registers.length; idx++) {
                 if (idx > 0) {
-                    sb.append(", ");
+                    printer.print(", ");
                 }
-                sb.append('v');
-                sb.append(instruction.registers[idx]);
+                printer.print("v");
+                printer.print(Integer.toString(instruction.registers[idx]));
             }
         }
-
-        printer.print(sb.toString());
     }
 }

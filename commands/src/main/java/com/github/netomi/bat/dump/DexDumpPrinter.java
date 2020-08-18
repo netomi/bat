@@ -50,9 +50,9 @@ implements   DexFileVisitor,
     }
 
     public DexDumpPrinter(OutputStream outputStream,
-                          boolean printFileSummary,
-                          boolean printHeaders,
-                          boolean printAnnotations) {
+                          boolean      printFileSummary,
+                          boolean      printHeaders,
+                          boolean      printAnnotations) {
         printer = new BufferedPrinter(outputStream);
 
         this.printFileSummary = printFileSummary;
@@ -134,7 +134,8 @@ implements   DexFileVisitor,
     // Private utility methods.
 
     private static String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
-        return classDefItem.getSourceFileIndex() + " (" + classDefItem.getSourceFile(dexFile) + ")";
+        String sourceFile = classDefItem.getSourceFile(dexFile);
+        return classDefItem.getSourceFileIndex() + " (" + (sourceFile != null ? sourceFile : "unknown") + ")";
     }
 
     private static String formatSignatureByteArray(byte[] array) {
@@ -305,12 +306,12 @@ implements   DexFileVisitor,
 
             code.triesAccept(dexFile, classDef, method, code, this);
 
-            println("      positions     :");
+            println("      positions     : ");
             if (code.debugInfo != null) {
                 code.debugInfo.debugSequenceAccept(dexFile, new SourceLinePrinter(code.debugInfo.getLineStart()));
             }
 
-            println("      locals        :");
+            println("      locals        : ");
             if (code.debugInfo != null) {
                 LocalVariablePrinter localVariablePrinter =
                         new LocalVariablePrinter(dexFile, method, code);

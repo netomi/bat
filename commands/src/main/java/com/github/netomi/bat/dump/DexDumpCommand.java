@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dump;
 
 import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.DexFormat;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.visitor.ClassNameFilter;
 import picocli.CommandLine;
@@ -32,8 +33,11 @@ import java.io.*;
          optionListHeading    = "%nOptions:%n")
 public class DexDumpCommand implements Runnable
 {
-    @Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = "inputfile to process (*.dex)")
+    @Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = "input file to process (*.dex)")
     private File inputFile;
+
+    @Option(names = "-o", description = "output file name (defaults to stdout)")
+    private File outputFile = null;
 
     @Option(names = "-a", description = "print annotations")
     private boolean printAnnotations = false;
@@ -44,24 +48,30 @@ public class DexDumpCommand implements Runnable
     @Option(names = "-h", description = "print headers")
     private boolean printHeaders = false;
 
-    @Option(names = "-c", description = "class to dump")
+    @Option(names = "-c", description = "class filter")
     private String classNameFilter = null;
 
     public void run()
     {
-        try (InputStream is = new FileInputStream(inputFile)) {
-
+        try (InputStream  is = new FileInputStream(inputFile);
+             OutputStream os = outputFile == null ? System.out : new FileOutputStream(outputFile))
+        {
             DexFileReader reader = new DexFileReader(is);
 
             DexFile dexFile = new DexFile();
             reader.visitDexFile(dexFile);
 
+            PrintStream ps = new PrintStream(os);
+            ps.println("Processing '" + inputFile.getName() + "'...");
+            ps.println("Opened '" + inputFile.getName() + "', DEX version '" + dexFile.getDexFormat().getVersion() + "'");
+            ps.flush();
+
             if (classNameFilter != null) {
                 dexFile.classDefsAccept(
                     new ClassNameFilter(classNameFilter,
-                    new DexDumpPrinter(System.out, printFileSummary, printHeaders, printAnnotations)));
+                    new DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations)));
             } else {
-                dexFile.accept(new DexDumpPrinter(System.out, printFileSummary, printHeaders, printAnnotations));
+                dexFile.accept(new DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations));
             }
         } catch (IOException ex) {
             ex.printStackTrace();
