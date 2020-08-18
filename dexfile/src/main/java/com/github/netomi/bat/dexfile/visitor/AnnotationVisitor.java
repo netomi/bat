@@ -20,15 +20,49 @@ import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.annotation.Annotation;
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet;
 
+import java.util.function.BiConsumer;
+
 public interface AnnotationVisitor
 {
     void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation);
 
-    static AnnotationVisitor concatenate(AnnotationVisitor... visitors) {
-        return (dexFile, classDef, annotationSet, index, annotation) -> {
-            for (AnnotationVisitor visitor : visitors) {
-                visitor.visitAnnotation(dexFile, classDef, annotationSet, index, annotation);
+    default AnnotationVisitor andThen(AnnotationVisitor... visitors) {
+        return Multi.of(this, visitors);
+    }
+
+    default AnnotationVisitor joinedByAnnotationConsumer(BiConsumer<DexFile, Annotation> consumer) {
+        AnnotationVisitor joiner = new AnnotationVisitor() {
+            private boolean firstVisited = false;
+            @Override
+            public void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation) {
+                if (firstVisited) {
+                    consumer.accept(dexFile, annotation);
+                } else {
+                    firstVisited = true;
+                }
             }
         };
+
+        return Multi.of(joiner, this);
+    }
+
+    class      Multi
+    extends    AbstractMultiVisitor<AnnotationVisitor>
+    implements AnnotationVisitor
+    {
+        public static AnnotationVisitor of(AnnotationVisitor visitor, AnnotationVisitor... visitors) {
+            return new Multi(visitor, visitors);
+        }
+
+        private Multi(AnnotationVisitor visitor, AnnotationVisitor... otherVisitors) {
+            super(visitor, otherVisitors);
+        }
+
+        @Override
+        public void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation) {
+            for (AnnotationVisitor visitor : visitors()) {
+                visitor.visitAnnotation(dexFile, classDef, annotationSet, index, annotation);
+            }
+        }
     }
 }

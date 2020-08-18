@@ -17,6 +17,8 @@ package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.*;
 
+import java.util.function.BiConsumer;
+
 public interface EncodedMethodVisitor
 {
     void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method);
@@ -29,28 +31,57 @@ public interface EncodedMethodVisitor
         visitAnyMethod(dexFile, classDef, index, method);
     }
 
-    static EncodedMethodVisitor concatenate(EncodedMethodVisitor... visitors) {
-        return new EncodedMethodVisitor() {
+    default EncodedMethodVisitor andThen(EncodedMethodVisitor... visitors) {
+        return Multi.of(this, visitors);
+    }
+
+    default EncodedMethodVisitor joinedByMethodConsumer(BiConsumer<DexFile, EncodedMethod> consumer) {
+        EncodedMethodVisitor joiner = new EncodedMethodVisitor() {
+            private boolean firstVisited = false;
             @Override
             public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
-                for (EncodedMethodVisitor visitor : visitors) {
-                    visitor.visitAnyMethod(dexFile, classDef, index, method);
-                }
-            }
-
-            @Override
-            public void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
-                for (EncodedMethodVisitor visitor : visitors) {
-                    visitor.visitDirectMethod(dexFile, classDef, index, method);
-                }
-            }
-
-            @Override
-            public void visitVirtualMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
-                for (EncodedMethodVisitor visitor : visitors) {
-                    visitor.visitVirtualMethod(dexFile, classDef, index, method);
+                if (firstVisited) {
+                    consumer.accept(dexFile, method);
+                } else {
+                    firstVisited = true;
                 }
             }
         };
+
+        return Multi.of(joiner, this);
+    }
+
+    class      Multi
+    extends    AbstractMultiVisitor<EncodedMethodVisitor>
+    implements EncodedMethodVisitor
+    {
+        public static EncodedMethodVisitor of(EncodedMethodVisitor visitor, EncodedMethodVisitor... visitors) {
+            return new Multi(visitor, visitors);
+        }
+
+        private Multi(EncodedMethodVisitor visitor, EncodedMethodVisitor... otherVisitors) {
+            super(visitor, otherVisitors);
+        }
+
+        @Override
+        public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+            for (EncodedMethodVisitor visitor : visitors()) {
+                visitor.visitAnyMethod(dexFile, classDef, index, method);
+            }
+        }
+
+        @Override
+        public void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+            for (EncodedMethodVisitor visitor : visitors()) {
+                visitor.visitDirectMethod(dexFile, classDef, index, method);
+            }
+        }
+
+        @Override
+        public void visitVirtualMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
+            for (EncodedMethodVisitor visitor : visitors()) {
+                visitor.visitVirtualMethod(dexFile, classDef, index, method);
+            }
+        }
     }
 }
