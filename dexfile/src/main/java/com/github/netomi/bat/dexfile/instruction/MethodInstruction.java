@@ -36,7 +36,7 @@ extends      DexInstruction
         return methodIndex;
     }
 
-    public MethodID getMethod(DexFile dexFile) {
+    public MethodID getMethodID(DexFile dexFile) {
         return dexFile.getMethodID(methodIndex);
     }
 
@@ -47,6 +47,8 @@ extends      DexInstruction
         switch (opcode.getFormat()) {
             case FORMAT_3rc:
             case FORMAT_35c:
+            case FORMAT_45cc:
+            case FORMAT_4rcc:
                 methodIndex = instructions[offset + 1] & 0xffff;
                 break;
 

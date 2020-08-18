@@ -62,8 +62,8 @@ public class DexDumpCommand implements Runnable
             reader.visitDexFile(dexFile);
 
             PrintStream ps = new PrintStream(os);
-            ps.println("Processing '" + inputFile.getName() + "'...");
-            ps.println("Opened '" + inputFile.getName() + "', DEX version '" + dexFile.getDexFormat().getVersion() + "'");
+            ps.println("Processing '" + inputFile.getPath() + "'...");
+            ps.println("Opened '" + inputFile.getPath() + "', DEX version '" + dexFile.getDexFormat().getVersion() + "'");
             ps.flush();
 
             if (classNameFilter != null) {

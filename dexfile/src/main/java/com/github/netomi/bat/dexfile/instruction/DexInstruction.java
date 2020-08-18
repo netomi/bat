@@ -153,14 +153,14 @@ public class DexInstruction
 
                         case 2:
                             registers = new int[] {
-                                instructions[offset + 2] & 0xf,
+                                 instructions[offset + 2] & 0xf,
                                 (instructions[offset + 2] >>> 4) & 0xf
                             };
                             break;
 
                         case 3:
                             registers = new int[] {
-                                instructions[offset + 2]         & 0xf,
+                                 instructions[offset + 2]         & 0xf,
                                 (instructions[offset + 2] >>> 4) & 0xf,
                                 (instructions[offset + 2] >>> 8) & 0xf,
                             };
@@ -168,7 +168,7 @@ public class DexInstruction
 
                         case 4:
                             registers = new int[] {
-                                instructions[offset + 2]          & 0xf,
+                                 instructions[offset + 2]          & 0xf,
                                 (instructions[offset + 2] >>>  4) & 0xf,
                                 (instructions[offset + 2] >>>  8) & 0xf,
                                 (instructions[offset + 2] >>> 12) & 0xf
@@ -177,7 +177,7 @@ public class DexInstruction
 
                         case 5:
                             registers = new int[] {
-                                instructions[offset + 2]          & 0xf,
+                                 instructions[offset + 2]          & 0xf,
                                 (instructions[offset + 2] >>>  4) & 0xf,
                                 (instructions[offset + 2] >>>  8) & 0xf,
                                 (instructions[offset + 2] >>> 12) & 0xf,
@@ -192,6 +192,7 @@ public class DexInstruction
                 break;
 
             case FORMAT_3rc:
+            case FORMAT_4rcc:
                 {
                     int registerCount = (instructions[offset] >>> 8) & 0xff;
                     int register      = instructions[offset + 2] & 0xffff;
@@ -203,6 +204,56 @@ public class DexInstruction
                     }
                 }
                 break;
+
+            case FORMAT_45cc:
+            {
+                int registerCount = (instructions[offset] >>> 12) & 0xf;
+                switch (registerCount) {
+                    case 1:
+                        registers = new int[] {
+                            instructions[offset + 2] & 0xf
+                        };
+                        break;
+
+                    case 2:
+                        registers = new int[] {
+                             instructions[offset + 2] & 0xf,
+                            (instructions[offset + 2] >>> 4) & 0xf
+                        };
+                        break;
+
+                    case 3:
+                        registers = new int[] {
+                             instructions[offset + 2]         & 0xf,
+                            (instructions[offset + 2] >>> 4) & 0xf,
+                            (instructions[offset + 2] >>> 8) & 0xf,
+                        };
+                        break;
+
+                    case 4:
+                        registers = new int[] {
+                             instructions[offset + 2]          & 0xf,
+                            (instructions[offset + 2] >>>  4) & 0xf,
+                            (instructions[offset + 2] >>>  8) & 0xf,
+                            (instructions[offset + 2] >>> 12) & 0xf
+                        };
+                        break;
+
+                    case 5:
+                        registers = new int[] {
+                             instructions[offset + 2]          & 0xf,
+                            (instructions[offset + 2] >>>  4) & 0xf,
+                            (instructions[offset + 2] >>>  8) & 0xf,
+                            (instructions[offset + 2] >>> 12) & 0xf,
+                            (instructions[offset]     >>>  8) & 0xf
+                        };
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("unexpected value when reading instruction with opcode " + opcode);
+                }
+            }
+            break;
         }
     }
 

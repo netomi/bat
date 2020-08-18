@@ -445,9 +445,13 @@ implements   DexFileVisitor,
 
         @Override
         public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
-            print("{ ");
-            value.valuesAccept(dexFile, this.joinedByValueConsumer((df, v) -> print(" ")));
-            print("}");
+            if (value.getValueCount() > 0) {
+                print("{ ");
+                value.valuesAccept(dexFile, this.joinedByValueConsumer((df, v) -> print(" ")));
+                print(" }");
+            } else {
+                print("{ }");
+            }
         }
 
         @Override
@@ -467,7 +471,9 @@ implements   DexFileVisitor,
 
         @Override
         public void visitStringValue(DexFile dexFile, EncodedStringValue value) {
-            printer.printAsMutf8(String.format("\"%s\"", value.getString(dexFile)), true);
+            printer.print("\"");
+            printer.printAsMutf8(value.getString(dexFile), true);
+            printer.print("\"");
         }
 
         @Override

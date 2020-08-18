@@ -24,15 +24,21 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.FORMAT_22b;
 import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.FORMAT_22s;
 
-public class ArithmeticInstruction
-extends      DexInstruction
+public class ArithmeticLiteralInstruction
+extends      ArithmeticInstruction
 {
-    static ArithmeticInstruction create(DexOpCode opCode, byte ident) {
-        return new ArithmeticInstruction(opCode);
+    private int value;
+
+    static ArithmeticLiteralInstruction create(DexOpCode opCode, byte ident) {
+        return new ArithmeticLiteralInstruction(opCode);
     }
 
-    ArithmeticInstruction(DexOpCode opcode) {
+    ArithmeticLiteralInstruction(DexOpCode opcode) {
         super(opcode);
+    }
+
+    public int getLiteral() {
+        return value;
     }
 
     @Override
@@ -40,13 +46,12 @@ extends      DexInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
-            case FORMAT_12x:
-            case FORMAT_23x:
+            case FORMAT_22b:
+                value = instructions[offset + 1] >> 8;
                 break;
 
-            case FORMAT_22b:
             case FORMAT_22s:
-                // handled by ArithmeticLiteralInstruction.
+                value = instructions[offset + 1];
                 break;
 
             default:
@@ -56,6 +61,6 @@ extends      DexInstruction
 
     @Override
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
-        visitor.visitArithmeticInstruction(dexFile, classDef, method, code, offset, this);
+        visitor.visitArithmeticLiteralInstruction(dexFile, classDef, method, code, offset, this);
     }
 }

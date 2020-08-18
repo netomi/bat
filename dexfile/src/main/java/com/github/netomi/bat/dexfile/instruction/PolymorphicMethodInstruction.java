@@ -15,24 +15,29 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-import com.github.netomi.bat.dexfile.ClassDef;
-import com.github.netomi.bat.dexfile.Code;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
-import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.FORMAT_22b;
-import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.FORMAT_22s;
-
-public class ArithmeticInstruction
-extends      DexInstruction
+public class PolymorphicMethodInstruction
+extends      MethodInstruction
 {
-    static ArithmeticInstruction create(DexOpCode opCode, byte ident) {
-        return new ArithmeticInstruction(opCode);
+    private int protoIndex;
+
+    static PolymorphicMethodInstruction create(DexOpCode opCode, byte ident) {
+        return new PolymorphicMethodInstruction(opCode);
     }
 
-    ArithmeticInstruction(DexOpCode opcode) {
+    PolymorphicMethodInstruction(DexOpCode opcode) {
         super(opcode);
+        protoIndex = DexConstants.NO_INDEX;
+    }
+
+    public int getProtoIndex() {
+        return protoIndex;
+    }
+
+    public ProtoID getProtoID(DexFile dexFile) {
+        return dexFile.getProtoID(protoIndex);
     }
 
     @Override
@@ -40,13 +45,9 @@ extends      DexInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
-            case FORMAT_12x:
-            case FORMAT_23x:
-                break;
-
-            case FORMAT_22b:
-            case FORMAT_22s:
-                // handled by ArithmeticLiteralInstruction.
+            case FORMAT_45cc:
+            case FORMAT_4rcc:
+                protoIndex = instructions[offset + 3] & 0xffff;
                 break;
 
             default:
@@ -56,6 +57,6 @@ extends      DexInstruction
 
     @Override
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
-        visitor.visitArithmeticInstruction(dexFile, classDef, method, code, offset, this);
+        visitor.visitPolymorphicMethodInstruction(dexFile, classDef, method, code, offset, this);
     }
 }

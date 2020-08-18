@@ -25,8 +25,16 @@ public interface InstructionVisitor
 {
     void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction);
 
-    default void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
+    default void visitAnyArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
+        visitAnyArithmeticInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitArithmeticLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticLiteralInstruction instruction) {
+        visitAnyArithmeticInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
     default void visitAnyArrayInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayInstruction instruction) {
@@ -61,8 +69,16 @@ public interface InstructionVisitor
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
-    default void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
+    default void visitAnyMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
+        visitAnyMethodInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitPolymorphicMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PolymorphicMethodInstruction instruction) {
+        visitAnyMethodInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
     default void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {

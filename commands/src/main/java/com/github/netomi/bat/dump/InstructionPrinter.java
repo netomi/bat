@@ -37,25 +37,23 @@ implements InstructionVisitor
     }
 
     @Override
-    public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
+    public void visitArithmeticLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticLiteralInstruction instruction) {
         printGeneric(instruction);
 
         int literal = instruction.getLiteral();
-        if (instruction.containsLiteral())  {
-            printer.print(", ");
-            printer.print("#int ");
-            printer.print(Integer.toString(literal));
-            printer.print(" // #");
+        printer.print(", ");
+        printer.print("#int ");
+        printer.print(Integer.toString(literal));
+        printer.print(" // #");
 
-            switch (instruction.getOpcode().getFormat()) {
-                case FORMAT_22s:
-                    printer.print(Primitives.asHexValue((short) literal));
-                    break;
+        switch (instruction.getOpcode().getFormat()) {
+            case FORMAT_22s:
+                printer.print(Primitives.asHexValue((short) literal));
+                break;
 
-                case FORMAT_22b:
-                    printer.print(Primitives.asHexValue((byte) literal));
-                    break;
-            }
+            case FORMAT_22b:
+                printer.print(Primitives.asHexValue((byte) literal));
+                break;
         }
     }
 
@@ -152,7 +150,7 @@ implements InstructionVisitor
     }
 
     @Override
-    public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
+    public void visitAnyMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
         printer.print(instruction.getMnemonic());
 
         if (instruction.registers.length > 0) {
@@ -167,12 +165,16 @@ implements InstructionVisitor
             }
             printer.print("}");
         } else {
-            printer.print("{}");
+            printer.print(" {}");
         }
 
         printer.print(", ");
 
-        MethodID methodID = instruction.getMethod(dexFile);
+        PolymorphicMethodInstruction polymorphicMethodInstruction =
+            instruction instanceof PolymorphicMethodInstruction ?
+                (PolymorphicMethodInstruction) instruction : null;
+
+        MethodID methodID = instruction.getMethodID(dexFile);
 
         printer.print(methodID.getClassType(dexFile));
         printer.print(".");
@@ -180,8 +182,18 @@ implements InstructionVisitor
         printer.print(":");
         printer.print(methodID.getProtoID(dexFile).getDescriptor(dexFile));
 
+        if (polymorphicMethodInstruction != null) {
+            ProtoID protoID = polymorphicMethodInstruction.getProtoID(dexFile);
+            printer.print(", " + protoID.getDescriptor(dexFile));
+        }
+
         printer.print(" // method@");
         printer.print(Primitives.asHexValue(instruction.getMethodIndex(), 4));
+
+        if (polymorphicMethodInstruction != null) {
+            printer.print(", proto@");
+            printer.print(Primitives.asHexValue(polymorphicMethodInstruction.getProtoIndex(), 4));
+        }
     }
 
     @Override
@@ -210,7 +222,9 @@ implements InstructionVisitor
     public void visitStringInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, StringInstruction instruction) {
         printGeneric(instruction);
 
-        printer.printAsMutf8(", \"" + instruction.getString(dexFile) + "\" // string@", false);
+        printer.print(", \"");
+        printer.printAsMutf8(instruction.getString(dexFile), false);
+        printer.print("\" // string@");
 
         if (instruction.getOpcode() == DexOpCode.CONST_STRING) {
             printer.print(Primitives.asHexValue(instruction.getStringIndex(), 4));
@@ -248,7 +262,7 @@ implements InstructionVisitor
             }
             printer.print("}");
         } else {
-            printer.print("{}");
+            printer.print(" {}");
         }
 
         printer.print(", ");

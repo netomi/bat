@@ -45,6 +45,8 @@ implements AutoCloseable
     public void printAsMutf8(String s, boolean escapeControlChars) {
         try {
             if (escapeControlChars) {
+                s = s.replaceAll("\\\\", "\\\\\\\\");
+                s = s.replaceAll("\"", "\\\\\"");
                 s = s.replaceAll("\r", "\\\\r");
                 s = s.replaceAll("\n", "\\\\n");
                 s = s.replaceAll("\t", "\\\\t");

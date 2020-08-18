@@ -52,15 +52,10 @@ implements InstructionVisitor
     }
 
     @Override
-    public void visitArithmeticInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticInstruction instruction) {
+    public void visitArithmeticLiteralInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArithmeticLiteralInstruction instruction) {
         printCommon(code, offset, instruction, false);
-
-        if (instruction.containsLiteral())  {
-            printer.print(", ");
-            printer.print(toHexString(instruction.getLiteral()));
-        }
-
-        printer.println();
+        printer.print(", ");
+        printer.println(toHexString(instruction.getLiteral()));
         printEndLabels(dexFile, code, offset, instruction.getLength());
     }
 
@@ -125,7 +120,7 @@ implements InstructionVisitor
         printDebugInfo(offset);
         printLabels(code, offset);
 
-        MethodID methodID = instruction.getMethod(dexFile);
+        MethodID methodID = instruction.getMethodID(dexFile);
 
         if (methodID.getName(dexFile).startsWith("access$")) {
             AccessMethodFollower methodFollower = new AccessMethodFollower();
@@ -453,7 +448,7 @@ implements InstructionVisitor
 
         @Override
         public void visitMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
-            MethodID methodID = instruction.getMethod(dexFile);
+            MethodID methodID = instruction.getMethodID(dexFile);
             explanation = "invokes: " + methodID.getClassType(dexFile) + "->" + methodID.getName(dexFile) + methodID.getProtoID(dexFile).getDescriptor(dexFile);
         }
     }
