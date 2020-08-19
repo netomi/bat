@@ -15,17 +15,17 @@
  */
 package com.github.netomi.bat.dexfile.visitor;
 
+import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.TypeList;
+import com.github.netomi.bat.dexfile.annotation.*;
 
 /**
- * This interface specifies the methods for a visitor of {@code TypeList}
- * instances as contained inside {@code ClassDef} instances and {@code ProtoID}
- * instances.
+ * This interface specifies the methods for a visitor of {@code AnnotationsDirectory}
+ * instances as contained inside {@code ClassDef} instances.
  *
  * @author Thomas Neidhart
  */
-public interface TypeListVisitor
+public interface AnnotationsDirectoryVisitor
 {
-    void visitTypeList(DexFile dexFile, TypeList typeList);
+    void visitAnnotationsDirectory(DexFile dexFile, ClassDef classDef, AnnotationsDirectory annotationsDirectory);
 }

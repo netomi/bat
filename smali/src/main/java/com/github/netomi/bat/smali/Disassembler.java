@@ -48,7 +48,7 @@ implements   ClassDefVisitor
     public static void main(String[] args) {
         DexFile dexFile = new DexFile();
 
-        try (InputStream is = new FileInputStream("out.dex"))
+        try (InputStream is = new FileInputStream("classes-io.dex"))
         {
             DexFileReader reader = new DexFileReader(is);
             reader.visitDexFile(dexFile);

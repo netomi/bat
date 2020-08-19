@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.dexfile.visitor.TypeVisitor;
 import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
@@ -138,6 +139,14 @@ extends      DataItem
         output.writeInt(shortyIndex);
         output.writeInt(returnTypeIndex);
         output.writeInt(parametersOffset);
+    }
+
+    public void parameterTypesAccept(DexFile dexFile, TypeVisitor visitor) {
+        if (parameters != null) {
+            for (int i = 0; i < parameters.getTypeCount(); i++) {
+                visitor.visitType(dexFile, parameters, i, parameters.getType(dexFile, i));
+            }
+        }
     }
 
     @Override

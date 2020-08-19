@@ -17,12 +17,20 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory;
 import com.github.netomi.bat.dexfile.util.DexClasses;
+import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * A class representing a class def item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#class-def-item">class def item @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 @DataItemAnn(
     type          = DexConstants.TYPE_CLASS_DEF_ITEM,
     dataAlignment = 4,
@@ -40,10 +48,10 @@ extends      DataItem
     private int classDataOffset;    // uint
     private int staticValuesOffset; // uint
 
-    public TypeList             interfaces;
-    public AnnotationsDirectory annotationsDirectory;
-    public ClassData            classData;
-    public EncodedArray         staticValues;
+    private TypeList             interfaces;
+    private AnnotationsDirectory annotationsDirectory;
+    private ClassData            classData;
+    private EncodedArray         staticValues;
 
     public static ClassDef readContent(DexDataInput input) {
         ClassDef classDef = new ClassDef();
@@ -52,19 +60,26 @@ extends      DataItem
     }
 
     private ClassDef() {
-        classIndex         = NO_INDEX;
-        accessFlags        = 0;
-        superClassIndex    = NO_INDEX;
-        interfacesOffset   = 0;
-        sourceFileIndex    = NO_INDEX;
-        annotationsOffset  = 0;
-        classDataOffset    = 0;
-        staticValuesOffset = 0;
+        this(NO_INDEX, 0, NO_INDEX, NO_INDEX, null, null, null, null);
+    }
 
-        interfaces           = null;
-        annotationsDirectory = null;
-        classData            = null;
-        staticValues         = null;
+    private ClassDef(int                  classIndex,
+                     int                  accessFlags,
+                     int                  superClassIndex,
+                     int                  sourceFileIndex,
+                     TypeList             interfaces,
+                     AnnotationsDirectory annotationsDirectory,
+                     ClassData            classData,
+                     EncodedArray         staticValues) {
+        this.classIndex      = classIndex;
+        this.accessFlags     = accessFlags;
+        this.superClassIndex = superClassIndex;
+        this.sourceFileIndex = sourceFileIndex;
+
+        this.interfaces           = interfaces;
+        this.annotationsDirectory = annotationsDirectory;
+        this.classData            = classData;
+        this.staticValues         = staticValues;
     }
 
     public int getInterfacesOffset() {
@@ -119,6 +134,22 @@ extends      DataItem
         return sourceFileIndex == NO_INDEX ?
             null :
             dexFile.getStringID(sourceFileIndex).getStringValue();
+    }
+
+    public TypeList getInterfaces() {
+        return interfaces;
+    }
+
+    public AnnotationsDirectory getAnnotationsDirectory() {
+        return annotationsDirectory;
+    }
+
+    public ClassData getClassData() {
+        return classData;
+    }
+
+    public EncodedArray getStaticValues() {
+        return staticValues;
     }
 
     @Override
@@ -185,15 +216,27 @@ extends      DataItem
             visitor)));
     }
 
-    public void interfacesAccept(DexFile dexFile, TypeListVisitor visitor) {
+    public void interfaceListAccept(DexFile dexFile, TypeListVisitor visitor) {
         if (interfaces != null) {
-            visitor.visitInterfaces(dexFile, this, interfaces);
+            visitor.visitTypeList(dexFile, interfaces);
+        }
+    }
+
+    public void interfacesAccept(DexFile dexFile, TypeVisitor visitor) {
+        if (interfaces != null) {
+            interfaces.typesAccept(dexFile, visitor);
         }
     }
 
     public void classDataAccept(DexFile dexFile, ClassDataVisitor visitor) {
         if (classData != null) {
             visitor.visitClassData(dexFile, this, classData);
+        }
+    }
+
+    public void annotationsDirectoryAccept(DexFile dexFile, AnnotationsDirectoryVisitor visitor) {
+        if (annotationsDirectory != null) {
+            visitor.visitAnnotationsDirectory(dexFile, this, this.annotationsDirectory);
         }
     }
 

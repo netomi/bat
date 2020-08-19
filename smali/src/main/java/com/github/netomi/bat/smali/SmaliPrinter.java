@@ -27,7 +27,6 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 public class SmaliPrinter
 implements   ClassDefVisitor,
@@ -37,8 +36,7 @@ implements   ClassDefVisitor,
              AnnotationElementVisitor,
              EncodedFieldVisitor,
              EncodedMethodVisitor,
-             CodeVisitor,
-             TypeListVisitor
+             CodeVisitor
 {
     private final IndentingPrinter printer;
 
@@ -73,11 +71,13 @@ implements   ClassDefVisitor,
             printer.println(".source \"" + sourceFile + "\"");
         }
 
-        classDef.interfacesAccept(dexFile, this);
+        classDef.interfaceListAccept(dexFile, (dexFile1, typeList) -> {
+            printer.println();
+            printer.println("# interfaces");
+            classDef.interfacesAccept(dexFile1, (df, tl, idx, type) -> printer.println(".implements " + type));
+        });
 
-        if (classDef.annotationsDirectory != null) {
-            classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, this);
-        }
+        classDef.annotationsDirectoryAccept(dexFile, new ClassAnnotationSetVisitor(this));
 
         classDef.classDataAccept(dexFile, this);
     }
@@ -114,19 +114,12 @@ implements   ClassDefVisitor,
     }
 
     @Override
-    public void visitInterfaces(DexFile dexFile, ClassDef classDefItem, TypeList typeList) {
-        printer.println();
-        printer.println("# interfaces");
-        typeList.typesAccept(dexFile, (dexFile1, typeList1, index, type) -> printer.println(".implements " + type));
-    }
-
-    @Override
     public void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
         printer.print(".field");
 
         String accessFlags =
-                DexAccessFlags.formatAsHumanReadable(field.getAccessFlags(), DexAccessFlags.Target.FIELD)
-                        .toLowerCase();
+            DexAccessFlags.formatAsHumanReadable(field.getAccessFlags(), DexAccessFlags.Target.FIELD)
+                          .toLowerCase();
 
         if (!accessFlags.isEmpty()) {
             printer.print(" " + accessFlags);
@@ -144,10 +137,7 @@ implements   ClassDefVisitor,
         }
 
         printer.println();
-
-        if (classDef.annotationsDirectory != null) {
-            classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, this);
-        }
+        classDef.annotationsDirectoryAccept(dexFile, new FieldAnnotationSetFilter(field, this));
     }
 
     @Override
@@ -169,7 +159,7 @@ implements   ClassDefVisitor,
         printer.levelUp();
         if (method.code != null) {
             method.codeAccept(dexFile, classDef, this);
-        } else if (classDef.annotationsDirectory != null) {
+        } else if (classDef.getAnnotationsDirectory() != null) {
             int     parameterIndex = 0;
             int     registerIndex  = method.isStatic() ? 0 : 1;
 
@@ -182,9 +172,7 @@ implements   ClassDefVisitor,
                 currentParameterType  = parameterType;
                 currentRegisterIndex  = registerIndex;
 
-                if (classDef.annotationsDirectory != null) {
-                    classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this);
-                }
+                classDef.annotationsDirectoryAccept(dexFile, new ParameterAnnotationSetFilter(method, this));
 
                 registerIndex++;
 
@@ -195,11 +183,10 @@ implements   ClassDefVisitor,
             }
 
             printParameterInfo = false;
-
-            classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this);
+            classDef.annotationsDirectoryAccept(dexFile, new MethodAnnotationSetFilter(method, this));
         }
-        printer.levelDown();
 
+        printer.levelDown();
         printer.println(".end method");
     }
 
@@ -243,9 +230,7 @@ implements   ClassDefVisitor,
 
                 localVariableInfos[localVariables + registerIndex] = localVariableInfo;
 
-                if (classDef.annotationsDirectory != null) {
-                    classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this);
-                }
+                classDef.annotationsDirectoryAccept(dexFile, new ParameterAnnotationSetFilter(method, this));
 
                 printParameterInfo = false;
 
@@ -258,9 +243,7 @@ implements   ClassDefVisitor,
             }
         }
 
-        if (classDef.annotationsDirectory != null) {
-            classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this);
-        }
+        classDef.annotationsDirectoryAccept(dexFile, new MethodAnnotationSetFilter(method, this));
 
         RegisterPrinter            registerPrinter     = new RegisterPrinter(code);
         BranchTargetPrinter        branchTargetPrinter = new BranchTargetPrinter();

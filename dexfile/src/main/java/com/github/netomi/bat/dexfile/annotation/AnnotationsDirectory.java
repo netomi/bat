@@ -43,6 +43,10 @@ extends      DataItem
     public List<MethodAnnotation>    methodAnnotations;
     public List<ParameterAnnotation> parameterAnnotations;
 
+    public static AnnotationsDirectory empty() {
+        return new AnnotationsDirectory();
+    }
+
     public static AnnotationsDirectory readContent(DexDataInput input) {
         AnnotationsDirectory annotationsDirectory = new AnnotationsDirectory();
         annotationsDirectory.read(input);

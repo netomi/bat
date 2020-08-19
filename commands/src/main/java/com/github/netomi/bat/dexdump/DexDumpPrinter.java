@@ -94,11 +94,12 @@ implements   DexFileVisitor,
             println("annotations_off     : " + formatNumber((long) classDef.getAnnotationsOffset()));
             println("class_data_off      : " + formatNumber((long) classDef.getClassDataOffset()));
 
-            if (classDef.classData != null) {
-                println("static_fields_size  : " + classDef.classData.getStaticFieldCount());
-                println("instance_fields_size: " + classDef.classData.getInstanceFieldCount());
-                println("direct_methods_size : " + classDef.classData.getDirectMethodCount());
-                println("virtual_methods_size: " + classDef.classData.getVirtualMethodCount());
+            if (classDef.getClassData() != null) {
+                ClassData classData = classDef.getClassData();
+                println("static_fields_size  : " + classData.getStaticFieldCount());
+                println("instance_fields_size: " + classData.getInstanceFieldCount());
+                println("direct_methods_size : " + classData.getDirectMethodCount());
+                println("virtual_methods_size: " + classData.getVirtualMethodCount());
             }
             else {
                 println("static_fields_size  : 0");
@@ -109,7 +110,7 @@ implements   DexFileVisitor,
             println();
         }
 
-        if (printAnnotations && classDef.annotationsDirectory != null) {
+        if (printAnnotations && classDef.getAnnotationsDirectory() != null) {
             println(String.format("Class #%d annotations:", index));
             classDef.annotationSetsAccept(dexFile, visitorImpl);
             println();
@@ -122,7 +123,7 @@ implements   DexFileVisitor,
         println("  Interfaces        -");
         classDef.interfacesAccept(dexFile, visitorImpl);
 
-        if (classDef.classData != null) {
+        if (classDef.getClassData() != null) {
             classDef.classDataAccept(dexFile, visitorImpl);
         } else {
             println("  Static fields     -");
@@ -181,7 +182,6 @@ implements   DexFileVisitor,
                   ClassDataVisitor,
                   EncodedFieldVisitor,
                   EncodedMethodVisitor,
-                  TypeListVisitor,
                   TypeVisitor,
                   CodeVisitor,
                   InstructionVisitor,
@@ -241,12 +241,15 @@ implements   DexFileVisitor,
             println("      type          : '" + encodedField.getType(dexFile) + "'");
             println("      access        : " + formatAccessFlags(encodedField.getAccessFlags(), DexAccessFlags.Target.FIELD));
 
-            if (encodedField.isStatic()       &&
-                classDef.staticValues != null &&
-                index < classDef.staticValues.getArray().getValueCount())
+            EncodedArrayValue staticValues =
+                    classDef.getStaticValues() != null ? classDef.getStaticValues().getArray() : null;
+
+            if (encodedField.isStatic() &&
+                staticValues != null    &&
+                index < staticValues.getValueCount())
             {
                 print("      value         : ");
-                classDef.staticValues.getArray().valueAccept(dexFile, index, this);
+                staticValues.valueAccept(dexFile, index, this);
                 println();
             }
         }
@@ -361,13 +364,6 @@ implements   DexFileVisitor,
 
             if (catchHandler.getCatchAllAddr() != -1) {
                 println(String.format("          %s -> %s", "<any>", Primitives.toHexString((short) catchHandler.getCatchAllAddr())));
-            }
-        }
-
-        @Override
-        public void visitInterfaces(DexFile dexFile, ClassDef classDefItem, TypeList typeList) {
-            if (typeList != null) {
-                typeList.typesAccept(dexFile, this);
             }
         }
 
