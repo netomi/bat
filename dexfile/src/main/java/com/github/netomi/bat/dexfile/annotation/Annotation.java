@@ -38,8 +38,13 @@ import com.github.netomi.bat.dexfile.value.EncodedValue;
 public class Annotation
 extends      DataItem
 {
-    private short                  visibility; // ubyte
-    private EncodedAnnotationValue annotation;
+    //private short                  visibility; // ubyte
+    private AnnotationVisibility   visibility;
+    private EncodedAnnotationValue value;
+
+    public static Annotation of(AnnotationVisibility visibility, EncodedAnnotationValue value) {
+        return new Annotation(visibility, value);
+    }
 
     public static Annotation readContent(DexDataInput input) {
         Annotation annotation = new Annotation();
@@ -48,32 +53,37 @@ extends      DataItem
     }
 
     private Annotation() {
-        visibility = 0;
-        annotation = null;
+        this(null, null);
+    }
+
+    private Annotation(AnnotationVisibility visibility, EncodedAnnotationValue value) {
+        this.visibility = visibility;
+        this.value      = value;
     }
 
     public AnnotationVisibility getVisibility() {
-        return AnnotationVisibility.of(visibility);
+        return visibility;
     }
 
     public EncodedAnnotationValue getAnnotationValue() {
-        return annotation;
+        return value;
     }
 
     @Override
     protected void read(DexDataInput input) {
-        visibility = input.readUnsignedByte();
-        annotation = EncodedValue.readAnnotationValue(input);
+        int visibilityValue = input.readUnsignedByte();
+        visibility = AnnotationVisibility.of(visibilityValue);
+        value      = EncodedValue.readAnnotationValue(input);
     }
 
     @Override
     protected void write(DexDataOutput output) {
-        output.writeUnsignedByte(visibility);
-        annotation.write(output);
+        output.writeUnsignedByte(visibility.getValue());
+        value.write(output);
     }
 
     @Override
     public String toString() {
-        return String.format("Annotation[visibility=%d,value=%s]", visibility, annotation);
+        return String.format("Annotation[visibility='%s',value=%s]", visibility.getName(), value);
     }
 }

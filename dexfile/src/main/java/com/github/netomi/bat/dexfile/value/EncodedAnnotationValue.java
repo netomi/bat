@@ -78,6 +78,7 @@ extends      EncodedValue
         typeIndex = input.readUleb128();
         int size  = input.readUleb128();
 
+        elements.clear();
         elements.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
             AnnotationElement element = AnnotationElement.readContent(input);

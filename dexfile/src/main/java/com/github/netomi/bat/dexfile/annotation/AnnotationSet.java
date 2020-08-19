@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.AnnotationVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
+import com.github.netomi.bat.util.IntArray;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,19 +43,27 @@ import java.util.function.BiConsumer;
 public class AnnotationSet
 extends      DataItem
 {
-    private static final int[] EMPTY_ENTRIES = new int[0];
+    //private int                 size;                    // uint
+    private IntArray              annotationOffsetEntries; // uint[]
+    private ArrayList<Annotation> annotations;
 
-    //private int              size;                    // uint
-    public int[]            annotationOffsetEntries; // uint[]
-    public List<Annotation> annotations;
+    public static AnnotationSet readContent(DexDataInput input) {
+        AnnotationSet annotationSet = new AnnotationSet();
+        annotationSet.read(input);
+        return annotationSet;
+    }
 
-    public AnnotationSet() {
-        annotationOffsetEntries = EMPTY_ENTRIES;
-        annotations             = Collections.emptyList();
+    private AnnotationSet() {
+        annotationOffsetEntries = new IntArray(0);
+        annotations             = new ArrayList<>(0);
     }
 
     public int getAnnotationCount() {
         return annotations.size();
+    }
+
+    public Annotation getAnnotation(int index) {
+        return annotations.get(index);
     }
 
     @Override
@@ -62,21 +71,31 @@ extends      DataItem
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
-
-        annotationOffsetEntries = new int[size];
+        annotationOffsetEntries.clear();
+        annotationOffsetEntries.resize(size);
         for (int i = 0; i < size; i++) {
-            annotationOffsetEntries[i] = input.readInt();
+            annotationOffsetEntries.set(i, input.readInt());
         }
     }
 
     @Override
     protected void readLinkedDataItems(DexDataInput input) {
-        annotations = new ArrayList<>(annotationOffsetEntries.length);
-        for (int i = 0; i < annotationOffsetEntries.length; i++) {
-            input.setOffset(annotationOffsetEntries[i]);
+        annotations.clear();
+        annotations.ensureCapacity(annotationOffsetEntries.size());
+        for (int i = 0; i < annotationOffsetEntries.size(); i++) {
+            input.setOffset(annotationOffsetEntries.get(i));
 
             Annotation annotation = Annotation.readContent(input);
-            annotations.add(annotation);
+            annotations.add(i, annotation);
+        }
+    }
+
+    @Override
+    protected void updateOffsets(Map dataItemMap) {
+        annotationOffsetEntries.clear();
+        annotationOffsetEntries.resize(annotations.size());
+        for (int i = 0; i < annotations.size(); i++) {
+            annotationOffsetEntries.set(i, dataItemMap.getOffset(annotations.get(i)));
         }
     }
 
@@ -84,9 +103,9 @@ extends      DataItem
     protected void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
-        output.writeInt(annotationOffsetEntries.length);
-        for (int annotationOffset : annotationOffsetEntries) {
-            output.writeInt(annotationOffset);
+        output.writeInt(annotationOffsetEntries.size());
+        for (int i = 0; i < annotationOffsetEntries.size(); i++) {
+            output.writeInt(annotationOffsetEntries.get(i));
         }
     }
 

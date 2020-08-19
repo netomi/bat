@@ -19,17 +19,31 @@ import com.github.netomi.bat.dexfile.DexConstants;
 
 public enum AnnotationVisibility
 {
-    VISIBILITY_BUILD  (DexConstants.VISIBILITY_BUILD),
-    VISIBILITY_RUNTIME(DexConstants.VISIBILITY_RUNTIME),
-    VISIBILITY_SYSTEM (DexConstants.VISIBILITY_SYSTEM);
+    VISIBILITY_BUILD  (DexConstants.VISIBILITY_BUILD,   "build"),
+    VISIBILITY_RUNTIME(DexConstants.VISIBILITY_RUNTIME, "runtime"),
+    VISIBILITY_SYSTEM (DexConstants.VISIBILITY_SYSTEM,  "system");
 
-    private final int value;
+    private final short  value;
+    private final String name;
 
-    AnnotationVisibility(int value) {
-        this.value = value;
+    AnnotationVisibility(int value, String name) {
+        this.value = (short) value;
+        this.name  = name;
+    }
+
+    public short getValue() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static AnnotationVisibility of(int value) {
-        return values()[value];
+        try {
+            return values()[value];
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("unexpected annotation visibility value " + value);
+        }
     }
 }

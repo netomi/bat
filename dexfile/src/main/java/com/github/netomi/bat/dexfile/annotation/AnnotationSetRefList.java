@@ -64,6 +64,7 @@ extends      DataItem
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
+        annotationSetRefs.clear();
         annotationSetRefs.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
             AnnotationSetRef annotationSetRef = AnnotationSetRef.readContent(input);

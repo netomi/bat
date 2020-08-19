@@ -79,8 +79,7 @@ extends      DexContent
     @Override
     protected void readLinkedDataItems(DexDataInput input) {
         input.setOffset(annotationsOffset);
-        annotationSet = new AnnotationSet();
-        annotationSet.read(input);
+        annotationSet = AnnotationSet.readContent(input);
     }
 
     @Override

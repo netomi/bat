@@ -85,6 +85,7 @@ extends      DataItem
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = input.readInt();
+        mapItems.clear();
         mapItems.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
             MapItem mapItem = MapItem.readContent(input);

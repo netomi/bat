@@ -66,8 +66,7 @@ extends      DexContent
     protected void readLinkedDataItems(DexDataInput input) {
         if (annotationsOffset != 0) {
             input.setOffset(annotationsOffset);
-            annotationSet = new AnnotationSet();
-            annotationSet.read(input);
+            annotationSet = AnnotationSet.readContent(input);
             annotationSet.readLinkedDataItems(input);
         }
     }

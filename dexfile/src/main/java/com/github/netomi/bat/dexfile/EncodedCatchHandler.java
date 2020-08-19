@@ -75,6 +75,7 @@ extends      DexContent
         int readSize = input.readSleb128();
         int size     = Math.abs(readSize);
 
+        handlers.clear();
         handlers.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
             TypeAddrPair typeAddrPair = TypeAddrPair.readContent(input);

@@ -335,22 +335,7 @@ implements   ClassDefVisitor,
 
     @Override
     public void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation) {
-        printer.print(".annotation ");
-
-        switch (annotation.getVisibility()) {
-            case VISIBILITY_BUILD:
-                printer.print("build ");
-                break;
-
-            case VISIBILITY_SYSTEM:
-                printer.print("system ");
-                break;
-
-            case VISIBILITY_RUNTIME:
-                printer.print("runtime ");
-                break;
-        }
-
+        printer.print(".annotation " + annotation.getVisibility().getName() + " ");
         EncodedAnnotationValue annotationValue = annotation.getAnnotationValue();
         printer.println(annotationValue.getType(dexFile));
         printer.levelUp();

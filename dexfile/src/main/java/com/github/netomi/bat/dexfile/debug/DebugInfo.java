@@ -72,9 +72,10 @@ extends      DataItem
     protected void read(DexDataInput input) {
         lineStart          = input.readUleb128();
         int parametersSize = input.readUleb128();
+        parameterNames.clear();
         parameterNames.resize(parametersSize);
         for (int i = 0; i < parametersSize; i++) {
-            parameterNames.add(i, input.readUleb128p1());
+            parameterNames.set(i, input.readUleb128p1());
         }
 
         DebugInstruction debugInstruction;

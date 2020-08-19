@@ -92,8 +92,7 @@ extends      DataItem
     protected void readLinkedDataItems(DexDataInput input) {
         if (classAnnotationsOffset != 0) {
             input.setOffset(classAnnotationsOffset);
-            classAnnotations = new AnnotationSet();
-            classAnnotations.read(input);
+            classAnnotations = AnnotationSet.readContent(input);
         }
 
         for (FieldAnnotation fieldAnnotation : fieldAnnotations) {

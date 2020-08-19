@@ -106,6 +106,7 @@ extends      DataItem
         input.skipAlignmentPadding(getDataAlignment());
 
         int size = (int) input.readUnsignedInt();
+        typeList.clear();
         typeList.resize(size);
         for (int i = 0; i < size; i++) {
             int typeIndex = input.readUnsignedShort();

@@ -89,6 +89,7 @@ extends      DataItem
         int virtualMethodsSize = input.readUleb128();
 
         int lastIndex = 0;
+        staticFields.clear();
         staticFields.ensureCapacity(staticFieldsSize);
         for (int i = 0; i < staticFieldsSize; i++) {
             EncodedField encodedField = EncodedField.readContent(input, lastIndex);
@@ -97,6 +98,7 @@ extends      DataItem
         }
 
         lastIndex = 0;
+        instanceFields.clear();
         instanceFields.ensureCapacity(instanceFieldsSize);
         for (int i = 0; i < instanceFieldsSize; i++) {
             EncodedField encodedField = EncodedField.readContent(input, lastIndex);
@@ -104,16 +106,18 @@ extends      DataItem
             instanceFields.add(encodedField);
         }
 
-        directMethods.ensureCapacity(directMethodsSize);
         lastIndex = 0;
+        directMethods.clear();
+        directMethods.ensureCapacity(directMethodsSize);
         for (int i = 0; i < directMethodsSize; i++) {
             EncodedMethod encodedMethod = EncodedMethod.readContent(input, lastIndex);
             lastIndex = encodedMethod.getMethodIndex();
             directMethods.add(encodedMethod);
         }
 
-        virtualMethods.ensureCapacity(virtualMethodsSize);
         lastIndex = 0;
+        virtualMethods.clear();
+        virtualMethods.ensureCapacity(virtualMethodsSize);
         for (int i = 0; i < virtualMethodsSize; i++) {
             EncodedMethod encodedMethod = EncodedMethod.readContent(input, lastIndex);
             lastIndex = encodedMethod.getMethodIndex();

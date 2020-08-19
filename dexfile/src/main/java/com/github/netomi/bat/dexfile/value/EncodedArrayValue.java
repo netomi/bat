@@ -66,6 +66,7 @@ extends      EncodedValue
     @Override
     public void readValue(DexDataInput input, int valueArg) {
         int size = input.readUleb128();
+        values.clear();
         values.ensureCapacity(size);
         for (int i = 0; i < size; i++) {
             values.add(EncodedValue.read(input));
