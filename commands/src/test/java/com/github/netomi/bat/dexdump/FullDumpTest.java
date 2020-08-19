@@ -33,8 +33,7 @@ public class FullDumpTest {
         "bytecodes.dex",
         "checkers.dex",
         "const-method-handle.dex",
-        // TODO: finish support for missing instructions.
-        // "invoke-custom.dex",
+        "invoke-custom.dex",
         "invoke-polymorphic.dex",
         "staticfields.dex",
         "values.dex"
@@ -57,7 +56,7 @@ public class FullDumpTest {
 
                 dexFile.accept(printer);
 
-                assertArrayEquals(toBytes(getClass().getResourceAsStream("/dex/" + expectedFile)), baos.toByteArray());
+                assertArrayEquals(toBytes(getClass().getResourceAsStream("/dex/" + expectedFile)), baos.toByteArray(), "testFile " + testFile + " differs");
             } catch (IOException ex) {
                 fail(ex);
             }

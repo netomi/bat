@@ -57,6 +57,10 @@ public interface InstructionVisitor
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
+    default void visitCallSiteInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, CallSiteInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
     default void visitConversionInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ConversionInstruction instruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }

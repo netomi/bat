@@ -29,14 +29,16 @@ import java.io.OutputStream;
 public class DexDumpPrinter
 implements   DexFileVisitor,
              ClassDefVisitor,
-             MethodHandleVisitor
+             MethodHandleVisitor,
+             CallSiteIDVisitor
 {
-    private final BufferedPrinter printer;
-    private final boolean         printFileSummary;
-    private final boolean         printHeaders;
-    private final boolean         printAnnotations;
+    private final BufferedPrinter     printer;
+    private final boolean             printFileSummary;
+    private final boolean             printHeaders;
+    private final boolean             printAnnotations;
 
-    private final VisitorImpl     visitorImpl;
+    private final VisitorImpl         visitorImpl;
+    private final EncodedValueVisitor callSiteArgumentPrinter;
 
     private int fileOffset;
     private int codeOffset;
@@ -59,7 +61,8 @@ implements   DexFileVisitor,
         this.printHeaders     = printHeaders;
         this.printAnnotations = printAnnotations;
 
-        visitorImpl = new VisitorImpl();
+        visitorImpl             = new VisitorImpl();
+        callSiteArgumentPrinter = new CallSiteArgumentPrinter(printer);
     }
 
     @Override
@@ -69,7 +72,8 @@ implements   DexFileVisitor,
         }
 
         dexFile.classDefsAccept(this);
-        dexFile.methodHandlesAccept(this.joinedByMethodHandleConsumer((df, mh) -> println()));
+        dexFile.methodHandlesAccept(this);
+        dexFile.callSiteIDsAccept(this);
 
         try {
             printer.close();
@@ -137,6 +141,18 @@ implements   DexFileVisitor,
         println("  type        : " + methodHandle.getMethodHandleType().getName());
         println("  target      : " + methodHandle.getTargetClassType(dexFile) + " " + methodHandle.getTargetMemberName(dexFile));
         println("  target_type : " + methodHandle.getTargetDecriptor(dexFile));
+    }
+
+    @Override
+    public void visitCallSiteID(DexFile dexFile, int index, CallSiteID callSiteID) {
+        println(String.format("Call site #%d: // offset %d", index, callSiteID.getCallSiteOffset()));
+        CallSite callSite = callSiteID.getCallSite();
+        EncodedArrayValue arrayValue = callSite.getArray();
+        for (int i = 0; i < arrayValue.getValueCount(); i++) {
+            print("  link_argument[" + i + "] : ");
+            arrayValue.valueAccept(dexFile, i, callSiteArgumentPrinter);
+            println();
+        }
     }
 
     // private utility methods.

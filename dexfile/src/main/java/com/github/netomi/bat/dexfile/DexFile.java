@@ -236,6 +236,14 @@ public class DexFile
         }
     }
 
+    public void callSiteIDsAccept(CallSiteIDVisitor visitor) {
+        ListIterator<CallSiteID> callSiteIDListIterator = callSiteIDs.listIterator();
+        while (callSiteIDListIterator.hasNext()) {
+            int index = callSiteIDListIterator.nextIndex();
+            visitor.visitCallSiteID(this, index, callSiteIDListIterator.next());
+        }
+    }
+
     public void dataItemsAccept(DataItemVisitor visitor) {
         visitor.visitHeader(this, header);
 

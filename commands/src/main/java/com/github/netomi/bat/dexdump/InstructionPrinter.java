@@ -92,6 +92,14 @@ implements InstructionVisitor
     }
 
     @Override
+    public void visitCallSiteInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, CallSiteInstruction instruction) {
+        printer.print(instruction.getMnemonic());
+        printRegisters(instruction, true);
+        printer.print(", call_site@");
+        printer.print(Primitives.asHexValue(instruction.getCallSiteIndex(), 4));
+    }
+
+    @Override
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
         printGeneric(instruction);
 
@@ -152,21 +160,7 @@ implements InstructionVisitor
     @Override
     public void visitAnyMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodInstruction instruction) {
         printer.print(instruction.getMnemonic());
-
-        if (instruction.registers.length > 0) {
-            printer.print(" ");
-            printer.print("{");
-            for (int idx = 0; idx < instruction.registers.length; idx++) {
-                if (idx > 0) {
-                    printer.print(", ");
-                }
-                printer.print("v");
-                printer.print(Integer.toString(instruction.registers[idx]));
-            }
-            printer.print("}");
-        } else {
-            printer.print(" {}");
-        }
+        printRegisters(instruction, true);
 
         printer.print(", ");
 
@@ -266,21 +260,7 @@ implements InstructionVisitor
     @Override
     public void visitArrayTypeInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, ArrayTypeInstruction instruction) {
         printer.print(instruction.getMnemonic());
-
-        if (instruction.registers.length > 0) {
-            printer.print(" ");
-            printer.print("{");
-            for (int idx = 0; idx < instruction.registers.length; idx++) {
-                if (idx > 0) {
-                    printer.print(", ");
-                }
-                printer.print("v");
-                printer.print(Integer.toString(instruction.registers[idx]));
-            }
-            printer.print("}");
-        } else {
-            printer.print(" {}");
-        }
+        printRegisters(instruction, true);
 
         printer.print(", ");
 
@@ -313,14 +293,36 @@ implements InstructionVisitor
             printer.print(" // spacer");
         }
 
-        if (instruction.registers.length > 0) {
-            printer.print(" ");
-            for (int idx = 0; idx < instruction.registers.length; idx++) {
-                if (idx > 0) {
-                    printer.print(", ");
+        printRegisters(instruction, false);
+    }
+
+    private void printRegisters(DexInstruction instruction, boolean useBrackets) {
+        if (useBrackets) {
+            if (instruction.registers.length > 0) {
+                printer.print(" ");
+                printer.print("{");
+                for (int idx = 0; idx < instruction.registers.length; idx++) {
+                    if (idx > 0) {
+                        printer.print(", ");
+                    }
+                    printer.print("v");
+                    printer.print(Integer.toString(instruction.registers[idx]));
                 }
-                printer.print("v");
-                printer.print(Integer.toString(instruction.registers[idx]));
+                printer.print("}");
+            }
+            else {
+                printer.print(" {}");
+            }
+        } else {
+            if (instruction.registers.length > 0) {
+                printer.print(" ");
+                for (int idx = 0; idx < instruction.registers.length; idx++) {
+                    if (idx > 0) {
+                        printer.print(", ");
+                    }
+                    printer.print("v");
+                    printer.print(Integer.toString(instruction.registers[idx]));
+                }
             }
         }
     }

@@ -47,10 +47,6 @@ public class DexInstruction
         }
     }
 
-    static DexInstruction createGeneric(DexOpCode opCode, byte ident) {
-        return new DexInstruction(opCode);
-    }
-
     public DexInstruction(DexOpCode opcode) {
         this.opcode    = opcode;
         this.registers = EMPTY_REGISTERS;

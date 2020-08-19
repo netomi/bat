@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
+import com.github.netomi.bat.dexfile.CallSite;
+
 import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*;
 
 /**
@@ -306,12 +308,15 @@ public enum DexOpCode
     SHR_INT_LIT8( (byte) 0xe1, FORMAT_22b, ArithmeticLiteralInstruction::create, "shr-int/lit8"),
     USHR_INT_LIT8((byte) 0xe2, FORMAT_22b, ArithmeticLiteralInstruction::create, "ushr-int/lit8"),
 
-    // polymorphic
+    // method proto instructions.
+
     INVOKE_POLYMORPHIC(      (byte) 0xfa, FORMAT_45cc, MethodProtoInstruction::create, "invoke-polymorphic"),
     INVOKE_POLYMORPHIC_RANGE((byte) 0xfb, FORMAT_4rcc, MethodProtoInstruction::create, "invoke-polymorphic/range"),
 
-    INVOKE_CUSTOM((byte) 0xfc, FORMAT_35c, "invoke-custom"),
-    INVOKE_CUSTOM_RANGE((byte) 0xfd, FORMAT_3rc, "invoke-custom/range"),
+    // callsite instructions.
+
+    INVOKE_CUSTOM(      (byte) 0xfc, FORMAT_35c, CallSiteInstruction::create, "invoke-custom"),
+    INVOKE_CUSTOM_RANGE((byte) 0xfd, FORMAT_3rc, CallSiteInstruction::create, "invoke-custom/range"),
 
     // method handle and proto instructions.
 
@@ -334,10 +339,6 @@ public enum DexOpCode
         {
             opcodes[opCode.opCode & 0xff] = opCode;
         }
-    }
-
-    DexOpCode(byte opcode, DexInstructionFormat format, String mnemonic) {
-        this(opcode, format, DexInstruction::createGeneric, mnemonic, false);
     }
 
     DexOpCode(byte opcode, DexInstructionFormat format, InstructionSupplier supplier, String mnemonic) {
