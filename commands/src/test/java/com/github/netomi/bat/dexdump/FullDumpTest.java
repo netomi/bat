@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dump;
+package com.github.netomi.bat.dexdump;
 
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
@@ -32,8 +32,8 @@ public class FullDumpTest {
         "all.dex",
         "bytecodes.dex",
         "checkers.dex",
+        "const-method-handle.dex",
         // TODO: finish support for missing instructions.
-        // "const-method-handle.dex",
         // "invoke-custom.dex",
         "invoke-polymorphic.dex",
         "staticfields.dex",

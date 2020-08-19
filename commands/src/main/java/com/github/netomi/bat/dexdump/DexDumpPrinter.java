@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dump;
+package com.github.netomi.bat.dexdump;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
@@ -25,11 +25,11 @@ import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.util.Primitives;
 
 import java.io.OutputStream;
-import java.util.List;
 
 public class DexDumpPrinter
 implements   DexFileVisitor,
-             ClassDefVisitor
+             ClassDefVisitor,
+             MethodHandleVisitor
 {
     private final BufferedPrinter printer;
     private final boolean         printFileSummary;
@@ -69,6 +69,7 @@ implements   DexFileVisitor,
         }
 
         dexFile.classDefsAccept(this);
+        dexFile.methodHandlesAccept(this.joinedByMethodHandleConsumer((df, mh) -> println()));
 
         try {
             printer.close();
@@ -107,7 +108,6 @@ implements   DexFileVisitor,
         if (printAnnotations && classDef.annotationsDirectory != null) {
             println(String.format("Class #%d annotations:", index));
             classDef.annotationSetsAccept(dexFile, visitorImpl);
-
             println();
         }
 
@@ -131,47 +131,19 @@ implements   DexFileVisitor,
         println();
     }
 
-    // Private utility methods.
+    @Override
+    public void visitMethodHandle(DexFile dexFile, int index, MethodHandle methodHandle) {
+        println(String.format("Method handle #%d:", index));
+        println("  type        : " + methodHandle.getMethodHandleType().getName());
+        println("  target      : " + methodHandle.getTargetClassType(dexFile) + " " + methodHandle.getTargetMemberName(dexFile));
+        println("  target_type : " + methodHandle.getTargetDecriptor(dexFile));
+    }
+
+    // private utility methods.
 
     private static String getSourceFileIndex(DexFile dexFile, ClassDef classDefItem) {
         String sourceFile = classDefItem.getSourceFile(dexFile);
         return classDefItem.getSourceFileIndex() + " (" + (sourceFile != null ? sourceFile : "unknown") + ")";
-    }
-
-    private static String formatSignatureByteArray(byte[] array) {
-        StringBuilder sb = new StringBuilder();
-
-        int len = array.length;
-
-        sb.append(Primitives.asHexValue(array[0]));
-        sb.append(Primitives.asHexValue(array[1]));
-        sb.append("...");
-        sb.append(Primitives.asHexValue(array[len - 2]));
-        sb.append(Primitives.asHexValue(array[len - 1]));
-
-        return sb.toString();
-    }
-
-    private static String formatNumber(long number) {
-        return String.format("%d (0x%06x)", number, number);
-    }
-
-    private static String formatNumber(int number) {
-        return String.format("%d (0x%04x)", number, number);
-    }
-
-    private static String formatAccessFlags(int accessFlags, int target) {
-        return String.format("0x%04x (%s)", accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags, target));
-    }
-
-    private static int align(int offset, int alignment) {
-        if (alignment > 1) {
-            int currentAlignment = offset % alignment;
-            int padding = (alignment - currentAlignment) % alignment;
-            return offset + padding;
-        } else {
-            return offset;
-        }
     }
 
     private void print(String value) {
@@ -186,7 +158,7 @@ implements   DexFileVisitor,
         printer.println();
     }
 
-    // inner helper classes
+    // inner helper classes.
 
     private class VisitorImpl
     implements    DexHeaderVisitor,
@@ -538,6 +510,46 @@ implements   DexFileVisitor,
             print("null");
         }
     }
+
+    // private utility methods.
+
+    private static String formatNumber(long number) {
+        return String.format("%d (0x%06x)", number, number);
+    }
+
+    private static String formatNumber(int number) {
+        return String.format("%d (0x%04x)", number, number);
+    }
+
+    private static String formatAccessFlags(int accessFlags, int target) {
+        return String.format("0x%04x (%s)", accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags, target));
+    }
+
+    private static int align(int offset, int alignment) {
+        if (alignment > 1) {
+            int currentAlignment = offset % alignment;
+            int padding = (alignment - currentAlignment) % alignment;
+            return offset + padding;
+        } else {
+            return offset;
+        }
+    }
+
+    private static String formatSignatureByteArray(byte[] array) {
+        StringBuilder sb = new StringBuilder();
+
+        int len = array.length;
+
+        sb.append(Primitives.asHexValue(array[0]));
+        sb.append(Primitives.asHexValue(array[1]));
+        sb.append("...");
+        sb.append(Primitives.asHexValue(array[len - 2]));
+        sb.append(Primitives.asHexValue(array[len - 1]));
+
+        return sb.toString();
+    }
+
+    // helper classes.
 
     private class SourceLinePrinter
     implements    DebugSequenceVisitor

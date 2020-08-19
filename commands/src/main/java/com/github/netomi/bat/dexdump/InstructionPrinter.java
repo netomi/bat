@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dump;
+package com.github.netomi.bat.dexdump;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
@@ -170,9 +170,9 @@ implements InstructionVisitor
 
         printer.print(", ");
 
-        PolymorphicMethodInstruction polymorphicMethodInstruction =
-            instruction instanceof PolymorphicMethodInstruction ?
-                (PolymorphicMethodInstruction) instruction : null;
+        MethodProtoInstruction polymorphicMethodInstruction =
+            instruction instanceof MethodProtoInstruction ?
+                (MethodProtoInstruction) instruction : null;
 
         MethodID methodID = instruction.getMethodID(dexFile);
 
@@ -194,6 +194,23 @@ implements InstructionVisitor
             printer.print(", proto@");
             printer.print(Primitives.asHexValue(polymorphicMethodInstruction.getProtoIndex(), 4));
         }
+    }
+
+    @Override
+    public void visitMethodHandleRefInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodHandleRefInstruction instruction) {
+        printGeneric(instruction);
+        printer.print(", ");
+        printer.print("method_handle@");
+        printer.print(Primitives.asHexValue(instruction.getMethodHandleIndex(), 4));
+    }
+
+    @Override
+    public void visitMethodTypeRefInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodTypeRefInstruction instruction) {
+        printGeneric(instruction);
+        printer.print(", ");
+        printer.print(instruction.getProtoID(dexFile).getDescriptor(dexFile));
+        printer.print(" // proto@");
+        printer.print(Primitives.asHexValue(instruction.getProtoIndex(), 4));
     }
 
     @Override

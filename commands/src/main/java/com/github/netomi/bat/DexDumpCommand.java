@@ -13,10 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dump;
+package com.github.netomi.bat;
 
+import com.github.netomi.bat.dexdump.DexDumpPrinter;
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.DexFormat;
 import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.visitor.ClassNameFilter;
 import picocli.CommandLine;

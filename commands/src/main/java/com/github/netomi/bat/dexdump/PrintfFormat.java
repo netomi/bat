@@ -24,7 +24,7 @@
 // http://java.sun.com/nav/business/index.html for further important licensing
 // information for the Java Technology.
 //
-package com.github.netomi.bat.dump;
+package com.github.netomi.bat.dexdump;
 
 import java.text.DecimalFormatSymbols;
 import java.util.Enumeration;

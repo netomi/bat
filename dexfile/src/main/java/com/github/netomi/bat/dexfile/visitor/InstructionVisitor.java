@@ -77,8 +77,16 @@ public interface InstructionVisitor
         visitAnyMethodInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
-    default void visitPolymorphicMethodInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PolymorphicMethodInstruction instruction) {
+    default void visitMethodProtoInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodProtoInstruction instruction) {
         visitAnyMethodInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitMethodHandleRefInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodHandleRefInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
+    }
+
+    default void visitMethodTypeRefInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, MethodTypeRefInstruction instruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction);
     }
 
     default void visitPayloadInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, PayloadInstruction instruction) {

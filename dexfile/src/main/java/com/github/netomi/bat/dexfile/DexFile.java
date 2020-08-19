@@ -16,10 +16,7 @@
 package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.*;
-import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor;
-import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
-import com.github.netomi.bat.dexfile.visitor.DexFileVisitor;
-import com.github.netomi.bat.dexfile.visitor.DexHeaderVisitor;
+import com.github.netomi.bat.dexfile.visitor.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -228,6 +225,14 @@ public class DexFile
         while (classDefListIterator.hasNext()) {
             int index = classDefListIterator.nextIndex();
             visitor.visitClassDef(this, index, classDefListIterator.next());
+        }
+    }
+
+    public void methodHandlesAccept(MethodHandleVisitor visitor) {
+        ListIterator<MethodHandle> methodHandleListIterator = methodHandles.listIterator();
+        while (methodHandleListIterator.hasNext()) {
+            int index = methodHandleListIterator.nextIndex();
+            visitor.visitMethodHandle(this, index, methodHandleListIterator.next());
         }
     }
 

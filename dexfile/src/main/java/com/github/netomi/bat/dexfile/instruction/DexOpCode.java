@@ -306,14 +306,17 @@ public enum DexOpCode
     SHR_INT_LIT8( (byte) 0xe1, FORMAT_22b, ArithmeticLiteralInstruction::create, "shr-int/lit8"),
     USHR_INT_LIT8((byte) 0xe2, FORMAT_22b, ArithmeticLiteralInstruction::create, "ushr-int/lit8"),
 
-    INVOKE_POLYMORPHIC(      (byte) 0xfa, FORMAT_45cc, PolymorphicMethodInstruction::create, "invoke-polymorphic"),
-    INVOKE_POLYMORPHIC_RANGE((byte) 0xfb, FORMAT_4rcc, PolymorphicMethodInstruction::create, "invoke-polymorphic/range"),
+    // polymorphic
+    INVOKE_POLYMORPHIC(      (byte) 0xfa, FORMAT_45cc, MethodProtoInstruction::create, "invoke-polymorphic"),
+    INVOKE_POLYMORPHIC_RANGE((byte) 0xfb, FORMAT_4rcc, MethodProtoInstruction::create, "invoke-polymorphic/range"),
 
     INVOKE_CUSTOM((byte) 0xfc, FORMAT_35c, "invoke-custom"),
     INVOKE_CUSTOM_RANGE((byte) 0xfd, FORMAT_3rc, "invoke-custom/range"),
 
-    CONST_METHOD_HANDLE((byte) 0xfe, FORMAT_21c, "const-method-handle"),
-    CONST_METHOD_TYPE((byte) 0xff, FORMAT_21c, "const-method-type");
+    // method handle and proto instructions.
+
+    CONST_METHOD_HANDLE((byte) 0xfe, FORMAT_21c, MethodHandleRefInstruction::create, "const-method-handle"),
+    CONST_METHOD_TYPE(  (byte) 0xff, FORMAT_21c, MethodTypeRefInstruction::create,   "const-method-type");
 
 
     private final byte                 opCode;

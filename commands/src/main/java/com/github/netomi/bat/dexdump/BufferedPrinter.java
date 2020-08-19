@@ -13,19 +13,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-package com.github.netomi.bat.dump;
+package com.github.netomi.bat.dexdump;
 
 import com.github.netomi.bat.dexfile.util.Mutf8;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 class      BufferedPrinter
-implements AutoCloseable
+implements Closeable
 {
     private final BufferedWriter out;
     private final OutputStream   outputStream;
@@ -38,7 +34,7 @@ implements AutoCloseable
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         out.close();
     }
 

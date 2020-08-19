@@ -18,26 +18,26 @@ package com.github.netomi.bat.dexfile.instruction;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
-public class PolymorphicMethodInstruction
-extends      MethodInstruction
+public class MethodHandleRefInstruction
+extends      DexInstruction
 {
-    private int protoIndex;
+    private int methodHandleIndex;
 
-    static PolymorphicMethodInstruction create(DexOpCode opCode, byte ident) {
-        return new PolymorphicMethodInstruction(opCode);
+    static MethodHandleRefInstruction create(DexOpCode opCode, byte ident) {
+        return new MethodHandleRefInstruction(opCode);
     }
 
-    PolymorphicMethodInstruction(DexOpCode opcode) {
+    MethodHandleRefInstruction(DexOpCode opcode) {
         super(opcode);
-        protoIndex = DexConstants.NO_INDEX;
+        methodHandleIndex = DexConstants.NO_INDEX;
     }
 
-    public int getProtoIndex() {
-        return protoIndex;
+    public int getMethodHandleIndex() {
+        return methodHandleIndex;
     }
 
-    public ProtoID getProtoID(DexFile dexFile) {
-        return dexFile.getProtoID(protoIndex);
+    public MethodHandle getMethodHandle(DexFile dexFile) {
+        return dexFile.getMethodHandle(methodHandleIndex);
     }
 
     @Override
@@ -45,9 +45,8 @@ extends      MethodInstruction
         super.read(instructions, offset);
 
         switch (opcode.getFormat()) {
-            case FORMAT_45cc:
-            case FORMAT_4rcc:
-                protoIndex = instructions[offset + 3] & 0xffff;
+            case FORMAT_21c:
+                methodHandleIndex = instructions[offset + 1] & 0xffff;
                 break;
 
             default:
@@ -57,6 +56,6 @@ extends      MethodInstruction
 
     @Override
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
-        visitor.visitPolymorphicMethodInstruction(dexFile, classDef, method, code, offset, this);
+        visitor.visitMethodHandleRefInstruction(dexFile, classDef, method, code, offset, this);
     }
 }

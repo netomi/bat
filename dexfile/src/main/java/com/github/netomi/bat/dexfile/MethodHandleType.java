@@ -19,32 +19,49 @@ import static com.github.netomi.bat.dexfile.DexConstants.*;
 
 public enum MethodHandleType
 {
-    STATIC_PUT        (METHOD_HANDLE_TYPE_STATIC_PUT),
-    STATIC_GET        (METHOD_HANDLE_TYPE_STATIC_GET),
-    INSTANCE_PUT      (METHOD_HANDLE_TYPE_INSTANCE_PUT),
-    INSTANCE_GET      (METHOD_HANDLE_TYPE_INSTANCE_GET),
-    INVOKE_STATIC     (METHOD_HANDLE_TYPE_INVOKE_STATIC),
-    INVOKE_INSTANCE   (METHOD_HANDLE_TYPE_INVOKE_INSTANCE),
-    INVOKE_CONSTRUCTOR(METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR),
-    INVOKE_DIRECT     (METHOD_HANDLE_TYPE_INVOKE_DIRECT),
-    INVOKE_INTERFACE  (METHOD_HANDLE_TYPE_INVOKE_INTERFACE);
+    STATIC_PUT        (METHOD_HANDLE_TYPE_STATIC_PUT,         true, false,  "static-put"),
+    STATIC_GET        (METHOD_HANDLE_TYPE_STATIC_GET,         true, false,  "static-get"),
+    INSTANCE_PUT      (METHOD_HANDLE_TYPE_INSTANCE_PUT,       true, true,   "instance-put"),
+    INSTANCE_GET      (METHOD_HANDLE_TYPE_INSTANCE_GET,       true, true,   "instance-get"),
+    INVOKE_STATIC     (METHOD_HANDLE_TYPE_INVOKE_STATIC,      false, false, "invoke-static"),
+    INVOKE_INSTANCE   (METHOD_HANDLE_TYPE_INVOKE_INSTANCE,    false, true,  "invoke-instance"),
+    INVOKE_CONSTRUCTOR(METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR, false, true,  "invoke-constructor"),
+    INVOKE_DIRECT     (METHOD_HANDLE_TYPE_INVOKE_DIRECT,      false, true,  "invoke-direct"),
+    INVOKE_INTERFACE  (METHOD_HANDLE_TYPE_INVOKE_INTERFACE,   false, true,  "invoke-interface");
 
-    private final int value;
+    private final int     value;
+    private final boolean targetsField;
+    private final boolean targetsInstance;
+    private final String  name;
 
-    MethodHandleType(int value) {
-        this.value = value;
+    MethodHandleType(int value, boolean targetsField, boolean targetsInstance, String name) {
+        this.value           = value;
+        this.targetsField    = targetsField;
+        this.targetsInstance = targetsInstance;
+        this.name            = name;
     }
 
     public int getValue() {
         return value;
     }
 
+    public boolean targetsField() {
+        return targetsField;
+    }
+
+    public boolean targetsInstance() {
+        return targetsInstance;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public static MethodHandleType of(int value) {
-        for (MethodHandleType type : values()) {
-            if (type.value == value) {
-                return type;
-            }
+        try {
+            return values()[value];
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("unexpected method handle type value " + value);
         }
-        throw new IllegalArgumentException("unexpected method handle type value " + value);
     }
 }

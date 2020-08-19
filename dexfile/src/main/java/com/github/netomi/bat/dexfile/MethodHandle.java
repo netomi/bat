@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -76,9 +77,60 @@ extends      DataItem
         return methodHandleType;
     }
 
-
     public int getFieldOrMethodId() {
         return fieldOrMethodId;
+    }
+
+    public FieldID getFieldID(DexFile dexFile) {
+        return getMethodHandleType().targetsField() ?
+            dexFile.getFieldID(fieldOrMethodId) :
+            null;
+    }
+
+    public MethodID getMethodID(DexFile dexFile) {
+        return getMethodHandleType().targetsField() ?
+            null :
+            dexFile.getMethodID(fieldOrMethodId);
+    }
+
+    public String getTargetClassType(DexFile dexFile) {
+        MethodHandleType methodHandleType = getMethodHandleType();
+        if (methodHandleType.targetsField()) {
+            FieldID fieldID = getFieldID(dexFile);
+            return fieldID.getClassType(dexFile);
+        } else {
+            MethodID methodID = getMethodID(dexFile);
+            return methodID.getClassType(dexFile);
+        }
+    }
+
+    public String getTargetMemberName(DexFile dexFile) {
+        MethodHandleType methodHandleType = getMethodHandleType();
+        if (methodHandleType.targetsField()) {
+            FieldID fieldID = getFieldID(dexFile);
+            return fieldID.getName(dexFile);
+        } else {
+            MethodID methodID = getMethodID(dexFile);
+            return methodID.getName(dexFile);
+        }
+    }
+
+    public String getTargetMemberDescriptor(DexFile dexFile) {
+        MethodHandleType methodHandleType = getMethodHandleType();
+        if (methodHandleType.targetsField()) {
+            FieldID fieldID = getFieldID(dexFile);
+            return fieldID.getType(dexFile);
+        } else {
+            MethodID methodID = getMethodID(dexFile);
+            return methodID.getProtoID(dexFile).getDescriptor(dexFile);
+        }
+    }
+
+    public String getTargetDecriptor(DexFile dexFile) {
+        MethodHandleType methodHandleType = getMethodHandleType();
+        return methodHandleType.targetsInstance() ?
+            String.format("(%s%s", getTargetClassType(dexFile), getTargetMemberDescriptor(dexFile).substring(1)) :
+            getTargetMemberDescriptor(dexFile);
     }
 
     @Override
