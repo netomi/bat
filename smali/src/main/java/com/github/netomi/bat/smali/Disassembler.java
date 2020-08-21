@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexFileReader;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.io.FileOutputStreamFactory;
 import com.github.netomi.bat.io.OutputStreamFactory;
+import com.github.netomi.bat.smali.disassemble.SmaliPrinter;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
