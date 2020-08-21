@@ -22,70 +22,20 @@ import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
-import com.github.netomi.bat.util.Primitives;
 import com.github.netomi.bat.util.Strings;
 
-class      EncodedValuePrinter
+class      CallSiteArgumentPrinter
 implements EncodedValueVisitor
 {
-    private final IndentingPrinter         printer;
-    private final AnnotationElementVisitor annotationElementVisitor;
-    private final String                   prefix;
+    private final IndentingPrinter printer;
 
-    public EncodedValuePrinter(IndentingPrinter printer) {
-        this(printer, null, null);
-    }
-
-    public EncodedValuePrinter(IndentingPrinter printer, AnnotationElementVisitor annotationElementVisitor) {
-        this(printer, annotationElementVisitor, null);
-    }
-
-    public EncodedValuePrinter(IndentingPrinter printer, AnnotationElementVisitor annotationElementVisitor, String prefix) {
-        this.printer                  = printer;
-        this.annotationElementVisitor = annotationElementVisitor;
-        this.prefix                   = prefix;
+    public CallSiteArgumentPrinter(IndentingPrinter printer) {
+        this.printer = printer;
     }
 
     @Override
     public void visitAnyValue(DexFile dexFile, EncodedValue value) {
         throw new RuntimeException("unexpected value " + value);
-    }
-
-    @Override
-    public void visitAnnotationValue(DexFile dexFile, EncodedAnnotationValue value) {
-        append(".subannotation " + value.getType(dexFile));
-        printer.println();
-        printer.levelUp();
-
-        if (annotationElementVisitor != null) {
-            value.annotationElementsAccept(dexFile, annotationElementVisitor);
-        } else {
-            throw new RuntimeException("no AnnotationElementVisitor specified while visiting value " + value);
-        }
-
-        printer.levelDown();
-        printer.print(".end subannotation");
-    }
-
-    @Override
-    public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
-        append("{");
-        int count = value.getValueCount();
-        if (count > 0) {
-            printer.println();
-            printer.levelUp();
-
-            for (int i = 0; i < count; i++) {
-                EncodedValue v = value.getValue(i);
-                v.accept(dexFile, this);
-                if ((i + 1) < count) {
-                    printer.print(",");
-                }
-                printer.println();
-            }
-            printer.levelDown();
-        }
-        printer.print("}");
     }
 
     @Override
@@ -107,6 +57,16 @@ implements EncodedValueVisitor
         append(methodID.getClassTypeID(dexFile).getType(dexFile) + "->" +
                methodID.getName(dexFile) +
                methodID.getProtoID(dexFile).getDescriptor(dexFile));
+    }
+
+    @Override
+    public void visitMethodHandleValue(DexFile dexFile, EncodedMethodHandleValue value) {
+        append(value.getMethodHandle(dexFile).getTargetClassType(dexFile));
+    }
+
+    @Override
+    public void visitMethodTypeValue(DexFile dexFile, EncodedMethodTypeValue value) {
+        append(value.getProtoID(dexFile).getDescriptor(dexFile));
     }
 
     @Override
@@ -191,10 +151,6 @@ implements EncodedValueVisitor
     // private utility methods.
 
     private void append(String text) {
-        if (prefix != null) {
-            printer.print(prefix + text);
-        } else {
-            printer.print(text);
-        }
+        printer.print(text);
     }
 }

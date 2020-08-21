@@ -49,4 +49,8 @@ public class Strings
 
         return sb.toString();
     }
+
+    public static String escapeChar(char c) {
+        return escapeString(Character.toString(c));
+    }
 }
