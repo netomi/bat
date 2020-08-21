@@ -26,6 +26,11 @@ import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * An class representing an annotation element inside a dex file.
+ *
+ * @author Thomas Neidhart
+ */
 public class AnnotationElement
 extends      DexContent
 {

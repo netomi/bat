@@ -20,6 +20,11 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
+/**
+ * An class representing a null value inside a dex file.
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedNullValue
 extends      EncodedValue
 {

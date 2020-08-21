@@ -26,6 +26,11 @@ import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * An class representing a referenced method handle (MethodHandle) value inside a dex file.
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedMethodHandleValue
 extends      EncodedValue
 {

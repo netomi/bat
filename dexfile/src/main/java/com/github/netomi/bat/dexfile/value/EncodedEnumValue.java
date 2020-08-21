@@ -26,6 +26,11 @@ import java.util.Objects;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * An class representing a referenced enum (FieldID) value inside a dex file.
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedEnumValue
 extends      EncodedValue
 {

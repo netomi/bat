@@ -22,6 +22,11 @@ import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 
 import java.util.Objects;
 
+/**
+ * An class representing a byte value inside a dex file.
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedByteValue
 extends      EncodedValue
 {

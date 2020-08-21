@@ -22,6 +22,13 @@ import com.github.netomi.bat.dexfile.io.DexFormatException;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.util.Primitives;
 
+/**
+ * An abstract base class representing a encoded values inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoding">value encoding @ dex format</a>
+ *
+ * @author Thomas Neidhart
+ */
 public abstract class EncodedValue
 {
     // Value types.

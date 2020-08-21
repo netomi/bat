@@ -25,6 +25,11 @@ import java.util.*;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
+/**
+ * An class representing an annotation value (TypeID + AnnotationElements) inside a dex file.
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedAnnotationValue
 extends      EncodedValue
 {

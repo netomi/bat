@@ -23,6 +23,11 @@ import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import java.util.*;
 import java.util.function.BiConsumer;
 
+/**
+ * An class representing an array of values inside a dex file.
+ *
+ * @author Thomas Neidhart
+ */
 public class EncodedArrayValue
 extends      EncodedValue
 {
