@@ -121,7 +121,7 @@ extends      SmaliBaseVisitor<ClassDef>
 
         int fieldIDIndex   = dexFile.addOrGetFieldID(classType, name, type);
         EncodedField field = EncodedField.of(fieldIDIndex, accessFlags);
-        classDef.getClassData().addField(field);
+        classDef.addField(dexFile, field);
 
         return super.visitFielddef(ctx);
     }

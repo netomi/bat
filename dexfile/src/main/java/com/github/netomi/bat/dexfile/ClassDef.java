@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Preconditions;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -60,7 +61,7 @@ extends      DataItem
                             sourceFileIndex,
                             TypeList.empty(),
                             AnnotationsDirectory.empty(),
-                            ClassData.empty(),
+                            null,
                             EncodedArray.empty());
     }
 
@@ -157,6 +158,17 @@ extends      DataItem
 
     public ClassData getClassData() {
         return classData;
+    }
+
+    public void addField(DexFile dexFile, EncodedField field) {
+        String fieldClass = field.getFieldID(dexFile).getClassType(dexFile);
+        Preconditions.checkArgument(fieldClass.equals(getType(dexFile)), "field class does not match this class");
+
+        if (classData == null) {
+            classData = ClassData.empty();
+        }
+
+        classData.addField(field);
     }
 
     public EncodedArray getStaticValues() {
