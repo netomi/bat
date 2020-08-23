@@ -18,6 +18,7 @@ package com.github.netomi.bat.smali.assemble;
 
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.smali.Disassembler;
 import com.github.netomi.bat.smali.parser.SmaliLexer;
 import com.github.netomi.bat.smali.parser.SmaliParser;
 import org.antlr.v4.runtime.CharStreams;
@@ -27,24 +28,25 @@ public class AntlrTest {
 
     public static void main(String[] args) {
         //String input = ".class public interface abstract annotation Landroid/annotation/SuppressLint;\n.super Ljava/lang/Object;\n.source \"SuppressLint.java\""; //\n\n# interfaces\n.implements Ljava/lang/annotation/Annotation;";
-        String input = ".class public interface abstract annotation Landroid/annotation/SuppressLint;\n.super Ljava/lang/Object;\n"; //\n\n# interfaces\n.implements Ljava/lang/annotation/Annotation;";
+        String input =
+            ".class public interface abstract annotation Landroid/annotation/SuppressLint;\n" +
+            ".super Ljava/lang/Object;\n\n\n" +
+            "# interfaces\n.implements Ljava/lang/annotation/Annotation;\n\n" +
+            ".field public publicStringField:Ljava/lang/String;\n" +
+            ".field public publicIntegerField:I\n" +
+            ".field public publicObjectField:Ljava/lang/Object;\n" +
+            ".field public publicStringArrayField:[Ljava/lang/String;\n" +
+            ".field private privateStringField:Ljava/lang/String;\n" +
+            ".field public static publicStaticStringField:Ljava/lang/String;\n" +
+            ".field private static privateStaticStringField:Ljava/lang/String;\n";
 
         SmaliLexer smaliLexer = new SmaliLexer(CharStreams.fromString(input));
         CommonTokenStream commonTokenStream = new CommonTokenStream(smaliLexer);
         SmaliParser smaliParser = new SmaliParser(commonTokenStream);
 
-        //smaliParser.smaliclass();
-
-//        List<Token> tokenList = commonTokenStream.getTokens();
-//        for (Token token : tokenList) {
-//            System.out.println(token);
-//        }
-
-//        ParseTreeWalker walker = new ParseTreeWalker();
-//        walker.walk(new MySmaliListener(), smaliParser.smaliclass());
         DexFile dexFile = new DexFile();
 
         ClassDef classDef = new ClassDefAssembler(dexFile).visit(smaliParser.smaliclass());
-        System.out.println(classDef);
+        new Disassembler(className -> System.out).visitClassDef(dexFile, 0, classDef);
     }
 }

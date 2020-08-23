@@ -49,6 +49,11 @@ extends      DexContent
         return new EncodedField(fieldIndex, accessFlags);
     }
 
+    public static EncodedField of(int fieldIndex, int accessFlags) {
+        Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative");
+        return new EncodedField(fieldIndex, accessFlags);
+    }
+
     public static EncodedField readContent(DexDataInput input, int lastIndex) {
         EncodedField encodedField = new EncodedField();
         encodedField.read(input);

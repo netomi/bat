@@ -42,11 +42,11 @@ extends      DataItem
     private int typeIndex;  // ushort
     private int nameIndex;  // uint;
 
-    public static FieldID of(int classIndex, int typeIndex, int nameIndex) {
+    public static FieldID of(int classIndex, int nameIndex, int typeIndex) {
         Preconditions.checkArgument(classIndex >= 0, "class index must be non negative");
-        Preconditions.checkArgument(typeIndex  >= 0, "type index must be non negative");
         Preconditions.checkArgument(nameIndex  >= 0, "name index must be non negative");
-        return new FieldID(classIndex, typeIndex, nameIndex);
+        Preconditions.checkArgument(typeIndex  >= 0, "type index must be non negative");
+        return new FieldID(classIndex, nameIndex, typeIndex);
     }
 
     public static FieldID readContent(DexDataInput input) {
@@ -59,10 +59,10 @@ extends      DataItem
         this(NO_INDEX, NO_INDEX, NO_INDEX);
     }
 
-    private FieldID(int classIndex, int typeIndex, int nameIndex) {
+    private FieldID(int classIndex, int nameIndex, int typeIndex) {
         this.classIndex = classIndex;
-        this.typeIndex  = typeIndex;
         this.nameIndex  = nameIndex;
+        this.typeIndex  = typeIndex;
     }
 
     public int getClassIndex() {

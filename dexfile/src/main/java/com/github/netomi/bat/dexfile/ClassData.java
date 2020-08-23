@@ -51,6 +51,14 @@ extends      DataItem
 
     private ClassData() {}
 
+    public void addField(EncodedField field) {
+        if (field.isStatic()) {
+            staticFields.add(field);
+        } else {
+            instanceFields.add(field);
+        }
+    }
+
     public int getStaticFieldCount() {
         return staticFields.size();
     }

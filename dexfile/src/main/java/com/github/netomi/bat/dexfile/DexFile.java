@@ -41,9 +41,10 @@ public class DexFile
 
     private byte[] linkData;
 
-    private Map<String, Integer> stringMap   = new HashMap<>();
-    private Map<String, Integer> typeMap     = new HashMap<>();
-    private Map<String, Integer> classDefMap = new HashMap<>();
+    private Map<String, Integer>  stringMap   = new HashMap<>();
+    private Map<String, Integer>  typeMap     = new HashMap<>();
+    private Map<String, Integer>  classDefMap = new HashMap<>();
+    private Map<FieldID, Integer> fieldIDMap  = new HashMap<>();
 
     public DexFile() {
         this.header = new DexHeader();
@@ -153,6 +154,21 @@ public class DexFile
 
     public FieldID getFieldID(int fieldIndex) {
         return fieldIDs.get(fieldIndex);
+    }
+
+    public int addOrGetFieldID(String classType, String name, String type) {
+        FieldID fieldID =
+            FieldID.of(addOrGetTypeIDIndex(classType),
+                       addOrGetStringIDIndex(name),
+                       addOrGetTypeIDIndex(type));
+
+        Integer index = fieldIDMap.get(fieldID);
+        if (index == null) {
+            fieldIDs.add(fieldID);
+            index = fieldIDs.size() - 1;
+            fieldIDMap.put(fieldID, index);
+        }
+        return index;
     }
 
     public int getMethodIDCount() {
@@ -318,6 +334,13 @@ public class DexFile
         while (classDefIterator.hasNext()) {
             int index = classDefIterator.nextIndex();
             classDefMap.put(classDefIterator.next().getClassName(this), index);
+        }
+
+        fieldIDMap = new HashMap<>(getFieldIDCount());
+        ListIterator<FieldID> fieldIDIterator = fieldIDs.listIterator();
+        while (fieldIDIterator.hasNext()) {
+            int index = fieldIDIterator.nextIndex();
+            fieldIDMap.put(fieldIDIterator.next(), index);
         }
     }
 

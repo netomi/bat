@@ -16,11 +16,10 @@
 
 package com.github.netomi.bat.smali.assemble;
 
-import com.github.netomi.bat.dexfile.ClassDef;
-import com.github.netomi.bat.dexfile.DexAccessFlags;
-import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor;
 import com.github.netomi.bat.smali.parser.SmaliParser;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -34,6 +33,8 @@ extends      SmaliBaseVisitor<ClassDef>
     private String superType   = null;
     private String sourceFile  = null;
 
+    private ClassDef classDef = null;
+
     public ClassDefAssembler(DexFile dexFile) {
         this.dexFile = dexFile;
     }
@@ -43,20 +44,29 @@ extends      SmaliBaseVisitor<ClassDef>
         ctx.classline().accept(this);
         ctx.superclassline().accept(this);
 
-        if (ctx.sourceline() != null) {
-            ctx.sourceline().accept(this);
+        SmaliParser.SourcelineContext sourcelineContext = ctx.sourceline();
+        if (sourcelineContext != null) {
+            sourcelineContext.accept(this);
         }
-
-        System.out.println(sourceFile);
 
         int classTypeIndex = dexFile.addOrGetTypeIDIndex(classType);
         int superTypeIndex = dexFile.addOrGetTypeIDIndex(superType);
         int sourceFileIndex = sourceFile != null ? dexFile.addOrGetStringIDIndex(sourceFile) : NO_INDEX;
 
-        return ClassDef.of(classTypeIndex,
-                           accessFlags,
-                           superTypeIndex,
-                           sourceFileIndex);
+        classDef = ClassDef.of(classTypeIndex,
+                               accessFlags,
+                               superTypeIndex,
+                               sourceFileIndex);
+
+        for (SmaliParser.InterfacelineContext interfacelineContext : ctx.interfaceline()) {
+            interfacelineContext.accept(this);
+        }
+
+        for (SmaliParser.MemberdefContext memberdefContext : ctx.memberdef()) {
+            memberdefContext.accept(this);
+        }
+
+        return classDef;
     }
 
     @Override
@@ -68,21 +78,57 @@ extends      SmaliBaseVisitor<ClassDef>
             accessFlags |= flag.getValue();
         }
 
-        System.out.println(Integer.toHexString(accessFlags));
-        return null;
+        return classDef;
     }
 
     @Override
     public ClassDef visitSuperclassline(SmaliParser.SuperclasslineContext ctx) {
         superType = ctx.CLASSTYPE().getText();
-        return null;
+        return classDef;
     }
 
     @Override
     public ClassDef visitSourceline(SmaliParser.SourcelineContext ctx) {
         sourceFile = ctx.FILENAME().getText();
-        return null;
+        return classDef;
     }
 
-    // helper classes.
+    @Override
+    public ClassDef visitInterfaceline(SmaliParser.InterfacelineContext ctx) {
+        String interfaceType = ctx.CLASSTYPE().getText();
+        classDef.getInterfaces().addType(dexFile.addOrGetTypeIDIndex(interfaceType));
+        return classDef;
+    }
+
+    @Override
+    public ClassDef visitMemberdef(SmaliParser.MemberdefContext ctx) {
+        for (ParseTree child : ctx.children) {
+            child.accept(this);
+        }
+        return classDef;
+    }
+
+    @Override
+    public ClassDef visitFielddef(SmaliParser.FielddefContext ctx) {
+        String name = ctx.MEMBERNAME().getText();
+        String type = ctx.fieldtype().getText();
+
+        int accessFlags = 0;
+        for (SmaliParser.FieldmodifierContext fieldmodifierContext : ctx.fieldmodifier()) {
+            DexAccessFlags flag = DexAccessFlags.of(fieldmodifierContext.getText());
+            accessFlags |= flag.getValue();
+        }
+
+        int fieldIDIndex   = dexFile.addOrGetFieldID(classType, name, type);
+        EncodedField field = EncodedField.of(fieldIDIndex, accessFlags);
+        classDef.getClassData().addField(field);
+
+        return super.visitFielddef(ctx);
+    }
+
+    @Override
+    public ClassDef visitMethoddef(SmaliParser.MethoddefContext ctx) {
+        System.out.println("method");
+        return super.visitMethoddef(ctx);
+    }
 }
