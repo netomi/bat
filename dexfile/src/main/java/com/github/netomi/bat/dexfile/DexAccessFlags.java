@@ -48,6 +48,15 @@ public enum DexAccessFlags
         this.target = target;
     }
 
+    public int getValue() {
+        return value;
+    }
+
+    public static DexAccessFlags of(String input) {
+        input = input.replaceAll("-", "_").toUpperCase();
+        return valueOf(input);
+    }
+
     public static String formatAsHumanReadable(int accessFlags, int target) {
         StringBuilder sb = new StringBuilder();
         for (DexAccessFlags accessFlag : values())

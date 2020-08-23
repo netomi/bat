@@ -39,6 +39,10 @@ extends      DataItem
     private ArrayList<EncodedMethod> directMethods  = new ArrayList<>(0);
     private ArrayList<EncodedMethod> virtualMethods = new ArrayList<>(0);
 
+    public static ClassData empty() {
+        return new ClassData();
+    }
+
     public static ClassData readContent(DexDataInput input) {
         ClassData classData = new ClassData();
         classData.read(input);

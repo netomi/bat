@@ -33,6 +33,10 @@ extends      DataItem
 {
     protected EncodedArrayValue encodedArrayValue;
 
+    public static EncodedArray empty() {
+        return new EncodedArray();
+    }
+
     public static EncodedArray readContent(DexDataInput input) {
         EncodedArray encodedArray = new EncodedArray();
         encodedArray.read(input);

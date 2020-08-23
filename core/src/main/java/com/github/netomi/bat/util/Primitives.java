@@ -51,7 +51,9 @@ public final class Primitives
         for (byte b : arr) {
             sb.append(toHexString(b));
         }
-        sb.setLength(sb.length() - 2);
+        if (arr.length > 0) {
+            sb.setLength(sb.length() - 2);
+        }
         sb.append(']');
         return sb.toString();
     }

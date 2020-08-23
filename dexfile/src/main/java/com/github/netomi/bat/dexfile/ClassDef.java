@@ -53,6 +53,17 @@ extends      DataItem
     private ClassData            classData;
     private EncodedArray         staticValues;
 
+    public static ClassDef of(int classIndex, int accessFlags, int superClassIndex, int sourceFileIndex) {
+        return new ClassDef(classIndex,
+                            accessFlags,
+                            superClassIndex,
+                            sourceFileIndex,
+                            TypeList.empty(),
+                            AnnotationsDirectory.empty(),
+                            ClassData.empty(),
+                            EncodedArray.empty());
+    }
+
     public static ClassDef readContent(DexDataInput input) {
         ClassDef classDef = new ClassDef();
         classDef.read(input);
