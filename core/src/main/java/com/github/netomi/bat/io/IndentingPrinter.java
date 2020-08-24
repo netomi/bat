@@ -68,6 +68,14 @@ implements   AutoCloseable
         }
     }
 
+    public void flush() {
+        try {
+            delegateWriter.flush();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     @Override
     public void close() throws Exception {
         delegateWriter.close();

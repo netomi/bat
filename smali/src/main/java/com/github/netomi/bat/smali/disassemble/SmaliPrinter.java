@@ -23,6 +23,8 @@ import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.io.IndentingPrinter;
 
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,10 @@ implements   ClassDefVisitor,
     private int     currentParameterIndex;
     private int     currentRegisterIndex;
     private String  currentParameterType;
+
+    public SmaliPrinter() {
+        this(new OutputStreamWriter(System.out));
+    }
 
     public SmaliPrinter(Writer writer) {
         this.printer = new IndentingPrinter(writer);
@@ -80,6 +86,8 @@ implements   ClassDefVisitor,
         classDef.annotationsDirectoryAccept(dexFile, new ClassAnnotationSetVisitor(this));
 
         classDef.classDataAccept(dexFile, this);
+
+        printer.flush();
     }
 
     @Override

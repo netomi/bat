@@ -232,6 +232,10 @@ extends      DataItem
         output.writeInt(staticValuesOffset);
     }
 
+    public void accept(DexFile dexFile, ClassDefVisitor visitor) {
+        visitor.visitClassDef(dexFile, 0, this);
+    }
+
     public void methodAccept(DexFile dexFile, String name, EncodedMethodVisitor visitor) {
         classDataAccept(dexFile,
             new AllEncodedMethodsVisitor(
