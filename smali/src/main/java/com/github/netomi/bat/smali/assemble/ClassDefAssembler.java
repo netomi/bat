@@ -71,7 +71,7 @@ extends      SmaliBaseVisitor<ClassDef>
 
     @Override
     public ClassDef visitClassline(SmaliParser.ClasslineContext ctx) {
-        classType = ctx.CLASSTYPE().getText();
+        classType = ctx.ClassType().getText();
 
         for (SmaliParser.ClassmodifierContext classmodifierContext : ctx.classmodifier()) {
             DexAccessFlags flag = DexAccessFlags.of(classmodifierContext.getText());
@@ -83,7 +83,7 @@ extends      SmaliBaseVisitor<ClassDef>
 
     @Override
     public ClassDef visitSuperclassline(SmaliParser.SuperclasslineContext ctx) {
-        superType = ctx.CLASSTYPE().getText();
+        superType = ctx.ClassType().getText();
         return classDef;
     }
 
@@ -95,7 +95,7 @@ extends      SmaliBaseVisitor<ClassDef>
 
     @Override
     public ClassDef visitInterfaceline(SmaliParser.InterfacelineContext ctx) {
-        String interfaceType = ctx.CLASSTYPE().getText();
+        String interfaceType = ctx.ClassType().getText();
         classDef.getInterfaces().addType(dexFile.addOrGetTypeIDIndex(interfaceType));
         return classDef;
     }
@@ -110,8 +110,8 @@ extends      SmaliBaseVisitor<ClassDef>
 
     @Override
     public ClassDef visitFielddef(SmaliParser.FielddefContext ctx) {
-        String name = ctx.MEMBERNAME().getText();
-        String type = ctx.fieldtype().getText();
+        String name = ctx.MemberName().getText();
+        String type = ctx.type().getText();
 
         int accessFlags = 0;
         for (SmaliParser.FieldmodifierContext fieldmodifierContext : ctx.fieldmodifier()) {
