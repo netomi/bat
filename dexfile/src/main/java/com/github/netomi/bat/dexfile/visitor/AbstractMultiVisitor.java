@@ -22,6 +22,7 @@ public abstract class AbstractMultiVisitor<V>
 {
     private final List<V> visitors;
 
+    @SafeVarargs
     protected AbstractMultiVisitor(V visitor, V... otherVisitors) {
         ArrayList<V> visitorList = new ArrayList<>();
 
