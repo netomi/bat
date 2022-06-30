@@ -16,6 +16,7 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -124,6 +125,10 @@ class ClassFile internal constructor() {
 
     fun methodsAccept(visitor: MemberVisitor) {
         methods.forEachIndexed { index, method -> visitor.visitMethod(this, index, method) }
+    }
+
+    fun attributesAccept(visitor: AttributeVisitor) {
+        attributes.forEach { attribute -> attribute.accept(this, visitor) }
     }
 
     companion object {

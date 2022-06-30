@@ -27,6 +27,10 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
     override val type: Type
         get() = Type.SOURCE_FILE
 
+    fun sourceFile(classFile: ClassFile): String {
+        return classFile.constantPool.getString(sourceFileIndex)
+    }
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()

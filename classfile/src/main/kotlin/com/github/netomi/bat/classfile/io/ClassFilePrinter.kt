@@ -15,10 +15,12 @@
  */
 package com.github.netomi.bat.classfile.io
 
+import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.ConstantPool
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
+import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
@@ -41,11 +43,18 @@ class ClassFilePrinter :
     }
 
     override fun visitClassFile(classFile: ClassFile) {
-        printer.println("class " + classFile.externalClassName)
+
+        val externalModifiers = classFile.accessFlags.modifiers.filter { it != AccessFlag.SUPER }
+                                                               .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
+
+        printer.println("%s class %s".format(externalModifiers, classFile.externalClassName))
         printer.levelUp()
         printer.println("minor version: " + classFile.minorVersion)
         printer.println("major version: " + classFile.majorVersion)
-        printer.println("flags: (0x%04x)".format(classFile.accessFlags.rawFlags))
+
+        val modifiers = classFile.accessFlags.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
+        printer.println("flags: (0x%04x) %s".format(classFile.accessFlags.rawFlags, modifiers))
+
         printer.println("this_class: #%-29d // %s".format(classFile.thisClassIndex,   classFile.className))
         printer.println("super_class: #%-28d // %s".format(classFile.superClassIndex, classFile.superClassName))
 
@@ -57,7 +66,10 @@ class ClassFilePrinter :
 
         printer.levelDown()
 
+        printer.println("Constant pool:")
+        printer.levelUp()
         classFile.constantPoolAccept(this)
+        printer.levelDown()
 
         printer.println("{")
 
@@ -67,15 +79,13 @@ class ClassFilePrinter :
 
         printer.println("}")
 
+        classFile.attributesAccept(this)
+
         printer.flush()
     }
 
-    override fun visitConstantPoolStart(classFile: ClassFile, constantPool: ConstantPool) {
-        printer.println("Constant pool:")
-    }
-
     override fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {
-        printer.print(String.format("%6s = ", "#$index"))
+        printer.print(String.format("%4s = ", "#$index"))
         constant.accept(classFile, this)
         printer.println()
     }
@@ -174,5 +184,9 @@ class ClassFilePrinter :
 
     override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
         printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.signature(classFile)))
+    }
+
+    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
+        printer.println("SourceFile: \"%s\"".format(attribute.sourceFile(classFile)))
     }
 }
