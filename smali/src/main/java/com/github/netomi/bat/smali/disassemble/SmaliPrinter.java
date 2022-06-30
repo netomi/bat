@@ -24,7 +24,6 @@ import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.io.IndentingPrinter;
 
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +51,7 @@ implements   ClassDefVisitor,
     }
 
     public SmaliPrinter(Writer writer) {
-        this.printer = new IndentingPrinter(writer);
+        this.printer = new IndentingPrinter(writer, 4);
     }
 
     @Override

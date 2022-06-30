@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
 import com.github.netomi.bat.dexfile.util.Numbers;
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
-import com.github.netomi.bat.dexfile.value.EncodedMethodHandleValue;
 import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;

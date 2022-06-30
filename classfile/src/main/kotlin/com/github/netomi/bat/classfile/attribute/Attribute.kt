@@ -89,7 +89,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
 
         companion object {
             private val nameToAttributeMap: Map<String, Type> by lazy {
-                values().map { it.attributeName to it }.toMap()
+                values().associateBy { it.attributeName }
             }
 
             fun of(name: String) : Type {
@@ -98,7 +98,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
         }
 
         fun createAttribute(attributeNameIndex: Int): Attribute {
-            return supplier?.invoke(attributeNameIndex) ?: TODO("not implemented yet")
+            return supplier?.invoke(attributeNameIndex) ?: UNKNOWN.supplier!!.invoke(attributeNameIndex)
         }
     }
 

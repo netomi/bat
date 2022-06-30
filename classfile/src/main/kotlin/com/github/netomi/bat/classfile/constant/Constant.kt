@@ -91,7 +91,7 @@ abstract class Constant {
 
         companion object {
             private val tagToConstantMap: Map<Int, Type> by lazy {
-                values().map { it.tag to it }.toMap()
+                values().associateBy { it.tag }
             }
 
             fun of(tag: Int) : Type {

@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.FieldID;
 import com.github.netomi.bat.dexfile.MethodID;
 import com.github.netomi.bat.dexfile.value.*;
-import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
 import com.github.netomi.bat.util.Strings;

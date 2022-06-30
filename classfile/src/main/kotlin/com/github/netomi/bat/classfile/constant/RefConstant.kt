@@ -33,11 +33,11 @@ abstract class RefConstant(open var classIndex: Int = -1, open var nameAndTypeIn
     }
 
     fun getMemberName(constantPool: ConstantPool): String {
-        return constantPool.getName(nameAndTypeIndex)
+        return constantPool.getNameAndType(nameAndTypeIndex).getMemberName(constantPool)
     }
 
     fun getDescriptor(constantPool: ConstantPool): String {
-        return constantPool.getType(nameAndTypeIndex)
+        return constantPool.getNameAndType(nameAndTypeIndex).getDescriptor(constantPool)
     }
 
     @Throws(IOException::class)

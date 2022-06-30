@@ -13,12 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.io;
+package com.github.netomi.bat.io
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.IOException
+import java.io.OutputStream
 
-public interface OutputStreamFactory
-{
-    OutputStream createOutputStream(String className) throws IOException;
+interface OutputStreamFactory {
+    @Throws(IOException::class)
+    fun createOutputStream(className: String): OutputStream
 }

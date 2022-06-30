@@ -22,7 +22,6 @@ import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
-import com.github.netomi.bat.util.Primitives;
 import com.github.netomi.bat.util.Strings;
 
 class      EncodedValuePrinter

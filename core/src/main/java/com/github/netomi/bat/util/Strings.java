@@ -19,6 +19,14 @@ public class Strings
 {
     private Strings() {}
 
+    public static boolean isAsciiPrintable(String value) {
+        for (char c : value.toCharArray()) {
+            int codePoint = c;
+            if (codePoint < 32 || codePoint >= 128) return false;
+        }
+        return true;
+    }
+
     public static String escapeString(String value) {
         int len = value.length();
         StringBuilder sb = new StringBuilder(len * 3 / 2);
@@ -37,6 +45,7 @@ public class Strings
                     case '\n': sb.append("\\n"); continue;
                     case '\r': sb.append("\\r"); continue;
                     case '\t': sb.append("\\t"); continue;
+                    case '\b': sb.append("\\b"); continue;
                 }
             }
 

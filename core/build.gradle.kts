@@ -9,5 +9,7 @@ tasks.test {
 }
 
 dependencies {
+    api("com.google.guava:guava:${Versions.guavaVersion}")
+
     testImplementation(kotlin("test"))
 }

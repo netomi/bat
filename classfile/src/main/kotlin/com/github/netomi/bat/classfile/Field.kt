@@ -15,4 +15,23 @@
  */
 package com.github.netomi.bat.classfile
 
-class Field : Member()
+import java.io.DataInput
+import java.io.IOException
+
+/**
+ * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.5
+ */
+class Field internal constructor(): Member() {
+
+    override val accessFlagTarget: AccessFlagTarget
+        get() = AccessFlagTarget.FIELD
+
+    companion object {
+        @Throws(IOException::class)
+        fun readField(input: DataInput, constantPool: ConstantPool): Field {
+            val field = Field()
+            field.read(input, constantPool)
+            return field
+        }
+    }
+}

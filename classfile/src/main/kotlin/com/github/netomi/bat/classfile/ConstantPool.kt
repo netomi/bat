@@ -40,12 +40,8 @@ class ConstantPool {
         return (constants[classIndex] as ClassConstant).getName(this)
     }
 
-    fun getName(nameAndTypeIndex: Int): String {
-        return (constants[nameAndTypeIndex] as NameAndTypeConstant).getMemberName(this)
-    }
-
-    fun getType(nameAndTypeIndex: Int): String {
-        return (constants[nameAndTypeIndex] as NameAndTypeConstant).getDescriptor(this)
+    fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
+        return (constants[nameAndTypeIndex] as NameAndTypeConstant)
     }
 
     @Throws(IOException::class)

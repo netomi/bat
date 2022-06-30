@@ -15,4 +15,36 @@
  */
 package com.github.netomi.bat.classfile
 
-abstract class Member
+import com.github.netomi.bat.classfile.attribute.Attribute
+import java.io.DataInput
+import java.io.IOException
+
+abstract class Member {
+    var accessFlags: AccessFlags = AccessFlags(0, accessFlagTarget)
+    var nameIndex: Int = 0
+    var descriptorIndex: Int = 0
+
+    protected val attributes = mutableListOf<Attribute>()
+
+    abstract val accessFlagTarget: AccessFlagTarget
+
+    fun name(classFile: ClassFile): String {
+        return classFile.constantPool.getString(nameIndex)
+    }
+
+    fun descriptor(classFile: ClassFile): String {
+        return classFile.constantPool.getString(descriptorIndex)
+    }
+
+    @Throws(IOException::class)
+    protected fun read(input: DataInput, constantPool: ConstantPool) {
+        accessFlags     = AccessFlags(input.readUnsignedShort(), accessFlagTarget)
+        nameIndex       = input.readUnsignedShort()
+        descriptorIndex = input.readUnsignedShort()
+
+        val attributeCount = input.readUnsignedShort()
+        for (i in 1 .. attributeCount) {
+            attributes.add(Attribute.readAttribute(input, constantPool))
+        }
+    }
+}

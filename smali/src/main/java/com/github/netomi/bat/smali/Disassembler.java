@@ -54,7 +54,7 @@ implements   ClassDefVisitor
             DexFileReader reader = new DexFileReader(is);
             reader.visitDexFile(dexFile);
 
-            dexFile.classDefsAccept(new Disassembler(new FileOutputStreamFactory(Paths.get("out2"))));
+            dexFile.classDefsAccept(new Disassembler(new FileOutputStreamFactory(Paths.get("out2"), "smali")));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

@@ -15,40 +15,49 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.visitor.MemberVisitor
+import com.github.netomi.bat.util.Classes
 import java.io.DataInput
 import java.io.IOException
 
+/**
+ * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
+ */
 class ClassFile internal constructor() {
     var minorVersion = 0
         private set
     var majorVersion = 0
         private set
-    var accessFlags: AccessFlags? = null
+    var accessFlags: AccessFlags = AccessFlags(0, AccessFlagTarget.CLASS)
         private set
     var thisClassIndex = 0
         private set
     var superClassIndex = 0
         private set
     val constantPool: ConstantPool = ConstantPool()
-    private  val interfaces = mutableListOf<Int>()
+    private val interfaces = mutableListOf<Int>()
+    private val fields     = mutableListOf<Field>()
+    private val methods    = mutableListOf<Method>()
+    private val attributes = mutableListOf<Attribute>()
 
     val className: String
         get() = constantPool.getClassName(thisClassIndex)
 
+    val externalClassName: String
+        get() = Classes.externalClassNameFromInternalName(className)
+
     val superClassName: String
         get() = constantPool.getClassName(superClassIndex)
 
-    fun getInterfaces(): Collection<String> {
+    fun interfaces(): Collection<String> {
         return if (interfaces.isEmpty()) {
             emptyList()
         } else {
-            val interfaceNames: MutableCollection<String> = ArrayList(interfaces.size)
-            for (index in interfaces) {
-                interfaceNames.add(constantPool.getClassName(index))
-            }
-            interfaceNames
+            interfaces.map { constantPool.getClassName(it) }
         }
     }
 
@@ -60,13 +69,28 @@ class ClassFile internal constructor() {
         minorVersion = input.readUnsignedShort()
         majorVersion = input.readUnsignedShort()
         constantPool.read(input)
-        accessFlags = AccessFlags(input.readUnsignedShort())
+        accessFlags = AccessFlags(input.readUnsignedShort(), AccessFlagTarget.CLASS)
         thisClassIndex = input.readUnsignedShort()
         superClassIndex = input.readUnsignedShort()
         val interfacesCount = input.readUnsignedShort()
         for (i in 0 until interfacesCount) {
             val idx = input.readUnsignedShort()
             interfaces.add(idx)
+        }
+
+        val fieldCount = input.readUnsignedShort()
+        for (i in 0 until fieldCount) {
+            fields.add(Field.readField(input, constantPool))
+        }
+
+        val methodCount = input.readUnsignedShort()
+        for (i in 0 until methodCount) {
+            methods.add(Method.readMethod(input, constantPool))
+        }
+
+        val attributeCount = input.readUnsignedShort()
+        for (i in 0 until attributeCount) {
+            attributes.add(Attribute.readAttribute(input, constantPool))
         }
     }
 
@@ -78,17 +102,25 @@ class ClassFile internal constructor() {
         constantPool.accept(this, visitor)
     }
 
+    fun membersAccept(visitor: MemberVisitor) {
+        fieldsAccept(visitor)
+        membersAccept(visitor)
+    }
+
+    fun fieldsAccept(visitor: MemberVisitor) {
+        fields.forEachIndexed { index, field -> visitor.visitField(this, index, field) }
+    }
+
+    fun methodsAccept(visitor: MemberVisitor) {
+        methods.forEachIndexed { index, method -> visitor.visitMethod(this, index, method) }
+    }
+
     companion object {
         @Throws(IOException::class)
         fun readClassFile(input: DataInput): ClassFile {
             val classFile = ClassFile()
             classFile.read(input)
             return classFile
-        }
-
-        @JvmStatic
-        fun externalClassName(internalClassName: String): String {
-            return internalClassName.replace("/".toRegex(), ".")
         }
     }
 }

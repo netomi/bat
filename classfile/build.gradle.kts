@@ -9,5 +9,6 @@ tasks.test {
 }
 
 dependencies {
+    implementation(project(":core"))
     testImplementation(kotlin("test"))
 }

@@ -20,7 +20,7 @@ import java.io.DataOutput
 import java.io.IOException
 
 data class UnknownAttribute internal constructor(override val attributeNameIndex: Int = -1,
-                                                          var info:               ByteArray) : Attribute(attributeNameIndex) {
+                                                          var info:               ByteArray = ByteArray(0)) : Attribute(attributeNameIndex) {
 
     override val type: Type
         get() = Type.UNKNOWN
@@ -61,7 +61,7 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
     companion object {
         @JvmStatic
         fun create(attributeNameIndex: Int): UnknownAttribute {
-            return create(attributeNameIndex)
+            return UnknownAttribute(attributeNameIndex)
         }
     }
 }

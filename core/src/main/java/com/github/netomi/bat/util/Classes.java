@@ -15,14 +15,14 @@
  */
 package com.github.netomi.bat.util;
 
+import java.util.Objects;
+
 public class Classes
 {
     protected Classes() {}
 
     public static String internalClassNameFromType(String type) {
-        if (type == null) {
-            return null;
-        }
+        Objects.requireNonNull(type);
 
         if (type.startsWith("L") && type.endsWith(";")) {
             return type.substring(1, type.length() - 1);
@@ -31,14 +31,17 @@ public class Classes
     }
 
     public static String internalTypeFromClassName(String className) {
+        Objects.requireNonNull(className);
         return "L" + className + ";";
     }
 
     public static String internalClassNameFromExternalName(String className) {
+        Objects.requireNonNull(className);
         return className.replaceAll(".", "/");
     }
 
     public static String externalClassNameFromInternalName(String className) {
+        Objects.requireNonNull(className);
         return className.replaceAll("/", ".");
     }
 
@@ -55,4 +58,35 @@ public class Classes
             "" :
             className.substring(0, idx);
     }
+
+    public static String externalTypeFromType(String internalType) {
+        Objects.requireNonNull(internalType);
+
+        if (internalType.startsWith("L") && internalType.endsWith(";")) {
+            String className = internalClassNameFromType(internalType);
+            return externalClassNameFromInternalName(className);
+        } else if (internalType.startsWith("[")) {
+            int dimension = (int) internalType.chars().filter(ch -> ch == '[').count();
+            String type = internalType.substring(dimension);
+            String result = externalTypeFromType(type);
+            for (int i = 0; i < dimension; i++) {
+                result = result + "[]";
+            }
+            return result;
+        } else {
+            switch (internalType) {
+                case "B": return "byte";
+                case "C": return "char";
+                case "D": return "double";
+                case "F": return "float";
+                case "I": return "int";
+                case "J": return "long";
+                case "S": return "short";
+                case "Z": return "boolean";
+                default: return internalType;
+            }
+        }
+    }
 }
+
+
