@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.classfile.attribute
 
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -36,6 +38,10 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
     override fun writeAttributeData(output: DataOutput) {
         output.writeInt(2)
         output.writeShort(sourceFileIndex)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+        visitor.visitSourceFileAttribute(classFile, this)
     }
 
     companion object {

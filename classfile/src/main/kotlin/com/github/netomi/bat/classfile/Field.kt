@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.IOException
 
@@ -25,6 +26,10 @@ class Field internal constructor(): Member() {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.FIELD
+
+    fun attributesAccept(classFile: ClassFile, visitor: AttributeVisitor) {
+        attributes.forEach { it.accept(classFile, visitor) }
+    }
 
     companion object {
         @Throws(IOException::class)

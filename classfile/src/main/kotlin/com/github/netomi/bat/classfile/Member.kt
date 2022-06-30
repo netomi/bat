@@ -43,7 +43,7 @@ abstract class Member {
         descriptorIndex = input.readUnsignedShort()
 
         val attributeCount = input.readUnsignedShort()
-        for (i in 1 .. attributeCount) {
+        for (i in 0 until attributeCount) {
             attributes.add(Attribute.readAttribute(input, constantPool))
         }
     }

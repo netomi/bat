@@ -21,33 +21,37 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-data class ConstantValueAttribute internal constructor(override val attributeNameIndex: Int,
-                                                                var constantValueIndex: Int = -1) : Attribute(attributeNameIndex) {
+data class SignatureAttribute internal constructor(override var attributeNameIndex: Int,
+                                                            var signatureIndex:     Int = -1) : Attribute(attributeNameIndex) {
 
     override val type: Type
-        get() = Type.CONSTANT_VALUE
+        get() = Type.SIGNATURE
+
+    fun signature(classFile: ClassFile): String {
+        return classFile.constantPool.getString(signatureIndex)
+    }
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
         assert(length == 2)
-        constantValueIndex = input.readUnsignedShort()
+        signatureIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.write(2)
-        output.writeShort(constantValueIndex)
+        output.writeInt(2)
+        output.writeShort(signatureIndex)
     }
 
     override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
-        visitor.visitConstantValueAttribute(classFile, this)
+        visitor.visitSignatureAttribute(classFile, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(attributeNameIndex: Int): ConstantValueAttribute {
-            return ConstantValueAttribute(attributeNameIndex)
+        fun create(attributeNameIndex: Int): SignatureAttribute {
+            return SignatureAttribute(attributeNameIndex)
         }
     }
 }

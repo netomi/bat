@@ -15,7 +15,9 @@
  */
 package com.github.netomi.bat.classfile.attribute
 
+import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.ConstantPool
+import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -35,6 +37,8 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
         output.writeByte(attributeNameIndex)
         writeAttributeData(output)
     }
+
+    abstract fun accept(classFile: ClassFile, visitor: AttributeVisitor)
 
     companion object {
         @JvmStatic
@@ -64,7 +68,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
         INNER_CLASSES("InnerClasses", null),
         ENCLOSING_METHOD("EnclosingMethod", EnclosingMethodAttribute.Companion::create),
         SYNTHETIC("Synthetic", SyntheticAttribute.Companion::create),
-        SIGNATURE("Signature", null),
+        SIGNATURE("Signature", SignatureAttribute.Companion::create),
         SOURCE_FILE("SourceFile", SourceFileAttribute.Companion::create),
         SOURCE_DEBUG_EXTENSION("SourceDebugExtension", null),
         LINE_NUMBER_TABLE("LineNumberTable", null),

@@ -15,7 +15,9 @@
  */
 package com.github.netomi.bat.classfile.attribute
 
+import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.ConstantPool
+import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -52,6 +54,10 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
         output.writeInt(4)
         output.writeShort(classIndex)
         output.writeShort(methodIndex)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+        visitor.visitEnclosingMethodAttribute(classFile, this)
     }
 
     companion object {

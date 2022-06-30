@@ -18,11 +18,9 @@ package com.github.netomi.bat.classfile.io
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.ConstantPool
 import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.constant.*
-import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
-import com.github.netomi.bat.classfile.visitor.MemberVisitor
+import com.github.netomi.bat.classfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.Classes
 import com.github.netomi.bat.util.Strings
@@ -32,7 +30,7 @@ import java.io.Writer
 import java.util.*
 
 class ClassFilePrinter :
-    ClassFileVisitor, ConstantPoolVisitor, ConstantVisitor, MemberVisitor
+    ClassFileVisitor, ConstantPoolVisitor, ConstantVisitor, MemberVisitor, AttributeVisitor
 {
     private val printer: IndentingPrinter
 
@@ -50,6 +48,13 @@ class ClassFilePrinter :
         printer.println("flags: (0x%04x)".format(classFile.accessFlags.rawFlags))
         printer.println("this_class: #%-29d // %s".format(classFile.thisClassIndex,   classFile.className))
         printer.println("super_class: #%-28d // %s".format(classFile.superClassIndex, classFile.superClassName))
+
+        printer.println("interfaces: %d, fields: %d, methods: %d, attributes: %d".format(
+            classFile.interfaces().count(),
+            classFile.fields().count(),
+            classFile.methods().count(),
+            classFile.attributes().count()))
+
         printer.levelDown()
 
         classFile.constantPoolAccept(this)
@@ -162,7 +167,12 @@ class ClassFilePrinter :
 
         val modifiers = field.accessFlags.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
         printer.println("flags: (0x%04x) %s".format(field.accessFlags.rawFlags, modifiers))
+
+        field.attributesAccept(classFile, this)
         printer.levelDown()
    }
 
+    override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+        printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.signature(classFile)))
+    }
 }

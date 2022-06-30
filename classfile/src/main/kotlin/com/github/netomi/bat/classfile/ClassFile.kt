@@ -16,7 +16,6 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -59,6 +58,18 @@ class ClassFile internal constructor() {
         } else {
             interfaces.map { constantPool.getClassName(it) }
         }
+    }
+
+    fun fields(): Collection<Field> {
+        return fields
+    }
+
+    fun methods(): Collection<Method> {
+        return methods
+    }
+
+    fun attributes(): Collection<Attribute> {
+        return attributes
     }
 
     @Throws(IOException::class)

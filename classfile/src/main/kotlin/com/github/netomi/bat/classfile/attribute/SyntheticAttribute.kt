@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.classfile.attribute
 
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -33,6 +35,10 @@ data class SyntheticAttribute internal constructor(override var attributeNameInd
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
         output.writeInt(0)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+        visitor.visitSyntheticAttribute(classFile, this)
     }
 
     companion object {

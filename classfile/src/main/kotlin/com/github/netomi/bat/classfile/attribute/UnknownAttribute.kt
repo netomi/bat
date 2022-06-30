@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.classfile.attribute
 
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -56,6 +58,10 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
         var result = attributeNameIndex
         result = 31 * result + info.contentHashCode()
         return result
+    }
+
+    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+        visitor.visitUnknownAttribute(classFile, this)
     }
 
     companion object {
