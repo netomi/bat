@@ -26,12 +26,14 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_InvokeDynamic_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.10">CONSTANT_InvokeDynamic_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class InvokeDynamicConstant internal constructor(var bootstrapMethodAttrIndex: Int = -1,
-                                                      var nameAndTypeIndex:         Int = -1) : Constant() {
+data class InvokeDynamicConstant internal constructor(
+    override val owner:                    ConstantPool,
+             var bootstrapMethodAttrIndex: Int = -1,
+             var nameAndTypeIndex:         Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.INVOKE_DYNAMIC
@@ -53,22 +55,21 @@ data class InvokeDynamicConstant internal constructor(var bootstrapMethodAttrInd
         visitor.visitInvokeDynamicConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitInvokeDynamicConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitInvokeDynamicConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): InvokeDynamicConstant {
-            return InvokeDynamicConstant()
+        fun create(owner: ConstantPool): InvokeDynamicConstant {
+            return InvokeDynamicConstant(owner)
         }
 
         @JvmStatic
-        fun create(bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): InvokeDynamicConstant {
-            return InvokeDynamicConstant(bootstrapMethodAttrIndex, nameAndTypeIndex)
+        fun create(owner: ConstantPool, bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): InvokeDynamicConstant {
+            return InvokeDynamicConstant(owner, bootstrapMethodAttrIndex, nameAndTypeIndex)
         }
     }
 }

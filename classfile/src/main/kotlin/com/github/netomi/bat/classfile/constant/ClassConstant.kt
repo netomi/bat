@@ -30,14 +30,14 @@ import java.io.IOException
  *
  * @author Thomas Neidhart
  */
-data class ClassConstant internal constructor(var nameIndex: Int = -1) : Constant() {
+data class ClassConstant internal constructor(override val owner:     ConstantPool,
+                                                       var nameIndex: Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.CLASS
 
-    fun getName(constantPool: ConstantPool): String {
-        return constantPool.getString(nameIndex)
-    }
+    val className: String
+        get() = owner.getString(nameIndex)
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -54,22 +54,21 @@ data class ClassConstant internal constructor(var nameIndex: Int = -1) : Constan
         visitor.visitClassConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitClassConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitClassConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): ClassConstant {
-            return ClassConstant()
+        fun create(owner: ConstantPool): ClassConstant {
+            return ClassConstant(owner)
         }
 
         @JvmStatic
-        fun create(nameIndex: Int): ClassConstant {
-            return ClassConstant(nameIndex)
+        fun create(owner: ConstantPool, nameIndex: Int): ClassConstant {
+            return ClassConstant(owner, nameIndex)
         }
     }
 }

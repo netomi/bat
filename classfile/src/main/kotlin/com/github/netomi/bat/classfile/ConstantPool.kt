@@ -37,7 +37,7 @@ class ConstantPool {
     }
 
     fun getClassName(classIndex: Int): String {
-        return (constants[classIndex] as ClassConstant).getName(this)
+        return (constants[classIndex] as ClassConstant).className
     }
 
     fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
@@ -47,18 +47,19 @@ class ConstantPool {
     @Throws(IOException::class)
     fun read(input: DataInput) {
         check(constants.isEmpty()) { "Trying to populate a non-empty ConstantPool." }
+
         val entries = input.readUnsignedShort()
         constants.add(null)
         var i = 1
         while (i < entries) {
-            val constant = Constant.read(input)
+            val constant = Constant.read(input, this)
             constants.add(constant)
-            val constantPoolSize = constant.type.constantPoolSize
-            if (constantPoolSize > 1) {
+            if (constant.type.constantPoolSize > 1) {
                 constants.add(null)
+                i += 2
+            } else {
                 i++
             }
-            i++
         }
     }
 
@@ -78,16 +79,12 @@ class ConstantPool {
 
     fun accept(classFile: ClassFile, visitor: ConstantPoolVisitor) {
         visitor.visitConstantPoolStart(classFile, this)
-        val it: ListIterator<Constant?> = constants.listIterator()
-        while (it.hasNext()) {
-            val index = it.nextIndex()
-            val constant = it.next()
-            constant?.accept(classFile, this, index, visitor)
-        }
+        constants.forEachIndexed { index, constant -> constant?.accept(classFile, index, visitor) }
         visitor.visitConstantPoolEnd(classFile, this)
     }
 
     fun constantAccept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
-        constants[index]!!.accept(classFile, visitor)
+        check(constants[index] != null) { "Trying to accept a null constant at index $index" }
+        constants[index]?.accept(classFile, visitor)
     }
 }

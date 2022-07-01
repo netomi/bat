@@ -31,6 +31,7 @@ import java.io.IOException
 abstract class Constant {
 
     abstract val type: Type
+    abstract val owner: ConstantPool
 
     @Throws(IOException::class)
     abstract fun readConstantInfo(input: DataInput)
@@ -48,15 +49,14 @@ abstract class Constant {
                         visitor:   ConstantVisitor)
 
     abstract fun accept(classFile: ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor)
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor)
 
     companion object {
         @JvmStatic
-        fun read(input : DataInput): Constant {
+        fun read(input : DataInput, constantPool: ConstantPool): Constant {
             val tag      = input.readUnsignedByte()
-            val constant = Type.of(tag).createConstant()
+            val constant = Type.of(tag).createConstant(constantPool)
             constant.readConstantInfo(input)
 
             return constant
@@ -66,7 +66,7 @@ abstract class Constant {
     /**
      * Known constant types as contained in a java class file.
      */
-    enum class Type constructor(val tag: Int, val constantPoolSize: Int, val supplier: () -> Constant) {
+    enum class Type constructor(val tag: Int, val constantPoolSize: Int, val supplier: (ConstantPool) -> Constant) {
 
         // Valid constants and their corresponding tags:
         // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4-210
@@ -99,8 +99,8 @@ abstract class Constant {
             }
         }
 
-        fun createConstant(): Constant {
-            return supplier.invoke()
+        fun createConstant(owner: ConstantPool): Constant {
+            return supplier.invoke(owner)
         }
     }
 }

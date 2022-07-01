@@ -24,13 +24,14 @@ import com.github.netomi.bat.classfile.visitor.ConstantVisitor
 /**
  * A constant representing a CONSTANT_Fieldref_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.2">CONSTANT_Fieldref_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class FieldrefConstant internal constructor(override var classIndex:       Int = -1,
-                                                 override var nameAndTypeIndex: Int = -1) :
-        RefConstant(classIndex, nameAndTypeIndex) {
+data class FieldrefConstant internal constructor(
+    override val owner:            ConstantPool,
+    override var classIndex:       Int = -1,
+    override var nameAndTypeIndex: Int = -1) : RefConstant(owner, classIndex, nameAndTypeIndex) {
 
     override val type: Type
         get() = Type.FIELD_REF
@@ -40,22 +41,21 @@ data class FieldrefConstant internal constructor(override var classIndex:       
         visitor.visitFieldRefConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitFieldRefConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitFieldRefConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): FieldrefConstant {
-            return FieldrefConstant()
+        fun create(owner: ConstantPool): FieldrefConstant {
+            return FieldrefConstant(owner)
         }
 
         @JvmStatic
-        fun create(classIndex: Int, nameAndTypeIndex: Int): FieldrefConstant {
-            return FieldrefConstant(classIndex, nameAndTypeIndex)
+        fun create(owner: ConstantPool, classIndex: Int, nameAndTypeIndex: Int): FieldrefConstant {
+            return FieldrefConstant(owner, classIndex, nameAndTypeIndex)
         }
     }
 }

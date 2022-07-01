@@ -26,11 +26,12 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_Float_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.4">CONSTANT_Float_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class FloatConstant internal constructor(var value: Float = 0.0f) : Constant() {
+data class FloatConstant internal constructor(override val owner: ConstantPool,
+                                                       var value: Float = 0.0f) : Constant() {
 
     override val type: Type
         get() = Type.FLOAT
@@ -50,22 +51,21 @@ data class FloatConstant internal constructor(var value: Float = 0.0f) : Constan
         visitor.visitFloatConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitFloatConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitFloatConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): FloatConstant {
-            return FloatConstant()
+        fun create(owner: ConstantPool): FloatConstant {
+            return FloatConstant(owner)
         }
 
         @JvmStatic
-        fun create(value: Float): FloatConstant {
-            return FloatConstant(value)
+        fun create(owner: ConstantPool, value: Float): FloatConstant {
+            return FloatConstant(owner, value)
         }
     }
 }

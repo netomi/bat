@@ -25,18 +25,18 @@ import java.io.DataOutput
 /**
  * A constant representing a CONSTANT_String_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.3">CONSTANT_String_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class StringConstant internal constructor(var stringIndex: Int = -1): Constant() {
+data class StringConstant internal constructor(override val owner:       ConstantPool,
+                                                        var stringIndex: Int = -1): Constant() {
 
     override val type: Type
         get() = Type.STRING
 
-    fun getString(constantPool: ConstantPool): String {
-        return constantPool.getString(stringIndex)
-    }
+    val value: String
+        get() = owner.getString(stringIndex)
 
     override fun readConstantInfo(input: DataInput) {
         stringIndex = input.readUnsignedShort()
@@ -51,22 +51,21 @@ data class StringConstant internal constructor(var stringIndex: Int = -1): Const
         visitor.visitStringConstant(classFile, this);
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitStringConstant(classFile, constantPool, index, this);
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitStringConstant(classFile, index, this);
     }
 
     companion object {
         @JvmStatic
-        fun create(): StringConstant {
-            return StringConstant()
+        fun create(owner: ConstantPool): StringConstant {
+            return StringConstant(owner)
         }
 
         @JvmStatic
-        fun create(stringIndex: Int): StringConstant {
-            return StringConstant(stringIndex)
+        fun create(owner: ConstantPool, stringIndex: Int): StringConstant {
+            return StringConstant(owner, stringIndex)
         }
     }
 }

@@ -29,7 +29,8 @@ import java.io.DataOutput
  *
  * @author Thomas Neidhart
  */
-data class Utf8Constant internal constructor(var value: String = ""): Constant() {
+data class Utf8Constant internal constructor(override val owner: ConstantPool,
+                                                      var value: String = ""): Constant() {
 
     override val type: Type
         get() = Type.UTF8
@@ -47,22 +48,21 @@ data class Utf8Constant internal constructor(var value: String = ""): Constant()
         visitor.visitUtf8Constant(classFile, this);
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitUtf8Constant(classFile, constantPool, index, this);
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitUtf8Constant(classFile, index, this);
     }
 
     companion object {
         @JvmStatic
-        fun create() : Utf8Constant {
-            return Utf8Constant()
+        fun create(owner: ConstantPool) : Utf8Constant {
+            return Utf8Constant(owner)
         }
 
         @JvmStatic
-        fun create(value: String) : Utf8Constant {
-            return Utf8Constant(value)
+        fun create(owner: ConstantPool, value: String) : Utf8Constant {
+            return Utf8Constant(owner, value)
         }
     }
 }

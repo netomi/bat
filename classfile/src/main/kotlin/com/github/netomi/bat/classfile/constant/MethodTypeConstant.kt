@@ -26,18 +26,19 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_MethodType_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.9">CONSTANT_MethodType_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class MethodTypeConstant internal constructor(var descriptorIndex: Int = -1) : Constant() {
+data class MethodTypeConstant internal constructor(
+    override val owner:           ConstantPool,
+             var descriptorIndex: Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.METHOD_TYPE
 
-    fun getDescriptor(constantPool: ConstantPool): String {
-        return constantPool.getString(descriptorIndex)
-    }
+    val descriptor: String
+        get() = owner.getString(descriptorIndex)
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -54,22 +55,21 @@ data class MethodTypeConstant internal constructor(var descriptorIndex: Int = -1
         visitor.visitMethodTypeConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitMethodTypeConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitMethodTypeConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): MethodTypeConstant {
-            return MethodTypeConstant()
+        fun create(owner: ConstantPool): MethodTypeConstant {
+            return MethodTypeConstant(owner)
         }
 
         @JvmStatic
-        fun create(descriptorIndex: Int): MethodTypeConstant {
-            return MethodTypeConstant(descriptorIndex)
+        fun create(owner: ConstantPool, descriptorIndex: Int): MethodTypeConstant {
+            return MethodTypeConstant(owner, descriptorIndex)
         }
     }
 }

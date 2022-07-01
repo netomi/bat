@@ -26,15 +26,20 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_Dynamic_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.10">CONSTANT_Dynamic_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class DynamicConstant internal constructor(var bootstrapMethodAttrIndex: Int = -1,
-                                                var nameAndTypeIndex:         Int = -1) : Constant() {
+data class DynamicConstant internal constructor(
+    override val owner:                    ConstantPool,
+             var bootstrapMethodAttrIndex: Int = -1,
+             var nameAndTypeIndex:         Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.DYNAMIC
+
+    val nameAndType: NameAndTypeConstant
+        get() = owner.getNameAndType(nameAndTypeIndex)
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -53,22 +58,21 @@ data class DynamicConstant internal constructor(var bootstrapMethodAttrIndex: In
         visitor.visitDynamicConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitDynamicConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitDynamicConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): DynamicConstant {
-            return DynamicConstant()
+        fun create(owner: ConstantPool): DynamicConstant {
+            return DynamicConstant(owner)
         }
 
         @JvmStatic
-        fun create(bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): DynamicConstant {
-            return DynamicConstant(bootstrapMethodAttrIndex, nameAndTypeIndex)
+        fun create(owner: ConstantPool, bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): DynamicConstant {
+            return DynamicConstant(owner, bootstrapMethodAttrIndex, nameAndTypeIndex)
         }
     }
 }

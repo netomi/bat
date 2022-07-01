@@ -26,12 +26,14 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_MethodHandle_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.8">CONSTANT_MethodHandle_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class MethodHandleConstant internal constructor(var referenceKind:  Int =  0,
-                                                     var referenceIndex: Int = -1) : Constant() {
+data class MethodHandleConstant internal constructor(
+    override val owner:          ConstantPool,
+             var referenceKind:  Int =  0,
+             var referenceIndex: Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.METHOD_HANDLE
@@ -53,22 +55,21 @@ data class MethodHandleConstant internal constructor(var referenceKind:  Int =  
         visitor.visitMethodHandleConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitMethodHandleConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitMethodHandleConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): MethodHandleConstant {
-            return MethodHandleConstant()
+        fun create(owner: ConstantPool): MethodHandleConstant {
+            return MethodHandleConstant(owner)
         }
 
         @JvmStatic
-        fun create(referenceKind: Int, referenceIndex: Int): MethodHandleConstant {
-            return MethodHandleConstant(referenceKind, referenceIndex)
+        fun create(owner: ConstantPool, referenceKind: Int, referenceIndex: Int): MethodHandleConstant {
+            return MethodHandleConstant(owner, referenceKind, referenceIndex)
         }
     }
 }

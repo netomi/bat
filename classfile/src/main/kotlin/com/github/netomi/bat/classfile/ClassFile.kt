@@ -34,9 +34,9 @@ class ClassFile internal constructor() {
         private set
     var accessFlags: AccessFlags = AccessFlags(0, AccessFlagTarget.CLASS)
         private set
-    var thisClassIndex = 0
+    var thisClassIndex = -1
         private set
-    var superClassIndex = 0
+    var superClassIndex = -1
         private set
     val constantPool: ConstantPool = ConstantPool()
     private val interfaces = mutableListOf<Int>()

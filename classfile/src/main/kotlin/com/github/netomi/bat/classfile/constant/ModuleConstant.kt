@@ -26,14 +26,18 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_Module_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.11">CONSTANT_Module_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class ModuleConstant internal constructor(var nameIndex: Int = -1): Constant() {
+data class ModuleConstant internal constructor(override val owner:     ConstantPool,
+                                                        var nameIndex: Int = -1): Constant() {
 
     override val type: Type
         get() = Type.MODULE
+
+    val moduleName: String
+        get() = owner.getString(nameIndex)
 
     fun getName(constantPool: ConstantPool): String {
         return constantPool.getString(nameIndex)
@@ -54,22 +58,21 @@ data class ModuleConstant internal constructor(var nameIndex: Int = -1): Constan
         visitor.visitModuleConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitModuleConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitModuleConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): ModuleConstant {
-            return ModuleConstant()
+        fun create(owner: ConstantPool): ModuleConstant {
+            return ModuleConstant(owner)
         }
 
         @JvmStatic
-        fun create(nameIndex: Int): ModuleConstant {
-            return ModuleConstant(nameIndex)
+        fun create(owner: ConstantPool, nameIndex: Int): ModuleConstant {
+            return ModuleConstant(owner, nameIndex)
         }
     }
 }

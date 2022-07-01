@@ -26,11 +26,12 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_Long_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.5">CONSTANT_Long_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class LongConstant internal constructor(var value: Long = 0) : Constant() {
+data class LongConstant internal constructor(override val owner: ConstantPool,
+                                                      var value: Long = 0) : Constant() {
 
     override val type: Type
         get() = Type.LONG
@@ -55,20 +56,19 @@ data class LongConstant internal constructor(var value: Long = 0) : Constant() {
         visitor.visitLongConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitLongConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitLongConstant(classFile, index, this)
     }
 
     companion object {
-        fun create() : LongConstant {
-            return LongConstant()
+        fun create(owner: ConstantPool) : LongConstant {
+            return LongConstant(owner)
         }
 
-        fun create(value: Long) : LongConstant {
-            return LongConstant(value)
+        fun create(owner: ConstantPool, value: Long) : LongConstant {
+            return LongConstant(owner, value)
         }
     }
 }

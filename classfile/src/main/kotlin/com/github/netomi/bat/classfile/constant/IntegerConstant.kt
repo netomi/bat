@@ -26,11 +26,12 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_Integer_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.4">CONSTANT_Integer_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class IntegerConstant internal constructor(var value: Int = 0) : Constant() {
+data class IntegerConstant internal constructor(override val owner: ConstantPool,
+                                                         var value: Int = 0) : Constant() {
 
     override val type: Type
         get() = Type.INTEGER
@@ -50,22 +51,21 @@ data class IntegerConstant internal constructor(var value: Int = 0) : Constant()
         visitor.visitIntegerConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitIntegerConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitIntegerConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): IntegerConstant {
-            return IntegerConstant()
+        fun create(owner: ConstantPool): IntegerConstant {
+            return IntegerConstant(owner)
         }
 
         @JvmStatic
-        fun create(value: Int): IntegerConstant {
-            return IntegerConstant(value)
+        fun create(owner: ConstantPool, value: Int): IntegerConstant {
+            return IntegerConstant(owner, value)
         }
     }
 }

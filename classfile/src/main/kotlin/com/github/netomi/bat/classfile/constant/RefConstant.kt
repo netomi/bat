@@ -26,19 +26,21 @@ import java.io.IOException
  *
  * @author Thomas Neidhart
  */
-abstract class RefConstant(open var classIndex: Int = -1, open var nameAndTypeIndex: Int = -1): Constant() {
+abstract class RefConstant(override val owner:            ConstantPool,
+                               open var classIndex:       Int = -1,
+                               open var nameAndTypeIndex: Int = -1): Constant() {
 
-    fun getClassName(constantPool: ConstantPool): String {
-        return constantPool.getClassName(classIndex)
-    }
+    val className: String
+        get() = owner.getClassName(classIndex)
 
-    fun getMemberName(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(nameAndTypeIndex).getMemberName(constantPool)
-    }
+    val nameAndType: NameAndTypeConstant
+        get() = owner.getNameAndType(nameAndTypeIndex)
 
-    fun getDescriptor(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(nameAndTypeIndex).getDescriptor(constantPool)
-    }
+    val memberName: String
+        get() = nameAndType.memberName
+
+    val descriptor: String
+        get() = nameAndType.descriptor
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {

@@ -84,7 +84,7 @@ class ClassFilePrinter :
         printer.flush()
     }
 
-    override fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {
+    override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
         printer.print(String.format("%4s = ", "#$index"))
         constant.accept(classFile, this)
         printer.println()
@@ -122,10 +122,10 @@ class ClassFilePrinter :
     }
 
     override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
-        val cp = classFile.constantPool
-        val className = cp.getClassName(refConstant.classIndex)
-        val memberName = cp.getNameAndType(refConstant.nameAndTypeIndex).getMemberName(cp)
-        val descriptor = cp.getNameAndType(refConstant.nameAndTypeIndex).getDescriptor(cp)
+        val className  = refConstant.className
+        val memberName = refConstant.memberName
+        val descriptor = refConstant.descriptor
+
         val str = "$className.$memberName:$descriptor"
         var type = "Unknown"
         when (refConstant.type) {
@@ -162,7 +162,7 @@ class ClassFilePrinter :
     }
 
     override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
-        val str = constant.getName(classFile.constantPool)
+        val str = constant.packageName
         printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, str))
     }
 

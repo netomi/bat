@@ -23,12 +23,14 @@ import com.github.netomi.bat.classfile.visitor.ConstantVisitor
 /**
  * A constant representing a CONSTANT_InterfaceMethodref_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.2">CONSTANT_InterfaceMethodref_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class InterfaceMethodrefConstant internal constructor(override var classIndex:       Int = -1,
-                                                          override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
+data class InterfaceMethodrefConstant internal constructor(
+    override val owner:            ConstantPool,
+    override var classIndex:       Int = -1,
+    override var nameAndTypeIndex: Int = -1) : RefConstant(owner, classIndex, nameAndTypeIndex) {
 
     override val type: Type
         get() = Type.INTERFACE_METHOD_REF
@@ -38,22 +40,21 @@ data class InterfaceMethodrefConstant internal constructor(override var classInd
         visitor.visitInterfaceMethodRefConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitInterfaceMethodRefConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitInterfaceMethodRefConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): InterfaceMethodrefConstant {
-            return InterfaceMethodrefConstant()
+        fun create(owner: ConstantPool): InterfaceMethodrefConstant {
+            return InterfaceMethodrefConstant(owner)
         }
 
         @JvmStatic
-        fun create(classIndex: Int, nameAndTypeIndex: Int): InterfaceMethodrefConstant {
-            return InterfaceMethodrefConstant(classIndex, nameAndTypeIndex)
+        fun create(owner: ConstantPool, classIndex: Int, nameAndTypeIndex: Int): InterfaceMethodrefConstant {
+            return InterfaceMethodrefConstant(owner, classIndex, nameAndTypeIndex)
         }
     }
 }

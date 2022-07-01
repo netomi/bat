@@ -34,11 +34,11 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
     }
 
     fun getMethodName(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(methodIndex).getMemberName(constantPool);
+        return constantPool.getNameAndType(methodIndex).memberName;
     }
 
     fun getMethodType(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(methodIndex).getDescriptor(constantPool)
+        return constantPool.getNameAndType(methodIndex).descriptor
     }
 
     @Throws(IOException::class)

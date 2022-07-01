@@ -23,12 +23,14 @@ import com.github.netomi.bat.classfile.visitor.ConstantVisitor
 /**
  * A constant representing a CONSTANT_Methodref_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.2">CONSTANT_MethodRef_info Structure</a>
  *
  * @author Thomas Neidhart
  */
-data class MethodrefConstant internal constructor(override var classIndex:       Int = -1,
-                                                  override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
+data class MethodrefConstant internal constructor(
+    override val owner:            ConstantPool,
+    override var classIndex:       Int = -1,
+    override var nameAndTypeIndex: Int = -1) : RefConstant(owner, classIndex, nameAndTypeIndex) {
 
     override val type: Type
         get() = Type.METHOD_REF
@@ -38,22 +40,21 @@ data class MethodrefConstant internal constructor(override var classIndex:      
         visitor.visitMethodRefConstant(classFile, this)
     }
 
-    override fun accept(classFile:    ClassFile,
-                        constantPool: ConstantPool,
-                        index:        Int,
-                        visitor:      ConstantPoolVisitor) {
-        visitor.visitMethodRefConstant(classFile, constantPool, index, this)
+    override fun accept(classFile: ClassFile,
+                        index:     Int,
+                        visitor:   ConstantPoolVisitor) {
+        visitor.visitMethodRefConstant(classFile, index, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(): MethodrefConstant {
-            return MethodrefConstant()
+        fun create(owner: ConstantPool): MethodrefConstant {
+            return MethodrefConstant(owner)
         }
 
         @JvmStatic
-        fun create(classIndex: Int, nameAndTypeIndex: Int): MethodrefConstant {
-            return MethodrefConstant(classIndex, nameAndTypeIndex)
+        fun create(owner: ConstantPool, classIndex: Int, nameAndTypeIndex: Int): MethodrefConstant {
+            return MethodrefConstant(owner, classIndex, nameAndTypeIndex)
         }
     }
 }

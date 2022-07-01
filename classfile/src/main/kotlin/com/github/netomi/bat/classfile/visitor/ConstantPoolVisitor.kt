@@ -24,77 +24,77 @@ interface ConstantPoolVisitor {
 
     fun visitConstantPoolEnd(classFile: ClassFile, constantPool: ConstantPool) {}
 
-    fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {}
+    fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {}
 
-    fun visitAnyRefConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: RefConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitAnyRefConstant(classFile: ClassFile, index: Int, constant: RefConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitIntegerConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: IntegerConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitLongConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: LongConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitLongConstant(classFile: ClassFile, index: Int, constant: LongConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitFloatConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: FloatConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitFloatConstant(classFile: ClassFile, index: Int, constant: FloatConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitDoubleConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: DoubleConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitDoubleConstant(classFile: ClassFile, index: Int, constant: DoubleConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitClassConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: ClassConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitClassConstant(classFile: ClassFile, index: Int, constant: ClassConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitFieldRefConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: FieldrefConstant) {
-        visitAnyRefConstant(classFile, constantPool, index, constant)
+    fun visitFieldRefConstant(classFile: ClassFile, index: Int, constant: FieldrefConstant) {
+        visitAnyRefConstant(classFile, index, constant)
     }
 
-    fun visitMethodRefConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: MethodrefConstant) {
-        visitAnyRefConstant(classFile, constantPool, index, constant)
+    fun visitMethodRefConstant(classFile: ClassFile, index: Int, constant: MethodrefConstant) {
+        visitAnyRefConstant(classFile, index, constant)
     }
 
-    fun visitInterfaceMethodRefConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: InterfaceMethodrefConstant) {
-        visitAnyRefConstant(classFile, constantPool, index, constant)
+    fun visitInterfaceMethodRefConstant(classFile: ClassFile, index: Int, constant: InterfaceMethodrefConstant) {
+        visitAnyRefConstant(classFile, index, constant)
     }
 
-    fun visitUtf8Constant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Utf8Constant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitStringConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: StringConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitStringConstant(classFile: ClassFile, index: Int, constant: StringConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitNameAndTypeConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: NameAndTypeConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitNameAndTypeConstant(classFile: ClassFile, index: Int, constant: NameAndTypeConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitMethodTypeConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: MethodTypeConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitMethodTypeConstant(classFile: ClassFile, index: Int, constant: MethodTypeConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitMethodHandleConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: MethodHandleConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitDynamicConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: DynamicConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitDynamicConstant(classFile: ClassFile, index: Int, constant: DynamicConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitInvokeDynamicConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: InvokeDynamicConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitInvokeDynamicConstant(classFile: ClassFile, index: Int, constant: InvokeDynamicConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitModuleConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: ModuleConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitModuleConstant(classFile: ClassFile, index: Int, constant: ModuleConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 
-    fun visitPackageConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: PackageConstant) {
-        visitAnyConstant(classFile, constantPool, index, constant)
+    fun visitPackageConstant(classFile: ClassFile, index: Int, constant: PackageConstant) {
+        visitAnyConstant(classFile, index, constant)
     }
 }
