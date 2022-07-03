@@ -452,9 +452,9 @@ Class #6            -
 000a26: 6700 1c00                              |0013: sput v0, Lcom/google/android/test/Test;.sI:I // field@001c
 000a2a: 1800 ffff cdab 7956 3412               |0015: const-wide v0, #double 5.62635e-221 // #12345679abcdffff
 000a34: 6800 1d00                              |001a: sput-wide v0, Lcom/google/android/test/Test;.sL:J // field@001d
-000a38: 1400 00e4 4046                         |001c: const v0, #float 12345 // #4640e400
+000a38: 1400 00e4 4046                         |001c: const v0, #float 12345.0 // #4640e400
 000a3e: 6700 1b00                              |001f: sput v0, Lcom/google/android/test/Test;.sF:F // field@001b
-000a42: 1800 0000 0000 801c c840               |0021: const-wide v0, #double 12345 // #40c81c8000000000
+000a42: 1800 0000 0000 801c c840               |0021: const-wide v0, #double 12345.0 // #40c81c8000000000
 000a4c: 6800 1a00                              |0026: sput-wide v0, Lcom/google/android/test/Test;.sD:D // field@001a
 000a50: 1200                                   |0028: const/4 v0, #int 0 // #0
 000a52: 6900 1e00                              |0029: sput-object v0, Lcom/google/android/test/Test;.sO:Ljava/lang/Object; // field@001e
@@ -505,9 +505,9 @@ Class #6            -
 000ad8: 5981 1100                              |001a: iput v1, v8, Lcom/google/android/test/Test;.mI:I // field@0011
 000adc: 1802 ffff cdab 7956 3412               |001c: const-wide v2, #double 5.62635e-221 // #12345679abcdffff
 000ae6: 5a82 1200                              |0021: iput-wide v2, v8, Lcom/google/android/test/Test;.mL:J // field@0012
-000aea: 1401 00e4 4046                         |0023: const v1, #float 12345 // #4640e400
+000aea: 1401 00e4 4046                         |0023: const v1, #float 12345.0 // #4640e400
 000af0: 5981 1000                              |0026: iput v1, v8, Lcom/google/android/test/Test;.mF:F // field@0010
-000af4: 1802 0000 0000 801c c840               |0028: const-wide v2, #double 12345 // #40c81c8000000000
+000af4: 1802 0000 0000 801c c840               |0028: const-wide v2, #double 12345.0 // #40c81c8000000000
 000afe: 5a82 0f00                              |002d: iput-wide v2, v8, Lcom/google/android/test/Test;.mD:D // field@000f
 000b02: 1201                                   |002f: const/4 v1, #int 0 // #0
 000b04: 5b81 1300                              |0030: iput-object v1, v8, Lcom/google/android/test/Test;.mO:Ljava/lang/Object; // field@0013
@@ -677,7 +677,7 @@ Class #6            -
 000d26: bb20                                   |0041: add-long/2addr v0, v2
 000d28: 5ab0 1200                              |0042: iput-wide v0, v11, Lcom/google/android/test/Test;.mL:J // field@0012
 000d2c: 52b0 1000                              |0044: iget v0, v11, Lcom/google/android/test/Test;.mF:F // field@0010
-000d30: 1401 00e4 4046                         |0046: const v1, #float 12345 // #4640e400
+000d30: 1401 00e4 4046                         |0046: const v1, #float 12345.0 // #4640e400
 000d36: 52b2 1000                              |0049: iget v2, v11, Lcom/google/android/test/Test;.mF:F // field@0010
 000d3a: 1503 803f                              |004b: const/high16 v3, #int 1065353216 // #3f80
 000d3e: c732                                   |004d: sub-float/2addr v2, v3
@@ -690,7 +690,7 @@ Class #6            -
 000d50: c610                                   |0056: add-float/2addr v0, v1
 000d52: 59b0 1000                              |0057: iput v0, v11, Lcom/google/android/test/Test;.mF:F // field@0010
 000d56: 53b0 0f00                              |0059: iget-wide v0, v11, Lcom/google/android/test/Test;.mD:D // field@000f
-000d5a: 1802 0000 0000 801c c840               |005b: const-wide v2, #double 12345 // #40c81c8000000000
+000d5a: 1802 0000 0000 801c c840               |005b: const-wide v2, #double 12345.0 // #40c81c8000000000
 000d64: 53b4 0f00                              |0060: iget-wide v4, v11, Lcom/google/android/test/Test;.mD:D // field@000f
 000d68: 1906 f03f                              |0062: const-wide/high16 v6, #long 4607182418800017408 // #3ff0
 000d6c: cc64                                   |0064: sub-double/2addr v4, v6
@@ -707,7 +707,7 @@ Class #6            -
 000d8a: 2d00 0001                              |0073: cmpl-float v0, v0, v1
 000d8e: 3800 2900                              |0075: if-eqz v0, 009e // +0029
 000d92: 52b0 1000                              |0077: iget v0, v11, Lcom/google/android/test/Test;.mF:F // field@0010
-000d96: 1401 9a99 993e                         |0079: const v1, #float 0.3 // #3e99999a
+000d96: 1401 9a99 993e                         |0079: const v1, #float 0.300000 // #3e99999a
 000d9c: 2d00 0001                              |007c: cmpl-float v0, v0, v1
 000da0: 3900 2000                              |007e: if-nez v0, 009e // +0020
 000da4: 52b0 1000                              |0080: iget v0, v11, Lcom/google/android/test/Test;.mF:F // field@0010
@@ -733,7 +733,7 @@ Class #6            -
 000df2: 2f00 0002                              |00a7: cmpl-double v0, v0, v2
 000df6: 3800 2b00                              |00a9: if-eqz v0, 00d4 // +002b
 000dfa: 53b0 0f00                              |00ab: iget-wide v0, v11, Lcom/google/android/test/Test;.mD:D // field@000f
-000dfe: 1802 3333 3333 3333 d33f               |00ad: const-wide v2, #double 0.3 // #3fd3333333333333
+000dfe: 1802 3333 3333 3333 d33f               |00ad: const-wide v2, #double 0.300000 // #3fd3333333333333
 000e08: 2f00 0002                              |00b2: cmpl-double v0, v0, v2
 000e0c: 3900 2000                              |00b4: if-nez v0, 00d4 // +0020
 000e10: 53b0 0f00                              |00b6: iget-wide v0, v11, Lcom/google/android/test/Test;.mD:D // field@000f
@@ -841,7 +841,7 @@ Class #6            -
 000f18: bb20                                   |003c: add-long/2addr v0, v2
 000f1a: 6800 1d00                              |003d: sput-wide v0, Lcom/google/android/test/Test;.sL:J // field@001d
 000f1e: 6000 1b00                              |003f: sget v0, Lcom/google/android/test/Test;.sF:F // field@001b
-000f22: 1401 00e4 4046                         |0041: const v1, #float 12345 // #4640e400
+000f22: 1401 00e4 4046                         |0041: const v1, #float 12345.0 // #4640e400
 000f28: 6002 1b00                              |0044: sget v2, Lcom/google/android/test/Test;.sF:F // field@001b
 000f2c: 7f22                                   |0046: neg-float v2, v2
 000f2e: 1503 803f                              |0047: const/high16 v3, #int 1065353216 // #3f80
@@ -856,7 +856,7 @@ Class #6            -
 000f48: c610                                   |0054: add-float/2addr v0, v1
 000f4a: 6700 1b00                              |0055: sput v0, Lcom/google/android/test/Test;.sF:F // field@001b
 000f4e: 6100 1a00                              |0057: sget-wide v0, Lcom/google/android/test/Test;.sD:D // field@001a
-000f52: 1802 0000 0000 801c c840               |0059: const-wide v2, #double 12345 // #40c81c8000000000
+000f52: 1802 0000 0000 801c c840               |0059: const-wide v2, #double 12345.0 // #40c81c8000000000
 000f5c: 6104 1a00                              |005e: sget-wide v4, Lcom/google/android/test/Test;.sD:D // field@001a
 000f60: 8044                                   |0060: neg-double v4, v4
 000f62: 1906 f03f                              |0061: const-wide/high16 v6, #long 4607182418800017408 // #3ff0

@@ -2042,7 +2042,7 @@ goto options to rotate board" // string@00c2
 002bd0: 5433 3b00                              |004c: iget-object v3, v3, Lcom/google/android/checkers/a;.b:[I // field@003b
 002bd4: 4403 0309                              |004e: aget v3, v3, v9
 002bd8: 5983 2a00                              |0050: iput v3, v8, Lcom/google/android/checkers/CheckersView;.x:I // field@002a
-002bdc: 1403 6666 663f                         |0052: const v3, #float 0.9 // #3f666666
+002bdc: 1403 6666 663f                         |0052: const v3, #float 0.900000 // #3f666666
 002be2: 5983 1e00                              |0055: iput v3, v8, Lcom/google/android/checkers/CheckersView;.l:F // field@001e
 002be6: 3800 4500                              |0057: if-eqz v0, 009c // +0045
 002bea: 5483 2200                              |0059: iget-object v3, v8, Lcom/google/android/checkers/CheckersView;.p:Lcom/google/android/checkers/a; // field@0022
@@ -2941,7 +2941,7 @@ goto options to rotate board" // string@00c2
 0036f2: 0800 1c00                              |0197: move-object/from16 v0, v28
 0036f6: 5202 1e00                              |0199: iget v2, v0, Lcom/google/android/checkers/CheckersView;.l:F // field@001e
 0036fa: 8922                                   |019b: float-to-double v2, v2
-0036fc: 1804 9a99 9999 9999 a93f               |019c: const-wide v4, #double 0.05 // #3fa999999999999a
+0036fc: 1804 9a99 9999 9999 a93f               |019c: const-wide v4, #double 0.0500000 // #3fa999999999999a
 003706: cc42                                   |01a1: sub-double/2addr v2, v4
 003708: 8c22                                   |01a2: double-to-float v2, v2
 00370a: 0800 1c00                              |01a3: move-object/from16 v0, v28
@@ -4514,7 +4514,7 @@ Class #2            -
 004c66: 5405 5300                              |006f: iget-object v5, v0, Lcom/google/android/checkers/a;.z:[S // field@0053
 004c6a: 4a04 0504                              |0071: aget-short v4, v5, v4
 004c6e: 2c03 8104 0000                         |0073: sparse-switch v3, 000004f4 // +00000481
-004c74: 1403 3f42 0f00                         |0076: const v3, #float 1.4013e-39 // #000f423f
+004c74: 1403 3f42 0f00                         |0076: const v3, #float 1.40130e-39 // #000f423f
 004c7a: 3334 a1ff                              |0079: if-ne v4, v3, 001a // -005f
 004c7e: 0800 1800                              |007b: move-object/from16 v0, v24
 004c82: 0201 1b00                              |007d: move/from16 v1, v27
@@ -4895,7 +4895,7 @@ Class #2            -
 0051da: 28c4                                   |0329: goto 02ed // -003c
 0051dc: 0200 1900                              |032a: move/from16 v0, v25
 0051e0: 3704 4afd                              |032c: if-le v4, v0, 0076 // -02b6
-0051e4: 1404 3f42 0f00                         |032e: const v4, #float 1.4013e-39 // #000f423f
+0051e4: 1404 3f42 0f00                         |032e: const v4, #float 1.40130e-39 // #000f423f
 0051ea: 2900 45fd                              |0331: goto/16 0076 // -02bb
 0051ee: 0200 1a00                              |0333: move/from16 v0, v26
 0051f2: 3404 f9ff                              |0335: if-lt v4, v0, 032e // -0007

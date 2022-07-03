@@ -162,7 +162,7 @@ Class #1            -
 000456: 1a02 0000                              |0011: const-string v2, " => " // string@0000
 00045a: 6e20 0e00 2100                         |0013: invoke-virtual {v1, v2}, Ljava/lang/StringBuilder;.append:(Ljava/lang/String;)Ljava/lang/StringBuilder; // method@000e
 000460: 0c01                                   |0016: move-result-object v1
-000462: 1402 0030 4046                         |0017: const v2, #float 12300 // #46403000
+000462: 1402 0030 4046                         |0017: const v2, #float 12300.0 // #46403000
 000468: 7110 0900 0200                         |001a: invoke-static {v2}, Ljava/lang/Float;.valueOf:(F)Ljava/lang/Float; // method@0009
 00046e: 0c02                                   |001d: move-result-object v2
 000470: fa20 1100 2300 0100                    |001e: invoke-polymorphic {v3, v2}, Ljava/lang/invoke/MethodHandle;.invoke:([Ljava/lang/Object;)Ljava/lang/Object;, (Ljava/lang/Object;)Ljava/lang/Class; // method@0011, proto@0001

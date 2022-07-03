@@ -32,7 +32,7 @@ implements   DexFileVisitor,
              MethodHandleVisitor,
              CallSiteIDVisitor
 {
-    private final BufferedPrinter     printer;
+    private final Mutf8Printer        printer;
     private final boolean             printFileSummary;
     private final boolean             printHeaders;
     private final boolean             printAnnotations;
@@ -55,7 +55,7 @@ implements   DexFileVisitor,
                           boolean      printFileSummary,
                           boolean      printHeaders,
                           boolean      printAnnotations) {
-        printer = new BufferedPrinter(outputStream);
+        printer = new Mutf8Printer(outputStream);
 
         this.printFileSummary = printFileSummary;
         this.printHeaders     = printHeaders;

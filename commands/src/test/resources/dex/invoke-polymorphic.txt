@@ -74,7 +74,7 @@ Class #0            -
       outs          : 0
       insns size    : 30 16-bit code units
 0001c4:                                        |[0001c4] Main.main:([Ljava/lang/String;)V
-0001d4: 1802 9a99 9999 9999 0140               |0000: const-wide v2, #double 2.2 // #400199999999999a
+0001d4: 1802 9a99 9999 9999 0140               |0000: const-wide v2, #double 2.20000 // #400199999999999a
 0001de: 1214                                   |0005: const/4 v4, #int 1 // #1
 0001e0: 1200                                   |0006: const/4 v0, #int 0 // #0
 0001e2: 1205                                   |0007: const/4 v5, #int 0 // #0

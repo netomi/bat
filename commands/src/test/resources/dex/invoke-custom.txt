@@ -3999,10 +3999,10 @@ Class #11           -
 00359a: 7120 7f00 7500                         |0039: invoke-static {v5, v7}, LTestLinkerMethodMultipleArgumentTypes;.assertEquals:(II)V // method@007f
 0035a0: 0205 1700                              |003c: move/from16 v5, v23
 0035a4: 7120 7f00 5200                         |003e: invoke-static {v2, v5}, LTestLinkerMethodMultipleArgumentTypes;.assertEquals:(II)V // method@007f
-0035aa: 1402 9a99 3141                         |0041: const v2, #float 11.1 // #4131999a
+0035aa: 1402 9a99 3141                         |0041: const v2, #float 11.1000 // #4131999a
 0035b0: 0208 1800                              |0044: move/from16 v8, v24
 0035b4: 7120 7e00 8200                         |0046: invoke-static {v2, v8}, LTestLinkerMethodMultipleArgumentTypes;.assertEquals:(FF)V // method@007e
-0035ba: 1809 9a99 9999 9999 0140               |0049: const-wide v9, #double 2.2 // #400199999999999a
+0035ba: 1809 9a99 9999 9999 0140               |0049: const-wide v9, #double 2.20000 // #400199999999999a
 0035c4: 050b 1900                              |004e: move-wide/from16 v11, v25
 0035c8: 7140 7d00 a9cb                         |0050: invoke-static {v9, v10, v11, v12}, LTestLinkerMethodMultipleArgumentTypes;.assertEquals:(DD)V // method@007d
 0035ce: 1a02 2c00                              |0053: const-string v2, "Hello" // string@002c
@@ -4011,7 +4011,7 @@ Class #11           -
 0035dc: 1c02 1000                              |005a: const-class v2, LTestLinkerMethodMultipleArgumentTypes; // type@0010
 0035e0: 080a 1c00                              |005c: move-object/from16 v10, v28
 0035e4: 7120 8100 a200                         |005e: invoke-static {v2, v10}, LTestLinkerMethodMultipleArgumentTypes;.assertEquals:(Ljava/lang/Object;Ljava/lang/Object;)V // method@0081
-0035ea: 170d 15cd 5b07                         |0061: const-wide/32 v13, #float 1.6536e-34 // #075bcd15
+0035ea: 170d 15cd 5b07                         |0061: const-wide/32 v13, #float 1.65360e-34 // #075bcd15
 0035f0: 0502 1d00                              |0064: move-wide/from16 v2, v29
 0035f4: 7140 8000 ed32                         |0066: invoke-static {v13, v14, v2, v3}, LTestLinkerMethodMultipleArgumentTypes;.assertEquals:(JJ)V // method@0080
 0035fa: 1c0d 1000                              |0069: const-class v13, LTestLinkerMethodMultipleArgumentTypes; // type@0010
@@ -5605,8 +5605,8 @@ Call site #28: // offset 29927
   link_argument[5] : 97 (int)
   link_argument[6] : 1024 (int)
   link_argument[7] : 1 (int)
-  link_argument[8] : 11.1 (float)
-  link_argument[9] : 2.2 (double)
+  link_argument[8] : 11.1000 (float)
+  link_argument[9] : 2.20000 (double)
   link_argument[10] : Hello (String)
   link_argument[11] : LTestLinkerMethodMultipleArgumentTypes; (Class)
   link_argument[12] : 123456789 (long)
@@ -5677,7 +5677,7 @@ Call site #39: // offset 30112
   link_argument[2] : ()V (MethodType)
   link_argument[3] : Ljava/lang/Throwable; (Class)
   link_argument[4] : 3.40282e+38 (float)
-  link_argument[5] : 1.4013e-45 (float)
+  link_argument[5] : 1.40130e-45 (float)
   link_argument[6] : 3.14159 (float)
   link_argument[7] : -3.14159 (float)
 Call site #40: // offset 30142
@@ -5685,7 +5685,7 @@ Call site #40: // offset 30142
   link_argument[1] : methodJ (String)
   link_argument[2] : ()V (MethodType)
   link_argument[3] : 1.79769e+308 (double)
-  link_argument[4] : 4.9e-324 (double)
+  link_argument[4] : 4.90000e-324 (double)
   link_argument[5] : 2.71828 (double)
   link_argument[6] : -3.14159 (double)
 Call site #41: // offset 30186

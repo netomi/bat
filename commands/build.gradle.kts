@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":dexfile"))
 
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiterVersion}")
 }
 
 /*jar {

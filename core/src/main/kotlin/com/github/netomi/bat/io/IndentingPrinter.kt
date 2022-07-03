@@ -18,7 +18,7 @@ package com.github.netomi.bat.io
 import java.io.IOException
 import java.io.Writer
 
-class IndentingPrinter(private val delegateWriter: Writer, private val spacesPerLevel: Int = 4) : AutoCloseable {
+open class IndentingPrinter(protected val delegateWriter: Writer, private val spacesPerLevel: Int = 4) : AutoCloseable {
     private var level = 0
     private var indentedLine = false
 
