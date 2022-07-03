@@ -26,7 +26,7 @@ import java.io.IOException
 /**
  * A constant representing a CONSTANT_Double_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.5">CONSTANT_Double_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.5">CONSTANT_Double_info Structure</a>
  *
  * @author Thomas Neidhart
  */

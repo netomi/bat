@@ -21,6 +21,13 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
+/**
+ * A class representing a Signature attribute in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.9">Signature Attribute</a>
+ *
+ * @author Thomas Neidhart
+ */
 data class SignatureAttribute internal constructor(override var attributeNameIndex: Int,
                                                             var signatureIndex:     Int = -1) : Attribute(attributeNameIndex) {
 
@@ -28,7 +35,7 @@ data class SignatureAttribute internal constructor(override var attributeNameInd
         get() = Type.SIGNATURE
 
     fun signature(classFile: ClassFile): String {
-        return classFile.constantPool.getString(signatureIndex)
+        return classFile.cp.getString(signatureIndex)
     }
 
     @Throws(IOException::class)

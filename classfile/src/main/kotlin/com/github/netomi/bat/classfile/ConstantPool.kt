@@ -15,10 +15,7 @@
  */
 package com.github.netomi.bat.classfile
 
-import com.github.netomi.bat.classfile.constant.ClassConstant
-import com.github.netomi.bat.classfile.constant.Constant
-import com.github.netomi.bat.classfile.constant.NameAndTypeConstant
-import com.github.netomi.bat.classfile.constant.Utf8Constant
+import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.ConstantVisitor
 import java.io.DataInput
@@ -30,6 +27,10 @@ class ConstantPool {
 
     fun addConstant(constant: Constant) {
         constants.add(constant)
+    }
+
+    fun getInteger(constantIndex: Int): Int {
+        return (constants[constantIndex] as IntegerConstant).value
     }
 
     fun getString(constantIndex: Int): String {

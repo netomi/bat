@@ -13,52 +13,52 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.attribute
+package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
 /**
- * A class representing a SourceFile attribute in a class file.
+ * A class representing a RuntimeVisibleAnnotations attribute in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.10">SourceFile Attribute</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.16">RuntimeVisibleAnnotations Attribute</a>
  *
  * @author Thomas Neidhart
  */
-data class SourceFileAttribute internal constructor(override var attributeNameIndex: Int,
-                                                             var sourceFileIndex:    Int = -1) : Attribute(attributeNameIndex) {
+data class RuntimeVisibleAnnotationsAttribute internal constructor(
+    override var attributeNameIndex: Int,
+             var annotations: MutableList<Annotation> = mutableListOf()) : Attribute(attributeNameIndex) {
 
     override val type: Type
-        get() = Type.SOURCE_FILE
-
-    fun sourceFile(classFile: ClassFile): String {
-        return classFile.cp.getString(sourceFileIndex)
-    }
+        get() = Type.RUNTIME_VISIBLE_ANNOTATIONS
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
-        assert(length == 2)
-        sourceFileIndex = input.readUnsignedShort()
+
+        val annotationCount = input.readUnsignedShort()
+        for (i in 0 until annotationCount) {
+            annotations.add(Annotation.readAnnotation(input))
+        }
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(2)
-        output.writeShort(sourceFileIndex)
+        output.writeInt(0)
     }
 
     override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
-        visitor.visitSourceFileAttribute(classFile, this)
+        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, this)
     }
 
     companion object {
         @JvmStatic
-        fun create(attributeNameIndex: Int): SourceFileAttribute {
-            return SourceFileAttribute(attributeNameIndex)
+        fun create(attributeNameIndex: Int): RuntimeVisibleAnnotationsAttribute {
+            return RuntimeVisibleAnnotationsAttribute(attributeNameIndex)
         }
     }
 }

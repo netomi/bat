@@ -17,11 +17,18 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.ConstantPool
+import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
+/**
+ * Base class for attributes as contained in a class file.
+ *
+ * @author Thomas Neidhart
+ */
 abstract class Attribute protected constructor(open val attributeNameIndex: Int) {
 
     abstract val type: Type
@@ -75,8 +82,8 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
         LOCAL_VARIABLE_TABLE("LocalVariableTable", null),
         LOCAL_VARIABLE_TYPE_TABLE("LocalVariableTypeTable", null),
         DEPRECATED("Deprecated", DeprecatedAttribute.Companion::create),
-        RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations", null),
-        RUNTIME_INVISIBLE_ANNOTATIONS("RuntimeInvisibleAnnotations", null),
+        RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::create),
+        RUNTIME_INVISIBLE_ANNOTATIONS("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::create),
         RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS("RuntimeVisibleParameterAnnotations", null),
         RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", null),
         RUNTIME_VISIBLE_TYPE_ANNOTATIONS("RuntimeVisibleTypeAnnotations", null),

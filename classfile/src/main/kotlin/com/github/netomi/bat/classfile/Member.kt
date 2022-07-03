@@ -29,11 +29,11 @@ abstract class Member {
     abstract val accessFlagTarget: AccessFlagTarget
 
     fun name(classFile: ClassFile): String {
-        return classFile.constantPool.getString(nameIndex)
+        return classFile.cp.getString(nameIndex)
     }
 
     fun descriptor(classFile: ClassFile): String {
-        return classFile.constantPool.getString(descriptorIndex)
+        return classFile.cp.getString(descriptorIndex)
     }
 
     @Throws(IOException::class)

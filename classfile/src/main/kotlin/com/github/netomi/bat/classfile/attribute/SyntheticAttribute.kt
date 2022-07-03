@@ -21,6 +21,13 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
+/**
+ * A class representing a Synthetic attribute in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.8">Synthetic Attribute</a>
+ *
+ * @author Thomas Neidhart
+ */
 data class SyntheticAttribute internal constructor(override var attributeNameIndex: Int = -1) : Attribute(attributeNameIndex) {
 
     override val type: Type

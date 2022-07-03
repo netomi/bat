@@ -21,6 +21,13 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
+/**
+ * A class representing a Deprecated attribute in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.15">Deprecated Attribute</a>
+ *
+ * @author Thomas Neidhart
+ */
 data class DeprecatedAttribute internal constructor(override var attributeNameIndex: Int) : Attribute(attributeNameIndex) {
 
     override val type: Type

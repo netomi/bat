@@ -22,6 +22,43 @@ import java.io.DataInputStream
 import java.io.FileInputStream
 import java.io.IOException
 
+interface TypedVisitor<out T> {
+    fun visitAnyElement(): T? {
+        return null
+    }
+
+    fun visitElement(element: Element): T? {
+        return visitAnyElement()
+    }
+}
+
+typealias Visitor = TypedVisitor<Any>
+
+data class Element (val a: Int) {
+    fun <T> accept(visitor: TypedVisitor<T>): T? {
+        return visitor.visitElement(this)
+    }
+}
+
+class Test {
+   val elements: MutableList<Element> = mutableListOf()
+
+    fun acceptElements(visitor: Visitor) {
+        elements.forEach { it.accept(visitor) }
+    }
+
+    fun <T> collectElements(visitor: TypedVisitor<T>): Collection<T> {
+        val result = mutableListOf<T>()
+        elements.forEach {
+            when(val x = it.accept(visitor)) {
+                Unit, null -> Unit
+                else -> result.add(x)
+            }
+        }
+        return result
+    }
+}
+
 object Main {
     @Throws(IOException::class)
     @JvmStatic
@@ -29,5 +66,21 @@ object Main {
         val input: DataInput = DataInputStream(FileInputStream("Member.class"))
         val classFile = ClassFile.readClassFile(input)
         classFile.accept(ClassFilePrinter())
+
+//        val t = Test()
+//        t.elements.add(Element(1))
+//        t.elements.add(Element(2))
+//
+//        val visitor = object: Visitor {
+//            override fun visitElement(element: Element) {
+//                println("element ${element.a}")
+//                //return element
+//            }
+//        }
+//
+//        t.acceptElements(visitor)
+//
+//        val result = t.collectElements(visitor)
+//        println(result)
     }
 }

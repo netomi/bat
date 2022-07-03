@@ -21,6 +21,11 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
+/**
+ * A class representing an unknown attribute in a class file.
+ * 
+ * @author Thomas Neidhart
+ */
 data class UnknownAttribute internal constructor(override val attributeNameIndex: Int = -1,
                                                           var info:               ByteArray = ByteArray(0)) : Attribute(attributeNameIndex) {
 

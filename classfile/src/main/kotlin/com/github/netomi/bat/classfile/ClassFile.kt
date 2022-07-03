@@ -38,26 +38,28 @@ class ClassFile internal constructor() {
         private set
     var superClassIndex = -1
         private set
-    val constantPool: ConstantPool = ConstantPool()
+
+    val cp: ConstantPool   = ConstantPool()
+
     private val interfaces = mutableListOf<Int>()
     private val fields     = mutableListOf<Field>()
     private val methods    = mutableListOf<Method>()
     private val attributes = mutableListOf<Attribute>()
 
     val className: String
-        get() = constantPool.getClassName(thisClassIndex)
+        get() = cp.getClassName(thisClassIndex)
 
     val externalClassName: String
         get() = Classes.externalClassNameFromInternalName(className)
 
     val superClassName: String
-        get() = constantPool.getClassName(superClassIndex)
+        get() = cp.getClassName(superClassIndex)
 
     fun interfaces(): Collection<String> {
         return if (interfaces.isEmpty()) {
             emptyList()
         } else {
-            interfaces.map { constantPool.getClassName(it) }
+            interfaces.map { cp.getClassName(it) }
         }
     }
 
@@ -80,10 +82,11 @@ class ClassFile internal constructor() {
 
         minorVersion = input.readUnsignedShort()
         majorVersion = input.readUnsignedShort()
-        constantPool.read(input)
-        accessFlags = AccessFlags(input.readUnsignedShort(), AccessFlagTarget.CLASS)
-        thisClassIndex = input.readUnsignedShort()
+        cp.read(input)
+        accessFlags     = AccessFlags(input.readUnsignedShort(), AccessFlagTarget.CLASS)
+        thisClassIndex  = input.readUnsignedShort()
         superClassIndex = input.readUnsignedShort()
+
         val interfacesCount = input.readUnsignedShort()
         for (i in 0 until interfacesCount) {
             val idx = input.readUnsignedShort()
@@ -92,17 +95,17 @@ class ClassFile internal constructor() {
 
         val fieldCount = input.readUnsignedShort()
         for (i in 0 until fieldCount) {
-            fields.add(Field.readField(input, constantPool))
+            fields.add(Field.readField(input, cp))
         }
 
         val methodCount = input.readUnsignedShort()
         for (i in 0 until methodCount) {
-            methods.add(Method.readMethod(input, constantPool))
+            methods.add(Method.readMethod(input, cp))
         }
 
         val attributeCount = input.readUnsignedShort()
         for (i in 0 until attributeCount) {
-            attributes.add(Attribute.readAttribute(input, constantPool))
+            attributes.add(Attribute.readAttribute(input, cp))
         }
     }
 
@@ -111,7 +114,7 @@ class ClassFile internal constructor() {
     }
 
     fun constantPoolAccept(visitor: ConstantPoolVisitor) {
-        constantPool.accept(this, visitor)
+        cp.accept(this, visitor)
     }
 
     fun membersAccept(visitor: MemberVisitor) {

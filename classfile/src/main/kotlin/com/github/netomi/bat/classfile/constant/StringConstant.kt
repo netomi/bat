@@ -25,7 +25,7 @@ import java.io.DataOutput
 /**
  * A constant representing a CONSTANT_String_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.3">CONSTANT_String_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.3">CONSTANT_String_info Structure</a>
  *
  * @author Thomas Neidhart
  */

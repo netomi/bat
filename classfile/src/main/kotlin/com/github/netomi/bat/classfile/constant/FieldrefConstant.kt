@@ -24,7 +24,7 @@ import com.github.netomi.bat.classfile.visitor.ConstantVisitor
 /**
  * A constant representing a CONSTANT_Fieldref_info structure in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4.2">CONSTANT_Fieldref_info Structure</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2">CONSTANT_Fieldref_info Structure</a>
  *
  * @author Thomas Neidhart
  */
