@@ -26,14 +26,14 @@ import org.junit.jupiter.api.Test
 class DoubleConstantTest : ConstantBaseTest() {
 
     override fun createEmptyConstant(): DoubleConstant {
-        return DoubleConstant.create()
+        return DoubleConstant.create(constantPool)
     }
 
     override fun createConstants(): List<DoubleConstant> {
-        return listOf(DoubleConstant.create(0.0),
-                DoubleConstant.create(100.0),
-                DoubleConstant.create(Double.MIN_VALUE),
-                DoubleConstant.create(Double.NEGATIVE_INFINITY))
+        return listOf(DoubleConstant.create(constantPool, 0.0),
+                DoubleConstant.create(constantPool, 100.0),
+                DoubleConstant.create(constantPool, Double.MIN_VALUE),
+                DoubleConstant.create(constantPool, Double.NEGATIVE_INFINITY))
     }
 
     @Test
@@ -73,12 +73,12 @@ class DoubleConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile(), ConstantPool(), 0, object : ConstantPoolVisitor {
-            override fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {
+        constant.accept(ClassFile(), 0, object : ConstantPoolVisitor {
+            override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }
 
-            override fun visitDoubleConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: DoubleConstant) {
+            override fun visitDoubleConstant(classFile: ClassFile, index: Int, constant: DoubleConstant) {
                 correctMethod++
             }
         })

@@ -26,13 +26,13 @@ import org.junit.jupiter.api.Test
 class LongConstantTest : ConstantBaseTest() {
 
     override fun createEmptyConstant(): LongConstant {
-        return LongConstant.create()
+        return LongConstant.create(constantPool)
     }
 
     override fun createConstants(): List<LongConstant> {
-        return listOf(LongConstant.create(0),
-                LongConstant.create(100),
-                LongConstant.create(Long.MIN_VALUE))
+        return listOf(LongConstant.create(constantPool, 0),
+                LongConstant.create(constantPool, 100),
+                LongConstant.create(constantPool, Long.MIN_VALUE))
     }
 
     @Test
@@ -72,12 +72,12 @@ class LongConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile(), ConstantPool(), 0, object : ConstantPoolVisitor {
-            override fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {
+        constant.accept(ClassFile(), 0, object : ConstantPoolVisitor {
+            override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }
 
-            override fun visitLongConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: LongConstant) {
+            override fun visitLongConstant(classFile: ClassFile, index: Int, constant: LongConstant) {
                 correctMethod++
             }
         })

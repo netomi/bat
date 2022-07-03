@@ -26,13 +26,13 @@ import org.junit.jupiter.api.Test
 class Utf8ConstantTest : ConstantBaseTest() {
 
     override fun createEmptyConstant(): Utf8Constant {
-        return Utf8Constant.create()
+        return Utf8Constant.create(constantPool)
     }
 
     override fun createConstants(): List<Utf8Constant> {
-        return listOf(Utf8Constant.create("some content"),
-                Utf8Constant.create(""),
-                Utf8Constant.create("\u0033"))
+        return listOf(Utf8Constant.create(constantPool, "some content"),
+                Utf8Constant.create(constantPool, ""),
+                Utf8Constant.create(constantPool, "\u0033"))
     }
 
     @Test
@@ -72,12 +72,12 @@ class Utf8ConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile(), ConstantPool(), 0, object : ConstantPoolVisitor {
-            override fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {
+        constant.accept(ClassFile(), 0, object : ConstantPoolVisitor {
+            override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }
 
-            override fun visitUtf8Constant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Utf8Constant) {
+            override fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {
                 correctMethod++
             }
         })

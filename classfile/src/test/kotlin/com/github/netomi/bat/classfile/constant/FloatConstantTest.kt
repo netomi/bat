@@ -26,14 +26,14 @@ import com.github.netomi.bat.classfile.visitor.ConstantVisitor
 class FloatConstantTest : ConstantBaseTest() {
 
     override fun createEmptyConstant(): FloatConstant {
-        return FloatConstant.create()
+        return FloatConstant.create(constantPool)
     }
 
     override fun createConstants(): List<FloatConstant> {
-        return listOf(FloatConstant.create(0f),
-                FloatConstant.create(100.0f),
-                FloatConstant.create(Float.MIN_VALUE),
-                FloatConstant.create(Float.NEGATIVE_INFINITY))
+        return listOf(FloatConstant.create(constantPool, 0f),
+                FloatConstant.create(constantPool, 100.0f),
+                FloatConstant.create(constantPool, Float.MIN_VALUE),
+                FloatConstant.create(constantPool, Float.NEGATIVE_INFINITY))
     }
 
     @Test
@@ -73,12 +73,12 @@ class FloatConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile(), ConstantPool(), 0, object : ConstantPoolVisitor {
-            override fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {
+        constant.accept(ClassFile(), 0, object : ConstantPoolVisitor {
+            override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }
 
-            override fun visitFloatConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: FloatConstant) {
+            override fun visitFloatConstant(classFile: ClassFile, index: Int, constant: FloatConstant) {
                 correctMethod++
             }
         })

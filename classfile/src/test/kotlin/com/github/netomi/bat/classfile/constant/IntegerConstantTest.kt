@@ -26,13 +26,13 @@ import com.github.netomi.bat.classfile.visitor.ConstantVisitor
 class IntegerConstantTest : ConstantBaseTest() {
 
     override fun createEmptyConstant(): IntegerConstant {
-        return IntegerConstant.create()
+        return IntegerConstant.create(constantPool)
     }
 
     override fun createConstants(): List<IntegerConstant> {
-        return listOf(IntegerConstant.create(0),
-                IntegerConstant.create(100),
-                IntegerConstant.create(Integer.MIN_VALUE))
+        return listOf(IntegerConstant.create(constantPool, 0),
+                IntegerConstant.create(constantPool, 100),
+                IntegerConstant.create(constantPool, Integer.MIN_VALUE))
     }
 
     @Test
@@ -72,12 +72,12 @@ class IntegerConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile(), ConstantPool(), 0, object : ConstantPoolVisitor {
-            override fun visitAnyConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: Constant) {
+        constant.accept(ClassFile(), 0, object : ConstantPoolVisitor {
+            override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }
 
-            override fun visitIntegerConstant(classFile: ClassFile, constantPool: ConstantPool, index: Int, constant: IntegerConstant) {
+            override fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
                 correctMethod++
             }
         })
