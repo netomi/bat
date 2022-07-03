@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class FullDumpTest {
 
                 dexFile.accept(printer)
 
-                val expected = toBytes(javaClass.getResourceAsStream("/dex/$expectedFile"))
+                val expected = javaClass.getResourceAsStream("/dex/$expectedFile")?.readAllBytes()
                 assertArrayEquals(expected, baos.toByteArray(), "testFile $testFile differs")
             }
         } catch (ex: IOException) {
@@ -68,16 +68,5 @@ class FullDumpTest {
             Arguments.of("staticfields.dex"),
             Arguments.of("values.dex")
         )
-
-        @Throws(IOException::class)
-        private fun toBytes(`is`: InputStream): ByteArray {
-            val buffer = ByteArrayOutputStream()
-            var read: Int
-            val data = ByteArray(8192)
-            while (`is`.read(data, 0, data.size).also { read = it } != -1) {
-                buffer.write(data, 0, read)
-            }
-            return buffer.toByteArray()
-        }
     }
 }
