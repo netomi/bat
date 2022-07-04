@@ -28,4 +28,5 @@ dependencies {
     implementation("org.antlr:antlr4-runtime:${Versions.antlrVersion}")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiterVersion}")
 }
