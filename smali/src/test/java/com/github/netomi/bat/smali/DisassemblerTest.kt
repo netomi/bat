@@ -37,7 +37,7 @@ import java.util.zip.ZipInputStream
 class DisassemblerTest {
     @ParameterizedTest
     @MethodSource("dexFiles")
-    fun batchDissamble(testFile: String) {
+    fun batchDisassemble(testFile: String) {
         javaClass.getResourceAsStream("/dex/$testFile").use { `is` ->
             println("checking $testFile...")
 
