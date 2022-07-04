@@ -44,6 +44,6 @@ internal class SourceLinePrinter constructor(
     }
 
     private fun printPosition() {
-        printer.println("        %s line=%d".format(Primitives.toHexString(codeOffset.toShort()), lineNumber))
+        printer.println("    %s line=%d".format(Primitives.toHexString(codeOffset.toShort()), lineNumber))
     }
 }

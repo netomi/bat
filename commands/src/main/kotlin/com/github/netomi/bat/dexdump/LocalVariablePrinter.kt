@@ -144,7 +144,7 @@ private class LocalVariableInfo constructor(private val name: String?, private v
 
     fun toString(registerNum: Int): String {
         val sb = StringBuilder()
-        sb.append("        ")
+        sb.append("    ")
         sb.append(Primitives.toHexString(startAddr.toShort()))
         sb.append(" - ")
         sb.append(Primitives.toHexString(endAddr.toShort()))

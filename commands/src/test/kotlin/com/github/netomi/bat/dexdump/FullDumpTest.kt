@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexdump
 
-import com.github.netomi.bat.dexdump.DexDumpPrinter
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
 import org.junit.jupiter.api.Assertions.assertArrayEquals
@@ -24,7 +23,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
 
 class FullDumpTest {
@@ -44,7 +42,7 @@ class FullDumpTest {
                 val printer = DexDumpPrinter(baos, true, true, true)
 
                 dexFile.accept(printer)
-                
+
                 val expected = javaClass.getResourceAsStream("/dex/$expectedFile")?.readAllBytes()
                 assertArrayEquals(expected, baos.toByteArray(), "testFile $testFile differs")
             }

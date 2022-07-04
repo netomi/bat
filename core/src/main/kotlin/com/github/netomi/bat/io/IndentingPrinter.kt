@@ -30,6 +30,16 @@ open class IndentingPrinter(protected val delegateWriter: Writer, private val sp
         level--
     }
 
+    fun resetLevel(): Int {
+        val oldLevel = level
+        level = 0
+        return oldLevel
+    }
+
+    fun setLevel(newLevel: Int) {
+        level = newLevel
+    }
+
     fun print(text: CharSequence) {
         try {
             printIndentation()

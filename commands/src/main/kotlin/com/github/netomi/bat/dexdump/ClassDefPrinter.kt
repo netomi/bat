@@ -71,51 +71,61 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     }
 
     override fun visitClassData(dexFile: DexFile, classDef: ClassDef, classData: ClassData) {
-        printer.println("  Static fields     -")
+        printer.println("Static fields     -")
+        printer.levelUp()
         classData.staticFieldsAccept(dexFile, classDef, this)
-        printer.println("  Instance fields   -")
+        printer.levelDown()
+        printer.println("Instance fields   -")
+        printer.levelUp()
         classData.instanceFieldsAccept(dexFile, classDef, this)
-        printer.println("  Direct methods    -")
+        printer.levelDown()
+        printer.println("Direct methods    -")
+        printer.levelUp()
         classData.directMethodsAccept(dexFile, classDef, this)
-        printer.println("  Virtual methods   -")
+        printer.levelDown()
+        printer.println("Virtual methods   -")
+        printer.levelUp()
         classData.virtualMethodsAccept(dexFile, classDef, this)
+        printer.levelDown()
     }
 
     override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, encodedField: EncodedField) {
-        printer.println("    #%-14d : (in %s)".format(index, classDef.getType(dexFile)))
-        printer.println("      name          : '" + encodedField.getName(dexFile) + "'")
-        printer.println("      type          : '" + encodedField.getType(dexFile) + "'")
-        printer.println("      access        : " + DexDumpPrinter.formatAccessFlags(encodedField.accessFlags, DexAccessFlags.Target.FIELD))
+        printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
+        printer.println("  name          : '" + encodedField.getName(dexFile) + "'")
+        printer.println("  type          : '" + encodedField.getType(dexFile) + "'")
+        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(encodedField.accessFlags, DexAccessFlags.Target.FIELD))
         val staticValues = if (classDef.staticValues != null) classDef.staticValues.array else null
         if (encodedField.isStatic && staticValues != null && index < staticValues.valueCount) {
-            printer.print("      value         : ")
+            printer.print("  value         : ")
             staticValues.valueAccept(dexFile, index, this)
             printer.println()
         }
     }
 
     override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, encodedMethod: EncodedMethod) {
-        printer.println("    #%-14d : (in %s)".format(index, classDef.getType(dexFile)))
-        printer.println("      name          : '" + encodedMethod.getName(dexFile) + "'")
-        printer.println("      type          : '" + encodedMethod.getDescriptor(dexFile) + "'")
-        printer.println("      access        : " + DexDumpPrinter.formatAccessFlags(encodedMethod.accessFlags, DexAccessFlags.Target.METHOD))
+        printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
+        printer.println("  name          : '" + encodedMethod.getName(dexFile) + "'")
+        printer.println("  type          : '" + encodedMethod.getDescriptor(dexFile) + "'")
+        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(encodedMethod.accessFlags, DexAccessFlags.Target.METHOD))
 
         if (encodedMethod.code != null) {
             encodedMethod.codeAccept(dexFile, classDef, this)
         } else {
-            printer.println("      code          : (none)")
+            printer.println("  code          : (none)")
         }
 
         printer.println()
     }
 
     override fun visitCode(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code) {
-        printer.println("      code          -")
-        printer.println("      registers     : " + code.registersSize)
-        printer.println("      ins           : " + code.insSize)
-        printer.println("      outs          : " + code.outsSize)
-        printer.println("      insns size    : " + code.insnsSize + " 16-bit code units")
+        printer.println("  code          -")
+        printer.println("  registers     : " + code.registersSize)
+        printer.println("  ins           : " + code.insSize)
+        printer.println("  outs          : " + code.outsSize)
+        printer.println("  insns size    : " + code.insnsSize + " 16-bit code units")
         fileOffset = method.codeOffset
+
+        val oldLevel = printer.resetLevel()
 
         printer.println(
             Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
@@ -126,17 +136,21 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         fileOffset = align(fileOffset, 4)
         fileOffset += 16
         codeOffset = 0
+
         code.instructionsAccept(dexFile, classDef, method, code, this)
+
+        printer.setLevel(oldLevel)
+
         val catchCount = if (code.tries.size == 0) "(none)" else code.tries.size.toString()
-        printer.println("      catches       : %s".format(catchCount))
+        printer.println("  catches       : %s".format(catchCount))
         code.triesAccept(dexFile, classDef, method, code, this)
 
-        printer.println("      positions     : ")
+        printer.println("  positions     : ")
         if (code.debugInfo != null) {
             code.debugInfo.debugSequenceAccept(dexFile, SourceLinePrinter(code.debugInfo.lineStart, printer))
         }
 
-        printer.println("      locals        : ")
+        printer.println("  locals        : ")
         if (code.debugInfo != null) {
             val localVariablePrinter = LocalVariablePrinter(dexFile, method, code, printer)
             code.debugInfo.debugSequenceAccept(dexFile, localVariablePrinter)
@@ -179,18 +193,18 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryObject: Try) {
         val startAddr = Primitives.toHexString(tryObject.startAddr.toShort())
         val endAddr = Primitives.toHexString((tryObject.startAddr + tryObject.insnCount).toShort())
-        printer.println(String.format("        %s - %s", startAddr, endAddr))
+        printer.println("    %s - %s".format(startAddr, endAddr))
         val catchHandler = tryObject.catchHandler
         for (addrPair in catchHandler.handlers) {
-            printer.println("          %s -> %s".format(addrPair.getType(dexFile), Primitives.toHexString(addrPair.address.toShort())))
+            printer.println("      %s -> %s".format(addrPair.getType(dexFile), Primitives.toHexString(addrPair.address.toShort())))
         }
         if (catchHandler.catchAllAddr != -1) {
-            printer.println("          %s -> %s".format("<any>", Primitives.toHexString(catchHandler.catchAllAddr.toShort())))
+            printer.println("      %s -> %s".format("<any>", Primitives.toHexString(catchHandler.catchAllAddr.toShort())))
         }
     }
 
     override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, type: String) {
-        printer.println("    #%-14d : '%s'".format(index, type))
+        printer.println("#%-14d : '%s'".format(index, type))
     }
 
     override fun visitAnyAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {}
