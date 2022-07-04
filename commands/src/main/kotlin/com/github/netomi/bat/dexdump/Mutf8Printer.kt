@@ -20,7 +20,7 @@ import com.github.netomi.bat.io.IndentingPrinter
 import java.io.*
 
 internal class Mutf8Printer constructor(private val outputStream: OutputStream)
-    : IndentingPrinter(OutputStreamWriter(outputStream)) {
+    : IndentingPrinter(OutputStreamWriter(outputStream), 2) {
 
     fun printAsMutf8(text: String, escapeControlChars: Boolean) {
         var s = text
