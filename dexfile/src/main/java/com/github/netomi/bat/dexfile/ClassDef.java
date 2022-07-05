@@ -171,6 +171,17 @@ extends      DataItem
         classData.addField(field);
     }
 
+    public void addMethod(DexFile dexFile, EncodedMethod method) {
+        String methodClass = method.getMethodID(dexFile).getClassType(dexFile);
+        Preconditions.checkArgument(methodClass.equals(getType(dexFile)), "field class does not match this class");
+
+        if (classData == null) {
+            classData = ClassData.empty();
+        }
+
+        classData.addMethod(method);
+    }
+
     public EncodedArray getStaticValues() {
         return staticValues;
     }

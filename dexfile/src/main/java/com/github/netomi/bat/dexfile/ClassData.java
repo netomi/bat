@@ -59,6 +59,14 @@ extends      DataItem
         }
     }
 
+    public void addMethod(EncodedMethod method) {
+        if (method.isDirectMethod()) {
+            directMethods.add(method);
+        } else {
+            virtualMethods.add(method);
+        }
+    }
+
     public int getStaticFieldCount() {
         return staticFields.size();
     }

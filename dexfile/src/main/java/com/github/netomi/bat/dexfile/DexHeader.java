@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.io.DexFormatException;
 import com.github.netomi.bat.util.EmptyArray;
 import com.github.netomi.bat.util.Primitives;
+import com.google.common.primitives.Bytes;
 
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -68,6 +69,12 @@ extends      DataItem
     public DexHeader() {
         magic     = EmptyArray.BYTE;
         signature = EmptyArray.BYTE;
+    }
+
+    public DexHeader(DexFormat dexFormat) {
+        magic      = Bytes.concat(DexConstants.DEX_FILE_MAGIC, dexFormat.getPattern());
+        signature  = new byte[20];
+        headerSize = 0x70;
     }
 
     public long getFileSize() {
@@ -248,32 +255,32 @@ extends      DataItem
         switch (type) {
             case DexConstants.TYPE_STRING_ID_ITEM:
                 this.stringIDsSize    = count;
-                this.stringIDsOffsets = offset;
+                this.stringIDsOffsets = count > 0 ? offset : 0;
                 break;
 
             case DexConstants.TYPE_TYPE_ID_ITEM:
                 this.typeIDsSize   = count;
-                this.typeIDsOffset = offset;
+                this.typeIDsOffset = count > 0 ? offset : 0;
                 break;
 
             case DexConstants.TYPE_PROTO_ID_ITEM:
                 this.protoIDsSize   = count;
-                this.protoIDsOffset = offset;
+                this.protoIDsOffset = count > 0 ? offset : 0;
                 break;
 
             case DexConstants.TYPE_FIELD_ID_ITEM:
                 this.fieldIDsSize   = count;
-                this.fieldIDsOffset = offset;
+                this.fieldIDsOffset = count > 0 ? offset : 0;
                 break;
 
             case DexConstants.TYPE_METHOD_ID_ITEM:
                 this.methodIDsSize   = count;
-                this.methodIDsOffset = offset;
+                this.methodIDsOffset = count > 0 ? offset : 0;
                 break;
 
             case DexConstants.TYPE_CLASS_DEF_ITEM:
                 this.classDefsSize   = count;
-                this.classDefsOffset = offset;
+                this.classDefsOffset = count > 0 ? offset : 0;
                 break;
 
             case DexConstants.TYPE_MAP_LIST:

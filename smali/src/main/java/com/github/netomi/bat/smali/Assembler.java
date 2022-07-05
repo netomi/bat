@@ -17,6 +17,8 @@ package com.github.netomi.bat.smali;
 
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.DexFormat;
+import com.github.netomi.bat.dexfile.io.DexFileWriter;
 import com.github.netomi.bat.smali.assemble.ClassDefAssembler;
 import com.github.netomi.bat.smali.disassemble.SmaliPrinter;
 import com.github.netomi.bat.smali.parser.SmaliLexer;
@@ -62,19 +64,22 @@ public class Assembler
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         SmaliParser       parser      = new SmaliParser(tokenStream);
 
-        ClassDef classDef = new ClassDefAssembler(dexFile).visit(parser.smaliclass());
+        ClassDef classDef = new ClassDefAssembler(dexFile).visit(parser.sFiles());
         return classDef;
     }
 
     public static void main(String[] args) throws IOException {
-        String fileName = "smali/src/test/resources/smali/fields/SimpleFields.smali";
+        String fileName = "smali/src/test/resources/smali/Test.smali";
 
-        DexFile dexFile = new DexFile();
+        DexFile dexFile = DexFile.of(DexFormat.FORMAT_035);
         try (InputStream is = Files.newInputStream(Paths.get(fileName)))
         {
             ClassDef classDef = new Assembler(dexFile).assemble(is);
 
             classDef.accept(dexFile, new SmaliPrinter());
+
+            dexFile.addClassDef(classDef);
+            dexFile.accept(new DexFileWriter(new FileOutputStream("out.dex")));
         }
     }
 }

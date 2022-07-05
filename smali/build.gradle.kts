@@ -5,10 +5,16 @@ plugins {
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 
-tasks.generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments   = arguments + listOf("-package", "com.github.netomi.bat.smali.parser")
-    arguments   = arguments + listOf("-visitor")
+tasks {
+    compileKotlin {
+        dependsOn(generateGrammarSource)
+    }
+
+    generateGrammarSource {
+        maxHeapSize = "64m"
+        arguments = arguments + listOf("-package", "com.github.netomi.bat.smali.parser", "-visitor")
+        outputDirectory = File("${project.buildDir}/generated-src/antlr/main/com/github/netomi/bat/smali/parser")
+    }
 }
 
 tasks.test {

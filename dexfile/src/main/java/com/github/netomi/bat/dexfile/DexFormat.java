@@ -38,6 +38,10 @@ public enum DexFormat
         return version;
     }
 
+    public byte[] getPattern() {
+        return Arrays.copyOf(pattern, pattern.length);
+    }
+
     public static DexFormat fromPattern(byte[] pattern, int from, int to) {
         for (DexFormat format : values()) {
             if (Arrays.equals(format.pattern, Arrays.copyOfRange(pattern, from, to))) {

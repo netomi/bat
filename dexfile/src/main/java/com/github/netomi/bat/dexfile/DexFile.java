@@ -17,10 +17,13 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.io.*;
 import com.github.netomi.bat.dexfile.visitor.*;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
@@ -41,13 +44,23 @@ public class DexFile
 
     private byte[] linkData;
 
-    private Map<String, Integer>  stringMap   = new HashMap<>();
-    private Map<String, Integer>  typeMap     = new HashMap<>();
-    private Map<String, Integer>  classDefMap = new HashMap<>();
-    private Map<FieldID, Integer> fieldIDMap  = new HashMap<>();
+    private Map<String, Integer>  stringMap    = new HashMap<>();
+    private Map<String, Integer>  typeMap      = new HashMap<>();
+    private Map<ProtoID, Integer>  protoIDMap   = new HashMap<>();
+    private Map<String, Integer>  classDefMap  = new HashMap<>();
+    private Map<FieldID, Integer> fieldIDMap   = new HashMap<>();
+    private Map<MethodID, Integer> methodIDMap = new HashMap<>();
+
+    public static DexFile of(DexFormat dexFormat) {
+        return new DexFile(dexFormat);
+    }
 
     public DexFile() {
         this.header = new DexHeader();
+    }
+
+    public DexFile(DexFormat dexFormat) {
+        this.header = new DexHeader(dexFormat);
     }
 
     public DexHeader getHeader() {
@@ -144,6 +157,35 @@ public class DexFile
         return protoIDs.get(protoIndex);
     }
 
+    public int addOrGetProtoID(String shorty, String returnType, String... parameterTypes) {
+        ProtoID protoID = null;
+
+        if (parameterTypes.length > 0) {
+            int[] parameterTypeIndices = new int[parameterTypes.length];
+            for (int i = 0; i < parameterTypes.length; i++) {
+                parameterTypeIndices[i] = addOrGetTypeIDIndex(parameterTypes[i]);
+            }
+
+            protoID =
+                ProtoID.of(addOrGetStringIDIndex(shorty),
+                           addOrGetTypeIDIndex(returnType),
+                           parameterTypeIndices);
+
+        } else {
+            protoID =
+                ProtoID.of(addOrGetStringIDIndex(shorty),
+                           addOrGetTypeIDIndex(returnType));
+        }
+
+        Integer index = protoIDMap.get(protoID);
+        if (index == null) {
+            protoIDs.add(protoID);
+            index = protoIDs.size() - 1;
+            protoIDMap.put(protoID, index);
+        }
+        return index;
+    }
+
     public int getFieldIDCount() {
         return fieldIDs.size();
     }
@@ -183,6 +225,21 @@ public class DexFile
         return methodIDs.get(methodIndex);
     }
 
+    public int addOrGetMethodID(String classType, String name, String shorty, String returnType, String... parameterTypes) {
+        MethodID methodID =
+            MethodID.of(addOrGetTypeIDIndex(classType),
+                        addOrGetProtoID(shorty, returnType, parameterTypes),
+                        addOrGetStringIDIndex(name));
+
+        Integer index = methodIDMap.get(methodID);
+        if (index == null) {
+            methodIDs.add(methodID);
+            index = methodIDs.size() - 1;
+            methodIDMap.put(methodID, index);
+        }
+        return index;
+    }
+
     public int getClassDefCount() {
         return classDefs.size();
     }
@@ -198,6 +255,11 @@ public class DexFile
 
     public ClassDef getClassDef(int classDefIndex) {
         return classDefs.get(classDefIndex);
+    }
+
+    public void addClassDef(ClassDef classDef) {
+        classDefs.add(classDef);
+        classDefMap.put(classDef.getClassName(this), classDefs.size() - 1);
     }
 
     public int getCallSiteIDCount() {
@@ -329,6 +391,13 @@ public class DexFile
             typeMap.put(typeIterator.next().getType(this), index);
         }
 
+        protoIDMap = new HashMap<>(getProtoIDCount());
+        ListIterator<ProtoID> protoIDIterator = protoIDs.listIterator();
+        while (protoIDIterator.hasNext()) {
+            int index = protoIDIterator.nextIndex();
+            protoIDMap.put(protoIDIterator.next(), index);
+        }
+
         classDefMap = new HashMap<>(getClassDefCount());
         ListIterator<ClassDef> classDefIterator = classDefs.listIterator();
         while (classDefIterator.hasNext()) {
@@ -341,6 +410,13 @@ public class DexFile
         while (fieldIDIterator.hasNext()) {
             int index = fieldIDIterator.nextIndex();
             fieldIDMap.put(fieldIDIterator.next(), index);
+        }
+
+        methodIDMap = new HashMap<>(getMethodIDCount());
+        ListIterator<MethodID> methodIDIterator = methodIDs.listIterator();
+        while (methodIDIterator.hasNext()) {
+            int index = methodIDIterator.nextIndex();
+            methodIDMap.put(methodIDIterator.next(), index);
         }
     }
 
@@ -512,6 +588,9 @@ public class DexFile
         private final OutputStream    os;
         private final DataItemMapImpl dataItemMap;
 
+        private int dataOffset;
+        private int dataSize;
+
         Writer(OutputStream os) {
             this.os          = os;
             this.dataItemMap = new DataItemMapImpl();
@@ -520,14 +599,36 @@ public class DexFile
         public void write() throws IOException {
             dataItemMap.collectDataItems(DexFile.this);
 
+            dataOffset = 0;
+            dataSize   = 0;
+
             // In the first pass we update all the offsets.
             DexDataOutput countingOutput = new CountingDexDataOutput();
             writeDexFile(countingOutput);
 
             int size = countingOutput.getOffset();
+            header.fileSize   = size;
+            header.dataOffset = dataOffset;
+            header.dataSize   = dataSize;
 
             ByteBufferBackedDexDataOutput output = new ByteBufferBackedDexDataOutput(size);
             MapList newMapList = writeDexFile(output);
+
+            ByteBuffer byteBuffer = output.getByteBuffer();
+
+            Hasher sha1Signature = Hashing.sha1().newHasher();
+            byteBuffer.position(32);
+            sha1Signature.putBytes(byteBuffer);
+            header.signature = sha1Signature.hash().asBytes();
+            byteBuffer.position(12);
+            byteBuffer.put(header.signature);
+
+            Hasher adlerChecksum = Hashing.adler32().newHasher();
+            byteBuffer.position(12);
+            adlerChecksum.putBytes(byteBuffer);
+            header.checksum = adlerChecksum.hash().asInt();
+            byteBuffer.position(8);
+            byteBuffer.putInt((int) header.checksum);
 
             // set the newly created MapList.
             mapList = newMapList;
@@ -540,7 +641,7 @@ public class DexFile
 
             writeHeader(mapList, output);
 
-            output.writePadding((int) header.headerSize - output.getOffset());
+            output.writePadding((int) Math.max(0, header.headerSize - output.getOffset()));
 
             writeStringIDs(mapList, output);
             writeTypeIDs  (mapList, output);
@@ -652,14 +753,17 @@ public class DexFile
         }
 
         private void writeDataSection(MapList mapList, DexDataOutput output) {
-            // TODO: update header fields dataSize and dataOffset
+            dataOffset = output.getOffset();
 
             // Collect all DataItems that reside in the data section.
             dataItemMap.writeDataItems(mapList, output);
             dataItemMap.updateOffsets(DexFile.this);
+
+            dataSize = output.getOffset() - dataOffset;
         }
 
         private void writeMapList(MapList mapList, DexDataOutput output) {
+            writePadding(MapList.class, output);
             header.updateDataItem(DexConstants.TYPE_MAP_LIST, 0, output.getOffset());
             mapList.updateMapItem(DexConstants.TYPE_MAP_LIST, 1, output.getOffset());
             mapList.write(output);

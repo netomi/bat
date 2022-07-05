@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
+import com.github.netomi.bat.util.Preconditions;
 
 import java.util.Objects;
 
@@ -39,6 +40,11 @@ extends      DexContent
 
     public  Code code;
 
+    public static EncodedMethod of(int methodIndex, int accessFlags) {
+        Preconditions.checkArgument(methodIndex >= 0, "methodIndex must not be negative");
+        return new EncodedMethod(methodIndex, accessFlags);
+    }
+
     public static EncodedMethod readContent(DexDataInput input, int lastIndex) {
         EncodedMethod encodedMethod = new EncodedMethod();
         encodedMethod.read(input);
@@ -52,8 +58,9 @@ extends      DexContent
         code        = null;
     }
 
-    public EncodedMethod(int methodIndex) {
+    public EncodedMethod(int methodIndex, int accessFlags) {
         this.methodIndex = methodIndex;
+        this.accessFlags = accessFlags;
     }
 
     public int getCodeOffset() {
@@ -95,6 +102,18 @@ extends      DexContent
 
     public boolean isStatic() {
         return (accessFlags & DexConstants.ACC_STATIC) != 0;
+    }
+
+    public boolean isPrivate() {
+        return (accessFlags & DexConstants.ACC_PRIVATE) != 0;
+    }
+
+    public boolean isConstructor() {
+        return (accessFlags & DexConstants.ACC_CONSTRUCTOR) != 0;
+    }
+
+    public boolean isDirectMethod() {
+        return isStatic() || isPrivate() || isConstructor();
     }
 
     @Override

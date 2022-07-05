@@ -19,8 +19,8 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
+
 
 /**
  * A class representing a map list item inside a dex file.
@@ -77,7 +77,7 @@ extends      DataItem
         }
 
         mapItem.size   = size;
-        mapItem.offset = offset;
+        mapItem.offset = size > 0 ? offset : 0;
     }
 
     @Override

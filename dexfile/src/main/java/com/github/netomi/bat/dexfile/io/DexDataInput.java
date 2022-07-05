@@ -52,8 +52,8 @@ implements   Closeable
 
     public void skipAlignmentPadding(int alignment) {
         if (alignment > 1) {
-            int currentAligment = getOffset() % alignment;
-            int padding = (alignment - currentAligment) % alignment;
+            int currentAlignment = getOffset() % alignment;
+            int padding = (alignment - currentAlignment) % alignment;
             skipBytes(padding);
         }
     }

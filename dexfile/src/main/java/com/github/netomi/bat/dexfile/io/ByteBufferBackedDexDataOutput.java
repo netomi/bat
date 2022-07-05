@@ -35,6 +35,10 @@ implements   DexDataOutput
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
     }
 
+    public ByteBuffer getByteBuffer() {
+        return byteBuffer;
+    }
+
     @Override
     public ByteOrder order() {
         return byteBuffer.order();
@@ -67,7 +71,7 @@ implements   DexDataOutput
         int currentAlignment = getOffset() % alignment;
         int padding = (alignment - currentAlignment) % alignment;
         for (int i = 0; i < padding; i++) {
-            byteBuffer.put((byte) 0x0);
+            writeByte((byte) 0x0);
         }
     }
 
@@ -83,7 +87,7 @@ implements   DexDataOutput
 
     @Override
     public void writeUnsignedByte(short b) {
-        byteBuffer.put((byte) b);
+        writeByte((byte) b);
     }
 
     @Override
@@ -94,20 +98,20 @@ implements   DexDataOutput
     @Override
     public void writeShort(short value, int bytes) {
         for (int i = 0; i < bytes; i++) {
-            byteBuffer.put((byte) value);
+            writeByte((byte) value);
             value >>>= 8;
         }
     }
 
     @Override
     public void writeUnsignedShort(int value) {
-        byteBuffer.putShort((short) value);
+        writeShort((short) value);
     }
 
     @Override
     public void writeChar(char value, int bytes) {
         for (int i = 0; i < bytes; i++) {
-            byteBuffer.put((byte) value);
+            writeByte((byte) value);
             value >>>= 8;
         }
     }
@@ -120,20 +124,20 @@ implements   DexDataOutput
     @Override
     public void writeInt(int value, int bytes) {
         for (int i = 0; i < bytes; i++) {
-            byteBuffer.put((byte) value);
+            writeByte((byte) value);
             value >>>= 8;
         }
     }
 
     @Override
     public void writeUnsignedInt(long value) {
-        byteBuffer.putInt((int) value);
+        writeInt((int) value);
     }
 
     @Override
     public void writeLong(long value, int bytes) {
         for (int i = 0; i < bytes; i++) {
-            byteBuffer.put((byte) value);
+            writeByte((byte) value);
             value >>>= 8;
         }
     }
@@ -143,7 +147,7 @@ implements   DexDataOutput
         int bits = Float.floatToIntBits(value);
         bits >>>= 32 - (8*bytes);
         for (int i = 0; i < bytes; i++) {
-            byteBuffer.put((byte) bits);
+            writeByte((byte) bits);
             bits >>>= 8;
         }
     }
@@ -153,7 +157,7 @@ implements   DexDataOutput
         long bits = Double.doubleToLongBits(value);
         bits >>>= 64 - (8*bytes);
         for (int i = 0; i < bytes; i++) {
-            byteBuffer.put((byte) bits);
+            writeByte((byte) bits);
             bits >>>= 8;
         }
     }
@@ -166,7 +170,7 @@ implements   DexDataOutput
             if (value != 0) {
                 b |= 0x80;
             }
-            byteBuffer.put(b);
+            writeByte(b);
         } while (value != 0);
     }
 
@@ -182,11 +186,11 @@ implements   DexDataOutput
             value >>= 7;
             if (value ==  0 && ((b & 0x40) == 0) ||
                 value == -1 && ((b & 0x40) != 0)) {
-                byteBuffer.put(b);
+                writeByte(b);
                 break;
             }
 
-            byteBuffer.put((byte) (b | 0x80));
+            writeByte((byte) (b | 0x80));
         }
     }
 
