@@ -15,16 +15,20 @@
  */
 package com.github.netomi.bat.smali.assemble
 
-import com.github.netomi.bat.dexfile.ClassDef
-import com.github.netomi.bat.dexfile.DexAccessFlags
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
-import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.EncodedField
-import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.annotation.Annotation
+import com.github.netomi.bat.dexfile.annotation.AnnotationVisibility
+import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue
+import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
+import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser
-import com.github.netomi.bat.smali.parser.SmaliParser.SAccListContext
-import com.github.netomi.bat.smali.parser.SmaliParser.SFileContext
+import com.github.netomi.bat.smali.parser.SmaliParser.*
+import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.Token
+import org.antlr.v4.runtime.tree.TerminalNode
+
 
 class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDef?>() {
 
@@ -57,7 +61,31 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
         ctx.sField().forEach { visitSField(it, classType) }
         ctx.sMethod().forEach { visitSMethod(it, classType) }
 
+        ctx.sAnnotation().forEach { visitSAnnotation(it) }
+
         return classDef
+    }
+
+    override fun visitSAnnotation(ctx: SmaliParser.SAnnotationContext): ClassDef? {
+        val annotationType       = ctx.OBJECT_TYPE().text
+        val annotationVisibility = AnnotationVisibility.of(ctx.ANN_VISIBLE().text)
+
+        val annotationTypeIndex = dexFile.addOrGetTypeIDIndex(annotationType)
+
+        val encodedValue = EncodedAnnotationValue.of(annotationTypeIndex)
+
+        ctx.sAnnotationKeyName().forEachIndexed { index, sAnnotationKeyNameContext ->
+            val sAnnotationValueContext = ctx.sAnnotationValue(index)
+
+            println(sAnnotationKeyNameContext.text)
+            println(sAnnotationValueContext.text)
+
+            parseAnnotationValueContext(sAnnotationValueContext)
+        }
+
+        Annotation.of(annotationVisibility, encodedValue)
+        
+        return null
     }
 
     fun visitSField(ctx: SmaliParser.SFieldContext, classType: String) {
@@ -104,6 +132,53 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
             val parameterTypes = methodObj.substring(x + 1, y).split(",")
             val returnType = methodObj.substring(y + 1)
             return Triple(name, parameterTypes, returnType)
+        }
+
+        fun parseAnnotationValueContext(ctx: SAnnotationValueContext) {
+            val t: ParserRuleContext = ctx.getChild(0) as ParserRuleContext
+            when (t.ruleIndex) {
+                RULE_sArrayValue -> {
+                    val arrayValueContext: SArrayValueContext = t as SArrayValueContext
+                    for (annotationValueContext: SAnnotationValueContext in arrayValueContext.sAnnotationValue()) {
+                        parseAnnotationValueContext(annotationValueContext)
+                    }
+                }
+
+                RULE_sBaseValue -> {
+                    val baseValueContext = t as SBaseValueContext
+                    val value: Any? = parseBaseValue(baseValueContext)
+
+                    println(value)
+                }
+
+            }
+        }
+
+        private fun parseBaseValue(ctx: SBaseValueContext): Any? {
+            val value: Token = if (ctx.childCount == 1) {
+                val tn: TerminalNode = ctx.getChild(0) as TerminalNode
+                tn.symbol
+            } else {
+                val tn: TerminalNode = ctx.getChild(1) as TerminalNode
+                tn.symbol
+            }
+
+            return when (value.type) {
+                SmaliLexer.STRING -> value.text
+                SmaliLexer.BOOLEAN -> "true" == value.text
+                SmaliLexer.BYTE -> value.text
+                SmaliLexer.SHORT -> value.text
+                SmaliLexer.CHAR -> value.text
+                SmaliLexer.INT -> value.text
+                SmaliLexer.LONG -> value.text
+                SmaliLexer.BASE_FLOAT, SmaliLexer.FLOAT_INFINITY, SmaliLexer.FLOAT_NAN -> value.text
+                SmaliLexer.BASE_DOUBLE, SmaliLexer.DOUBLE_INFINITY, SmaliLexer.DOUBLE_NAN -> value.text
+                SmaliLexer.METHOD_FULL -> value.text
+                SmaliLexer.OBJECT_TYPE -> value.text
+                SmaliLexer.NULL -> null
+                SmaliLexer.FIELD_FULL -> value.text
+                else -> null
+            }
         }
     }
 }

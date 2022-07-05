@@ -13,12 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.io;
+package com.github.netomi.bat.dexfile.io
 
-public class DexFormatException
-extends      RuntimeException
-{
-    public DexFormatException(String message) {
-        super(message);
-    }
-}
+class DexFormatException(message: String) : RuntimeException(message)

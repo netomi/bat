@@ -73,9 +73,9 @@ public final class DexConstants
 
     // Annotation Visibility types.
 
-    public static final int VISIBILITY_BUILD   = 0x00;
-    public static final int VISIBILITY_RUNTIME = 0x01;
-    public static final int VISIBILITY_SYSTEM  = 0x02;
+    public static final short VISIBILITY_BUILD   = 0x00;
+    public static final short VISIBILITY_RUNTIME = 0x01;
+    public static final short VISIBILITY_SYSTEM  = 0x02;
 
     // Method Handle Types.
 

@@ -325,7 +325,7 @@ implements   ClassDefVisitor,
 
     @Override
     public void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation) {
-        printer.print(".annotation " + annotation.getVisibility().getName() + " ");
+        printer.print(".annotation " + annotation.getVisibility().getSimpleName() + " ");
         EncodedAnnotationValue annotationValue = annotation.getAnnotationValue();
         printer.println(annotationValue.getType(dexFile));
         printer.levelUp();

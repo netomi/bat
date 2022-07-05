@@ -84,6 +84,6 @@ extends      DataItem
 
     @Override
     public String toString() {
-        return String.format("Annotation[visibility='%s',value=%s]", visibility.getName(), value);
+        return String.format("Annotation[visibility='%s',value=%s]", visibility.getSimpleName(), value);
     }
 }

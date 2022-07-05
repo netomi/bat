@@ -69,7 +69,7 @@ public class Assembler
     }
 
     public static void main(String[] args) throws IOException {
-        String fileName = "smali/src/test/resources/smali/Test.smali";
+        String fileName = "smali/src/test/resources/smali/R.smali";
 
         DexFile dexFile = DexFile.of(DexFormat.FORMAT_035);
         try (InputStream is = Files.newInputStream(Paths.get(fileName)))
