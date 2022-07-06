@@ -13,23 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.value;
+package com.github.netomi.bat.dexfile.value
 
-public class EncodedLongValueTest
-extends      EncodedValueTest<EncodedLongValue>
-{
-    @Override
-    protected EncodedLongValue[] getTestInstance() {
-        return new EncodedLongValue[] {
-            EncodedLongValue.of(0),
-            EncodedLongValue.of(1),
-            EncodedLongValue.of(-1),
-            EncodedLongValue.of(127),
-            EncodedLongValue.of(-127),
-            EncodedLongValue.of(128),
-            EncodedLongValue.of(-128),
-            EncodedLongValue.of(Long.MIN_VALUE),
-            EncodedLongValue.of(Long.MAX_VALUE)
-        };
+import com.github.netomi.bat.dexfile.value.EncodedStringValue.Companion.of
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+
+class EncodedStringValueTest : EncodedValueTest<EncodedStringValue>() {
+    override val testInstance: Array<EncodedStringValue>
+        get() = arrayOf(
+            of(1),
+            of(65535)
+        )
+
+    @Test
+    fun inputChecking() {
+        assertThrows(IllegalArgumentException::class.java) { of(-1) }
     }
 }

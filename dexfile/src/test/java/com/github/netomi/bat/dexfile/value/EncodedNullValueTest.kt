@@ -13,27 +13,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.value;
+package com.github.netomi.bat.dexfile.value
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-public class EncodedStringValueTest
-extends      EncodedValueTest<EncodedStringValue>
-{
-    @Override
-    protected EncodedStringValue[] getTestInstance() {
-        return new EncodedStringValue[] {
-            EncodedStringValue.of(1),
-            EncodedStringValue.of(65535)
-        };
-    }
-
-    @Test
-    public void inputChecking() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            EncodedStringValue.of(-1);
-        });
-    }
+class EncodedNullValueTest : EncodedValueTest<EncodedNullValue>() {
+    override val testInstance: Array<EncodedNullValue>
+        get() = arrayOf(EncodedNullValue)
 }

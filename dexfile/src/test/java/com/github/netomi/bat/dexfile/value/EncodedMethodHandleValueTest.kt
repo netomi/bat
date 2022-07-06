@@ -13,27 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.value;
+package com.github.netomi.bat.dexfile.value
 
-import org.junit.jupiter.api.Test;
+import com.github.netomi.bat.dexfile.value.EncodedMethodHandleValue.Companion.of
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-public class EncodedTypeValueTest
-extends      EncodedValueTest<EncodedTypeValue>
-{
-    @Override
-    protected EncodedTypeValue[] getTestInstance() {
-        return new EncodedTypeValue[] {
-            EncodedTypeValue.of(1),
-            EncodedTypeValue.of(65535)
-        };
-    }
+class EncodedMethodHandleValueTest : EncodedValueTest<EncodedMethodHandleValue>() {
+    override val testInstance: Array<EncodedMethodHandleValue>
+        get() = arrayOf(
+            of(1),
+            of(65535)
+        )
 
     @Test
-    public void inputChecking() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            EncodedTypeValue.of(-1);
-        });
+    fun inputChecking() {
+        assertThrows(IllegalArgumentException::class.java) { of(-1) }
     }
 }

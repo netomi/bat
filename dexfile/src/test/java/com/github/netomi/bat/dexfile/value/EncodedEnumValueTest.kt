@@ -13,21 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.value;
+package com.github.netomi.bat.dexfile.value
 
-public class EncodedDoubleValueTest
-extends      EncodedValueTest<EncodedDoubleValue>
-{
-    @Override
-    protected EncodedDoubleValue[] getTestInstance() {
-        return new EncodedDoubleValue[] {
-            EncodedDoubleValue.of(0d),
-            EncodedDoubleValue.of(1d),
-            EncodedDoubleValue.of(-1d),
-            EncodedDoubleValue.of(0.1d),
-            EncodedDoubleValue.of(-0.1d),
-            EncodedDoubleValue.of(Double.MIN_VALUE),
-            EncodedDoubleValue.of(Double.MAX_VALUE)
-        };
+import com.github.netomi.bat.dexfile.value.EncodedEnumValue.Companion.of
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+
+class EncodedEnumValueTest : EncodedValueTest<EncodedEnumValue>() {
+    override val testInstance: Array<EncodedEnumValue>
+        get() = arrayOf(
+            of(1),
+            of(65535)
+        )
+
+    @Test
+    fun inputChecking() {
+        assertThrows(IllegalArgumentException::class.java) { of(-1) }
     }
 }

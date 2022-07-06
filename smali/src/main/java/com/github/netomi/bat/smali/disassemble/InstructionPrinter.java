@@ -90,11 +90,11 @@ implements InstructionVisitor
         printer.print("(");
 
         EncodedValueVisitor valueVisitor = new CallSiteArgumentPrinter(printer);
-        for (int i = 1; i < arrayValue.getValueCount(); i++) {
+        for (int i = 1; i < arrayValue.getEncodedValueCount(); i++) {
             if (i > 1) {
                 printer.print(", ");
             }
-            arrayValue.getValue(i).accept(dexFile, valueVisitor);
+            arrayValue.getEncodedValue(i).accept(dexFile, valueVisitor);
         }
 
         printer.print(")@");

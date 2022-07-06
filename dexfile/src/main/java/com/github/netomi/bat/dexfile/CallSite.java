@@ -33,9 +33,9 @@ extends      EncodedArray
     public static CallSite of(int methodHandleIndex, int nameIndex, int protoIndex) {
         CallSite callSite = new CallSite();
 
-        callSite.encodedArrayValue.addValue(EncodedMethodHandleValue.of(methodHandleIndex));
-        callSite.encodedArrayValue.addValue(EncodedStringValue.of(nameIndex));
-        callSite.encodedArrayValue.addValue(EncodedMethodTypeValue.of(protoIndex));
+        callSite.encodedArrayValue.addEncodedValue(EncodedMethodHandleValue.of(methodHandleIndex));
+        callSite.encodedArrayValue.addEncodedValue(EncodedStringValue.of(nameIndex));
+        callSite.encodedArrayValue.addEncodedValue(EncodedMethodTypeValue.of(protoIndex));
 
         return callSite;
     }
@@ -49,7 +49,7 @@ extends      EncodedArray
     private CallSite() {}
 
     public EncodedMethodHandleValue getMethodHandle() {
-        return (EncodedMethodHandleValue) encodedArrayValue.getValue(0);
+        return (EncodedMethodHandleValue) encodedArrayValue.getEncodedValue(0);
     }
 
     public MethodHandle getMethodHandle(DexFile dexFile) {
@@ -57,15 +57,15 @@ extends      EncodedArray
     }
 
     public EncodedStringValue getMethodName() {
-        return (EncodedStringValue) encodedArrayValue.getValue(1);
+        return (EncodedStringValue) encodedArrayValue.getEncodedValue(1);
     }
 
     public String getMethodName(DexFile dexFile) {
-        return getMethodName().getString(dexFile);
+        return getMethodName().getStringValue(dexFile);
     }
 
     public EncodedMethodTypeValue getMethodType() {
-        return (EncodedMethodTypeValue) encodedArrayValue.getValue(2);
+        return (EncodedMethodTypeValue) encodedArrayValue.getEncodedValue(2);
     }
 
     public ProtoID getMethodType(DexFile dexFile) {

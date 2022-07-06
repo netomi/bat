@@ -80,7 +80,7 @@ internal class CallSiteArgumentPrinter(private val printer: Mutf8Printer) : Enco
     }
 
     override fun visitStringValue(dexFile: DexFile, value: EncodedStringValue) {
-        printer.print("${value.getString(dexFile)} (String)")
+        printer.print("${value.getStringValue(dexFile)} (String)")
     }
 
     override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {

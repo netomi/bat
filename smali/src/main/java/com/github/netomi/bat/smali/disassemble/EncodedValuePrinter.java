@@ -69,13 +69,13 @@ implements EncodedValueVisitor
     @Override
     public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
         append("{");
-        int count = value.getValueCount();
+        int count = value.getEncodedValueCount();
         if (count > 0) {
             printer.println();
             printer.levelUp();
 
             for (int i = 0; i < count; i++) {
-                EncodedValue v = value.getValue(i);
+                EncodedValue v = value.getEncodedValue(i);
                 v.accept(dexFile, this);
                 if ((i + 1) < count) {
                     printer.print(",");
@@ -94,7 +94,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitFieldValue(DexFile dexFile, EncodedFieldValue value) {
-        FieldID fieldID = value.getField(dexFile);
+        FieldID fieldID = value.getFieldID(dexFile);
         append(fieldID.getClassType(dexFile) + "->" +
                fieldID.getName(dexFile) + ":" +
                fieldID.getType(dexFile));
@@ -102,7 +102,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitMethodValue(DexFile dexFile, EncodedMethodValue value) {
-        MethodID methodID = value.getMethod(dexFile);
+        MethodID methodID = value.getMethodID(dexFile);
         append(methodID.getClassTypeID(dexFile).getType(dexFile) + "->" +
                methodID.getName(dexFile) +
                methodID.getProtoID(dexFile).getDescriptor(dexFile));
@@ -145,7 +145,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitEnumValue(DexFile dexFile, EncodedEnumValue value) {
-        FieldID fieldID = value.getEnumField(dexFile);
+        FieldID fieldID = value.getFieldID(dexFile);
         append(".enum " +
                fieldID.getClassType(dexFile) + "->" +
                fieldID.getName(dexFile) + ":" +
@@ -184,7 +184,7 @@ implements EncodedValueVisitor
 
     @Override
     public void visitStringValue(DexFile dexFile, EncodedStringValue value) {
-        append("\"" + Strings.escapeString(value.getString(dexFile)) + "\"");
+        append("\"" + Strings.escapeString(value.getStringValue(dexFile)) + "\"");
     }
 
     // private utility methods.

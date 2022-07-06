@@ -13,18 +13,21 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.value;
+package com.github.netomi.bat.dexfile.value
 
-public class EncodedAnnotationValueTest
-extends      EncodedValueTest<EncodedAnnotationValue>
-{
-    @Override
-    protected EncodedAnnotationValue[] getTestInstance() {
-        return new EncodedAnnotationValue[] {
-            EncodedAnnotationValue.of(1, AnnotationElement.of(2, EncodedStringValue.of(3))),
-            EncodedAnnotationValue.of(65535,
-                                      AnnotationElement.of(65535, EncodedStringValue.of(65535)),
-                                      AnnotationElement.of(1, EncodedIntValue.of(1))),
-        };
+import com.github.netomi.bat.dexfile.value.EncodedMethodValue.Companion.of
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+
+class EncodedMethodValueTest : EncodedValueTest<EncodedMethodValue>() {
+    override val testInstance: Array<EncodedMethodValue>
+        get() = arrayOf(
+            of(1),
+            of(65535)
+        )
+
+    @Test
+    fun inputChecking() {
+        assertThrows(IllegalArgumentException::class.java) { of(-1) }
     }
 }

@@ -62,14 +62,14 @@ extends      DataItem
     }
 
     public void accept(DexFile dexFile, EncodedValueVisitor visitor) {
-        for (int i = 0; i < encodedArrayValue.getValueCount(); i++) {
-            encodedArrayValue.getValue(i).accept(dexFile, visitor);
+        for (int i = 0; i < encodedArrayValue.getEncodedValueCount(); i++) {
+            encodedArrayValue.getEncodedValue(i).accept(dexFile, visitor);
         }
     }
 
     public void accept(DexFile dexFile, int index, EncodedValueVisitor visitor) {
-        if (index >= 0 && index < encodedArrayValue.getValueCount()) {
-            encodedArrayValue.getValue(index).accept(dexFile, visitor);
+        if (index >= 0 && index < encodedArrayValue.getEncodedValueCount()) {
+            encodedArrayValue.getEncodedValue(index).accept(dexFile, visitor);
         }
     }
 
