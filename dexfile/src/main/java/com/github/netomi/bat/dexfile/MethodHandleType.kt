@@ -24,6 +24,7 @@ import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INVOKE_INTE
 import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INVOKE_STATIC
 import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_STATIC_GET
 import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_STATIC_PUT
+import com.google.common.base.Preconditions
 
 enum class MethodHandleType(val value: Int, private val targetsField: Boolean, private val targetsInstance: Boolean, val simpleName: String) {
     STATIC_PUT(        METHOD_HANDLE_TYPE_STATIC_PUT,         true,  false, "static-put"),
@@ -47,6 +48,7 @@ enum class MethodHandleType(val value: Int, private val targetsField: Boolean, p
     companion object {
         @JvmStatic
         fun of(value: Int): MethodHandleType {
+            Preconditions.checkElementIndex(value, MethodHandleType.values().size, "unexpected MethodHandleType value $value")
             return values()[value]
         }
     }
