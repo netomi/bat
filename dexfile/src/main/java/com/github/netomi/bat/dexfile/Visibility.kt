@@ -13,34 +13,26 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile;
+package com.github.netomi.bat.dexfile
 
-public enum Visibility
-{
+import com.github.netomi.bat.util.Primitives
+
+enum class Visibility(val flagValue: Int) {
     PUBLIC         (DexConstants.ACC_PUBLIC),
     PRIVATE        (DexConstants.ACC_PRIVATE),
     PROTECTED      (DexConstants.ACC_PROTECTED),
     PACKAGE_PRIVATE(0x0);
 
-    private final int value;
-
-    Visibility(int value) {
-        this.value = value;
-    }
-
-    public int getFlagValue() {
-        return value;
-    }
-
-    public static Visibility of(int accessFlags) {
-        int value = accessFlags & 0xf;
-
-        for (Visibility visibility : values()) {
-            if (value == visibility.getFlagValue()) {
-                return visibility;
+    companion object {
+        @JvmStatic
+        fun of(accessFlags: Int): Visibility {
+            val value = accessFlags and 0xf
+            for (visibility in values()) {
+                if (value == visibility.flagValue) {
+                    return visibility
+                }
             }
+            throw IllegalStateException("unexpected accessFlags ${Primitives.toHexString(accessFlags)}")
         }
-
-        throw new IllegalStateException("unexpected accessFlags " + accessFlags);
     }
 }

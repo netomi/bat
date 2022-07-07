@@ -47,7 +47,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     override fun visitHeader(dexFile: DexFile, header: DexHeader) {
         printer.println("DEX file header:")
         printer.println("magic               : '" + Primitives.toAsciiString(header.magic) + "'")
-        printer.println("checksum            : " + Primitives.asHexValue(header.checksum, 8))
+        printer.println("checksum            : " + Primitives.asHexValue(header.checksum.toLong(), 8))
         printer.println("signature           : " + formatSignatureByteArray(header.signature))
         printer.println("file_size           : " + header.fileSize)
         printer.println("header_size         : " + header.headerSize)

@@ -79,7 +79,7 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         annotations.clear();
         annotations.ensureCapacity(annotationOffsetEntries.size());
         for (int i = 0; i < annotationOffsetEntries.size(); i++) {
@@ -91,7 +91,7 @@ extends      DataItem
     }
 
     @Override
-    protected void updateOffsets(Map dataItemMap) {
+    public void updateOffsets(Map dataItemMap) {
         annotationOffsetEntries.clear();
         annotationOffsetEntries.resize(annotations.size());
         for (int i = 0; i < annotations.size(); i++) {
@@ -100,7 +100,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeInt(annotationOffsetEntries.size());

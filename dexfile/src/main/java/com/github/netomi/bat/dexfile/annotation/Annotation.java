@@ -77,7 +77,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeUnsignedByte(visibility.getValue());
         value.write(output);
     }

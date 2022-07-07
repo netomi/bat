@@ -31,8 +31,6 @@ import java.util.Objects;
  * A class representing a string data item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#string-data-item">string data item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_STRING_DATA_ITEM,
@@ -78,7 +76,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         int utf16Size = stringValue.length();
         output.writeUleb128(utf16Size);
 

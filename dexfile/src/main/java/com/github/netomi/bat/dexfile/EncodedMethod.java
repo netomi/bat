@@ -27,8 +27,6 @@ import java.util.Objects;
  * A class representing an encoded method inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-method-format">encoded method @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 public class EncodedMethod
 extends      DexContent
@@ -124,7 +122,7 @@ extends      DexContent
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         if (codeOffset != 0) {
             input.setOffset(codeOffset);
 
@@ -142,7 +140,7 @@ extends      DexContent
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         codeOffset = dataItemMap.getOffset(code);
     }
 
@@ -153,7 +151,7 @@ extends      DexContent
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeUleb128(deltaMethodIndex);
         output.writeUleb128(accessFlags);
         output.writeUleb128(codeOffset);

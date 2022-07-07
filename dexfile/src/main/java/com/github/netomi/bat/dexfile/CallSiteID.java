@@ -25,8 +25,6 @@ import java.util.Objects;
  * A class representing a callsite id item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#call-site-id-item">callsite id item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_CALL_SITE_ID_ITEM,
@@ -73,18 +71,18 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         input.setOffset(callSiteOffset);
         callSite = CallSite.readContent(input);
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         callSiteOffset = dataItemMap.getOffset(callSite);
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(callSiteOffset);
     }

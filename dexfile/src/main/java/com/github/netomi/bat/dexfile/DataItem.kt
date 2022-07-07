@@ -13,34 +13,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile;
+package com.github.netomi.bat.dexfile
 
 /**
  * Represents a data item contained in a dex file.
- *
- * @author Thomas Neidhart
  */
-public abstract class DataItem
-extends               DexContent
-{
+abstract class DataItem : DexContent() {
     /**
-     * Returns the type of this {@code DataItem} instance.
+     * Returns the type of this `DataItem` instance.
      *
      * @return the type of this DataItem.
      */
-    protected int getItemType() {
-        return this.getClass().getAnnotation(DataItemAnn.class).type();
+    val itemType: Int
+        get() = javaClass.getAnnotation(DataItemAnn::class.java).type
+
+    val dataAlignment: Int
+        get() = javaClass.getAnnotation(DataItemAnn::class.java).dataAlignment
+
+    protected fun containedInDataSection(): Boolean {
+        return javaClass.getAnnotation(DataItemAnn::class.java).dataSection
     }
 
-    protected int getDataAlignment() {
-        return this.getClass().getAnnotation(DataItemAnn.class).dataAlignment();
-    }
-
-    protected boolean containedInDataSection() {
-        return this.getClass().getAnnotation(DataItemAnn.class).dataSection();
-    }
-
-    public interface Map {
-        int getOffset(DataItem item);
+    interface Map {
+        fun getOffset(item: DataItem?): Int
     }
 }

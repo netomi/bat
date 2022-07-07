@@ -57,7 +57,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         encodedArrayValue.writeValue(output, 0);
     }
 

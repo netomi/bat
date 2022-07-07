@@ -77,18 +77,18 @@ extends      DexContent
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         input.setOffset(annotationsOffset);
         annotationSet = AnnotationSet.readContent(input);
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         annotationsOffset = dataItemMap.getOffset(annotationSet);
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeInt(methodIndex);
         output.writeInt(annotationsOffset);
     }

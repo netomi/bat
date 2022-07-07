@@ -13,44 +13,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile;
+package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.io.DexDataInput;
-import com.github.netomi.bat.dexfile.io.DexDataOutput;
-import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
+import com.github.netomi.bat.dexfile.io.DexDataInput
+import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 
 /**
- * The common base interface for any structure contained
- * in a dex file.
- *
- * @author Thomas Neidhart
+ * The common base interface for any structure contained in a dex file.
  */
-public abstract class DexContent
-{
+abstract class DexContent {
     /**
      * De-serializes this structure from the given input stream.
      *
      * @param input the input stream to read from.
      */
-    protected abstract void read(DexDataInput input);
+    protected abstract fun read(input: DexDataInput)
 
     /**
      * Serializes this structure to the given output stream.
      *
      * @param output the output stream to write to.
      */
-    protected abstract void write(DexDataOutput output);
+    abstract fun write(output: DexDataOutput)
 
-    protected void readLinkedDataItems(DexDataInput input) {}
+    open fun readLinkedDataItems(input: DexDataInput) {}
 
-    protected void updateOffsets(DataItem.Map dataItemMap) {}
+    open fun updateOffsets(dataItemMap: DataItem.Map) {}
 
     /**
-     * Applies the given {@link DataItemVisitor} to all {@link DataItem}s
-     * contained in this {@link DexContent}.
+     * Applies the given [DataItemVisitor] to all [DataItem]s
+     * contained in this [DexContent].
      *
-     * @param dexFile the {@link DexFile} associated with this instance.
+     * @param dexFile the [DexFile] associated with this instance.
      * @param visitor the visitor to apply.
      */
-    public void dataItemsAccept(DexFile dexFile, DataItemVisitor visitor) {}
+    open fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {}
 }

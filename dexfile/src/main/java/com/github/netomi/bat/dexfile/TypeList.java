@@ -27,8 +27,6 @@ import java.util.Objects;
  * A class representing a list of type ids inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-list">type list @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_LIST,
@@ -115,7 +113,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         int size = typeList.size();

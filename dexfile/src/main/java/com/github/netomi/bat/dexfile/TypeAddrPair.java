@@ -76,7 +76,7 @@ extends      DexContent
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeUleb128(typeIndex);
         output.writeUleb128(addr);
     }

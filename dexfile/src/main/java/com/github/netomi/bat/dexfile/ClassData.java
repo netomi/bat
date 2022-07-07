@@ -146,7 +146,7 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         for (EncodedMethod method : directMethods) {
             method.readLinkedDataItems(input);
         }
@@ -157,7 +157,7 @@ extends      DataItem
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         for (EncodedMethod method : directMethods) {
             method.updateOffsets(dataItemMap);
         }
@@ -168,7 +168,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeUleb128(staticFields.size());
         output.writeUleb128(instanceFields.size());
         output.writeUleb128(directMethods.size());

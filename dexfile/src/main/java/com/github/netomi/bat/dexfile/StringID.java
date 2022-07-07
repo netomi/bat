@@ -26,8 +26,6 @@ import java.util.Objects;
  * A class representing a string id item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#string-item">string id item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_STRING_ID_ITEM,
@@ -78,18 +76,18 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         input.setOffset(stringDataOffset);
         stringData = StringData.readContent(input);
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         stringDataOffset = dataItemMap.getOffset(stringData);
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(stringDataOffset);
     }

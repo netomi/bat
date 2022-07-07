@@ -123,7 +123,7 @@ extends      DexContent
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeUleb128(deltaFieldIndex);
         output.writeUleb128(accessFlags);
     }

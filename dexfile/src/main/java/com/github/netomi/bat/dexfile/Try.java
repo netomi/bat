@@ -26,8 +26,6 @@ import java.util.Objects;
  * A class representing a try item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-item">try item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 public class Try
 extends      DexContent
@@ -95,7 +93,7 @@ extends      DexContent
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeInt(startAddr);
         output.writeUnsignedShort(insnCount);
         output.writeUnsignedShort(handlerOffset);

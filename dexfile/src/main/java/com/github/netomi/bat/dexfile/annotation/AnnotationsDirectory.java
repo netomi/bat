@@ -93,7 +93,7 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         if (classAnnotationsOffset != 0) {
             input.setOffset(classAnnotationsOffset);
             classAnnotations = AnnotationSet.readContent(input);
@@ -113,7 +113,7 @@ extends      DataItem
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         classAnnotationsOffset = dataItemMap.getOffset(classAnnotations);
 
         for (FieldAnnotation fieldAnnotation : fieldAnnotations) {
@@ -130,7 +130,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeInt(classAnnotationsOffset);

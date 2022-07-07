@@ -27,8 +27,6 @@ import java.util.*;
  * A class representing a debug info item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#debug-info-item">debug info item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_DEBUG_INFO_ITEM,
@@ -86,7 +84,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeUleb128(lineStart);
         output.writeUleb128(parameterNames.size());
         for (int i = 0; i < parameterNames.size(); i++) {

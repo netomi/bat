@@ -85,7 +85,7 @@ extends      DexContent
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeUnsignedShort(type);
         output.writeUnsignedShort(0x0);
         output.writeInt(size);

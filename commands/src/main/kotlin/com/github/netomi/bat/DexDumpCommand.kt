@@ -60,9 +60,8 @@ class DexDumpCommand : Runnable {
                     reader.visitDexFile(dexFile)
 
                     val ps = PrintStream(os)
-                    ps.println("Processing '$path'...")
-                    ps.println("Opened '%path', DEX version '${dexFile.dexFormat.version}'")
-                    ps.flush()
+                    ps.println("Processing '$name'...")
+                    ps.println("Opened '$name', DEX version '${dexFile.dexFormat?.version}'")
 
                     if (classNameFilter != null) {
                         dexFile.classDefsAccept(

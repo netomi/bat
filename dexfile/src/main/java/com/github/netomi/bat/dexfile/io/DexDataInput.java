@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.dexfile.io;
 
+import com.google.common.hash.Hasher;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -22,7 +24,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-import java.util.zip.Checksum;
 
 public class DexDataInput
 implements   Closeable
@@ -211,10 +212,8 @@ implements   Closeable
         return Arrays.copyOf(buf, readBytes);
     }
 
-    public void update(Checksum checksum) {
-        while (byteBuffer.hasRemaining()) {
-            checksum.update(byteBuffer.get());
-        }
+    public void update(Hasher hasher) {
+        hasher.putBytes(byteBuffer);
     }
 
     @Override

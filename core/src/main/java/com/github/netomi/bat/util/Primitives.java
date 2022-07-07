@@ -50,9 +50,10 @@ public final class Primitives
         sb.append('[');
         for (byte b : arr) {
             sb.append(toHexString(b));
+            sb.append(',');
         }
         if (arr.length > 0) {
-            sb.setLength(sb.length() - 2);
+            sb.setLength(sb.length() - 1);
         }
         sb.append(']');
         return sb.toString();
@@ -87,9 +88,7 @@ public final class Primitives
 
         String hexValue = Integer.toHexString(value);
         int leadingZeros = digits - hexValue.length();
-        for (int i = 0; i < leadingZeros; i++) {
-            sb.append('0');
-        }
+        sb.append("0".repeat(Math.max(0, leadingZeros)));
         sb.append(hexValue);
         return sb.toString();
     }
@@ -99,9 +98,7 @@ public final class Primitives
 
         String hexValue = Long.toHexString(value);
         int leadingZeros = digits - hexValue.length();
-        for (int i = 0; i < leadingZeros; i++) {
-            sb.append('0');
-        }
+        sb.append("0".repeat(Math.max(0, leadingZeros)));
         sb.append(hexValue);
         return sb.toString();
     }

@@ -29,8 +29,6 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
  * A class representing a proto id item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#proto-id-item">proto id item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_PROTO_ID_ITEM,
@@ -121,7 +119,7 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         if (parametersOffset != 0) {
             input.setOffset(parametersOffset);
             parameters = TypeList.readContent(input);
@@ -129,12 +127,12 @@ extends      DataItem
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         parametersOffset = dataItemMap.getOffset(parameters);
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(shortyIndex);
         output.writeInt(returnTypeIndex);

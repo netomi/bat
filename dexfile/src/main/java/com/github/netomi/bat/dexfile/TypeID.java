@@ -27,8 +27,6 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
  * A class representing a type id item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-id-item">type id item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_TYPE_ID_ITEM,
@@ -74,7 +72,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
         output.writeInt(descriptorIndex);
     }

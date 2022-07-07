@@ -13,18 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile;
+package com.github.netomi.bat.dexfile
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
 
-/**
- * @author Thomas Neidhart
- */
 @Retention(value = RetentionPolicy.RUNTIME)
-public @interface DataItemAnn
-{
-    int type();
-    int dataAlignment();
-    boolean dataSection();
-}
+annotation class DataItemAnn(val type: Int, val dataAlignment: Int, val dataSection: Boolean)

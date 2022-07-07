@@ -124,7 +124,7 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         if (debugInfoOffset != 0) {
             input.setOffset(debugInfoOffset);
             debugInfo = DebugInfo.readContent(input);
@@ -132,12 +132,12 @@ extends      DataItem
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         debugInfoOffset = dataItemMap.getOffset(debugInfo);
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeUnsignedShort(registersSize);

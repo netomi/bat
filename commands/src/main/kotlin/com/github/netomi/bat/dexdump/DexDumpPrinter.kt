@@ -53,7 +53,7 @@ class DexDumpPrinter constructor(
         dexFile.methodHandlesAccept(this)
         dexFile.callSiteIDsAccept(this)
 
-        printer.close()
+        printer.flush()
     }
 
     override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {

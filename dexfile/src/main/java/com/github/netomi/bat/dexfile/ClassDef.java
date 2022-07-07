@@ -29,8 +29,6 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
  * A class representing a class def item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#class-def-item">class def item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_CLASS_DEF_ITEM,

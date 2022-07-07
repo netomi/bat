@@ -24,8 +24,6 @@ import java.util.*;
  * A class representing an encoded catch handler inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-catch-handler">encoded catch handler @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 public class EncodedCatchHandler
 extends      DexContent
@@ -88,7 +86,7 @@ extends      DexContent
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         int writtenSize = handlers.size();
         if (catchAllAddr != -1) {
             writtenSize = -writtenSize;

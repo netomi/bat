@@ -454,7 +454,7 @@ class DebugStartLocalExtended : DebugStartLocal {
     }
 
     fun signature(dexFile: DexFile): String {
-        return dexFile.getString(sigIndex)
+        return dexFile.getString(sigIndex)!!
     }
 
     override fun read(input: DexDataInput) {

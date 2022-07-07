@@ -28,8 +28,6 @@ import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
  * A class representing a method handle item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-handle-item">method handle item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_METHOD_HANDLE_ITEM,
@@ -144,7 +142,7 @@ extends      DataItem
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeUnsignedShort(methodHandleType);

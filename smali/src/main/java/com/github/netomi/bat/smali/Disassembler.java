@@ -51,7 +51,7 @@ implements   ClassDefVisitor
 
         try (InputStream is = new FileInputStream("classes-io.dex"))
         {
-            DexFileReader reader = new DexFileReader(is);
+            DexFileReader reader = new DexFileReader(is, false);
             reader.visitDexFile(dexFile);
 
             dexFile.classDefsAccept(new Disassembler(new FileOutputStreamFactory(Paths.get("out2"), "smali")));

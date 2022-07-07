@@ -73,21 +73,21 @@ extends      DataItem
     }
 
     @Override
-    protected void readLinkedDataItems(DexDataInput input) {
+    public void readLinkedDataItems(DexDataInput input) {
         for (AnnotationSetRef annotationSetRef : annotationSetRefs) {
             annotationSetRef.readLinkedDataItems(input);
         }
     }
 
     @Override
-    protected void updateOffsets(DataItem.Map dataItemMap) {
+    public void updateOffsets(DataItem.Map dataItemMap) {
         for (AnnotationSetRef annotationSetRef : annotationSetRefs) {
             annotationSetRef.updateOffsets(dataItemMap);
         }
     }
 
     @Override
-    protected void write(DexDataOutput output) {
+    public void write(DexDataOutput output) {
         output.writeAlignmentPadding(getDataAlignment());
 
         output.writeInt(annotationSetRefs.size());
