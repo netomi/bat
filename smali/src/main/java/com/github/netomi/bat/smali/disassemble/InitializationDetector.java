@@ -44,7 +44,6 @@ implements InstructionVisitor
     public void visitFieldInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, FieldInstruction instruction) {
         String mnemonic = instruction.getMnemonic();
 
-
         if (mnemonic.contains("sput")) {
             FieldID fieldID = instruction.getField(dexFile);
 

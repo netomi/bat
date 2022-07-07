@@ -20,6 +20,7 @@ import java.io.IOException
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
 
 class FileOutputStreamFactory(private val baseDir: Path, private val extension: String) : OutputStreamFactory {
     @Throws(IOException::class)
@@ -35,7 +36,10 @@ class FileOutputStreamFactory(private val baseDir: Path, private val extension: 
             currentPath = currentPath.resolve(component)
         }
 
-        Files.createDirectories(currentPath)
+        if (!currentPath.exists()) {
+            Files.createDirectories(currentPath)
+        }
+
         currentPath = currentPath.resolve(Classes.simpleClassNameFromInternalName(className) + '.' + extension)
 
         return Files.newOutputStream(currentPath)

@@ -13,6 +13,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":dexfile"))
+    implementation(project(":smali"))
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiterVersion}")

@@ -15,10 +15,31 @@
  */
 package com.github.netomi.bat.dexfile.visitor;
 
+import com.github.netomi.bat.dexfile.CallSite;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 
 public interface ClassDefVisitor
 {
     void visitClassDef(DexFile dexFile, int index, ClassDef classDef);
+
+    class      Multi
+    extends    AbstractMultiVisitor<ClassDefVisitor>
+    implements ClassDefVisitor
+    {
+        public static ClassDefVisitor of(ClassDefVisitor visitor, ClassDefVisitor... visitors) {
+            return new Multi(visitor, visitors);
+        }
+
+        private Multi(ClassDefVisitor visitor, ClassDefVisitor... otherVisitors) {
+            super(visitor, otherVisitors);
+        }
+
+        @Override
+        public void visitClassDef(DexFile dexFile, int index, ClassDef classDef) {
+            for (ClassDefVisitor visitor : visitors()) {
+                visitor.visitClassDef(dexFile, index, classDef);
+            }
+        }
+    }
 }

@@ -53,7 +53,7 @@ class DexDumpCommand : Runnable {
     override fun run() {
         inputFile?.apply {
             FileInputStream(this).use { `is` ->
-                val output = if (outputFile == null) System.out else FileOutputStream(outputFile)
+                val output = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
                 output.use { os ->
                     val reader  = DexFileReader(`is`)
                     val dexFile = DexFile()

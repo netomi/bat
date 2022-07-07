@@ -445,11 +445,11 @@ implements InstructionVisitor
 
     private void printLabels(Code code, int offset) {
         branchTargetPrinter.printLabels(offset, printer);
-        TryPrinter.printTryCatchLabels(code, offset, printer);
+        TryCatchPrinter.printTryCatchLabels(code, offset, printer);
     }
 
     private void printEndLabels(DexFile dexFile, Code code, int offset, int instructionLength) {
-        TryPrinter.printTryEndLabel(dexFile, code, offset, instructionLength, printer);
+        TryCatchPrinter.printTryEndLabel(dexFile, code, offset, instructionLength, printer);
     }
 
     private void printCommentIfLikelyFloat(IndentingPrinter printer, int val) {
