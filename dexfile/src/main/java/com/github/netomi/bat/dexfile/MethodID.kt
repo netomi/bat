@@ -101,7 +101,7 @@ data class MethodID internal constructor(
             Preconditions.checkArgument(classIndex >= 0, "class index must be non negative")
             Preconditions.checkArgument(nameIndex >= 0, "name index must be non negative")
             Preconditions.checkArgument(protoIndex >= 0, "proto index must be non negative")
-            return MethodID(classIndex, protoIndex, nameIndex)
+            return MethodID(classIndex, nameIndex, protoIndex)
         }
 
         @JvmStatic
