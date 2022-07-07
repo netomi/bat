@@ -202,8 +202,8 @@ class DexFile {
     fun addOrGetMethodID(classType: String, name: String, shorty: String, returnType: String, vararg parameterTypes: String): Int {
         val methodID = MethodID.of(
             addOrGetTypeIDIndex(classType),
-            addOrGetProtoID(shorty, returnType, *parameterTypes),
-            addOrGetStringIDIndex(name)
+            addOrGetStringIDIndex(name),
+            addOrGetProtoID(shorty, returnType, *parameterTypes)
         )
         var index = methodIDMap[methodID]
         if (index == null) {

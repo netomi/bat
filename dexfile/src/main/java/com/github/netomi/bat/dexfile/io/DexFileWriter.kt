@@ -56,6 +56,7 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
         // after the second pass, update the checksum and signature fields
         val byteBuffer = output.byteBuffer
 
+        @Suppress("DEPRECATION")
         val sha1Signature = Hashing.sha1().newHasher()
         byteBuffer.position(32)
         sha1Signature.putBytes(byteBuffer)

@@ -57,6 +57,7 @@ class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor 
 
     private fun verifySignature(dexFile: DexFile) {
         assert(dexFile.header != null)
+        @Suppress("DEPRECATION")
         val sha1Hasher = Hashing.sha1().newHasher()
 
         input.offset = 32
