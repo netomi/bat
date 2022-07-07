@@ -58,8 +58,10 @@ public abstract class DexContentTest<T extends DexContent>
             // write a dummy byte to avoid any data item starting at offset 0.
             output.writeByte((byte) 0x0);
 
+            DexFile dexFile = new DexFile(DexFormat.FORMAT_035);
+
             // collect all linked data items and serialize them first.
-            data.dataItemsAccept(null, new DataItemVisitor() {
+            data.dataItemsAccept(dexFile, new DataItemVisitor() {
                 @Override
                 public void visitAnyDataItem(DexFile dexFile, DataItem dataItem) {
                     dataItemMap.setOffset(dataItem, output.getOffset());

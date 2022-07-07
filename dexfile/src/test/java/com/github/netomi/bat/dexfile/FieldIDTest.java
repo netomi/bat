@@ -58,8 +58,8 @@ extends      DexContentTest<FieldID>
         FieldID[] data = getTestInstances();
 
         assertEquals(1, data[0].getClassIndex());
-        assertEquals(2, data[0].getTypeIndex());
-        assertEquals(3, data[0].getNameIndex());
+        assertEquals(2, data[0].getNameIndex());
+        assertEquals(3, data[0].getTypeIndex());
     }
 
     @Test
