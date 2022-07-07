@@ -103,7 +103,7 @@ implements InstructionVisitor
         printer.print(methodHandle.getTargetClassType(dexFile));
         printer.print("->");
         printer.print(methodHandle.getTargetMemberName(dexFile));
-        printer.println(methodHandle.getTargetDecriptor(dexFile));
+        printer.println(methodHandle.getTargetDescriptor(dexFile));
     }
 
     @Override

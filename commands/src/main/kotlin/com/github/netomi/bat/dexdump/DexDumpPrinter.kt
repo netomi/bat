@@ -115,9 +115,9 @@ class DexDumpPrinter constructor(
     override fun visitMethodHandle(dexFile: DexFile, index: Int, methodHandle: MethodHandle) {
         printer.println("Method handle #%d:".format(index))
         printer.levelUp()
-        printer.println("type        : " + methodHandle.methodHandleType.getName())
+        printer.println("type        : " + methodHandle.methodHandleType.simpleName)
         printer.println("target      : " + methodHandle.getTargetClassType(dexFile) + " " + methodHandle.getTargetMemberName(dexFile))
-        printer.println("target_type : " + methodHandle.getTargetDecriptor(dexFile))
+        printer.println("target_type : " + methodHandle.getTargetDescriptor(dexFile))
         printer.levelDown()
     }
 

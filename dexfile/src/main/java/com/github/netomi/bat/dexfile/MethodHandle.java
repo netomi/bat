@@ -124,7 +124,7 @@ extends      DataItem
         }
     }
 
-    public String getTargetDecriptor(DexFile dexFile) {
+    public String getTargetDescriptor(DexFile dexFile) {
         MethodHandleType methodHandleType = getMethodHandleType();
         return methodHandleType.targetsInstance() ?
             String.format("(%s%s", getTargetClassType(dexFile), getTargetMemberDescriptor(dexFile).substring(1)) :
