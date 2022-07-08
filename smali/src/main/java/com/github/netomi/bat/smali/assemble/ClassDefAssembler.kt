@@ -18,12 +18,11 @@ package com.github.netomi.bat.smali.assemble
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.annotation.Annotation
+import com.github.netomi.bat.dexfile.annotation.AnnotationSet
 import com.github.netomi.bat.dexfile.annotation.AnnotationVisibility
-import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue
-import com.github.netomi.bat.dexfile.value.EncodedValue
+import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliLexer
-import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
@@ -58,37 +57,43 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
             classDef.interfaces.addType(dexFile.addOrGetTypeIDIndex(it.name.text))
         }
 
+        val annotationDirectory = classDef.annotationsDirectory
+
         ctx.sField().forEach { visitSField(it, classType) }
         ctx.sMethod().forEach { visitSMethod(it, classType) }
 
-        ctx.sAnnotation().forEach { visitSAnnotation(it) }
+        ctx.sAnnotation().forEach { visitSAnnotation(it, annotationDirectory.classAnnotations) }
 
         return classDef
     }
 
-    override fun visitSAnnotation(ctx: SmaliParser.SAnnotationContext): ClassDef? {
+    fun visitSAnnotation(ctx: SAnnotationContext, annotationSet: AnnotationSet) {
         val annotationType       = ctx.OBJECT_TYPE().text
         val annotationVisibility = AnnotationVisibility.of(ctx.ANN_VISIBLE().text)
 
         val annotationTypeIndex = dexFile.addOrGetTypeIDIndex(annotationType)
 
-        val encodedValue = EncodedAnnotationValue.of(annotationTypeIndex)
+        val annotationElements = mutableListOf<AnnotationElement>()
 
         ctx.sAnnotationKeyName().forEachIndexed { index, sAnnotationKeyNameContext ->
             val sAnnotationValueContext = ctx.sAnnotationValue(index)
 
-            println(sAnnotationKeyNameContext.text)
-            println(sAnnotationValueContext.text)
-
-            parseAnnotationValueContext(sAnnotationValueContext)
+            val annotationValue = parseAnnotationValueContext(sAnnotationValueContext)
+            if (annotationValue != null) {
+                val element =
+                    AnnotationElement.of(dexFile.addOrGetStringIDIndex(sAnnotationKeyNameContext.text),
+                                         annotationValue)
+                annotationElements.add(element)
+            }
         }
 
-        Annotation.of(annotationVisibility, encodedValue)
-        
-        return null
+        val encodedAnnotationValue = EncodedAnnotationValue.of(annotationTypeIndex, *annotationElements.toTypedArray())
+        val annotation = Annotation.of(annotationVisibility, encodedAnnotationValue)
+
+        annotationSet.addAnnotation(annotation)
     }
 
-    fun visitSField(ctx: SmaliParser.SFieldContext, classType: String) {
+    fun visitSField(ctx: SFieldContext, classType: String) {
         val fieldElements = ctx.fieldObj.text.split(":")
         assert(fieldElements.size == 2)
 
@@ -103,7 +108,7 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
 
     }
 
-    fun visitSMethod(ctx: SmaliParser.SMethodContext, classType: String) {
+    fun visitSMethod(ctx: SMethodContext, classType: String) {
         val (name, parameterTypes, returnType) = parseMethodObj(ctx.methodObj.text)
 
         val accessFlags = collectAccessFlags(ctx.sAccList())
@@ -113,6 +118,31 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
 
         classDef.addMethod(dexFile, method)
     }
+
+    private fun parseAnnotationValueContext(ctx: SAnnotationValueContext): EncodedValue? {
+        val t: ParserRuleContext = ctx.getChild(0) as ParserRuleContext
+        when (t.ruleIndex) {
+            RULE_sArrayValue -> {
+                val values = mutableListOf<EncodedValue>()
+
+                val arrayValueContext: SArrayValueContext = t as SArrayValueContext
+                for (annotationValueContext: SAnnotationValueContext in arrayValueContext.sAnnotationValue()) {
+                    val value = parseAnnotationValueContext(annotationValueContext)
+                    value?.apply { values.add(this) }
+                }
+
+                return EncodedArrayValue.of(*values.toTypedArray())
+            }
+
+            RULE_sBaseValue -> {
+                val baseValueContext = t as SBaseValueContext
+                return EncodedValueParser.parseBaseValue(baseValueContext, dexFile)
+            }
+        }
+
+        return null
+    }
+
 
     companion object {
         fun collectAccessFlags(sAccListContext: SAccListContext): Int {
@@ -132,53 +162,6 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
             val parameterTypes = methodObj.substring(x + 1, y).split(",")
             val returnType = methodObj.substring(y + 1)
             return Triple(name, parameterTypes, returnType)
-        }
-
-        fun parseAnnotationValueContext(ctx: SAnnotationValueContext) {
-            val t: ParserRuleContext = ctx.getChild(0) as ParserRuleContext
-            when (t.ruleIndex) {
-                RULE_sArrayValue -> {
-                    val arrayValueContext: SArrayValueContext = t as SArrayValueContext
-                    for (annotationValueContext: SAnnotationValueContext in arrayValueContext.sAnnotationValue()) {
-                        parseAnnotationValueContext(annotationValueContext)
-                    }
-                }
-
-                RULE_sBaseValue -> {
-                    val baseValueContext = t as SBaseValueContext
-                    val value: Any? = parseBaseValue(baseValueContext)
-
-                    println(value)
-                }
-
-            }
-        }
-
-        private fun parseBaseValue(ctx: SBaseValueContext): Any? {
-            val value: Token = if (ctx.childCount == 1) {
-                val tn: TerminalNode = ctx.getChild(0) as TerminalNode
-                tn.symbol
-            } else {
-                val tn: TerminalNode = ctx.getChild(1) as TerminalNode
-                tn.symbol
-            }
-
-            return when (value.type) {
-                SmaliLexer.STRING -> value.text
-                SmaliLexer.BOOLEAN -> "true" == value.text
-                SmaliLexer.BYTE -> value.text
-                SmaliLexer.SHORT -> value.text
-                SmaliLexer.CHAR -> value.text
-                SmaliLexer.INT -> value.text
-                SmaliLexer.LONG -> value.text
-                SmaliLexer.BASE_FLOAT, SmaliLexer.FLOAT_INFINITY, SmaliLexer.FLOAT_NAN -> value.text
-                SmaliLexer.BASE_DOUBLE, SmaliLexer.DOUBLE_INFINITY, SmaliLexer.DOUBLE_NAN -> value.text
-                SmaliLexer.METHOD_FULL -> value.text
-                SmaliLexer.OBJECT_TYPE -> value.text
-                SmaliLexer.NULL -> null
-                SmaliLexer.FIELD_FULL -> value.text
-                else -> null
-            }
         }
     }
 }

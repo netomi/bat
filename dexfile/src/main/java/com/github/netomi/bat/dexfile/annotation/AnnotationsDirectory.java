@@ -54,7 +54,7 @@ extends      DataItem
     }
 
     private AnnotationsDirectory() {
-        classAnnotations     = null;
+        classAnnotations     = AnnotationSet.empty();
         fieldAnnotations     = Collections.emptyList();
         methodAnnotations    = Collections.emptyList();
         parameterAnnotations = Collections.emptyList();

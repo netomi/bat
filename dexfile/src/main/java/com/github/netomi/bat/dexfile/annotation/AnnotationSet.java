@@ -23,17 +23,12 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.util.IntArray;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.ListIterator;
-import java.util.function.BiConsumer;
 
 /**
  * A class representing an annotation set item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#annotation-set-item">annotation set item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
     type          = DexConstants.TYPE_ANNOTATION_SET_ITEM,
@@ -53,6 +48,10 @@ extends      DataItem
         return annotationSet;
     }
 
+    public static AnnotationSet empty() {
+        return new AnnotationSet();
+    }
+
     private AnnotationSet() {
         annotationOffsetEntries = new IntArray(0);
         annotations             = new ArrayList<>(0);
@@ -64,6 +63,10 @@ extends      DataItem
 
     public Annotation getAnnotation(int index) {
         return annotations.get(index);
+    }
+
+    public void addAnnotation(Annotation annotation) {
+        annotations.add(annotation);
     }
 
     @Override
