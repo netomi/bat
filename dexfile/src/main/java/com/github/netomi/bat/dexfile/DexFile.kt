@@ -327,39 +327,39 @@ class DexFile {
         }
     }
 
-    fun read(`in`: DexDataInput) {
+    internal fun refreshCaches() {
         // update caches:
-        stringMap = HashMap(stringIDCount)
+        stringMap.clear()
         val stringIterator: ListIterator<StringID> = stringIDs.listIterator()
         while (stringIterator.hasNext()) {
             val index = stringIterator.nextIndex()
             stringMap[stringIterator.next().stringValue] = index
         }
-        typeMap = HashMap(typeIDCount)
+        typeMap.clear()
         val typeIterator: ListIterator<TypeID> = typeIDs.listIterator()
         while (typeIterator.hasNext()) {
             val index = typeIterator.nextIndex()
             typeMap[typeIterator.next().getType(this)] = index
         }
-        protoIDMap = HashMap(protoIDCount)
+        protoIDMap.clear()
         val protoIDIterator: ListIterator<ProtoID> = protoIDs.listIterator()
         while (protoIDIterator.hasNext()) {
             val index = protoIDIterator.nextIndex()
             protoIDMap[protoIDIterator.next()] = index
         }
-        classDefMap = HashMap(classDefCount)
+        classDefMap.clear()
         val classDefIterator: ListIterator<ClassDef> = classDefs.listIterator()
         while (classDefIterator.hasNext()) {
             val index = classDefIterator.nextIndex()
             classDefMap[classDefIterator.next().getClassName(this)] = index
         }
-        fieldIDMap = HashMap(fieldIDCount)
+        fieldIDMap.clear()
         val fieldIDIterator: ListIterator<FieldID> = fieldIDs.listIterator()
         while (fieldIDIterator.hasNext()) {
             val index = fieldIDIterator.nextIndex()
             fieldIDMap[fieldIDIterator.next()] = index
         }
-        methodIDMap = HashMap(methodIDCount)
+        methodIDMap.clear()
         val methodIDIterator: ListIterator<MethodID> = methodIDs.listIterator()
         while (methodIDIterator.hasNext()) {
             val index = methodIDIterator.nextIndex()

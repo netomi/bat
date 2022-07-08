@@ -29,7 +29,7 @@ import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 
 
-class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDef?>() {
+internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDef?>() {
 
     private lateinit var classDef: ClassDef
 
@@ -67,12 +67,7 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
         return classDef
     }
 
-    fun visitSAnnotation(ctx: SAnnotationContext, annotationSet: AnnotationSet) {
-        val annotationType       = ctx.OBJECT_TYPE().text
-        val annotationVisibility = AnnotationVisibility.of(ctx.ANN_VISIBLE().text)
-
-        val annotationTypeIndex = dexFile.addOrGetTypeIDIndex(annotationType)
-
+    private fun visitSAnnotation(ctx: SAnnotationContext, annotationSet: AnnotationSet) {
         val annotationElements = mutableListOf<AnnotationElement>()
 
         ctx.sAnnotationKeyName().forEachIndexed { index, sAnnotationKeyNameContext ->
@@ -86,6 +81,10 @@ class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDe
                 annotationElements.add(element)
             }
         }
+
+        val annotationType       = ctx.OBJECT_TYPE().text
+        val annotationTypeIndex  = dexFile.addOrGetTypeIDIndex(annotationType)
+        val annotationVisibility = AnnotationVisibility.of(ctx.ANN_VISIBLE().text)
 
         val encodedAnnotationValue = EncodedAnnotationValue.of(annotationTypeIndex, *annotationElements.toTypedArray())
         val annotation = Annotation.of(annotationVisibility, encodedAnnotationValue)

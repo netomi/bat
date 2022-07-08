@@ -88,6 +88,8 @@ class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor 
         readMethodHandles(mapList, dexFile)
         readLinkedDataItems(dexFile)
         dexFile.linkData = readLinkData(header)
+
+        dexFile.refreshCaches()
     }
 
     private fun readHeader(): DexHeader {
