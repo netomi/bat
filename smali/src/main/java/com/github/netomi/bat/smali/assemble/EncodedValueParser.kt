@@ -39,7 +39,7 @@ object EncodedValueParser {
         }
 
         return when (value.type) {
-            SmaliLexer.STRING ->        EncodedStringValue.of(dexFile.addOrGetStringIDIndex(value.text.removeSurrounding("\"")))
+            SmaliLexer.STRING ->        EncodedStringValue.of(dexFile.addOrGetStringIDIndex(Strings.unescapeJavaString(value.text.removeSurrounding("\""))))
             SmaliLexer.BOOLEAN ->       EncodedBooleanValue.of("true" == value.text)
             SmaliLexer.BYTE ->          EncodedByteValue.of(java.lang.Byte.decode(value.text.removeSuffix("t")))
             SmaliLexer.SHORT ->         EncodedShortValue.of(java.lang.Short.decode(value.text.removeSuffix("s")))

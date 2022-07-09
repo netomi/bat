@@ -17,11 +17,13 @@ package com.github.netomi.bat.dexfile;
 
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory;
 import com.github.netomi.bat.dexfile.util.DexClasses;
-import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
+import com.github.netomi.bat.dexfile.value.EncodedValue;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.util.Preconditions;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
 
@@ -171,13 +173,40 @@ extends      DataItem
 
     public void addMethod(DexFile dexFile, EncodedMethod method) {
         String methodClass = method.getMethodID(dexFile).getClassType(dexFile);
-        Preconditions.checkArgument(methodClass.equals(getType(dexFile)), "field class does not match this class");
+        Preconditions.checkArgument(methodClass.equals(getType(dexFile)), "method class does not match this class");
 
         if (classData == null) {
             classData = ClassData.empty();
         }
 
         classData.addMethod(method);
+    }
+
+    public void setStaticValue(DexFile dexFile, EncodedField field, EncodedValue value) {
+        String fieldClass = field.getFieldID(dexFile).getClassType(dexFile);
+        Preconditions.checkArgument(fieldClass.equals(getType(dexFile)), "field class does not match this class");
+
+        AtomicInteger staticFieldIndex = new AtomicInteger(NO_INDEX);
+        classData.staticFieldsAccept(dexFile, this, (df, cd, idx, f) -> { if (f == field) staticFieldIndex.set(idx); } );
+
+        int fieldIndex = staticFieldIndex.get();
+        if (fieldIndex == NO_INDEX) {
+            throw new RuntimeException("trying to add a static value for a field that does not belong to this class: " + getType(dexFile));
+        }
+
+        int currentStaticValues = staticValues.encodedArrayValue.getEncodedValueCount();
+
+        if (currentStaticValues <= fieldIndex) {
+            for (int i = currentStaticValues; i < fieldIndex; i++) {
+                EncodedField currentField = classData.getStaticField(i);
+                String type = currentField.getFieldID(dexFile).getType(dexFile);
+                EncodedValue encodedValue = DexClasses.getDefaultEncodedValueForType(type);
+                staticValues.encodedArrayValue.addEncodedValue(encodedValue);
+            }
+            staticValues.encodedArrayValue.addEncodedValue(value);
+        } else {
+            staticValues.encodedArrayValue.setEncodedValue(fieldIndex, value);
+        }
     }
 
     public EncodedArray getStaticValues() {

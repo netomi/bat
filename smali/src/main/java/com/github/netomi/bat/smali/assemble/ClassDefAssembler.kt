@@ -105,6 +105,11 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
         classDef.addField(dexFile, field)
 
+        if (field.isStatic && ctx.sBaseValue() != null) {
+            val staticValue = EncodedValueParser.parseBaseValue(ctx.sBaseValue(), dexFile)
+
+            classDef.setStaticValue(dexFile, field, staticValue)
+        }
     }
 
     fun visitSMethod(ctx: SMethodContext, classType: String) {

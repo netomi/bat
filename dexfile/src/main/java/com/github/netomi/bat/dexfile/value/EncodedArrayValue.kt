@@ -43,6 +43,10 @@ data class EncodedArrayValue internal constructor(private var values: ArrayList<
         values.add(value)
     }
 
+    fun setEncodedValue(idx: Int, value: EncodedValue) {
+        values[idx] = value
+    }
+
     override fun readValue(input: DexDataInput, valueArg: Int) {
         val size = input.readUleb128()
         values.clear()

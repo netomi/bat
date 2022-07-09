@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.util;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.value.*;
 import com.github.netomi.bat.util.Classes;
 
 public class DexClasses
@@ -31,4 +32,24 @@ extends      Classes
             method.getName(dexFile),
             method.getDescriptor(dexFile));
     }
+
+    public static EncodedValue getDefaultEncodedValueForType(String type) {
+        switch (type) {
+            case "B": return EncodedByteValue.of((byte) 0x00);
+            case "S": return EncodedShortValue.of((short) 0x00);
+            case "C": return EncodedCharValue.of((char) 0x00);
+            case "I": return EncodedIntValue.of(0);
+            case "J": return EncodedLongValue.of(0l);
+            case "F": return EncodedFloatValue.of(0.0f);
+            case "D": return EncodedDoubleValue.of(0.0);
+            case "Z": return EncodedBooleanValue.of(false);
+        }
+
+        if (type.startsWith("L") && type.endsWith(";")) {
+            return EncodedNullValue.INSTANCE;
+        } else {
+            return EncodedNullValue.INSTANCE;
+        }
+    }
+
 }
