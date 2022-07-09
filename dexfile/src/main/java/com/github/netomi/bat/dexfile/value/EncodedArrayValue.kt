@@ -84,7 +84,7 @@ data class EncodedArrayValue internal constructor(private var values: ArrayList<
     }
 
     override fun toString(): String {
-        return "EncodedArrayValue[values=%s]".format(values)
+        return "EncodedArrayValue[values=${values}]"
     }
 
     companion object {

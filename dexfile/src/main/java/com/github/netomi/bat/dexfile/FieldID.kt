@@ -75,7 +75,7 @@ data class FieldID internal constructor(
     }
 
     override fun toString(): String {
-        return "FieldID[classIdx=%d,nameIdx=%d,typeIdx=%d]".format(classIndex_, nameIndex_, typeIndex_)
+        return "FieldID[classIdx=${classIndex_},nameIdx=${nameIndex_},typeIdx=${typeIndex_}]"
     }
 
     companion object {

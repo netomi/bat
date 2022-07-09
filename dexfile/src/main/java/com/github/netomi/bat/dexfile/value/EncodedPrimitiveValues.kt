@@ -163,7 +163,7 @@ data class EncodedBooleanValue internal constructor(private var value_: Boolean 
     }
 
     override fun toString(): String {
-        return "EncodedBooleanValue[value=%s]".format(value_)
+        return "EncodedBooleanValue[value=${value_}]"
     }
 
     companion object {

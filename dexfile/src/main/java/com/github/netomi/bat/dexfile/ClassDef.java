@@ -194,18 +194,18 @@ extends      DataItem
             throw new RuntimeException("trying to add a static value for a field that does not belong to this class: " + getType(dexFile));
         }
 
-        int currentStaticValues = staticValues.encodedArrayValue.getEncodedValueCount();
+        int currentStaticValues = staticValues.getArray().getEncodedValueCount();
 
         if (currentStaticValues <= fieldIndex) {
             for (int i = currentStaticValues; i < fieldIndex; i++) {
                 EncodedField currentField = classData.getStaticField(i);
                 String type = currentField.getFieldID(dexFile).getType(dexFile);
                 EncodedValue encodedValue = DexClasses.getDefaultEncodedValueForType(type);
-                staticValues.encodedArrayValue.addEncodedValue(encodedValue);
+                staticValues.getArray().addEncodedValue(encodedValue);
             }
-            staticValues.encodedArrayValue.addEncodedValue(value);
+            staticValues.getArray().addEncodedValue(value);
         } else {
-            staticValues.encodedArrayValue.setEncodedValue(fieldIndex, value);
+            staticValues.getArray().setEncodedValue(fieldIndex, value);
         }
     }
 

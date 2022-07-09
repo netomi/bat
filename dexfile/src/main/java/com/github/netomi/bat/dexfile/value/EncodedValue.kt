@@ -103,7 +103,7 @@ abstract class EncodedValue {
                 VALUE_ANNOTATION    -> EncodedAnnotationValue()
                 VALUE_NULL          -> EncodedNullValue
                 VALUE_BOOLEAN       -> EncodedBooleanValue()
-                else -> throw DexFormatException("Unexpected EncodedValue type: " + Primitives.toHexString(valueType.toShort()))
+                else -> throw DexFormatException("Unexpected EncodedValue type: ${Primitives.toHexString(valueType.toShort())}")
             }
         }
 

@@ -62,7 +62,7 @@ data class CallSiteID internal constructor(private var callSite_: CallSite = Cal
     }
 
     override fun toString(): String {
-        return "CallSiteID[callSite=%s]".format(callSite_)
+        return "CallSiteID[callSite=${callSite_}]"
     }
 
     companion object {

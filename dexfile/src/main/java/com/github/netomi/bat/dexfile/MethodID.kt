@@ -92,7 +92,7 @@ data class MethodID internal constructor(
     }
 
     override fun toString(): String {
-        return "MethodID[classIdx=%d,nameIdx=%d,typeIdx=%d]".format(classIndex_, nameIndex_, protoIndex_)
+        return "MethodID[classIdx=${classIndex_},nameIdx=${nameIndex_},protoIdx=${protoIndex_}]"
     }
 
     companion object {

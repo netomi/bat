@@ -58,7 +58,7 @@ data class EncodedStringValue internal constructor(private var stringIndex_: Int
     }
 
     override fun toString(): String {
-        return "EncodedStringValue[stringIdx=%d]".format(stringIndex_)
+        return "EncodedStringValue[stringIdx=${stringIndex_}]"
     }
 
     companion object {
@@ -104,7 +104,7 @@ data class EncodedFieldValue internal constructor(private var fieldIndex_: Int) 
     }
 
     override fun toString(): String {
-        return "EncodedFieldValue[fieldIdx=%d]".format(fieldIndex_)
+        return "EncodedFieldValue[fieldIdx=${fieldIndex_}]"
     }
 
     companion object {
@@ -150,7 +150,7 @@ data class EncodedMethodValue internal constructor(private var methodIndex_: Int
     }
 
     override fun toString(): String {
-        return "EncodedMethodValue[methodIdx=%d]".format(methodIndex_)
+        return "EncodedMethodValue[methodIdx=${methodIndex_}]"
     }
 
     companion object {
@@ -196,7 +196,7 @@ data class EncodedTypeValue internal constructor(private var typeIndex_: Int) : 
     }
 
     override fun toString(): String {
-        return "EncodedTypeValue[typeIdx=%d]".format(typeIndex)
+        return "EncodedTypeValue[typeIdx=${typeIndex_}]"
     }
 
     companion object {
@@ -240,7 +240,7 @@ data class EncodedEnumValue internal constructor(private var fieldIndex_: Int = 
     }
 
     override fun toString(): String {
-        return "EncodedEnumValue[fieldIdx=%d]".format(fieldIndex)
+        return "EncodedEnumValue[fieldIdx=${fieldIndex_}]"
     }
 
     companion object {
@@ -284,7 +284,7 @@ data class EncodedMethodHandleValue internal constructor(private var handleIndex
     }
 
     override fun toString(): String {
-        return "EncodedMethodHandleValue[methodHandleIdx=%d]".format(handleIndex_)
+        return "EncodedMethodHandleValue[methodHandleIdx=${handleIndex_}]"
     }
 
     companion object {
@@ -328,7 +328,7 @@ data class EncodedMethodTypeValue internal constructor(private var protoIndex_: 
     }
 
     override fun toString(): String {
-        return "EncodedMethodTypeValue[protoIdx=%d]".format(protoIndex_)
+        return "EncodedMethodTypeValue[protoIdx=${protoIndex_}]"
     }
 
     companion object {

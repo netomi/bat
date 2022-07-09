@@ -24,8 +24,6 @@ import java.util.*
 
 /**
  * Represents a debug instruction as contained in the debug sequence of a debug info item.
- *
- * @author Thomas Neidhart
  */
 abstract class DebugInstruction protected constructor(val opcode: Byte) : DexContent() {
 
@@ -33,7 +31,7 @@ abstract class DebugInstruction protected constructor(val opcode: Byte) : DexCon
         write(output)
     }
 
-    abstract fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor)
+    abstract fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor)
 
     companion object {
         const val DBG_END_SEQUENCE:         Byte = 0x00
@@ -94,12 +92,12 @@ data class DebugAdvanceLine internal constructor(private var lineDiff_: Int = 0)
         output.writeSleb128(lineDiff_)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitAdvanceLine(dexFile, debugInfo, this)
     }
 
     override fun toString(): String {
-        return "DebugAdvanceLine[lineDiff=%d]".format(lineDiff)
+        return "DebugAdvanceLine[lineDiff=${lineDiff_}]"
     }
 
     companion object {
@@ -131,7 +129,7 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
         output.writeByte(opcode)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitAdvanceLineAndPC(dexFile, debugInfo, this)
     }
 
@@ -148,7 +146,7 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
     }
 
     override fun toString(): String {
-        return "DebugAdvanceLineAndPC[lineDiff=%d,addrDiff=%d]".format(lineDiff, addrDiff)
+        return "DebugAdvanceLineAndPC[lineDiff=${lineDiff},addrDiff=${addrDiff}]"
     }
 }
 
@@ -169,12 +167,12 @@ data class DebugAdvancePC internal constructor(private var addrDiff_: Int = 0) :
         output.writeUleb128(addrDiff_)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitAdvancePC(dexFile, debugInfo, this)
     }
 
     override fun toString(): String {
-        return "DebugAdvancePC[addrDiff=%d]".format(addrDiff)
+        return "DebugAdvancePC[addrDiff=${addrDiff_}]"
     }
 
     companion object {
@@ -201,12 +199,12 @@ data class DebugEndLocal internal constructor(private var registerNum_: Int = 0)
         output.writeUleb128(registerNum_)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitEndLocal(dexFile, debugInfo, this)
     }
 
     override fun toString(): String {
-        return "DebugEndLocal[registerNum=%d]".format(registerNum)
+        return "DebugEndLocal[registerNum=${registerNum_}]"
     }
 
     companion object {
@@ -227,7 +225,7 @@ object DebugEndSequence : DebugInstruction(DBG_END_SEQUENCE) {
         output.writeByte(opcode)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitEndSequence(dexFile, debugInfo, this)
     }
 
@@ -261,12 +259,12 @@ data class DebugRestartLocal internal constructor(private var registerNum_: Int 
         output.writeUleb128(registerNum_)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitRestartLocal(dexFile, debugInfo, this)
     }
 
     override fun toString(): String {
-        return "DebugRestartLocal[registerNum=%d]".format(registerNum)
+        return "DebugRestartLocal[registerNum=${registerNum_}]"
     }
 
     companion object {
@@ -287,7 +285,7 @@ object DebugSetEpilogueBegin : DebugInstruction(DBG_SET_EPILOGUE_BEGIN) {
         output.writeByte(opcode)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitSetEpilogueBegin(dexFile, debugInfo, this)
     }
 
@@ -325,12 +323,12 @@ data class DebugSetFile internal constructor(private var nameIndex_: Int = 0) : 
         output.writeUleb128p1(nameIndex_)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitSetFile(dexFile, debugInfo, this)
     }
 
     override fun toString(): String {
-        return "DebugSetFile[nameIndex=%d]".format(nameIndex)
+        return "DebugSetFile[nameIndex=${nameIndex_}]"
     }
 
     companion object {
@@ -351,7 +349,7 @@ object DebugSetPrologueEnd : DebugInstruction(DBG_SET_PROLOGUE_END) {
         output.writeByte(opcode)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitSetPrologueEnd(dexFile, debugInfo, this)
     }
 
@@ -411,7 +409,7 @@ open class DebugStartLocal : DebugInstruction {
         output.writeUleb128p1(typeIndex)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitStartLocal(dexFile, debugInfo, this)
     }
 
@@ -429,7 +427,7 @@ open class DebugStartLocal : DebugInstruction {
     }
 
     override fun toString(): String {
-        return "DebugStartLocal[registerNum=%d,nameIndex=%d,typeIndex=%d]".format(registerNum, nameIndex, typeIndex)
+        return "DebugStartLocal[registerNum=${registerNum},nameIndex=${nameIndex},typeIndex=${typeIndex}]"
     }
 
     companion object {
@@ -467,7 +465,7 @@ class DebugStartLocalExtended : DebugStartLocal {
         output.writeUleb128p1(sigIndex)
     }
 
-    override fun accept(dexFile: DexFile?, debugInfo: DebugInfo?, visitor: DebugSequenceVisitor) {
+    override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitStartLocalExtended(dexFile, debugInfo, this)
     }
 
@@ -484,7 +482,7 @@ class DebugStartLocalExtended : DebugStartLocal {
     }
 
     override fun toString(): String {
-        return "DebugStartLocalExtended[registerNum=%d,nameIndex=%d,typeIndex=%d,sigIndex=%d]".format(registerNum, nameIndex, typeIndex, sigIndex)
+        return "DebugStartLocalExtended[registerNum=${registerNum},nameIndex=${nameIndex},typeIndex=${typeIndex},sigIndex=${sigIndex}]"
     }
 
     companion object {

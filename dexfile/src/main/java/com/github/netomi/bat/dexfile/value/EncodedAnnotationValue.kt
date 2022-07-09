@@ -93,7 +93,7 @@ data class EncodedAnnotationValue internal constructor(
     }
 
     override fun toString(): String {
-        return "EncodedAnnotationValue[typeIndex=%d,elements=%s]".format(typeIndex_, elements)
+        return "EncodedAnnotationValue[typeIndex=${typeIndex_},elements=${elements}]"
     }
 
     companion object {
@@ -108,29 +108,35 @@ data class EncodedAnnotationValue internal constructor(
  * A class representing an annotation element inside a dex file.
  */
 data class AnnotationElement internal constructor(
-    var nameIndex: Int =          NO_INDEX,
-    var value:     EncodedValue = EncodedNullValue) : DexContent() {
+    private var nameIndex_: Int =          NO_INDEX,
+    private var value_:     EncodedValue = EncodedNullValue) : DexContent() {
+
+    val nameIndex: Int
+        get() = nameIndex_
 
     fun getName(dexFile: DexFile): String {
-        return dexFile.getStringID(nameIndex).stringValue
+        return dexFile.getStringID(nameIndex_).stringValue
     }
+
+    val value: EncodedValue
+        get() = value_
 
     override fun read(input: DexDataInput) {
-        nameIndex = input.readUleb128()
-        value = EncodedValue.read(input)
+        nameIndex_ = input.readUleb128()
+        value_     = EncodedValue.read(input)
     }
 
-    public override fun write(output: DexDataOutput) {
-        output.writeUleb128(nameIndex)
-        value.write(output)
+    override fun write(output: DexDataOutput) {
+        output.writeUleb128(nameIndex_)
+        value_.write(output)
     }
 
-    fun accept(dexFile: DexFile?, visitor: AnnotationElementVisitor) {
+    fun accept(dexFile: DexFile, visitor: AnnotationElementVisitor) {
         visitor.visitAnnotationElement(dexFile, this)
     }
 
     override fun toString(): String {
-        return "AnnotationElement[nameIndex=%d,value=%s]".format(nameIndex, value)
+        return "AnnotationElement[nameIndex=${nameIndex_},value=${value_}]"
     }
 
     companion object {

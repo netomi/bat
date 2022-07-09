@@ -105,7 +105,7 @@ class DebugInfo private constructor() : DataItem() {
     }
 
     override fun toString(): String {
-        return "DebugInfo[lineStart=%d,parameterNames=%s,debugSequence=%d]".format(lineStart, parameterNames, debugSequence.size)
+        return "DebugInfo[lineStart=${lineStart},parameterNames=${parameterNames},debugSequence=${debugSequence.size}]"
     }
 
     companion object {

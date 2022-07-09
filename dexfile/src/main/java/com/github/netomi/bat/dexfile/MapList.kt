@@ -95,7 +95,7 @@ class MapList private constructor() : DataItem() {
     }
 
     override fun toString(): String {
-        return "MapList[items=%d]".format(mapItems.size)
+        return "MapList[items=${mapItems.size}]"
     }
 
     companion object {

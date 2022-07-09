@@ -15,6 +15,9 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.annotation.*
+import com.github.netomi.bat.dexfile.annotation.Annotation
+import com.github.netomi.bat.dexfile.debug.DebugInfo
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 
@@ -80,5 +83,70 @@ internal class DataItemMapImpl : DataItem.Map {
     override fun getOffset(item: DataItem?): Int {
         val offset = offsetMap[item]
         return offset ?: 0
+    }
+}
+
+private class DataSectionItemCollector(private val dataItemMap: DataItemMapImpl) : DataItemVisitor {
+
+    override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {}
+
+    override fun visitStringData(dexFile: DexFile, stringID: StringID, stringData: StringData) {
+        dataItemMap.addDataItem(stringData)
+    }
+
+    override fun visitParameterTypes(dexFile: DexFile, protoID: ProtoID, typeList: TypeList) {
+        dataItemMap.addDataItem(typeList)
+    }
+
+    override fun visitClassData(dexFile: DexFile, classDef: ClassDef, classData: ClassData) {
+        dataItemMap.addDataItem(classData)
+    }
+
+    override fun visitInterfaceTypes(dexFile: DexFile, classDef: ClassDef, typeList: TypeList) {
+        dataItemMap.addDataItem(typeList)
+    }
+
+    override fun visitStaticValuesArray(dexFile: DexFile, classDef: ClassDef, encodedArray: EncodedArray) {
+        dataItemMap.addDataItem(encodedArray)
+    }
+
+    override fun visitAnnotationsDirectory(dexFile: DexFile, classDef: ClassDef, annotationsDirectory: AnnotationsDirectory) {
+        dataItemMap.addDataItem(annotationsDirectory)
+    }
+
+    override fun visitClassAnnotations(dexFile: DexFile, annotationsDirectory: AnnotationsDirectory, annotationSet: AnnotationSet) {
+        dataItemMap.addDataItem(annotationSet)
+    }
+
+    override fun visitFieldAnnotations(dexFile: DexFile, fieldAnnotation: FieldAnnotation, annotationSet: AnnotationSet) {
+        dataItemMap.addDataItem(annotationSet)
+    }
+
+    override fun visitMethodAnnotations(dexFile: DexFile, methodAnnotation: MethodAnnotation, annotationSet: AnnotationSet) {
+        dataItemMap.addDataItem(annotationSet)
+    }
+
+    override fun visitParameterAnnotations(dexFile: DexFile, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
+        dataItemMap.addDataItem(annotationSetRefList)
+    }
+
+    override fun visitAnnotationSet(dexFile: DexFile, annotationSetRef: AnnotationSetRef, annotationSet: AnnotationSet) {
+        dataItemMap.addDataItem(annotationSet)
+    }
+
+    override fun visitAnnotation(dexFile: DexFile, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
+        dataItemMap.addDataItem(annotation)
+    }
+
+    override fun visitCode(dexFile: DexFile, encodedMethod: EncodedMethod, code: Code) {
+        dataItemMap.addDataItem(code)
+    }
+
+    override fun visitDebugInfo(dexFile: DexFile, code: Code, debugInfo: DebugInfo) {
+        dataItemMap.addDataItem(debugInfo)
+    }
+
+    override fun visitCallSite(dexFile: DexFile, callSiteID: CallSiteID, callSite: CallSite) {
+        dataItemMap.addDataItem(callSite)
     }
 }
