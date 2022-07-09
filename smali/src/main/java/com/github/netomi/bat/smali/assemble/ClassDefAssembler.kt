@@ -20,13 +20,12 @@ import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet
 import com.github.netomi.bat.dexfile.annotation.AnnotationVisibility
+import com.github.netomi.bat.dexfile.annotation.FieldAnnotation
+import com.github.netomi.bat.dexfile.annotation.MethodAnnotation
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
-import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import org.antlr.v4.runtime.ParserRuleContext
-import org.antlr.v4.runtime.Token
-import org.antlr.v4.runtime.tree.TerminalNode
 
 
 internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDef?>() {
@@ -110,6 +109,14 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
             classDef.setStaticValue(dexFile, field, staticValue)
         }
+
+        val annotationSet = AnnotationSet.empty()
+        ctx.sAnnotation().forEach { visitSAnnotation(it, annotationSet) }
+
+        if (annotationSet.annotationCount > 0) {
+            val fieldAnnotation = FieldAnnotation.of(field.fieldIndex, annotationSet)
+            classDef.annotationsDirectory.fieldAnnotations.add(fieldAnnotation)
+        }
     }
 
     fun visitSMethod(ctx: SMethodContext, classType: String) {
@@ -121,6 +128,14 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val method = EncodedMethod.of(methodIDIndex, accessFlags);
 
         classDef.addMethod(dexFile, method)
+
+        val annotationSet = AnnotationSet.empty()
+        ctx.sAnnotation().forEach { visitSAnnotation(it, annotationSet) }
+
+        if (annotationSet.annotationCount > 0) {
+            val methodAnnotation = MethodAnnotation.of(method.methodIndex, annotationSet)
+            classDef.annotationsDirectory.methodAnnotations.add(methodAnnotation)
+        }
     }
 
     private fun parseAnnotationValueContext(ctx: SAnnotationValueContext): EncodedValue? {

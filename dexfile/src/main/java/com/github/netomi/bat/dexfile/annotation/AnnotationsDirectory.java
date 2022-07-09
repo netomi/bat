@@ -55,9 +55,9 @@ extends      DataItem
 
     private AnnotationsDirectory() {
         classAnnotations     = AnnotationSet.empty();
-        fieldAnnotations     = Collections.emptyList();
-        methodAnnotations    = Collections.emptyList();
-        parameterAnnotations = Collections.emptyList();
+        fieldAnnotations     = new ArrayList<>(0);
+        methodAnnotations    = new ArrayList<>(0);
+        parameterAnnotations = new ArrayList<>(0);
     }
 
     public int getClassAnnotationsOffset() {

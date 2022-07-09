@@ -43,8 +43,9 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
     }
 
     fun accept(dexFile: DexFile, index: Int, visitor: EncodedValueVisitor) {
-        Preconditions.checkElementIndex(index, array.encodedValueCount, "index out of range of array values")
-        array.getEncodedValue(index).accept(dexFile, visitor)
+        if (index >= 0 && index < array.encodedValueCount) {
+            array.getEncodedValue(index).accept(dexFile, visitor)
+        }
     }
 
     override fun equals(other: Any?): Boolean {
