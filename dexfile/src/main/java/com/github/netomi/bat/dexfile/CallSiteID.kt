@@ -30,7 +30,7 @@ import java.util.*
     type          = DexConstants.TYPE_CALL_SITE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-data class CallSiteID internal constructor(private var callSite_: CallSite = CallSite.of(NO_INDEX, NO_INDEX, NO_INDEX)) : DataItem() {
+data class CallSiteID internal constructor(private var callSite_: CallSite = CallSite.empty()) : DataItem() {
 
     val callSite: CallSite
         get() = callSite_

@@ -26,7 +26,7 @@ import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_STATIC_GET
 import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_STATIC_PUT
 import com.google.common.base.Preconditions
 
-enum class MethodHandleType(val value: Int, private val targetsField: Boolean, private val targetsInstance: Boolean, val simpleName: String) {
+enum class MethodHandleType(val value: Int, val targetsField: Boolean, val targetsInstance: Boolean, val simpleName: String) {
     STATIC_PUT(        METHOD_HANDLE_TYPE_STATIC_PUT,         true,  false, "static-put"),
     STATIC_GET(        METHOD_HANDLE_TYPE_STATIC_GET,         true,  false, "static-get"),
     INSTANCE_PUT(      METHOD_HANDLE_TYPE_INSTANCE_PUT,       true,  true,  "instance-put"),
@@ -36,14 +36,6 @@ enum class MethodHandleType(val value: Int, private val targetsField: Boolean, p
     INVOKE_CONSTRUCTOR(METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR, false, true,  "invoke-constructor"),
     INVOKE_DIRECT(     METHOD_HANDLE_TYPE_INVOKE_DIRECT,      false, true,  "invoke-direct"),
     INVOKE_INTERFACE(  METHOD_HANDLE_TYPE_INVOKE_INTERFACE,   false, true,  "invoke-interface");
-
-    fun targetsField(): Boolean {
-        return targetsField
-    }
-
-    fun targetsInstance(): Boolean {
-        return targetsInstance
-    }
 
     companion object {
         @JvmStatic

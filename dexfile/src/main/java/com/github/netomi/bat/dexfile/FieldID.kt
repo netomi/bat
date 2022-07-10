@@ -39,7 +39,7 @@ data class FieldID internal constructor(
         get() = classIndex_
 
     val nameIndex: Int
-        get() = nameIndex
+        get() = nameIndex_
 
     val typeIndex: Int
         get() = typeIndex_

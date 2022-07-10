@@ -53,6 +53,11 @@ class CallSite private constructor() : EncodedArray() {
 
     companion object {
         @JvmStatic
+        fun empty(): CallSite {
+            return CallSite()
+        }
+
+        @JvmStatic
         fun of(methodHandleIndex: Int, nameIndex: Int, protoIndex: Int): CallSite {
             val callSite = CallSite()
             callSite.array.addEncodedValue(EncodedMethodHandleValue.of(methodHandleIndex))

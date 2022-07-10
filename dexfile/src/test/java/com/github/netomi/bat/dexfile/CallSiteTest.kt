@@ -15,42 +15,43 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.CallSite.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
+import com.github.netomi.bat.dexfile.value.EncodedMethodHandleValue
+import com.github.netomi.bat.dexfile.value.EncodedMethodTypeValue
+import com.github.netomi.bat.dexfile.value.EncodedStringValue
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import java.util.function.Function
 
-class MapListTest : DexContentTest<MapList>() {
-    override fun getTestInstances(): Array<MapList> {
-        val l1 = MapList.empty()
-        l1.updateMapItem(1, 2, 0)
-        val l2 = MapList.empty()
-        l2.updateMapItem(2, 3, 0)
-        return arrayOf(l1, l2)
+class CallSiteTest : DexContentTest<CallSite>() {
+    override fun getTestInstances(): Array<CallSite> {
+        return arrayOf(
+            of(1, 2, 3),
+            of(65535, 65535, 65535)
+        )
     }
 
-    override fun getFactoryMethod(): Function<DexDataInput, MapList> {
-        return Function { input -> MapList.readMapList(input) }
+    override fun getFactoryMethod(): Function<DexDataInput, CallSite> {
+        return Function { input -> CallSite.readContent(input) }
     }
 
     @Test
     fun getter() {
         val data = testInstances
-        assertEquals(1, data[0].getMapItem(0).getType())
-        assertEquals(2, data[0].getMapItem(0).getSize())
+        assertEquals(EncodedMethodHandleValue.of(1), data[0].methodHandle)
+        assertEquals(EncodedStringValue.of(2), data[0].methodName)
+        assertEquals(EncodedMethodTypeValue.of(3), data[0].methodType)
     }
 
     @Test
     fun equals() {
-        val l1 = MapList.empty()
-        l1.updateMapItem(1, 2, 0)
-        val l2 = MapList.empty()
-        l2.updateMapItem(2, 2, 0)
-        val l3 = MapList.empty()
-        l3.updateMapItem(1, 2, 5)
-        assertEquals(l1, l1)
-        assertNotEquals(l1, l2)
-        assertEquals(l1, l3)
+        val c1 = of(1, 2, 3)
+        val c2 = of(2, 3, 4)
+        val c3 = of(1, 2, 3)
+        assertEquals(c1, c1)
+        assertNotEquals(c1, c2)
+        assertEquals(c1, c3)
     }
 }
