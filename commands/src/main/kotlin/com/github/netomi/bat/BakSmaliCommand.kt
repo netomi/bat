@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexFileReader
 import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
 import com.github.netomi.bat.io.FileOutputStreamFactory
 import com.github.netomi.bat.smali.Disassembler
+import com.sun.jdi.BooleanValue
 import picocli.CommandLine
 import java.io.File
 import java.io.FileInputStream
@@ -42,6 +43,9 @@ class BakSmaliCommand : Runnable {
     @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out", description = ["output directory"])
     private var outputFile: File? = null
 
+    @CommandLine.Option(names = ["-v"], description = ["verbose output"])
+    private var verbose: Boolean = false
+
     override fun run() {
         inputFile?.apply {
             FileInputStream(this).use { `is` ->
@@ -54,18 +58,24 @@ class BakSmaliCommand : Runnable {
                     val dexFile = DexFile()
                     val reader  = DexFileReader(`is`, false)
 
-                    println("Disassembling '$name' into directory ${outputPath} ...")
+                    printVerbose("Disassembling '$name' into directory ${outputPath} ...")
                     reader.visitDexFile(dexFile)
 
                     dexFile.classDefsAccept(
                         ClassDefVisitor.Multi.of(
-                            { df, _, classDef -> println("  disassembling class '${classDef.getClassName(df)}'") },
+                            { df, _, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
                             Disassembler(FileOutputStreamFactory(outputPath, "smali")))
                         )
 
-                    println("done.")
+                    printVerbose("done.")
                 }
             }
+        }
+    }
+
+    private fun printVerbose(text: String) {
+        if (verbose) {
+            println(text)
         }
     }
 
