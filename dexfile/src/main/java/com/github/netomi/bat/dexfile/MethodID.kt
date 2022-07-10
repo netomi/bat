@@ -23,6 +23,7 @@ import com.github.netomi.bat.dexfile.visitor.AllEncodedMethodsVisitor
 import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor
 import com.github.netomi.bat.dexfile.visitor.MethodNameAndProtoFilter
 import com.google.common.base.Preconditions
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 
 /**
  * A class representing a method id item inside a dex file.
@@ -33,11 +34,11 @@ import com.google.common.base.Preconditions
     type          = DexConstants.TYPE_METHOD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-data class MethodID internal constructor(
-    private var classIndex_: Int = NO_INDEX, // ushort
-    private var nameIndex_:  Int = NO_INDEX, // uint
-    private var protoIndex_: Int = NO_INDEX  // ushort
-) : DataItem() {
+@NoCopy
+data class MethodID private constructor(
+    private var classIndex_: Int = NO_INDEX,
+    private var nameIndex_:  Int = NO_INDEX,
+    private var protoIndex_: Int = NO_INDEX) : DataItem() {
 
     val classIndex: Int
         get() = classIndex_

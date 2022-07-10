@@ -23,15 +23,17 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
 import com.github.netomi.bat.util.Preconditions
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 import kotlin.collections.ArrayList
 
 /**
  * A class representing an annotation value (TypeID + AnnotationElements) inside a dex file.
  */
+@NoCopy
 data class EncodedAnnotationValue internal constructor(
     private var typeIndex_: Int                          = NO_INDEX,
-    private var elements:  ArrayList<AnnotationElement> = ArrayList(0)): EncodedValue() {
+    private val elements_:  ArrayList<AnnotationElement> = ArrayList(0)): EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_ANNOTATION
@@ -40,10 +42,10 @@ data class EncodedAnnotationValue internal constructor(
         get() = typeIndex_
 
     val annotationElements: List<AnnotationElement>
-        get() = elements
+        get() = elements_
 
     val annotationElementCount: Int
-        get() = elements.size
+        get() = elements_.size
 
     private constructor(typeIndex: Int, vararg elements: AnnotationElement) : this(typeIndex, arrayListOf(*elements))
 
@@ -52,21 +54,21 @@ data class EncodedAnnotationValue internal constructor(
     }
 
     fun getAnnotationElement(index: Int): AnnotationElement {
-        return elements[index]
+        return elements_[index]
     }
 
     fun addAnnotationElement(element: AnnotationElement) {
-        elements.add(element)
+        elements_.add(element)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         typeIndex_ = input.readUleb128()
         val size = input.readUleb128()
-        elements.clear()
-        elements.ensureCapacity(size)
+        elements_.clear()
+        elements_.ensureCapacity(size)
         for (i in 0 until size) {
             val element = AnnotationElement.readContent(input)
-            elements.add(element)
+            elements_.add(element)
         }
     }
 
@@ -76,8 +78,8 @@ data class EncodedAnnotationValue internal constructor(
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
         output.writeUleb128(typeIndex_)
-        output.writeUleb128(elements.size)
-        for (element in elements) {
+        output.writeUleb128(elements_.size)
+        for (element in elements_) {
             element.write(output)
         }
     }
@@ -87,13 +89,13 @@ data class EncodedAnnotationValue internal constructor(
     }
 
     fun annotationElementsAccept(dexFile: DexFile, visitor: AnnotationElementVisitor) {
-        for (element in elements) {
+        for (element in elements_) {
             element.accept(dexFile, visitor)
         }
     }
 
     override fun toString(): String {
-        return "EncodedAnnotationValue[typeIndex=${typeIndex_},elements=${elements}]"
+        return "EncodedAnnotationValue[typeIndex=${typeIndex_},elements=${elements_}]"
     }
 
     companion object {

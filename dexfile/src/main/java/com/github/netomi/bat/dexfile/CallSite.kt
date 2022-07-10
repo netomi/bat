@@ -67,9 +67,9 @@ class CallSite private constructor() : EncodedArray() {
         }
 
         @JvmStatic
-        fun readContent(input: DexDataInput?): CallSite {
+        fun readContent(input: DexDataInput): CallSite {
             val callSite = CallSite()
-            callSite.read(input!!)
+            callSite.read(input)
             return callSite
         }
     }

@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.MethodHandleType.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.util.Preconditions
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 
 /**
@@ -31,6 +32,7 @@ import java.util.*
     type          = DexConstants.TYPE_METHOD_HANDLE_ITEM,
     dataAlignment = 4,
     dataSection   = false)
+@NoCopy
 data class MethodHandle private constructor(
     private var methodHandleTypeValue_: Int = 0,       // ushort
     private var fieldOrMethodId_: Int       = NO_INDEX // ushort

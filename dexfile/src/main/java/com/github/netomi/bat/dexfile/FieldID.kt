@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.google.common.base.Preconditions
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 
 /**
  * A class representing a field id item inside a dex file.
@@ -29,7 +30,8 @@ import com.google.common.base.Preconditions
     type          = DexConstants.TYPE_FIELD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-data class FieldID internal constructor(
+@NoCopy
+data class FieldID private constructor(
     private var classIndex_: Int = NO_INDEX, // ushort
     private var nameIndex_:  Int = NO_INDEX, // uint
     private var typeIndex_:  Int = NO_INDEX  // ushort

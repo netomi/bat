@@ -48,7 +48,7 @@ internal object TryCatchPrinter {
     }
 
     @JvmStatic
-    fun printTryEndLabel(dexFile: DexFile?, code: Code, offset: Int, instructionLength: Int, printer: IndentingPrinter) {
+    fun printTryEndLabel(dexFile: DexFile, code: Code, offset: Int, instructionLength: Int, printer: IndentingPrinter) {
         for (currentTry in code.tries) {
             if (currentTry.endAddr == offset + instructionLength - 1) {
                 printer.println(":try_end_" + Integer.toHexString(offset + instructionLength))

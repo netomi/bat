@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
 import com.google.common.base.Preconditions
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 
 /**
@@ -29,7 +30,8 @@ import java.util.*
  *
  * @see [encoded field @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-field-format)
  */
-data class EncodedField internal constructor(
+@NoCopy
+data class EncodedField private constructor(
     private var fieldIndex_:  Int = NO_INDEX, // uleb128
     private var accessFlags_: Int = 0
 ) : DexContent() {

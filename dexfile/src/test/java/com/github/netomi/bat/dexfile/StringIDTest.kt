@@ -15,42 +15,40 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.StringID.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import java.util.function.Function
 
-class MapListTest : DexContentTest<MapList>() {
-    override fun getTestInstances(): Array<MapList> {
-        val l1 = MapList.empty()
-        l1.updateMapItem(1, 2, 0)
-        val l2 = MapList.empty()
-        l2.updateMapItem(2, 3, 0)
-        return arrayOf(l1, l2)
+class StringIDTest : DexContentTest<StringID>() {
+    override fun getTestInstances(): Array<StringID> {
+        return arrayOf(
+            of("Terence Hill"),
+            of("Jean-Claude Van Damme"),
+            of("Bud Spencer")
+        )
     }
 
-    override fun getFactoryMethod(): Function<DexDataInput, MapList> {
-        return Function { input -> MapList.readMapList(input) }
+    override fun getFactoryMethod(): Function<DexDataInput, StringID> {
+        return Function { input -> StringID.readContent(input) }
     }
 
     @Test
     fun getter() {
         val data = testInstances
-        assertEquals(1, data[0].getMapItem(0).type)
-        assertEquals(2, data[0].getMapItem(0).size)
+        assertEquals("Terence Hill", data[0].stringValue)
+        assertEquals("Bud Spencer", data[2].stringValue)
     }
 
     @Test
     fun equals() {
-        val l1 = MapList.empty()
-        l1.updateMapItem(1, 2, 0)
-        val l2 = MapList.empty()
-        l2.updateMapItem(2, 2, 0)
-        val l3 = MapList.empty()
-        l3.updateMapItem(1, 2, 5)
-        assertEquals(l1, l1)
-        assertNotEquals(l1, l2)
-        assertEquals(l1, l3)
+        val t1 = of("Terence Hill")
+        val t2 = of("Bud Spencer")
+        val t3 = of("Terence Hill")
+        assertEquals(t1, t1)
+        assertNotEquals(t1, t2)
+        assertEquals(t1, t3)
     }
 }

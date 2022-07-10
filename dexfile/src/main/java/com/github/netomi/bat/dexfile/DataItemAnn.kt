@@ -15,8 +15,5 @@
  */
 package com.github.netomi.bat.dexfile
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-
-@Retention(value = RetentionPolicy.RUNTIME)
+@Retention(AnnotationRetention.RUNTIME)
 annotation class DataItemAnn(val type: Int, val dataAlignment: Int, val dataSection: Boolean)

@@ -20,39 +20,44 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import kotlin.collections.ArrayList
 
 /**
  * A class representing an array of values inside a dex file.
  */
-data class EncodedArrayValue internal constructor(private var values: ArrayList<EncodedValue> = ArrayList(0)): EncodedValue() {
+@NoCopy
+data class EncodedArrayValue internal constructor(private val values_: ArrayList<EncodedValue> = ArrayList(0)) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_ARRAY
 
+    val encodedValues: List<EncodedValue>
+        get() = values_
+
     val encodedValueCount: Int
-        get() = values.size
+        get() = values_.size
 
     private constructor(vararg values: EncodedValue) : this(arrayListOf(*values))
 
     fun getEncodedValue(index: Int): EncodedValue {
-        return values[index]
+        return values_[index]
     }
 
     fun addEncodedValue(value: EncodedValue) {
-        values.add(value)
+        values_.add(value)
     }
 
     fun setEncodedValue(idx: Int, value: EncodedValue) {
-        values[idx] = value
+        values_[idx] = value
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         val size = input.readUleb128()
-        values.clear()
-        values.ensureCapacity(size)
+        values_.clear()
+        values_.ensureCapacity(size)
         for (i in 0 until size) {
-            values.add(read(input))
+            values_.add(read(input))
         }
     }
 
@@ -61,8 +66,8 @@ data class EncodedArrayValue internal constructor(private var values: ArrayList<
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeUleb128(values.size)
-        for (value in values) {
+        output.writeUleb128(values_.size)
+        for (value in values_) {
             value.write(output)
         }
     }
@@ -72,19 +77,19 @@ data class EncodedArrayValue internal constructor(private var values: ArrayList<
     }
 
     fun valuesAccept(dexFile: DexFile, visitor: EncodedValueVisitor) {
-        for (value in values) {
+        for (value in values_) {
             value.accept(dexFile, visitor)
         }
     }
 
     fun valueAccept(dexFile: DexFile, index: Int, visitor: EncodedValueVisitor) {
-        if (index >= 0 && index < values.size) {
-            values[index].accept(dexFile, visitor)
+        if (index >= 0 && index < values_.size) {
+            values_[index].accept(dexFile, visitor)
         }
     }
 
     override fun toString(): String {
-        return "EncodedArrayValue[values=${values}]"
+        return "EncodedArrayValue[values=${values_}]"
     }
 
     companion object {

@@ -15,42 +15,39 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.EncodedCatchHandler.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import java.util.function.Function
 
-class MapListTest : DexContentTest<MapList>() {
-    override fun getTestInstances(): Array<MapList> {
-        val l1 = MapList.empty()
-        l1.updateMapItem(1, 2, 0)
-        val l2 = MapList.empty()
-        l2.updateMapItem(2, 3, 0)
-        return arrayOf(l1, l2)
+class EncodedCatchHandlerTest : DexContentTest<EncodedCatchHandler>() {
+    override fun getTestInstances(): Array<EncodedCatchHandler> {
+        return arrayOf(
+            of(1),
+            of(0, TypeAddrPair.of(1, 2), TypeAddrPair.of(3, 4))
+        )
     }
 
-    override fun getFactoryMethod(): Function<DexDataInput, MapList> {
-        return Function { input -> MapList.readMapList(input) }
+    override fun getFactoryMethod(): Function<DexDataInput, EncodedCatchHandler> {
+        return Function { input -> EncodedCatchHandler.readContent(input) }
     }
 
     @Test
     fun getter() {
         val data = testInstances
-        assertEquals(1, data[0].getMapItem(0).type)
-        assertEquals(2, data[0].getMapItem(0).size)
+        assertEquals(1, data[0].catchAllAddr)
+        assertEquals(TypeAddrPair.of(1, 2), data[1].getHandler(0))
     }
 
     @Test
     fun equals() {
-        val l1 = MapList.empty()
-        l1.updateMapItem(1, 2, 0)
-        val l2 = MapList.empty()
-        l2.updateMapItem(2, 2, 0)
-        val l3 = MapList.empty()
-        l3.updateMapItem(1, 2, 5)
-        assertEquals(l1, l1)
-        assertNotEquals(l1, l2)
-        assertEquals(l1, l3)
+        val c1 = of(1, TypeAddrPair.of(1, 2))
+        val c2 = of(1, TypeAddrPair.of(3, 4))
+        val c3 = of(1, TypeAddrPair.of(1, 2))
+        assertEquals(c1, c1)
+        assertNotEquals(c1, c2)
+        assertEquals(c1, c3)
     }
 }

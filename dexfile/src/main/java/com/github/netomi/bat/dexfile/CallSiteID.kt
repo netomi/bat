@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
+import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 
 /**
@@ -30,7 +31,8 @@ import java.util.*
     type          = DexConstants.TYPE_CALL_SITE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-data class CallSiteID internal constructor(private var callSite_: CallSite = CallSite.empty()) : DataItem() {
+@NoCopy
+data class CallSiteID private constructor(private var callSite_: CallSite = CallSite.empty()) : DataItem() {
 
     val callSite: CallSite
         get() = callSite_
