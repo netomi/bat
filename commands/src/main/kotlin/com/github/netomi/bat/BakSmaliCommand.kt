@@ -53,15 +53,14 @@ class BakSmaliCommand : Runnable {
 
                     val dexFile = DexFile()
                     val reader  = DexFileReader(`is`, false)
-                    reader.visitDexFile(dexFile)
 
-                    println("Disassembling '$name' into directory ${outputFile!!.absolutePath} ...")
+                    println("Disassembling '$name' into directory ${outputPath} ...")
                     reader.visitDexFile(dexFile)
 
                     dexFile.classDefsAccept(
                         ClassDefVisitor.Multi.of(
                             { df, _, classDef -> println("  disassembling class '${classDef.getClassName(df)}'") },
-                            Disassembler(FileOutputStreamFactory(outputFile!!.toPath(), "smali")))
+                            Disassembler(FileOutputStreamFactory(outputPath, "smali")))
                         )
 
                     println("done.")
