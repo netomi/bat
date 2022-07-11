@@ -17,7 +17,7 @@ package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.util.DexClasses;
+import com.github.netomi.bat.util.Classes;
 import com.github.netomi.bat.util.Matchers;
 import com.github.netomi.bat.util.StringMatcher;
 
@@ -36,7 +36,7 @@ implements   ClassDefVisitor
     @Override
     public void visitClassDef(DexFile dexFile, int index, ClassDef classDefItem) {
         String className = classDefItem.getClassName(dexFile);
-        if (accepted(DexClasses.externalClassNameFromInternalName(className))) {
+        if (accepted(Classes.externalClassNameFromInternalName(className))) {
             visitor.visitClassDef(dexFile, index, classDefItem);
         }
     }

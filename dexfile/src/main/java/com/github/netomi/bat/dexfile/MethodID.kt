@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.AllEncodedMethodsVisitor
 import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor
 import com.github.netomi.bat.dexfile.visitor.MethodNameAndProtoFilter
+import com.github.netomi.bat.util.Classes
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -80,7 +81,7 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
     }
 
     fun accept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
-        val className = DexClasses.internalClassNameFromType(getClassType(dexFile))
+        val className = Classes.internalClassNameFromType(getClassType(dexFile))
         val classDef  = dexFile.getClassDef(className)
 
         classDef?.classDataAccept(dexFile,
@@ -95,8 +96,8 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
         other as MethodID
 
         return classIndex  == other.classIndex &&
-                nameIndex  == other.nameIndex  &&
-                protoIndex == other.protoIndex
+               nameIndex   == other.nameIndex  &&
+               protoIndex  == other.protoIndex
     }
 
     override fun hashCode(): Int {

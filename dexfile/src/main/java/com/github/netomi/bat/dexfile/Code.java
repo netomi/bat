@@ -52,6 +52,14 @@ extends      DataItem
     public List<EncodedCatchHandler> catchHandlerList;
     public DebugInfo                 debugInfo;
 
+    public static Code of(int registersSize, int insSize, int outsSize) {
+        Code code = new Code();
+        code.registersSize = registersSize;
+        code.insSize = insSize;
+        code.outsSize = outsSize;
+        return code;
+    }
+
     public static Code readItem(DexDataInput input) {
         Code code = new Code();
         code.read(input);

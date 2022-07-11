@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.value.EncodedValue;
 import com.github.netomi.bat.dexfile.visitor.*;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
+import com.github.netomi.bat.util.Classes;
 import com.github.netomi.bat.util.Preconditions;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -115,7 +116,7 @@ extends      DataItem
     }
 
     public String getClassName(DexFile dexFile) {
-        return DexClasses.internalClassNameFromType(getType(dexFile));
+        return Classes.internalClassNameFromType(getType(dexFile));
     }
 
     public String getType(DexFile dexFile) {
@@ -131,7 +132,7 @@ extends      DataItem
     }
 
     public String getSuperClassName(DexFile dexFile) {
-        return DexClasses.internalClassNameFromType(getSuperClassType(dexFile));
+        return Classes.internalClassNameFromType(getSuperClassType(dexFile));
     }
 
     public String getSuperClassType(DexFile dexFile) {

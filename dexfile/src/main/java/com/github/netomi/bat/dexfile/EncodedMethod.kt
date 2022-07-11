@@ -153,7 +153,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     }
 
     override fun toString(): String {
-        return "EncodedMethod[methodIndex=%d,accessFlags=%04x,code=%d]".format(methodIndex, accessFlags, code.toString())
+        return "EncodedMethod[methodIndex=%d,accessFlags=%04x,code=%d]".format(methodIndex, accessFlags, code?.insSize)
     }
 
     companion object {

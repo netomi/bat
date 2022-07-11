@@ -17,11 +17,12 @@ package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
+import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
-import com.github.netomi.bat.dexfile.annotation.AnnotationSet
-import com.github.netomi.bat.dexfile.annotation.AnnotationVisibility
-import com.github.netomi.bat.dexfile.annotation.FieldAnnotation
-import com.github.netomi.bat.dexfile.annotation.MethodAnnotation
+import com.github.netomi.bat.dexfile.instruction.DexInstruction
+import com.github.netomi.bat.dexfile.instruction.DexInstructions
+import com.github.netomi.bat.dexfile.io.InstructionWriter
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
@@ -124,12 +125,18 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
         val accessFlags = collectAccessFlags(ctx.sAccList())
 
-        val methodIDIndex = dexFile.addOrGetMethodID(classType, name, "", returnType, *parameterTypes.toTypedArray())
+        val methodIDIndex =
+            dexFile.addOrGetMethodID(classType,
+                                     name,
+                                     DexClasses.toShortyFormat(parameterTypes, returnType),
+                                     returnType,
+                                     *parameterTypes.toTypedArray())
+
         val method = EncodedMethod.of(methodIDIndex, accessFlags);
 
         ctx.sParameter().forEach { println(it) }
 
-        ctx.sInstruction().forEach { visitSInstructions(it, method) }
+        visitSInstructions(ctx.sInstruction(), method)
 
         classDef.addMethod(dexFile, method)
 
@@ -142,24 +149,68 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         }
     }
 
-    private fun visitSInstructions(ctx: SInstructionContext, method: EncodedMethod) {
+    private fun visitSInstructions(lCtx: List<SInstructionContext>, method: EncodedMethod) {
 
+        val instructions = mutableListOf<DexInstruction>()
         var registers = 0
 
-        val t = ctx.getChild(0) as ParserRuleContext
-        when (t.ruleIndex) {
-            RULE_fregisters -> {
-                val c = t as FregistersContext
-                registers = c.xregisters.text.toInt()
-            }
+        lCtx.forEach { ctx ->
+            val t = ctx.getChild(0) as ParserRuleContext
+            when (t.ruleIndex) {
+                RULE_fregisters -> {
+                    val c = t as FregistersContext
+                    registers = c.xregisters.text.toInt()
+                }
 
-            RULE_fm5c -> {
-                val c = t as Fm5cContext
-                val opName = c.op.text
+                RULE_fm5c -> {
+                    val c = t as Fm5cContext
+                    val opName = c.op.text
 
+                    val insn = when (opName) {
+                        "invoke-direct" -> {
+                            val methodType = c.method.text
+
+                            val (classType, methodName, descriptor) = parseMethodType(methodType)
+                            val (_, parameterTypes, returnType) = parseMethodObj(descriptor)
+
+                            val methodID = dexFile.addOrGetMethodID(classType, methodName, DexClasses.toShortyFormat(parameterTypes, returnType), returnType, *parameterTypes.toTypedArray())
+
+                            val regs = intArrayOf(c.REGISTER(0).text.substring(1).toInt())
+                            DexInstructions.invokeDirect(methodID, *regs)
+                        }
+
+                        "return-void" -> {
+                            DexInstructions.returnVoid()
+                        }
+                        else -> DexInstructions.nop()
+                    }
+
+                    instructions.add(insn)
+                }
             }
         }
-        println(t.ruleIndex)
+        println(instructions)
+
+        val code = Code.of(registers, 1, 0)
+
+        val insns = writeInstructions(instructions)
+        code.insns = insns
+        code.insnsSize = insns.size
+
+        method.code = code
+    }
+
+    private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
+        val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a: Int, b: Int -> a + b }
+
+        val writer = InstructionWriter(codeLen)
+        var offset = 0
+        for (instruction in instructions) {
+            instruction.write(writer, offset)
+            offset += instruction.length
+        }
+
+        return writer.array
     }
 
     private fun parseAnnotationValueContext(ctx: SAnnotationValueContext): EncodedValue? {
@@ -205,6 +256,17 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
             val parameterTypes = methodObj.substring(x + 1, y).split(",")
             val returnType = methodObj.substring(y + 1)
             return Triple(name, parameterTypes, returnType)
+        }
+
+        fun parseMethodType(methodType: String): Triple<String, String, String> {
+            val x = methodType.indexOf("->")
+            val y = methodType.indexOf("(")
+
+            val classType = methodType.substring(0, x)
+            val methodName = methodType.substring(x + 2, y)
+            val descriptor = methodType.substring(y)
+
+            return Triple(classType, methodName, descriptor)
         }
     }
 }
