@@ -24,6 +24,8 @@ import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
 import com.github.netomi.bat.util.Strings;
 
+import java.util.List;
+
 class      EncodedValuePrinter
 implements EncodedValueVisitor
 {
@@ -69,13 +71,14 @@ implements EncodedValueVisitor
     @Override
     public void visitArrayValue(DexFile dexFile, EncodedArrayValue value) {
         append("{");
-        int count = value.getEncodedValueCount();
+        List<EncodedValue> encodedValues = value.getValues();
+        int count = encodedValues.size();
         if (count > 0) {
             printer.println();
             printer.levelUp();
 
             for (int i = 0; i < count; i++) {
-                EncodedValue v = value.getEncodedValue(i);
+                EncodedValue v = encodedValues.get(i);
                 v.accept(dexFile, this);
                 if ((i + 1) < count) {
                     printer.print(",");

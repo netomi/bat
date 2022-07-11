@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.Mutf8.decode
 import com.github.netomi.bat.dexfile.util.Mutf8.encode
-import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 
 /**
@@ -57,7 +56,9 @@ class StringData private constructor(): DataItem() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
+
         val o = other as StringData
+
         return string == o.string
     }
 
@@ -70,13 +71,11 @@ class StringData private constructor(): DataItem() {
     }
 
     companion object {
-        @JvmStatic
         fun of(value: String): StringData {
             Objects.requireNonNull(value, "value must not be null")
             return StringData(value)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): StringData {
             val stringData = StringData()
             stringData.read(input)

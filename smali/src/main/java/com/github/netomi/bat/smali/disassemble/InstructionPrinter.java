@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.instruction.*;
 import com.github.netomi.bat.dexfile.util.Numbers;
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
+import com.github.netomi.bat.dexfile.value.EncodedValue;
 import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
@@ -90,11 +91,12 @@ implements InstructionVisitor
         printer.print("(");
 
         EncodedValueVisitor valueVisitor = new CallSiteArgumentPrinter(printer);
-        for (int i = 1; i < arrayValue.getEncodedValueCount(); i++) {
+        List<EncodedValue> encodedValues = arrayValue.getValues();
+        for (int i = 1; i < encodedValues.size(); i++) {
             if (i > 1) {
                 printer.print(", ");
             }
-            arrayValue.getEncodedValue(i).accept(dexFile, valueVisitor);
+            encodedValues.get(i).accept(dexFile, valueVisitor);
         }
 
         printer.print(")@");

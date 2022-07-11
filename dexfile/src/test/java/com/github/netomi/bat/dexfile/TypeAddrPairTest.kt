@@ -21,17 +21,15 @@ import org.junit.jupiter.api.Test
 import java.util.function.Function
 
 class TypeAddrPairTest : DexContentTest<TypeAddrPair>() {
-    override fun getTestInstances(): Array<TypeAddrPair> {
-        return arrayOf(
-            TypeAddrPair.of(1, 20),
-            TypeAddrPair.of(2, 0),
-            TypeAddrPair.of(65535, 65535)
-        )
-    }
+    override val testInstances: Array<TypeAddrPair>
+        get() = arrayOf(
+                    TypeAddrPair.of(1, 20),
+                    TypeAddrPair.of(2, 0),
+                    TypeAddrPair.of(65535, 65535)
+                )
 
-    override fun getFactoryMethod(): Function<DexDataInput, TypeAddrPair> {
-        return Function { input -> TypeAddrPair.readContent(input) }
-    }
+    override val factoryMethod: Function<DexDataInput, TypeAddrPair>
+        get() = Function { input -> TypeAddrPair.readContent(input) }
 
     @Test
     fun inputChecking() {

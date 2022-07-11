@@ -156,15 +156,32 @@ extends      DataItem
         }
 
         if (tries.size() > 0) {
-            // TODO: correctly update handler offset in Try
+            int tryStartOffset = output.getOffset();
+
             for (Try tryItem : tries) {
                 tryItem.write(output);
             }
 
+            HashMap<EncodedCatchHandler, Integer> offsetMap = new HashMap<>();
+            int startOffset = output.getOffset();
+
             output.writeUleb128(catchHandlerList.size());
             for (EncodedCatchHandler encodedCatchHandler : catchHandlerList) {
+                int currentOffset = output.getOffset();
+                offsetMap.put(encodedCatchHandler, currentOffset - startOffset);
                 encodedCatchHandler.write(output);
             }
+
+            int endOffset = output.getOffset();
+
+            // re-write the Try elements with the updated handler offsets.
+            output.setOffset(tryStartOffset);
+            for (Try tryItem : tries) {
+                tryItem.setHandlerOffset(offsetMap.get(tryItem.catchHandler));
+                tryItem.write(output);
+            }
+
+            output.setOffset(endOffset);
         }
     }
 

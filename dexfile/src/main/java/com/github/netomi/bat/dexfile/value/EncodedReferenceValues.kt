@@ -27,30 +27,25 @@ import java.util.*
 /**
  * A class representing a referenced string (StringID) value inside a dex file.
  */
-data class EncodedStringValue internal constructor(private var stringIndex_: Int) : EncodedValue() {
+data class EncodedStringValue internal constructor(var stringIndex: Int = NO_INDEX) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_STRING
 
-    val stringIndex: Int
-        get() = stringIndex_
-
-    internal constructor() : this(DexConstants.NO_INDEX) {}
-
     fun getStringValue(dexFile: DexFile): String {
-        return dexFile.getStringID(stringIndex_).stringValue
+        return dexFile.getStringID(stringIndex).stringValue
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        stringIndex_ = input.readUnsignedInt(valueArg + 1)
+        stringIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedInt(stringIndex_) - 1)
+        return writeType(output, requiredBytesForUnsignedInt(stringIndex) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(stringIndex_, valueArg + 1)
+        output.writeInt(stringIndex, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -58,7 +53,7 @@ data class EncodedStringValue internal constructor(private var stringIndex_: Int
     }
 
     override fun toString(): String {
-        return "EncodedStringValue[stringIdx=${stringIndex_}]"
+        return "EncodedStringValue[stringIdx=${stringIndex}]"
     }
 
     companion object {
@@ -73,30 +68,25 @@ data class EncodedStringValue internal constructor(private var stringIndex_: Int
 /**
  * A class representing a referenced field (FieldID) value inside a dex file.
  */
-data class EncodedFieldValue internal constructor(private var fieldIndex_: Int) : EncodedValue() {
+data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_FIELD
 
-    val fieldIndex: Int
-        get() = fieldIndex_
-
-    internal constructor() : this(DexConstants.NO_INDEX)
-
     fun getFieldID(dexFile: DexFile): FieldID {
-        return dexFile.getFieldID(fieldIndex_)
+        return dexFile.getFieldID(fieldIndex)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        fieldIndex_ = input.readUnsignedInt(valueArg + 1)
+        fieldIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedInt(fieldIndex_) - 1)
+        return writeType(output, requiredBytesForUnsignedInt(fieldIndex) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(fieldIndex_, valueArg + 1)
+        output.writeInt(fieldIndex, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -104,7 +94,7 @@ data class EncodedFieldValue internal constructor(private var fieldIndex_: Int) 
     }
 
     override fun toString(): String {
-        return "EncodedFieldValue[fieldIdx=${fieldIndex_}]"
+        return "EncodedFieldValue[fieldIdx=${fieldIndex}]"
     }
 
     companion object {
@@ -119,30 +109,25 @@ data class EncodedFieldValue internal constructor(private var fieldIndex_: Int) 
 /**
  * A class representing a referenced method (MethodID) value inside a dex file.
  */
-data class EncodedMethodValue internal constructor(private var methodIndex_: Int) : EncodedValue() {
+data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_INDEX) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_METHOD
 
-    val methodIndex: Int
-        get() = methodIndex_
-
-    internal constructor() : this(DexConstants.NO_INDEX)
-
     fun getMethodID(dexFile: DexFile): MethodID {
-        return dexFile.getMethodID(methodIndex_)
+        return dexFile.getMethodID(methodIndex)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        methodIndex_ = input.readUnsignedInt(valueArg + 1)
+        methodIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedInt(methodIndex_) - 1)
+        return writeType(output, requiredBytesForUnsignedInt(methodIndex) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(methodIndex_, valueArg + 1)
+        output.writeInt(methodIndex, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -150,7 +135,7 @@ data class EncodedMethodValue internal constructor(private var methodIndex_: Int
     }
 
     override fun toString(): String {
-        return "EncodedMethodValue[methodIdx=${methodIndex_}]"
+        return "EncodedMethodValue[methodIdx=${methodIndex}]"
     }
 
     companion object {
@@ -165,30 +150,25 @@ data class EncodedMethodValue internal constructor(private var methodIndex_: Int
 /**
  * A class representing a referenced type (TypeID) value inside a dex file.
  */
-data class EncodedTypeValue internal constructor(private var typeIndex_: Int) : EncodedValue() {
+data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_TYPE
 
-    val typeIndex: Int
-        get() = typeIndex_
-
-    internal constructor() : this(DexConstants.NO_INDEX)
-
     fun getType(dexFile: DexFile): String {
-        return dexFile.getTypeID(typeIndex_).getType(dexFile)
+        return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        typeIndex_ = input.readUnsignedInt(valueArg + 1)
+        typeIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedInt(typeIndex_) - 1)
+        return writeType(output, requiredBytesForUnsignedInt(typeIndex) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(typeIndex_, valueArg + 1)
+        output.writeInt(typeIndex, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -196,7 +176,7 @@ data class EncodedTypeValue internal constructor(private var typeIndex_: Int) : 
     }
 
     override fun toString(): String {
-        return "EncodedTypeValue[typeIdx=${typeIndex_}]"
+        return "EncodedTypeValue[typeIdx=${typeIndex}]"
     }
 
     companion object {
@@ -211,28 +191,25 @@ data class EncodedTypeValue internal constructor(private var typeIndex_: Int) : 
 /**
  * A class representing a referenced enum (FieldID) value inside a dex file.
  */
-data class EncodedEnumValue internal constructor(private var fieldIndex_: Int = NO_INDEX) : EncodedValue() {
+data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_ENUM
 
-    val fieldIndex: Int
-        get() = fieldIndex_
-
     fun getFieldID(dexFile: DexFile): FieldID {
-        return dexFile.getFieldID(fieldIndex_)
+        return dexFile.getFieldID(fieldIndex)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        fieldIndex_ = input.readUnsignedInt(valueArg + 1)
+        fieldIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedInt(fieldIndex_) - 1)
+        return writeType(output, requiredBytesForUnsignedInt(fieldIndex) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(fieldIndex_, valueArg + 1)
+        output.writeInt(fieldIndex, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -240,7 +217,7 @@ data class EncodedEnumValue internal constructor(private var fieldIndex_: Int = 
     }
 
     override fun toString(): String {
-        return "EncodedEnumValue[fieldIdx=${fieldIndex_}]"
+        return "EncodedEnumValue[fieldIdx=${fieldIndex}]"
     }
 
     companion object {
@@ -255,28 +232,25 @@ data class EncodedEnumValue internal constructor(private var fieldIndex_: Int = 
 /**
  * A class representing a referenced method handle (MethodHandle) value inside a dex file.
  */
-data class EncodedMethodHandleValue internal constructor(private var handleIndex_: Int = NO_INDEX) : EncodedValue() {
+data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = NO_INDEX) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_METHOD_HANDLE
 
-    val handleIndex: Int
-        get() = handleIndex_
-
     fun getMethodHandle(dexFile: DexFile): MethodHandle {
-        return dexFile.getMethodHandle(handleIndex_)
+        return dexFile.getMethodHandle(handleIndex)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        handleIndex_ = input.readUnsignedInt(valueArg + 1)
+        handleIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedInt(handleIndex_) - 1)
+        return writeType(output, requiredBytesForUnsignedInt(handleIndex) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(handleIndex_, valueArg + 1)
+        output.writeInt(handleIndex, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -284,7 +258,7 @@ data class EncodedMethodHandleValue internal constructor(private var handleIndex
     }
 
     override fun toString(): String {
-        return "EncodedMethodHandleValue[methodHandleIdx=${handleIndex_}]"
+        return "EncodedMethodHandleValue[methodHandleIdx=${handleIndex}]"
     }
 
     companion object {
@@ -299,28 +273,25 @@ data class EncodedMethodHandleValue internal constructor(private var handleIndex
 /**
  * A class representing a referenced method type (ProtoID) value inside a dex file.
  */
-data class EncodedMethodTypeValue internal constructor(private var protoIndex_: Int = NO_INDEX) : EncodedValue() {
+data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_INDEX) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_METHOD_TYPE
 
-    val protoIndex: Int
-        get() = protoIndex_
-
     fun getProtoID(dexFile: DexFile): ProtoID {
-        return dexFile.getProtoID(protoIndex_)
+        return dexFile.getProtoID(protoIndex)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        protoIndex_ = input.readUnsignedInt(valueArg + 1)
+        protoIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedInt(protoIndex_) - 1)
+        return writeType(output, requiredBytesForUnsignedInt(protoIndex) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(protoIndex_, valueArg + 1)
+        output.writeInt(protoIndex, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -328,7 +299,7 @@ data class EncodedMethodTypeValue internal constructor(private var protoIndex_: 
     }
 
     override fun toString(): String {
-        return "EncodedMethodTypeValue[protoIdx=${protoIndex_}]"
+        return "EncodedMethodTypeValue[protoIdx=${protoIndex}]"
     }
 
     companion object {

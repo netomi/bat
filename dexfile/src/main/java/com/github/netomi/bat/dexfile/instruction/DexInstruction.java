@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.Code;
 import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.EncodedMethod;
+import com.github.netomi.bat.dexfile.io.InstructionWriter;
 import com.github.netomi.bat.util.Primitives;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
@@ -251,6 +252,225 @@ public class DexInstruction
             }
             break;
         }
+    }
+
+    public void write(InstructionWriter writer, int offset) {
+        short[] instructionData = writeData();
+        for (short instructionDatum : instructionData) {
+            writer.write(offset++, instructionDatum);
+        }
+    }
+
+    protected short[] writeData() {
+        short[] data = new short[getLength()];
+
+        data[0] = (short) (opcode.getOpCode() & 0xff);
+
+        switch (opcode.getFormat()) {
+            case FORMAT_00x:
+            case FORMAT_10x:
+            case FORMAT_10t:
+            case FORMAT_20t:
+            case FORMAT_30t:
+                break;
+
+            case FORMAT_11n: {
+                int a = registers[0] & 0xf;
+                if (a != registers[0]) {
+                    throw new RuntimeException("register number " + registers[0] + " too big for opcode format");
+                }
+                data[0] |= a << 8;
+                break;
+            }
+
+            case FORMAT_12x:
+            case FORMAT_22c:
+            case FORMAT_22s:
+            case FORMAT_22t: {
+                int a = registers[0] & 0xf;
+                int b = registers[1] & 0xf;
+
+                if (a != registers[0]) {
+                    throw new RuntimeException("register number " + registers[0] + " too big for opcode format");
+                }
+
+                if (b != registers[1]) {
+                    throw new RuntimeException("register number " + registers[1] + " too big for opcode format");
+                }
+
+                data[0] |= a << 8 | b << 12;
+                break;
+            }
+
+            case FORMAT_11x:
+            case FORMAT_21c:
+            case FORMAT_21t:
+            case FORMAT_21s:
+            case FORMAT_21h:
+            case FORMAT_31c:
+            case FORMAT_31i:
+            case FORMAT_31t:
+            case FORMAT_51l: {
+                int a = registers[0] & 0xff;
+
+                if (a != registers[0]) {
+                    throw new RuntimeException("register number " + registers[0] + " too big for opcode format");
+                }
+
+                data[0] |= a << 8;
+                break;
+            }
+
+            case FORMAT_22b: {
+                int a = registers[0] & 0xff;
+                int b = registers[1] & 0xff;
+
+                if (a != registers[0]) {
+                    throw new RuntimeException("register number " + registers[0] + " too big for opcode format");
+                }
+
+                if (b != registers[1]) {
+                    throw new RuntimeException("register number " + registers[1] + " too big for opcode format");
+                }
+
+                data[0] |= a << 8;
+                data[1] |= b;
+                break;
+            }
+
+            case FORMAT_22x: {
+                int a = registers[0] & 0xff;
+                int b = registers[1] & 0xffff;
+
+                if (a != registers[0]) {
+                    throw new RuntimeException("register number " + registers[0] + " too big for opcode format");
+                }
+
+                if (b != registers[1]) {
+                    throw new RuntimeException("register number " + registers[1] + " too big for opcode format");
+                }
+
+                data[0] |= a << 8;
+                data[1] |= b;
+                break;
+            }
+
+            case FORMAT_23x: {
+                int a = registers[0] & 0xff;
+                int b = registers[1] & 0xff;
+                int c = registers[2] & 0xff;
+
+                if (a != registers[0]) {
+                    throw new RuntimeException("register number " + registers[0] + " too big for opcode format");
+                }
+
+                if (b != registers[1]) {
+                    throw new RuntimeException("register number " + registers[1] + " too big for opcode format");
+                }
+
+                if (c != registers[2]) {
+                    throw new RuntimeException("register number " + registers[2] + " too big for opcode format");
+                }
+
+                data[0] |= a << 8;
+                data[1] |= b | c << 8;
+                break;
+
+            }
+
+            case FORMAT_32x: {
+                int a = registers[0] & 0xffff;
+                int b = registers[1] & 0xffff;
+
+                if (a != registers[0]) {
+                    throw new RuntimeException("register number " + registers[0] + " too big for opcode format");
+                }
+
+                if (b != registers[1]) {
+                    throw new RuntimeException("register number " + registers[1] + " too big for opcode format");
+                }
+
+                data[1] |= a;
+                data[2] |= b;
+                break;
+            }
+
+            case FORMAT_35c:
+            {
+                switch (registers.length) {
+                    case 0:
+                        break;
+
+                    case 1:
+                        data[0] |= 1 << 12;
+                        data[2] |= registers[0];
+                        break;
+
+                    case 2:
+                        data[0] |= 2 << 12;
+                        data[2] |= registers[0] | registers[1] << 4;
+                        break;
+
+                    case 3:
+                        data[0] |= 3 << 12;
+                        data[2] |= registers[0] | registers[1] << 4 | registers[2] << 8;
+                        break;
+
+                    case 4:
+                        data[0] |= 4 << 12;
+                        data[2] |= registers[0] | registers[1] << 4 | registers[2] << 8 | registers[3] << 12;
+                        break;
+
+                    case 5:
+                        data[0] |= 4 << 12 | registers[4] << 8;
+                        data[2] |= registers[0] | registers[1] << 4 | registers[2] << 8 | registers[3] << 12;
+                        break;
+                }
+            }
+            break;
+
+            case FORMAT_3rc:
+            case FORMAT_4rcc:
+            {
+                data[0] |= registers.length << 8;
+                data[2] |= registers[0];
+            }
+            break;
+
+            case FORMAT_45cc:
+            {
+                data[0] |= registers.length << 12;
+
+                switch (registers.length) {
+                    case 1:
+                        data[2] |= registers[0];
+                        break;
+
+                    case 2:
+                        data[2] |= registers[0] | registers[1] << 4;
+                        break;
+
+                    case 3:
+                        data[2] |= registers[0] | registers[1] << 4 | registers[2] << 8;
+                        break;
+
+                    case 4:
+                        data[2] |= registers[0] | registers[1] << 4 | registers[2] << 8 | registers[3] << 12;
+                        break;
+
+                    case 5:
+                        data[2] |= registers[0] | registers[1] << 4 | registers[2] << 8 | registers[3] << 12;
+                        data[0] |= registers[4] << 8;
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("unexpected value when reading instruction with opcode " + opcode);
+                }
+            }
+            break;
+        }
+
+        return data;
     }
 
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {

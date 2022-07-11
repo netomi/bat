@@ -17,6 +17,8 @@ package com.github.netomi.bat.smali.disassemble;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
+import com.github.netomi.bat.dexfile.instruction.DexInstruction;
+import com.github.netomi.bat.dexfile.io.InstructionWriter;
 import com.github.netomi.bat.dexfile.util.DexClasses;
 import com.github.netomi.bat.dexfile.value.AnnotationElement;
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
@@ -25,6 +27,7 @@ import com.github.netomi.bat.io.IndentingPrinter;
 
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +167,7 @@ implements   ClassDefVisitor,
 
         // print code.
         printer.levelUp();
-        if (method.code != null) {
+        if (method.getCode() != null) {
             method.codeAccept(dexFile, classDef, this);
         } else if (classDef.getAnnotationsDirectory() != null) {
             int     parameterIndex = 0;
@@ -268,8 +271,34 @@ implements   ClassDefVisitor,
         code.instructionsAccept(dexFile, classDef, method, code, branchTargetPrinter);
 
         // print the instructions.
+//        code.instructionsAccept(dexFile, classDef, method, code,
+//                                new InstructionPrinter(printer, registerPrinter, branchTargetPrinter, debugState));
+
+        final ArrayList<DexInstruction> instructions = new ArrayList<>();
+
+        code.instructionsAccept(dexFile, classDef, method, code, new InstructionVisitor() {
+            @Override
+            public void visitAnyInstruction(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, DexInstruction instruction) {
+                instructions.add(instruction);
+            }
+        });
+
+        int codeLen = instructions.stream().map( a -> a.getLength() ).reduce(0, (a, b) -> a + b );
+        System.out.println(codeLen);
+
+        InstructionWriter writer = new InstructionWriter(codeLen);
+        int offset = 0;
+        for (DexInstruction instruction : instructions) {
+            instruction.write(writer, offset);
+
+            offset += instruction.getLength();
+        }
+
+        code.insns = writer.getArray();
+
         code.instructionsAccept(dexFile, classDef, method, code,
-                                new InstructionPrinter(printer, registerPrinter, branchTargetPrinter, debugState));
+                new InstructionPrinter(printer, registerPrinter, branchTargetPrinter, debugState));
+
     }
 
     @Override

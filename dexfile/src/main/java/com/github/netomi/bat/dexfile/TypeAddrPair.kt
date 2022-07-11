@@ -19,51 +19,60 @@ import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.google.common.base.Preconditions
-import dev.ahmedmourad.nocopy.annotations.NoCopy
+import java.util.*
 
 /**
  * A class representing an encoded type address pair inside a dex file.
  *
  * @see [type addr pair @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-type-addr-pair)
  */
-@NoCopy
-data class TypeAddrPair private constructor(
-    private var typeIndex_: Int = NO_INDEX,
-    private var address_:   Int = 0) : DexContent() {
+class TypeAddrPair private constructor(_typeIndex: Int = NO_INDEX, _address: Int = 0) : DexContent() {
 
-    val typeIndex: Int
-        get() = typeIndex_
+    var typeIndex: Int = _typeIndex
+        private set
 
-    val address: Int
-        get() = address_
+    var address: Int = _address
+        private set
 
     fun getType(dexFile: DexFile): String {
-        return dexFile.getTypeID(typeIndex_).getType(dexFile)
+        return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 
     override fun read(input: DexDataInput) {
-        typeIndex_ = input.readUleb128()
-        address_ = input.readUleb128()
+        typeIndex = input.readUleb128()
+        address   = input.readUleb128()
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeUleb128(typeIndex_)
-        output.writeUleb128(address_)
+        output.writeUleb128(typeIndex)
+        output.writeUleb128(address)
     }
-    
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TypeAddrPair
+
+        return typeIndex == other.typeIndex &&
+               address   == other.address
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(typeIndex, address)
+    }
+
     override fun toString(): String {
-        return "TypeAddrPair[type=${typeIndex_},addr=${address_}]"
+        return "TypeAddrPair[type=${typeIndex},addr=${address}]"
     }
 
     companion object {
-        @JvmStatic
         fun of(typeIndex: Int, addr: Int): TypeAddrPair {
             Preconditions.checkArgument(typeIndex >= 0, "typeIndex must not be negative")
             Preconditions.checkArgument(addr >= 0, "addr must not be negative")
             return TypeAddrPair(typeIndex, addr)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): TypeAddrPair {
             val typeAddrPair = TypeAddrPair()
             typeAddrPair.read(input)

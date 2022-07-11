@@ -15,8 +15,6 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-import com.github.netomi.bat.dexfile.CallSite;
-
 import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*;
 
 /**

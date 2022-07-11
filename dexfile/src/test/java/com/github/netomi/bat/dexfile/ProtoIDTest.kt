@@ -15,21 +15,22 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.FieldID.Companion.of
+import com.github.netomi.bat.dexfile.ProtoID.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.util.function.Function
 
-class FieldIDTest : DexContentTest<FieldID>() {
-    override val testInstances: Array<FieldID>
+class ProtoIDTest : DexContentTest<ProtoID>() {
+    override val testInstances: Array<ProtoID>
         get() = arrayOf(
-                    of(1, 2, 3),
+                    of(1, 2, 3, 4, 5),
+                    of(1, 2),
                     of(65535, 65535, 65535)
                 )
 
-    override val factoryMethod: Function<DexDataInput, FieldID>
-        get() = Function { input -> FieldID.readContent(input) }
+    override val factoryMethod: Function<DexDataInput, ProtoID>
+        get() = Function { input -> ProtoID.readContent(input) }
 
     @Test
     fun inputChecking() {
@@ -41,18 +42,22 @@ class FieldIDTest : DexContentTest<FieldID>() {
     @Test
     fun getter() {
         val data = testInstances
-        assertEquals(1, data[0].classIndex)
-        assertEquals(2, data[0].nameIndex)
-        assertEquals(3, data[0].typeIndex)
+        assertEquals(1, data[0].shortyIndex)
+        assertEquals(2, data[0].returnTypeIndex)
+        val parameters = data[0].parameters
+        assertEquals(3, parameters.typeCount)
+        assertEquals(3, parameters.getTypeIndex(0))
+        assertEquals(4, parameters.getTypeIndex(1))
+        assertEquals(5, parameters.getTypeIndex(2))
     }
 
     @Test
     fun equals() {
-        val f1 = of(1, 2, 3)
-        val f2 = of(1, 3, 4)
-        val f3 = of(1, 2, 3)
-        assertEquals(f1, f1)
-        assertNotEquals(f1, f2)
-        assertEquals(f1, f3)
+        val p1 = of(1, 2, 3)
+        val p2 = of(1, 3, 4)
+        val p3 = of(1, 2, 3)
+        assertEquals(p1, p1)
+        assertNotEquals(p1, p2)
+        assertEquals(p1, p3)
     }
 }

@@ -95,7 +95,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         printer.println("  type          : '" + encodedField.getType(dexFile) + "'")
         printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(encodedField.accessFlags, DexAccessFlags.Target.FIELD))
         val staticValues = if (classDef.staticValues != null) classDef.staticValues.array else null
-        if (encodedField.isStatic && staticValues != null && index < staticValues.encodedValueCount) {
+        if (encodedField.isStatic && staticValues != null && index < staticValues.values.size) {
             printer.print("  value         : ")
             staticValues.valueAccept(dexFile, index, this)
             printer.println()
@@ -252,7 +252,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     }
 
     override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
-        if (value.encodedValueCount > 0) {
+        if (value.values.isNotEmpty()) {
             printer.print("{ ")
             value.valuesAccept(dexFile, joinedByValueConsumer { _, _ -> printer.print(" ") })
             printer.print(" }")
@@ -317,8 +317,8 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
 
     override fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {
         printer.print(value.getType(dexFile))
-        for (i in 0 until value.annotationElementCount) {
-            val element = value.getAnnotationElement(i)
+        for (i in 0 until value.elements.size) {
+            val element = value.elements[i]
             printer.print(" " + element.getName(dexFile) + "=")
             element.value.accept(dexFile, this)
         }

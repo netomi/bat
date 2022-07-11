@@ -27,21 +27,21 @@ import com.github.netomi.bat.dexfile.value.EncodedStringValue
  */
 class CallSite private constructor() : EncodedArray() {
     val methodHandle: EncodedMethodHandleValue
-        get() = array.getEncodedValue(0) as EncodedMethodHandleValue
+        get() = array.values[0] as EncodedMethodHandleValue
 
     fun getMethodHandle(dexFile: DexFile): MethodHandle {
         return methodHandle.getMethodHandle(dexFile)
     }
 
     val methodName: EncodedStringValue
-        get() = array.getEncodedValue(1) as EncodedStringValue
+        get() = array.values[1] as EncodedStringValue
 
     fun getMethodName(dexFile: DexFile): String {
         return methodName.getStringValue(dexFile)
     }
 
     val methodType: EncodedMethodTypeValue
-        get() = array.getEncodedValue(2) as EncodedMethodTypeValue
+        get() = array.values[2] as EncodedMethodTypeValue
 
     fun getMethodType(dexFile: DexFile): ProtoID {
         return methodType.getProtoID(dexFile)

@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.util.Preconditions
-import dev.ahmedmourad.nocopy.annotations.NoCopy
+import java.util.*
 
 /**
  * A class representing a type id item inside a dex file.
@@ -30,38 +30,48 @@ import dev.ahmedmourad.nocopy.annotations.NoCopy
     type          = DexConstants.TYPE_TYPE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-@NoCopy
-data class TypeID private constructor(private var descriptorIndex_: Int = NO_INDEX) : DataItem() {
+class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() {
 
-    val descriptorIndex: Int
-        get() = descriptorIndex_
+    var descriptorIndex: Int = _descriptorIndex
+        private set
 
     fun getType(dexFile: DexFile): String {
-        return dexFile.getStringID(descriptorIndex_).stringValue
+        return dexFile.getStringID(descriptorIndex).stringValue
     }
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
-        descriptorIndex_ = input.readInt()
+        descriptorIndex = input.readInt()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeAlignmentPadding(dataAlignment)
-        output.writeInt(descriptorIndex_)
+        output.writeInt(descriptorIndex)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as TypeID
+
+        return descriptorIndex == other.descriptorIndex
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(descriptorIndex)
     }
 
     override fun toString(): String {
-        return "TypeID[descriptorIdx=${descriptorIndex_}]"
+        return "TypeID[descriptorIdx=${descriptorIndex}]"
     }
 
     companion object {
-        @JvmStatic
         fun of(descriptorIndex: Int): TypeID {
             Preconditions.checkArgument(descriptorIndex >= 0, "descriptor index must not be negative")
             return TypeID(descriptorIndex)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): TypeID {
             val typeID = TypeID()
             typeID.read(input)

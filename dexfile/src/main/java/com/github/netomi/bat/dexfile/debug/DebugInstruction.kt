@@ -78,18 +78,18 @@ abstract class DebugInstruction protected constructor(val opcode: Byte) : DexCon
 /**
  * Represents a debug instruction that advances the line register.
  */
-data class DebugAdvanceLine internal constructor(private var lineDiff_: Int = 0): DebugInstruction(DBG_ADVANCE_LINE) {
+data class DebugAdvanceLine internal constructor(private var _lineDiff: Int = 0): DebugInstruction(DBG_ADVANCE_LINE) {
 
     val lineDiff: Int
-        get() = lineDiff_
+        get() = _lineDiff
 
     override fun read(input: DexDataInput) {
-        lineDiff_ = input.readSleb128()
+        _lineDiff = input.readSleb128()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeByte(opcode)
-        output.writeSleb128(lineDiff_)
+        output.writeSleb128(_lineDiff)
     }
 
     override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
@@ -97,7 +97,7 @@ data class DebugAdvanceLine internal constructor(private var lineDiff_: Int = 0)
     }
 
     override fun toString(): String {
-        return "DebugAdvanceLine[lineDiff=${lineDiff_}]"
+        return "DebugAdvanceLine[lineDiff=${_lineDiff}]"
     }
 
     companion object {
@@ -137,7 +137,9 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         if (!super.equals(other)) return false
+
         val o = other as DebugStartLocalExtended
+
         return opcode == o.opcode
     }
 
@@ -153,18 +155,18 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
 /**
  * Represents a debug instruction that advances the address register.
  */
-data class DebugAdvancePC internal constructor(private var addrDiff_: Int = 0) : DebugInstruction(DBG_ADVANCE_PC) {
+data class DebugAdvancePC internal constructor(private var _addrDiff: Int = 0) : DebugInstruction(DBG_ADVANCE_PC) {
 
     val addrDiff: Int
-        get() = addrDiff_
+        get() = _addrDiff
 
     override fun read(input: DexDataInput) {
-        addrDiff_ = input.readUleb128()
+        _addrDiff = input.readUleb128()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeByte(opcode)
-        output.writeUleb128(addrDiff_)
+        output.writeUleb128(_addrDiff)
     }
 
     override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
@@ -172,7 +174,7 @@ data class DebugAdvancePC internal constructor(private var addrDiff_: Int = 0) :
     }
 
     override fun toString(): String {
-        return "DebugAdvancePC[addrDiff=${addrDiff_}]"
+        return "DebugAdvancePC[addrDiff=${_addrDiff}]"
     }
 
     companion object {
@@ -185,18 +187,18 @@ data class DebugAdvancePC internal constructor(private var addrDiff_: Int = 0) :
 /**
  * Represents a debug instruction that ends a local variable at the current address.
  */
-data class DebugEndLocal internal constructor(private var registerNum_: Int = 0) : DebugInstruction(DBG_END_LOCAL) {
+data class DebugEndLocal internal constructor(private var _registerNum: Int = 0) : DebugInstruction(DBG_END_LOCAL) {
 
     val registerNum: Int
-        get() = registerNum_
+        get() = _registerNum
 
     override fun read(input: DexDataInput) {
-        registerNum_ = input.readUleb128()
+        _registerNum = input.readUleb128()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeByte(opcode)
-        output.writeUleb128(registerNum_)
+        output.writeUleb128(_registerNum)
     }
 
     override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
@@ -204,7 +206,7 @@ data class DebugEndLocal internal constructor(private var registerNum_: Int = 0)
     }
 
     override fun toString(): String {
-        return "DebugEndLocal[registerNum=${registerNum_}]"
+        return "DebugEndLocal[registerNum=${_registerNum}]"
     }
 
     companion object {
@@ -245,18 +247,18 @@ object DebugEndSequence : DebugInstruction(DBG_END_SEQUENCE) {
 /**
  * Represents a debug instruction that restarts a previously defined local variable at the current address.
  */
-data class DebugRestartLocal internal constructor(private var registerNum_: Int = 0) : DebugInstruction(DBG_RESTART_LOCAL) {
+data class DebugRestartLocal internal constructor(private var _registerNum: Int = 0) : DebugInstruction(DBG_RESTART_LOCAL) {
 
     val registerNum: Int
-        get() = registerNum_
+        get() = _registerNum
 
     override fun read(input: DexDataInput) {
-        registerNum_ = input.readUleb128()
+        _registerNum = input.readUleb128()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeByte(opcode)
-        output.writeUleb128(registerNum_)
+        output.writeUleb128(_registerNum)
     }
 
     override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
@@ -264,7 +266,7 @@ data class DebugRestartLocal internal constructor(private var registerNum_: Int 
     }
 
     override fun toString(): String {
-        return "DebugRestartLocal[registerNum=${registerNum_}]"
+        return "DebugRestartLocal[registerNum=${_registerNum}]"
     }
 
     companion object {
@@ -305,22 +307,22 @@ object DebugSetEpilogueBegin : DebugInstruction(DBG_SET_EPILOGUE_BEGIN) {
 /**
  * Represents a debug instruction that sets associated source file for subsequent line number entries.
  */
-data class DebugSetFile internal constructor(private var nameIndex_: Int = 0) : DebugInstruction(DBG_SET_FILE) {
+data class DebugSetFile internal constructor(private var _nameIndex: Int = 0) : DebugInstruction(DBG_SET_FILE) {
 
     val nameIndex: Int
-        get() = nameIndex_
+        get() = _nameIndex
 
     fun name(dexFile: DexFile): String {
-        return dexFile.getStringID(nameIndex_).stringValue
+        return dexFile.getStringID(_nameIndex).stringValue
     }
 
     override fun read(input: DexDataInput) {
-        nameIndex_ = input.readUleb128p1()
+        _nameIndex = input.readUleb128p1()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeByte(opcode)
-        output.writeUleb128p1(nameIndex_)
+        output.writeUleb128p1(_nameIndex)
     }
 
     override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
@@ -328,7 +330,7 @@ data class DebugSetFile internal constructor(private var nameIndex_: Int = 0) : 
     }
 
     override fun toString(): String {
-        return "DebugSetFile[nameIndex=${nameIndex_}]"
+        return "DebugSetFile[nameIndex=${_nameIndex}]"
     }
 
     companion object {
@@ -416,7 +418,9 @@ open class DebugStartLocal : DebugInstruction {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
+
         val o = other as DebugStartLocal
+
         return registerNum == o.registerNum &&
                nameIndex   == o.nameIndex   &&
                typeIndex   == o.typeIndex
@@ -473,7 +477,9 @@ class DebugStartLocalExtended : DebugStartLocal {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         if (!super.equals(other)) return false
+
         val o = other as DebugStartLocalExtended
+
         return sigIndex == o.sigIndex
     }
 

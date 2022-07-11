@@ -17,7 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import dev.ahmedmourad.nocopy.annotations.NoCopy
+import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -29,21 +29,20 @@ import kotlin.collections.ArrayList
     type          = DexConstants.TYPE_MAP_LIST,
     dataAlignment = 4,
     dataSection   = true)
-@NoCopy
-data class MapList private constructor(private val mapItems_: ArrayList<MapItem> = ArrayList(0)) : DataItem() {
+class MapList private constructor(private val _mapItems: ArrayList<MapItem> = ArrayList(0)) : DataItem() {
 
     val mapItems: List<MapItem>
-        get() = mapItems_
+        get() = _mapItems
 
     val mapItemCount: Int
-        get() = mapItems_.size
+        get() = _mapItems.size
 
     fun getMapItem(index: Int): MapItem {
-        return mapItems_[index]
+        return _mapItems[index]
     }
 
     fun getMapItemByType(type: Int): MapItem? {
-        for (mapItem in mapItems_) {
+        for (mapItem in _mapItems) {
             if (mapItem.type == type) {
                 return mapItem
             }
@@ -55,7 +54,7 @@ data class MapList private constructor(private val mapItems_: ArrayList<MapItem>
         var mapItem = getMapItemByType(type)
         if (mapItem == null) {
             mapItem = MapItem.of(type)
-            mapItems_.add(mapItem)
+            _mapItems.add(mapItem)
         }
 
         mapItem.size   = size
@@ -65,11 +64,11 @@ data class MapList private constructor(private val mapItems_: ArrayList<MapItem>
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
         val size = input.readInt()
-        mapItems_.clear()
-        mapItems_.ensureCapacity(size)
+        _mapItems.clear()
+        _mapItems.ensureCapacity(size)
         for (i in 0 until size) {
             val mapItem = MapItem.readContent(input)
-            mapItems_.add(mapItem)
+            _mapItems.add(mapItem)
         }
     }
 
@@ -77,7 +76,7 @@ data class MapList private constructor(private val mapItems_: ArrayList<MapItem>
         output.writeAlignmentPadding(dataAlignment)
 
         // only write out map items which are not empty and sort by offset
-        val filteredMap = mapItems_.filter { it.size > 0 }.sortedBy { it.offset }
+        val filteredMap = _mapItems.filter { it.size > 0 }.sortedBy { it.offset }
 
         output.writeInt(filteredMap.size)
         for (mapItem in filteredMap) {
@@ -85,8 +84,21 @@ data class MapList private constructor(private val mapItems_: ArrayList<MapItem>
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MapList
+
+        return _mapItems == other._mapItems
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(_mapItems)
+    }
+
     override fun toString(): String {
-        return "MapList[items=${mapItems_.size}]"
+        return "MapList[items=${_mapItems.size}]"
     }
 
     companion object {
@@ -94,7 +106,6 @@ data class MapList private constructor(private val mapItems_: ArrayList<MapItem>
             return MapList()
         }
 
-        @JvmStatic
         internal fun readMapList(input: DexDataInput): MapList {
             val mapList = MapList()
             mapList.read(input)

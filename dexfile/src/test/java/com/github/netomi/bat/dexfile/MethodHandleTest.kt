@@ -23,16 +23,14 @@ import org.junit.jupiter.api.Test
 import java.util.function.Function
 
 class MethodHandleTest : DexContentTest<MethodHandle>() {
-    override fun getTestInstances(): Array<MethodHandle> {
-        return arrayOf(
-            of(MethodHandleType.INSTANCE_GET, 1),
-            of(MethodHandleType.INSTANCE_PUT, 65535)
-        )
-    }
+    override val testInstances: Array<MethodHandle>
+        get() = arrayOf(
+                    of(MethodHandleType.INSTANCE_GET, 1),
+                    of(MethodHandleType.INSTANCE_PUT, 65535)
+                )
 
-    override fun getFactoryMethod(): Function<DexDataInput, MethodHandle> {
-        return Function { input -> MethodHandle.readContent(input) }
-    }
+    override val factoryMethod: Function<DexDataInput, MethodHandle>
+        get() = Function { input -> MethodHandle.readContent(input) }
 
     @Test
     fun inputChecking() {

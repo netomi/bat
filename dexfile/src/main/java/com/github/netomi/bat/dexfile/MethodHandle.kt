@@ -16,11 +16,9 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
-import com.github.netomi.bat.dexfile.MethodHandleType.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.util.Preconditions
-import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 
 /**
@@ -32,17 +30,13 @@ import java.util.*
     type          = DexConstants.TYPE_METHOD_HANDLE_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-@NoCopy
-data class MethodHandle private constructor(
-    private var methodHandleTypeValue_: Int = 0,       // ushort
-    private var fieldOrMethodId_: Int       = NO_INDEX // ushort
-) : DataItem() {
+class MethodHandle private constructor(_methodHandleTypeValue: Int = 0, _fieldOrMethodId: Int = NO_INDEX) : DataItem() {
 
-    val methodHandleTypeValue: Int
-        get() = methodHandleTypeValue_
+    var methodHandleTypeValue: Int = _methodHandleTypeValue
+        private set
 
-    val fieldOrMethodId: Int
-        get() = fieldOrMethodId_
+    var fieldOrMethodId: Int = _fieldOrMethodId
+        private set
 
     val methodHandleType: MethodHandleType
         get() = MethodHandleType.of(methodHandleTypeValue)
@@ -95,9 +89,9 @@ data class MethodHandle private constructor(
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
-        methodHandleTypeValue_ = input.readUnsignedShort()
+        methodHandleTypeValue = input.readUnsignedShort()
         input.readUnsignedShort()
-        fieldOrMethodId_ = input.readUnsignedShort()
+        fieldOrMethodId = input.readUnsignedShort()
         input.readUnsignedShort()
     }
 
@@ -109,24 +103,35 @@ data class MethodHandle private constructor(
         output.writeUnsignedShort(0x0)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MethodHandle
+
+        return methodHandleTypeValue == other.methodHandleTypeValue &&
+               fieldOrMethodId       == other.fieldOrMethodId
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(methodHandleTypeValue, fieldOrMethodId)
+    }
+
     override fun toString(): String {
-        return "MethodHandle[type=%02x,fieldOrMethodId=%d]".format(methodHandleTypeValue_, fieldOrMethodId_)
+        return "MethodHandle[type=%02x,fieldOrMethodId=%d]".format(methodHandleType, fieldOrMethodId)
     }
 
     companion object {
-        @JvmStatic
         fun of(methodHandleType: MethodHandleType, fieldOrMethodId: Int): MethodHandle {
             Objects.requireNonNull(methodHandleType, "methodHandleType must not be null")
             return of(methodHandleType.value, fieldOrMethodId)
         }
 
-        @JvmStatic
         fun of(methodHandleType: Int, fieldOrMethodId: Int): MethodHandle {
             Preconditions.checkArgument(fieldOrMethodId >= 0, "fieldOrMethodId must not be negative")
             return MethodHandle(methodHandleType, fieldOrMethodId)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): MethodHandle {
             val methodHandle = MethodHandle()
             methodHandle.read(input)

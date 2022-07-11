@@ -22,17 +22,17 @@ import org.junit.jupiter.api.Test
 import java.util.function.Function
 
 class MapListTest : DexContentTest<MapList>() {
-    override fun getTestInstances(): Array<MapList> {
-        val l1 = MapList.empty()
-        l1.updateMapItem(1, 2, 0)
-        val l2 = MapList.empty()
-        l2.updateMapItem(2, 3, 0)
-        return arrayOf(l1, l2)
-    }
+    override val testInstances: Array<MapList>
+        get() {
+            val l1 = MapList.empty()
+            l1.updateMapItem(1, 2, 0)
+            val l2 = MapList.empty()
+            l2.updateMapItem(2, 3, 0)
+            return arrayOf(l1, l2)
+        }
 
-    override fun getFactoryMethod(): Function<DexDataInput, MapList> {
-        return Function { input -> MapList.readMapList(input) }
-    }
+    override val factoryMethod: Function<DexDataInput, MapList>
+        get() = Function { input -> MapList.readMapList(input) }
 
     @Test
     fun getter() {

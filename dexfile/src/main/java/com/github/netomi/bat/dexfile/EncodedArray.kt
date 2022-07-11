@@ -37,14 +37,14 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
     }
 
     fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
-        for (i in 0 until array.encodedValueCount) {
-            array.getEncodedValue(i).accept(dexFile, visitor)
+        for (i in 0 until array.values.size) {
+            array.values[i].accept(dexFile, visitor)
         }
     }
 
     fun accept(dexFile: DexFile, index: Int, visitor: EncodedValueVisitor) {
-        if (index >= 0 && index < array.encodedValueCount) {
-            array.getEncodedValue(index).accept(dexFile, visitor)
+        if (index >= 0 && index < array.values.size) {
+            array.values[index].accept(dexFile, visitor)
         }
     }
 

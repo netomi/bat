@@ -20,20 +20,18 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import java.util.*
 
 /**
  * A class representing a byte value inside a dex file.
  */
-data class EncodedByteValue internal constructor(private var value_: Byte = 0.toByte()) : EncodedValue() {
+data class EncodedByteValue internal constructor(var value: Byte = 0.toByte()) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_BYTE
 
-    val value: Byte
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = input.readByte()
+        value = input.readByte()
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -41,7 +39,7 @@ data class EncodedByteValue internal constructor(private var value_: Byte = 0.to
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeByte(value_)
+        output.writeByte(value)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -49,7 +47,7 @@ data class EncodedByteValue internal constructor(private var value_: Byte = 0.to
     }
 
     override fun toString(): String {
-        return "EncodedByteValue[value=0x%02x]".format(value_)
+        return "EncodedByteValue[value=0x%02x]".format(value)
     }
 
     companion object {
@@ -61,26 +59,23 @@ data class EncodedByteValue internal constructor(private var value_: Byte = 0.to
 }
 
 /**
- * A class representing a int value inside a dex file.
+ * A class representing an int value inside a dex file.
  */
-data class EncodedIntValue internal constructor(private var value_: Int = 0) : EncodedValue() {
+data class EncodedIntValue internal constructor(var value: Int = 0) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_INT
 
-    val value: Int
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = input.readInt(valueArg + 1)
+        value = input.readInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForSignedInt(value_) - 1)
+        return writeType(output, requiredBytesForSignedInt(value) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeInt(value_, valueArg + 1)
+        output.writeInt(value, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -88,7 +83,7 @@ data class EncodedIntValue internal constructor(private var value_: Int = 0) : E
     }
 
     override fun toString(): String {
-        return "EncodedIntValue[value=%d]".format(value_)
+        return "EncodedIntValue[value=${value}]"
     }
 
     companion object {
@@ -102,24 +97,21 @@ data class EncodedIntValue internal constructor(private var value_: Int = 0) : E
 /**
  * A class representing a char value inside a dex file.
  */
-data class EncodedCharValue internal constructor(private var value_: Char = 0.toChar()) : EncodedValue() {
+data class EncodedCharValue internal constructor(var value: Char = 0.toChar()) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_CHAR
 
-    val value: Char
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = input.readChar(valueArg + 1)
+        value = input.readChar(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForUnsignedChar(value_) - 1)
+        return writeType(output, requiredBytesForUnsignedChar(value) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeChar(value_, valueArg + 1)
+        output.writeChar(value, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -127,7 +119,7 @@ data class EncodedCharValue internal constructor(private var value_: Char = 0.to
     }
 
     override fun toString(): String {
-        return "EncodedCharValue[value=%d,\'%c\']".format(value_.code, value_)
+        return "EncodedCharValue[value=%d,\'%c\']".format(value.code, value)
     }
 
     companion object {
@@ -141,29 +133,27 @@ data class EncodedCharValue internal constructor(private var value_: Char = 0.to
 /**
  * A class representing a boolean value inside a dex file.
  */
-data class EncodedBooleanValue internal constructor(private var value_: Boolean = false) : EncodedValue() {
+data class EncodedBooleanValue internal constructor(var value: Boolean = false) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_BOOLEAN
 
-    val value: Boolean
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = valueArg and 0x1 == 1
+        value = valueArg and 0x1 == 1
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, if (value_) 1 else 0)
+        return writeType(output, if (value) 1 else 0)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {}
+
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitBooleanValue(dexFile, this)
     }
 
     override fun toString(): String {
-        return "EncodedBooleanValue[value=${value_}]"
+        return "EncodedBooleanValue[value=${value}]"
     }
 
     companion object {
@@ -177,24 +167,21 @@ data class EncodedBooleanValue internal constructor(private var value_: Boolean 
 /**
  * A class representing a short value inside a dex file.
  */
-data class EncodedShortValue internal constructor(private var value_: Short = 0.toShort()) : EncodedValue() {
+data class EncodedShortValue internal constructor(var value: Short = 0.toShort()) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_SHORT
 
-    val value: Short
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = input.readShort(valueArg + 1)
+        value = input.readShort(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForSignedShort(value_) - 1)
+        return writeType(output, requiredBytesForSignedShort(value) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeShort(value_, valueArg + 1)
+        output.writeShort(value, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -202,7 +189,7 @@ data class EncodedShortValue internal constructor(private var value_: Short = 0.
     }
 
     override fun toString(): String {
-        return "EncodedShortValue[value=%d]".format(value_)
+        return "EncodedShortValue[value=${value}]"
     }
 
     companion object {
@@ -216,24 +203,21 @@ data class EncodedShortValue internal constructor(private var value_: Short = 0.
 /**
  * A class representing a double value inside a dex file.
  */
-data class EncodedDoubleValue internal constructor(private var value_: Double = 0.0) : EncodedValue() {
+data class EncodedDoubleValue internal constructor(var value: Double = 0.0) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_DOUBLE
 
-    val value: Double
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = input.readDouble(valueArg + 1)
+        value = input.readDouble(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForDouble(value_) - 1)
+        return writeType(output, requiredBytesForDouble(value) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeDouble(value_, valueArg + 1)
+        output.writeDouble(value, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -241,7 +225,7 @@ data class EncodedDoubleValue internal constructor(private var value_: Double = 
     }
 
     override fun toString(): String {
-        return "EncodedDoubleValue[value=%f]".format(value_)
+        return "EncodedDoubleValue[value=%f]".format(value)
     }
 
     companion object {
@@ -255,24 +239,21 @@ data class EncodedDoubleValue internal constructor(private var value_: Double = 
 /**
  * A class representing a float value inside a dex file.
  */
-data class EncodedFloatValue internal constructor(private var value_: Float = 0f) : EncodedValue() {
+data class EncodedFloatValue internal constructor(var value: Float = 0f) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_FLOAT
 
-    val value: Float
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = input.readFloat(valueArg + 1)
+        value = input.readFloat(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForFloat(value_) - 1)
+        return writeType(output, requiredBytesForFloat(value) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeFloat(value_, valueArg + 1)
+        output.writeFloat(value, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -280,7 +261,7 @@ data class EncodedFloatValue internal constructor(private var value_: Float = 0f
     }
 
     override fun toString(): String {
-        return "EncodedFloatValue[value=%f]".format(value_)
+        return "EncodedFloatValue[value=%f]".format(value)
     }
 
     companion object {
@@ -294,24 +275,21 @@ data class EncodedFloatValue internal constructor(private var value_: Float = 0f
 /**
  * A class representing a int value inside a dex file.
  */
-data class EncodedLongValue internal constructor(private var value_: Long = 0) : EncodedValue() {
+data class EncodedLongValue internal constructor(var value: Long = 0) : EncodedValue() {
 
     override val valueType: Int
         get() = VALUE_LONG
 
-    val value: Long
-        get() = value_
-
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        value_ = input.readLong(valueArg + 1)
+        value = input.readLong(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
-        return writeType(output, requiredBytesForSignedLong(value_) - 1)
+        return writeType(output, requiredBytesForSignedLong(value) - 1)
     }
 
     override fun writeValue(output: DexDataOutput, valueArg: Int) {
-        output.writeLong(value_, valueArg + 1)
+        output.writeLong(value, valueArg + 1)
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
@@ -319,7 +297,7 @@ data class EncodedLongValue internal constructor(private var value_: Long = 0) :
     }
 
     override fun toString(): String {
-        return "EncodedLongValue[value=%d]".format(value_)
+        return "EncodedLongValue[value=${value}]"
     }
 
     companion object {

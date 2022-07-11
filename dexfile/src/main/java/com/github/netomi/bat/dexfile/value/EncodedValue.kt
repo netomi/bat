@@ -49,8 +49,6 @@ abstract class EncodedValue {
 
     abstract fun accept(dexFile: DexFile, visitor: EncodedValueVisitor)
 
-    abstract override fun hashCode(): Int
-    abstract override fun equals(other: Any?): Boolean
 
     companion object {
         // Value types.

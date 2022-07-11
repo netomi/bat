@@ -21,17 +21,15 @@ import org.junit.jupiter.api.Test
 import java.util.function.Function
 
 class TypeIDTest : DexContentTest<TypeID>() {
-    override fun getTestInstances(): Array<TypeID> {
-        return arrayOf(
-            TypeID.of(10),
-            TypeID.of(20),
-            TypeID.of(65535)
-        )
-    }
+    override val testInstances: Array<TypeID>
+        get() = arrayOf(
+                    TypeID.of(10),
+                    TypeID.of(20),
+                    TypeID.of(65535)
+                )
 
-    override fun getFactoryMethod(): Function<DexDataInput, TypeID> {
-        return Function { input -> TypeID.readContent(input) }
-    }
+    override val factoryMethod: Function<DexDataInput, TypeID>
+        get() = Function { input -> TypeID.readContent(input) }
 
     @Test
     fun inputChecking() {

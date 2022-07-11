@@ -194,7 +194,7 @@ extends      DataItem
             throw new RuntimeException("trying to add a static value for a field that does not belong to this class: " + getType(dexFile));
         }
 
-        int currentStaticValues = staticValues.getArray().getEncodedValueCount();
+        int currentStaticValues = staticValues.getArray().getValues().size();
 
         if (currentStaticValues <= fieldIndex) {
             for (int i = currentStaticValues; i < fieldIndex; i++) {

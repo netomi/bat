@@ -20,7 +20,6 @@ import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.Strings
-import java.lang.Boolean
 
 internal class CallSiteArgumentPrinter(private val printer: IndentingPrinter) : EncodedValueVisitor {
 

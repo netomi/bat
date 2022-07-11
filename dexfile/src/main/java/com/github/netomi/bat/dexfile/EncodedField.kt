@@ -22,7 +22,6 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
 import com.google.common.base.Preconditions
-import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 
 /**
@@ -30,25 +29,21 @@ import java.util.*
  *
  * @see [encoded field @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-field-format)
  */
-@NoCopy
-data class EncodedField private constructor(
-    private var fieldIndex_:  Int = NO_INDEX, // uleb128
-    private var accessFlags_: Int = 0
-) : DexContent() {
+class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags: Int = 0) : DexContent() {
 
-    private var deltaFieldIndex = 0 // uleb128
+    private var deltaFieldIndex = 0
 
-    val fieldIndex: Int
-        get() = fieldIndex_
+    var fieldIndex: Int = _fieldIndex
+        private set
 
-    val accessFlags: Int
-        get() = accessFlags_
+    var accessFlags: Int = _accessFlags
+        private set
 
     val visibility: Visibility
-        get() = of(accessFlags_)
+        get() = of(accessFlags)
 
     val modifiers: EnumSet<FieldModifier>
-        get() = setOf(accessFlags_)
+        get() = setOf(accessFlags)
 
     fun getFieldID(dexFile: DexFile): FieldID {
         return dexFile.getFieldID(fieldIndex)
@@ -67,11 +62,11 @@ data class EncodedField private constructor(
 
     override fun read(input: DexDataInput) {
         deltaFieldIndex = input.readUleb128()
-        accessFlags_    = input.readUleb128()
+        accessFlags     = input.readUleb128()
     }
 
     private fun updateFieldIndex(lastIndex: Int) {
-        fieldIndex_ = deltaFieldIndex + lastIndex
+        fieldIndex = deltaFieldIndex + lastIndex
     }
 
     private fun updateDeltaFieldIndex(lastIndex: Int) {
@@ -89,10 +84,24 @@ data class EncodedField private constructor(
         output.writeUleb128(accessFlags)
     }
 
-    fun staticValueAccept(dexFile: DexFile?, classDef: ClassDef, index: Int, visitor: EncodedValueVisitor?) {
+    fun staticValueAccept(dexFile: DexFile, classDef: ClassDef, index: Int, visitor: EncodedValueVisitor) {
         if (isStatic) {
             classDef.staticValueAccept(dexFile, index, visitor)
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as EncodedField
+
+        return fieldIndex  == other.fieldIndex &&
+               accessFlags == other.accessFlags
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(fieldIndex, accessFlags)
     }
 
     override fun toString(): String {
@@ -100,7 +109,6 @@ data class EncodedField private constructor(
     }
 
     companion object {
-        @JvmStatic
         fun of(fieldIndex: Int, visibility: Visibility, vararg modifiers: FieldModifier): EncodedField {
             Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative")
             var accessFlags = visibility.flagValue
@@ -110,7 +118,6 @@ data class EncodedField private constructor(
             return EncodedField(fieldIndex, accessFlags)
         }
 
-        @JvmStatic
         fun of(fieldIndex: Int, accessFlags: Int): EncodedField {
             Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative")
             return EncodedField(fieldIndex, accessFlags)

@@ -43,8 +43,8 @@ object EncodedNullValue : EncodedValue() {
         return System.identityHashCode(this)
     }
 
-    override fun equals(obj: Any?): Boolean {
-        return this === obj
+    override fun equals(other: Any?): Boolean {
+        return this === other
     }
 
     override fun toString(): String {

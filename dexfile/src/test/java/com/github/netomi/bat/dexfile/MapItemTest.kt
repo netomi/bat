@@ -23,16 +23,14 @@ import org.junit.jupiter.api.Test
 import java.util.function.Function
 
 class MapItemTest : DexContentTest<MapItem>() {
-    override fun getTestInstances(): Array<MapItem> {
-        return arrayOf(
-            of(1, 2),
-            of(2, 0)
-        )
-    }
+    override val testInstances: Array<MapItem>
+        get() = arrayOf(
+                    of(1, 2),
+                    of(2, 0)
+                )
 
-    override fun getFactoryMethod(): Function<DexDataInput, MapItem> {
-        return Function { input -> MapItem.readContent(input) }
-    }
+    override val factoryMethod: Function<DexDataInput, MapItem>
+        get() = Function { input -> MapItem.readContent(input) }
 
     @Test
     fun getter() {

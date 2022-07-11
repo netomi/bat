@@ -83,13 +83,11 @@ class StringID private constructor(): DataItem() {
     }
 
     companion object {
-        @JvmStatic
         fun of(value: String): StringID {
             Objects.requireNonNull(value, "value must not be null")
             return StringID(StringData.of(value))
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): StringID {
             val stringID = StringID()
             stringID.read(input)

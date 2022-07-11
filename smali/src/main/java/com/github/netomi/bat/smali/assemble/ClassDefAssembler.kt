@@ -127,6 +127,10 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val methodIDIndex = dexFile.addOrGetMethodID(classType, name, "", returnType, *parameterTypes.toTypedArray())
         val method = EncodedMethod.of(methodIDIndex, accessFlags);
 
+        ctx.sParameter().forEach { println(it) }
+
+        ctx.sInstruction().forEach { visitSInstructions(it, method) }
+
         classDef.addMethod(dexFile, method)
 
         val annotationSet = AnnotationSet.empty()
@@ -136,6 +140,26 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
             val methodAnnotation = MethodAnnotation.of(method.methodIndex, annotationSet)
             classDef.annotationsDirectory.methodAnnotations.add(methodAnnotation)
         }
+    }
+
+    private fun visitSInstructions(ctx: SInstructionContext, method: EncodedMethod) {
+
+        var registers = 0
+
+        val t = ctx.getChild(0) as ParserRuleContext
+        when (t.ruleIndex) {
+            RULE_fregisters -> {
+                val c = t as FregistersContext
+                registers = c.xregisters.text.toInt()
+            }
+
+            RULE_fm5c -> {
+                val c = t as Fm5cContext
+                val opName = c.op.text
+
+            }
+        }
+        println(t.ruleIndex)
     }
 
     private fun parseAnnotationValueContext(ctx: SAnnotationValueContext): EncodedValue? {

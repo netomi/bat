@@ -15,8 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.EncodedField.Companion.of
-import com.github.netomi.bat.dexfile.EncodedField.Companion.readContent
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import org.junit.jupiter.api.Assertions.*
@@ -25,39 +23,39 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.function.Function
 
-class EncodedFieldTest : DexContentTest<EncodedField>() {
-    override val testInstances: Array<EncodedField>
+class EncodedMethodTest : DexContentTest<EncodedMethod>() {
+    override val testInstances: Array<EncodedMethod>
         get() = arrayOf(
-                    of(1, Visibility.PUBLIC, FieldModifier.FINAL),
-                    of(2, Visibility.PRIVATE),
-                    of(65535, Visibility.PACKAGE_PRIVATE, FieldModifier.VOLATILE, FieldModifier.SYNTHETIC)
+                    EncodedMethod.of(1, Visibility.PUBLIC, MethodModifier.FINAL),
+                    EncodedMethod.of(2, Visibility.PRIVATE),
+                    EncodedMethod.of(65535, Visibility.PACKAGE_PRIVATE, MethodModifier.SYNCHRONIZED, MethodModifier.SYNTHETIC)
                 )
 
-    override val factoryMethod: Function<DexDataInput, EncodedField>
-        get() = Function { input -> readContent(input, 0) }
+    override val factoryMethod: Function<DexDataInput, EncodedMethod>
+        get() = Function { input -> EncodedMethod.readContent(input, 0) }
 
-    override fun getWriteMethod(data: EncodedField): Consumer<DexDataOutput> {
+    override fun getWriteMethod(data: EncodedMethod): Consumer<DexDataOutput> {
         return Consumer { output -> data.write(output, 0) }
     }
 
     @Test
     fun inputChecking() {
-        assertThrows(IllegalArgumentException::class.java) { of(-1, Visibility.PUBLIC, FieldModifier.FINAL) }
+        assertThrows(IllegalArgumentException::class.java) { EncodedMethod.of(-1, Visibility.PUBLIC, MethodModifier.FINAL) }
     }
 
     @Test
     fun getter() {
         val data = testInstances
-        assertEquals(1, data[0].fieldIndex)
+        assertEquals(1, data[0].methodIndex)
         assertEquals(Visibility.PUBLIC, data[0].visibility)
-        assertEquals(EnumSet.of(FieldModifier.FINAL), data[0].modifiers)
+        assertEquals(EnumSet.of(MethodModifier.FINAL), data[0].modifiers)
     }
 
     @Test
     fun equals() {
-        val e1 = of(1, Visibility.PUBLIC, FieldModifier.FINAL)
-        val e2 = of(2, Visibility.PRIVATE, FieldModifier.STATIC)
-        val e3 = of(1, Visibility.PUBLIC, FieldModifier.FINAL)
+        val e1 = EncodedMethod.of(1, Visibility.PUBLIC, MethodModifier.FINAL)
+        val e2 = EncodedMethod.of(2, Visibility.PRIVATE, MethodModifier.STATIC)
+        val e3 = EncodedMethod.of(1, Visibility.PUBLIC, MethodModifier.FINAL)
         assertEquals(e1, e1)
         assertNotEquals(e1, e2)
         assertEquals(e1, e3)

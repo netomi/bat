@@ -15,11 +15,9 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
-import dev.ahmedmourad.nocopy.annotations.NoCopy
 import java.util.*
 
 /**
@@ -31,14 +29,17 @@ import java.util.*
     type          = DexConstants.TYPE_CALL_SITE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-@NoCopy
-data class CallSiteID private constructor(private var callSite_: CallSite = CallSite.empty()) : DataItem() {
+class CallSiteID private constructor() : DataItem() {
 
-    val callSite: CallSite
-        get() = callSite_
-
-    var callSiteOffset = 0 // uint
+    var callSite: CallSite = CallSite.empty()
         private set
+
+    var callSiteOffset = 0
+        private set
+
+    private constructor(callSite: CallSite): this() {
+        this.callSite = callSite
+    }
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
@@ -47,11 +48,11 @@ data class CallSiteID private constructor(private var callSite_: CallSite = Call
 
     override fun readLinkedDataItems(input: DexDataInput) {
         input.offset = callSiteOffset
-        callSite_ = CallSite.readContent(input)
+        callSite = CallSite.readContent(input)
     }
 
     override fun updateOffsets(dataItemMap: Map) {
-        callSiteOffset = dataItemMap.getOffset(callSite_)
+        callSiteOffset = dataItemMap.getOffset(callSite)
     }
 
     override fun write(output: DexDataOutput) {
@@ -60,11 +61,24 @@ data class CallSiteID private constructor(private var callSite_: CallSite = Call
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        visitor.visitCallSite(dexFile, this, callSite_)
+        visitor.visitCallSite(dexFile, this, callSite)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as CallSiteID
+
+        return callSite == other.callSite
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(callSite)
     }
 
     override fun toString(): String {
-        return "CallSiteID[callSite=${callSite_}]"
+        return "CallSiteID[callSite=${callSite}]"
     }
 
     companion object {

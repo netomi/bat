@@ -23,17 +23,15 @@ import org.junit.jupiter.api.Test
 import java.util.function.Function
 
 class StringIDTest : DexContentTest<StringID>() {
-    override fun getTestInstances(): Array<StringID> {
-        return arrayOf(
-            of("Terence Hill"),
-            of("Jean-Claude Van Damme"),
-            of("Bud Spencer")
-        )
-    }
+    override val testInstances: Array<StringID>
+        get() = arrayOf(
+                    of("Terence Hill"),
+                    of("Jean-Claude Van Damme"),
+                    of("Bud Spencer")
+                )
 
-    override fun getFactoryMethod(): Function<DexDataInput, StringID> {
-        return Function { input -> StringID.readContent(input) }
-    }
+    override val factoryMethod: Function<DexDataInput, StringID>
+        get() = Function { input -> StringID.readContent(input) }
 
     @Test
     fun getter() {

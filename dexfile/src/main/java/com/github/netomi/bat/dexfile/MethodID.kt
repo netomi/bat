@@ -23,7 +23,7 @@ import com.github.netomi.bat.dexfile.visitor.AllEncodedMethodsVisitor
 import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor
 import com.github.netomi.bat.dexfile.visitor.MethodNameAndProtoFilter
 import com.google.common.base.Preconditions
-import dev.ahmedmourad.nocopy.annotations.NoCopy
+import java.util.*
 
 /**
  * A class representing a method id item inside a dex file.
@@ -34,23 +34,19 @@ import dev.ahmedmourad.nocopy.annotations.NoCopy
     type          = DexConstants.TYPE_METHOD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-@NoCopy
-data class MethodID private constructor(
-    private var classIndex_: Int = NO_INDEX,
-    private var nameIndex_:  Int = NO_INDEX,
-    private var protoIndex_: Int = NO_INDEX) : DataItem() {
+class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int = NO_INDEX, _protoIndex: Int = NO_INDEX) : DataItem() {
 
-    val classIndex: Int
-        get() = classIndex_
+    var classIndex: Int = _classIndex
+        private set
 
-    val nameIndex: Int
-        get() = nameIndex_
+    var nameIndex: Int = _nameIndex
+        private set
 
-    val protoIndex: Int
-        get() = protoIndex_
+    var protoIndex: Int = _protoIndex
+        private set
 
     fun getClassTypeID(dexFile: DexFile): TypeID {
-        return dexFile.getTypeID(classIndex_)
+        return dexFile.getTypeID(classIndex)
     }
 
     fun getClassType(dexFile: DexFile): String {
@@ -58,29 +54,29 @@ data class MethodID private constructor(
     }
 
     fun getProtoID(dexFile: DexFile): ProtoID {
-        return dexFile.getProtoID(protoIndex_)
+        return dexFile.getProtoID(protoIndex)
     }
 
     fun getName(dexFile: DexFile): String {
-        return dexFile.getStringID(nameIndex_).stringValue
+        return dexFile.getStringID(nameIndex).stringValue
     }
 
     fun getShortyType(dexFile: DexFile): String {
-        return dexFile.getProtoID(protoIndex_).getShorty(dexFile)
+        return dexFile.getProtoID(protoIndex).getShorty(dexFile)
     }
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
-        classIndex_ = input.readUnsignedShort()
-        protoIndex_ = input.readUnsignedShort()
-        nameIndex_ = input.readInt()
+        classIndex = input.readUnsignedShort()
+        protoIndex = input.readUnsignedShort()
+        nameIndex  = input.readInt()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeAlignmentPadding(dataAlignment)
-        output.writeUnsignedShort(classIndex_)
-        output.writeUnsignedShort(protoIndex_)
-        output.writeInt(nameIndex_)
+        output.writeUnsignedShort(classIndex)
+        output.writeUnsignedShort(protoIndex)
+        output.writeInt(nameIndex)
     }
 
     fun accept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
@@ -92,20 +88,33 @@ data class MethodID private constructor(
             MethodNameAndProtoFilter(getName(dexFile), getProtoID(dexFile), visitor)))
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MethodID
+
+        return classIndex  == other.classIndex &&
+                nameIndex  == other.nameIndex  &&
+                protoIndex == other.protoIndex
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(classIndex, nameIndex, protoIndex)
+    }
+
     override fun toString(): String {
-        return "MethodID[classIdx=${classIndex_},nameIdx=${nameIndex_},protoIdx=${protoIndex_}]"
+        return "MethodID[classIdx=${classIndex},nameIdx=${nameIndex},protoIdx=${protoIndex}]"
     }
 
     companion object {
-        @JvmStatic
         fun of(classIndex: Int, nameIndex: Int, protoIndex: Int): MethodID {
-            Preconditions.checkArgument(classIndex >= 0, "class index must be non negative")
-            Preconditions.checkArgument(nameIndex >= 0, "name index must be non negative")
-            Preconditions.checkArgument(protoIndex >= 0, "proto index must be non negative")
+            Preconditions.checkArgument(classIndex >= 0, "class index must not be negative")
+            Preconditions.checkArgument(nameIndex >= 0, "name index must not be negative")
+            Preconditions.checkArgument(protoIndex >= 0, "proto index must not be negative")
             return MethodID(classIndex, nameIndex, protoIndex)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): MethodID {
             val methodID = MethodID()
             methodID.read(input)

@@ -23,20 +23,19 @@ import org.junit.jupiter.api.Test
 import java.util.function.Function
 
 class CallSiteIDTest : DexContentTest<CallSiteID>() {
-    override fun getTestInstances(): Array<CallSiteID> {
-        return arrayOf(
-            of(of(1, 2, 3)),
-            of(of(65535, 65535, 65535))
-        )
-    }
 
-    override fun getFactoryMethod(): Function<DexDataInput, CallSiteID> {
-        return Function { input -> CallSiteID.readContent(input) }
-    }
+    override val testInstances: Array<CallSiteID>
+        get() = arrayOf(
+                    of(of(1, 2, 3)),
+                    of(of(65535, 65535, 65535))
+                )
+
+    override val factoryMethod: Function<DexDataInput, CallSiteID>
+        get() = Function { input -> CallSiteID.readContent(input) }
 
     @Test
     fun getter() {
-        val data = testInstances
+       val data = testInstances
         assertEquals(of(1, 2, 3), data[0].callSite)
     }
 

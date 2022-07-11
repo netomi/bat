@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import dev.ahmedmourad.nocopy.annotations.NoCopy
+import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
 
@@ -27,58 +27,70 @@ import kotlin.math.abs
  *
  * @see [encoded catch handler @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-catch-handler)
  */
-@NoCopy
-data class EncodedCatchHandler private constructor(
-    private var catchAllAddr_: Int                     = NO_INDEX, // uleb128
-    private val handlers_:     ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent() {
+class EncodedCatchHandler private constructor(
+    _catchAllAddr:         Int                     = NO_INDEX,
+    private val _handlers: ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent() {
 
-    val catchAllAddr: Int
-        get() = catchAllAddr_
+    var catchAllAddr: Int = _catchAllAddr
+        private set
 
     val handlers: List<TypeAddrPair>
-        get() = handlers_
+        get() = _handlers
 
     val handlerCount: Int
-        get() = handlers_.size
+        get() = _handlers.size
 
     fun getHandler(index: Int): TypeAddrPair {
-        return handlers_[index]
+        return _handlers[index]
     }
 
     override fun read(input: DexDataInput) {
         val readSize = input.readSleb128()
         val size = abs(readSize)
-        handlers_.clear()
-        handlers_.ensureCapacity(size)
+        _handlers.clear()
+        _handlers.ensureCapacity(size)
         for (i in 0 until size) {
             val typeAddrPair = TypeAddrPair.readContent(input)
-            handlers_.add(typeAddrPair)
+            _handlers.add(typeAddrPair)
         }
         if (readSize <= 0) {
-            catchAllAddr_ = input.readUleb128()
+            catchAllAddr = input.readUleb128()
         }
     }
 
     override fun write(output: DexDataOutput) {
-        var writtenSize = handlers_.size
-        if (catchAllAddr_ != -1) {
+        var writtenSize = _handlers.size
+        if (catchAllAddr != -1) {
             writtenSize = -writtenSize
         }
         output.writeSleb128(writtenSize)
-        for (typeAddrPair in handlers_) {
+        for (typeAddrPair in _handlers) {
             typeAddrPair.write(output)
         }
         if (writtenSize <= 0) {
-            output.writeUleb128(catchAllAddr_)
+            output.writeUleb128(catchAllAddr)
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as EncodedCatchHandler
+
+        return catchAllAddr == other.catchAllAddr &&
+               _handlers    == other._handlers
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(catchAllAddr, _handlers)
+    }
+
     override fun toString(): String {
-        return "EncodedCatchHandler[handlers=%d,catchAllAddr=%04x]".format(handlers_.size, catchAllAddr_)
+        return "EncodedCatchHandler[handlers=%d,catchAllAddr=%04x]".format(_handlers.size, catchAllAddr)
     }
 
     companion object {
-        @JvmStatic
         fun of(catchAllAddr: Int, vararg handlers: TypeAddrPair): EncodedCatchHandler {
             return EncodedCatchHandler(catchAllAddr, arrayListOf(*handlers))
         }

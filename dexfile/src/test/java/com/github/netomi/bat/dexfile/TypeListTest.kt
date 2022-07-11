@@ -15,37 +15,44 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.EncodedCatchHandler.Companion.of
+import com.github.netomi.bat.dexfile.TypeList.Companion.empty
+import com.github.netomi.bat.dexfile.TypeList.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import java.util.function.Function
 
-class EncodedCatchHandlerTest : DexContentTest<EncodedCatchHandler>() {
-    override val testInstances: Array<EncodedCatchHandler>
+class TypeListTest : DexContentTest<TypeList>() {
+    override val testInstances: Array<TypeList>
         get() = arrayOf(
-                    of(1),
-                    of(0, TypeAddrPair.of(1, 2), TypeAddrPair.of(3, 4))
-                )
+            empty(),
+            of(1, 2, 3),
+            of(6, 5, 4, 3, 2, 1),
+            of(65535)
+        )
 
-    override val factoryMethod: Function<DexDataInput, EncodedCatchHandler>
-        get() = Function { input -> EncodedCatchHandler.readContent(input) }
+    override val factoryMethod: Function<DexDataInput, TypeList>
+        get() = Function { input -> TypeList.readContent(input) }
 
     @Test
     fun getter() {
         val data = testInstances
-        assertEquals(1, data[0].catchAllAddr)
-        assertEquals(TypeAddrPair.of(1, 2), data[1].getHandler(0))
+        assertEquals(0, data[0].typeCount)
+        assertEquals(3, data[1].typeCount)
+        assertEquals(6, data[2].typeCount)
     }
 
     @Test
     fun equals() {
-        val c1 = of(1, TypeAddrPair.of(1, 2))
-        val c2 = of(1, TypeAddrPair.of(3, 4))
-        val c3 = of(1, TypeAddrPair.of(1, 2))
-        assertEquals(c1, c1)
-        assertNotEquals(c1, c2)
-        assertEquals(c1, c3)
+        val l1 = empty()
+        val l2 = empty()
+        assertEquals(l1, l2)
+        l1.addType(1)
+        assertNotEquals(l1, l2)
+        l2.addType(1)
+        assertEquals(l1, l2)
+        l1.addType(2)
+        assertNotEquals(l1, l2)
     }
 }

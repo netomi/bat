@@ -56,6 +56,20 @@ extends      ArrayInstruction
     }
 
     @Override
+    protected short[] writeData() {
+        short[] data = super.writeData();
+
+        switch (opcode.getFormat()) {
+            case FORMAT_3rc:
+            case FORMAT_35c:
+                data[1] |= typeIndex;
+                break;
+        }
+
+        return data;
+    }
+
+    @Override
     public void accept(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int offset, InstructionVisitor visitor) {
         visitor.visitArrayTypeInstruction(dexFile, classDef, method, code, offset, this);
     }

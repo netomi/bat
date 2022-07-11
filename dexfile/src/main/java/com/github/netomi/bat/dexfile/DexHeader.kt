@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.io.DexFormatException
 import com.github.netomi.bat.util.Primitives
 import com.google.common.primitives.Bytes
 import java.nio.ByteOrder
+import java.util.*
 
 @DataItemAnn(
     type          = DexConstants.TYPE_HEADER_ITEM,
