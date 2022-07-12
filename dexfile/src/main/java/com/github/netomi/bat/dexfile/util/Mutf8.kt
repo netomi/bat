@@ -87,19 +87,19 @@ object Mutf8 {
      * Encodes the modified UTF-8 bytes corresponding to `s` into `dst`, starting at `offset`.
      */
     private fun encode(dst: ByteArray, offset: Int, s: String) {
-        var offset = offset
+        var o = offset
         val length = s.length
         for (i in 0 until length) {
             val ch = s[i]
             if (ch.code != 0 && ch.code <= 127) { // U+0000 uses two bytes.
-                dst[offset++] = ch.code.toByte()
+                dst[o++] = ch.code.toByte()
             } else if (ch.code <= 2047) {
-                dst[offset++] = (0xc0 or (0x1f and (ch.code shr 6))).toByte()
-                dst[offset++] = (0x80 or (0x3f and ch.code)).toByte()
+                dst[o++] = (0xc0 or (0x1f and (ch.code shr 6))).toByte()
+                dst[o++] = (0x80 or (0x3f and ch.code)).toByte()
             } else {
-                dst[offset++] = (0xe0 or (0x0f and (ch.code shr 12))).toByte()
-                dst[offset++] = (0x80 or (0x3f and (ch.code shr 6))).toByte()
-                dst[offset++] = (0x80 or (0x3f and ch.code)).toByte()
+                dst[o++] = (0xe0 or (0x0f and (ch.code shr 12))).toByte()
+                dst[o++] = (0x80 or (0x3f and (ch.code shr 6))).toByte()
+                dst[o++] = (0x80 or (0x3f and ch.code)).toByte()
             }
         }
     }

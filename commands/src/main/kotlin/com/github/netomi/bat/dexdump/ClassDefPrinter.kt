@@ -94,7 +94,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         printer.println("  name          : '" + encodedField.getName(dexFile) + "'")
         printer.println("  type          : '" + encodedField.getType(dexFile) + "'")
         printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(encodedField.accessFlags, DexAccessFlags.Target.FIELD))
-        val staticValues = if (classDef.staticValues != null) classDef.staticValues.array else null
+        val staticValues = if (!classDef.staticValues.isEmpty) classDef.staticValues.array else null
         if (encodedField.isStatic && staticValues != null && index < staticValues.values.size) {
             printer.print("  value         : ")
             staticValues.valueAccept(dexFile, index, this)

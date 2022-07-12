@@ -147,11 +147,11 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
 
-        val other = other as EncodedMethod
+        val o = other as EncodedMethod
 
-        return methodIndex == other.methodIndex &&
-               accessFlags == other.accessFlags &&
-               code        == other.code
+        return methodIndex == o.methodIndex &&
+               accessFlags == o.accessFlags &&
+               code        == o.code
     }
 
     override fun hashCode(): Int {

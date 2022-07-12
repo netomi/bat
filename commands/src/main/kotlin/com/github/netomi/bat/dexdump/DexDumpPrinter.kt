@@ -67,7 +67,7 @@ class DexDumpPrinter constructor(
             printer.println("annotations_off     : " + formatNumber(classDef.annotationsOffset.toLong()))
             printer.println("class_data_off      : " + formatNumber(classDef.classDataOffset.toLong()))
 
-            if (classDef.classData != null) {
+            if (!classDef.classData.isEmpty) {
                 val classData = classDef.classData
                 printer.println("static_fields_size  : " + classData.staticFieldCount)
                 printer.println("instance_fields_size: " + classData.instanceFieldCount)
@@ -82,7 +82,7 @@ class DexDumpPrinter constructor(
             printer.println()
         }
 
-        if (printAnnotations && classDef.annotationsDirectory != null) {
+        if (printAnnotations && !classDef.annotationsDirectory.isEmpty) {
             printer.println("Class #%d annotations:".format(index))
             classDef.annotationSetsAccept(dexFile, classDefPrinter)
             printer.println()
@@ -98,7 +98,7 @@ class DexDumpPrinter constructor(
         classDef.interfacesAccept(dexFile, classDefPrinter)
         printer.levelDown()
 
-        if (classDef.classData != null) {
+        if (!classDef.classData.isEmpty) {
             classDef.classDataAccept(dexFile, classDefPrinter)
         } else {
             printer.println("Static fields     -")
