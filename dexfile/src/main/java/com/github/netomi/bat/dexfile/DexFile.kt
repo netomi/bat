@@ -15,7 +15,7 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.io.DexDataInput
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.*
 import java.util.*
 
@@ -81,13 +81,12 @@ class DexFile {
         return stringIDs[index]
     }
 
-    fun getString(index: Int): String? {
-        return if (index == DexConstants.NO_INDEX) null else getStringID(index).stringValue
+    fun getString(index: Int): String {
+        return getStringID(index).stringValue
     }
 
-    fun getStringIDIndex(string: String): Int {
-        val index = stringMap[string]
-        return index ?: DexConstants.NO_INDEX
+    fun getStringNullable(index: Int): String? {
+        return if (index == NO_INDEX) null else getString(index)
     }
 
     fun addOrGetStringIDIndex(string: String): Int {
@@ -111,13 +110,12 @@ class DexFile {
         return typeIDs[index]
     }
 
-    fun getType(index: Int): String? {
-        return if (index == DexConstants.NO_INDEX) null else getTypeID(index).getType(this)
+    fun getType(index: Int): String {
+        return getTypeID(index).getType(this)
     }
 
-    fun getTypeIDIndex(type: String): Int {
-        val index = typeMap[type]
-        return index ?: DexConstants.NO_INDEX
+    fun getTypeNullable(index: Int): String? {
+        return if (index == NO_INDEX) null else getType(index)
     }
 
     fun addOrGetTypeIDIndex(type: String): Int {
@@ -141,17 +139,13 @@ class DexFile {
         return protoIDs[protoIndex]
     }
 
-    fun addOrGetProtoID(shorty: String, returnType: String, vararg parameterTypes: String): Int {
-        val protoID =
-            if (parameterTypes.isNotEmpty()) {
-                val parameterTypeIndices = IntArray(parameterTypes.size)
-                for (i in parameterTypes.indices) {
-                    parameterTypeIndices[i] = addOrGetTypeIDIndex(parameterTypes[i])
-                }
-                ProtoID.of(addOrGetStringIDIndex(shorty), addOrGetTypeIDIndex(returnType), *parameterTypeIndices)
-            } else {
-                ProtoID.of(addOrGetStringIDIndex(shorty), addOrGetTypeIDIndex(returnType))
-            }
+    fun addOrGetProtoID(parameterTypes: List<String>, returnType: String): Int {
+        val shorty = DexClasses.toShortyFormat(parameterTypes, returnType)
+        val shortyIndex          = addOrGetStringIDIndex(shorty)
+        val returnTypeIndex      = addOrGetTypeIDIndex(returnType)
+        val parameterTypeIndices = parameterTypes.map { addOrGetTypeIDIndex(it) }.toIntArray()
+
+        val protoID = ProtoID.of(shortyIndex, returnTypeIndex, *parameterTypeIndices)
 
         var index = protoIDMap[protoID]
         if (index == null) {
@@ -174,11 +168,13 @@ class DexFile {
     }
 
     fun addOrGetFieldID(classType: String, name: String, type: String): Int {
-        val fieldID = FieldID.of(
-            addOrGetTypeIDIndex(classType),
-            addOrGetStringIDIndex(name),
-            addOrGetTypeIDIndex(type)
-        )
+        val fieldID =
+            FieldID.of(
+                addOrGetTypeIDIndex(classType),
+                addOrGetStringIDIndex(name),
+                addOrGetTypeIDIndex(type)
+            )
+
         var index = fieldIDMap[fieldID]
         if (index == null) {
             fieldIDs.add(fieldID)
@@ -199,12 +195,14 @@ class DexFile {
         return methodIDs[methodIndex]
     }
 
-    fun addOrGetMethodID(classType: String, name: String, shorty: String, returnType: String, vararg parameterTypes: String): Int {
-        val methodID = MethodID.of(
-            addOrGetTypeIDIndex(classType),
-            addOrGetStringIDIndex(name),
-            addOrGetProtoID(shorty, returnType, *parameterTypes)
-        )
+    fun addOrGetMethodID(classType: String, name: String, parameterTypes: List<String>, returnType: String): Int {
+        val methodID =
+            MethodID.of(
+                addOrGetTypeIDIndex(classType),
+                addOrGetStringIDIndex(name),
+                addOrGetProtoID(parameterTypes, returnType)
+            )
+
         var index = methodIDMap[methodID]
         if (index == null) {
             methodIDs.add(methodID)
@@ -291,10 +289,10 @@ class DexFile {
 
     fun dataItemsAccept(visitor: DataItemVisitor) {
         if (header != null) {
-            visitor.visitHeader(this, header)
+            visitor.visitHeader(this, header!!)
         }
         if (mapList != null) {
-            visitor.visitMapList(this, mapList)
+            visitor.visitMapList(this, mapList!!)
         }
         for (stringIDItem in stringIDs) {
             visitor.visitStringID(this, stringIDItem)
@@ -324,6 +322,24 @@ class DexFile {
         for (methodHandleItem in methodHandles) {
             visitor.visitMethodHandle(this, methodHandleItem)
             methodHandleItem.dataItemsAccept(this, visitor)
+        }
+    }
+
+    internal fun referencedIDsAccept(visitor: ReferencedIDVisitor) {
+        for (typeIDItem in typeIDs) {
+            typeIDItem.referencedIDsAccept(this, visitor)
+        }
+
+        for (protoIDItem in protoIDs) {
+            protoIDItem.referencedIDsAccept(this, visitor)
+        }
+
+        for (fieldIDItem in fieldIDs) {
+            fieldIDItem.referencedIDsAccept(this, visitor)
+        }
+
+        for (methodIDItem in methodIDs) {
+            methodIDItem.referencedIDsAccept(this, visitor)
         }
     }
 

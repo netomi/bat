@@ -17,22 +17,25 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.util.Primitives
 
+/**
+ * An enum to represent the mutually exclusive visibility flag.
+ */
 enum class Visibility(val flagValue: Int) {
-    PUBLIC         (DexConstants.ACC_PUBLIC),
-    PRIVATE        (DexConstants.ACC_PRIVATE),
-    PROTECTED      (DexConstants.ACC_PROTECTED),
+    PUBLIC         (ACC_PUBLIC),
+    PRIVATE        (ACC_PRIVATE),
+    PROTECTED      (ACC_PROTECTED),
     PACKAGE_PRIVATE(0x0);
 
     companion object {
         @JvmStatic
         fun of(accessFlags: Int): Visibility {
-            val value = accessFlags and 0xf
+            val maskedValue = accessFlags and 0xf
             for (visibility in values()) {
-                if (value == visibility.flagValue) {
+                if (maskedValue == visibility.flagValue) {
                     return visibility
                 }
             }
-            throw IllegalStateException("unexpected accessFlags ${Primitives.toHexString(accessFlags)}")
+            throw IllegalArgumentException("unexpected accessFlags ${Primitives.toHexString(accessFlags)}")
         }
     }
 }

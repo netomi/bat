@@ -26,8 +26,10 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Objects;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.TYPE_CLASS_DATA_ITEM;
+
 @DataItemAnn(
-    type          = DexConstants.TYPE_CLASS_DATA_ITEM,
+    type          = TYPE_CLASS_DATA_ITEM,
     dataAlignment = 1,
     dataSection   = true
 )
@@ -50,6 +52,13 @@ extends      DataItem
     }
 
     private ClassData() {}
+
+    public boolean isEmpty() {
+        return staticFields.isEmpty()   &&
+               instanceFields.isEmpty() &&
+               directMethods.isEmpty()  &&
+               virtualMethods.isEmpty();
+    }
 
     public void addField(EncodedField field) {
         if (field.isStatic()) {
@@ -253,7 +262,9 @@ extends      DataItem
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         ClassData other = (ClassData) o;
+
         return Objects.equals(staticFields,   other.staticFields)   &&
                Objects.equals(instanceFields, other.instanceFields) &&
                Objects.equals(directMethods,  other.directMethods)  &&

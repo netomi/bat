@@ -16,7 +16,6 @@
 package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
 class MethodProtoInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, _protoIndex: Int = NO_INDEX) : MethodInstruction(opcode, _protoIndex) {

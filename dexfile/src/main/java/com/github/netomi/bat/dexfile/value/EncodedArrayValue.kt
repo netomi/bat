@@ -31,6 +31,10 @@ data class EncodedArrayValue internal constructor(val values: ArrayList<EncodedV
     override val valueType: Int
         get() = VALUE_ARRAY
 
+    fun isEmpty(): Boolean {
+        return values.isEmpty()
+    }
+
     fun addEncodedValue(value: EncodedValue) {
         values.add(value)
     }

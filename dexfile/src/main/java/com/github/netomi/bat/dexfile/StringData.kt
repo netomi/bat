@@ -27,10 +27,10 @@ import java.util.*
  * @see [string data item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.string-data-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_STRING_DATA_ITEM,
+    type          = TYPE_STRING_DATA_ITEM,
     dataAlignment = 1,
     dataSection   = true)
-class StringData private constructor(): DataItem() {
+class StringData private constructor(): DataItem(), Comparable<StringData> {
 
     lateinit var string: String
         private set
@@ -38,6 +38,9 @@ class StringData private constructor(): DataItem() {
     internal constructor(string: String): this() {
         this.string = string
     }
+
+    override val isEmpty: Boolean
+        get() = false
 
     override fun read(input: DexDataInput) {
         val utf16Size = input.readUleb128()
@@ -51,6 +54,10 @@ class StringData private constructor(): DataItem() {
         val data = encode(string)
         output.writeBytes(data)
         output.writeByte(0x0.toByte())
+    }
+
+    override fun compareTo(other: StringData): Int {
+        return string.compareTo(other.string)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -72,7 +79,6 @@ class StringData private constructor(): DataItem() {
 
     companion object {
         fun of(value: String): StringData {
-            Objects.requireNonNull(value, "value must not be null")
             return StringData(value)
         }
 

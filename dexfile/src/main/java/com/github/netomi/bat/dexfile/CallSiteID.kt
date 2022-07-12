@@ -26,7 +26,7 @@ import java.util.*
  * @see [callsite id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.call-site-id-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_CALL_SITE_ID_ITEM,
+    type          = TYPE_CALL_SITE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
 class CallSiteID private constructor() : DataItem() {
@@ -40,6 +40,9 @@ class CallSiteID private constructor() : DataItem() {
     private constructor(callSite: CallSite): this() {
         this.callSite = callSite
     }
+
+    override val isEmpty: Boolean
+        get() = callSite.isEmpty
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
@@ -82,13 +85,11 @@ class CallSiteID private constructor() : DataItem() {
     }
 
     companion object {
-        @JvmStatic
         fun of(callSite: CallSite): CallSiteID {
             Objects.requireNonNull(callSite, "callSite must not be null")
             return CallSiteID(callSite)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): CallSiteID {
             val callSiteID = CallSiteID()
             callSiteID.read(input)

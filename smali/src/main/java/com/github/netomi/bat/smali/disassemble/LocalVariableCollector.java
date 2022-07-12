@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
+import static com.github.netomi.bat.dexfile.DexConstantsKt.NO_INDEX;
 
 class      LocalVariableCollector
 implements DebugSequenceVisitor
@@ -99,9 +99,9 @@ implements DebugSequenceVisitor
 
     private void handleStartLocal(DexFile dexFile, int registerNum, int nameIndex, int typeIndex, int sigIndex) {
         localVariableInfos[registerNum] =
-                new LocalVariableInfo(dexFile.getString(nameIndex),
-                                      dexFile.getType(typeIndex),
-                                      dexFile.getString(sigIndex));
+                new LocalVariableInfo(dexFile.getStringNullable(nameIndex),
+                                      dexFile.getTypeNullable(typeIndex),
+                                      dexFile.getStringNullable(sigIndex));
 
         StringBuilder sb = new StringBuilder();
 
@@ -109,7 +109,7 @@ implements DebugSequenceVisitor
         sb.append(registerPrinter.formatRegister(registerNum));
         sb.append(", ");
 
-        String name = dexFile.getString(nameIndex);
+        String name = dexFile.getStringNullable(nameIndex);
         if (name != null) {
             sb.append("\"");
             sb.append(name);
@@ -118,11 +118,11 @@ implements DebugSequenceVisitor
             sb.append("null");
         }
         sb.append(":");
-        sb.append(dexFile.getType(typeIndex));
+        sb.append(dexFile.getTypeNullable(typeIndex));
 
         if (sigIndex != NO_INDEX) {
             sb.append(", \"");
-            sb.append(dexFile.getString(sigIndex));
+            sb.append(dexFile.getStringNullable(sigIndex));
             sb.append("\"");
         }
 

@@ -25,15 +25,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.TYPE_ANNOTATION_SET_REF_LIST;
+
 /**
  * A class representing an annotation set ref list inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#set-ref-list">annotation set ref list @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_ANNOTATION_SET_REF_LIST,
+    type          = TYPE_ANNOTATION_SET_REF_LIST,
     dataAlignment = 4,
     dataSection   = true
 )
@@ -57,6 +57,11 @@ extends      DataItem
 
     public AnnotationSetRef getAnnotationSetRef(int index) {
         return annotationSetRefs.get(index);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return annotationSetRefs.isEmpty();
     }
 
     @Override

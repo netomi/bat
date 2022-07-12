@@ -17,28 +17,26 @@ package com.github.netomi.bat.dexfile.annotation;
 
 import com.github.netomi.bat.dexfile.DataItem;
 import com.github.netomi.bat.dexfile.DataItemAnn;
-import com.github.netomi.bat.dexfile.DexConstants;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
 import com.github.netomi.bat.dexfile.value.EncodedValue;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.TYPE_ANNOTATION_ITEM;
+
 /**
  * A class representing an annotation item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#annotation-item">annotation item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_ANNOTATION_ITEM,
+    type          = TYPE_ANNOTATION_ITEM,
     dataAlignment = 1,
     dataSection   = true
 )
 public class Annotation
 extends      DataItem
 {
-    //private short                  visibility; // ubyte
     private AnnotationVisibility   visibility;
     private EncodedAnnotationValue value;
 
@@ -67,6 +65,11 @@ extends      DataItem
 
     public EncodedAnnotationValue getAnnotationValue() {
         return value;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return visibility == null;
     }
 
     @Override

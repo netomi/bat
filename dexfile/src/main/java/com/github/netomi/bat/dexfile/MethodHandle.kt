@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.util.Preconditions
@@ -27,10 +26,10 @@ import java.util.*
  * @see [method handle item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.method-handle-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_METHOD_HANDLE_ITEM,
+    type          = TYPE_METHOD_HANDLE_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class MethodHandle private constructor(_methodHandleTypeValue: Int = 0, _fieldOrMethodId: Int = NO_INDEX) : DataItem() {
+class MethodHandle private constructor(_methodHandleTypeValue: Int = -1, _fieldOrMethodId: Int = NO_INDEX) : DataItem() {
 
     var methodHandleTypeValue: Int = _methodHandleTypeValue
         private set
@@ -86,6 +85,9 @@ class MethodHandle private constructor(_methodHandleTypeValue: Int = 0, _fieldOr
             getTargetMemberDescriptor(dexFile)
         }
     }
+
+    override val isEmpty: Boolean
+        get() = methodHandleTypeValue == -1
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)

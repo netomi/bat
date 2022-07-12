@@ -17,8 +17,8 @@ package com.github.netomi.bat.dexfile.debug
 
 import com.github.netomi.bat.dexfile.DataItem
 import com.github.netomi.bat.dexfile.DataItemAnn
-import com.github.netomi.bat.dexfile.DexConstants
 import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.TYPE_DEBUG_INFO_ITEM
 import com.github.netomi.bat.dexfile.debug.DebugInstruction.Companion.readInstruction
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
@@ -33,17 +33,15 @@ import kotlin.collections.ArrayList
  * @see [debug info item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.debug-info-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_DEBUG_INFO_ITEM,
+    type          = TYPE_DEBUG_INFO_ITEM,
     dataAlignment = 1,
     dataSection   = true)
 class DebugInfo private constructor() : DataItem() {
 
-    var lineStart = 0 // uleb128
+    var lineStart = 0
         private set
 
-    // private int   parametersSize; // uleb128
-
-    private val parameterNames                             = IntArray(0) // uleb128p1[]
+    private val parameterNames                             = IntArray(0)
     private val debugSequence: ArrayList<DebugInstruction> = ArrayList(0)
 
     val parameterCount: Int
@@ -52,6 +50,9 @@ class DebugInfo private constructor() : DataItem() {
     fun getParameterName(dexFile: DexFile, parameterIndex: Int): String? {
         return dexFile.getString(parameterNames[parameterIndex])
     }
+
+    override val isEmpty: Boolean
+        get() = false
 
     override fun read(input: DexDataInput) {
         lineStart = input.readUleb128()
@@ -70,6 +71,8 @@ class DebugInfo private constructor() : DataItem() {
             debugInstruction = readInstruction(input)
             debugSequence.add(debugInstruction)
         } while (debugInstruction.opcode != DebugInstruction.DBG_END_SEQUENCE)
+
+        debugSequence.trimToSize()
     }
 
     override fun write(output: DexDataOutput) {
@@ -94,7 +97,9 @@ class DebugInfo private constructor() : DataItem() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
+
         val o = other as DebugInfo
+
         return lineStart      == o.lineStart      &&
                parameterNames == o.parameterNames &&
                debugSequence  == o.debugSequence

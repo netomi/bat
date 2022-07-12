@@ -15,10 +15,12 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
 import com.google.common.base.Preconditions
 import java.util.*
@@ -29,16 +31,16 @@ import java.util.*
  * @see [proto id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.proto-id-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_PROTO_ID_ITEM,
+    type          = TYPE_PROTO_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
 class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex: Int = NO_INDEX, private var _parameters: TypeList = TypeList.empty()) : DataItem() {
 
     var shortyIndex: Int = _shortyIndex
-        private set
+        internal set
 
     var returnTypeIndex: Int = _returnTypeIndex
-        private set
+        internal set
 
     val parameters: TypeList
         get() = _parameters
@@ -61,9 +63,16 @@ class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex
         return sb.toString()
     }
 
-    fun getReturnType(dexFile: DexFile): String {
-        return dexFile.getTypeID(returnTypeIndex).getType(dexFile)
+    fun getReturnTypeTypeID(dexFile: DexFile): TypeID {
+        return dexFile.getTypeID(returnTypeIndex)
     }
+
+    fun getReturnType(dexFile: DexFile): String {
+        return getReturnTypeTypeID(dexFile).getType(dexFile)
+    }
+
+    override val isEmpty: Boolean
+        get() = shortyIndex == NO_INDEX
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
@@ -100,6 +109,12 @@ class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex
         if (!_parameters.isEmpty) {
             visitor.visitParameterTypes(dexFile, this, _parameters)
         }
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitStringID(dexFile, PropertyAccessor(this::shortyIndex))
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::returnTypeIndex))
+        _parameters.referencedIDsAccept(dexFile, visitor)
     }
 
     override fun equals(other: Any?): Boolean {

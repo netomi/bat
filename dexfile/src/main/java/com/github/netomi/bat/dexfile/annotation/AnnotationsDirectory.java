@@ -22,11 +22,12 @@ import com.github.netomi.bat.dexfile.visitor.AnnotationSetVisitor;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.TYPE_ANNOTATIONS_DIRECTORY_ITEM;
+
 @DataItemAnn(
-    type          = DexConstants.TYPE_ANNOTATIONS_DIRECTORY_ITEM,
+    type          = TYPE_ANNOTATIONS_DIRECTORY_ITEM,
     dataAlignment = 4,
     dataSection   = true
 )
@@ -62,6 +63,13 @@ extends      DataItem
 
     public int getClassAnnotationsOffset() {
         return classAnnotationsOffset;
+    }
+
+    public boolean isEmpty() {
+        return classAnnotations.isEmpty()  &&
+               fieldAnnotations.isEmpty()  &&
+               methodAnnotations.isEmpty() &&
+               parameterAnnotations.isEmpty();
     }
 
     @Override

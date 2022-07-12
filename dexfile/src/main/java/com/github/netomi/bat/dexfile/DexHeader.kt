@@ -25,13 +25,13 @@ import java.nio.ByteOrder
 import java.util.*
 
 @DataItemAnn(
-    type          = DexConstants.TYPE_HEADER_ITEM,
+    type          = TYPE_HEADER_ITEM,
     dataAlignment = 4,
     dataSection   = false)
 class DexHeader private constructor() : DataItem() {
 
     private constructor(format: DexFormat): this() {
-        magic = Bytes.concat(DexConstants.DEX_FILE_MAGIC, format.pattern)
+        magic = Bytes.concat(DEX_FILE_MAGIC, format.pattern)
     }
 
     var magic: ByteArray = ByteArray(8) // ubyte[8]
@@ -84,10 +84,13 @@ class DexHeader private constructor() : DataItem() {
     val dexFormat: DexFormat?
         get() = fromPattern(magic, 4, 8)
 
+    override val isEmpty: Boolean
+        get() = false
+
     public override fun read(input: DexDataInput) {
         input.readFully(magic)
 
-        if (!DexConstants.DEX_FILE_MAGIC.contentEquals(magic.copyOf(4))) {
+        if (!DEX_FILE_MAGIC.contentEquals(magic.copyOf(4))) {
             throw DexFormatException("Invalid dex file: unexpected magic ${Primitives.toHexString(magic.copyOf(4))}")
         }
 
@@ -96,7 +99,7 @@ class DexHeader private constructor() : DataItem() {
 
         input.skipBytes(32)
         endianTag = input.readUnsignedInt()
-        if (endianTag == DexConstants.REVERSE_ENDIAN_CONSTANT) {
+        if (endianTag == REVERSE_ENDIAN_CONSTANT) {
             input.order(ByteOrder.LITTLE_ENDIAN)
         }
 
@@ -138,9 +141,9 @@ class DexHeader private constructor() : DataItem() {
             writeUnsignedInt(headerSize)
 
             if (output.order() == ByteOrder.LITTLE_ENDIAN) {
-                writeUnsignedInt(DexConstants.ENDIAN_CONSTANT)
+                writeUnsignedInt(ENDIAN_CONSTANT)
             } else {
-                writeUnsignedInt(DexConstants.REVERSE_ENDIAN_CONSTANT)
+                writeUnsignedInt(REVERSE_ENDIAN_CONSTANT)
             }
 
             writeUnsignedInt(linkSize.toLong())
@@ -165,31 +168,31 @@ class DexHeader private constructor() : DataItem() {
 
     internal fun updateDataItem(type: Int, count: Int, offset: Int) {
         when (type) {
-            DexConstants.TYPE_STRING_ID_ITEM -> {
+            TYPE_STRING_ID_ITEM -> {
                 stringIDsSize = count
                 stringIDsOffsets = if (count > 0) offset else 0
             }
-            DexConstants.TYPE_TYPE_ID_ITEM -> {
+            TYPE_TYPE_ID_ITEM -> {
                 typeIDsSize = count
                 typeIDsOffset = if (count > 0) offset else 0
             }
-            DexConstants.TYPE_PROTO_ID_ITEM -> {
+            TYPE_PROTO_ID_ITEM -> {
                 protoIDsSize = count
                 protoIDsOffset = if (count > 0) offset else 0
             }
-            DexConstants.TYPE_FIELD_ID_ITEM -> {
+            TYPE_FIELD_ID_ITEM -> {
                 fieldIDsSize = count
                 fieldIDsOffset = if (count > 0) offset else 0
             }
-            DexConstants.TYPE_METHOD_ID_ITEM -> {
+            TYPE_METHOD_ID_ITEM -> {
                 methodIDsSize = count
                 methodIDsOffset = if (count > 0) offset else 0
             }
-            DexConstants.TYPE_CLASS_DEF_ITEM -> {
+            TYPE_CLASS_DEF_ITEM -> {
                 classDefsSize = count
                 classDefsOffset = if (count > 0) offset else 0
             }
-            DexConstants.TYPE_MAP_LIST -> mapOffset = offset
+            TYPE_MAP_LIST -> mapOffset = offset
             else -> throw IllegalArgumentException("unexpected DataItem type: $type")
         }
     }

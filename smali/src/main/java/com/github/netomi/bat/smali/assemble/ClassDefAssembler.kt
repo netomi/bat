@@ -16,7 +16,6 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
@@ -128,9 +127,8 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val methodIDIndex =
             dexFile.addOrGetMethodID(classType,
                                      name,
-                                     DexClasses.toShortyFormat(parameterTypes, returnType),
-                                     returnType,
-                                     *parameterTypes.toTypedArray())
+                                     parameterTypes,
+                                     returnType)
 
         val method = EncodedMethod.of(methodIDIndex, accessFlags);
 
@@ -162,6 +160,17 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
                     registers = c.xregisters.text.toInt()
                 }
 
+                RULE_f0x -> {
+                    val c = t as F0xContext
+                    val insn = when (val opName = c.op.text) {
+                        "return-void" -> DexInstructions.returnVoid()
+                        "nop"         -> DexInstructions.nop()
+                        else          -> throw RuntimeException("unexpected opnane ${opName}")
+                    }
+
+                    instructions.add(insn)
+                }
+
                 RULE_fm5c -> {
                     val c = t as Fm5cContext
                     val opName = c.op.text
@@ -173,7 +182,7 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
                             val (classType, methodName, descriptor) = parseMethodType(methodType)
                             val (_, parameterTypes, returnType) = parseMethodObj(descriptor)
 
-                            val methodID = dexFile.addOrGetMethodID(classType, methodName, DexClasses.toShortyFormat(parameterTypes, returnType), returnType, *parameterTypes.toTypedArray())
+                            val methodID = dexFile.addOrGetMethodID(classType, methodName, parameterTypes, returnType)
 
                             val regs = intArrayOf(c.REGISTER(0).text.substring(1).toInt())
                             DexInstructions.invokeDirect(methodID, *regs)

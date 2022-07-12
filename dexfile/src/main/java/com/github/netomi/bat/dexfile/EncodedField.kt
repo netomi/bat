@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.FieldModifier.Companion.setOf
 import com.github.netomi.bat.dexfile.Visibility.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
@@ -58,7 +57,7 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
     }
 
     val isStatic: Boolean
-        get() = accessFlags and DexConstants.ACC_STATIC != 0
+        get() = accessFlags and ACC_STATIC != 0
 
     override fun read(input: DexDataInput) {
         deltaFieldIndex = input.readUleb128()

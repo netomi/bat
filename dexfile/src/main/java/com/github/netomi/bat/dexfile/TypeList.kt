@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.PrimitiveIterable
+import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
 import com.github.netomi.bat.util.IntArray
 import java.util.*
@@ -27,11 +29,14 @@ import java.util.*
  *
  * @see [type list @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-list)
  */
-@DataItemAnn(type = DexConstants.TYPE_TYPE_LIST, dataAlignment = 4, dataSection = false)
+@DataItemAnn(
+    type          = TYPE_TYPE_LIST,
+    dataAlignment = 4,
+    dataSection   = false)
 class TypeList private constructor(private val typeList: IntArray = IntArray(0)) : DataItem() {
 
-    val isEmpty: Boolean
-        get() = typeCount == 0
+    override val isEmpty: Boolean
+        get() = typeList.size() == 0
 
     /**
      * Returns the number of types contained in this TypeList.
@@ -86,6 +91,13 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
         }
     }
 
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        val size = typeList.size()
+        for (i in 0 until size) {
+            visitor.visitTypeID(dexFile, ArrayElementAccessor(typeList, i))
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -107,9 +119,13 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
         /**
          * Returns a new empty TypeList instance.
          */
-        @JvmStatic
         fun empty(): TypeList {
             return TypeList()
+        }
+
+        fun of(dexFile: DexFile, types: List<String>): TypeList {
+            val typeIndexList = types.map { dexFile.addOrGetTypeIDIndex(it) }
+            return of(*typeIndexList.toIntArray())
         }
 
         /**
@@ -126,7 +142,6 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
             return typeList
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): TypeList {
             val typeList = TypeList()
             typeList.read(input)

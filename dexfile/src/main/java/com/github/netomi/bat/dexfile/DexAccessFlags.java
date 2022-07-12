@@ -16,7 +16,7 @@
 package com.github.netomi.bat.dexfile;
 
 import static com.github.netomi.bat.dexfile.DexAccessFlags.Target.*;
-import static com.github.netomi.bat.dexfile.DexConstants.*;
+import static com.github.netomi.bat.dexfile.DexConstantsKt.*;
 
 public enum DexAccessFlags
 {

@@ -26,7 +26,7 @@ import java.util.*
  * @see [string id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.string-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_STRING_ID_ITEM,
+    type          = TYPE_STRING_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
 class StringID private constructor(): DataItem() {
@@ -43,6 +43,9 @@ class StringID private constructor(): DataItem() {
     internal constructor(stringData: StringData): this() {
         this.stringData = stringData
     }
+
+    override val isEmpty: Boolean
+        get() = false
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
@@ -70,7 +73,9 @@ class StringID private constructor(): DataItem() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
+
         val o = other as StringID
+
         return stringData == o.stringData
     }
 
@@ -84,7 +89,6 @@ class StringID private constructor(): DataItem() {
 
     companion object {
         fun of(value: String): StringID {
-            Objects.requireNonNull(value, "value must not be null")
             return StringID(StringData.of(value))
         }
 

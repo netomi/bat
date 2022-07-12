@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile.instruction;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.NO_INDEX;
+
 public class FieldInstruction
 extends      DexInstruction
 {
@@ -29,7 +31,7 @@ extends      DexInstruction
 
     FieldInstruction(DexOpCode opcode) {
         super(opcode);
-        fieldIndex = DexConstants.NO_INDEX;
+        fieldIndex = NO_INDEX;
     }
 
     public int getFieldIndex() {

@@ -15,8 +15,6 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
-import com.github.netomi.bat.dexfile.DexConstants;
-
 /**
  * @author Thomas Neidhart
  */

@@ -26,7 +26,7 @@ import kotlin.collections.ArrayList
  * @see [map list item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.map-list)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_MAP_LIST,
+    type          = TYPE_MAP_LIST,
     dataAlignment = 4,
     dataSection   = true)
 class MapList private constructor(private val _mapItems: ArrayList<MapItem> = ArrayList(0)) : DataItem() {
@@ -60,6 +60,9 @@ class MapList private constructor(private val _mapItems: ArrayList<MapItem> = Ar
         mapItem.size   = size
         mapItem.offset = if (size > 0) offset else 0
     }
+
+    override val isEmpty: Boolean
+        get() = mapItems.isEmpty()
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)

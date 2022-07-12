@@ -17,12 +17,10 @@
 package com.github.netomi.bat.dexfile.value
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
 import com.github.netomi.bat.util.Preconditions
-import java.util.*
 
 /**
  * A class representing a referenced string (StringID) value inside a dex file.

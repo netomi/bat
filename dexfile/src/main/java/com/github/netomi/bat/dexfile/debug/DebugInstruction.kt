@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile.debug
 
 import com.github.netomi.bat.dexfile.DexContent
 import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
@@ -312,8 +313,8 @@ data class DebugSetFile internal constructor(private var _nameIndex: Int = 0) : 
     val nameIndex: Int
         get() = _nameIndex
 
-    fun name(dexFile: DexFile): String {
-        return dexFile.getStringID(_nameIndex).stringValue
+    fun name(dexFile: DexFile): String? {
+        return dexFile.getStringNullable(nameIndex)
     }
 
     override fun read(input: DexDataInput) {
@@ -390,12 +391,12 @@ open class DebugStartLocal : DebugInstruction {
         this.typeIndex   = typeIndex
     }
 
-    fun name(dexFile: DexFile): String {
-        return dexFile.getStringID(nameIndex).stringValue
+    fun name(dexFile: DexFile): String? {
+        return dexFile.getStringNullable(nameIndex)
     }
 
-    fun type(dexFile: DexFile): String {
-        return dexFile.getTypeID(typeIndex).getType(dexFile)
+    fun type(dexFile: DexFile): String? {
+        return dexFile.getTypeNullable(typeIndex)
     }
 
     override fun read(input: DexDataInput) {
@@ -455,8 +456,8 @@ class DebugStartLocalExtended : DebugStartLocal {
         this.sigIndex = sigIndex
     }
 
-    fun signature(dexFile: DexFile): String {
-        return dexFile.getString(sigIndex)!!
+    fun signature(dexFile: DexFile): String? {
+        return dexFile.getStringNullable(sigIndex)
     }
 
     override fun read(input: DexDataInput) {

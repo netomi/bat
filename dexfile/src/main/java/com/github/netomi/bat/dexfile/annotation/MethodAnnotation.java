@@ -23,14 +23,12 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 
 import java.util.Objects;
 
-import static com.github.netomi.bat.dexfile.DexConstants.NO_INDEX;
+import static com.github.netomi.bat.dexfile.DexConstantsKt.NO_INDEX;
 
 /**
  * A class representing a method annotation format inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-annotation">method annotation format @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 public class MethodAnnotation
 extends      DexContent

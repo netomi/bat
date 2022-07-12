@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile.instruction;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.NO_INDEX;
+
 public class ArrayTypeInstruction
 extends      ArrayInstruction
 {
@@ -29,7 +31,7 @@ extends      ArrayInstruction
 
     ArrayTypeInstruction(DexOpCode opcode) {
         super(opcode);
-        typeIndex = DexConstants.NO_INDEX;
+        typeIndex = NO_INDEX;
     }
 
     public int getTypeIndex() {

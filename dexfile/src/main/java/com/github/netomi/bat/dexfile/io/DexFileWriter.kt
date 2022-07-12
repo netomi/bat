@@ -106,14 +106,14 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
     }
 
     private fun writeHeader(header: DexHeader, mapList: MapList, output: DexDataOutput) {
-        mapList.updateMapItem(DexConstants.TYPE_HEADER_ITEM, 1, output.offset)
+        mapList.updateMapItem(TYPE_HEADER_ITEM, 1, output.offset)
         header.write(output)
     }
 
     private fun writeStringIDs(dexFile: DexFile, header: DexHeader, mapList: MapList, output: DexDataOutput) {
         writePadding(StringID::class.java, output)
-        header.updateDataItem(DexConstants.TYPE_STRING_ID_ITEM, dexFile.stringIDCount, output.offset)
-        mapList.updateMapItem(DexConstants.TYPE_STRING_ID_ITEM, dexFile.stringIDCount, output.offset)
+        header.updateDataItem(TYPE_STRING_ID_ITEM, dexFile.stringIDCount, output.offset)
+        mapList.updateMapItem(TYPE_STRING_ID_ITEM, dexFile.stringIDCount, output.offset)
         for (stringID in dexFile.getStringIDs()) {
             stringID.write(output)
         }
@@ -121,8 +121,8 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
     private fun writeTypeIDs(dexFile: DexFile, header: DexHeader, mapList: MapList, output: DexDataOutput) {
         writePadding(TypeID::class.java, output)
-        header.updateDataItem(DexConstants.TYPE_TYPE_ID_ITEM, dexFile.typeIDCount, output.offset)
-        mapList.updateMapItem(DexConstants.TYPE_TYPE_ID_ITEM, dexFile.typeIDCount, output.offset)
+        header.updateDataItem(TYPE_TYPE_ID_ITEM, dexFile.typeIDCount, output.offset)
+        mapList.updateMapItem(TYPE_TYPE_ID_ITEM, dexFile.typeIDCount, output.offset)
         for (typeID in dexFile.getTypeIDs()) {
            typeID.write(output)
         }
@@ -130,8 +130,8 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
     private fun writeProtoIDs(dexFile: DexFile, header: DexHeader, mapList: MapList, output: DexDataOutput) {
         writePadding(ProtoID::class.java, output)
-        header.updateDataItem(DexConstants.TYPE_PROTO_ID_ITEM, dexFile.protoIDCount, output.offset)
-        mapList.updateMapItem(DexConstants.TYPE_PROTO_ID_ITEM, dexFile.protoIDCount, output.offset)
+        header.updateDataItem(TYPE_PROTO_ID_ITEM, dexFile.protoIDCount, output.offset)
+        mapList.updateMapItem(TYPE_PROTO_ID_ITEM, dexFile.protoIDCount, output.offset)
         for (protoID in dexFile.getProtoIDs()) {
             protoID.write(output)
         }
@@ -139,8 +139,8 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
     private fun writeFieldIDs(dexFile: DexFile, header: DexHeader, mapList: MapList, output: DexDataOutput) {
         writePadding(FieldID::class.java, output)
-        header.updateDataItem(DexConstants.TYPE_FIELD_ID_ITEM, dexFile.fieldIDCount, output.offset)
-        mapList.updateMapItem(DexConstants.TYPE_FIELD_ID_ITEM, dexFile.fieldIDCount, output.offset)
+        header.updateDataItem(TYPE_FIELD_ID_ITEM, dexFile.fieldIDCount, output.offset)
+        mapList.updateMapItem(TYPE_FIELD_ID_ITEM, dexFile.fieldIDCount, output.offset)
         for (fieldID in dexFile.getFieldIDs()) {
             fieldID.write(output)
         }
@@ -148,8 +148,8 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
     private fun writeMethodIDs(dexFile: DexFile, header: DexHeader, mapList: MapList, output: DexDataOutput) {
         writePadding(MethodID::class.java, output)
-        header.updateDataItem(DexConstants.TYPE_METHOD_ID_ITEM, dexFile.methodIDCount, output.offset)
-        mapList.updateMapItem(DexConstants.TYPE_METHOD_ID_ITEM, dexFile.methodIDCount, output.offset)
+        header.updateDataItem(TYPE_METHOD_ID_ITEM, dexFile.methodIDCount, output.offset)
+        mapList.updateMapItem(TYPE_METHOD_ID_ITEM, dexFile.methodIDCount, output.offset)
         for (methodID in dexFile.getMethodIDs()) {
             methodID.write(output)
         }
@@ -157,8 +157,8 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
     private fun writeClassDefs(dexFile: DexFile, header: DexHeader, mapList: MapList, output: DexDataOutput) {
         writePadding(ClassDef::class.java, output)
-        header.updateDataItem(DexConstants.TYPE_CLASS_DEF_ITEM, dexFile.classDefCount, output.offset)
-        mapList.updateMapItem(DexConstants.TYPE_CLASS_DEF_ITEM, dexFile.classDefCount, output.offset)
+        header.updateDataItem(TYPE_CLASS_DEF_ITEM, dexFile.classDefCount, output.offset)
+        mapList.updateMapItem(TYPE_CLASS_DEF_ITEM, dexFile.classDefCount, output.offset)
         for (classDef in dexFile.getClassDefs()) {
             classDef.write(output)
         }
@@ -167,7 +167,7 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
     private fun writeCallSiteIDs(dexFile: DexFile, mapList: MapList, output: DexDataOutput) {
         if (dexFile.callSiteIDCount > 0) {
             writePadding(CallSiteID::class.java, output)
-            mapList.updateMapItem(DexConstants.TYPE_CALL_SITE_ID_ITEM, dexFile.callSiteIDCount, output.offset)
+            mapList.updateMapItem(TYPE_CALL_SITE_ID_ITEM, dexFile.callSiteIDCount, output.offset)
             for (callSiteID in dexFile.getCallSiteIDs()) {
                 callSiteID.write(output)
             }
@@ -177,7 +177,7 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
     private fun writeMethodHandles(dexFile: DexFile, mapList: MapList, output: DexDataOutput) {
         if (dexFile.methodHandleCount > 0) {
             writePadding(MethodHandle::class.java, output)
-            mapList.updateMapItem(DexConstants.TYPE_METHOD_HANDLE_ITEM, dexFile.methodHandleCount, output.offset)
+            mapList.updateMapItem(TYPE_METHOD_HANDLE_ITEM, dexFile.methodHandleCount, output.offset)
             for (methodHandle in dexFile.getMethodHandles()) {
                 methodHandle.write(output)
             }
@@ -195,8 +195,8 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
     private fun writeMapList(header: DexHeader, mapList: MapList, output: DexDataOutput) {
         writePadding(MapList::class.java, output)
-        header.updateDataItem(DexConstants.TYPE_MAP_LIST, 0, output.offset)
-        mapList.updateMapItem(DexConstants.TYPE_MAP_LIST, 1, output.offset)
+        header.updateDataItem(TYPE_MAP_LIST, 0, output.offset)
+        mapList.updateMapItem(TYPE_MAP_LIST, 1, output.offset)
         mapList.write(output)
     }
 
@@ -216,24 +216,25 @@ private class DataItemMapImpl : DataItem.Map {
     private val offsetMap:   MutableMap<DataItem, Int>             = mutableMapOf()
 
     fun collectDataItems(dexFile: DexFile) {
-        dexFile.dataItemsAccept(DataSectionItemCollector(this))
+        // collect all non-empty data items
+        dexFile.dataItemsAccept(DataSectionItemCollector({ dataItem -> !dataItem.isEmpty }, this))
     }
 
     fun writeDataItems(mapList: MapList, output: DexDataOutput) {
-        writeDataItems(mapList, output, DexConstants.TYPE_TYPE_LIST)
-        writeDataItems(mapList, output, DexConstants.TYPE_ANNOTATION_SET_REF_LIST)
-        writeDataItems(mapList, output, DexConstants.TYPE_ANNOTATION_SET_ITEM)
+        writeDataItems(mapList, output, TYPE_TYPE_LIST)
+        writeDataItems(mapList, output, TYPE_ANNOTATION_SET_REF_LIST)
+        writeDataItems(mapList, output, TYPE_ANNOTATION_SET_ITEM)
         // write the code items before the class data as it references its offset
         // using uleb128 encoding which is a variable length encoding. If the code
         // items were written afterwards, its exact offset would not be known
         // and thus the size of the class data items may vary.
-        writeDataItems(mapList, output, DexConstants.TYPE_CODE_ITEM)
-        writeDataItems(mapList, output, DexConstants.TYPE_CLASS_DATA_ITEM)
-        writeDataItems(mapList, output, DexConstants.TYPE_STRING_DATA_ITEM)
-        writeDataItems(mapList, output, DexConstants.TYPE_DEBUG_INFO_ITEM)
-        writeDataItems(mapList, output, DexConstants.TYPE_ANNOTATION_ITEM)
-        writeDataItems(mapList, output, DexConstants.TYPE_ENCODED_ARRAY_ITEM)
-        writeDataItems(mapList, output, DexConstants.TYPE_ANNOTATIONS_DIRECTORY_ITEM)
+        writeDataItems(mapList, output, TYPE_CODE_ITEM)
+        writeDataItems(mapList, output, TYPE_CLASS_DATA_ITEM)
+        writeDataItems(mapList, output, TYPE_STRING_DATA_ITEM)
+        writeDataItems(mapList, output, TYPE_DEBUG_INFO_ITEM)
+        writeDataItems(mapList, output, TYPE_ANNOTATION_ITEM)
+        writeDataItems(mapList, output, TYPE_ENCODED_ARRAY_ITEM)
+        writeDataItems(mapList, output, TYPE_ANNOTATIONS_DIRECTORY_ITEM)
     }
 
     fun updateOffsets(dexFile: DexFile) {
@@ -276,67 +277,75 @@ private class DataItemMapImpl : DataItem.Map {
     }
 }
 
-private class DataSectionItemCollector(private val dataItemMap: DataItemMapImpl) : DataItemVisitor {
+private class DataSectionItemCollector(private val predicate: (DataItem) -> Boolean,
+                                       private val dataItemMap: DataItemMapImpl) : DataItemVisitor {
 
+    // ignore other data items
     override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {}
 
+    private fun visitDataItem(dataItem: DataItem) {
+        if (predicate.invoke(dataItem)) {
+            dataItemMap.addDataItem(dataItem)
+        }
+    }
+
     override fun visitStringData(dexFile: DexFile, stringID: StringID, stringData: StringData) {
-        dataItemMap.addDataItem(stringData)
+        visitDataItem(stringData)
     }
 
     override fun visitParameterTypes(dexFile: DexFile, protoID: ProtoID, typeList: TypeList) {
-        dataItemMap.addDataItem(typeList)
+        visitDataItem(typeList)
     }
 
     override fun visitClassData(dexFile: DexFile, classDef: ClassDef, classData: ClassData) {
-        dataItemMap.addDataItem(classData)
+        visitDataItem(classData)
     }
 
     override fun visitInterfaceTypes(dexFile: DexFile, classDef: ClassDef, typeList: TypeList) {
-        dataItemMap.addDataItem(typeList)
+        visitDataItem(typeList)
     }
 
     override fun visitStaticValuesArray(dexFile: DexFile, classDef: ClassDef, encodedArray: EncodedArray) {
-        dataItemMap.addDataItem(encodedArray)
+        visitDataItem(encodedArray)
     }
 
     override fun visitAnnotationsDirectory(dexFile: DexFile, classDef: ClassDef, annotationsDirectory: AnnotationsDirectory) {
-        dataItemMap.addDataItem(annotationsDirectory)
+        visitDataItem(annotationsDirectory)
     }
 
     override fun visitClassAnnotations(dexFile: DexFile, annotationsDirectory: AnnotationsDirectory, annotationSet: AnnotationSet) {
-        dataItemMap.addDataItem(annotationSet)
+        visitDataItem(annotationSet)
     }
 
     override fun visitFieldAnnotations(dexFile: DexFile, fieldAnnotation: FieldAnnotation, annotationSet: AnnotationSet) {
-        dataItemMap.addDataItem(annotationSet)
+        visitDataItem(annotationSet)
     }
 
     override fun visitMethodAnnotations(dexFile: DexFile, methodAnnotation: MethodAnnotation, annotationSet: AnnotationSet) {
-        dataItemMap.addDataItem(annotationSet)
+        visitDataItem(annotationSet)
     }
 
     override fun visitParameterAnnotations(dexFile: DexFile, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
-        dataItemMap.addDataItem(annotationSetRefList)
+        visitDataItem(annotationSetRefList)
     }
 
     override fun visitAnnotationSet(dexFile: DexFile, annotationSetRef: AnnotationSetRef, annotationSet: AnnotationSet) {
-        dataItemMap.addDataItem(annotationSet)
+        visitDataItem(annotationSet)
     }
 
     override fun visitAnnotation(dexFile: DexFile, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
-        dataItemMap.addDataItem(annotation)
+        visitDataItem(annotation)
     }
 
     override fun visitCode(dexFile: DexFile, encodedMethod: EncodedMethod, code: Code) {
-        dataItemMap.addDataItem(code)
+        visitDataItem(code)
     }
 
     override fun visitDebugInfo(dexFile: DexFile, code: Code, debugInfo: DebugInfo) {
-        dataItemMap.addDataItem(debugInfo)
+        visitDataItem(debugInfo)
     }
 
     override fun visitCallSite(dexFile: DexFile, callSiteID: CallSiteID, callSite: CallSite) {
-        dataItemMap.addDataItem(callSite)
+        visitDataItem(callSite)
     }
 }

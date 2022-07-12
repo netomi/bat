@@ -26,6 +26,7 @@ import com.github.netomi.bat.dexfile.value.EncodedStringValue
  * @see [callsite item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.call-site-item)
  */
 class CallSite private constructor() : EncodedArray() {
+
     val methodHandle: EncodedMethodHandleValue
         get() = array.values[0] as EncodedMethodHandleValue
 
@@ -52,12 +53,10 @@ class CallSite private constructor() : EncodedArray() {
     }
 
     companion object {
-        @JvmStatic
         fun empty(): CallSite {
             return CallSite()
         }
 
-        @JvmStatic
         fun of(methodHandleIndex: Int, nameIndex: Int, protoIndex: Int): CallSite {
             val callSite = CallSite()
             callSite.array.addEncodedValue(EncodedMethodHandleValue.of(methodHandleIndex))
@@ -66,7 +65,6 @@ class CallSite private constructor() : EncodedArray() {
             return callSite
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): CallSite {
             val callSite = CallSite()
             callSite.read(input)

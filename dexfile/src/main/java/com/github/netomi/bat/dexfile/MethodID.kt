@@ -15,13 +15,9 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.visitor.AllEncodedMethodsVisitor
-import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor
-import com.github.netomi.bat.dexfile.visitor.MethodNameAndProtoFilter
+import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.Classes
 import com.google.common.base.Preconditions
 import java.util.*
@@ -32,7 +28,7 @@ import java.util.*
  * @see [method id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.method-id-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_METHOD_ID_ITEM,
+    type          = TYPE_METHOD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
 class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int = NO_INDEX, _protoIndex: Int = NO_INDEX) : DataItem() {
@@ -66,6 +62,9 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
         return dexFile.getProtoID(protoIndex).getShorty(dexFile)
     }
 
+    override val isEmpty: Boolean
+        get() = classIndex == NO_INDEX
+
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
         classIndex = input.readUnsignedShort()
@@ -87,6 +86,12 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
         classDef?.classDataAccept(dexFile,
             AllEncodedMethodsVisitor(
             MethodNameAndProtoFilter(getName(dexFile), getProtoID(dexFile), visitor)))
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::classIndex))
+        visitor.visitStringID(dexFile, PropertyAccessor(this::nameIndex))
+        visitor.visitProtoID(dexFile, PropertyAccessor(this::protoIndex))
     }
 
     override fun equals(other: Any?): Boolean {

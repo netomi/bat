@@ -30,9 +30,10 @@ abstract class DataItem : DexContent() {
     val dataAlignment: Int
         get() = javaClass.getAnnotation(DataItemAnn::class.java).dataAlignment
 
-    protected fun containedInDataSection(): Boolean {
-        return javaClass.getAnnotation(DataItemAnn::class.java).dataSection
-    }
+    val containedInDataSection: Boolean
+        get() = javaClass.getAnnotation(DataItemAnn::class.java).dataSection
+
+    abstract val isEmpty: Boolean
 
     interface Map {
         fun getOffset(item: DataItem?): Int

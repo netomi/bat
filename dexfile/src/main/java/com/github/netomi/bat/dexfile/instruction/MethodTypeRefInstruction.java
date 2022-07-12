@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile.instruction;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.NO_INDEX;
+
 public class MethodTypeRefInstruction
 extends      DexInstruction
 {
@@ -29,7 +31,7 @@ extends      DexInstruction
 
     MethodTypeRefInstruction(DexOpCode opcode) {
         super(opcode);
-        protoIndex = DexConstants.NO_INDEX;
+        protoIndex = NO_INDEX;
     }
 
     public int getProtoIndex() {

@@ -15,12 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.ACC_ENUM
-import com.github.netomi.bat.dexfile.DexConstants.ACC_FINAL
-import com.github.netomi.bat.dexfile.DexConstants.ACC_STATIC
-import com.github.netomi.bat.dexfile.DexConstants.ACC_SYNTHETIC
-import com.github.netomi.bat.dexfile.DexConstants.ACC_TRANSIENT
-import com.github.netomi.bat.dexfile.DexConstants.ACC_VOLATILE
 import java.util.*
 
 enum class FieldModifier(val flagValue: Int) {

@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor
@@ -75,13 +74,13 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     }
 
     val isStatic: Boolean
-        get() = accessFlags and DexConstants.ACC_STATIC != 0
+        get() = accessFlags and ACC_STATIC != 0
 
     val isPrivate: Boolean
-        get() = accessFlags and DexConstants.ACC_PRIVATE != 0
+        get() = accessFlags and ACC_PRIVATE != 0
 
     val isConstructor: Boolean
-        get() = accessFlags and DexConstants.ACC_CONSTRUCTOR != 0
+        get() = accessFlags and ACC_CONSTRUCTOR != 0
 
     val isDirectMethod: Boolean
         get() = isStatic || isPrivate || isConstructor
@@ -132,7 +131,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
         if (code != null) {
-            visitor.visitCode(dexFile, this, code)
+            visitor.visitCode(dexFile, this, code!!)
             code!!.dataItemsAccept(dexFile, visitor)
         }
     }

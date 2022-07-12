@@ -25,11 +25,10 @@ import com.github.netomi.bat.dexfile.visitor.TryVisitor;
 
 import java.util.*;
 
-/**
- * @author Thomas Neidhart
- */
+import static com.github.netomi.bat.dexfile.DexConstantsKt.TYPE_CODE_ITEM;
+
 @DataItemAnn(
-    type          = DexConstants.TYPE_CODE_ITEM,
+    type          = TYPE_CODE_ITEM,
     dataAlignment = 4,
     dataSection   = true
 )
@@ -80,6 +79,11 @@ extends      DataItem
 
     public int getDebugInfoOffset() {
         return debugInfoOffset;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return insns.length == 0;
     }
 
     @Override

@@ -15,20 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.ACC_ABSTRACT
-import com.github.netomi.bat.dexfile.DexConstants.ACC_BRIDGE
-import com.github.netomi.bat.dexfile.DexConstants.ACC_CONSTRUCTOR
-import com.github.netomi.bat.dexfile.DexConstants.ACC_DECLARED_SYNCHRONIZED
-import com.github.netomi.bat.dexfile.DexConstants.ACC_ENUM
-import com.github.netomi.bat.dexfile.DexConstants.ACC_FINAL
-import com.github.netomi.bat.dexfile.DexConstants.ACC_NATIVE
-import com.github.netomi.bat.dexfile.DexConstants.ACC_STATIC
-import com.github.netomi.bat.dexfile.DexConstants.ACC_STRICT
-import com.github.netomi.bat.dexfile.DexConstants.ACC_SYNCHRONIZED
-import com.github.netomi.bat.dexfile.DexConstants.ACC_SYNTHETIC
-import com.github.netomi.bat.dexfile.DexConstants.ACC_TRANSIENT
-import com.github.netomi.bat.dexfile.DexConstants.ACC_VARARGS
-import com.github.netomi.bat.dexfile.DexConstants.ACC_VOLATILE
 import java.util.*
 
 enum class MethodModifier(val flagValue: Int) {

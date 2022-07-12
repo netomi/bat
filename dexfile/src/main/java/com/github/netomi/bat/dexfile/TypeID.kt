@@ -15,10 +15,11 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.util.Preconditions
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -27,17 +28,20 @@ import java.util.*
  * @see [type id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-id-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_TYPE_ID_ITEM,
+    type          = TYPE_TYPE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
 class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() {
 
     var descriptorIndex: Int = _descriptorIndex
-        private set
+        internal set
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getStringID(descriptorIndex).stringValue
     }
+
+    override val isEmpty: Boolean
+        get() = descriptorIndex == NO_INDEX
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
@@ -47,6 +51,10 @@ class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() 
     override fun write(output: DexDataOutput) {
         output.writeAlignmentPadding(dataAlignment)
         output.writeInt(descriptorIndex)
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitStringID(dexFile, PropertyAccessor(this::descriptorIndex))
     }
 
     override fun equals(other: Any?): Boolean {
@@ -67,6 +75,11 @@ class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() 
     }
 
     companion object {
+        fun of(dexFile: DexFile, descriptor: String): TypeID {
+            val descriptorIndex = dexFile.addOrGetStringIDIndex(descriptor)
+            return of(descriptorIndex)
+        }
+
         fun of(descriptorIndex: Int): TypeID {
             Preconditions.checkArgument(descriptorIndex >= 0, "descriptor index must not be negative")
             return TypeID(descriptorIndex)

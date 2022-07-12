@@ -15,9 +15,9 @@
  */
 package com.github.netomi.bat.dexfile.value
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.DexContent
 import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor
@@ -82,7 +82,6 @@ data class EncodedAnnotationValue internal constructor(
     }
 
     companion object {
-        @JvmStatic
         fun of(typeIndex: Int, vararg elements: AnnotationElement): EncodedAnnotationValue {
             return EncodedAnnotationValue(typeIndex, arrayListOf(*elements))
         }
@@ -119,7 +118,6 @@ data class AnnotationElement private constructor(
     }
 
     companion object {
-        @JvmStatic
         fun of(nameIndex: Int, value: EncodedValue): AnnotationElement {
             Preconditions.checkArgument(nameIndex >= 0, "nameIndex must not be negative")
             Objects.requireNonNull(value, "value must not be null")

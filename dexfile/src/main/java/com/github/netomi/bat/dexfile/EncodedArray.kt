@@ -19,14 +19,16 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 
 @DataItemAnn(
-    type          = DexConstants.TYPE_ENCODED_ARRAY_ITEM,
+    type          = TYPE_ENCODED_ARRAY_ITEM,
     dataAlignment = 1,
     dataSection   = true)
 open class EncodedArray protected constructor(val array: EncodedArrayValue = EncodedArrayValue.empty()) : DataItem() {
+
+    override val isEmpty: Boolean
+        get() = array.isEmpty()
 
     override fun read(input: DexDataInput) {
         array.readValue(input, 0)
@@ -64,12 +66,10 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
     }
 
     companion object {
-        @JvmStatic
         fun empty(): EncodedArray {
             return EncodedArray()
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): EncodedArray {
             val encodedArray = EncodedArray()
             encodedArray.read(input)

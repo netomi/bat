@@ -30,8 +30,6 @@ import java.util.Objects;
  * A class representing an annotation set ref item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#set-ref-item">annotation set ref item @ dex format</a>
- *
- * @author Thomas Neidhart
  */
 public class AnnotationSetRef
 extends      DexContent

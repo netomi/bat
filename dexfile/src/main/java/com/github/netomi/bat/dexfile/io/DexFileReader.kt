@@ -175,7 +175,7 @@ class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor 
         }
 
         private fun readCallSiteIDs(mapList: MapList, dexFile: DexFile) {
-            val mapItem: MapItem? = mapList.getMapItemByType(DexConstants.TYPE_CALL_SITE_ID_ITEM)
+            val mapItem: MapItem? = mapList.getMapItemByType(TYPE_CALL_SITE_ID_ITEM)
             if (mapItem != null) {
                 input.offset = mapItem.offset
                 dexFile.apply {
@@ -190,7 +190,7 @@ class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor 
         }
 
         private fun readMethodHandles(mapList: MapList, dexFile: DexFile) {
-            val mapItem: MapItem? = mapList.getMapItemByType(DexConstants.TYPE_METHOD_HANDLE_ITEM)
+            val mapItem: MapItem? = mapList.getMapItemByType(TYPE_METHOD_HANDLE_ITEM)
             if (mapItem != null) {
                 input.offset = mapItem.offset
                 dexFile.apply {

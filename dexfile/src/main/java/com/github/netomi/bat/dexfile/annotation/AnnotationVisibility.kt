@@ -15,13 +15,15 @@
  */
 package com.github.netomi.bat.dexfile.annotation
 
-import com.github.netomi.bat.dexfile.DexConstants
+import com.github.netomi.bat.dexfile.VISIBILITY_BUILD
+import com.github.netomi.bat.dexfile.VISIBILITY_RUNTIME
+import com.github.netomi.bat.dexfile.VISIBILITY_SYSTEM
 import com.google.common.base.Preconditions
 
 enum class AnnotationVisibility(val value: Short, val simpleName: String) {
-    VISIBILITY_BUILD  (DexConstants.VISIBILITY_BUILD,   "build"),
-    VISIBILITY_RUNTIME(DexConstants.VISIBILITY_RUNTIME, "runtime"),
-    VISIBILITY_SYSTEM (DexConstants.VISIBILITY_SYSTEM,  "system");
+    BUILD  (VISIBILITY_BUILD,   "build"),
+    RUNTIME(VISIBILITY_RUNTIME, "runtime"),
+    SYSTEM (VISIBILITY_SYSTEM,  "system");
 
     companion object {
         @JvmStatic

@@ -15,15 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INSTANCE_GET
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INSTANCE_PUT
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INVOKE_DIRECT
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INVOKE_INSTANCE
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INVOKE_INTERFACE
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_INVOKE_STATIC
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_STATIC_GET
-import com.github.netomi.bat.dexfile.DexConstants.METHOD_HANDLE_TYPE_STATIC_PUT
 import com.google.common.base.Preconditions
 
 enum class MethodHandleType(val value: Int, val targetsField: Boolean, val targetsInstance: Boolean, val simpleName: String) {
@@ -38,7 +29,6 @@ enum class MethodHandleType(val value: Int, val targetsField: Boolean, val targe
     INVOKE_INTERFACE(  METHOD_HANDLE_TYPE_INVOKE_INTERFACE,   false, true,  "invoke-interface");
 
     companion object {
-        @JvmStatic
         fun of(value: Int): MethodHandleType {
             Preconditions.checkElementIndex(value, MethodHandleType.values().size, "unexpected MethodHandleType value $value")
             return values()[value]

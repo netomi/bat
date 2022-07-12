@@ -25,13 +25,15 @@ import com.github.netomi.bat.util.IntArray;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.TYPE_ANNOTATION_SET_ITEM;
+
 /**
  * A class representing an annotation set item inside a dex file.
  *
  * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#annotation-set-item">annotation set item @ dex format</a>
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_ANNOTATION_SET_ITEM,
+    type          = TYPE_ANNOTATION_SET_ITEM,
     dataAlignment = 4,
     dataSection   = true
 )
@@ -55,6 +57,10 @@ extends      DataItem
     private AnnotationSet() {
         annotationOffsetEntries = new IntArray(0);
         annotations             = new ArrayList<>(0);
+    }
+
+    public boolean isEmpty() {
+        return annotations.isEmpty();
     }
 
     public int getAnnotationCount() {

@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile.instruction;
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 
+import static com.github.netomi.bat.dexfile.DexConstantsKt.NO_INDEX;
+
 public class CallSiteInstruction
 extends      DexInstruction
 {
@@ -29,7 +31,7 @@ extends      DexInstruction
 
     CallSiteInstruction(DexOpCode opcode) {
         super(opcode);
-        callSiteIndex = DexConstants.NO_INDEX;
+        callSiteIndex = NO_INDEX;
     }
 
     public int getCallSiteIndex() {

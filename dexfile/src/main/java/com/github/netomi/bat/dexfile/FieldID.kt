@@ -15,9 +15,10 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.DexConstants.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -27,7 +28,7 @@ import java.util.*
  * @see [field id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.field-id-item)
  */
 @DataItemAnn(
-    type          = DexConstants.TYPE_FIELD_ID_ITEM,
+    type          = TYPE_FIELD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
 class FieldID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int = NO_INDEX, _typeIndex:  Int = NO_INDEX) : DataItem() {
@@ -57,6 +58,12 @@ class FieldID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int 
         return dexFile.getStringID(nameIndex).stringValue
     }
 
+    /**
+     * This item is considered to be empty only if its an uninitialized instance.
+     */
+    override val isEmpty: Boolean
+        get() = classIndex == NO_INDEX
+
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
         classIndex = input.readUnsignedShort()
@@ -69,6 +76,12 @@ class FieldID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int 
         output.writeUnsignedShort(classIndex)
         output.writeUnsignedShort(typeIndex)
         output.writeInt(nameIndex)
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::classIndex))
+        visitor.visitStringID(dexFile, PropertyAccessor(this::nameIndex))
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::typeIndex))
     }
 
     override fun equals(other: Any?): Boolean {
