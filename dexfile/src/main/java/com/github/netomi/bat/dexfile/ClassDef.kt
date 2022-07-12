@@ -45,7 +45,7 @@ class ClassDef private constructor(
     _staticValues:         EncodedArray         = EncodedArray.empty()) : DataItem() {
 
     var classIndex: Int = _classIndex
-        private set
+        internal set
 
     var accessFlags: Int = _accessFlags
         private set
@@ -54,10 +54,10 @@ class ClassDef private constructor(
         get() = Visibility.of(accessFlags)
 
     var superClassIndex: Int = _superClassIndex
-        private set
+        internal set
 
     var sourceFileIndex: Int = _sourceFileIndex
-        private set
+        internal set
 
     var interfacesOffset = 0
         private set
@@ -242,6 +242,20 @@ class ClassDef private constructor(
         classData.dataItemsAccept(dexFile, visitor)
 
         visitor.visitStaticValuesArray(dexFile, this, staticValues)
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::classIndex))
+
+        if (superClassIndex != NO_INDEX) {
+            visitor.visitTypeID(dexFile, PropertyAccessor(this::superClassIndex))
+        }
+
+        if (sourceFileIndex != NO_INDEX) {
+            visitor.visitStringID(dexFile, PropertyAccessor(this::sourceFileIndex))
+        }
+
+        classData.referencedIDsAccept(dexFile, visitor)
     }
 
     override fun toString(): String {

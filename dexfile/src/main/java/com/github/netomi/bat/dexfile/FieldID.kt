@@ -34,13 +34,13 @@ import java.util.*
 class FieldID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int = NO_INDEX, _typeIndex:  Int = NO_INDEX) : DataItem() {
 
     var classIndex: Int = _classIndex
-        private set
+        internal set
 
     var nameIndex: Int = _nameIndex
-        private set
+        internal set
 
     var typeIndex: Int = _typeIndex
-        private set
+        internal set
 
     fun getClassTypeID(dexFile: DexFile): TypeID {
         return dexFile.getTypeID(classIndex)

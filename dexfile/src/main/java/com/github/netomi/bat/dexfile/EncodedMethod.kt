@@ -19,6 +19,8 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -32,7 +34,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     private var deltaMethodIndex = 0
 
     var methodIndex: Int = _methodIndex
-        private set
+        internal set
 
     var accessFlags: Int = _accessFlags
         private set
@@ -134,6 +136,11 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
             visitor.visitCode(dexFile, this, code!!)
             code!!.dataItemsAccept(dexFile, visitor)
         }
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
+    {
+        visitor.visitMethodID(dexFile, PropertyAccessor(this::methodIndex))
     }
 
     override fun equals(other: Any?): Boolean {

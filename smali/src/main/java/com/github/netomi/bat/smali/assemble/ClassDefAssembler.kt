@@ -262,7 +262,9 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
             val y = methodObj.indexOf(')')
 
             val name = methodObj.substring(0, x)
-            val parameterTypes = methodObj.substring(x + 1, y).split(",")
+
+            val parameters = methodObj.substring(x + 1, y)
+            val parameterTypes = if (parameters.isEmpty()) emptyList() else parameters.split(",")
             val returnType = methodObj.substring(y + 1)
             return Triple(name, parameterTypes, returnType)
         }

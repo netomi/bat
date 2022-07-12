@@ -21,11 +21,15 @@ import com.github.netomi.bat.util.IntArray
 import kotlin.reflect.KMutableProperty
 
 internal interface ReferencedIDVisitor {
-    fun visitStringID(dexFile: DexFile, accessor: IDAccessor)
+    fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {}
 
-    fun visitTypeID(dexFile: DexFile, accessor: IDAccessor)
+    fun visitTypeID(dexFile: DexFile, accessor: IDAccessor) {}
 
-    fun visitProtoID(dexFile: DexFile, accessor: IDAccessor)
+    fun visitProtoID(dexFile: DexFile, accessor: IDAccessor) {}
+
+    fun visitFieldID(dexFile: DexFile, accessor: IDAccessor) {}
+
+    fun visitMethodID(dexFile: DexFile, accessor: IDAccessor) {}
 }
 
 internal interface IDAccessor {

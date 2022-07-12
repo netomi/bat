@@ -341,6 +341,10 @@ class DexFile {
         for (methodIDItem in methodIDs) {
             methodIDItem.referencedIDsAccept(this, visitor)
         }
+
+        for (classDefItem in classDefs) {
+            classDefItem.referencedIDsAccept(this, visitor)
+        }
     }
 
     internal fun refreshCaches() {

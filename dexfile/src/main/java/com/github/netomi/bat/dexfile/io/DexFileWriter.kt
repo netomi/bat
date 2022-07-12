@@ -21,6 +21,8 @@ import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.debug.DebugInfo
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor
+import com.github.netomi.bat.dexfile.visitor.IDAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.hash.Hashing
 import java.io.OutputStream
 
@@ -38,6 +40,8 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
         dataOffset = 0
         dataSize   = 0
+
+        sortDataItems(dexFile)
 
         assert(dexFile.dexFormat != null)
         val header = DexHeader.of(dexFile.dexFormat!!)
@@ -208,6 +212,58 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
         } else {
             header.updateLinkData(0, 0)
         }
+    }
+
+    private fun sortDataItems(dexFile: DexFile) {
+        val stringIDMapping = sortStringIDs(dexFile)
+
+        dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
+            override fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {
+                val oldIndex = accessor.get()
+                accessor.set(stringIDMapping[oldIndex]!!)
+            }
+        })
+
+        val typeIDMapping   = sortTypeIDs(dexFile)
+
+        dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
+            override fun visitTypeID(dexFile: DexFile, accessor: IDAccessor) {
+                val oldIndex = accessor.get()
+                accessor.set(typeIDMapping[oldIndex]!!)
+            }
+        })
+
+        dexFile.refreshCaches()
+
+        println("done")
+    }
+
+    private fun sortStringIDs(dexFile: DexFile): Map<Int, Int> {
+        val sortedStringIDs = dexFile.stringIDs.sortedBy { it.stringData }
+
+        val oldIndices = dexFile.stringIDs.withIndex().associate { iv -> Pair(iv.value, iv.index) }
+        val newIndices = sortedStringIDs.withIndex().associate   { iv -> Pair(iv.value, iv.index) }
+
+        val mapping = oldIndices.keys.associate { stringID -> Pair(oldIndices[stringID]!!, newIndices[stringID]!!) }
+
+        dexFile.stringIDs.clear()
+        dexFile.stringIDs.addAll(sortedStringIDs)
+
+        return mapping
+    }
+
+    internal fun sortTypeIDs(dexFile: DexFile): Map<Int, Int> {
+        val sortedTypeIDs = dexFile.typeIDs.sortedBy { it.descriptorIndex }
+
+        val oldIndices = dexFile.typeIDs.withIndex().associate { iv -> Pair(iv.value, iv.index) }
+        val newIndices = sortedTypeIDs.withIndex().associate   { iv -> Pair(iv.value, iv.index) }
+
+        val mapping = oldIndices.keys.associate { stringID -> Pair(oldIndices[stringID]!!, newIndices[stringID]!!) }
+
+        dexFile.typeIDs.clear()
+        dexFile.typeIDs.addAll(sortedTypeIDs)
+
+        return mapping
     }
 }
 

@@ -20,6 +20,8 @@ import com.github.netomi.bat.dexfile.Visibility.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -33,7 +35,7 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
     private var deltaFieldIndex = 0
 
     var fieldIndex: Int = _fieldIndex
-        private set
+        internal set
 
     var accessFlags: Int = _accessFlags
         private set
@@ -87,6 +89,11 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
         if (isStatic) {
             classDef.staticValueAccept(dexFile, index, visitor)
         }
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
+    {
+        visitor.visitFieldID(dexFile, PropertyAccessor(this::fieldIndex))
     }
 
     override fun equals(other: Any?): Boolean {
