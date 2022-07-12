@@ -20,6 +20,8 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -65,6 +67,10 @@ data class EncodedArrayValue internal constructor(val values: ArrayList<EncodedV
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitArrayValue(dexFile, this)
+    }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        values.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
     fun valuesAccept(dexFile: DexFile, visitor: EncodedValueVisitor) {

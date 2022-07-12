@@ -17,6 +17,8 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -38,7 +40,7 @@ class Try private constructor(): DexContent() {
 
     // package-private as these fields are set from the Code item.
     var handlerOffset = 0
-        // TODO: make set internal
+        // TODO: make set internal once Code is migrated to kotlin
 
     val endAddr: Int
         get() = startAddr + insnCount - 1
@@ -59,6 +61,10 @@ class Try private constructor(): DexContent() {
         output.writeInt(startAddr)
         output.writeUnsignedShort(insnCount)
         output.writeUnsignedShort(handlerOffset)
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        catchHandler.referencedIDsAccept(dexFile, visitor)
     }
 
     override fun equals(other: Any?): Boolean {

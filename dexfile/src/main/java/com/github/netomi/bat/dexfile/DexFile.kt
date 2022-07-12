@@ -15,7 +15,7 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.visitor.*
 import java.util.*
 
@@ -60,15 +60,16 @@ class DexFile {
     internal val callSiteIDs   = ArrayList<CallSiteID>()
     internal val methodHandles = ArrayList<MethodHandle>()
 
+    private val classDefMap : MutableMap<String, Int> = mutableMapOf()
+
+    private var _composer: DexComposer? = null
+    val composer: DexComposer by lazy {
+        _composer = DexComposer(this)
+        _composer!!
+    }
+
     var linkData: ByteArray?   = null
         internal set
-
-    private var stringMap:   MutableMap<String, Int>   = mutableMapOf()
-    private var typeMap:     MutableMap<String, Int>   = mutableMapOf()
-    private var protoIDMap:  MutableMap<ProtoID, Int>  = mutableMapOf()
-    private var classDefMap: MutableMap<String, Int>   = mutableMapOf()
-    private var fieldIDMap:  MutableMap<FieldID, Int>  = mutableMapOf()
-    private var methodIDMap: MutableMap<MethodID, Int> = mutableMapOf()
 
     val stringIDCount: Int
         get() = stringIDs.size
@@ -89,14 +90,9 @@ class DexFile {
         return if (index == NO_INDEX) null else getString(index)
     }
 
-    fun addOrGetStringIDIndex(string: String): Int {
-        var index = stringMap[string]
-        if (index == null) {
-            stringIDs.add(StringID.of(string))
-            index = stringIDs.size - 1
-            stringMap[string] = index
-        }
-        return index
+    internal fun addStringID(stringID: StringID): Int {
+        stringIDs.add(stringID)
+        return stringIDs.size - 1
     }
 
     val typeIDCount: Int
@@ -118,14 +114,9 @@ class DexFile {
         return if (index == NO_INDEX) null else getType(index)
     }
 
-    fun addOrGetTypeIDIndex(type: String): Int {
-        var index = typeMap[type]
-        if (index == null) {
-            typeIDs.add(TypeID.of(addOrGetStringIDIndex(type)))
-            index = typeIDs.size - 1
-            typeMap[type] = index
-        }
-        return index
+    internal fun addTypeID(typeID: TypeID): Int {
+        typeIDs.add(typeID)
+        return typeIDs.size - 1
     }
 
     val protoIDCount: Int
@@ -139,21 +130,9 @@ class DexFile {
         return protoIDs[protoIndex]
     }
 
-    fun addOrGetProtoID(parameterTypes: List<String>, returnType: String): Int {
-        val shorty = DexClasses.toShortyFormat(parameterTypes, returnType)
-        val shortyIndex          = addOrGetStringIDIndex(shorty)
-        val returnTypeIndex      = addOrGetTypeIDIndex(returnType)
-        val parameterTypeIndices = parameterTypes.map { addOrGetTypeIDIndex(it) }.toIntArray()
-
-        val protoID = ProtoID.of(shortyIndex, returnTypeIndex, *parameterTypeIndices)
-
-        var index = protoIDMap[protoID]
-        if (index == null) {
-            protoIDs.add(protoID)
-            index = protoIDs.size - 1
-            protoIDMap[protoID] = index
-        }
-        return index
+    internal fun addProtoID(protoID: ProtoID): Int {
+        protoIDs.add(protoID)
+        return protoIDs.size - 1
     }
 
     val fieldIDCount: Int
@@ -167,21 +146,9 @@ class DexFile {
         return fieldIDs[fieldIndex]
     }
 
-    fun addOrGetFieldID(classType: String, name: String, type: String): Int {
-        val fieldID =
-            FieldID.of(
-                addOrGetTypeIDIndex(classType),
-                addOrGetStringIDIndex(name),
-                addOrGetTypeIDIndex(type)
-            )
-
-        var index = fieldIDMap[fieldID]
-        if (index == null) {
-            fieldIDs.add(fieldID)
-            index = fieldIDs.size - 1
-            fieldIDMap[fieldID] = index
-        }
-        return index
+    internal fun addFieldID(fieldID: FieldID): Int {
+        fieldIDs.add(fieldID)
+        return fieldIDs.size - 1
     }
 
     val methodIDCount: Int
@@ -195,21 +162,9 @@ class DexFile {
         return methodIDs[methodIndex]
     }
 
-    fun addOrGetMethodID(classType: String, name: String, parameterTypes: List<String>, returnType: String): Int {
-        val methodID =
-            MethodID.of(
-                addOrGetTypeIDIndex(classType),
-                addOrGetStringIDIndex(name),
-                addOrGetProtoID(parameterTypes, returnType)
-            )
-
-        var index = methodIDMap[methodID]
-        if (index == null) {
-            methodIDs.add(methodID)
-            index = methodIDs.size - 1
-            methodIDMap[methodID] = index
-        }
-        return index
+    internal fun addMethodID(methodID: MethodID): Int {
+        methodIDs.add(methodID)
+        return methodIDs.size - 1
     }
 
     val classDefCount: Int
@@ -229,6 +184,11 @@ class DexFile {
     }
 
     fun addClassDef(classDef: ClassDef) {
+        val className = classDef.getClassName(this)
+        if (getClassDef(className) != null) {
+            throw IllegalArgumentException("class with name $className already exists in dex file.")
+        }
+
         classDefs.add(classDef)
         classDefMap[classDef.getClassName(this)] = classDefs.size - 1
     }
@@ -264,27 +224,15 @@ class DexFile {
     }
 
     fun classDefsAccept(visitor: ClassDefVisitor) {
-        val classDefListIterator: ListIterator<ClassDef> = classDefs.listIterator()
-        while (classDefListIterator.hasNext()) {
-            val index = classDefListIterator.nextIndex()
-            visitor.visitClassDef(this, index, classDefListIterator.next())
-        }
+        classDefs.forEachIndexed { index, classDef -> visitor.visitClassDef(this, index, classDef) }
     }
 
     fun methodHandlesAccept(visitor: MethodHandleVisitor) {
-        val methodHandleListIterator: ListIterator<MethodHandle> = methodHandles.listIterator()
-        while (methodHandleListIterator.hasNext()) {
-            val index = methodHandleListIterator.nextIndex()
-            visitor.visitMethodHandle(this, index, methodHandleListIterator.next())
-        }
+        methodHandles.forEachIndexed { index, methodHandle -> visitor.visitMethodHandle(this, index, methodHandle) }
     }
 
     fun callSiteIDsAccept(visitor: CallSiteIDVisitor) {
-        val callSiteIDListIterator: ListIterator<CallSiteID> = callSiteIDs.listIterator()
-        while (callSiteIDListIterator.hasNext()) {
-            val index = callSiteIDListIterator.nextIndex()
-            visitor.visitCallSiteID(this, index, callSiteIDListIterator.next())
-        }
+        callSiteIDs.forEachIndexed { index, callSiteID -> visitor.visitCallSiteID(this, index, callSiteID) }
     }
 
     fun dataItemsAccept(visitor: DataItemVisitor) {
@@ -329,62 +277,25 @@ class DexFile {
         for (typeIDItem in typeIDs) {
             typeIDItem.referencedIDsAccept(this, visitor)
         }
-
         for (protoIDItem in protoIDs) {
             protoIDItem.referencedIDsAccept(this, visitor)
         }
-
         for (fieldIDItem in fieldIDs) {
             fieldIDItem.referencedIDsAccept(this, visitor)
         }
-
         for (methodIDItem in methodIDs) {
             methodIDItem.referencedIDsAccept(this, visitor)
         }
-
         for (classDefItem in classDefs) {
             classDefItem.referencedIDsAccept(this, visitor)
+        }
+        for (callSiteIDItem in callSiteIDs) {
+            callSiteIDItem.referencedIDsAccept(this, visitor)
         }
     }
 
     internal fun refreshCaches() {
-        // update caches:
-        stringMap.clear()
-        val stringIterator: ListIterator<StringID> = stringIDs.listIterator()
-        while (stringIterator.hasNext()) {
-            val index = stringIterator.nextIndex()
-            stringMap[stringIterator.next().stringValue] = index
-        }
-        typeMap.clear()
-        val typeIterator: ListIterator<TypeID> = typeIDs.listIterator()
-        while (typeIterator.hasNext()) {
-            val index = typeIterator.nextIndex()
-            typeMap[typeIterator.next().getType(this)] = index
-        }
-        protoIDMap.clear()
-        val protoIDIterator: ListIterator<ProtoID> = protoIDs.listIterator()
-        while (protoIDIterator.hasNext()) {
-            val index = protoIDIterator.nextIndex()
-            protoIDMap[protoIDIterator.next()] = index
-        }
-        classDefMap.clear()
-        val classDefIterator: ListIterator<ClassDef> = classDefs.listIterator()
-        while (classDefIterator.hasNext()) {
-            val index = classDefIterator.nextIndex()
-            classDefMap[classDefIterator.next().getClassName(this)] = index
-        }
-        fieldIDMap.clear()
-        val fieldIDIterator: ListIterator<FieldID> = fieldIDs.listIterator()
-        while (fieldIDIterator.hasNext()) {
-            val index = fieldIDIterator.nextIndex()
-            fieldIDMap[fieldIDIterator.next()] = index
-        }
-        methodIDMap.clear()
-        val methodIDIterator: ListIterator<MethodID> = methodIDs.listIterator()
-        while (methodIDIterator.hasNext()) {
-            val index = methodIDIterator.nextIndex()
-            methodIDMap[methodIDIterator.next()] = index
-        }
+        classDefs.forEachIndexed  { index, classDef  -> classDefMap[classDef.getClassName(this)] = index }
     }
 
     override fun toString(): String {
@@ -393,7 +304,6 @@ class DexFile {
         sb.append(header)
         return sb.toString()
     }
-
 
     companion object {
         @JvmStatic

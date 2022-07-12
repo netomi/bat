@@ -75,11 +75,6 @@ class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() 
     }
 
     companion object {
-        fun of(dexFile: DexFile, descriptor: String): TypeID {
-            val descriptorIndex = dexFile.addOrGetStringIDIndex(descriptor)
-            return of(descriptorIndex)
-        }
-
         fun of(descriptorIndex: Int): TypeID {
             Preconditions.checkArgument(descriptorIndex >= 0, "descriptor index must not be negative")
             return TypeID(descriptorIndex)

@@ -19,6 +19,8 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.value.EncodedMethodHandleValue
 import com.github.netomi.bat.dexfile.value.EncodedMethodTypeValue
 import com.github.netomi.bat.dexfile.value.EncodedStringValue
+import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 
 /**
  * A class representing a callsite item inside a dex file.

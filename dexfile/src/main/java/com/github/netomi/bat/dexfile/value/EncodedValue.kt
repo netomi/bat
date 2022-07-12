@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.io.DexFormatException
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Primitives
 
 /**
@@ -49,6 +50,7 @@ abstract class EncodedValue {
 
     abstract fun accept(dexFile: DexFile, visitor: EncodedValueVisitor)
 
+    internal abstract fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
 
     companion object {
         // Value types.

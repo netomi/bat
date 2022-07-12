@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
 
 @DataItemAnn(
@@ -48,6 +49,10 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
         if (index >= 0 && index < array.values.size) {
             array.values[index].accept(dexFile, visitor)
         }
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        array.referencedIDsAccept(dexFile, visitor)
     }
 
     override fun equals(other: Any?): Boolean {

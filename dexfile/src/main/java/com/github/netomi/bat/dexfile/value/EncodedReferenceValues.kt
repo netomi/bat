@@ -20,6 +20,8 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Preconditions
 
 /**
@@ -48,6 +50,10 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitStringValue(dexFile, this)
+    }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitStringID(dexFile, PropertyAccessor(this::stringIndex))
     }
 
     override fun toString(): String {
@@ -91,6 +97,10 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
         visitor.visitFieldValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitFieldID(dexFile, PropertyAccessor(this::fieldIndex))
+    }
+
     override fun toString(): String {
         return "EncodedFieldValue[fieldIdx=${fieldIndex}]"
     }
@@ -130,6 +140,10 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitMethodValue(dexFile, this)
+    }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitMethodID(dexFile, PropertyAccessor(this::methodIndex))
     }
 
     override fun toString(): String {
@@ -173,6 +187,10 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
         visitor.visitTypeValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::typeIndex))
+    }
+
     override fun toString(): String {
         return "EncodedTypeValue[typeIdx=${typeIndex}]"
     }
@@ -212,6 +230,10 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitEnumValue(dexFile, this)
+    }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitFieldID(dexFile, PropertyAccessor(this::fieldIndex))
     }
 
     override fun toString(): String {
@@ -255,6 +277,10 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
         visitor.visitMethodHandleValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitMethodHandle(dexFile, PropertyAccessor(this::handleIndex))
+    }
+
     override fun toString(): String {
         return "EncodedMethodHandleValue[methodHandleIdx=${handleIndex}]"
     }
@@ -294,6 +320,10 @@ data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitMethodTypeValue(dexFile, this)
+    }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitProtoID(dexFile, PropertyAccessor(this::protoIndex))
     }
 
     override fun toString(): String {

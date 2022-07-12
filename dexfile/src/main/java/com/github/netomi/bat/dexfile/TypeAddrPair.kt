@@ -17,6 +17,8 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -28,7 +30,7 @@ import java.util.*
 class TypeAddrPair private constructor(_typeIndex: Int = NO_INDEX, _address: Int = 0) : DexContent() {
 
     var typeIndex: Int = _typeIndex
-        private set
+        internal set
 
     var address: Int = _address
         private set
@@ -45,6 +47,10 @@ class TypeAddrPair private constructor(_typeIndex: Int = NO_INDEX, _address: Int
     override fun write(output: DexDataOutput) {
         output.writeUleb128(typeIndex)
         output.writeUleb128(address)
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::typeIndex))
     }
 
     override fun equals(other: Any?): Boolean {

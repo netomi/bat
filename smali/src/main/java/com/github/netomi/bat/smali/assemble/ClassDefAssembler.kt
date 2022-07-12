@@ -18,10 +18,10 @@ package com.github.netomi.bat.smali.assemble
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
+import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.DexInstructions
 import com.github.netomi.bat.dexfile.io.InstructionWriter
-import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
@@ -29,6 +29,8 @@ import org.antlr.v4.runtime.ParserRuleContext
 
 
 internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDef?>() {
+
+    private val dexComposer: DexComposer = dexFile.composer
 
     private lateinit var classDef: ClassDef
 
@@ -43,9 +45,9 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
             accessFlags = accessFlags or flag.value
         }
 
-        val classTypeIndex  = dexFile.addOrGetTypeIDIndex(classType)
-        val superTypeIndex  = if (superType != null) dexFile.addOrGetTypeIDIndex(superType) else NO_INDEX
-        val sourceFileIndex = if (sourceFile != null) dexFile.addOrGetStringIDIndex(sourceFile) else NO_INDEX;
+        val classTypeIndex  = dexComposer.addOrGetTypeIDIndex(classType)
+        val superTypeIndex  = if (superType != null) dexComposer.addOrGetTypeIDIndex(superType) else NO_INDEX
+        val sourceFileIndex = if (sourceFile != null) dexComposer.addOrGetStringIDIndex(sourceFile) else NO_INDEX;
 
         classDef = ClassDef.of(classTypeIndex,
                                accessFlags,
@@ -53,7 +55,7 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
                                sourceFileIndex);
 
         ctx.sInterface().forEach {
-            classDef.interfaces.addType(dexFile.addOrGetTypeIDIndex(it.name.text))
+            classDef.interfaces.addType(dexComposer.addOrGetTypeIDIndex(it.name.text))
         }
 
         val annotationDirectory = classDef.annotationsDirectory
@@ -75,14 +77,14 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
             val annotationValue = parseAnnotationValueContext(sAnnotationValueContext)
             if (annotationValue != null) {
                 val element =
-                    AnnotationElement.of(dexFile.addOrGetStringIDIndex(sAnnotationKeyNameContext.text),
+                    AnnotationElement.of(dexComposer.addOrGetStringIDIndex(sAnnotationKeyNameContext.text),
                                          annotationValue)
                 annotationElements.add(element)
             }
         }
 
         val annotationType       = ctx.OBJECT_TYPE().text
-        val annotationTypeIndex  = dexFile.addOrGetTypeIDIndex(annotationType)
+        val annotationTypeIndex  = dexComposer.addOrGetTypeIDIndex(annotationType)
         val annotationVisibility = AnnotationVisibility.of(ctx.ANN_VISIBLE().text)
 
         val encodedAnnotationValue = EncodedAnnotationValue.of(annotationTypeIndex, *annotationElements.toTypedArray())
@@ -99,13 +101,13 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val type = fieldElements[1]
         val accessFlags = collectAccessFlags(ctx.sAccList())
 
-        val fieldIDIndex = dexFile.addOrGetFieldID(classType, name, type);
+        val fieldIDIndex = dexComposer.addOrGetFieldID(classType, name, type);
         val field = EncodedField.of(fieldIDIndex, accessFlags);
 
         classDef.addField(dexFile, field)
 
         if (field.isStatic && ctx.sBaseValue() != null) {
-            val staticValue = EncodedValueParser.parseBaseValue(ctx.sBaseValue(), dexFile)
+            val staticValue = EncodedValueParser.parseBaseValue(ctx.sBaseValue(), dexComposer)
 
             classDef.setStaticValue(dexFile, field, staticValue)
         }
@@ -125,10 +127,10 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val accessFlags = collectAccessFlags(ctx.sAccList())
 
         val methodIDIndex =
-            dexFile.addOrGetMethodID(classType,
-                                     name,
-                                     parameterTypes,
-                                     returnType)
+            dexComposer.addOrGetMethodID(classType,
+                                         name,
+                                         parameterTypes,
+                                         returnType)
 
         val method = EncodedMethod.of(methodIDIndex, accessFlags);
 
@@ -182,7 +184,7 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
                             val (classType, methodName, descriptor) = parseMethodType(methodType)
                             val (_, parameterTypes, returnType) = parseMethodObj(descriptor)
 
-                            val methodID = dexFile.addOrGetMethodID(classType, methodName, parameterTypes, returnType)
+                            val methodID = dexComposer.addOrGetMethodID(classType, methodName, parameterTypes, returnType)
 
                             val regs = intArrayOf(c.REGISTER(0).text.substring(1).toInt())
                             DexInstructions.invokeDirect(methodID, *regs)
@@ -239,7 +241,7 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
             RULE_sBaseValue -> {
                 val baseValueContext = t as SBaseValueContext
-                return EncodedValueParser.parseBaseValue(baseValueContext, dexFile)
+                return EncodedValueParser.parseBaseValue(baseValueContext, dexComposer)
             }
         }
 

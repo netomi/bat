@@ -125,7 +125,6 @@ class MethodHandle private constructor(_methodHandleTypeValue: Int = -1, _fieldO
 
     companion object {
         fun of(methodHandleType: MethodHandleType, fieldOrMethodId: Int): MethodHandle {
-            Objects.requireNonNull(methodHandleType, "methodHandleType must not be null")
             return of(methodHandleType.value, fieldOrMethodId)
         }
 

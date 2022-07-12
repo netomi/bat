@@ -30,6 +30,8 @@ internal interface ReferencedIDVisitor {
     fun visitFieldID(dexFile: DexFile, accessor: IDAccessor) {}
 
     fun visitMethodID(dexFile: DexFile, accessor: IDAccessor) {}
+
+    fun visitMethodHandle(dexFile: DexFile, accessor: IDAccessor) {}
 }
 
 internal interface IDAccessor {

@@ -138,84 +138,84 @@ class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor 
         }
     }
 
-        private fun readFieldIDs(header: DexHeader, dexFile: DexFile) {
-            input.offset = header.fieldIDsOffset
+    private fun readFieldIDs(header: DexHeader, dexFile: DexFile) {
+        input.offset = header.fieldIDsOffset
+        dexFile.apply {
+            fieldIDs.clear()
+            fieldIDs.ensureCapacity(header.fieldIDsSize)
+            for (i in 0 until header.fieldIDsSize) {
+                val fieldIDItem = FieldID.readContent(input)
+                fieldIDs.add(i, fieldIDItem)
+            }
+        }
+    }
+
+    private fun readMethodIDs(header: DexHeader, dexFile: DexFile) {
+        input.offset = header.methodIDsOffset
+        dexFile.apply {
+            methodIDs.clear()
+            methodIDs.ensureCapacity(header.methodIDsSize)
+            for (i in 0 until header.methodIDsSize) {
+                val methodIDItem = MethodID.readContent(input)
+                methodIDs.add(i, methodIDItem)
+            }
+        }
+    }
+
+    private fun readClassDefs(header: DexHeader, dexFile: DexFile) {
+        input.offset = header.classDefsOffset
+        dexFile.apply {
+            classDefs.clear()
+            classDefs.ensureCapacity(header.classDefsSize)
+            for (i in 0 until header.classDefsSize) {
+                val classDefItem = ClassDef.readContent(input)
+                classDefs.add(i, classDefItem)
+            }
+        }
+    }
+
+    private fun readCallSiteIDs(mapList: MapList, dexFile: DexFile) {
+        val mapItem: MapItem? = mapList.getMapItemByType(TYPE_CALL_SITE_ID_ITEM)
+        if (mapItem != null) {
+            input.offset = mapItem.offset
             dexFile.apply {
-                fieldIDs.clear()
-                fieldIDs.ensureCapacity(header.fieldIDsSize)
-                for (i in 0 until header.fieldIDsSize) {
-                    val fieldIDItem = FieldID.readContent(input)
-                    fieldIDs.add(i, fieldIDItem)
+                callSiteIDs.clear()
+                callSiteIDs.ensureCapacity(mapItem.size)
+                for (i in 0 until mapItem.size) {
+                    val callSiteIDItem = CallSiteID.readContent(input)
+                    callSiteIDs.add(i, callSiteIDItem)
                 }
             }
         }
+    }
 
-        private fun readMethodIDs(header: DexHeader, dexFile: DexFile) {
-            input.offset = header.methodIDsOffset
+    private fun readMethodHandles(mapList: MapList, dexFile: DexFile) {
+        val mapItem: MapItem? = mapList.getMapItemByType(TYPE_METHOD_HANDLE_ITEM)
+        if (mapItem != null) {
+            input.offset = mapItem.offset
             dexFile.apply {
-                methodIDs.clear()
-                methodIDs.ensureCapacity(header.methodIDsSize)
-                for (i in 0 until header.methodIDsSize) {
-                    val methodIDItem = MethodID.readContent(input)
-                    methodIDs.add(i, methodIDItem)
+                methodHandles.clear()
+                methodHandles.ensureCapacity(mapItem.size)
+                for (i in 0 until mapItem.size) {
+                    val methodHandleItem = MethodHandle.readContent(input)
+                    methodHandles.add(i, methodHandleItem)
                 }
             }
         }
+    }
 
-        private fun readClassDefs(header: DexHeader, dexFile: DexFile) {
-            input.offset = header.classDefsOffset
-            dexFile.apply {
-                classDefs.clear()
-                classDefs.ensureCapacity(header.classDefsSize)
-                for (i in 0 until header.classDefsSize) {
-                    val classDefItem = ClassDef.readContent(input)
-                    classDefs.add(i, classDefItem)
-                }
+    private fun readLinkedDataItems(dexFile: DexFile) {
+        dexFile.dataItemsAccept(object : DataItemVisitor {
+            override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {
+                dataItem.readLinkedDataItems(input)
             }
-        }
+        })
+    }
 
-        private fun readCallSiteIDs(mapList: MapList, dexFile: DexFile) {
-            val mapItem: MapItem? = mapList.getMapItemByType(TYPE_CALL_SITE_ID_ITEM)
-            if (mapItem != null) {
-                input.offset = mapItem.offset
-                dexFile.apply {
-                    callSiteIDs.clear()
-                    callSiteIDs.ensureCapacity(mapItem.size)
-                    for (i in 0 until mapItem.size) {
-                        val callSiteIDItem = CallSiteID.readContent(input)
-                        callSiteIDs.add(i, callSiteIDItem)
-                    }
-                }
-            }
-        }
-
-        private fun readMethodHandles(mapList: MapList, dexFile: DexFile) {
-            val mapItem: MapItem? = mapList.getMapItemByType(TYPE_METHOD_HANDLE_ITEM)
-            if (mapItem != null) {
-                input.offset = mapItem.offset
-                dexFile.apply {
-                    methodHandles.clear()
-                    methodHandles.ensureCapacity(mapItem.size)
-                    for (i in 0 until mapItem.size) {
-                        val methodHandleItem = MethodHandle.readContent(input)
-                        methodHandles.add(i, methodHandleItem)
-                    }
-                }
-            }
-        }
-
-        private fun readLinkedDataItems(dexFile: DexFile) {
-            dexFile.dataItemsAccept(object : DataItemVisitor {
-                override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {
-                    dataItem.readLinkedDataItems(input)
-                }
-            })
-        }
-
-        private fun readLinkData(header: DexHeader): ByteArray {
-            val linkData = ByteArray(header.linkSize)
-            input.offset = header.linkOffset
-            input.readFully(linkData)
-            return linkData
-        }
+    private fun readLinkData(header: DexHeader): ByteArray {
+        val linkData = ByteArray(header.linkSize)
+        input.offset = header.linkOffset
+        input.readFully(linkData)
+        return linkData
+    }
 }

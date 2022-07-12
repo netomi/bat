@@ -60,10 +60,6 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
         typeList.add(typeIDIndex)
     }
 
-    fun addType(dexFile: DexFile, type: String) {
-        addType(dexFile.addOrGetTypeIDIndex(type))
-    }
-
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)
         val size = input.readUnsignedInt().toInt()
@@ -121,11 +117,6 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
          */
         fun empty(): TypeList {
             return TypeList()
-        }
-
-        fun of(dexFile: DexFile, types: List<String>): TypeList {
-            val typeIndexList = types.map { dexFile.addOrGetTypeIDIndex(it) }
-            return of(*typeIndexList.toIntArray())
         }
 
         /**

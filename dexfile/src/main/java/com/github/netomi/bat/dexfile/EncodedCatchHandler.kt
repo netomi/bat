@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
@@ -69,6 +70,10 @@ class EncodedCatchHandler private constructor(
         if (writtenSize <= 0) {
             output.writeUleb128(catchAllAddr)
         }
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        handlers.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
     override fun equals(other: Any?): Boolean {

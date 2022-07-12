@@ -22,6 +22,8 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Preconditions
 import java.util.*
 import kotlin.collections.ArrayList
@@ -71,6 +73,11 @@ data class EncodedAnnotationValue internal constructor(
         visitor.visitAnnotationValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitTypeID(dexFile, PropertyAccessor(this::typeIndex))
+        elements.forEach { it.referencedIDsAccept(dexFile, visitor) }
+    }
+
     fun annotationElementsAccept(dexFile: DexFile, visitor: AnnotationElementVisitor) {
         for (element in elements) {
             element.accept(dexFile, visitor)
@@ -113,6 +120,11 @@ data class AnnotationElement private constructor(
         visitor.visitAnnotationElement(dexFile, this)
     }
 
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        visitor.visitStringID(dexFile, PropertyAccessor(this::nameIndex))
+        value.referencedIDsAccept(dexFile, visitor)
+    }
+
     override fun toString(): String {
         return "AnnotationElement[nameIndex=${nameIndex},value=${value}]"
     }
@@ -120,7 +132,6 @@ data class AnnotationElement private constructor(
     companion object {
         fun of(nameIndex: Int, value: EncodedValue): AnnotationElement {
             Preconditions.checkArgument(nameIndex >= 0, "nameIndex must not be negative")
-            Objects.requireNonNull(value, "value must not be null")
             return AnnotationElement(nameIndex, value)
         }
 

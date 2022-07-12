@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
 
 /**
@@ -45,6 +46,8 @@ data class EncodedByteValue internal constructor(var value: Byte = 0.toByte()) :
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitByteValue(dexFile, this)
     }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
 
     override fun toString(): String {
         return "EncodedByteValue[value=0x%02x]".format(value)
@@ -82,6 +85,8 @@ data class EncodedIntValue internal constructor(var value: Int = 0) : EncodedVal
         visitor.visitIntValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
+
     override fun toString(): String {
         return "EncodedIntValue[value=${value}]"
     }
@@ -118,6 +123,8 @@ data class EncodedCharValue internal constructor(var value: Char = 0.toChar()) :
         visitor.visitCharValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
+
     override fun toString(): String {
         return "EncodedCharValue[value=%d,\'%c\']".format(value.code, value)
     }
@@ -151,6 +158,8 @@ data class EncodedBooleanValue internal constructor(var value: Boolean = false) 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitBooleanValue(dexFile, this)
     }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
 
     override fun toString(): String {
         return "EncodedBooleanValue[value=${value}]"
@@ -188,6 +197,8 @@ data class EncodedShortValue internal constructor(var value: Short = 0.toShort()
         visitor.visitShortValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
+
     override fun toString(): String {
         return "EncodedShortValue[value=${value}]"
     }
@@ -223,6 +234,8 @@ data class EncodedDoubleValue internal constructor(var value: Double = 0.0) : En
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitDoubleValue(dexFile, this)
     }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
 
     override fun toString(): String {
         return "EncodedDoubleValue[value=%f]".format(value)
@@ -260,6 +273,8 @@ data class EncodedFloatValue internal constructor(var value: Float = 0f) : Encod
         visitor.visitFloatValue(dexFile, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
+
     override fun toString(): String {
         return "EncodedFloatValue[value=%f]".format(value)
     }
@@ -295,6 +310,8 @@ data class EncodedLongValue internal constructor(var value: Long = 0) : EncodedV
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
         visitor.visitLongValue(dexFile, this)
     }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
 
     override fun toString(): String {
         return "EncodedLongValue[value=${value}]"

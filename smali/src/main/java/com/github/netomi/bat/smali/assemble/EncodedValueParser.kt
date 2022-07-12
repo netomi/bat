@@ -16,7 +16,7 @@
 
 package com.github.netomi.bat.smali.assemble
 
-import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser
@@ -26,7 +26,7 @@ import org.antlr.v4.runtime.tree.TerminalNode
 
 object EncodedValueParser {
 
-    fun parseBaseValue(ctx: SmaliParser.SBaseValueContext, dexFile: DexFile): EncodedValue? {
+    fun parseBaseValue(ctx: SmaliParser.SBaseValueContext, dexComposer: DexComposer): EncodedValue? {
         val value: Token = if (ctx.childCount == 1) {
             val tn = ctx.getChild(0) as TerminalNode
             tn.symbol
@@ -39,7 +39,7 @@ object EncodedValueParser {
         }
 
         return when (value.type) {
-            SmaliLexer.STRING ->        EncodedStringValue.of(dexFile.addOrGetStringIDIndex(Strings.unescapeJavaString(value.text.removeSurrounding("\""))))
+            SmaliLexer.STRING ->        EncodedStringValue.of(dexComposer.addOrGetStringIDIndex(Strings.unescapeJavaString(value.text.removeSurrounding("\""))))
             SmaliLexer.BOOLEAN ->       EncodedBooleanValue.of("true" == value.text)
             SmaliLexer.BYTE ->          EncodedByteValue.of(java.lang.Byte.decode(value.text.removeSuffix("t")))
             SmaliLexer.SHORT ->         EncodedShortValue.of(java.lang.Short.decode(value.text.removeSuffix("s")))
@@ -53,7 +53,7 @@ object EncodedValueParser {
             SmaliLexer.DOUBLE_INFINITY,
             SmaliLexer.DOUBLE_NAN ->    EncodedDoubleValue.of(value.text.toDouble())
             SmaliLexer.METHOD_FULL ->   null //value.text
-            SmaliLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexFile.addOrGetTypeIDIndex(value.text))
+            SmaliLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexComposer.addOrGetTypeIDIndex(value.text))
             SmaliLexer.NULL ->          EncodedNullValue
             SmaliLexer.FIELD_FULL ->    null // value.text
             else -> null

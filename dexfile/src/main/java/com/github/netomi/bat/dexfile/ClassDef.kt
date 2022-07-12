@@ -255,7 +255,10 @@ class ClassDef private constructor(
             visitor.visitStringID(dexFile, PropertyAccessor(this::sourceFileIndex))
         }
 
+        interfaces.referencedIDsAccept(dexFile, visitor)
         classData.referencedIDsAccept(dexFile, visitor)
+        staticValues.referencedIDsAccept(dexFile, visitor)
+        // TODO: visit AnnotationsDirectory
     }
 
     override fun toString(): String {

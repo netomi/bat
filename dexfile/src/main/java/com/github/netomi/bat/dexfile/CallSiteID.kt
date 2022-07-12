@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
 
 /**
@@ -67,6 +68,10 @@ class CallSiteID private constructor() : DataItem() {
         visitor.visitCallSite(dexFile, this, callSite)
     }
 
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        callSite.referencedIDsAccept(dexFile, visitor)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -86,7 +91,6 @@ class CallSiteID private constructor() : DataItem() {
 
     companion object {
         fun of(callSite: CallSite): CallSiteID {
-            Objects.requireNonNull(callSite, "callSite must not be null")
             return CallSiteID(callSite)
         }
 
