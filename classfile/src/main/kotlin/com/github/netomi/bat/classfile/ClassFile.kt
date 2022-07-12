@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.Classes
 import java.io.DataInput
 import java.io.IOException
+import java.util.*
 
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
@@ -32,8 +33,12 @@ class ClassFile internal constructor() {
         private set
     var majorVersion = 0
         private set
-    var accessFlags: AccessFlags = AccessFlags(0, AccessFlagTarget.CLASS)
+    var accessFlags: Int = 0
         private set
+    val visibility: Visibility
+        get() = Visibility.of(accessFlags)
+    val modifiers: EnumSet<AccessFlag>
+        get() = accessFlagModifiers(accessFlags, AccessFlagTarget.CLASS)
     var thisClassIndex = -1
         private set
     var superClassIndex = -1
@@ -83,7 +88,7 @@ class ClassFile internal constructor() {
         minorVersion = input.readUnsignedShort()
         majorVersion = input.readUnsignedShort()
         cp.read(input)
-        accessFlags     = AccessFlags(input.readUnsignedShort(), AccessFlagTarget.CLASS)
+        accessFlags     = input.readUnsignedShort()
         thisClassIndex  = input.readUnsignedShort()
         superClassIndex = input.readUnsignedShort()
 

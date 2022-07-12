@@ -45,16 +45,16 @@ class ClassFilePrinter :
 
     override fun visitClassFile(classFile: ClassFile) {
 
-        val externalModifiers = classFile.accessFlags.modifiers.filter { it != AccessFlag.SUPER }
-                                                               .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
+        val externalModifiers = classFile.modifiers.filter { it != AccessFlag.SUPER }
+                                                   .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
 
         printer.println("%s class %s".format(externalModifiers, classFile.externalClassName))
         printer.levelUp()
         printer.println("minor version: " + classFile.minorVersion)
         printer.println("major version: " + classFile.majorVersion)
 
-        val modifiers = classFile.accessFlags.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
-        printer.println("flags: (0x%04x) %s".format(classFile.accessFlags.rawFlags, modifiers))
+        val modifiers = classFile.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
+        printer.println("flags: (0x%04x) %s".format(classFile.accessFlags, modifiers))
 
         printer.println("this_class: #%-29d // %s".format(classFile.thisClassIndex,   classFile.className))
         printer.println("super_class: #%-28d // %s".format(classFile.superClassIndex, classFile.superClassName))
@@ -168,7 +168,7 @@ class ClassFilePrinter :
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
-        val externalModifiers = field.accessFlags.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
+        val externalModifiers = field.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
         val externalType = Classes.externalTypeFromType(field.descriptor(classFile))
         printer.println("%s %s %s;".format(externalModifiers, externalType, field.name(classFile)))
 
@@ -176,8 +176,8 @@ class ClassFilePrinter :
 
         printer.println("descriptor: %s".format(field.descriptor(classFile)))
 
-        val modifiers = field.accessFlags.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
-        printer.println("flags: (0x%04x) %s".format(field.accessFlags.rawFlags, modifiers))
+        val modifiers = field.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
+        printer.println("flags: (0x%04x) %s".format(field.accessFlags, modifiers))
 
         field.attributesAccept(classFile, this)
         printer.levelDown()
@@ -214,16 +214,13 @@ class ClassFilePrinter :
 
         printer.levelUp()
 
-        attribute.annotations.forEachIndexed {
-                index, annotation ->
+        attribute.annotations.forEachIndexed { index, annotation ->
             printer.println("%2d: #%d()".format(index, annotation.typeIndex))
             printer.levelUp()
             printer.println(Classes.externalTypeFromType(annotation.type(cp)))
 
             printer.levelUp()
-            annotation.elementValues.forEachIndexed {
-                index, (elementName, elementValue) ->
-
+            annotation.elementValues.forEachIndexed { _, (elementName, elementValue) ->
                 printer.print("%s=".format(cp.getString(elementName)))
                 elementValue.accept(classFile, annotation, 0, null, this)
                 printer.println()
@@ -253,9 +250,9 @@ class ClassFilePrinter :
 
     override fun visitArrayElementValue(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, elementValue: ArrayElementValue) {
         printer.print("[")
-        elementValue.elementValues.forEachIndexed { index, ev ->
+        elementValue.elementValues.forEachIndexed { idx, ev ->
             ev.accept(classFile, annotation, index, null, this)
-            if (index < elementValue.elementValues.size - 1) printer.print(",")
+            if (idx < elementValue.elementValues.size - 1) printer.print(",")
         }
         printer.print("]")
     }

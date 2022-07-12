@@ -18,11 +18,19 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.attribute.Attribute
 import java.io.DataInput
 import java.io.IOException
+import java.util.*
 
 abstract class Member {
-    var accessFlags: AccessFlags = AccessFlags(0, accessFlagTarget)
+    var accessFlags: Int = 0
+        private set
+    val visibility: Visibility
+        get() = Visibility.of(accessFlags)
+    val modifiers: EnumSet<AccessFlag>
+        get() = accessFlagModifiers(accessFlags, accessFlagTarget)
     var nameIndex: Int = 0
+        private set
     var descriptorIndex: Int = 0
+        private set
 
     protected val attributes = mutableListOf<Attribute>()
 
@@ -38,7 +46,7 @@ abstract class Member {
 
     @Throws(IOException::class)
     protected fun read(input: DataInput, constantPool: ConstantPool) {
-        accessFlags     = AccessFlags(input.readUnsignedShort(), accessFlagTarget)
+        accessFlags     = input.readUnsignedShort()
         nameIndex       = input.readUnsignedShort()
         descriptorIndex = input.readUnsignedShort()
 
