@@ -17,17 +17,18 @@ package com.github.netomi.bat.dexfile
 
 import java.util.*
 
-enum class FieldModifier(val flagValue: Int) {
-    STATIC   (ACC_STATIC),
-    FINAL    (ACC_FINAL),
-    VOLATILE (ACC_VOLATILE),
-    TRANSIENT(ACC_TRANSIENT),
-    SYNTHETIC(ACC_SYNTHETIC),
-    ENUM     (ACC_ENUM);
+enum class ClassModifier(val flagValue: Int) {
+    STATIC    (ACC_STATIC),
+    FINAL     (ACC_FINAL),
+    INTERFACE (ACC_INTERFACE),
+    ABSTRACT  (ACC_ABSTRACT),
+    SYNTHETIC (ACC_SYNTHETIC),
+    ANNOTATION(ACC_ANNOTATION),
+    ENUM      (ACC_ENUM);
 
     companion object {
-        fun setOf(accessFlags: Int): EnumSet<FieldModifier> {
-            val set = EnumSet.noneOf(FieldModifier::class.java)
+        fun setOf(accessFlags: Int): EnumSet<ClassModifier> {
+            val set = EnumSet.noneOf(ClassModifier::class.java)
             for (modifier in values()) {
                 if (accessFlags and modifier.flagValue != 0) {
                     set.add(modifier)

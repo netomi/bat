@@ -31,7 +31,6 @@ enum class MethodModifier(val flagValue: Int) {
     DECLARED_SYNCHRONIZED(ACC_DECLARED_SYNCHRONIZED);
 
     companion object {
-        @JvmStatic
         fun setOf(accessFlags: Int): EnumSet<MethodModifier> {
             val set = EnumSet.noneOf(MethodModifier::class.java)
             for (modifier in values()) {

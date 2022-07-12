@@ -23,6 +23,7 @@ import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.Classes
 import com.github.netomi.bat.util.Preconditions
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -52,6 +53,9 @@ class ClassDef private constructor(
 
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
+
+    val modifiers: EnumSet<ClassModifier>
+        get() = ClassModifier.setOf(accessFlags)
 
     var superClassIndex: Int = _superClassIndex
         internal set
