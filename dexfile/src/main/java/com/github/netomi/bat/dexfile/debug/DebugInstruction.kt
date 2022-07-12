@@ -21,6 +21,8 @@ import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
 
 /**
@@ -33,6 +35,8 @@ abstract class DebugInstruction protected constructor(val opcode: Byte) : DexCon
     }
 
     abstract fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor)
+
+    internal open fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {}
 
     companion object {
         const val DBG_END_SEQUENCE:         Byte = 0x00
@@ -308,30 +312,49 @@ object DebugSetEpilogueBegin : DebugInstruction(DBG_SET_EPILOGUE_BEGIN) {
 /**
  * Represents a debug instruction that sets associated source file for subsequent line number entries.
  */
-data class DebugSetFile internal constructor(private var _nameIndex: Int = 0) : DebugInstruction(DBG_SET_FILE) {
+class DebugSetFile internal constructor(_nameIndex: Int = 0) : DebugInstruction(DBG_SET_FILE) {
 
-    val nameIndex: Int
-        get() = _nameIndex
+    var nameIndex: Int = _nameIndex
+        internal set
 
     fun name(dexFile: DexFile): String? {
         return dexFile.getStringNullable(nameIndex)
     }
 
     override fun read(input: DexDataInput) {
-        _nameIndex = input.readUleb128p1()
+        nameIndex = input.readUleb128p1()
     }
 
     override fun write(output: DexDataOutput) {
         output.writeByte(opcode)
-        output.writeUleb128p1(_nameIndex)
+        output.writeUleb128p1(nameIndex)
     }
 
     override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitSetFile(dexFile, debugInfo, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        if (nameIndex != NO_INDEX) {
+            visitor.visitStringID(dexFile, PropertyAccessor(this::nameIndex))
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        val o = other as DebugSetFile
+
+        return nameIndex == o.nameIndex
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(nameIndex)
+    }
+
     override fun toString(): String {
-        return "DebugSetFile[nameIndex=${_nameIndex}]"
+        return "DebugSetFile[nameIndex=${nameIndex}]"
     }
 
     companion object {
@@ -377,9 +400,9 @@ open class DebugStartLocal : DebugInstruction {
     var registerNum = 0
         protected set
     var nameIndex = 0
-        protected set
+        internal set
     var typeIndex = 0
-        protected set
+        internal set
 
     internal constructor() : this(DBG_START_LOCAL)
 
@@ -416,6 +439,16 @@ open class DebugStartLocal : DebugInstruction {
         visitor.visitStartLocal(dexFile, debugInfo, this)
     }
 
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        if (nameIndex != NO_INDEX) {
+            visitor.visitStringID(dexFile, PropertyAccessor(this::nameIndex))
+        }
+
+        if (typeIndex != NO_INDEX) {
+            visitor.visitTypeID(dexFile, PropertyAccessor(this::typeIndex))
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
@@ -448,7 +481,7 @@ open class DebugStartLocal : DebugInstruction {
 class DebugStartLocalExtended : DebugStartLocal {
 
     var sigIndex = 0
-        private set
+        internal set
 
     internal constructor() : super(DBG_START_LOCAL_EXTENDED)
 
@@ -472,6 +505,14 @@ class DebugStartLocalExtended : DebugStartLocal {
 
     override fun accept(dexFile: DexFile, debugInfo: DebugInfo, visitor: DebugSequenceVisitor) {
         visitor.visitStartLocalExtended(dexFile, debugInfo, this)
+    }
+
+    override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        super.referencedIDsAccept(dexFile, visitor)
+
+        if (sigIndex != NO_INDEX) {
+            visitor.visitStringID(dexFile, PropertyAccessor(this::sigIndex))
+        }
     }
 
     override fun equals(other: Any?): Boolean {

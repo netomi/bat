@@ -22,7 +22,10 @@ import com.github.netomi.bat.dexfile.TYPE_DEBUG_INFO_ITEM
 import com.github.netomi.bat.dexfile.debug.DebugInstruction.Companion.readInstruction
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.IntArray
 import java.util.*
 import kotlin.collections.ArrayList
@@ -92,6 +95,15 @@ class DebugInfo private constructor() : DataItem() {
         for (debugInstruction in debugSequence) {
             debugInstruction.accept(dexFile, this, visitor)
         }
+    }
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        val size = parameterNames.size()
+        for (i in 0 until size) {
+            visitor.visitStringID(dexFile, ArrayElementAccessor(parameterNames, i))
+        }
+
+        debugSequence.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
     override fun equals(other: Any?): Boolean {
