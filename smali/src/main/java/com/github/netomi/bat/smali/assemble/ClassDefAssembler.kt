@@ -200,7 +200,6 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
                 }
             }
         }
-        println(instructions)
 
         val code = Code.of(registers, 1, 0)
 
