@@ -22,17 +22,22 @@ import com.github.netomi.bat.util.Primitives
 import com.google.common.hash.Hashing
 import java.io.InputStream
 
-class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor {
+class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFileVisitor {
 
-    private val input:         DexDataInput = DexDataInput(`is`)
-    private val strictParsing: Boolean      = strict
+    private val input:          DexDataInput = DexDataInput(`is`)
+    private val verifyChecksum: Boolean      = verifyChecksum
 
     override fun visitDexFile(dexFile: DexFile) {
         read(dexFile)
 
-        if (strictParsing) {
+        if (verifyChecksum) {
             verifyChecksum(dexFile)
-            verifySignature(dexFile)
+            // signature verification seems to be disabled by libdex of
+            // the Android project (used by dexdump), and some dex files
+            // have invalid signature data (e.g. invoke-custom.dex taken
+            // from the dexdump source repo), so disable the check as it
+            // would lead to some false positives.
+            // verifySignature(dexFile)
         }
     }
 

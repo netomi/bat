@@ -41,7 +41,7 @@ class DisassemblerTest {
         javaClass.getResourceAsStream("/dex/$testFile").use { `is` ->
             println("checking $testFile...")
 
-            val reader = DexFileReader(`is`, false)
+            val reader = DexFileReader(`is`, true)
             val dexFile = DexFile()
             reader.visitDexFile(dexFile)
 
