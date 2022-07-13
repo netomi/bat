@@ -46,7 +46,7 @@ class Assembler(private val dexFile: DexFile) {
             Unit
         }
 
-        if (Files.isRegularFile(input)) {
+        if (Files.isDirectory(input)) {
             val inputFiles = Files.find(input, Int.MAX_VALUE, REGULAR_FILE)
 
             inputFiles.use {

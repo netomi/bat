@@ -27,8 +27,8 @@ import com.github.netomi.bat.classfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.Classes
 import com.github.netomi.bat.util.Strings
+import java.io.OutputStream
 import java.io.OutputStreamWriter
-import java.io.PrintStream
 import java.io.Writer
 import java.util.*
 
@@ -37,7 +37,7 @@ class ClassFilePrinter :
 {
     private val printer: IndentingPrinter
 
-    constructor(ps: PrintStream = System.out) : this(OutputStreamWriter(ps))
+    constructor(os: OutputStream = System.out) : this(OutputStreamWriter(os))
 
     constructor(writer: Writer) {
         this.printer = IndentingPrinter(writer, 2)

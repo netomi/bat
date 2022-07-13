@@ -15,10 +15,8 @@
  */
 package com.github.netomi.bat
 
-import com.github.netomi.bat.dexdump.DexDumpPrinter
-import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.io.DexFileReader
-import com.github.netomi.bat.dexfile.visitor.ClassNameFilter
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.io.ClassFilePrinter
 import picocli.CommandLine
 import java.io.*
 
@@ -26,13 +24,13 @@ import java.io.*
  * Command-line tool to dump dex files.
  */
 @CommandLine.Command(
-    name                 = "bat-dexdump",
-    description          = ["dumps dex files."],
+    name                 = "bat-classdump",
+    description          = ["dumps class files."],
     parameterListHeading = "%nParameters:%n",
     optionListHeading    = "%nOptions:%n")
-class DexDumpCommand : Runnable {
+class ClassDumpCommand : Runnable {
 
-    @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.dex)"])
+    @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.class / *.jar)"])
     private var inputFile: File? = null
 
     @CommandLine.Option(names = ["-o"], description = ["output file name (defaults to stdout)"])
@@ -40,12 +38,6 @@ class DexDumpCommand : Runnable {
 
     @CommandLine.Option(names = ["-a"], description = ["print annotations"])
     private var printAnnotations = false
-
-    @CommandLine.Option(names = ["-f"], description = ["print file summary"])
-    private var printFileSummary = false
-
-    @CommandLine.Option(names = ["-h"], description = ["print headers"])
-    private var printHeaders = false
 
     @CommandLine.Option(names = ["-c"], description = ["class filter"])
     private var classNameFilter: String? = null
@@ -55,20 +47,12 @@ class DexDumpCommand : Runnable {
             FileInputStream(this).use { `is` ->
                 val output = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
                 output.use { os ->
-                    val reader  = DexFileReader(`is`)
-                    val dexFile = DexFile()
-                    reader.visitDexFile(dexFile)
 
                     println("Processing '$name'...")
-                    println("Opened '$name', DEX version '${dexFile.dexFormat?.version}'")
 
-                    if (classNameFilter != null) {
-                        dexFile.classDefsAccept(
-                            ClassNameFilter(classNameFilter,
-                            DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations)))
-                    } else {
-                        dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations))
-                    }
+                    // TODO: currently supporting only single class files.
+                    val classFile = ClassFile.readClassFile(DataInputStream(inputStream()))
+                    classFile.accept(ClassFilePrinter(os))
                 }
             }
         }
@@ -78,7 +62,7 @@ class DexDumpCommand : Runnable {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val cmdLine = CommandLine(DexDumpCommand())
+            val cmdLine = CommandLine(ClassDumpCommand())
             cmdLine.execute(*args)
         }
     }

@@ -33,7 +33,7 @@ import kotlin.io.path.exists
  * Command-line tool to disassemble dex files in smali format.
  */
 @CommandLine.Command(
-    name                 = "smali",
+    name                 = "bat-smali",
     description          = ["assembles smali files to dex format."],
     parameterListHeading = "%nParameters:%n",
     optionListHeading    = "%nOptions:%n")
