@@ -51,7 +51,7 @@ class ClassDumpCommand : Runnable {
                     println("Processing '$name'...")
 
                     // TODO: currently supporting only single class files.
-                    val classFile = ClassFile.readClassFile(DataInputStream(inputStream()))
+                    val classFile = ClassFile.readClassFile(DataInputStream(`is`))
                     classFile.accept(ClassFilePrinter(os))
                 }
             }
