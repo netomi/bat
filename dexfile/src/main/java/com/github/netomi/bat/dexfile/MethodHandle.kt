@@ -17,6 +17,8 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Preconditions
 import java.util.*
 
@@ -88,6 +90,14 @@ class MethodHandle private constructor(_methodHandleTypeValue: Int = -1, _fieldO
 
     override val isEmpty: Boolean
         get() = methodHandleTypeValue == -1
+
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+        if (methodHandleType.targetsField) {
+            visitor.visitFieldID(dexFile, PropertyAccessor(this::fieldOrMethodId))
+        } else {
+            visitor.visitMethodID(dexFile, PropertyAccessor(this::fieldOrMethodId))
+        }
+    }
 
     override fun read(input: DexDataInput) {
         input.skipAlignmentPadding(dataAlignment)

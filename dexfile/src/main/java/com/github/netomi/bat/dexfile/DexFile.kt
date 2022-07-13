@@ -292,6 +292,9 @@ class DexFile {
         for (callSiteIDItem in callSiteIDs) {
             callSiteIDItem.referencedIDsAccept(this, visitor)
         }
+        for (methodHandleItem in methodHandles) {
+            methodHandleItem.referencedIDsAccept(this, visitor)
+        }
     }
 
     internal fun refreshCaches() {
