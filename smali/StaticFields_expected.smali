@@ -2,7 +2,6 @@
 .super Ljava/lang/Object;
 .source "StaticFields.java"
 
-
 # static fields
 .field public static final test00_public_static_final_byte_42:B = 0x2at
 

@@ -17,20 +17,13 @@ package com.github.netomi.bat.smali
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
-import com.github.netomi.bat.io.OutputStreamFactory
 import com.github.netomi.bat.util.Arrays
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -72,28 +65,6 @@ class DisassemblerTest {
                     zipEntry = zipInputStream.nextEntry
                 }
             }
-        }
-    }
-
-    private class TestOutputStreamFactory : OutputStreamFactory {
-        private val outputStreamMap: MutableMap<String, ByteArrayOutputStream>
-
-        init {
-            outputStreamMap = TreeMap()
-        }
-
-        val classNames: Iterable<String>
-            get() = outputStreamMap.keys
-
-        fun getOutputStream(className: String): ByteArrayOutputStream? {
-            return outputStreamMap[className]
-        }
-
-        @Throws(IOException::class)
-        override fun createOutputStream(className: String): OutputStream {
-            val baos = ByteArrayOutputStream()
-            outputStreamMap[className] = baos
-            return baos
         }
     }
 

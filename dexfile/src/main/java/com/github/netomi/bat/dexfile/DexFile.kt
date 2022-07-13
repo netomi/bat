@@ -227,6 +227,10 @@ class DexFile {
         classDefs.forEachIndexed { index, classDef -> visitor.visitClassDef(this, index, classDef) }
     }
 
+    fun classDefAccept(className: String, visitor: ClassDefVisitor) {
+        getClassDef(className)?.accept(this, visitor)
+    }
+
     fun methodHandlesAccept(visitor: MethodHandleVisitor) {
         methodHandles.forEachIndexed { index, methodHandle -> visitor.visitMethodHandle(this, index, methodHandle) }
     }

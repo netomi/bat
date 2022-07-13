@@ -18,29 +18,46 @@ package com.github.netomi.bat.smali
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
-import com.github.netomi.bat.dexfile.io.DexFileWriter
-import com.github.netomi.bat.smali.disassemble.SmaliPrinter
+import com.github.netomi.bat.util.Arrays
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class AssemblerTest {
 
     @ParameterizedTest
     @MethodSource("smaliFiles")
     fun batchDisassemble(testFile: String) {
-        javaClass.getResourceAsStream("/smali/$testFile").use { `is` ->
+        javaClass.getResourceAsStream("/smali/$testFile")!!.use { `is` ->
             println("assembling $testFile...")
 
-            val dexFile = DexFile.of(DexFormat.FORMAT_035)
+            val baos = ByteArrayOutputStream()
+            `is`.copyTo(baos)
 
-            val classDef = Assembler(dexFile).assemble(`is`)
+            val dexFile  = DexFile.of(DexFormat.FORMAT_035)
+            val classDef = Assembler(dexFile).assemble(ByteArrayInputStream(baos.toByteArray()))
 
-            classDef.accept(dexFile, SmaliPrinter())
+            val className = classDef.getClassName(dexFile)
 
-            // just see if there are exceptions during writing for now.
-            dexFile.accept(DexFileWriter(ByteArrayOutputStream()))
+            val outputStreamFactory = TestOutputStreamFactory()
+            val disassembler = Disassembler(outputStreamFactory)
+            dexFile.classDefAccept(className, disassembler)
+
+            val expectedBytes = baos.toByteArray()
+            val actualBytes   = outputStreamFactory.getOutputStream(className)!!.toByteArray()
+
+            // testing purposes only.
+            if (!Arrays.equals(expectedBytes, actualBytes, expectedBytes.size)) {
+                Files.write(Paths.get("${className}_expected.smali"), expectedBytes)
+                Files.write(Paths.get("${className}_actual.smali"), actualBytes)
+            }
+
+            assertArrayEquals(expectedBytes, actualBytes)
         }
     }
 
