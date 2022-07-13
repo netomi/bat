@@ -79,10 +79,12 @@ implements   ClassDefVisitor,
             printer.println(".source \"" + sourceFile + "\"");
         }
 
-        classDef.interfaceListAccept(dexFile, (dexFile1, typeList) -> {
-            printer.println();
-            printer.println("# interfaces");
-            classDef.interfacesAccept(dexFile1, (df, tl, idx, type) -> printer.println(".implements " + type));
+        classDef.interfaceListAccept(dexFile, (df1, typeList) -> {
+            if (!typeList.isEmpty()) {
+                printer.println();
+                printer.println("# interfaces");
+                classDef.interfacesAccept(df1, (df2, tl, idx, type) -> printer.println(".implements " + type));
+            }
         });
 
         classDef.annotationsDirectoryAccept(dexFile, new ClassAnnotationSetVisitor(this));

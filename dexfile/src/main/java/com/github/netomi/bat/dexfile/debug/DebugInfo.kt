@@ -51,7 +51,7 @@ class DebugInfo private constructor() : DataItem() {
         get() = parameterNames.size()
 
     fun getParameterName(dexFile: DexFile, parameterIndex: Int): String? {
-        return dexFile.getString(parameterNames[parameterIndex])
+        return dexFile.getStringNullable(parameterNames[parameterIndex])
     }
 
     override val isEmpty: Boolean

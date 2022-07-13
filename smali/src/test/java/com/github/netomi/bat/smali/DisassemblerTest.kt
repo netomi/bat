@@ -41,7 +41,7 @@ class DisassemblerTest {
         javaClass.getResourceAsStream("/dex/$testFile").use { `is` ->
             println("checking $testFile...")
 
-            val reader = DexFileReader(`is`)
+            val reader = DexFileReader(`is`, false)
             val dexFile = DexFile()
             reader.visitDexFile(dexFile)
 
@@ -51,7 +51,7 @@ class DisassemblerTest {
 
             val expectedArchive = testFile.replace(".dex".toRegex(), ".zip")
 
-            ZipInputStream(javaClass.getResourceAsStream("/dex/$expectedArchive")).use { zipInputStream ->
+            ZipInputStream(javaClass.getResourceAsStream("/dex/$expectedArchive")!!).use { zipInputStream ->
                 var zipEntry: ZipEntry? = zipInputStream.nextEntry
                 while (zipEntry != null) {
                     if (zipEntry.name.endsWith(".smali")) {
@@ -62,8 +62,8 @@ class DisassemblerTest {
 
                         // testing purposes only.
                         if (!Arrays.equals(expectedBytes, actualBytes, expectedBytes.size)) {
-                            Files.write(Paths.get("expected.smali"), expectedBytes)
-                            Files.write(Paths.get("actual.smali"), actualBytes)
+                            Files.write(Paths.get("${className}_expected.smali"), expectedBytes)
+                            Files.write(Paths.get("${className}_actual.smali"), actualBytes)
                         }
 
                         assertArrayEquals(expectedBytes, actualBytes)

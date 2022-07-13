@@ -100,7 +100,7 @@ class DexHeader private constructor() : DataItem() {
         input.skipBytes(32)
         endianTag = input.readUnsignedInt()
         if (endianTag == REVERSE_ENDIAN_CONSTANT) {
-            input.order(ByteOrder.LITTLE_ENDIAN)
+            input.order(ByteOrder.BIG_ENDIAN)
         }
 
         input.offset = 8

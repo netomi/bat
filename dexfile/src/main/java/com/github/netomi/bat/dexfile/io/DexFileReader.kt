@@ -24,13 +24,8 @@ import java.io.InputStream
 
 class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor {
 
-    private val input: DexDataInput
-    private val strictParsing: Boolean
-
-    init {
-        input = DexDataInput(`is`)
-        strictParsing = strict
-    }
+    private val input:         DexDataInput = DexDataInput(`is`)
+    private val strictParsing: Boolean      = strict
 
     override fun visitDexFile(dexFile: DexFile) {
         read(dexFile)
@@ -41,6 +36,7 @@ class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor 
         }
     }
 
+    @Suppress("UnstableApiUsage")
     private fun verifyChecksum(dexFile: DexFile) {
         assert(dexFile.header != null)
         val adlerHasher = Hashing.adler32().newHasher()
@@ -55,6 +51,7 @@ class DexFileReader(`is`: InputStream, strict: Boolean = true) : DexFileVisitor 
         }
     }
 
+    @Suppress("UnstableApiUsage")
     private fun verifySignature(dexFile: DexFile) {
         assert(dexFile.header != null)
         @Suppress("DEPRECATION")
