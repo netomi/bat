@@ -19,11 +19,7 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.io.IndentingPrinter
 
 internal class RegisterPrinter(code: Code) {
-    private val localRegisters: Int
-
-    init {
-        localRegisters = code.registersSize - code.insSize
-    }
+    private val localRegisters: Int = code.registersSize - code.insSize
 
     fun formatRegister(registerNum: Int): String {
         val registerPrefix = if (registerNum < localRegisters) "v" else "p"
