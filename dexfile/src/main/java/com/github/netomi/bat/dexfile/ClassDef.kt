@@ -250,14 +250,14 @@ class ClassDef private constructor(
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor(this::classIndex))
+        visitor.visitTypeID(dexFile, PropertyAccessor({ classIndex }, { classIndex = it }))
 
         if (superClassIndex != NO_INDEX) {
-            visitor.visitTypeID(dexFile, PropertyAccessor(this::superClassIndex))
+            visitor.visitTypeID(dexFile, PropertyAccessor({ superClassIndex }, { superClassIndex = it }))
         }
 
         if (sourceFileIndex != NO_INDEX) {
-            visitor.visitStringID(dexFile, PropertyAccessor(this::sourceFileIndex))
+            visitor.visitStringID(dexFile, PropertyAccessor({ sourceFileIndex }, { sourceFileIndex = it }))
         }
 
         interfaces.referencedIDsAccept(dexFile, visitor)

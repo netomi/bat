@@ -89,9 +89,9 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor(this::classIndex))
-        visitor.visitStringID(dexFile, PropertyAccessor(this::nameIndex))
-        visitor.visitProtoID(dexFile, PropertyAccessor(this::protoIndex))
+        visitor.visitTypeID(dexFile, PropertyAccessor({ classIndex }, { classIndex = it }))
+        visitor.visitStringID(dexFile, PropertyAccessor({ nameIndex }, { nameIndex = it }))
+        visitor.visitProtoID(dexFile, PropertyAccessor({ protoIndex }, { protoIndex = it }))
     }
 
     override fun equals(other: Any?): Boolean {

@@ -39,13 +39,14 @@ internal interface IDAccessor {
     fun set(value: Int)
 }
 
-internal class PropertyAccessor(private val property: KMutableProperty<Int>): IDAccessor {
+// do not use KMutableProperty as it would add a dependency to kotlin-reflect which we want to avoid
+internal class PropertyAccessor(private val getter: () -> Int, private val setter: (Int) -> Unit): IDAccessor {
     override fun get(): Int {
-        return property.getter.call()
+        return getter.invoke()
     }
 
     override fun set(value: Int) {
-        property.setter.call(value)
+        setter.invoke(value)
     }
 }
 

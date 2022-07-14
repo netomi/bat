@@ -54,7 +54,7 @@ class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() 
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitStringID(dexFile, PropertyAccessor(this::descriptorIndex))
+        visitor.visitStringID(dexFile, PropertyAccessor({ descriptorIndex }, { descriptorIndex = it }))
     }
 
     override fun equals(other: Any?): Boolean {

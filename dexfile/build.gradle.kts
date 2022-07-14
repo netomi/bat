@@ -11,7 +11,5 @@ tasks.test {
 dependencies {
     implementation(project(":core"))
 
-    implementation(kotlin("reflect"))
-
     testImplementation(kotlin("test"))
 }

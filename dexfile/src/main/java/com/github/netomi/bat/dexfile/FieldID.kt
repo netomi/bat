@@ -79,9 +79,9 @@ class FieldID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int 
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor(this::classIndex))
-        visitor.visitStringID(dexFile, PropertyAccessor(this::nameIndex))
-        visitor.visitTypeID(dexFile, PropertyAccessor(this::typeIndex))
+        visitor.visitTypeID(dexFile, PropertyAccessor({ classIndex }, { classIndex = it }))
+        visitor.visitStringID(dexFile, PropertyAccessor({ nameIndex }, { nameIndex = it }))
+        visitor.visitTypeID(dexFile, PropertyAccessor({ typeIndex }, { typeIndex = it }))
     }
 
     override fun equals(other: Any?): Boolean {

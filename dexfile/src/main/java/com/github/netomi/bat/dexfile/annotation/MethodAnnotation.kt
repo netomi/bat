@@ -72,7 +72,7 @@ class MethodAnnotation private constructor(_methodIndex: Int = NO_INDEX, _annota
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitMethodID(dexFile, PropertyAccessor(this::methodIndex))
+        visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
         annotationSet.referencedIDsAccept(dexFile, visitor)
     }
 

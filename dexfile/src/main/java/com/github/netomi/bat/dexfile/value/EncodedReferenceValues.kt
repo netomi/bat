@@ -53,7 +53,7 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitStringID(dexFile, PropertyAccessor(this::stringIndex))
+        visitor.visitStringID(dexFile, PropertyAccessor({ stringIndex }, { stringIndex = it }))
     }
 
     override fun toString(): String {
@@ -98,7 +98,7 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitFieldID(dexFile, PropertyAccessor(this::fieldIndex))
+        visitor.visitFieldID(dexFile, PropertyAccessor({ fieldIndex }, { fieldIndex = it }))
     }
 
     override fun toString(): String {
@@ -143,7 +143,7 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitMethodID(dexFile, PropertyAccessor(this::methodIndex))
+        visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
     }
 
     override fun toString(): String {
@@ -188,7 +188,7 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor(this::typeIndex))
+        visitor.visitTypeID(dexFile, PropertyAccessor({ typeIndex }, { typeIndex = it }))
     }
 
     override fun toString(): String {
@@ -233,7 +233,7 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitFieldID(dexFile, PropertyAccessor(this::fieldIndex))
+        visitor.visitFieldID(dexFile, PropertyAccessor({ fieldIndex }, { fieldIndex = it }))
     }
 
     override fun toString(): String {
@@ -278,7 +278,7 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitMethodHandle(dexFile, PropertyAccessor(this::handleIndex))
+        visitor.visitMethodHandle(dexFile, PropertyAccessor({ handleIndex }, { handleIndex = it }))
     }
 
     override fun toString(): String {
@@ -323,7 +323,7 @@ data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitProtoID(dexFile, PropertyAccessor(this::protoIndex))
+        visitor.visitProtoID(dexFile, PropertyAccessor({ protoIndex }, { protoIndex = it }))
     }
 
     override fun toString(): String {
