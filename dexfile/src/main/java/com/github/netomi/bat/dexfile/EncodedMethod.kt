@@ -180,7 +180,6 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
             return EncodedMethod(methodIndex, accessFlags)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput, lastIndex: Int): EncodedMethod {
             val encodedMethod = EncodedMethod()
             encodedMethod.read(input)

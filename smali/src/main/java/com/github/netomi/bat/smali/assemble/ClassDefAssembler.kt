@@ -94,7 +94,13 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
 
-        visitSInstructions(ctx.sInstruction(), method)
+        if (!method.isAbstract) {
+            visitSInstructions(ctx.sInstruction(), method)
+        } else {
+            if (ctx.sInstruction().isNotEmpty()) {
+                parserError(ctx, "abstract method containing code instructions")
+            }
+        }
 
         classDef.addMethod(dexFile, method)
 

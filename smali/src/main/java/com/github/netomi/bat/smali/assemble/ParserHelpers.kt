@@ -19,12 +19,33 @@ package com.github.netomi.bat.smali.assemble
 import com.github.netomi.bat.dexfile.DexAccessFlags
 import com.github.netomi.bat.smali.parser.SmaliParser
 import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.tree.ParseTree
 
 fun parserError(ctx: ParserRuleContext, message: String): Nothing {
     val lineNumber = ctx.getStart().line
     val column     = ctx.getStart().charPositionInLine
 
-    throw RuntimeException("$message at line: $lineNumber col: $column -> ${ctx.text}")
+    val list = mutableListOf<String>()
+    getParseContextText(ctx, list)
+    throw RuntimeException("$message at line: $lineNumber col: $column -> ${list.joinToString(" ")}")
+}
+
+private fun getParseContextText(ctx: ParserRuleContext, list: MutableList<String>) {
+    if (ctx.childCount == 0) list.add(ctx.text)
+    else {
+        for (child in ctx.children) {
+            getParseContextText(child, list)
+        }
+    }
+}
+
+private fun getParseContextText(node: ParseTree, list: MutableList<String>) {
+    if (node.childCount == 0) list.add(node.text)
+    else {
+        for (i in 0 until node.childCount) {
+            getParseContextText(node.getChild(i), list)
+        }
+    }
 }
 
 data class FieldInfo(val classType:String?, val name: String, val type: String)
