@@ -79,3 +79,23 @@ internal const val METHOD_HANDLE_TYPE_INVOKE_INSTANCE    = 0x05
 internal const val METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR = 0x06
 internal const val METHOD_HANDLE_TYPE_INVOKE_DIRECT      = 0x07
 internal const val METHOD_HANDLE_TYPE_INVOKE_INTERFACE   = 0x08
+
+// Encoded Value Types.
+internal const val VALUE_BYTE          = 0x00
+internal const val VALUE_SHORT         = 0x02
+internal const val VALUE_CHAR          = 0x03
+internal const val VALUE_INT           = 0x04
+internal const val VALUE_LONG          = 0x06
+internal const val VALUE_FLOAT         = 0x10
+internal const val VALUE_DOUBLE        = 0x11
+internal const val VALUE_METHOD_TYPE   = 0x15
+internal const val VALUE_METHOD_HANDLE = 0x16
+internal const val VALUE_STRING        = 0x17
+internal const val VALUE_TYPE          = 0x18
+internal const val VALUE_FIELD         = 0x19
+internal const val VALUE_METHOD        = 0x1a
+internal const val VALUE_ENUM          = 0x1b
+internal const val VALUE_ARRAY         = 0x1c
+internal const val VALUE_ANNOTATION    = 0x1d
+internal const val VALUE_NULL          = 0x1e
+internal const val VALUE_BOOLEAN       = 0x1f

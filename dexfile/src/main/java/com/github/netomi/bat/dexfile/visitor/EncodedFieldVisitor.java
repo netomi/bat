@@ -67,21 +67,21 @@ public interface EncodedFieldVisitor
 
         @Override
         public void visitAnyField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
-            for (EncodedFieldVisitor visitor : visitors()) {
+            for (EncodedFieldVisitor visitor : getVisitors()) {
                 visitor.visitAnyField(dexFile, classDef, index, field);
             }
         }
 
         @Override
         public void visitStaticField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
-            for (EncodedFieldVisitor visitor : visitors()) {
+            for (EncodedFieldVisitor visitor : getVisitors()) {
                 visitor.visitStaticField(dexFile, classDef, index, field);
             }
         }
 
         @Override
         public void visitInstanceField(DexFile dexFile, ClassDef classDef, int index, EncodedField field) {
-            for (EncodedFieldVisitor visitor : visitors()) {
+            for (EncodedFieldVisitor visitor : getVisitors()) {
                 visitor.visitInstanceField(dexFile, classDef, index, field);
             }
         }

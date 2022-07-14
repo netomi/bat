@@ -18,16 +18,15 @@ package com.github.netomi.bat.dexfile.value
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
-import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 
 /**
  * An class representing a null value inside a dex file.
  */
 object EncodedNullValue : EncodedValue() {
-    override val valueType: Int
-        get() = VALUE_NULL
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.NULL
 
     override fun readValue(input: DexDataInput, valueArg: Int) {}
 

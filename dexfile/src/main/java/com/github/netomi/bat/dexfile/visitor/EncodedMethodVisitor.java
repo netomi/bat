@@ -65,21 +65,21 @@ public interface EncodedMethodVisitor
 
         @Override
         public void visitAnyMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
-            for (EncodedMethodVisitor visitor : visitors()) {
+            for (EncodedMethodVisitor visitor : getVisitors()) {
                 visitor.visitAnyMethod(dexFile, classDef, index, method);
             }
         }
 
         @Override
         public void visitDirectMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
-            for (EncodedMethodVisitor visitor : visitors()) {
+            for (EncodedMethodVisitor visitor : getVisitors()) {
                 visitor.visitDirectMethod(dexFile, classDef, index, method);
             }
         }
 
         @Override
         public void visitVirtualMethod(DexFile dexFile, ClassDef classDef, int index, EncodedMethod method) {
-            for (EncodedMethodVisitor visitor : visitors()) {
+            for (EncodedMethodVisitor visitor : getVisitors()) {
                 visitor.visitVirtualMethod(dexFile, classDef, index, method);
             }
         }

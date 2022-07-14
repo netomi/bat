@@ -58,7 +58,7 @@ public interface MethodHandleVisitor
 
         @Override
         public void visitMethodHandle(DexFile dexFile, int index, MethodHandle methodHandle) {
-            for (MethodHandleVisitor visitor : visitors()) {
+            for (MethodHandleVisitor visitor : getVisitors()) {
                 visitor.visitMethodHandle(dexFile, index, methodHandle);
             }
         }

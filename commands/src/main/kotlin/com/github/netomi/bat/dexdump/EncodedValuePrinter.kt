@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexdump
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.*
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 
 internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer): EncodedValueVisitor {
 
@@ -29,7 +29,7 @@ internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer
     override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
         if (value.values.isNotEmpty()) {
             printer.print("{ ")
-            value.valuesAccept(dexFile, joinedByValueConsumer { _, _ -> printer.print(" ") })
+            value.valuesAccept(dexFile, joinedBy { _, _ -> printer.print(" ") })
             printer.print(" }")
         } else {
             printer.print("{ }")

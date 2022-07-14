@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile.visitor;
 
-import com.github.netomi.bat.dexfile.CallSite;
 import com.github.netomi.bat.dexfile.ClassDef;
 import com.github.netomi.bat.dexfile.DexFile;
 
@@ -37,7 +36,7 @@ public interface ClassDefVisitor
 
         @Override
         public void visitClassDef(DexFile dexFile, int index, ClassDef classDef) {
-            for (ClassDefVisitor visitor : visitors()) {
+            for (ClassDefVisitor visitor : getVisitors()) {
                 visitor.visitClassDef(dexFile, index, classDef);
             }
         }

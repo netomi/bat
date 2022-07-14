@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
 import com.github.netomi.bat.dexfile.value.EncodedValue;
 import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor;
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
 import com.github.netomi.bat.io.IndentingPrinter;
 import com.github.netomi.bat.util.Strings;

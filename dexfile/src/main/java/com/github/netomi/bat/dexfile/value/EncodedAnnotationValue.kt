@@ -21,11 +21,10 @@ import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Preconditions
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -35,8 +34,8 @@ data class EncodedAnnotationValue internal constructor(
     var typeIndex: Int                          = NO_INDEX,
     val elements:  ArrayList<AnnotationElement> = ArrayList(0)): EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_ANNOTATION
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.ANNOTATION
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getTypeID(typeIndex).getType(dexFile)

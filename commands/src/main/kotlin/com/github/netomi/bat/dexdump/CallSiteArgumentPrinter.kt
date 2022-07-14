@@ -17,7 +17,7 @@ package com.github.netomi.bat.dexdump
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.*
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 
 internal class CallSiteArgumentPrinter(private val printer: Mutf8Printer) : EncodedValueVisitor {
 

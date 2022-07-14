@@ -19,10 +19,8 @@ package com.github.netomi.bat.dexfile.value
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
-import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -30,8 +28,8 @@ import kotlin.collections.ArrayList
  */
 data class EncodedArrayValue internal constructor(val values: ArrayList<EncodedValue> = ArrayList(0)) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_ARRAY
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.ARRAY
 
     fun isEmpty(): Boolean {
         return values.isEmpty()

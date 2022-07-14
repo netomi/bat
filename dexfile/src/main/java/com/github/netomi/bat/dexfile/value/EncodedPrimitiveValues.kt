@@ -19,17 +19,16 @@ package com.github.netomi.bat.dexfile.value
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import java.util.*
 
 /**
  * A class representing a byte value inside a dex file.
  */
 data class EncodedByteValue internal constructor(var value: Byte = 0.toByte()) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_BYTE
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.BYTE
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = input.readByte()
@@ -66,8 +65,8 @@ data class EncodedByteValue internal constructor(var value: Byte = 0.toByte()) :
  */
 data class EncodedIntValue internal constructor(var value: Int = 0) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_INT
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.INT
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = input.readInt(valueArg + 1)
@@ -104,8 +103,8 @@ data class EncodedIntValue internal constructor(var value: Int = 0) : EncodedVal
  */
 data class EncodedCharValue internal constructor(var value: Char = 0.toChar()) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_CHAR
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.CHAR
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = input.readChar(valueArg + 1)
@@ -142,8 +141,8 @@ data class EncodedCharValue internal constructor(var value: Char = 0.toChar()) :
  */
 data class EncodedBooleanValue internal constructor(var value: Boolean = false) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_BOOLEAN
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.BOOLEAN
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = valueArg and 0x1 == 1
@@ -178,8 +177,8 @@ data class EncodedBooleanValue internal constructor(var value: Boolean = false) 
  */
 data class EncodedShortValue internal constructor(var value: Short = 0.toShort()) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_SHORT
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.SHORT
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = input.readShort(valueArg + 1)
@@ -216,8 +215,8 @@ data class EncodedShortValue internal constructor(var value: Short = 0.toShort()
  */
 data class EncodedDoubleValue internal constructor(var value: Double = 0.0) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_DOUBLE
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.DOUBLE
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = input.readDouble(valueArg + 1)
@@ -254,8 +253,8 @@ data class EncodedDoubleValue internal constructor(var value: Double = 0.0) : En
  */
 data class EncodedFloatValue internal constructor(var value: Float = 0f) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_FLOAT
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.FLOAT
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = input.readFloat(valueArg + 1)
@@ -292,8 +291,8 @@ data class EncodedFloatValue internal constructor(var value: Float = 0f) : Encod
  */
 data class EncodedLongValue internal constructor(var value: Long = 0) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_LONG
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.LONG
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         value = input.readLong(valueArg + 1)

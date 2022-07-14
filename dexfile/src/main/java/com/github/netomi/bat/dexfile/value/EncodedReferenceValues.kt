@@ -19,7 +19,7 @@ package com.github.netomi.bat.dexfile.value
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Preconditions
@@ -29,8 +29,8 @@ import com.github.netomi.bat.util.Preconditions
  */
 data class EncodedStringValue internal constructor(var stringIndex: Int = NO_INDEX) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_STRING
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.STRING
 
     fun getStringValue(dexFile: DexFile): String {
         return dexFile.getStringID(stringIndex).stringValue
@@ -74,8 +74,8 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
  */
 data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_FIELD
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.FIELD
 
     fun getFieldID(dexFile: DexFile): FieldID {
         return dexFile.getFieldID(fieldIndex)
@@ -119,8 +119,8 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
  */
 data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_INDEX) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_METHOD
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.METHOD
 
     fun getMethodID(dexFile: DexFile): MethodID {
         return dexFile.getMethodID(methodIndex)
@@ -164,8 +164,8 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
  */
 data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_TYPE
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.TYPE
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getTypeID(typeIndex).getType(dexFile)
@@ -209,8 +209,8 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
  */
 data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_ENUM
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.ENUM
 
     fun getFieldID(dexFile: DexFile): FieldID {
         return dexFile.getFieldID(fieldIndex)
@@ -254,8 +254,8 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
  */
 data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = NO_INDEX) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_METHOD_HANDLE
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.METHOD_HANDLE
 
     fun getMethodHandle(dexFile: DexFile): MethodHandle {
         return dexFile.getMethodHandle(handleIndex)
@@ -299,8 +299,8 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
  */
 data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_INDEX) : EncodedValue() {
 
-    override val valueType: Int
-        get() = VALUE_METHOD_TYPE
+    override val valueType: EncodedValueType
+        get() = EncodedValueType.METHOD_TYPE
 
     fun getProtoID(dexFile: DexFile): ProtoID {
         return dexFile.getProtoID(protoIndex)

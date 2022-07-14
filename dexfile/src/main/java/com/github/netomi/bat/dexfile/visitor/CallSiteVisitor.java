@@ -59,7 +59,7 @@ public interface CallSiteVisitor
 
         @Override
         public void visitCallSite(DexFile dexFile, int index, CallSite callSite) {
-            for (CallSiteVisitor visitor : visitors()) {
+            for (CallSiteVisitor visitor : getVisitors()) {
                 visitor.visitCallSite(dexFile, index, callSite);
             }
         }

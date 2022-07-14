@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.FieldModifier.Companion.setOf
 import com.github.netomi.bat.dexfile.Visibility.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.base.Preconditions

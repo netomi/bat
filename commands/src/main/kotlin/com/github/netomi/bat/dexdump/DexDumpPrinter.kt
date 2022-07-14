@@ -16,14 +16,8 @@
 package com.github.netomi.bat.dexdump
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.annotation.*
-import com.github.netomi.bat.dexfile.annotation.Annotation
-import com.github.netomi.bat.dexfile.debug.*
-import com.github.netomi.bat.dexfile.instruction.DexInstruction
-import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.value.*
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
-import com.github.netomi.bat.util.Primitives
 import java.io.OutputStream
 
 class DexDumpPrinter constructor(

@@ -60,7 +60,7 @@ public interface AnnotationVisitor
 
         @Override
         public void visitAnnotation(DexFile dexFile, ClassDef classDef, AnnotationSet annotationSet, int index, Annotation annotation) {
-            for (AnnotationVisitor visitor : visitors()) {
+            for (AnnotationVisitor visitor : getVisitors()) {
                 visitor.visitAnnotation(dexFile, classDef, annotationSet, index, annotation);
             }
         }

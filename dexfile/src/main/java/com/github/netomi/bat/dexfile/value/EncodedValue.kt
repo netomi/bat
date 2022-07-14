@@ -15,11 +15,11 @@
  */
 package com.github.netomi.bat.dexfile.value
 
-import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.io.DexFormatException
-import com.github.netomi.bat.dexfile.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Primitives
 
@@ -29,12 +29,12 @@ import com.github.netomi.bat.util.Primitives
  * @see [value encoding @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoding)
  */
 abstract class EncodedValue {
-    abstract val valueType: Int
+    abstract val valueType: EncodedValueType
 
     abstract fun readValue(input: DexDataInput, valueArg: Int)
 
     protected fun writeType(output: DexDataOutput, valueArg: Int): Int {
-        val typeAndArg = valueArg shl 5 or valueType
+        val typeAndArg = valueArg shl 5 or valueType.value
         output.writeUnsignedByte(typeAndArg.toShort())
         return valueArg
     }
@@ -53,26 +53,6 @@ abstract class EncodedValue {
     internal abstract fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
 
     companion object {
-        // Value types.
-        const val VALUE_BYTE          = 0x00
-        const val VALUE_SHORT         = 0x02
-        const val VALUE_CHAR          = 0x03
-        const val VALUE_INT           = 0x04
-        const val VALUE_LONG          = 0x06
-        const val VALUE_FLOAT         = 0x10
-        const val VALUE_DOUBLE        = 0x11
-        const val VALUE_METHOD_TYPE   = 0x15
-        const val VALUE_METHOD_HANDLE = 0x16
-        const val VALUE_STRING        = 0x17
-        const val VALUE_TYPE          = 0x18
-        const val VALUE_FIELD         = 0x19
-        const val VALUE_METHOD        = 0x1a
-        const val VALUE_ENUM          = 0x1b
-        const val VALUE_ARRAY         = 0x1c
-        const val VALUE_ANNOTATION    = 0x1d
-        const val VALUE_NULL          = 0x1e
-        const val VALUE_BOOLEAN       = 0x1f
-
         @JvmStatic
         fun read(input: DexDataInput): EncodedValue {
             val typeAndArg = input.readUnsignedByte().toInt()
@@ -84,27 +64,8 @@ abstract class EncodedValue {
         }
 
         private fun create(valueType: Int): EncodedValue {
-            return when (valueType) {
-                VALUE_BYTE          -> EncodedByteValue()
-                VALUE_SHORT         -> EncodedShortValue()
-                VALUE_CHAR          -> EncodedCharValue()
-                VALUE_INT           -> EncodedIntValue()
-                VALUE_LONG          -> EncodedLongValue()
-                VALUE_FLOAT         -> EncodedFloatValue()
-                VALUE_DOUBLE        -> EncodedDoubleValue()
-                VALUE_METHOD_TYPE   -> EncodedMethodTypeValue()
-                VALUE_METHOD_HANDLE -> EncodedMethodHandleValue()
-                VALUE_STRING        -> EncodedStringValue()
-                VALUE_TYPE          -> EncodedTypeValue()
-                VALUE_FIELD         -> EncodedFieldValue()
-                VALUE_METHOD        -> EncodedMethodValue()
-                VALUE_ENUM          -> EncodedEnumValue()
-                VALUE_ARRAY         -> EncodedArrayValue()
-                VALUE_ANNOTATION    -> EncodedAnnotationValue()
-                VALUE_NULL          -> EncodedNullValue
-                VALUE_BOOLEAN       -> EncodedBooleanValue()
-                else -> throw DexFormatException("Unexpected EncodedValue type: ${Primitives.toHexString(valueType.toShort())}")
-            }
+            return EncodedValueType.of(valueType)?.supplier?.invoke()
+                ?: throw DexFormatException("Unexpected EncodedValue type: ${Primitives.toHexString(valueType.toShort())}")
         }
 
         @JvmStatic
@@ -181,6 +142,37 @@ abstract class EncodedValue {
                    else if (bits shl 48 == 0L) 6
                    else if (bits shl 56 == 0L) 7
                    else                        8
+        }
+    }
+}
+
+enum class EncodedValueType constructor(val value: Int, val supplier: () -> EncodedValue) {
+    BYTE          (VALUE_BYTE,          ::EncodedByteValue),
+    SHORT         (VALUE_SHORT,         ::EncodedShortValue),
+    CHAR          (VALUE_CHAR,          ::EncodedCharValue),
+    INT           (VALUE_INT,           ::EncodedIntValue),
+    LONG          (VALUE_LONG,          ::EncodedLongValue),
+    FLOAT         (VALUE_FLOAT,         ::EncodedFloatValue),
+    DOUBLE        (VALUE_DOUBLE,        ::EncodedDoubleValue),
+    METHOD_TYPE   (VALUE_METHOD_TYPE,   ::EncodedMethodTypeValue),
+    METHOD_HANDLE (VALUE_METHOD_HANDLE, ::EncodedMethodHandleValue),
+    STRING        (VALUE_STRING,        ::EncodedStringValue),
+    TYPE          (VALUE_TYPE,          ::EncodedTypeValue),
+    FIELD         (VALUE_FIELD,         ::EncodedFieldValue),
+    METHOD        (VALUE_METHOD,        ::EncodedMethodValue),
+    ENUM          (VALUE_ENUM,          ::EncodedEnumValue),
+    ARRAY         (VALUE_ARRAY,         ::EncodedArrayValue),
+    ANNOTATION    (VALUE_ANNOTATION,    ::EncodedAnnotationValue),
+    NULL          (VALUE_NULL,          { EncodedNullValue }),
+    BOOLEAN       (VALUE_BOOLEAN,       ::EncodedBooleanValue);
+
+    companion object {
+        private val valueToTypeMap: Map<Int, EncodedValueType> by lazy {
+            values().associateBy { it.value }
+        }
+
+        fun of(valueType: Int) : EncodedValueType? {
+            return valueToTypeMap[valueType]
         }
     }
 }
