@@ -112,12 +112,16 @@ class ClassDef private constructor(
     fun addField(dexFile: DexFile, field: EncodedField) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
+        Preconditions.checkArgument(!classData.fields.contains(field), "field already exists in this class")
+
         classData.addField(field)
     }
 
     fun addMethod(dexFile: DexFile, method: EncodedMethod) {
         val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(methodClass == getType(dexFile), "method class does not match this class")
+        Preconditions.checkArgument(!classData.methods.contains(method), "method already exists in this class")
+
         classData.addMethod(method)
     }
 

@@ -59,7 +59,7 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
     }
 
     val isStatic: Boolean
-        get() = accessFlags and ACC_STATIC != 0
+        get() = modifiers.contains(FieldModifier.STATIC)
 
     override fun read(input: DexDataInput) {
         deltaFieldIndex = input.readUleb128()

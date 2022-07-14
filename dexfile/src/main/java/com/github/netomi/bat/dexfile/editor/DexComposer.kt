@@ -53,7 +53,7 @@ class DexComposer internal constructor(val dexFile: DexFile) {
         return index
     }
 
-    fun addOrGetProtoID(parameterTypes: List<String>, returnType: String): Int {
+    fun addOrGetProtoIDIndex(parameterTypes: List<String>, returnType: String): Int {
         val shorty               = DexClasses.toShortyFormat(parameterTypes, returnType)
         val shortyIndex          = addOrGetStringIDIndex(shorty)
         val returnTypeIndex      = addOrGetTypeIDIndex(returnType)
@@ -69,7 +69,7 @@ class DexComposer internal constructor(val dexFile: DexFile) {
         return index
     }
 
-    fun addOrGetFieldID(classType: String, name: String, type: String): Int {
+    fun addOrGetFieldIDIndex(classType: String, name: String, type: String): Int {
         val fieldID =
             FieldID.of(
                 addOrGetTypeIDIndex(classType),
@@ -85,12 +85,12 @@ class DexComposer internal constructor(val dexFile: DexFile) {
         return index
     }
 
-    fun addOrGetMethodID(classType: String, name: String, parameterTypes: List<String>, returnType: String): Int {
+    fun addOrGetMethodIDIndex(classType: String, name: String, parameterTypes: List<String>, returnType: String): Int {
         val methodID =
             MethodID.of(
                 addOrGetTypeIDIndex(classType),
                 addOrGetStringIDIndex(name),
-                addOrGetProtoID(parameterTypes, returnType)
+                addOrGetProtoIDIndex(parameterTypes, returnType)
             )
 
         var index = methodIDMap[methodID]

@@ -76,13 +76,16 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     }
 
     val isStatic: Boolean
-        get() = accessFlags and ACC_STATIC != 0
+        get() = modifiers.contains(MethodModifier.STATIC)
+
+    val isAbstract: Boolean
+        get() = modifiers.contains(MethodModifier.ABSTRACT)
 
     val isPrivate: Boolean
-        get() = accessFlags and ACC_PRIVATE != 0
+        get() = visibility == Visibility.PRIVATE
 
     val isConstructor: Boolean
-        get() = accessFlags and ACC_CONSTRUCTOR != 0
+        get() = modifiers.contains(MethodModifier.CONSTRUCTOR)
 
     val isDirectMethod: Boolean
         get() = isStatic || isPrivate || isConstructor

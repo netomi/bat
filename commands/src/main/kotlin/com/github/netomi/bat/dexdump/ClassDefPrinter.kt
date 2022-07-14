@@ -125,7 +125,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         printer.println("  insns size    : " + code.insnsSize + " 16-bit code units")
         fileOffset = method.codeOffset
 
-        val oldLevel = printer.resetLevel()
+        printer.resetIndentation(0)
 
         printer.println(
             Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
@@ -139,7 +139,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
 
         code.instructionsAccept(dexFile, classDef, method, code, this)
 
-        printer.setLevel(oldLevel)
+        printer.levelDown()
 
         val catchCount = if (code.tries.size == 0) "(none)" else code.tries.size.toString()
         printer.println("  catches       : %s".format(catchCount))

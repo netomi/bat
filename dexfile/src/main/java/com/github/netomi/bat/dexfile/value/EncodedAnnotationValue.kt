@@ -84,12 +84,20 @@ data class EncodedAnnotationValue internal constructor(
     }
 
     override fun toString(): String {
-        return "EncodedAnnotationValue[typeIndex=${typeIndex},elements=${elements}]"
+        return "EncodedAnnotationValue[typeIndex=${typeIndex},elements=${elements.size} items]"
     }
 
     companion object {
+        fun of(typeIndex: Int, elements: Collection<AnnotationElement>): EncodedAnnotationValue {
+            val annotationValue = EncodedAnnotationValue(typeIndex)
+            annotationValue.elements.addAll(elements)
+            return annotationValue
+        }
+
         fun of(typeIndex: Int, vararg elements: AnnotationElement): EncodedAnnotationValue {
-            return EncodedAnnotationValue(typeIndex, arrayListOf(*elements))
+            val annotationValue = EncodedAnnotationValue(typeIndex)
+            annotationValue.elements.addAll(elements)
+            return annotationValue
         }
     }
 }

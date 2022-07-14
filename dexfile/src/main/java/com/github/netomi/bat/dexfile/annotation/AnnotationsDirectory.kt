@@ -199,11 +199,11 @@ class AnnotationsDirectory private constructor(
     }
 
     override fun toString(): String {
-        return ("AnnotationsDirectory[classAnnotationCount=%d, fieldAnnotationCount=%d, " +
-                                     "methodAnnotationCount=%d, parameterAnnotationCount=%d]").format(classAnnotations.annotationCount,
-                                                                                                      fieldAnnotations.size,
-                                                                                                      methodAnnotations.size,
-                                                                                                      parameterAnnotations.size)
+        return ("AnnotationsDirectory[classAnnotationCount=%d,fieldAnnotationCount=%d," +
+                                     "methodAnnotationCount=%d,parameterAnnotationCount=%d]").format(classAnnotations.annotationCount,
+                                                                                                     fieldAnnotations.size,
+                                                                                                     methodAnnotations.size,
+                                                                                                     parameterAnnotations.size)
     }
 
     companion object {

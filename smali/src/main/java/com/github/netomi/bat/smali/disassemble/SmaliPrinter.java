@@ -17,8 +17,6 @@ package com.github.netomi.bat.smali.disassemble;
 
 import com.github.netomi.bat.dexfile.*;
 import com.github.netomi.bat.dexfile.annotation.*;
-import com.github.netomi.bat.dexfile.instruction.DexInstruction;
-import com.github.netomi.bat.dexfile.io.InstructionWriter;
 import com.github.netomi.bat.dexfile.value.AnnotationElement;
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue;
 import com.github.netomi.bat.dexfile.visitor.*;
@@ -27,7 +25,6 @@ import com.github.netomi.bat.util.Classes;
 
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -169,9 +166,9 @@ implements   ClassDefVisitor,
 
         // print code.
         printer.levelUp();
-        if (method.getCode() != null) {
+        if (method.getCode() != null && !method.isAbstract()) {
             method.codeAccept(dexFile, classDef, this);
-        } else if (classDef.getAnnotationsDirectory() != null) {
+        } else if (!classDef.getAnnotationsDirectory().isEmpty()) {
             int     parameterIndex = 0;
             int     registerIndex  = method.isStatic() ? 0 : 1;
 
@@ -311,19 +308,17 @@ implements   ClassDefVisitor,
     public void visitParameterAnnotationSet(DexFile dexFile, ClassDef classDef, ParameterAnnotation parameterAnnotation, AnnotationSetRefList annotationSetRefList) {
         if (currentParameterIndex < annotationSetRefList.getAnnotationSetRefCount()) {
             AnnotationSetRef annotationSetRef = annotationSetRefList.getAnnotationSetRef(currentParameterIndex);
-            if (annotationSetRef != null) {
-                AnnotationSet annotationSet = annotationSetRef.getAnnotationSet();
-                if (annotationSet != null && annotationSet.getAnnotationCount() > 0) {
-                    if (printParameterInfo) {
-                        printer.println(String.format(".param p%d    # %s",
-                                currentRegisterIndex,
-                                currentParameterType));
-                    }
-                    printer.levelUp();
-                    annotationSet.accept(dexFile, classDef, this);
-                    printer.levelDown();
-                    printer.println(".end param");
+            AnnotationSet annotationSet = annotationSetRef.getAnnotationSet();
+            if (!annotationSet.isEmpty()) {
+                if (printParameterInfo) {
+                    printer.println(String.format(".param p%d    # %s",
+                            currentRegisterIndex,
+                            currentParameterType));
                 }
+                printer.levelUp();
+                annotationSet.accept(dexFile, classDef, this);
+                printer.levelDown();
+                printer.println(".end param");
             }
         }
     }

@@ -2,6 +2,26 @@
 .super Ljava/lang/Object;
 .implements Ljava/lang/annotation/Annotation;
 
+.annotation system Ldalvik/annotation/AnnotationDefault;
+    value = .subannotation LAnnotationWithValues;
+                booleanValue = false
+                byteValue = 1t
+                charValue = '2'
+                shortValue = 3s
+                intValue = 4
+                longValue = 5l
+                floatValue = 6.0f
+                doubleValue = 7.0
+                stringValue = "8"
+                subAnnotationValue = .subannotation LSubAnnotation;
+                                            stringValue = "9"
+                                     .end subannotation
+                typeValue = L10;
+                methodValue = L10;->11()V
+                enumValue = .enum LEnum;->12:LEnum;
+            .end subannotation
+.end annotation
+
 .method public abstract booleanValue()Z
 .end method
 
@@ -44,24 +64,4 @@
 
 .method public abstract enumValue()LEnum;
 .end method
-
-.annotation system Ldalvik/annotation/AnnotationDefault;
-    value = .subannotation LAnnotationWithValues;
-                booleanValue = false
-                byteValue = 1t
-                charValue = '2'
-                shortValue = 3s
-                intValue = 4
-                longValue = 5l
-                floatValue = 6.0f
-                doubleValue = 7.0
-                stringValue = "8"
-                subAnnotationValue = .subannotation LSubAnnotation;
-                                            stringValue = "9"
-                                     .end subannotation
-                typeValue = L10;
-                methodValue = L10;->11()V
-                enumValue = .enum LEnum;->12:LEnum;                
-            .end subannotation
-.end annotation
 

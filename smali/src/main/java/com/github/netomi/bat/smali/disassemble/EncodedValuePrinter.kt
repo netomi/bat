@@ -32,6 +32,13 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
     }
 
     override fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {
+        val resetIndentation = if (printer.currentPosition > 0) {
+            printer.resetIndentation(printer.currentPosition)
+            true
+        } else {
+            false
+        }
+
         appendWithPrefix(".subannotation " + value.getType(dexFile))
         printer.println()
         printer.levelUp()
@@ -42,23 +49,20 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
         }
         printer.levelDown()
         printer.print(".end subannotation")
+
+        if (resetIndentation) {
+            printer.levelDown()
+        }
     }
 
     override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
         appendWithPrefix("{")
 
-        val encodedValues = value.values
-        if (encodedValues.isNotEmpty()) {
+        if (!value.isEmpty()) {
             printer.println()
             printer.levelUp()
-            for (i in encodedValues.indices) {
-                val v = encodedValues[i]
-                v.accept(dexFile, this)
-                if (i + 1 < encodedValues.size) {
-                    printer.print(",")
-                }
-                printer.println()
-            }
+            value.valuesAccept(dexFile, this.joinedBy { _, _ -> printer.println(",") })
+            printer.println()
             printer.levelDown()
         }
         printer.print("}")

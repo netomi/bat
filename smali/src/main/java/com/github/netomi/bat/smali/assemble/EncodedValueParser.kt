@@ -21,21 +21,23 @@ import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.util.Strings
-import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.tree.TerminalNode
 
-object EncodedValueParser {
+internal object EncodedValueParser {
 
-    fun parseBaseValue(ctx: SmaliParser.SBaseValueContext, dexComposer: DexComposer): EncodedValue? {
-        val value: Token = if (ctx.childCount == 1) {
+    fun parseBaseValue(ctx: SmaliParser.SBaseValueContext, dexComposer: DexComposer): EncodedValue {
+
+        // a base value is usually only a single token, only exception: enum fields
+        val (value, isEnum) = if (ctx.childCount == 1) {
             val tn = ctx.getChild(0) as TerminalNode
-            tn.symbol
+            Pair(tn.symbol, false)
         } else {
+            // in case of an enum, the first child is the ".enum" fragment.
             val first = (ctx.getChild(0) as TerminalNode).symbol
             assert(first.type == SmaliLexer.DENUM)
 
             val tn = ctx.getChild(1) as TerminalNode
-            tn.symbol
+            Pair(tn.symbol, true)
         }
 
         return when (value.type) {
@@ -45,19 +47,28 @@ object EncodedValueParser {
             SmaliLexer.SHORT ->         EncodedShortValue.of(java.lang.Short.decode(value.text.removeSuffix("s")))
             SmaliLexer.CHAR ->          EncodedCharValue.of(Strings.unescapeJavaString(value.text.removeSurrounding("'")).first())
             SmaliLexer.INT ->           EncodedIntValue.of(Integer.decode(value.text))
-            SmaliLexer.LONG ->          EncodedLongValue.of(java.lang.Long.decode(value.text.removeSuffix("L")))
+            SmaliLexer.LONG ->          EncodedLongValue.of(java.lang.Long.decode(value.text.removeSuffix("L").removeSuffix("l")))
             SmaliLexer.BASE_FLOAT,
             SmaliLexer.FLOAT_INFINITY,
             SmaliLexer.FLOAT_NAN ->     EncodedFloatValue.of(value.text.toFloat())
             SmaliLexer.BASE_DOUBLE,
             SmaliLexer.DOUBLE_INFINITY,
             SmaliLexer.DOUBLE_NAN ->    EncodedDoubleValue.of(value.text.toDouble())
-            SmaliLexer.METHOD_FULL ->   null //value.text
+            SmaliLexer.METHOD_FULL -> {
+                val (classType, methodName, parameterTypes, returnType) = parseMethodObject(value.text)
+                val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+                EncodedMethodValue.of(methodIndex)
+            }
+            SmaliLexer.FIELD_FULL -> {
+                val (classType, fieldName, type) = parseFieldObject(value.text)
+                val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, type)
+
+                if (isEnum) EncodedEnumValue.of(fieldIndex) else EncodedFieldValue.of(fieldIndex)
+            }
             SmaliLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexComposer.addOrGetTypeIDIndex(value.text))
             SmaliLexer.NULL ->          EncodedNullValue
-            SmaliLexer.FIELD_FULL ->    null // value.text
             else -> null
-        }
+        } ?: parserError(ctx, "failure to parse base value")
     }
 
 }

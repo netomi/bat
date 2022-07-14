@@ -15,65 +15,56 @@
  */
 package com.github.netomi.bat.io
 
-import java.io.IOException
 import java.io.Writer
 
 open class IndentingPrinter(protected val delegateWriter: Writer, private val spacesPerLevel: Int = 4) : AutoCloseable {
-    private var level = 0
-    private var indentedLine = false
+    private var indentedLine      = false
+    private val indentationStack  = ArrayDeque<Int>()
+
+    private val currentIndentation
+        get() = indentationStack.first()
+
+    var currentPosition = 0
+        private set
+
+    init {
+        indentationStack.addFirst(0)
+    }
 
     fun levelUp() {
-        level++
+        val currentIndentation = indentationStack.first()
+        indentationStack.addFirst(currentIndentation + spacesPerLevel)
     }
 
     fun levelDown() {
-        level--
+        indentationStack.removeFirst()
     }
 
-    fun resetLevel(): Int {
-        val oldLevel = level
-        level = 0
-        return oldLevel
-    }
-
-    fun setLevel(newLevel: Int) {
-        level = newLevel
+    fun resetIndentation(indentation: Int) {
+        indentationStack.addFirst(indentation)
     }
 
     fun print(text: CharSequence) {
-        try {
-            printIndentation()
-            delegateWriter.write(text.toString())
-        } catch (ioe: IOException) {
-            throw RuntimeException(ioe)
-        }
+        printIndentation()
+        delegateWriter.write(text.toString())
+        currentPosition += text.length
     }
 
     fun println(text: CharSequence) {
-        try {
-            printIndentation()
-            delegateWriter.write(text.toString())
-            println()
-        } catch (ioe: IOException) {
-            throw RuntimeException(ioe)
-        }
+        printIndentation()
+        delegateWriter.write(text.toString())
+        println()
     }
 
     fun println() {
-        indentedLine = try {
-            delegateWriter.write('\n'.code)
-            false
-        } catch (ioe: IOException) {
-            throw RuntimeException(ioe)
-        }
+        currentPosition = 0
+
+        delegateWriter.write('\n'.code)
+        indentedLine = false
     }
 
     fun flush() {
-        try {
-            delegateWriter.flush()
-        } catch (ex: IOException) {
-            throw RuntimeException(ex)
-        }
+        delegateWriter.flush()
     }
 
     @Throws(Exception::class)
@@ -81,12 +72,13 @@ open class IndentingPrinter(protected val delegateWriter: Writer, private val sp
         delegateWriter.close()
     }
 
-    @Throws(IOException::class)
     private fun printIndentation() {
-        if (level > 0 && !indentedLine) {
-            val spaces = level * spacesPerLevel
+        if (!indentedLine && currentIndentation > 0) {
+            val spaces = currentIndentation
             delegateWriter.write(String.format("%" + spaces + "s", ""))
+
             indentedLine = true
+            currentPosition += spaces
         }
     }
 }

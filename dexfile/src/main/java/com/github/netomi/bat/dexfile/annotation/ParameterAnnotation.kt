@@ -100,7 +100,7 @@ class ParameterAnnotation private constructor(
     }
 
     override fun toString(): String {
-        return "ParameterAnnotation[methodIndex=${methodIndex}, annotationSetRefList=${annotationSetRefList.annotationSetRefCount} items]"
+        return "ParameterAnnotation[methodIndex=${methodIndex},annotationSetRefList=${annotationSetRefList.annotationSetRefCount} items]"
     }
 
     companion object {

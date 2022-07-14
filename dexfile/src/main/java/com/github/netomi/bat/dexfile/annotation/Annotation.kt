@@ -76,7 +76,7 @@ class Annotation private constructor(_visibility:      AnnotationVisibility   = 
     }
 
     override fun toString(): String {
-        return "Annotation[visibility='%s',value=%s]".format(visibility.simpleName, annotationValue)
+        return "Annotation[visibility='${visibility.simpleName}',value=${annotationValue}]"
     }
 
     companion object {

@@ -84,7 +84,7 @@ data class EncodedArrayValue internal constructor(val values: ArrayList<EncodedV
     }
 
     override fun toString(): String {
-        return "EncodedArrayValue[values=${values}]"
+        return "EncodedArrayValue[values=${values.size} items]"
     }
 
     companion object {
@@ -92,8 +92,14 @@ data class EncodedArrayValue internal constructor(val values: ArrayList<EncodedV
             return EncodedArrayValue()
         }
 
+        fun of(values: Collection<EncodedValue>): EncodedArrayValue {
+            return EncodedArrayValue(ArrayList(values))
+        }
+
         fun of(vararg values: EncodedValue): EncodedArrayValue {
-            return EncodedArrayValue(arrayListOf(*values))
+            val array = EncodedArrayValue()
+            array.values.addAll(values)
+            return array
         }
     }
 }

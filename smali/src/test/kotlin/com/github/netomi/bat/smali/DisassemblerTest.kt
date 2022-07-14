@@ -55,11 +55,13 @@ class DisassemblerTest {
 
                         // testing purposes only.
                         if (!Arrays.equals(expectedBytes, actualBytes, expectedBytes.size)) {
-                            Files.write(Paths.get("${className}_expected.smali"), expectedBytes)
-                            Files.write(Paths.get("${className}_actual.smali"), actualBytes)
+                            val lastSlashIndex = className.lastIndexOf('/')
+                            val fileName = if (lastSlashIndex != -1) className.substring(lastSlashIndex + 1) else className
+                            Files.write(Paths.get("${fileName}_expected.smali"), expectedBytes)
+                            Files.write(Paths.get("${fileName}_actual.smali"), actualBytes)
                         }
 
-                        assertArrayEquals(expectedBytes, actualBytes)
+                        assertArrayEquals(expectedBytes, actualBytes, "result differ for class $className")
                     }
                     zipInputStream.closeEntry()
                     zipEntry = zipInputStream.nextEntry
