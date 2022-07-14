@@ -91,7 +91,7 @@ class FieldAnnotation private constructor(_fieldIndex: Int = NO_INDEX, _annotati
     }
 
     override fun toString(): String {
-        return "FieldAnnotation[fieldIdx=${fieldIndex},annotationSet=${annotationSet.annotationCount}]"
+        return "FieldAnnotation[fieldIdx=${fieldIndex},annotationSet=${annotationSet.annotationCount} items]"
     }
 
     companion object {

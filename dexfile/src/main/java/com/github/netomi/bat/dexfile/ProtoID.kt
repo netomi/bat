@@ -106,9 +106,7 @@ class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        if (!_parameters.isEmpty) {
-            visitor.visitParameterTypes(dexFile, this, _parameters)
-        }
+        visitor.visitParameterTypes(dexFile, this, _parameters)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

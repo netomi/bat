@@ -24,7 +24,6 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
-import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.IntArray
 import java.util.*

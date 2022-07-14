@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.Primitives
 
@@ -36,10 +35,10 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     TryVisitor,
     DebugSequenceVisitor,
     AnnotationSetVisitor,
-    AnnotationVisitor,
-    EncodedValueVisitor {
+    AnnotationVisitor {
 
-    private val instructionPrinter: InstructionVisitor = InstructionPrinter(printer)
+    private val instructionPrinter: InstructionVisitor   = InstructionPrinter(printer)
+    private val encodedValuePrinter: EncodedValueVisitor = EncodedValuePrinter(printer)
 
     private var fileOffset = 0
     private var codeOffset = 0
@@ -97,7 +96,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         val staticValues = if (!classDef.staticValues.isEmpty) classDef.staticValues.array else null
         if (encodedField.isStatic && staticValues != null && index < staticValues.values.size) {
             printer.print("  value         : ")
-            staticValues.valueAccept(dexFile, index, this)
+            staticValues.valueAccept(dexFile, index, encodedValuePrinter)
             printer.println()
         }
     }
@@ -210,8 +209,10 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     override fun visitAnyAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {}
 
     override fun visitClassAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {
-        printer.println("Annotations on class")
-        annotationSet.accept(dexFile, classDef, this)
+        if (!annotationSet.isEmpty) {
+            printer.println("Annotations on class")
+            annotationSet.accept(dexFile, classDef, this)
+        }
     }
 
     override fun visitFieldAnnotationSet(dexFile: DexFile, classDef: ClassDef, fieldAnnotation: FieldAnnotation, annotationSet: AnnotationSet) {
@@ -241,91 +242,10 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     }
 
     override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
-        printer.print("  ${annotation.visibility} ")
+        printer.print("  VISIBILITY_${annotation.visibility} ")
         val annotationValue = annotation.annotationValue
-        annotationValue.accept(dexFile, this)
+        annotationValue.accept(dexFile, encodedValuePrinter)
         printer.println()
-    }
-
-    override fun visitAnyValue(dexFile: DexFile, value: EncodedValue) {
-        printer.print(value.toString())
-    }
-
-    override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
-        if (value.values.isNotEmpty()) {
-            printer.print("{ ")
-            value.valuesAccept(dexFile, joinedByValueConsumer { _, _ -> printer.print(" ") })
-            printer.print(" }")
-        } else {
-            printer.print("{ }")
-        }
-    }
-
-    override fun visitEnumValue(dexFile: DexFile, value: EncodedEnumValue) {
-        printer.print(value.getFieldID(dexFile).getName(dexFile))
-    }
-
-    override fun visitMethodValue(dexFile: DexFile, value: EncodedMethodValue) {
-        printer.print(value.getMethodID(dexFile).getName(dexFile))
-    }
-
-    override fun visitFieldValue(dexFile: DexFile, value: EncodedFieldValue) {
-        printer.print(value.getFieldID(dexFile).getName(dexFile))
-    }
-
-    override fun visitStringValue(dexFile: DexFile, value: EncodedStringValue) {
-        printer.print("\"")
-        printer.printAsMutf8(value.getStringValue(dexFile), true)
-        printer.print("\"")
-    }
-
-    override fun visitCharValue(dexFile: DexFile, value: EncodedCharValue) {
-        printer.print(value.value.code.toString())
-    }
-
-    override fun visitByteValue(dexFile: DexFile, value: EncodedByteValue) {
-        printer.print(value.value.toInt().toString())
-    }
-
-    override fun visitShortValue(dexFile: DexFile, value: EncodedShortValue) {
-        printer.print(value.value.toString())
-    }
-
-    override fun visitBooleanValue(dexFile: DexFile, value: EncodedBooleanValue) {
-        printer.print(java.lang.Boolean.toString(value.value))
-    }
-
-    override fun visitIntValue(dexFile: DexFile, value: EncodedIntValue) {
-        printer.print(value.value.toString())
-    }
-
-    override fun visitLongValue(dexFile: DexFile, value: EncodedLongValue) {
-        printer.print(value.value.toString())
-    }
-
-    override fun visitDoubleValue(dexFile: DexFile, value: EncodedDoubleValue) {
-        printer.print("%g".format(value.value))
-    }
-
-    override fun visitFloatValue(dexFile: DexFile, value: EncodedFloatValue) {
-        printer.print("%g".format(value.value.toDouble()))
-    }
-
-    override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {
-        printer.print(value.getType(dexFile))
-    }
-
-    override fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {
-        printer.print(value.getType(dexFile))
-        for (i in 0 until value.elements.size) {
-            val element = value.elements[i]
-            printer.print(" " + element.getName(dexFile) + "=")
-            element.value.accept(dexFile, this)
-        }
-    }
-
-    override fun visitNullValue(dexFile: DexFile, value: EncodedNullValue) {
-        printer.print("null")
     }
 
     companion object {

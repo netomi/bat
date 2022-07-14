@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexdump
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
+import com.github.netomi.bat.util.Arrays
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.fail
 import org.junit.jupiter.params.ParameterizedTest
@@ -24,6 +25,8 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
 
 class FullDumpTest {
 
@@ -32,7 +35,7 @@ class FullDumpTest {
     fun fullDexDump(testFile: String) {
         val expectedFile = testFile.replace(".dex", ".txt")
         try {
-            javaClass.getResourceAsStream("/dex/$testFile").use { `is` ->
+            javaClass.getResourceAsStream("/dex/$testFile")!!.use { `is` ->
                 val reader = DexFileReader(`is`)
 
                 val dexFile = DexFile()
@@ -43,8 +46,16 @@ class FullDumpTest {
 
                 dexFile.accept(printer)
 
-                val expected = javaClass.getResourceAsStream("/dex/$expectedFile")?.readAllBytes()
-                assertArrayEquals(expected, baos.toByteArray(), "testFile $testFile differs")
+                val actualBytes   = baos.toByteArray()
+                val expectedBytes = javaClass.getResourceAsStream("/dex/$expectedFile")!!.readAllBytes()
+
+                // testing purposes only.
+                if (!Arrays.equals(expectedBytes, actualBytes, expectedBytes.size)) {
+                    Files.write(Paths.get("${testFile}_expected.txt"), expectedBytes)
+                    Files.write(Paths.get("${testFile}_actual.txt"), actualBytes)
+                }
+
+                assertArrayEquals(expectedBytes, actualBytes, "testFile $testFile differs")
             }
         } catch (ex: IOException) {
             fail(ex)

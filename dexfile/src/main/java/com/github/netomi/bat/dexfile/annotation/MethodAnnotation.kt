@@ -63,7 +63,7 @@ class MethodAnnotation private constructor(_methodIndex: Int = NO_INDEX, _annota
         output.writeInt(annotationsOffset)
     }
 
-    fun accept(dexFile: DexFile?, classDef: ClassDef?, visitor: AnnotationSetVisitor) {
+    fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
         visitor.visitMethodAnnotationSet(dexFile, classDef, this, annotationSet)
     }
 
@@ -91,7 +91,7 @@ class MethodAnnotation private constructor(_methodIndex: Int = NO_INDEX, _annota
     }
 
     override fun toString(): String {
-        return "MethodAnnotation[methodIdx=${methodIndex},annotationSet=${annotationSet.annotationCount}}]"
+        return "MethodAnnotation[methodIdx=${methodIndex},annotationSet=${annotationSet.annotationCount} items]"
     }
 
     companion object {

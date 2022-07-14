@@ -93,10 +93,7 @@ class AnnotationSet private constructor() : DataItem() {
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        annotations.forEachIndexed { index, annotation ->
-            visitor.visitAnnotation(dexFile, this, index, annotation)
-            annotation.dataItemsAccept(dexFile, visitor)
-        }
+        annotations.forEachIndexed { index, annotation -> visitor.visitAnnotation(dexFile, this, index, annotation) }
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
