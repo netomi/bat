@@ -26,24 +26,24 @@ fun parserError(ctx: ParserRuleContext, message: String): Nothing {
     val column     = ctx.getStart().charPositionInLine
 
     val list = mutableListOf<String>()
-    getParseContextText(ctx, list)
+    fillParseContextText(ctx, list)
     throw RuntimeException("$message at line: $lineNumber col: $column -> ${list.joinToString(" ")}")
 }
 
-private fun getParseContextText(ctx: ParserRuleContext, list: MutableList<String>) {
+private fun fillParseContextText(ctx: ParserRuleContext, list: MutableList<String>) {
     if (ctx.childCount == 0) list.add(ctx.text)
     else {
         for (child in ctx.children) {
-            getParseContextText(child, list)
+            fillParseContextText(child, list)
         }
     }
 }
 
-private fun getParseContextText(node: ParseTree, list: MutableList<String>) {
+private fun fillParseContextText(node: ParseTree, list: MutableList<String>) {
     if (node.childCount == 0) list.add(node.text)
     else {
         for (i in 0 until node.childCount) {
-            getParseContextText(node.getChild(i), list)
+            fillParseContextText(node.getChild(i), list)
         }
     }
 }
