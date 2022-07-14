@@ -23,9 +23,9 @@ import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.util.Strings
 import org.antlr.v4.runtime.tree.TerminalNode
 
-internal object EncodedValueParser {
+internal class EncodedValueAssembler constructor(private val dexComposer: DexComposer) {
 
-    fun parseBaseValue(ctx: SmaliParser.SBaseValueContext, dexComposer: DexComposer): EncodedValue {
+    fun parseBaseValue(ctx: SmaliParser.SBaseValueContext): EncodedValue {
 
         // a base value is usually only a single token, only exception: enum fields
         val (value, isEnum) = if (ctx.childCount == 1) {
@@ -70,5 +70,4 @@ internal object EncodedValueParser {
             else -> null
         } ?: parserError(ctx, "failure to parse base value")
     }
-
 }

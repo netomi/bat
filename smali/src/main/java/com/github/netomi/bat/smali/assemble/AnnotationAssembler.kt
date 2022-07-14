@@ -17,7 +17,6 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.annotation.Annotation
-import com.github.netomi.bat.dexfile.annotation.AnnotationSet
 import com.github.netomi.bat.dexfile.annotation.AnnotationVisibility
 import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.value.AnnotationElement
@@ -27,19 +26,19 @@ import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.smali.parser.SmaliParser
 import org.antlr.v4.runtime.ParserRuleContext
 
-object AnnotationParser {
+internal class AnnotationAssembler constructor(
+    private val encodedValueAssembler: EncodedValueAssembler,
+    private val dexComposer:           DexComposer) {
 
-    fun visitSAnnotation(ctx: SmaliParser.SAnnotationContext, annotationSet: AnnotationSet, dexComposer: DexComposer) {
-        val annotationTypeIndex  = dexComposer.addOrGetTypeIDIndex(ctx.OBJECT_TYPE().text)
+    fun parseAnnotation(ctx: SmaliParser.SAnnotationContext): Annotation {
+        val annotationTypeIndex = dexComposer.addOrGetTypeIDIndex(ctx.OBJECT_TYPE().text)
         val annotationVisibility = AnnotationVisibility.of(ctx.ANN_VISIBLE().text)
 
         val annotationElements =
             parseAnnotationAnnotationElements(ctx.sAnnotationKeyName(), ctx.sAnnotationValue(), dexComposer)
 
         val encodedAnnotationValue = EncodedAnnotationValue.of(annotationTypeIndex, annotationElements)
-        val annotation = Annotation.of(annotationVisibility, encodedAnnotationValue)
-
-        annotationSet.addAnnotation(annotation)
+        return Annotation.of(annotationVisibility, encodedAnnotationValue)
     }
 
     private fun parseAnnotationAnnotationElements(keyContexts:   List<SmaliParser.SAnnotationKeyNameContext>,
@@ -51,7 +50,7 @@ object AnnotationParser {
         keyContexts.forEachIndexed { index, sAnnotationKeyNameContext ->
             val sAnnotationValueContext = valueContexts[index]
 
-            val annotationValue     = parseAnnotationValueContext(sAnnotationValueContext, dexComposer)
+            val annotationValue     = parseAnnotationValueContext(sAnnotationValueContext)
             val annotationNameIndex = dexComposer.addOrGetStringIDIndex(sAnnotationKeyNameContext.text)
             val element             = AnnotationElement.of(annotationNameIndex, annotationValue)
             annotationElements.add(element)
@@ -60,7 +59,7 @@ object AnnotationParser {
         return annotationElements
     }
 
-    private fun parseAnnotationValueContext(ctx: SmaliParser.SAnnotationValueContext, dexComposer: DexComposer): EncodedValue {
+    private fun parseAnnotationValueContext(ctx: SmaliParser.SAnnotationValueContext): EncodedValue {
         val t = ctx.getChild(0) as ParserRuleContext
         when (t.ruleIndex) {
             SmaliParser.RULE_sArrayValue -> {
@@ -68,7 +67,7 @@ object AnnotationParser {
 
                 val arrayValueContext = t as SmaliParser.SArrayValueContext
                 arrayValueContext.sAnnotationValue().forEach {
-                    values.add(parseAnnotationValueContext(it, dexComposer))
+                    values.add(parseAnnotationValueContext(it))
                 }
 
                 return EncodedArrayValue.of(values)
@@ -90,11 +89,10 @@ object AnnotationParser {
 
             SmaliParser.RULE_sBaseValue -> {
                 val baseValueContext = t as SmaliParser.SBaseValueContext
-                return EncodedValueParser.parseBaseValue(baseValueContext, dexComposer)
+                return encodedValueAssembler.parseBaseValue(baseValueContext)
             }
         }
 
         parserError(ctx, "failed to parse annotation value")
     }
-
 }

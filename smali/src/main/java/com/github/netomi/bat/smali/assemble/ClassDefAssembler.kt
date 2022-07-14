@@ -18,16 +18,15 @@ package com.github.netomi.bat.smali.assemble
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.editor.DexComposer
-import com.github.netomi.bat.dexfile.instruction.DexInstruction
-import com.github.netomi.bat.dexfile.instruction.DexInstructions
-import com.github.netomi.bat.dexfile.io.InstructionWriter
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
-import org.antlr.v4.runtime.ParserRuleContext
 
 internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDef?>() {
 
-    private val dexComposer: DexComposer = dexFile.composer
+    private val dexComposer:           DexComposer           = dexFile.composer
+    private val encodedValueAssembler: EncodedValueAssembler = EncodedValueAssembler(dexComposer)
+    private val codeAssembler:         CodeAssembler         = CodeAssembler(dexFile, dexComposer)
+    private val annotationAssembler:   AnnotationAssembler   = AnnotationAssembler(encodedValueAssembler, dexComposer)
 
     private lateinit var classDef: ClassDef
 
@@ -51,8 +50,8 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
             classDef.interfaces.addType(dexComposer.addOrGetTypeIDIndex(it.name.text))
         }
 
-        val annotationDirectory = classDef.annotationsDirectory
-        ctx.sAnnotation().forEach { AnnotationParser.visitSAnnotation(it, annotationDirectory.classAnnotations, dexComposer) }
+        val annotationSet = classDef.annotationsDirectory.classAnnotations
+        ctx.sAnnotation().forEach { annotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
 
         ctx.sField().forEach  { visitSField(it, classType) }
         ctx.sMethod().forEach { visitSMethod(it, classType) }
@@ -70,12 +69,12 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         classDef.addField(dexFile, field)
 
         if (field.isStatic && ctx.sBaseValue() != null) {
-            val staticValue = EncodedValueParser.parseBaseValue(ctx.sBaseValue(), dexComposer)
+            val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
             classDef.setStaticValue(dexFile, field, staticValue)
         }
 
         val annotationSet = AnnotationSet.empty()
-        ctx.sAnnotation().forEach { AnnotationParser.visitSAnnotation(it, annotationSet, dexComposer) }
+        ctx.sAnnotation().forEach { annotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
         if (!annotationSet.isEmpty) {
             val fieldAnnotation = FieldAnnotation.of(field.fieldIndex, annotationSet)
             classDef.annotationsDirectory.fieldAnnotations.add(fieldAnnotation)
@@ -95,7 +94,8 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
 
         if (!method.isAbstract) {
-            visitSInstructions(ctx.sInstruction(), method)
+            val code = codeAssembler.parseCode(ctx.sInstruction(), method)
+            method.code = code
         } else {
             if (ctx.sInstruction().isNotEmpty()) {
                 parserError(ctx, "abstract method containing code instructions")
@@ -105,83 +105,10 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         classDef.addMethod(dexFile, method)
 
         val annotationSet = AnnotationSet.empty()
-        ctx.sAnnotation().forEach { AnnotationParser.visitSAnnotation(it, annotationSet, dexComposer) }
+        ctx.sAnnotation().forEach { annotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
         if (!annotationSet.isEmpty) {
             val methodAnnotation = MethodAnnotation.of(method.methodIndex, annotationSet)
             classDef.annotationsDirectory.methodAnnotations.add(methodAnnotation)
         }
-    }
-
-    private fun visitSInstructions(lCtx: List<SInstructionContext>, method: EncodedMethod) {
-
-        val instructions = mutableListOf<DexInstruction>()
-        var registers = 0
-
-        lCtx.forEach { ctx ->
-            val t = ctx.getChild(0) as ParserRuleContext
-            when (t.ruleIndex) {
-                RULE_fregisters -> {
-                    val c = t as FregistersContext
-                    registers = c.xregisters.text.toInt()
-                }
-
-                RULE_f0x -> {
-                    val c = t as F0xContext
-                    val insn = when (val opName = c.op.text) {
-                        "return-void" -> DexInstructions.returnVoid()
-                        "nop"         -> DexInstructions.nop()
-                        else          -> parserError(ctx, "unexpected opname $opName")
-                    }
-
-                    instructions.add(insn)
-                }
-
-                RULE_fm5c -> {
-                    val c = t as Fm5cContext
-                    val opName = c.op.text
-
-                    val insn = when (opName) {
-                        "invoke-direct" -> {
-                            val methodType = c.method.text
-
-                            val (classType, methodName, parameterTypes, returnType) = parseMethodObject(methodType)
-                            val methodID =
-                                dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
-
-                            val regs = intArrayOf(c.REGISTER(0).text.substring(1).toInt())
-                            DexInstructions.invokeDirect(methodID, *regs)
-                        }
-
-                        "return-void" -> {
-                            DexInstructions.returnVoid()
-                        }
-                        else -> DexInstructions.nop()
-                    }
-
-                    instructions.add(insn)
-                }
-            }
-        }
-
-        val code = Code.of(registers, 1, 0)
-
-        val insns = writeInstructions(instructions)
-        code.insns = insns
-        code.insnsSize = insns.size
-
-        method.code = code
-    }
-
-    private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
-        val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a: Int, b: Int -> a + b }
-
-        val writer = InstructionWriter(codeLen)
-        var offset = 0
-        for (instruction in instructions) {
-            instruction.write(writer, offset)
-            offset += instruction.length
-        }
-
-        return writer.array
     }
 }
