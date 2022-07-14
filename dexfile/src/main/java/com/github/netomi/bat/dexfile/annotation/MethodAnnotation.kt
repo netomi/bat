@@ -95,12 +95,10 @@ class MethodAnnotation private constructor(_methodIndex: Int = NO_INDEX, _annota
     }
 
     companion object {
-        @JvmStatic
         fun of(methodIndex: Int, annotationSet: AnnotationSet): MethodAnnotation {
             return MethodAnnotation(methodIndex, annotationSet)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): MethodAnnotation {
             val methodAnnotation = MethodAnnotation()
             methodAnnotation.read(input)

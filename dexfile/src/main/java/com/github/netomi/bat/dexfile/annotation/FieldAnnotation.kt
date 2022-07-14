@@ -95,12 +95,10 @@ class FieldAnnotation private constructor(_fieldIndex: Int = NO_INDEX, _annotati
     }
 
     companion object {
-        @JvmStatic
         fun of(fieldIndex: Int, annotationSet: AnnotationSet): FieldAnnotation {
             return FieldAnnotation(fieldIndex, annotationSet)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): FieldAnnotation {
             val fieldAnnotation = FieldAnnotation()
             fieldAnnotation.read(input)

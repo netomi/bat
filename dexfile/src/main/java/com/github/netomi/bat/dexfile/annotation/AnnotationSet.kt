@@ -20,9 +20,10 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
-import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.IntArray
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * A class representing an annotation set item inside a dex file.
@@ -100,17 +101,28 @@ class AnnotationSet private constructor() : DataItem() {
         annotations.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        val o = other as AnnotationSet
+
+        return annotations == o.annotations
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(annotations)
+    }
+
     override fun toString(): String {
-        return "AnnotationSet[annotations=${annotations.size}]"
+        return "AnnotationSet[annotations=${annotations.size} items]"
     }
 
     companion object {
-        @JvmStatic
         fun empty(): AnnotationSet {
             return AnnotationSet()
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): AnnotationSet {
             val annotationSet = AnnotationSet()
             annotationSet.read(input)

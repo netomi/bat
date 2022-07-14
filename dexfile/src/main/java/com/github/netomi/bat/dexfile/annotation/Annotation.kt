@@ -22,8 +22,8 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue
 import com.github.netomi.bat.dexfile.value.EncodedValue.Companion.readAnnotationValue
-import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import java.util.*
 
 /**
  * A class representing an annotation item inside a dex file.
@@ -59,6 +59,20 @@ class Annotation private constructor(_visibility:      AnnotationVisibility   = 
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         annotationValue.referencedIDsAccept(dexFile, visitor)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        val o = other as Annotation
+
+        return visibility      == o.visibility &&
+               annotationValue == o.annotationValue
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(visibility, annotationValue)
     }
 
     override fun toString(): String {

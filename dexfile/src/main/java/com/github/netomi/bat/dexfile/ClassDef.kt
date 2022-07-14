@@ -263,7 +263,7 @@ class ClassDef private constructor(
         interfaces.referencedIDsAccept(dexFile, visitor)
         classData.referencedIDsAccept(dexFile, visitor)
         staticValues.referencedIDsAccept(dexFile, visitor)
-        // TODO: visit AnnotationsDirectory
+        annotationsDirectory.referencedIDsAccept(dexFile, visitor)
     }
 
     override fun toString(): String {
