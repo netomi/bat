@@ -18,9 +18,9 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-class TypeInstruction internal constructor(opcode: DexOpCode) : DexInstruction(opcode) {
+class TypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
-    var typeIndex: Int = NO_INDEX
+    var typeIndex: Int = _typeIndex
         private set
 
     fun getTypeID(dexFile: DexFile): TypeID {
@@ -38,11 +38,28 @@ class TypeInstruction internal constructor(opcode: DexOpCode) : DexInstruction(o
         }
     }
 
+    override fun writeData(): ShortArray {
+        val data = super.writeData()
+
+        when (opcode.format) {
+            DexInstructionFormat.FORMAT_21c,
+            DexInstructionFormat.FORMAT_22c -> data[1] = typeIndex.toShort()
+
+            else -> {}
+        }
+
+        return data
+    }
+
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitTypeInstruction(dexFile, classDef, method, code, offset, this)
     }
 
     companion object {
+        fun of(opCode: DexOpCode, typeIndex: Int, vararg registers: Int): TypeInstruction {
+            return TypeInstruction(opCode, typeIndex, *registers)
+        }
+
         @JvmStatic
         fun create(opCode: DexOpCode, ident: Byte): TypeInstruction {
             return TypeInstruction(opCode)

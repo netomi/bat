@@ -30,6 +30,8 @@ import com.github.netomi.bat.smali.parser.SmaliParser.F21c_fieldContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F21t_branchContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F22c_fieldContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_intContext
+import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_stringContext
+import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_typeContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fx0t_branchContext
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -70,10 +72,6 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                     val mnemonic = c.op.text
                     val opcode = DexOpCode.get(mnemonic)
 
-                    if (opcode.format != DexInstructionFormat.FORMAT_10x) {
-                        parserError(ctx, "unexpected instruction $mnemonic")
-                    }
-
                     opcode.createInstruction(0)
                 }
 
@@ -82,16 +80,15 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                 SmaliParser.RULE_fx0t_branch     -> parseBranchInstructionFx0t(t as Fx0t_branchContext, codeOffset)
                 SmaliParser.RULE_f21t_branch     -> parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
                 SmaliParser.RULE_f21c_field      -> parseFieldInstructionF21c(t as F21c_fieldContext)
-                SmaliParser.RULE_f22c_field      -> parseFieldInstrucctionF22c(t as F22c_fieldContext)
-                SmaliParser.RULE_fconst_int      -> parseLiteralInstruction(t as Fconst_intContext)
+                SmaliParser.RULE_f22c_field      -> parseFieldInstructionF22c(t as F22c_fieldContext)
+                SmaliParser.RULE_fconst_int      -> parseLiteralInstructionInteger(t as Fconst_intContext)
+                SmaliParser.RULE_fconst_string   -> parseLiteralInstructionString(t as Fconst_stringContext)
+                SmaliParser.RULE_fconst_type     -> parseLiteralInstructionType(t as Fconst_typeContext)
 
                 SmaliParser.RULE_fm5c -> {
                     val c = t as SmaliParser.Fm5cContext
 
                     val mnemonic = c.op.text
-                    if (!mnemonic.startsWith("invoke-")) {
-                        parserError(ctx, "unexpected instruction $mnemonic")
-                    }
                     val opcode = DexOpCode.get(mnemonic)
                     val registers = c.REGISTER().map { registerInfo.registerNumber(it.text) }.toIntArray()
 
@@ -198,10 +195,6 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode.get(mnemonic)
 
-        if (!mnemonic.startsWith("goto")) {
-            parserError(ctx, "unexpected instruction $mnemonic")
-        }
-
         val label = ctx.target.text
         val branchOffset = branchOffset(codeOffset, label)
 
@@ -216,18 +209,11 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val branchOffset = branchOffset(codeOffset, label)
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
-        if (!mnemonic.startsWith("if-") && !mnemonic.endsWith("z")) {
-            parserError(ctx, "unexpected instruction $mnemonic")
-        }
-
         return BranchInstruction.of(opcode, branchOffset, r1)
     }
 
     private fun parseFieldInstructionF21c(ctx: F21c_fieldContext): FieldInstruction {
         val mnemonic = ctx.op.text
-        if (!(mnemonic.startsWith("sget") || mnemonic.startsWith("sput"))) {
-            parserError(ctx, "unexpected instruction $mnemonic")
-        }
         val opcode   = DexOpCode.get(mnemonic)
 
         val register = registerInfo.registerNumber(ctx.r1.text)
@@ -239,11 +225,8 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         return FieldInstruction.of(opcode, fieldIndex, register)
     }
 
-    private fun parseFieldInstrucctionF22c(ctx: F22c_fieldContext): FieldInstruction {
+    private fun parseFieldInstructionF22c(ctx: F22c_fieldContext): FieldInstruction {
         val mnemonic = ctx.op.text
-        if (!(mnemonic.startsWith("iget") || mnemonic.startsWith("iput"))) {
-            parserError(ctx, "unexpected instruction $mnemonic")
-        }
         val opcode = DexOpCode.get(mnemonic)
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
@@ -256,7 +239,7 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         return FieldInstruction.of(opcode, fieldIndex, r1, r2)
     }
 
-    private fun parseLiteralInstruction(ctx: Fconst_intContext): LiteralInstruction {
+    private fun parseLiteralInstructionInteger(ctx: Fconst_intContext): LiteralInstruction {
         val mnemonic = ctx.op.text
         val opcode = DexOpCode.get(mnemonic)
 
@@ -264,6 +247,26 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val literal = ctx.cst.text.toLong()
 
         return LiteralInstruction.of(opcode, literal, r1)
+    }
+
+    private fun parseLiteralInstructionString(ctx: Fconst_stringContext): StringInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val stringIndex = dexComposer.addOrGetStringIDIndex(ctx.cst.text)
+
+        return StringInstruction.of(opcode, stringIndex, r1)
+    }
+
+    private fun parseLiteralInstructionType(ctx: Fconst_typeContext): TypeInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.cst.text)
+
+        return TypeInstruction.of(opcode, typeIndex, r1)
     }
 
     private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
