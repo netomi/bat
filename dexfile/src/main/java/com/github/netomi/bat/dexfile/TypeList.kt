@@ -33,7 +33,7 @@ import java.util.*
     type          = TYPE_TYPE_LIST,
     dataAlignment = 4,
     dataSection   = false)
-class TypeList private constructor(private val typeList: IntArray = IntArray(0)) : DataItem() {
+class TypeList private constructor(private val typeList: IntArray = IntArray(0)) : DataItem(), Comparable<TypeList> {
 
     override val isEmpty: Boolean
         get() = typeList.size() == 0
@@ -92,6 +92,10 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
         for (i in 0 until size) {
             visitor.visitTypeID(dexFile, ArrayElementAccessor(typeList, i))
         }
+    }
+
+    override fun compareTo(other: TypeList): Int {
+        return typeList.compareTo(other.typeList);
     }
 
     override fun equals(other: Any?): Boolean {

@@ -37,10 +37,10 @@ class ClassData private constructor(
     val instanceFields: List<EncodedField>
         get() = _instanceFields
 
-    val directMethods: List<EncodedMethod>
+    val directMethods: MutableList<EncodedMethod>
         get() = _directMethods
 
-    val virtualMethods: List<EncodedMethod>
+    val virtualMethods: MutableList<EncodedMethod>
         get() = _virtualMethods
 
     val fields: List<EncodedField>

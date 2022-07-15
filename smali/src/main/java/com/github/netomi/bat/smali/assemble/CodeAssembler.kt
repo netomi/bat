@@ -29,6 +29,7 @@ import com.github.netomi.bat.smali.parser.SmaliParser.F12x_conversionContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F21c_fieldContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F21t_branchContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F22c_fieldContext
+import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_intContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fx0t_branchContext
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -61,6 +62,7 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                 SmaliParser.RULE_fprologue  -> null
                 SmaliParser.RULE_fepilogue  -> null
                 SmaliParser.RULE_fregisters -> null
+                SmaliParser.RULE_sLabel     -> null
 
                 SmaliParser.RULE_f10x -> {
                     val c = t as SmaliParser.F10xContext
@@ -81,6 +83,7 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                 SmaliParser.RULE_f21t_branch     -> parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
                 SmaliParser.RULE_f21c_field      -> parseFieldInstructionF21c(t as F21c_fieldContext)
                 SmaliParser.RULE_f22c_field      -> parseFieldInstrucctionF22c(t as F22c_fieldContext)
+                SmaliParser.RULE_fconst_int      -> parseLiteralInstruction(t as Fconst_intContext)
 
                 SmaliParser.RULE_fm5c -> {
                     val c = t as SmaliParser.Fm5cContext
@@ -251,6 +254,16 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
 
         val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
         return FieldInstruction.of(opcode, fieldIndex, r1, r2)
+    }
+
+    private fun parseLiteralInstruction(ctx: Fconst_intContext): LiteralInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val literal = ctx.cst.text.toLong()
+
+        return LiteralInstruction.of(opcode, literal, r1)
     }
 
     private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {

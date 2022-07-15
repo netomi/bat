@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.debug.DebugInfo
+import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor
 import com.github.netomi.bat.dexfile.visitor.IDAccessor
@@ -215,51 +216,68 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
     }
 
     private fun sortDataItems(dexFile: DexFile) {
-        val stringIDMapping = sortStringIDs(dexFile)
-
+        val stringIDMapping = sortIDList(dexFile.stringIDs, compareBy { it.stringData })
         dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
             override fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {
                 accessor.set(stringIDMapping[accessor.get()]!!)
             }
         })
 
-        val typeIDMapping   = sortTypeIDs(dexFile)
-
+        val typeIDMapping = sortIDList(dexFile.typeIDs, compareBy { it.descriptorIndex } )
         dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
             override fun visitTypeID(dexFile: DexFile, accessor: IDAccessor) {
                 accessor.set(typeIDMapping[accessor.get()]!!)
             }
         })
 
+        val protoIDMapping = sortIDList(dexFile.protoIDs, compareBy({ it.returnTypeIndex }, { it.parameters }) )
+        dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
+            override fun visitProtoID(dexFile: DexFile, accessor: IDAccessor) {
+                accessor.set(protoIDMapping[accessor.get()]!!)
+            }
+        })
+
+        val fieldIDMapping  = sortIDList(dexFile.fieldIDs,  compareBy({ it.classIndex }, { it.nameIndex }, { it.typeIndex }))
+        val methodIDMapping = sortIDList(dexFile.methodIDs, compareBy({ it.classIndex }, { it.nameIndex }, { it.protoIndex }))
+
+        dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
+            override fun visitFieldID(dexFile: DexFile, accessor: IDAccessor) {
+                accessor.set(fieldIDMapping[accessor.get()]!!)
+            }
+
+            override fun visitMethodID(dexFile: DexFile, accessor: IDAccessor) {
+                accessor.set(methodIDMapping[accessor.get()]!!)
+            }
+        })
+
+        dexFile.classDefsAccept(object: ClassDefVisitor {
+            override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+                classDef.classData.directMethods.sortWith(compareBy { it.methodIndex })
+                classDef.classData.virtualMethods.sortWith(compareBy { it.methodIndex })
+            }
+        })
+
+        dexFile.dataItemsAccept(object: DataItemVisitor {
+            override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {}
+            override fun visitAnnotationSet(dexFile: DexFile, annotationSetRef: AnnotationSetRef, annotationSet: AnnotationSet) {
+                annotationSet.annotations.sortWith(compareBy { it.annotationValue.typeIndex })
+            }
+
+            override fun visitAnnotationsDirectory(dexFile: DexFile, classDef: ClassDef, annotationsDirectory: AnnotationsDirectory) {
+                annotationsDirectory.fieldAnnotations.sortWith(compareBy { it.fieldIndex })
+                annotationsDirectory.methodAnnotations.sortWith(compareBy { it.methodIndex })
+                annotationsDirectory.parameterAnnotations.sortWith(compareBy { it.methodIndex })
+            }
+        })
+
         dexFile.refreshCaches()
     }
 
-    private fun sortStringIDs(dexFile: DexFile): Map<Int, Int> {
-        val sortedStringIDs = dexFile.stringIDs.sortedBy { it.stringData }
-
-        val oldIndices = dexFile.stringIDs.withIndex().associate { iv -> Pair(iv.value, iv.index) }
-        val newIndices = sortedStringIDs.withIndex().associate   { iv -> Pair(iv.value, iv.index) }
-
-        val mapping = oldIndices.keys.associate { stringID -> Pair(oldIndices[stringID]!!, newIndices[stringID]!!) }
-
-        dexFile.stringIDs.clear()
-        dexFile.stringIDs.addAll(sortedStringIDs)
-
-        return mapping
-    }
-
-    internal fun sortTypeIDs(dexFile: DexFile): Map<Int, Int> {
-        val sortedTypeIDs = dexFile.typeIDs.sortedBy { it.descriptorIndex }
-
-        val oldIndices = dexFile.typeIDs.withIndex().associate { iv -> Pair(iv.value, iv.index) }
-        val newIndices = sortedTypeIDs.withIndex().associate   { iv -> Pair(iv.value, iv.index) }
-
-        val mapping = oldIndices.keys.associate { stringID -> Pair(oldIndices[stringID]!!, newIndices[stringID]!!) }
-
-        dexFile.typeIDs.clear()
-        dexFile.typeIDs.addAll(sortedTypeIDs)
-
-        return mapping
+    private fun <T> sortIDList(list: MutableList<T>, comparator: Comparator<T>): Map<Int, Int> {
+        val oldIndices = list.withIndex().associate { iv -> Pair(iv.value, iv.index) }
+        list.sortWith(comparator)
+        val newIndices = list.withIndex().associate { iv -> Pair(iv.value, iv.index) }
+        return oldIndices.keys.associate { stringID -> Pair(oldIndices[stringID]!!, newIndices[stringID]!!) }
     }
 }
 

@@ -15,13 +15,17 @@
  */
 package com.github.netomi.bat.util;
 
+import com.google.common.primitives.Ints;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 /**
  * Implements a growing array of int primitives.
  */
 public class IntArray
-implements   Cloneable
+implements   Cloneable,
+             Comparable<IntArray>
 {
     private static final int MIN_CAPACITY_INCREMENT = 12;
 
@@ -213,6 +217,11 @@ implements   Cloneable
      */
     public int[] toArray() {
         return java.util.Arrays.copyOf(values, size);
+    }
+
+    @Override
+    public int compareTo(@NotNull IntArray o) {
+        return Ints.lexicographicalComparator().compare(values, o.values);
     }
 
     @Override

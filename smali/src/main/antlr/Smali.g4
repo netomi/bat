@@ -288,7 +288,9 @@ sInstruction
 	| f21t_branch
 	| f2t
 	| f11x_basic
-	| fconst
+	| fconst_int
+	| fconst_string
+	| fconst_type
 	| ft2c
 	| f21c_field
 	| f22c_field
@@ -354,7 +356,7 @@ f11x_basic: op=
 	| 'monitor-enter'
 	| 'monitor-exit' ) r1=REGISTER
 	;
-fconst: op=
+fconst_int: op=
     ( 'const/4'
     | 'const/16'
     | CONST
@@ -362,10 +364,13 @@ fconst: op=
     | 'const-wide/16'
     | 'const-wide/32'
     | 'const-wide/high16'
-    | 'const-wide')                                        r1=REGISTER ',' cst=(INT|LONG)
-	| op=('const-string' | 'const-string/jumbo')           r1=REGISTER ',' cst=STRING
-    | op=('const-class' | 'check-cast' | 'new-instance' )  r1=REGISTER ',' cst=(OBJECT_TYPE|ARRAY_TYPE)
+    | 'const-wide') r1=REGISTER ',' cst=(INT|LONG)
 	;
+
+fconst_string: op=('const-string' | 'const-string/jumbo') r1=REGISTER ',' cst=STRING;
+
+fconst_type: op=('const-class' | 'check-cast' | 'new-instance' )  r1=REGISTER ',' cst=(OBJECT_TYPE|ARRAY_TYPE);
+
 f21c_field
     : op=
     ( SGET

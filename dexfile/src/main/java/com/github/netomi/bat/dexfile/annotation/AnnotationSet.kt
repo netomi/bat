@@ -37,7 +37,8 @@ import kotlin.collections.ArrayList
 class AnnotationSet private constructor() : DataItem() {
 
     private val annotationOffsetEntries: IntArray  = IntArray(0)
-    private val annotations: ArrayList<Annotation> = ArrayList(0)
+
+    val annotations: ArrayList<Annotation> = ArrayList(0)
 
     val annotationCount: Int
         get() = annotations.size
