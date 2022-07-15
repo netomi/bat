@@ -285,13 +285,13 @@ sInstruction
 	| fcatchall
 	| f10x
 	| fx0t_branch
-	| f21t
+	| f21t_branch
 	| f2t
 	| f11x_basic
 	| fconst
 	| ft2c
-	| f21c
-	| ff2c
+	| f21c_field
+	| f22c_field
 	| f12x_conversion
 	| f2x
 	| f3x
@@ -366,7 +366,7 @@ fconst: op=
 	| op=('const-string' | 'const-string/jumbo')           r1=REGISTER ',' cst=STRING
     | op=('const-class' | 'check-cast' | 'new-instance' )  r1=REGISTER ',' cst=(OBJECT_TYPE|ARRAY_TYPE)
 	;
-f21c
+f21c_field
     : op=
     ( SGET
 	| 'sget-wide'
@@ -385,7 +385,7 @@ f21c
 	;
 
 ft2c :	op=('instance-of'|'new-array') r1=REGISTER ',' r2=REGISTER ',' type=(OBJECT_TYPE|ARRAY_TYPE);
-ff2c :	op=
+f22c_field : op=
     ( IGET
 	| 'iget-wide'
 	| 'iget-object'
@@ -546,7 +546,7 @@ fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArray
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
 ftrc : op='filled-new-array/range' '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' type=(OBJECT_TYPE|ARRAY_TYPE);
 f31t : op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
-f21t : op=
+f21t_branch : op=
     ( 'if-eqz'
     | 'if-nez'
     | 'if-ltz'

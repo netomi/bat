@@ -26,6 +26,9 @@ import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.smali.parser.SmaliParser.F11x_basicContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F12x_conversionContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F21c_fieldContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F21t_branchContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F22c_fieldContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fx0t_branchContext
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -75,61 +78,9 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                 SmaliParser.RULE_f12x_conversion -> parseConversionInstructionF12x(t as F12x_conversionContext)
                 SmaliParser.RULE_f11x_basic      -> parseBasicInstructionF11x(t as F11x_basicContext)
                 SmaliParser.RULE_fx0t_branch     -> parseBranchInstructionFx0t(t as Fx0t_branchContext, codeOffset)
-
-                SmaliParser.RULE_f21t -> {
-                    val c = t as SmaliParser.F21tContext
-
-                    val mnemonic = c.op.text
-                    val opcode   = DexOpCode.get(mnemonic)
-
-                    val label = c.label.text
-                    val branchOffset = branchOffset(codeOffset, label)
-                    val r1 = registerInfo.registerNumber(c.r1.text)
-
-                    if (!mnemonic.startsWith("if-") && !mnemonic.endsWith("z")) {
-                        parserError(ctx, "unexpected instruction $mnemonic")
-                    }
-
-                    BranchInstruction.of(opcode, branchOffset, r1)
-                }
-
-                SmaliParser.RULE_f21c -> {
-                    val c = t as SmaliParser.F21cContext
-
-                    val mnemonic = c.op.text
-                    if (!(mnemonic.startsWith("sget") || mnemonic.startsWith("sput"))) {
-                        parserError(ctx, "unexpected instruction $mnemonic")
-                    }
-                    val opcode   = DexOpCode.get(mnemonic)
-
-                    val register = registerInfo.registerNumber(c.r1.text)
-
-                    val field = c.fld.text
-                    val (classType, fieldName, fieldType) = parseFieldObject(field)
-
-                    val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
-                    FieldInstruction.of(opcode, fieldIndex, register)
-                }
-
-                SmaliParser.RULE_ff2c -> {
-                    val c = t as SmaliParser.Ff2cContext
-
-                    val mnemonic = c.op.text
-                    if (!(mnemonic.startsWith("iget") || mnemonic.startsWith("iput"))) {
-                        parserError(ctx, "unexpected instruction $mnemonic")
-                    }
-                    val opcode = DexOpCode.get(mnemonic)
-
-                    val r1 = registerInfo.registerNumber(c.r1.text)
-                    val r2 = registerInfo.registerNumber(c.r2.text)
-
-                    val field = c.fld.text
-                    val (classType, fieldName, fieldType) = parseFieldObject(field)
-
-                    val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
-
-                    FieldInstruction.of(opcode, fieldIndex, r1, r2)
-                }
+                SmaliParser.RULE_f21t_branch     -> parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
+                SmaliParser.RULE_f21c_field      -> parseFieldInstructionF21c(t as F21c_fieldContext)
+                SmaliParser.RULE_f22c_field      -> parseFieldInstrucctionF22c(t as F22c_fieldContext)
 
                 SmaliParser.RULE_fm5c -> {
                     val c = t as SmaliParser.Fm5cContext
@@ -252,6 +203,54 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val branchOffset = branchOffset(codeOffset, label)
 
         return BranchInstruction.of(opcode, branchOffset)
+    }
+
+    private fun parseBranchInstructionF21t(ctx: F21t_branchContext, codeOffset: Int): BranchInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = DexOpCode.get(mnemonic)
+
+        val label = ctx.label.text
+        val branchOffset = branchOffset(codeOffset, label)
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+
+        if (!mnemonic.startsWith("if-") && !mnemonic.endsWith("z")) {
+            parserError(ctx, "unexpected instruction $mnemonic")
+        }
+
+        return BranchInstruction.of(opcode, branchOffset, r1)
+    }
+
+    private fun parseFieldInstructionF21c(ctx: F21c_fieldContext): FieldInstruction {
+        val mnemonic = ctx.op.text
+        if (!(mnemonic.startsWith("sget") || mnemonic.startsWith("sput"))) {
+            parserError(ctx, "unexpected instruction $mnemonic")
+        }
+        val opcode   = DexOpCode.get(mnemonic)
+
+        val register = registerInfo.registerNumber(ctx.r1.text)
+
+        val field = ctx.fld.text
+        val (classType, fieldName, fieldType) = parseFieldObject(field)
+
+        val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
+        return FieldInstruction.of(opcode, fieldIndex, register)
+    }
+
+    private fun parseFieldInstrucctionF22c(ctx: F22c_fieldContext): FieldInstruction {
+        val mnemonic = ctx.op.text
+        if (!(mnemonic.startsWith("iget") || mnemonic.startsWith("iput"))) {
+            parserError(ctx, "unexpected instruction $mnemonic")
+        }
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val r2 = registerInfo.registerNumber(ctx.r2.text)
+
+        val field = ctx.fld.text
+        val (classType, fieldName, fieldType) = parseFieldObject(field)
+
+        val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
+        return FieldInstruction.of(opcode, fieldIndex, r1, r2)
     }
 
     private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
