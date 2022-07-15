@@ -110,6 +110,27 @@ internal class CodeAssembler constructor(private val dexFile: DexFile, private v
                     instructions.add(insn)
                 }
 
+                SmaliParser.RULE_f21c -> {
+                    val c = t as SmaliParser.F21cContext
+
+                    val mnemonic = c.op.text
+                    if (!(mnemonic.startsWith("sget") || mnemonic.startsWith("sput"))) {
+                        parserError(ctx, "unexpected instruction $mnemonic")
+                    }
+                    val opcode   = DexOpCode.get(mnemonic)
+
+                    val register = getRegisterNumber(c.r1.text, registerInfo!!)
+
+                    val field = c.fld.text
+                    val (classType, fieldName, fieldType) = parseFieldObject(field)
+
+                    val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
+
+                    val insn = FieldInstruction.of(opcode, fieldIndex, register!!)
+                    codeOffset += insn.length
+                    instructions.add(insn)
+                }
+
                 SmaliParser.RULE_fm5c -> {
                     val c = t as SmaliParser.Fm5cContext
                     val opName = c.op.text
@@ -158,7 +179,7 @@ internal class CodeAssembler constructor(private val dexFile: DexFile, private v
                 SmaliParser.RULE_f10x,
                 SmaliParser.RULE_f1x,
                 SmaliParser.RULE_fconst,
-                SmaliParser.RULE_ff1c,
+                SmaliParser.RULE_f21c,
                 SmaliParser.RULE_ft2c,
                 SmaliParser.RULE_ff2c,
                 SmaliParser.RULE_f2x,
