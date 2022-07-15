@@ -231,11 +231,11 @@ internal class CodeAssembler constructor(private val dexFile: DexFile, private v
     private fun computeRegisterInfo(method: EncodedMethod, registers: Int): RegisterInfo {
         val protoID = method.getMethodID(dexFile).getProtoID(dexFile)
 
-        var insSize = if (method.isStatic) 1 else 0
+        var insSize = if (method.isStatic) 0 else 1
         val argumentSize = DexClasses.getArgumentSize(protoID.parameters.getTypes(dexFile))
         insSize += argumentSize
 
-        return RegisterInfo(registers, registers - argumentSize, argumentSize)
+        return RegisterInfo(registers, registers - insSize, insSize)
     }
 
     private fun getRegisterNumber(register: String, registerInfo: RegisterInfo): Int? {
@@ -257,4 +257,4 @@ internal class CodeAssembler constructor(private val dexFile: DexFile, private v
     }
 }
 
-data class RegisterInfo(val registers: Int, val locals: Int, val insSize: Int)
+private data class RegisterInfo(val registers: Int, val locals: Int, val insSize: Int)

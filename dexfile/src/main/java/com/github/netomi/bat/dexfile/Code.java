@@ -54,7 +54,7 @@ extends      DataItem
     public static Code of(int registersSize, int insSize, int outsSize) {
         Code code = new Code();
         code.registersSize = registersSize;
-        code.insSize = insSize;
+        code.insSize  = insSize;
         code.outsSize = outsSize;
         return code;
     }
