@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-open class MethodInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX) : DexInstruction(opcode) {
+open class MethodInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var methodIndex: Int = _methodIndex
         private set
@@ -47,7 +47,7 @@ open class MethodInstruction internal constructor(opcode: DexOpCode, _methodInde
             DexInstructionFormat.FORMAT_3rc,
             DexInstructionFormat.FORMAT_35c,
             DexInstructionFormat.FORMAT_45cc,
-            DexInstructionFormat.FORMAT_4rcc -> data[1] = (data[1].toInt() or methodIndex).toShort()
+            DexInstructionFormat.FORMAT_4rcc -> data[1] = methodIndex.toShort()
 
             else -> {}
         }
@@ -60,9 +60,7 @@ open class MethodInstruction internal constructor(opcode: DexOpCode, _methodInde
 
     companion object {
         fun of(opCode: DexOpCode, methodIndex: Int, vararg registers: Int): MethodInstruction {
-            val instruction = MethodInstruction(opCode, methodIndex)
-            instruction.registers = registers
-            return instruction
+            return MethodInstruction(opCode, methodIndex, *registers)
         }
 
         @JvmStatic

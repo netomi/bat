@@ -54,7 +54,7 @@ class Annotation private constructor(_visibility:      AnnotationVisibility   = 
 
     override fun write(output: DexDataOutput) {
         output.writeUnsignedByte(visibility.value)
-        annotationValue.write(output)
+        annotationValue.writeValue(output, 0)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

@@ -77,6 +77,7 @@ class ParameterAnnotation private constructor(
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
         visitor.visitParameterAnnotations(dexFile, this, annotationSetRefList)
+        annotationSetRefList.dataItemsAccept(dexFile, visitor)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

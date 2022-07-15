@@ -69,6 +69,7 @@ class MethodAnnotation private constructor(_methodIndex: Int = NO_INDEX, _annota
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
         visitor.visitMethodAnnotations(dexFile, this, annotationSet)
+        annotationSet.dataItemsAccept(dexFile, visitor)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

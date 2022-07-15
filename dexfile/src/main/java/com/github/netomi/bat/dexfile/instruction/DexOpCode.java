@@ -15,6 +15,9 @@
  */
 package com.github.netomi.bat.dexfile.instruction;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*;
 
 /**
@@ -330,12 +333,19 @@ public enum DexOpCode
 
     private static final DexOpCode[] opcodes;
 
+    private static final Map<String, DexOpCode> mnemonicToOpCodeMapping;
+
     static
     {
         opcodes = new DexOpCode[0x100];
         for (DexOpCode opCode : values())
         {
             opcodes[opCode.opCode & 0xff] = opCode;
+        }
+
+        mnemonicToOpCodeMapping = new HashMap<>();
+        for (DexOpCode opCode : values()) {
+            mnemonicToOpCodeMapping.put(opCode.mnemonic, opCode);
         }
     }
 
@@ -382,6 +392,10 @@ public enum DexOpCode
     public static DexOpCode get(byte opcode)
     {
         return opcodes[opcode & 0xff];
+    }
+
+    public static DexOpCode get(String mnemonic) {
+        return mnemonicToOpCodeMapping.get(mnemonic);
     }
 
     @FunctionalInterface

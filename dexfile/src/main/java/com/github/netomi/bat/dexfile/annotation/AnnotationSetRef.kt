@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.AnnotationVisitor
+import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
 
@@ -63,6 +64,11 @@ class AnnotationSetRef private constructor(_annotationSet: AnnotationSet = Annot
 
     fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationVisitor) {
         annotationSet.accept(dexFile, classDef, visitor)
+    }
+
+    override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
+        visitor.visitAnnotationSet(dexFile, this, annotationSet)
+        annotationSet.dataItemsAccept(dexFile, visitor)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

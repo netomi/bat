@@ -18,6 +18,7 @@ package com.github.netomi.bat
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
 import com.github.netomi.bat.dexfile.io.DexFileReader
+import com.github.netomi.bat.dexfile.io.DexFileWriter
 import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
 import com.github.netomi.bat.io.FileOutputStreamFactory
 import com.github.netomi.bat.smali.Assembler
@@ -61,6 +62,8 @@ class SmaliCommand : Runnable {
                 Assembler(dexFile).assemble(toPath())
                 printVerbose("done assembling '${name}'.")
             }
+
+            DexFileWriter(outputFile!!.outputStream()).visitDexFile(dexFile)
         }
     }
 

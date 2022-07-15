@@ -53,6 +53,11 @@ public class DexInstruction
         this.registers = EMPTY_REGISTERS;
     }
 
+    public DexInstruction(DexOpCode opcode, int... registers) {
+        this.opcode    = opcode;
+        this.registers = registers.length == 0 ? EMPTY_REGISTERS : registers;
+    }
+
     public DexOpCode getOpcode() {
         return opcode;
     }

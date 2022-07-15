@@ -64,6 +64,30 @@ FRAGMENT_OBJECT_TYPE: 'L' (ESC_SEQ |~(';'|':'|'\\'|' '|'\n'|'\t'|'\r'|'('|')'))+
 fragment
 FRAGMENT_ARRAY_TYPE: ('[')+ (FRAGMENT_PRIMITIVE_TYPE|FRAGMENT_OBJECT_TYPE);
 
+fragment SimpleNameChar :
+	'A' .. 'Z'             |
+    'a' .. 'z'             |
+    '0' .. '9'             |
+    //' '                  | // since DEX version 040
+    '$'                    |
+    '-'                    |
+    '_'                    |
+    //'\u00a0'             | // since DEX version 040
+    '\u00a1' .. '\u1fff'   |
+    //'\u2000' .. '\u200a' | // since DEX version 040
+    '\u2010' .. '\u2027'   |
+    //'\u202f' 	           | // since DEX version 040
+    '\u2030' .. '\ud7ff'   |
+    '\ue000' .. '\uffef'
+    //'\u10000' .. '\u10ffff' // not supported by antlr
+    ;
+
+fragment
+SimpleName : SimpleNameChar+ ;
+
+fragment
+MemberName : SimpleName | '<' SimpleName '>' ;
+
 fragment
 FRAGMENT_ID: (ESC_SEQ| ~('\\'|'\r'|'\n'|'\t'|' '|':'|'-'|'='|','|'{'|'}'|'('|')'|'+'|'"'|'\''|'#'|'/'|'.'|';'))+;
 
@@ -74,7 +98,7 @@ fragment
 FRAGMENT_FIELD_PART : FRAGMENT_ID ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
 METHOD_FULL  : (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_ID FRAGMENT_METHOD_PROTO;
-METHOD_PART  : FRAGMENT_ID FRAGMENT_METHOD_PROTO;
+METHOD_PART  : MemberName FRAGMENT_METHOD_PROTO;
 METHOD_PROTO : FRAGMENT_METHOD_PROTO;
 
 FIELD_FULL : (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_FIELD_PART;
@@ -254,14 +278,14 @@ sInstruction
     | fend
     | frestart
     | fprologue
-    | fepiogue
+    | fepilogue
     | fregisters
 	| flocals
 	| fcatch
 	| fcatchall
-	| f0x
-	| f0t
-	| f1t
+	| f10x
+	| fx0t
+	| f21t
 	| f2t
 	| f1x
 	| fconst
@@ -298,7 +322,7 @@ flocal: '.local' r=REGISTER ','
 fend           : '.end local' r=REGISTER;
 frestart       : '.restart local'  r=REGISTER;
 fprologue      : '.prologue';
-fepiogue       : '.epiogue';
+fepilogue       : '.epilogue';
 fregisters     : '.registers' xregisters=INT;
 flocals        : '.locals' xlocals=INT;
 fcatch         : '.catch' type=OBJECT_TYPE '{' start=LABEL '..' end=LABEL  '}' handle=LABEL;
@@ -308,16 +332,26 @@ fpackageswitch : '.packed-switch' start=INT LABEL+ '.end packed-switch';
 fspareswitch   : '.sparse-switch' (INT '->' LABEL)* '.end sparse-switch';
 farraydata     : '.array-data' size=INT (sBaseValue)+ '.end array-data';
 
-f0x	:	op=(NOP
-	|	'return-void')
+f10x: op=
+    ( NOP
+	| 'return-void')
 	;
-f0t	:	op=(GOTO|'goto/16'|'goto/32') target=LABEL
+fx0t: op=
+    ( GOTO
+    | 'goto/16'
+    | 'goto/32' ) target=LABEL
 	;
-f1x	:	op=('move-result'|'move-result-wide'|'move-result-object'
-	|	'move-exception'
-	|	RETURN|'return-wide'|'return-object'
-	|	THROW
-	|	'monitor-enter' | 'monitor-exit' ) r1=REGISTER
+f1x	: op=
+    ( 'move-result'
+    | 'move-result-wide'
+    | 'move-result-object'
+	| 'move-exception'
+	| RETURN
+	| 'return-wide'
+	| 'return-object'
+	| THROW
+	| 'monitor-enter'
+	| 'monitor-exit' ) r1=REGISTER
 	;
 fconst
     : op=('const/4'|'const/16'|CONST|'const/high16'|'const-wide/16'|'const-wide/32'|'const-wide/high16'|'const-wide')
@@ -426,7 +460,7 @@ f2x	: op=
     | 'rem-double/2addr') r1=REGISTER ',' r2=REGISTER
 	;
 
-f3x	:	op=
+f3x	: op=
     ( 'cmpl-float'
     | 'cmpg-float'
     | 'cmpl-double'
@@ -501,7 +535,7 @@ fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArray
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
 ftrc : op='filled-new-array/range' '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' type=(OBJECT_TYPE|ARRAY_TYPE);
 f31t : op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
-f1t  : op=
+f21t : op=
     ( 'if-eqz'
     | 'if-nez'
     | 'if-ltz'

@@ -85,7 +85,7 @@ class AnnotationSetRefList private constructor(private val annotationSetRefs: Ar
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
         for (annotationSetRef in annotationSetRefs) {
-            visitor.visitAnnotationSet(dexFile, annotationSetRef, annotationSetRef.annotationSet)
+            annotationSetRef.dataItemsAccept(dexFile, visitor)
         }
     }
 

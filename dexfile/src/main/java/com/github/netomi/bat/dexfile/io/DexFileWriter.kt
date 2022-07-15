@@ -219,8 +219,7 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
         dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
             override fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {
-                val oldIndex = accessor.get()
-                accessor.set(stringIDMapping[oldIndex]!!)
+                accessor.set(stringIDMapping[accessor.get()]!!)
             }
         })
 
@@ -228,14 +227,11 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
         dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
             override fun visitTypeID(dexFile: DexFile, accessor: IDAccessor) {
-                val oldIndex = accessor.get()
-                accessor.set(typeIDMapping[oldIndex]!!)
+                accessor.set(typeIDMapping[accessor.get()]!!)
             }
         })
 
         dexFile.refreshCaches()
-
-        println("done")
     }
 
     private fun sortStringIDs(dexFile: DexFile): Map<Int, Int> {

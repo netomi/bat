@@ -16,7 +16,7 @@
 
 package com.github.netomi.bat.dexfile.io
 
-class InstructionWriter constructor(size: Int){
+class InstructionWriter constructor(size: Int) {
 
     val array: ShortArray = ShortArray(size)
 

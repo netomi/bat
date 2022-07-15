@@ -22,9 +22,9 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode) : ArithmeticInstruction(opcode) {
+class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode, _literal: Int = 0) : ArithmeticInstruction(opcode) {
 
-    var literal = 0
+    var literal = _literal
         private set
 
     override fun read(instructions: ShortArray, offset: Int) {
@@ -43,7 +43,7 @@ class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode) : Ari
 
         when (opcode.format) {
             FORMAT_22b -> data[1] = (data[1].toInt() or (literal shl 8)).toShort()
-            FORMAT_22s -> data[1] = (data[1].toInt() or literal).toShort()
+            FORMAT_22s -> data[1] = literal.toShort()
 
             else -> {}
         }
@@ -55,6 +55,10 @@ class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode) : Ari
     }
 
     companion object {
+        fun of(opCode: DexOpCode, literal: Int): ArithmeticLiteralInstruction {
+            return ArithmeticLiteralInstruction(opCode, literal)
+        }
+
         @JvmStatic
         fun create(opCode: DexOpCode, ident: Byte): ArithmeticLiteralInstruction {
             return ArithmeticLiteralInstruction(opCode)

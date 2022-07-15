@@ -77,7 +77,8 @@ class AnnotationSet private constructor() : DataItem() {
         annotationOffsetEntries.clear()
         annotationOffsetEntries.resize(annotations.size)
         for (i in annotations.indices) {
-            annotationOffsetEntries[i] = dataItemMap.getOffset(annotations[i])
+            val offset = dataItemMap.getOffset(annotations[i])
+            annotationOffsetEntries[i] = offset
         }
     }
 

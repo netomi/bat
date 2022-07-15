@@ -69,6 +69,7 @@ class FieldAnnotation private constructor(_fieldIndex: Int = NO_INDEX, _annotati
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
         visitor.visitFieldAnnotations(dexFile, this, annotationSet)
+        annotationSet.dataItemsAccept(dexFile, visitor)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

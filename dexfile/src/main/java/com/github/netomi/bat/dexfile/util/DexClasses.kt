@@ -68,4 +68,24 @@ object DexClasses {
             EncodedNullValue
         }
     }
+
+    fun getArgumentSize(parameterTypes: Iterable<String>): Int {
+        return parameterTypes.fold(0) { size, type -> size + getArgumentSizeForType(type) }
+    }
+
+    fun getArgumentSizeForType(type: String): Int {
+        when (type) {
+            "B",
+            "S",
+            "C",
+            "I",
+            "Z",
+            "F" -> return 1
+
+            "J",
+            "D" -> return 2
+        }
+
+        return 1
+    }
 }
