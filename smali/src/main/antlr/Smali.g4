@@ -284,14 +284,15 @@ sInstruction
 	| fcatch
 	| fcatchall
 	| f10x
-	| fx0t
+	| fx0t_branch
 	| f21t
 	| f2t
-	| f1x
+	| f11x_basic
 	| fconst
 	| ft2c
 	| f21c
 	| ff2c
+	| f12x_conversion
 	| f2x
 	| f3x
 	| ft5c
@@ -336,12 +337,12 @@ f10x: op=
     ( NOP
 	| 'return-void')
 	;
-fx0t: op=
+fx0t_branch: op=
     ( GOTO
     | 'goto/16'
     | 'goto/32' ) target=LABEL
 	;
-f1x	: op=
+f11x_basic: op=
     ( 'move-result'
     | 'move-result-wide'
     | 'move-result-object'
@@ -400,6 +401,25 @@ ff2c :	op=
 	| 'iput-char'
 	| 'iput-short' ) r1=REGISTER ',' r2=REGISTER ',' fld=FIELD_FULL
 	;
+
+f12x_conversion: op=
+    ( 'int-to-long'
+    | 'int-to-float'
+    | 'int-to-double'
+    | 'long-to-int'
+    | 'long-to-float'
+    | 'long-to-double'
+    | 'float-to-int'
+    | 'float-to-long'
+    | 'float-to-double'
+    | 'double-to-int'
+    | 'double-to-long'
+    | 'double-to-float'
+    | 'int-to-byte'
+    | 'int-to-char'
+    | 'int-to-short' ) r1=REGISTER ',' r2=REGISTER
+    ;
+
 f2x	: op=
     ( MOVE
     | 'move/from16'
@@ -417,21 +437,6 @@ f2x	: op=
     | 'not-long'
     | 'neg-float'
     | 'neg-double'
-    | 'int-to-long'
-    | 'int-to-float'
-    | 'int-to-double'
-    | 'long-to-int'
-    | 'long-to-float'
-    | 'long-to-double'
-    | 'float-to-int'
-    | 'float-to-long'
-    | 'float-to-double'
-    | 'double-to-int'
-    | 'double-to-long'
-    | 'double-to-float'
-    | 'int-to-byte'
-    | 'int-to-char'
-    | 'int-to-short'
     | 'add-int/2addr'
     | 'sub-int/2addr'
     | 'mul-int/2addr'
@@ -576,5 +581,5 @@ f2sb : op=
     | 'xor-int/lit8'
     | 'shl-int/lit8'
     | 'shr-int/lit8'
-    |'ushr-int/lit8' ) r1=REGISTER ',' r2=REGISTER ',' lit=INT
+    | 'ushr-int/lit8' ) r1=REGISTER ',' r2=REGISTER ',' lit=INT
 	;

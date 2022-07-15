@@ -25,7 +25,6 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
     private val dexComposer:           DexComposer           = dexFile.composer
     private val encodedValueAssembler: EncodedValueAssembler = EncodedValueAssembler(dexComposer)
-    private val codeAssembler:         CodeAssembler         = CodeAssembler(dexFile, dexComposer)
     private val annotationAssembler:   AnnotationAssembler   = AnnotationAssembler(encodedValueAssembler, dexComposer)
 
     private lateinit var classDef: ClassDef
@@ -94,7 +93,8 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
 
         if (!method.isAbstract) {
-            val code = codeAssembler.parseCode(ctx.sInstruction(), method)
+            val codeAssembler = CodeAssembler(method, dexComposer)
+            val code = codeAssembler.parseCode(ctx.sInstruction())
             method.code = code
         } else {
             if (ctx.sInstruction().isNotEmpty()) {
