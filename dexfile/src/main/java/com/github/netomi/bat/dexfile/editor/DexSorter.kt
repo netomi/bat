@@ -67,12 +67,10 @@ class DexSorter : DexFileVisitor {
             }
         })
 
-        dexFile.classDefsAccept(object: ClassDefVisitor {
-            override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
-                classDef.classData.directMethods.sortWith(compareBy { it.methodIndex })
-                classDef.classData.virtualMethods.sortWith(compareBy { it.methodIndex })
-            }
-        })
+        dexFile.classDefsAccept { _, _, classDef ->
+            classDef.classData.directMethods.sortWith(compareBy { it.methodIndex })
+            classDef.classData.virtualMethods.sortWith(compareBy { it.methodIndex })
+        }
 
         dexFile.dataItemsAccept(object: DataItemVisitor {
             override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {}

@@ -20,11 +20,8 @@ import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.debug.DebugInfo
 import com.github.netomi.bat.dexfile.editor.DexSorter
-import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor
-import com.github.netomi.bat.dexfile.visitor.IDAccessor
-import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.hash.Hashing
 import java.io.OutputStream
 
