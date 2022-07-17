@@ -18,6 +18,7 @@ package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.DexAccessFlags
 import com.github.netomi.bat.smali.parser.SmaliParser
+import com.github.netomi.bat.util.Strings
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
 
@@ -98,4 +99,38 @@ fun parseAccessFlags(sAccListContext: SmaliParser.SAccListContext): Int {
         accessFlags = accessFlags or flag.value
     }
     return accessFlags
+}
+
+fun parseNumber(value: String): Long {
+    return when(value.last()) {
+        'l',
+        'L',
+        's',
+        'S',
+        't',
+        'T'   -> parseLong(value.dropLast(1))
+        '\"',
+        '\''  -> parseChar(value).code.toLong()
+        else  -> parseLong(value)
+    }
+}
+
+fun parseChar(value: String): Char {
+    return Strings.unescapeJavaString(value.removeSurrounding("'")).first()
+}
+
+fun parseInt(value: String): Int {
+    return Integer.decode(value)
+}
+
+fun parseLong(value: String): Long {
+    return java.lang.Long.decode(value.removeSuffix("l").removeSuffix("L"))
+}
+
+fun parseByte(value: String): Byte {
+    return java.lang.Byte.decode(value.removeSuffix("t").removeSuffix("T"))
+}
+
+fun parseShort(value: String): Short {
+    return java.lang.Short.decode(value.removeSuffix("s").removeSuffix("S"))
 }

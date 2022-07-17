@@ -100,7 +100,7 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                     MethodInstruction.of(opcode, methodIndex, *registers)
                 }
 
-                else -> parserError(t, "unexpected instruction")
+                else -> null //parserError(t, "unexpected instruction")
             }
 
             insn?.apply {
@@ -244,9 +244,9 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val opcode = DexOpCode.get(mnemonic)
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
-        val literal = ctx.cst.text.toLong()
+        val value = parseNumber(ctx.cst.text)
 
-        return LiteralInstruction.of(opcode, literal, r1)
+        return LiteralInstruction.of(opcode, value, r1)
     }
 
     private fun parseLiteralInstructionString(ctx: Fconst_stringContext): StringInstruction {

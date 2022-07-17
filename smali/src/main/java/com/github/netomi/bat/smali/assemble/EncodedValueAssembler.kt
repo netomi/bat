@@ -43,11 +43,11 @@ internal class EncodedValueAssembler constructor(private val dexComposer: DexCom
         return when (value.type) {
             SmaliLexer.STRING ->        EncodedStringValue.of(dexComposer.addOrGetStringIDIndex(Strings.unescapeJavaString(value.text.removeSurrounding("\""))))
             SmaliLexer.BOOLEAN ->       EncodedBooleanValue.of("true" == value.text)
-            SmaliLexer.BYTE ->          EncodedByteValue.of(java.lang.Byte.decode(value.text.removeSuffix("t")))
-            SmaliLexer.SHORT ->         EncodedShortValue.of(java.lang.Short.decode(value.text.removeSuffix("s")))
-            SmaliLexer.CHAR ->          EncodedCharValue.of(Strings.unescapeJavaString(value.text.removeSurrounding("'")).first())
-            SmaliLexer.INT ->           EncodedIntValue.of(Integer.decode(value.text))
-            SmaliLexer.LONG ->          EncodedLongValue.of(java.lang.Long.decode(value.text.removeSuffix("L").removeSuffix("l")))
+            SmaliLexer.BYTE ->          EncodedByteValue.of(parseByte(value.text))
+            SmaliLexer.SHORT ->         EncodedShortValue.of(parseShort(value.text))
+            SmaliLexer.CHAR ->          EncodedCharValue.of(parseChar(value.text))
+            SmaliLexer.INT ->           EncodedIntValue.of(parseInt(value.text))
+            SmaliLexer.LONG ->          EncodedLongValue.of(parseLong(value.text))
             SmaliLexer.BASE_FLOAT,
             SmaliLexer.FLOAT_INFINITY,
             SmaliLexer.FLOAT_NAN ->     EncodedFloatValue.of(value.text.toFloat())
