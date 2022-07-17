@@ -295,6 +295,8 @@ sInstruction
 	| f21c_field
 	| f22c_field
 	| f12x_conversion
+	| f12x_arithmetic
+	| f23x_arithmetic
 	| f2x
 	| f3x
 	| ft5c
@@ -425,18 +427,8 @@ f12x_conversion: op=
     | 'int-to-short' ) r1=REGISTER ',' r2=REGISTER
     ;
 
-f2x	: op=
-    ( MOVE
-    | 'move/from16'
-    | 'move/16'
-	| 'move-wide'
-	| 'move-wide/from16'
-	| 'move-wide/16'
-	| 'move-object'
-	| 'move-object/from16'
-	| 'move-object/16'
-	| 'array-length'
-	| 'neg-int'
+f12x_arithmetic: op=
+	( 'neg-int'
     | 'not-int'
     | 'neg-long'
     | 'not-long'
@@ -474,29 +466,23 @@ f2x	: op=
     | 'mul-double/2addr'
     | 'div-double/2addr'
     | 'rem-double/2addr') r1=REGISTER ',' r2=REGISTER
+    ;
+
+f2x	: op=
+    ( MOVE
+    | 'move/from16'
+    | 'move/16'
+	| 'move-wide'
+	| 'move-wide/from16'
+	| 'move-wide/16'
+	| 'move-object'
+	| 'move-object/from16'
+	| 'move-object/16'
+	| 'array-length' ) r1=REGISTER ',' r2=REGISTER
 	;
 
-f3x	: op=
-    ( 'cmpl-float'
-    | 'cmpg-float'
-    | 'cmpl-double'
-    | 'cmpg-double'
-    | 'cmp-long'
-	| AGET
-	| 'aget-wide'
-	| 'aget-object'
-	| 'aget-boolean'
-	| 'aget-byte'
-	| 'aget-char'
-	| 'aget-short'
-	| APUT
-	| 'aput-wide'
-	| 'aput-object'
-	| 'aput-boolean'
-	| 'aput-byte'
-	| 'aput-char'
-	| 'aput-short'
-	| 'add-int'
+f23x_arithmetic: op=
+	( 'add-int'
     | 'sub-int'
     | 'mul-int'
     | 'div-int'
@@ -528,6 +514,28 @@ f3x	: op=
     | 'mul-double'
     | 'div-double'
     | 'rem-double' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
+	;
+
+f3x	: op=
+    ( 'cmpl-float'
+    | 'cmpg-float'
+    | 'cmpl-double'
+    | 'cmpg-double'
+    | 'cmp-long'
+	| AGET
+	| 'aget-wide'
+	| 'aget-object'
+	| 'aget-boolean'
+	| 'aget-byte'
+	| 'aget-char'
+	| 'aget-short'
+	| APUT
+	| 'aput-wide'
+	| 'aput-object'
+	| 'aput-boolean'
+	| 'aput-byte'
+	| 'aput-char'
+	| 'aput-short' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
 	;
 
 ft5c :	op='filled-new-array' '{' (REGISTER (',' REGISTER)* )? '}' ',' type=ARRAY_TYPE;

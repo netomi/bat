@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-open class ArithmeticInstruction internal constructor(opcode: DexOpCode) : DexInstruction(opcode) {
+open class ArithmeticInstruction internal constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
@@ -42,6 +42,10 @@ open class ArithmeticInstruction internal constructor(opcode: DexOpCode) : DexIn
     }
 
     companion object {
+        fun of(opcode: DexOpCode, vararg registers: Int): ArithmeticInstruction {
+            return ArithmeticInstruction(opcode, *registers)
+        }
+
         @JvmStatic
         fun create(opCode: DexOpCode, ident: Byte): ArithmeticInstruction {
             return ArithmeticInstruction(opCode)
