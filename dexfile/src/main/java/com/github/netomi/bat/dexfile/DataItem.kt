@@ -39,3 +39,6 @@ abstract class DataItem : DexContent() {
         fun getOffset(item: DataItem?): Int
     }
 }
+
+@Retention(AnnotationRetention.RUNTIME)
+annotation class DataItemAnn(val type: Int, val dataAlignment: Int, val dataSection: Boolean)
