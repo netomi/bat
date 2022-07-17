@@ -302,8 +302,8 @@ sInstruction
 	| f23x_compare
 	| f23x_array
 	| ft5c
-	| fm5c
-	| fmrc
+	| f35c_method
+	| f3rc_method
 	| fm45cc
 	| fm4rcc
 	| fmcustomc
@@ -588,20 +588,22 @@ f23x_array: op=
 
 ft5c :	op='filled-new-array' '{' (REGISTER (',' REGISTER)* )? '}' ',' type=ARRAY_TYPE;
 
-fm5c :	op=
+f35c_method: op=
     ( 'invoke-virtual'
     | 'invoke-super'
     | 'invoke-direct'
     | 'invoke-static'
     | 'invoke-interface' )  '{' (REGISTER (',' REGISTER)* )? '}' ',' method=METHOD_FULL
 	;
-fmrc :	op=
+
+f3rc_method: op=
     ( 'invoke-virtual/range'
     | 'invoke-super/range'
     | 'invoke-direct/range'
     | 'invoke-static/range'
     | 'invoke-interface/range' )  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL
 	;
+
 fm45cc : op='invoke-polymorphic'  '{' (REGISTER (',' REGISTER)* )? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
 fm4rcc : op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
 fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArrayValue;

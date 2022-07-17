@@ -34,10 +34,13 @@ import com.github.netomi.bat.smali.parser.SmaliParser.F22sb_arithmeticContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F23x_arithmeticContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F23x_arrayContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F23x_compareContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F35c_methodContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F3rc_methodContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_intContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_stringContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_typeContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fx0t_branchContext
+import com.github.netomi.bat.util.toIntArray
 import org.antlr.v4.runtime.ParserRuleContext
 
 internal class CodeAssembler constructor(private val method: EncodedMethod, private val dexComposer: DexComposer) {
@@ -94,21 +97,8 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                 SmaliParser.RULE_f22sb_arithmetic -> parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
                 SmaliParser.RULE_f23x_compare     -> parseBasicInstructionCompareF23x(t as F23x_compareContext)
                 SmaliParser.RULE_f23x_array       -> parseArrayInstructionF23x(t as F23x_arrayContext)
-
-                SmaliParser.RULE_fm5c -> {
-                    val c = t as SmaliParser.Fm5cContext
-
-                    val mnemonic = c.op.text
-                    val opcode = DexOpCode.get(mnemonic)
-                    val registers = c.REGISTER().map { registerInfo.registerNumber(it.text) }.toIntArray()
-
-                    val methodType = c.method.text
-
-                    val (classType, methodName, parameterTypes, returnType) = parseMethodObject(methodType)
-                    val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
-
-                    MethodInstruction.of(opcode, methodIndex, *registers)
-                }
+                SmaliParser.RULE_f35c_method      -> parseMethodInstructionF35c(t as F35c_methodContext)
+                SmaliParser.RULE_f3rc_method      -> parseMethodInstructionF3rc(t as F3rc_methodContext)
 
                 else -> null //parserError(t, "unexpected instruction")
             }
@@ -320,6 +310,35 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val r3 = registerInfo.registerNumber(ctx.r3.text)
 
         return BasicInstruction.of(opcode, r1, r2, r3)
+    }
+
+    private fun parseMethodInstructionF35c(ctx: F35c_methodContext): MethodInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+        val registers = ctx.REGISTER().map { registerInfo.registerNumber(it.text) }.toIntArray()
+
+        val methodType = ctx.method.text
+
+        val (classType, methodName, parameterTypes, returnType) = parseMethodObject(methodType)
+        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+
+        return MethodInstruction.of(opcode, methodIndex, *registers)
+    }
+
+    private fun parseMethodInstructionF3rc(ctx: F3rc_methodContext): MethodInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val rStart = registerInfo.registerNumber(ctx.rstart.text)
+        val rEnd   = registerInfo.registerNumber(ctx.rend.text)
+
+        val methodType = ctx.method.text
+
+        val (classType, methodName, parameterTypes, returnType) = parseMethodObject(methodType)
+        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+
+        val registers = (rStart..rEnd).toIntArray()
+        return MethodInstruction.of(opcode, methodIndex, *registers)
     }
 
     private fun parseArrayInstructionF23x(ctx: F23x_arrayContext): ArrayInstruction {
