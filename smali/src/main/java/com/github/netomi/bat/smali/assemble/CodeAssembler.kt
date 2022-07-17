@@ -32,6 +32,8 @@ import com.github.netomi.bat.smali.parser.SmaliParser.F21t_branchContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F22c_fieldContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F22sb_arithmeticContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F23x_arithmeticContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F23x_arrayContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F23x_compareContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_intContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_stringContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_typeContext
@@ -90,7 +92,8 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                 SmaliParser.RULE_f12x_arithmetic  -> parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
                 SmaliParser.RULE_f23x_arithmetic  -> parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
                 SmaliParser.RULE_f22sb_arithmetic -> parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
-
+                SmaliParser.RULE_f23x_compare     -> parseBasicInstructionCompareF23x(t as F23x_compareContext)
+                SmaliParser.RULE_f23x_array       -> parseArrayInstructionF23x(t as F23x_arrayContext)
 
                 SmaliParser.RULE_fm5c -> {
                     val c = t as SmaliParser.Fm5cContext
@@ -306,6 +309,28 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val value = parseNumber(ctx.lit.text).toInt()
 
         return ArithmeticLiteralInstruction.of(opcode, value, r1, r2)
+    }
+
+    private fun parseBasicInstructionCompareF23x(ctx: F23x_compareContext): BasicInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val r2 = registerInfo.registerNumber(ctx.r2.text)
+        val r3 = registerInfo.registerNumber(ctx.r3.text)
+
+        return BasicInstruction.of(opcode, r1, r2, r3)
+    }
+
+    private fun parseArrayInstructionF23x(ctx: F23x_arrayContext): ArrayInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val r2 = registerInfo.registerNumber(ctx.r2.text)
+        val r3 = registerInfo.registerNumber(ctx.r3.text)
+
+        return ArrayInstruction.of(opcode, r1, r2, r3)
     }
 
     private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {

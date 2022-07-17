@@ -299,7 +299,8 @@ sInstruction
 	| f23x_arithmetic
     | f22sb_arithmetic
 	| f2x
-	| f3x
+	| f23x_compare
+	| f23x_array
 	| ft5c
 	| fm5c
 	| fmrc
@@ -341,11 +342,13 @@ f10x: op=
     ( NOP
 	| 'return-void')
 	;
+
 fx0t_branch: op=
     ( GOTO
     | 'goto/16'
     | 'goto/32' ) target=LABEL
 	;
+
 f11x_basic: op=
     ( 'move-result'
     | 'move-result-wide'
@@ -358,6 +361,7 @@ f11x_basic: op=
 	| 'monitor-enter'
 	| 'monitor-exit' ) r1=REGISTER
 	;
+
 fconst_int: op=
     ( 'const/4'
     | 'const/16'
@@ -392,6 +396,7 @@ f21c_field
 	;
 
 ft2c :	op=('instance-of'|'new-array') r1=REGISTER ',' r2=REGISTER ',' type=(OBJECT_TYPE|ARRAY_TYPE);
+
 f22c_field : op=
     ( IGET
 	| 'iget-wide'
@@ -537,13 +542,35 @@ f22sb_arithmetic : op=
     | 'shr-int/lit8'
     | 'ushr-int/lit8' ) r1=REGISTER ',' r2=REGISTER ',' lit=INT
 	;
-f3x	: op=
+
+f21t_branch : op=
+    ( 'if-eqz'
+    | 'if-nez'
+    | 'if-ltz'
+    | 'if-gez'
+    | 'if-gtz'
+    | 'if-lez' )  r1=REGISTER ',' label=LABEL
+    ;
+
+f2t	 : op=
+    ( 'if-eq'
+    | 'if-ne'
+    | 'if-lt'
+    | 'if-ge'
+    | 'if-gt'
+    | 'if-le' ) r1=REGISTER ',' r2=REGISTER ',' label=LABEL
+    ;
+
+f23x_compare: op=
     ( 'cmpl-float'
     | 'cmpg-float'
     | 'cmpl-double'
     | 'cmpg-double'
-    | 'cmp-long'
-	| AGET
+    | 'cmp-long' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
+	;
+
+f23x_array: op=
+    ( AGET
 	| 'aget-wide'
 	| 'aget-object'
 	| 'aget-boolean'
@@ -560,6 +587,7 @@ f3x	: op=
 	;
 
 ft5c :	op='filled-new-array' '{' (REGISTER (',' REGISTER)* )? '}' ',' type=ARRAY_TYPE;
+
 fm5c :	op=
     ( 'invoke-virtual'
     | 'invoke-super'
@@ -580,19 +608,3 @@ fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArray
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
 ftrc : op='filled-new-array/range' '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' type=(OBJECT_TYPE|ARRAY_TYPE);
 f31t : op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
-f21t_branch : op=
-    ( 'if-eqz'
-    | 'if-nez'
-    | 'if-ltz'
-    | 'if-gez'
-    | 'if-gtz'
-    | 'if-lez' )  r1=REGISTER ',' label=LABEL
-    ;
-f2t	 : op=
-    ( 'if-eq'
-    | 'if-ne'
-    | 'if-lt'
-    | 'if-ge'
-    | 'if-gt'
-    | 'if-le' ) r1=REGISTER ',' r2=REGISTER ',' label=LABEL
-    ;
