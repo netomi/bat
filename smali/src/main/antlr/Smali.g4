@@ -297,6 +297,7 @@ sInstruction
 	| f12x_conversion
 	| f12x_arithmetic
 	| f23x_arithmetic
+    | f22sb_arithmetic
 	| f2x
 	| f3x
 	| ft5c
@@ -308,7 +309,6 @@ sInstruction
 	| fmcustomrc
 	| ftrc
 	| sLabel
-	| f2sb
 	| f31t
 	| fpackageswitch
 	| fspareswitch
@@ -516,6 +516,27 @@ f23x_arithmetic: op=
     | 'rem-double' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
 	;
 
+f22sb_arithmetic : op=
+    ( 'add-int/lit16'
+    | 'rsub-int'
+    | 'mul-int/lit16'
+    | 'div-int/lit16'
+    | 'rem-int/lit16'
+    | 'and-int/lit16'
+    | 'or-int/lit16'
+    | 'xor-int/lit16'
+    | 'add-int/lit8'
+    | 'rsub-int/lit8'
+    | 'mul-int/lit8'
+    | 'div-int/lit8'
+    | 'rem-int/lit8'
+    | 'and-int/lit8'
+    | 'or-int/lit8'
+    | 'xor-int/lit8'
+    | 'shl-int/lit8'
+    | 'shr-int/lit8'
+    | 'ushr-int/lit8' ) r1=REGISTER ',' r2=REGISTER ',' lit=INT
+	;
 f3x	: op=
     ( 'cmpl-float'
     | 'cmpg-float'
@@ -575,24 +596,3 @@ f2t	 : op=
     | 'if-gt'
     | 'if-le' ) r1=REGISTER ',' r2=REGISTER ',' label=LABEL
     ;
-f2sb : op=
-    ( 'add-int/lit16'
-    | 'rsub-int'
-    | 'mul-int/lit16'
-    | 'div-int/lit16'
-    | 'rem-int/lit16'
-    | 'and-int/lit16'
-    | 'or-int/lit16'
-    | 'xor-int/lit16'
-    | 'add-int/lit8'
-    | 'rsub-int/lit8'
-    | 'mul-int/lit8'
-    | 'div-int/lit8'
-    | 'rem-int/lit8'
-    | 'and-int/lit8'
-    | 'or-int/lit8'
-    | 'xor-int/lit8'
-    | 'shl-int/lit8'
-    | 'shr-int/lit8'
-    | 'ushr-int/lit8' ) r1=REGISTER ',' r2=REGISTER ',' lit=INT
-	;

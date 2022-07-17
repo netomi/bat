@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode, _literal: Int = 0) : ArithmeticInstruction(opcode) {
+class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode, _literal: Int = 0, vararg registers: Int) : ArithmeticInstruction(opcode, *registers) {
 
     var literal = _literal
         private set
@@ -55,8 +55,8 @@ class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode, _lite
     }
 
     companion object {
-        fun of(opCode: DexOpCode, literal: Int): ArithmeticLiteralInstruction {
-            return ArithmeticLiteralInstruction(opCode, literal)
+        fun of(opCode: DexOpCode, literal: Int, vararg registers: Int): ArithmeticLiteralInstruction {
+            return ArithmeticLiteralInstruction(opCode, literal, *registers)
         }
 
         @JvmStatic

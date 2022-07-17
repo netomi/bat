@@ -30,6 +30,7 @@ import com.github.netomi.bat.smali.parser.SmaliParser.F12x_conversionContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F21c_fieldContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F21t_branchContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F22c_fieldContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F22sb_arithmeticContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F23x_arithmeticContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_intContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_stringContext
@@ -77,17 +78,18 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
                     opcode.createInstruction(0)
                 }
 
-                SmaliParser.RULE_f12x_conversion -> parseConversionInstructionF12x(t as F12x_conversionContext)
-                SmaliParser.RULE_f11x_basic      -> parseBasicInstructionF11x(t as F11x_basicContext)
-                SmaliParser.RULE_fx0t_branch     -> parseBranchInstructionFx0t(t as Fx0t_branchContext, codeOffset)
-                SmaliParser.RULE_f21t_branch     -> parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
-                SmaliParser.RULE_f21c_field      -> parseFieldInstructionF21c(t as F21c_fieldContext)
-                SmaliParser.RULE_f22c_field      -> parseFieldInstructionF22c(t as F22c_fieldContext)
-                SmaliParser.RULE_fconst_int      -> parseLiteralInstructionInteger(t as Fconst_intContext)
-                SmaliParser.RULE_fconst_string   -> parseLiteralInstructionString(t as Fconst_stringContext)
-                SmaliParser.RULE_fconst_type     -> parseLiteralInstructionType(t as Fconst_typeContext)
-                SmaliParser.RULE_f12x_arithmetic -> parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
-                SmaliParser.RULE_f23x_arithmetic -> parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
+                SmaliParser.RULE_f12x_conversion  -> parseConversionInstructionF12x(t as F12x_conversionContext)
+                SmaliParser.RULE_f11x_basic       -> parseBasicInstructionF11x(t as F11x_basicContext)
+                SmaliParser.RULE_fx0t_branch      -> parseBranchInstructionFx0t(t as Fx0t_branchContext, codeOffset)
+                SmaliParser.RULE_f21t_branch      -> parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
+                SmaliParser.RULE_f21c_field       -> parseFieldInstructionF21c(t as F21c_fieldContext)
+                SmaliParser.RULE_f22c_field       -> parseFieldInstructionF22c(t as F22c_fieldContext)
+                SmaliParser.RULE_fconst_int       -> parseLiteralInstructionInteger(t as Fconst_intContext)
+                SmaliParser.RULE_fconst_string    -> parseLiteralInstructionString(t as Fconst_stringContext)
+                SmaliParser.RULE_fconst_type      -> parseLiteralInstructionType(t as Fconst_typeContext)
+                SmaliParser.RULE_f12x_arithmetic  -> parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
+                SmaliParser.RULE_f23x_arithmetic  -> parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
+                SmaliParser.RULE_f22sb_arithmetic -> parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
 
 
                 SmaliParser.RULE_fm5c -> {
@@ -291,8 +293,19 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
         val r3 = registerInfo.registerNumber(ctx.r3.text)
-        
+
         return ArithmeticInstruction.of(opcode, r1, r2, r3)
+    }
+
+    private fun parseArithmeticLiteralInstructionF22sb(ctx: F22sb_arithmeticContext): ArithmeticInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val r2 = registerInfo.registerNumber(ctx.r2.text)
+        val value = parseNumber(ctx.lit.text).toInt()
+
+        return ArithmeticLiteralInstruction.of(opcode, value, r1, r2)
     }
 
     private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
