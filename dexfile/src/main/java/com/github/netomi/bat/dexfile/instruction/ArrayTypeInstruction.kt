@@ -18,21 +18,21 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-class MethodProtoInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, _protoIndex: Int = NO_INDEX) : MethodInstruction(opcode, _methodIndex) {
+class ArrayTypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: Int = NO_INDEX, vararg registers: Int) : ArrayInstruction(opcode, *registers) {
 
-    var protoIndex: Int = _protoIndex
+    var typeIndex: Int = _typeIndex
         private set
 
-    fun getProtoID(dexFile: DexFile): ProtoID {
-        return dexFile.getProtoID(protoIndex)
+    fun getTypeID(dexFile: DexFile): TypeID {
+        return dexFile.getTypeID(typeIndex)
     }
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        protoIndex = when (opcode.format) {
-            DexInstructionFormat.FORMAT_45cc,
-            DexInstructionFormat.FORMAT_4rcc -> instructions[offset + 3].toInt() and 0xffff
+        typeIndex = when (opcode.format) {
+            DexInstructionFormat.FORMAT_3rc,
+            DexInstructionFormat.FORMAT_35c -> instructions[offset + 1].toInt() and 0xffff
 
             else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
         }
@@ -42,8 +42,8 @@ class MethodProtoInstruction internal constructor(opcode: DexOpCode, _methodInde
         val data = super.writeData()
 
         when (opcode.format) {
-            DexInstructionFormat.FORMAT_45cc,
-            DexInstructionFormat.FORMAT_4rcc -> data[3] = protoIndex.toShort()
+            DexInstructionFormat.FORMAT_3rc,
+            DexInstructionFormat.FORMAT_35c -> data[1] = typeIndex.toShort()
 
             else -> {}
         }
@@ -51,19 +51,17 @@ class MethodProtoInstruction internal constructor(opcode: DexOpCode, _methodInde
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitMethodProtoInstruction(dexFile, classDef, method, code, offset, this)
+        visitor.visitArrayTypeInstruction(dexFile, classDef, method, code, offset, this)
     }
 
     companion object {
-        fun of(opcode: DexOpCode, methodIndex: Int, protoIndex: Int, vararg registers: Int): MethodProtoInstruction {
-            val instruction = MethodProtoInstruction(opcode, methodIndex, protoIndex)
-            instruction.registers = registers
-            return instruction
+        fun of(opCode: DexOpCode, typeIndex: Int, vararg registers: Int): ArrayTypeInstruction {
+            return ArrayTypeInstruction(opCode, typeIndex, *registers)
         }
 
         @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): MethodProtoInstruction {
-            return MethodProtoInstruction(opCode)
+        fun create(opCode: DexOpCode, ident: Byte): ArrayTypeInstruction {
+            return ArrayTypeInstruction(opCode)
         }
     }
 }
