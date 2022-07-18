@@ -224,20 +224,22 @@ private class DataItemMapImpl : DataItem.Map {
     }
 
     fun writeDataItems(mapList: MapList, output: DexDataOutput) {
+        writeDataItems(mapList, output, TYPE_STRING_DATA_ITEM)
         writeDataItems(mapList, output, TYPE_TYPE_LIST)
-        writeDataItems(mapList, output, TYPE_ANNOTATION_SET_REF_LIST)
+        writeDataItems(mapList, output, TYPE_ANNOTATION_ITEM)
         writeDataItems(mapList, output, TYPE_ANNOTATION_SET_ITEM)
+        writeDataItems(mapList, output, TYPE_ANNOTATIONS_DIRECTORY_ITEM)
+        writeDataItems(mapList, output, TYPE_DEBUG_INFO_ITEM)
+
         // write the code items before the class data as it references its offset
         // using uleb128 encoding which is a variable length encoding. If the code
         // items were written afterwards, its exact offset would not be known
         // and thus the size of the class data items may vary.
         writeDataItems(mapList, output, TYPE_CODE_ITEM)
         writeDataItems(mapList, output, TYPE_CLASS_DATA_ITEM)
-        writeDataItems(mapList, output, TYPE_STRING_DATA_ITEM)
-        writeDataItems(mapList, output, TYPE_DEBUG_INFO_ITEM)
-        writeDataItems(mapList, output, TYPE_ANNOTATION_ITEM)
+
+        writeDataItems(mapList, output, TYPE_ANNOTATION_SET_REF_LIST)
         writeDataItems(mapList, output, TYPE_ENCODED_ARRAY_ITEM)
-        writeDataItems(mapList, output, TYPE_ANNOTATIONS_DIRECTORY_ITEM)
     }
 
     fun updateOffsets(dexFile: DexFile) {
@@ -262,10 +264,15 @@ private class DataItemMapImpl : DataItem.Map {
     private fun writeDataItems(mapList: MapList, output: DexDataOutput, type: Int) {
         val dataItemSet: Set<DataItem>? = dataItemMap[type]
         if (dataItemSet != null && dataItemSet.isNotEmpty()) {
-            val align = dataItemSet.iterator().next().dataAlignment
+            val item = dataItemSet.iterator().next()
+            val align = item.dataAlignment
+
             output.writeAlignmentPadding(align)
             mapList.updateMapItem(type, dataItemSet.size, output.offset)
+
             for (dataItem in dataItemSet) {
+                output.writeAlignmentPadding(align)
+
                 val dataItemOffset = output.offset
                 dataItem.updateOffsets(this)
                 dataItem.write(output)

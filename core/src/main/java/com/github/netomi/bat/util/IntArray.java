@@ -221,7 +221,18 @@ implements   Cloneable,
 
     @Override
     public int compareTo(@NotNull IntArray o) {
-        return Ints.lexicographicalComparator().compare(values, o.values);
+        return compare(values, size, o.values, o.size);
+    }
+
+    private static int compare(int[] left, int leftSize, int[] right, int rightSize) {
+        int minLength = Math.min(leftSize, rightSize);
+        for (int i = 0; i < minLength; i++) {
+            int result = Ints.compare(left[i], right[i]);
+            if (result != 0) {
+                return result;
+            }
+        }
+        return leftSize - rightSize;
     }
 
     @Override

@@ -29,7 +29,7 @@ import java.util.*
     type          = TYPE_STRING_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class StringID private constructor(): DataItem() {
+class StringID private constructor(): DataItem(), Comparable<StringID> {
 
     lateinit var stringData: StringData
         private set
@@ -48,7 +48,6 @@ class StringID private constructor(): DataItem() {
         get() = false
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         stringDataOffset = input.readInt()
     }
 
@@ -62,12 +61,15 @@ class StringID private constructor(): DataItem() {
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(stringDataOffset)
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
         visitor.visitStringData(dexFile, this, stringData)
+    }
+
+    override fun compareTo(other: StringID): Int {
+        return stringData.compareTo(other.stringData)
     }
 
     override fun equals(other: Any?): Boolean {

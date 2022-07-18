@@ -65,14 +65,12 @@ class FieldID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int 
         get() = classIndex == NO_INDEX
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         classIndex = input.readUnsignedShort()
         typeIndex  = input.readUnsignedShort()
         nameIndex  = input.readInt()
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeUnsignedShort(classIndex)
         output.writeUnsignedShort(typeIndex)
         output.writeInt(nameIndex)

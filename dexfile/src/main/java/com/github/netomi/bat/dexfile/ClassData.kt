@@ -31,10 +31,10 @@ class ClassData private constructor(
     private val _directMethods:  ArrayList<EncodedMethod> = ArrayList(0),
     private val _virtualMethods: ArrayList<EncodedMethod> = ArrayList(0)) : DataItem() {
 
-    val staticFields: List<EncodedField>
+    val staticFields: MutableList<EncodedField>
         get() = _staticFields
 
-    val instanceFields: List<EncodedField>
+    val instanceFields: MutableList<EncodedField>
         get() = _instanceFields
 
     val directMethods: MutableList<EncodedMethod>

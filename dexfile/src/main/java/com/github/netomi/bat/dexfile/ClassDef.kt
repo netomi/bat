@@ -155,7 +155,6 @@ class ClassDef private constructor(
         get() = classIndex == NO_INDEX
 
     public override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         classIndex         = input.readInt()
         accessFlags        = input.readInt()
         superClassIndex    = input.readInt()
@@ -196,7 +195,6 @@ class ClassDef private constructor(
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(classIndex)
         output.writeInt(accessFlags)
         output.writeInt(superClassIndex)

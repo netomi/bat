@@ -33,7 +33,7 @@ class DexSorter : DexFileVisitor {
     }
 
     private fun sortDataItems(dexFile: DexFile) {
-        val stringIDMapping = sortIDList(dexFile.stringIDs, compareBy { it.stringData })
+        val stringIDMapping = sortIDList(dexFile.stringIDs, compareBy { it })
         dexFile.referencedIDsAccept(object: ReferencedIDVisitor {
             override fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {
                 accessor.set(stringIDMapping[accessor.get()]!!)
@@ -68,6 +68,9 @@ class DexSorter : DexFileVisitor {
         })
 
         dexFile.classDefsAccept { _, _, classDef ->
+            classDef.classData.staticFields.sortWith(compareBy { it.fieldIndex })
+            classDef.classData.instanceFields.sortWith(compareBy { it.fieldIndex })
+
             classDef.classData.directMethods.sortWith(compareBy { it.methodIndex })
             classDef.classData.virtualMethods.sortWith(compareBy { it.methodIndex })
         }

@@ -46,7 +46,6 @@ class AnnotationSetRefList private constructor(private val annotationSetRefs: Ar
         get() = !annotationSetRefs.any { !isEmpty }
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         val size = input.readInt()
         annotationSetRefs.clear()
         annotationSetRefs.ensureCapacity(size)
@@ -69,7 +68,6 @@ class AnnotationSetRefList private constructor(private val annotationSetRefs: Ar
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(annotationSetRefs.size)
         for (annotationSetRef in annotationSetRefs) {
             annotationSetRef.write(output)

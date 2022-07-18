@@ -55,7 +55,6 @@ class AnnotationSet private constructor() : DataItem() {
         get() = annotations.isEmpty()
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         val size = input.readInt()
         annotationOffsetEntries.clear()
         annotationOffsetEntries.resize(size)
@@ -84,7 +83,6 @@ class AnnotationSet private constructor() : DataItem() {
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(annotationOffsetEntries.size())
         for (i in 0 until annotationOffsetEntries.size()) {
             output.writeInt(annotationOffsetEntries[i])

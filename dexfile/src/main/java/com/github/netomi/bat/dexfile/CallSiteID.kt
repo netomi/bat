@@ -46,7 +46,6 @@ class CallSiteID private constructor() : DataItem() {
         get() = callSite.isEmpty
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         callSiteOffset = input.readInt()
     }
 
@@ -60,7 +59,6 @@ class CallSiteID private constructor() : DataItem() {
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(callSiteOffset)
     }
 

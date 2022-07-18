@@ -61,8 +61,7 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
     }
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
-        val size = input.readUnsignedInt().toInt()
+        val size = input.readInt()
         typeList.clear()
         typeList.resize(size)
         for (i in 0 until size) {
@@ -72,7 +71,6 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         val size = typeList.size()
         output.writeInt(size)
         for (i in 0 until size) {

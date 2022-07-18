@@ -44,12 +44,10 @@ class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() 
         get() = descriptorIndex == NO_INDEX
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         descriptorIndex = input.readInt()
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(descriptorIndex)
     }
 

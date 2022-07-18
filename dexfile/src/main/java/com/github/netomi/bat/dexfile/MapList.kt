@@ -65,7 +65,6 @@ class MapList private constructor(private val _mapItems: ArrayList<MapItem> = Ar
         get() = mapItems.isEmpty()
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         val size = input.readInt()
         _mapItems.clear()
         _mapItems.ensureCapacity(size)
@@ -76,8 +75,6 @@ class MapList private constructor(private val _mapItems: ArrayList<MapItem> = Ar
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
-
         // only write out map items which are not empty and sort by offset
         val filteredMap = _mapItems.filter { it.size > 0 }.sortedBy { it.offset }
 

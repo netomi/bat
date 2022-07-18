@@ -51,7 +51,6 @@ class AnnotationsDirectory private constructor(
                 parameterAnnotations.isEmpty()
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         classAnnotationsOffset = input.readInt()
 
         val fieldAnnotationsSize    = input.readInt()
@@ -112,7 +111,6 @@ class AnnotationsDirectory private constructor(
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(classAnnotationsOffset)
         output.writeInt(fieldAnnotations.size)
         output.writeInt(methodAnnotations.size)

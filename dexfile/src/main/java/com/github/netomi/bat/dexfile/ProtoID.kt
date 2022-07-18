@@ -45,7 +45,7 @@ class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex
     val parameters: TypeList
         get() = _parameters
 
-    var parametersOffset = 0
+    var parametersOffset: Int = 0
         private set
 
     fun getShorty(dexFile: DexFile): String {
@@ -75,7 +75,6 @@ class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex
         get() = shortyIndex == NO_INDEX
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         shortyIndex      = input.readInt()
         returnTypeIndex  = input.readInt()
         parametersOffset = input.readInt()
@@ -89,11 +88,10 @@ class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex
     }
 
     override fun updateOffsets(dataItemMap: Map) {
-        parametersOffset = if (!_parameters.isEmpty) { dataItemMap.getOffset(_parameters) } else { 0 }
+        parametersOffset = if (!_parameters.isEmpty) dataItemMap.getOffset(_parameters) else 0
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeInt(shortyIndex)
         output.writeInt(returnTypeIndex)
         output.writeInt(parametersOffset)

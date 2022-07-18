@@ -32,6 +32,30 @@ object DexClasses {
         )
     }
 
+    fun parseParameters(parameters: String): List<String> {
+        val result = mutableListOf<String>()
+
+        var index = 0
+        while (index < parameters.length) {
+            val char = parameters[index]
+
+            when (char) {
+                'L', '[' -> {
+                    val colon = parameters.indexOf(';', index)
+                    result.add(parameters.substring(index, colon + 1))
+                    index = colon + 1
+                }
+
+                else -> {
+                    result.add(char.toString())
+                    index++
+                }
+            }
+        }
+
+        return result
+    }
+
     fun toShortyFormat(parameterTypes: List<String>, returnType: String): String {
         var result = toShortyFormat(returnType)
 

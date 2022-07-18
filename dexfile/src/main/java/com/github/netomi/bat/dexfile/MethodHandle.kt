@@ -100,7 +100,6 @@ class MethodHandle private constructor(_methodHandleTypeValue: Int = -1, _fieldO
     }
 
     override fun read(input: DexDataInput) {
-        input.skipAlignmentPadding(dataAlignment)
         methodHandleTypeValue = input.readUnsignedShort()
         input.readUnsignedShort()
         fieldOrMethodId = input.readUnsignedShort()
@@ -108,7 +107,6 @@ class MethodHandle private constructor(_methodHandleTypeValue: Int = -1, _fieldO
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeUnsignedShort(methodHandleTypeValue)
         output.writeUnsignedShort(0x0)
         output.writeUnsignedShort(fieldOrMethodId)
