@@ -254,7 +254,7 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val opcode = DexOpCode.get(mnemonic)
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
-        val stringIndex = dexComposer.addOrGetStringIDIndex(ctx.cst.text)
+        val stringIndex = dexComposer.addOrGetStringIDIndex(ctx.cst.text.removeSurrounding("\""))
 
         return StringInstruction.of(opcode, stringIndex, r1)
     }

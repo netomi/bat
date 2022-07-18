@@ -31,6 +31,7 @@ import java.util.*
 import java.util.function.BiPredicate
 import java.util.function.Predicate
 import kotlin.collections.ArrayList
+import kotlin.io.path.name
 
 class Assembler(private val dexFile: DexFile) {
 
@@ -50,8 +51,8 @@ class Assembler(private val dexFile: DexFile) {
             val inputFiles = Files.find(input, Int.MAX_VALUE, REGULAR_FILE)
 
             inputFiles.use {
-                inputFiles.filter(SMALI_FILE)
-                          .forEach(assembleFile)
+                it.filter(SMALI_FILE)
+                  .forEach(assembleFile)
             }
         } else {
             assembleFile(input)
@@ -73,6 +74,6 @@ class Assembler(private val dexFile: DexFile) {
 
     companion object {
         private val REGULAR_FILE = BiPredicate { _: Path, attr: BasicFileAttributes -> attr.isRegularFile }
-        private val SMALI_FILE   = Predicate   { path: Path -> !path.endsWith(".smali") }
+        private val SMALI_FILE   = Predicate   { path: Path -> path.name.endsWith(".smali") }
     }
 }

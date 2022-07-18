@@ -50,10 +50,10 @@ internal class EncodedValueAssembler constructor(private val dexComposer: DexCom
             SmaliLexer.LONG ->          EncodedLongValue.of(parseLong(value.text))
             SmaliLexer.BASE_FLOAT,
             SmaliLexer.FLOAT_INFINITY,
-            SmaliLexer.FLOAT_NAN ->     EncodedFloatValue.of(value.text.toFloat())
+            SmaliLexer.FLOAT_NAN ->     EncodedFloatValue.of(parseFloat(value.text))
             SmaliLexer.BASE_DOUBLE,
             SmaliLexer.DOUBLE_INFINITY,
-            SmaliLexer.DOUBLE_NAN ->    EncodedDoubleValue.of(value.text.toDouble())
+            SmaliLexer.DOUBLE_NAN ->    EncodedDoubleValue.of(parseDouble(value.text))
             SmaliLexer.METHOD_FULL -> {
                 val (classType, methodName, parameterTypes, returnType) = parseMethodObject(value.text)
                 val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)

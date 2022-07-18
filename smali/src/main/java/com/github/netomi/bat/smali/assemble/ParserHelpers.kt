@@ -17,6 +17,7 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.DexAccessFlags
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.util.Strings
 import org.antlr.v4.runtime.ParserRuleContext
@@ -87,7 +88,7 @@ fun parseMethodObject(text: String): MethodInfo {
     val name = text.substring(startNameIndex, parameterStartIndex)
 
     val parameters = text.substring(parameterStartIndex + 1, parameterEndIndex)
-    val parameterTypes = if (parameters.isEmpty()) emptyList() else parameters.split(",")
+    val parameterTypes = if (parameters.isEmpty()) emptyList() else DexClasses.parseParameters(parameters)
     val returnType = text.substring(parameterEndIndex + 1)
     return MethodInfo(classType, name, parameterTypes, returnType)
 }
@@ -111,7 +112,13 @@ fun parseNumber(value: String): Long {
         'T'   -> parseLong(value.dropLast(1))
         '\"',
         '\''  -> parseChar(value).code.toLong()
-        else  -> parseLong(value)
+        else  -> {
+            if (value.contains(".")) {
+                parseDouble(value).toBits()
+            } else {
+                parseLong(value)
+            }
+        }
     }
 }
 
@@ -133,4 +140,12 @@ fun parseByte(value: String): Byte {
 
 fun parseShort(value: String): Short {
     return java.lang.Short.decode(value.removeSuffix("s").removeSuffix("S"))
+}
+
+fun parseFloat(value: String): Float {
+    return value.toFloat()
+}
+
+fun parseDouble(value: String): Double {
+    return value.toDouble()
 }
