@@ -209,10 +209,16 @@ class ClassDef private constructor(
         visitor.visitClassDef(dexFile, 0, this)
     }
 
-    fun methodAccept(dexFile: DexFile, name: String, visitor: EncodedMethodVisitor) {
-        classDataAccept(dexFile,
-            AllEncodedMethodsVisitor(
-            filterMethodsByName(name, visitor)))
+    fun fieldsAccept(dexFile: DexFile, visitor: EncodedFieldVisitor) {
+        classDataAccept(dexFile, allFields(visitor))
+    }
+
+    fun methodsAccept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
+        classDataAccept(dexFile, allMethods(visitor))
+    }
+
+    fun methodsAccept(dexFile: DexFile, name: String, visitor: EncodedMethodVisitor) {
+        classDataAccept(dexFile, allMethods(filterMethodsByName(name, visitor)))
     }
 
     fun interfaceListAccept(dexFile: DexFile, visitor: TypeListVisitor) {

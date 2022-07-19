@@ -13,21 +13,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.DexFile;
+import com.github.netomi.bat.dexfile.DexFile
 
-public class AllClassDefsVisitor
-implements   DexFileVisitor
-{
-    private final ClassDefVisitor visitor;
+fun allClassDefs(visitor: ClassDefVisitor): DexFileVisitor {
+    return DexFileVisitor { dexFile -> dexFile.classDefsAccept(visitor) }
+}
 
-    public AllClassDefsVisitor(ClassDefVisitor visitor) {
-        this.visitor = visitor;
-    }
-
-    @Override
-    public void visitDexFile(DexFile dexFile) {
-        dexFile.classDefsAccept(visitor);
-    }
+fun interface DexFileVisitor {
+    fun visitDexFile(dexFile: DexFile)
 }

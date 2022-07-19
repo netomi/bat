@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.ProtoID
 import java.util.function.BiConsumer
 
 fun multiMethodVisitorOf(visitor: EncodedMethodVisitor, vararg visitors: EncodedMethodVisitor): EncodedMethodVisitor {
-    return Multi(visitor, *visitors)
+    return MultiMethodVisitor(visitor, *visitors)
 }
 
 fun filterMethodsByName(name: String, visitor: EncodedMethodVisitor): EncodedMethodVisitor {
@@ -109,8 +109,8 @@ private class MethodNameAndProtoFilter(private val name:    String?,
     }
 }
 
-private class Multi constructor(       visitor:       EncodedMethodVisitor,
-                                vararg otherVisitors: EncodedMethodVisitor)
+private class MultiMethodVisitor constructor(       visitor:       EncodedMethodVisitor,
+                                             vararg otherVisitors: EncodedMethodVisitor)
     : AbstractMultiVisitor<EncodedMethodVisitor>(visitor, *otherVisitors), EncodedMethodVisitor {
 
     override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {

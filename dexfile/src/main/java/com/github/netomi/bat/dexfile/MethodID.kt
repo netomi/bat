@@ -81,9 +81,7 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
         val className = Classes.internalClassNameFromType(getClassType(dexFile))
         val classDef  = dexFile.getClassDef(className)
 
-        classDef?.classDataAccept(dexFile,
-            AllEncodedMethodsVisitor(
-            filterMethodsByNameAndProtoID(getName(dexFile), getProtoID(dexFile), visitor)))
+        classDef?.methodsAccept(dexFile, filterMethodsByNameAndProtoID(getName(dexFile), getProtoID(dexFile), visitor))
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

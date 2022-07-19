@@ -17,10 +17,9 @@ package com.github.netomi.bat
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
-import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
+import com.github.netomi.bat.dexfile.visitor.multiClassDefVisitorOf
 import com.github.netomi.bat.io.FileOutputStreamFactory
 import com.github.netomi.bat.smali.Disassembler
-import com.sun.jdi.BooleanValue
 import picocli.CommandLine
 import java.io.File
 import java.io.FileInputStream
@@ -61,8 +60,7 @@ class BakSmaliCommand : Runnable {
                     printVerbose("Disassembling '$name' into directory ${outputPath} ...")
                     reader.visitDexFile(dexFile)
 
-                    dexFile.classDefsAccept(
-                        ClassDefVisitor.Multi.of(
+                    dexFile.classDefsAccept(multiClassDefVisitorOf(
                             { df, _, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
                             Disassembler(FileOutputStreamFactory(outputPath, "smali")))
                         )

@@ -140,7 +140,7 @@ implements   ClassDefVisitor,
 
         if (field.isStatic()) {
             InitializationDetector detector = new InitializationDetector(field.getName(dexFile), field.getType(dexFile));
-            classDef.methodAccept(dexFile, "<clinit>", allCode(new AllInstructionsVisitor(detector)));
+            classDef.methodsAccept(dexFile, "<clinit>", allCode(new AllInstructionsVisitor(detector)));
 
             if (!detector.getFieldIsSetInStaticInitializer() || !field.getModifiers().contains(FieldModifier.FINAL)) {
                 field.staticValueAccept(dexFile, classDef, index, new EncodedValuePrinter(printer, null, " = "));

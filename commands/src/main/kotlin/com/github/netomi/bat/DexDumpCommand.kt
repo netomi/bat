@@ -18,7 +18,7 @@ package com.github.netomi.bat
 import com.github.netomi.bat.dexdump.DexDumpPrinter
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
-import com.github.netomi.bat.dexfile.visitor.ClassNameFilter
+import com.github.netomi.bat.dexfile.visitor.filteredByExternalClassName
 import picocli.CommandLine
 import java.io.*
 
@@ -64,7 +64,7 @@ class DexDumpCommand : Runnable {
 
                     if (classNameFilter != null) {
                         dexFile.classDefsAccept(
-                            ClassNameFilter(classNameFilter,
+                            filteredByExternalClassName(classNameFilter!!,
                             DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations)))
                     } else {
                         dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations))
