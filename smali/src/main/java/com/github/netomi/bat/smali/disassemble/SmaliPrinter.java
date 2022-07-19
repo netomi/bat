@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitorKt.allCode;
+
 public class SmaliPrinter
 implements   ClassDefVisitor,
              ClassDataVisitor,
@@ -111,14 +113,14 @@ implements   ClassDefVisitor,
             printer.println();
             printer.println();
             printer.println("# direct methods");
-            classData.directMethodsAccept(dexFile, classDef, this.joinedByMethodConsumer((df, method) -> printer.println()));
+            classData.directMethodsAccept(dexFile, classDef, this.joinedBy((df, method) -> printer.println()));
         }
 
         if (classData.getVirtualMethodCount() > 0) {
             printer.println();
             printer.println();
             printer.println("# virtual methods");
-            classData.virtualMethodsAccept(dexFile, classDef, this.joinedByMethodConsumer((df, method) -> printer.println()));
+            classData.virtualMethodsAccept(dexFile, classDef, this.joinedBy((df, method) -> printer.println()));
         }
     }
 
@@ -138,7 +140,7 @@ implements   ClassDefVisitor,
 
         if (field.isStatic()) {
             InitializationDetector detector = new InitializationDetector(field.getName(dexFile), field.getType(dexFile));
-            classDef.methodAccept(dexFile, "<clinit>", new AllCodeVisitor(new AllInstructionsVisitor(detector)));
+            classDef.methodAccept(dexFile, "<clinit>", allCode(new AllInstructionsVisitor(detector)));
 
             if (!detector.getFieldIsSetInStaticInitializer() || !field.getModifiers().contains(FieldModifier.FINAL)) {
                 field.staticValueAccept(dexFile, classDef, index, new EncodedValuePrinter(printer, null, " = "));

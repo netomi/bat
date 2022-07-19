@@ -33,10 +33,8 @@ fun filterValuesByType(acceptedTypes: EnumSet<EncodedValueType>, visitor: Encode
     return EncodedValueFilter(acceptedTypes, visitor)
 }
 
-interface EncodedValueVisitor {
-    fun visitAnyValue(dexFile: DexFile, value: EncodedValue) {
-        throw RuntimeException("Need to implement in class '${this.javaClass.name}'.")
-    }
+fun interface EncodedValueVisitor {
+    fun visitAnyValue(dexFile: DexFile, value: EncodedValue)
 
     fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {
         visitAnyValue(dexFile, value)
@@ -131,8 +129,10 @@ interface EncodedValueVisitor {
 
 private class EncodedValueFilter(private val acceptedTypes: EnumSet<EncodedValueType>, private val visitor: EncodedValueVisitor) : EncodedValueVisitor {
 
-    private fun accepted(value: EncodedValue): Boolean {
-        return acceptedTypes.contains(value.valueType)
+    override fun visitAnyValue(dexFile: DexFile, value: EncodedValue) {
+        if (accepted(value)) {
+            visitor.visitAnyValue(dexFile, value)
+        }
     }
 
     override fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {
@@ -241,6 +241,10 @@ private class EncodedValueFilter(private val acceptedTypes: EnumSet<EncodedValue
         if (accepted(value)) {
             visitor.visitTypeValue(dexFile, value)
         }
+    }
+
+    private fun accepted(value: EncodedValue): Boolean {
+        return acceptedTypes.contains(value.valueType)
     }
 }
 

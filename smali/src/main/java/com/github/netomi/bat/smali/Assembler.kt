@@ -66,10 +66,7 @@ class Assembler(private val dexFile: DexFile) {
         val tokenStream = CommonTokenStream(lexer)
         val parser      = SmaliParser(tokenStream)
 
-        val classDef = ClassDefAssembler(dexFile).visit(parser.sFiles())!!
-        dexFile.addClassDef(classDef)
-
-        return classDef
+        return ClassDefAssembler(dexFile).visit(parser.sFiles())!!
     }
 
     companion object {

@@ -45,6 +45,8 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
                         superTypeIndex,
                         sourceFileIndex)
 
+        dexFile.addClassDef(classDef)
+
         ctx.sInterface().forEach {
             classDef.interfaces.addType(dexComposer.addOrGetTypeIDIndex(it.name.text))
         }
@@ -93,7 +95,7 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
 
         if (!method.isAbstract) {
-            val codeAssembler = CodeAssembler(method, dexComposer)
+            val codeAssembler = CodeAssembler(classDef, method, dexComposer)
             val code = codeAssembler.parseCode(ctx.sInstruction())
             method.code = code
         } else {

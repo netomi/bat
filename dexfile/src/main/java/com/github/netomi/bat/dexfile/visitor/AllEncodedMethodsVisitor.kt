@@ -13,6 +13,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-public interface EncodedMemberVisitor extends EncodedFieldVisitor, EncodedMethodVisitor {}
+import com.github.netomi.bat.dexfile.ClassData
+import com.github.netomi.bat.dexfile.ClassDef
+import com.github.netomi.bat.dexfile.DexFile
+
+class AllEncodedMethodsVisitor(private val visitor: EncodedMethodVisitor) : ClassDataVisitor {
+    override fun visitClassData(dexFile: DexFile, classDef: ClassDef, classData: ClassData) {
+        classData.directMethodsAccept(dexFile, classDef, visitor)
+        classData.virtualMethodsAccept(dexFile, classDef, visitor)
+    }
+}

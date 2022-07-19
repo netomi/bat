@@ -16,6 +16,7 @@
 
 package com.github.netomi.bat.smali.assemble
 
+import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
@@ -43,7 +44,9 @@ import com.github.netomi.bat.smali.parser.SmaliParser.Fx0t_branchContext
 import com.github.netomi.bat.util.toIntArray
 import org.antlr.v4.runtime.ParserRuleContext
 
-internal class CodeAssembler constructor(private val method: EncodedMethod, private val dexComposer: DexComposer) {
+internal class CodeAssembler constructor(private val classDef:    ClassDef,
+                                         private val method:      EncodedMethod,
+                                         private val dexComposer: DexComposer) {
 
     private val dexFile: DexFile
         get() = dexComposer.dexFile
@@ -112,8 +115,13 @@ internal class CodeAssembler constructor(private val method: EncodedMethod, priv
         val code = Code.of(registerInfo.registers, registerInfo.insSize, 0)
 
         val insns = writeInstructions(instructions)
+
         code.insns     = insns
         code.insnsSize = insns.size
+
+        val outgoingArgumentSizeCalculator = OutgoingArgumentSizeCalculator()
+        code.instructionsAccept(dexFile, classDef, method, code, outgoingArgumentSizeCalculator)
+        code.outsSize = outgoingArgumentSizeCalculator.outgoingArgumentSize
 
         return code
     }

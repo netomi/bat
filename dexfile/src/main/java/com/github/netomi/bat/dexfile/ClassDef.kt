@@ -212,7 +212,7 @@ class ClassDef private constructor(
     fun methodAccept(dexFile: DexFile, name: String, visitor: EncodedMethodVisitor) {
         classDataAccept(dexFile,
             AllEncodedMethodsVisitor(
-            MethodNameFilter(name, visitor)))
+            filterMethodsByName(name, visitor)))
     }
 
     fun interfaceListAccept(dexFile: DexFile, visitor: TypeListVisitor) {

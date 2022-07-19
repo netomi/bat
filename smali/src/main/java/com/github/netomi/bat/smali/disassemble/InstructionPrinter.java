@@ -20,7 +20,6 @@ import com.github.netomi.bat.dexfile.instruction.*;
 import com.github.netomi.bat.dexfile.util.Numbers;
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue;
 import com.github.netomi.bat.dexfile.value.EncodedValue;
-import com.github.netomi.bat.dexfile.visitor.AllCodeVisitor;
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor;
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor;
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
@@ -29,6 +28,8 @@ import com.github.netomi.bat.util.Strings;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitorKt.allCode;
 
 class      InstructionPrinter
 implements InstructionVisitor
@@ -157,7 +158,8 @@ implements InstructionVisitor
         if (methodID.getName(dexFile).startsWith("access$")) {
             AccessMethodFollower methodFollower = new AccessMethodFollower();
 
-            methodID.accept(dexFile, new AllCodeVisitor(
+            methodID.accept(dexFile,
+                allCode(
                 new AllInstructionsVisitor(
                 methodFollower)));
 

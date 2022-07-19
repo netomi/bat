@@ -83,7 +83,7 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
 
         classDef?.classDataAccept(dexFile,
             AllEncodedMethodsVisitor(
-            MethodNameAndProtoFilter(getName(dexFile), getProtoID(dexFile), visitor)))
+            filterMethodsByNameAndProtoID(getName(dexFile), getProtoID(dexFile), visitor)))
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
