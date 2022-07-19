@@ -205,8 +205,7 @@ implements   ClassDefVisitor,
     public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
         printer.println(".registers " + code.registersSize);
 
-        LocalVariableCollector.LocalVariableInfo[] localVariableInfos =
-                new LocalVariableCollector.LocalVariableInfo[code.registersSize];
+        LocalVariableInfo[] localVariableInfos = new LocalVariableInfo[code.registersSize];
 
         if (code.debugInfo != null) {
             int localVariables = code.registersSize - code.insSize;
@@ -216,7 +215,7 @@ implements   ClassDefVisitor,
 
             if (!method.isStatic()) {
                 String classType = method.getClassType(dexFile);
-                localVariableInfos[localVariables] = new LocalVariableCollector.LocalVariableInfo("this", classType, null);
+                localVariableInfos[localVariables] = new LocalVariableInfo("this", classType, null);
             }
 
             ProtoID protoID     = method.getProtoID(dexFile);
@@ -236,9 +235,7 @@ implements   ClassDefVisitor,
                     printParameterInfo   = true;
                 }
 
-                LocalVariableCollector.LocalVariableInfo localVariableInfo =
-                    new LocalVariableCollector.LocalVariableInfo(parameterName, parameterType, null);
-
+                LocalVariableInfo localVariableInfo = new LocalVariableInfo(parameterName, parameterType, null);
                 localVariableInfos[localVariables + registerIndex] = localVariableInfo;
 
                 classDef.annotationsDirectoryAccept(dexFile, new ParameterAnnotationSetFilter(method, this));
