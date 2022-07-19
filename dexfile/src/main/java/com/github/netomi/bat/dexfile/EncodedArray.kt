@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue
+import com.github.netomi.bat.dexfile.value.visitor.EncodedArrayVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
@@ -37,6 +38,10 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
 
     override fun write(output: DexDataOutput) {
         array.writeValue(output, 0)
+    }
+
+    fun accept(dexFile: DexFile, visitor: EncodedArrayVisitor) {
+        array.accept(dexFile, visitor)
     }
 
     fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {

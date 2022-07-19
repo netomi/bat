@@ -19,6 +19,7 @@ package com.github.netomi.bat.dexfile.value
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.value.visitor.EncodedArrayVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import kotlin.collections.ArrayList
@@ -61,6 +62,10 @@ data class EncodedArrayValue internal constructor(val values: ArrayList<EncodedV
         for (value in values) {
             value.write(output)
         }
+    }
+
+    fun accept(dexFile: DexFile, visitor: EncodedArrayVisitor) {
+        values.forEachIndexed { index, encodedValue -> visitor.visitEncodedValue(dexFile, this, index, encodedValue ) }
     }
 
     override fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
