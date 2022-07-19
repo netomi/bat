@@ -110,7 +110,6 @@ fun parseNumber(value: String): Long {
         'S',
         't',
         'T'   -> parseLong(value.dropLast(1))
-        '\"',
         '\''  -> parseChar(value).code.toLong()
         else  -> {
             if (value.contains(".")) {
