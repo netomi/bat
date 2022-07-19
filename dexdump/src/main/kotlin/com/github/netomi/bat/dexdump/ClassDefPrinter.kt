@@ -102,14 +102,14 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         }
     }
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, encodedMethod: EncodedMethod) {
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
-        printer.println("  name          : '" + encodedMethod.getName(dexFile) + "'")
-        printer.println("  type          : '" + encodedMethod.getDescriptor(dexFile) + "'")
-        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(encodedMethod.accessFlags, DexAccessFlags.Target.METHOD))
+        printer.println("  name          : '" + method.getName(dexFile) + "'")
+        printer.println("  type          : '" + method.getDescriptor(dexFile) + "'")
+        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(method.accessFlags, DexAccessFlags.Target.METHOD))
 
-        if (encodedMethod.code != null) {
-            encodedMethod.codeAccept(dexFile, classDef, this)
+        if (method.code != null) {
+            method.codeAccept(dexFile, classDef, this)
         } else {
             printer.println("  code          : (none)")
         }
