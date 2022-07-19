@@ -18,6 +18,9 @@ package com.github.netomi.bat.smali
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
+import com.github.netomi.bat.dexfile.editor.DexSorter
+import com.github.netomi.bat.dexfile.io.DexFileReader
+import com.github.netomi.bat.dexfile.io.DexFileWriter
 import com.github.netomi.bat.util.Arrays
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.params.ParameterizedTest
@@ -25,6 +28,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -44,12 +48,16 @@ class AssemblerTest {
 
             val className = classDef.getClassName(dexFile)
 
+            DexSorter().visitDexFile(dexFile)
+
             val outputStreamFactory = TestOutputStreamFactory()
             val disassembler = Disassembler(outputStreamFactory)
             dexFile.classDefAccept(className, disassembler)
 
             val expectedBytes = baos.toByteArray()
             val actualBytes   = outputStreamFactory.getOutputStream(className)!!.toByteArray()
+
+            DexFileWriter(File("out.dex").outputStream()).visitDexFile(dexFile)
 
             // testing purposes only.
             if (!Arrays.equals(expectedBytes, actualBytes, expectedBytes.size)) {
