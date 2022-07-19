@@ -54,9 +54,7 @@ class AssemblerTest {
 
             val expectedBytes = baos.toByteArray()
             val actualBytes   = outputStreamFactory.getOutputStream(className)!!.toByteArray()
-
-            DexFileWriter(File("out.dex").outputStream()).visitDexFile(dexFile)
-
+            
             // testing purposes only.
             if (!expectedBytes.contentEquals(actualBytes)) {
                 val lastSlashIndex = className.lastIndexOf('/')
