@@ -27,8 +27,8 @@ open class ArrayInstruction internal constructor(opcode: DexOpCode, vararg regis
         super.read(instructions, offset)
 
         check(this.javaClass == ArrayInstruction::class.java    &&
-              opcode.format  != DexInstructionFormat.FORMAT_23x &&
-              opcode.format  != DexInstructionFormat.FORMAT_12x) { "unexpected format for opcode " + opcode.mnemonic }
+              (opcode.format == DexInstructionFormat.FORMAT_23x ||
+               opcode.format == DexInstructionFormat.FORMAT_12x)) { "unexpected format for opcode " + opcode.mnemonic }
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
