@@ -33,6 +33,8 @@ class FullDumpTest {
     @ParameterizedTest
     @MethodSource("testFiles")
     fun fullDexDump(testFile: String) {
+        println("checking $testFile...")
+
         val expectedFile = testFile.replace(".dex", ".txt")
         try {
             javaClass.getResourceAsStream("/dex/$testFile")!!.use { `is` ->
