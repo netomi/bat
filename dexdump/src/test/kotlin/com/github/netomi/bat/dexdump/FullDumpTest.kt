@@ -17,7 +17,6 @@ package com.github.netomi.bat.dexdump
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
-import com.github.netomi.bat.util.Arrays
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.fail
 import org.junit.jupiter.params.ParameterizedTest
@@ -52,7 +51,7 @@ class FullDumpTest {
                 val expectedBytes = javaClass.getResourceAsStream("/dex/$expectedFile")!!.readAllBytes()
 
                 // testing purposes only.
-                if (!Arrays.equals(expectedBytes, actualBytes, expectedBytes.size)) {
+                if (!expectedBytes.contentEquals(actualBytes)) {
                     Files.write(Paths.get("${testFile}_expected.txt"), expectedBytes)
                     Files.write(Paths.get("${testFile}_actual.txt"), actualBytes)
                 }

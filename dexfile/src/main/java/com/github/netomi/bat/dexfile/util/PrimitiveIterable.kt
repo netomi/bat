@@ -16,7 +16,6 @@
 package com.github.netomi.bat.dexfile.util
 
 import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.util.IntArray
 import java.util.function.BiFunction
 
 class PrimitiveIterable<E> private constructor(
@@ -27,7 +26,7 @@ class PrimitiveIterable<E> private constructor(
     override fun iterator(): Iterator<E> {
         return object : Iterator<E> {
             var index     = 0
-            val arraySize = array.size()
+            val arraySize = array.size
 
             override fun hasNext(): Boolean {
                 return index < arraySize

@@ -17,8 +17,6 @@
 package com.github.netomi.bat.dexfile.visitor
 
 import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.util.IntArray
-import kotlin.reflect.KMutableProperty
 
 internal interface ReferencedIDVisitor {
     fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {}

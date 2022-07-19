@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.github.netomi.bat.util.IntArray
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -36,7 +35,7 @@ import kotlin.collections.ArrayList
     dataSection   = true)
 class AnnotationSet private constructor() : DataItem() {
 
-    private val annotationOffsetEntries: IntArray  = IntArray(0)
+    private var annotationOffsetEntries: IntArray = intArrayOf()
 
     val annotations: ArrayList<Annotation> = ArrayList(0)
 
@@ -56,17 +55,18 @@ class AnnotationSet private constructor() : DataItem() {
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()
-        annotationOffsetEntries.clear()
-        annotationOffsetEntries.resize(size)
-        for (i in 0 until size) {
+        if (annotationOffsetEntries.size != size) {
+            annotationOffsetEntries = IntArray(size)
+        }
+        for (i in annotationOffsetEntries.indices) {
             annotationOffsetEntries[i] = input.readInt()
         }
     }
 
     override fun readLinkedDataItems(input: DexDataInput) {
         annotations.clear()
-        annotations.ensureCapacity(annotationOffsetEntries.size())
-        for (i in 0 until annotationOffsetEntries.size()) {
+        annotations.ensureCapacity(annotationOffsetEntries.size)
+        for (i in annotationOffsetEntries.indices) {
             input.offset = annotationOffsetEntries[i]
             val annotation = Annotation.readContent(input)
             annotations.add(i, annotation)
@@ -74,8 +74,9 @@ class AnnotationSet private constructor() : DataItem() {
     }
 
     override fun updateOffsets(dataItemMap: Map) {
-        annotationOffsetEntries.clear()
-        annotationOffsetEntries.resize(annotations.size)
+        if (annotationOffsetEntries.size != annotations.size) {
+            annotationOffsetEntries = IntArray(annotations.size)
+        }
         for (i in annotations.indices) {
             val offset = dataItemMap.getOffset(annotations[i])
             annotationOffsetEntries[i] = offset
@@ -83,9 +84,9 @@ class AnnotationSet private constructor() : DataItem() {
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeInt(annotationOffsetEntries.size())
-        for (i in 0 until annotationOffsetEntries.size()) {
-            output.writeInt(annotationOffsetEntries[i])
+        output.writeInt(annotationOffsetEntries.size)
+        for (element in annotationOffsetEntries) {
+            output.writeInt(element)
         }
     }
 

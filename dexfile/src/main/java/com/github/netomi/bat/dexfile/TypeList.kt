@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.util.PrimitiveIterable
 import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
-import com.github.netomi.bat.util.IntArray
+import com.google.common.primitives.Ints
 import java.util.*
 
 /**
@@ -33,16 +33,18 @@ import java.util.*
     type          = TYPE_TYPE_LIST,
     dataAlignment = 4,
     dataSection   = false)
-class TypeList private constructor(private val typeList: IntArray = IntArray(0)) : DataItem(), Comparable<TypeList> {
+class TypeList private constructor() : DataItem(), Comparable<TypeList> {
+
+    private var typeList: IntArray = intArrayOf()
 
     override val isEmpty: Boolean
-        get() = typeList.size() == 0
+        get() = typeList.isEmpty()
 
     /**
      * Returns the number of types contained in this TypeList.
      */
     val typeCount: Int
-        get() = typeList.size()
+        get() = typeList.size
 
     fun getType(dexFile: DexFile, index: Int): String {
         return dexFile.getTypeID(typeList[index]).getType(dexFile)
@@ -57,43 +59,44 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
     }
 
     fun addType(typeIDIndex: Int) {
-        typeList.add(typeIDIndex)
+        val oldSize = typeList.size
+        typeList = typeList.copyOf(oldSize + 1)
+        typeList[oldSize] = typeIDIndex
     }
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()
-        typeList.clear()
-        typeList.resize(size)
-        for (i in 0 until size) {
+        if (typeList.size != size) {
+            typeList = IntArray(size)
+        }
+        for (i in typeList.indices) {
             val typeIndex = input.readUnsignedShort()
             typeList[i] = typeIndex
         }
     }
 
     override fun write(output: DexDataOutput) {
-        val size = typeList.size()
+        val size = typeList.size
         output.writeInt(size)
-        for (i in 0 until size) {
+        for (i in typeList.indices) {
             output.writeUnsignedShort(typeList[i])
         }
     }
 
     fun typesAccept(dexFile: DexFile, visitor: TypeVisitor) {
-        val size = typeList.size()
-        for (i in 0 until size) {
+        for (i in typeList.indices) {
             visitor.visitType(dexFile, this, i, dexFile.getTypeID(typeList[i]).getType(dexFile))
         }
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        val size = typeList.size()
-        for (i in 0 until size) {
+        for (i in typeList.indices) {
             visitor.visitTypeID(dexFile, ArrayElementAccessor(typeList, i))
         }
     }
 
     override fun compareTo(other: TypeList): Int {
-        return typeList.compareTo(other.typeList);
+        return Ints.lexicographicalComparator().compare(typeList, other.typeList)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -102,15 +105,15 @@ class TypeList private constructor(private val typeList: IntArray = IntArray(0))
 
         other as TypeList
 
-        return typeList == other.typeList
+        return typeList.contentEquals(other.typeList)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(typeList)
+        return Objects.hash(typeList.contentHashCode())
     }
 
     override fun toString(): String {
-        return "TypeList[types=${typeList}]"
+        return "TypeList[types=${typeList.contentToString()}]"
     }
 
     companion object {

@@ -16,11 +16,11 @@
 
 package com.github.netomi.bat.util
 
-fun IntRange.toIntArray(): kotlin.IntArray {
+fun IntRange.toIntArray(): IntArray {
     if (last < first)
-        return kotlin.IntArray(0)
+        return IntArray(0)
 
-    val result = kotlin.IntArray(last - first + 1)
+    val result = IntArray(last - first + 1)
     var index = 0
     for (element in this)
         result[index++] = element

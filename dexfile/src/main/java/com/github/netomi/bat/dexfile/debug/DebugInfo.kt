@@ -25,7 +25,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.github.netomi.bat.util.IntArray
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -43,11 +42,11 @@ class DebugInfo private constructor() : DataItem() {
     var lineStart = 0
         private set
 
-    private val parameterNames                             = IntArray(0)
+    private var parameterNames                             = intArrayOf()
     private val debugSequence: ArrayList<DebugInstruction> = ArrayList(0)
 
     val parameterCount: Int
-        get() = parameterNames.size()
+        get() = parameterNames.size
 
     fun getParameterName(dexFile: DexFile, parameterIndex: Int): String? {
         return dexFile.getStringNullable(parameterNames[parameterIndex])
@@ -60,10 +59,11 @@ class DebugInfo private constructor() : DataItem() {
         lineStart = input.readUleb128()
 
         val parametersSize = input.readUleb128()
-        parameterNames.clear()
-        parameterNames.resize(parametersSize)
+        if (parameterNames.size != parametersSize) {
+            parameterNames = IntArray(parametersSize)
+        }
 
-        for (i in 0 until parametersSize) {
+        for (i in parameterNames.indices) {
             parameterNames[i] = input.readUleb128p1()
         }
 
@@ -79,10 +79,10 @@ class DebugInfo private constructor() : DataItem() {
 
     override fun write(output: DexDataOutput) {
         output.writeUleb128(lineStart)
-        output.writeUleb128(parameterNames.size())
+        output.writeUleb128(parameterNames.size)
 
-        for (i in 0 until parameterNames.size()) {
-            output.writeUleb128p1(parameterNames[i])
+        for (element in parameterNames) {
+            output.writeUleb128p1(element)
         }
 
         for (debugInstruction in debugSequence) {
@@ -97,8 +97,7 @@ class DebugInfo private constructor() : DataItem() {
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        val size = parameterNames.size()
-        for (i in 0 until size) {
+        for (i in parameterNames.indices) {
             visitor.visitStringID(dexFile, ArrayElementAccessor(parameterNames, i))
         }
 
@@ -112,16 +111,16 @@ class DebugInfo private constructor() : DataItem() {
         val o = other as DebugInfo
 
         return lineStart      == o.lineStart      &&
-               parameterNames == o.parameterNames &&
-               debugSequence  == o.debugSequence
+               debugSequence  == o.debugSequence  &&
+               parameterNames.contentEquals(o.parameterNames)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(lineStart, parameterNames, debugSequence)
+        return Objects.hash(lineStart, parameterNames.contentHashCode(), debugSequence)
     }
 
     override fun toString(): String {
-        return "DebugInfo[lineStart=${lineStart},parameterNames=${parameterNames},debugSequence=${debugSequence.size}]"
+        return "DebugInfo[lineStart=${lineStart},parameterNames=${parameterNames.size} items,debugSequence=${debugSequence.size} items]"
     }
 
     companion object {
