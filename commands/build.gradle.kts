@@ -3,6 +3,10 @@ plugins {
     distribution
 }
 
+base {
+    archivesName.set("bat-commands")
+}
+
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 tasks.test {

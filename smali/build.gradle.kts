@@ -3,6 +3,10 @@ plugins {
     id("antlr")
 }
 
+base {
+    archivesName.set("bat-smali")
+}
+
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 tasks {
