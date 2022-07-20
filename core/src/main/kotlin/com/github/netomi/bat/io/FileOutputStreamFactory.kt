@@ -24,9 +24,9 @@ import kotlin.io.path.exists
 
 class FileOutputStreamFactory(private val baseDir: Path, private val extension: String) : OutputStreamFactory {
     @Throws(IOException::class)
-    override fun createOutputStream(className: String): OutputStream {
+    override fun createOutputStream(internalClassName: String): OutputStream {
         val packageComponents =
-            Classes.internalPackageNameFromInternalName(className)
+            Classes.internalPackageNameFromInternalName(internalClassName)
                    .split("/".toRegex())
                    .dropLastWhile { it.isEmpty() }
                    .toTypedArray()
@@ -40,7 +40,7 @@ class FileOutputStreamFactory(private val baseDir: Path, private val extension: 
             Files.createDirectories(currentPath)
         }
 
-        currentPath = currentPath.resolve(Classes.simpleClassNameFromInternalName(className) + '.' + extension)
+        currentPath = currentPath.resolve(Classes.simpleClassNameFromInternalName(internalClassName) + '.' + extension)
 
         return Files.newOutputStream(currentPath)
     }

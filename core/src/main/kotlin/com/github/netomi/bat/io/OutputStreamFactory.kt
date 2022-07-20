@@ -20,5 +20,5 @@ import java.io.OutputStream
 
 interface OutputStreamFactory {
     @Throws(IOException::class)
-    fun createOutputStream(className: String): OutputStream
+    fun createOutputStream(internalClassName: String): OutputStream
 }
