@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 open class MethodInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var methodIndex: Int = _methodIndex
-        private set
+        internal set
 
     fun getMethodID(dexFile: DexFile): MethodID {
         return dexFile.getMethodID(methodIndex)

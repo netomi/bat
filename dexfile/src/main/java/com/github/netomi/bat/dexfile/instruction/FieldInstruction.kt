@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 class FieldInstruction internal constructor(opcode: DexOpCode, _fieldIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var fieldIndex: Int = _fieldIndex
-        private set
+        internal set
 
     fun getField(dexFile: DexFile): FieldID {
         return dexFile.getFieldID(fieldIndex)

@@ -29,6 +29,10 @@ fun filteredByExternalClassName(regularExpression: String, visitor: ClassDefVisi
     return ExternalClassNameFilter(regularExpression, visitor)
 }
 
+fun allClassData(visitor: ClassDataVisitor): ClassDefVisitor {
+    return ClassDefVisitor { dexFile, _, classDef -> classDef.classDataAccept(dexFile, visitor) }
+}
+
 fun interface ClassDefVisitor {
     fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef)
 }

@@ -16,12 +16,12 @@
 
 package com.github.netomi.bat.dexfile.editor
 
-import com.github.netomi.bat.dexfile.ClassDef
-import com.github.netomi.bat.dexfile.DataItem
-import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet
 import com.github.netomi.bat.dexfile.annotation.AnnotationSetRef
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
+import com.github.netomi.bat.dexfile.instruction.*
+import com.github.netomi.bat.dexfile.io.InstructionWriter
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.dexfile.visitor.IDAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
@@ -88,6 +88,9 @@ class DexSorter : DexFileVisitor {
             }
         })
 
+        // fix instructions that reference modified string/type/proto IDs.
+        dexFile.classDefsAccept(allClassData(allMethods(allCode(InstructionFixer(stringIDMapping, typeIDMapping, protoIDMapping, fieldIDMapping, methodIDMapping)))))
+
         dexFile.refreshCaches()
     }
 
@@ -96,5 +99,72 @@ class DexSorter : DexFileVisitor {
         list.sortWith(comparator)
         val newIndices = list.withIndex().associate { iv -> Pair(iv.value, iv.index) }
         return oldIndices.keys.associate { stringID -> Pair(oldIndices[stringID]!!, newIndices[stringID]!!) }
+    }
+}
+
+private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
+                                           val typeIDMapping:   Map<Int, Int>,
+                                           val protoIDMapping:  Map<Int, Int>,
+                                           val fieldIDMapping:  Map<Int, Int>,
+                                           val methodIDMapping: Map<Int, Int>): CodeVisitor, InstructionVisitor {
+
+    private var instructions: MutableList<DexInstruction> = mutableListOf()
+
+    override fun visitCode(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code) {
+        instructions = mutableListOf()
+
+        code.instructionsAccept(dexFile, classDef, method, method.code, this)
+
+        val modifiedInstructions = writeInstructions(instructions)
+        val newLength = modifiedInstructions.size
+
+        if (newLength == code.insnsSize) {
+            code.insns = modifiedInstructions
+        } else {
+            throw RuntimeException("fixed instructions have different size")
+        }
+    }
+
+    override fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction) {
+        instructions.add(instruction)
+    }
+
+    override fun visitStringInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: StringInstruction) {
+        instruction.stringIndex = stringIDMapping[instruction.stringIndex] ?: throw RuntimeException("unable to map stringIndex ${instruction.stringIndex}")
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+        instruction.typeIndex = typeIDMapping[instruction.typeIndex] ?: throw RuntimeException("unable to map typeIndex ${instruction.typeIndex}")
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    override fun visitFieldInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: FieldInstruction) {
+        instruction.fieldIndex = fieldIDMapping[instruction.fieldIndex] ?: throw RuntimeException("unable to map fieldIndex ${instruction.fieldIndex}")
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    override fun visitMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
+        instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: throw RuntimeException("unable to map methodIndex ${instruction.methodIndex}")
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    override fun visitMethodProtoInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodProtoInstruction) {
+        instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: throw RuntimeException("unable to map methodIndex ${instruction.methodIndex}")
+        instruction.protoIndex  = protoIDMapping[instruction.protoIndex]   ?: throw RuntimeException("unable to map protoIndex ${instruction.protoIndex}")
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
+        val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a, b -> a + b }
+
+        val writer = InstructionWriter(codeLen)
+        var offset = 0
+        for (instruction in instructions) {
+            instruction.write(writer, offset)
+            offset += instruction.length
+        }
+
+        return writer.array
     }
 }

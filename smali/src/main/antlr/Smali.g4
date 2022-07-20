@@ -298,7 +298,8 @@ sInstruction
 	| f12x_arithmetic
 	| f23x_arithmetic
     | f22sb_arithmetic
-	| f2x
+	| fx2x_move
+	| f12x_array
 	| f23x_compare
 	| f23x_array
 	| ft5c
@@ -473,7 +474,7 @@ f12x_arithmetic: op=
     | 'rem-double/2addr') r1=REGISTER ',' r2=REGISTER
     ;
 
-f2x	: op=
+fx2x_move: op=
     ( MOVE
     | 'move/from16'
     | 'move/16'
@@ -482,9 +483,10 @@ f2x	: op=
 	| 'move-wide/16'
 	| 'move-object'
 	| 'move-object/from16'
-	| 'move-object/16'
-	| 'array-length' ) r1=REGISTER ',' r2=REGISTER
+	| 'move-object/16' ) r1=REGISTER ',' r2=REGISTER
 	;
+
+f12x_array: op='array-length' r1=REGISTER ',' r2=REGISTER;
 
 f23x_arithmetic: op=
 	( 'add-int'

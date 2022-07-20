@@ -27,6 +27,7 @@ import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.smali.parser.SmaliParser.F11x_basicContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F12x_arithmeticContext
+import com.github.netomi.bat.smali.parser.SmaliParser.F12x_arrayContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F12x_conversionContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F21c_fieldContext
 import com.github.netomi.bat.smali.parser.SmaliParser.F21t_branchContext
@@ -40,7 +41,9 @@ import com.github.netomi.bat.smali.parser.SmaliParser.F3rc_methodContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_intContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_stringContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fconst_typeContext
+import com.github.netomi.bat.smali.parser.SmaliParser.Ft2cContext
 import com.github.netomi.bat.smali.parser.SmaliParser.Fx0t_branchContext
+import com.github.netomi.bat.smali.parser.SmaliParser.Fx2x_moveContext
 import com.github.netomi.bat.util.toIntArray
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -98,6 +101,9 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 SmaliParser.RULE_f12x_arithmetic  -> parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
                 SmaliParser.RULE_f23x_arithmetic  -> parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
                 SmaliParser.RULE_f22sb_arithmetic -> parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
+                SmaliParser.RULE_fx2x_move        -> parseBasicInstructionMoveFx2x(t as Fx2x_moveContext)
+                SmaliParser.RULE_f12x_array       -> parseArrayInstructionF12x(t as F12x_arrayContext)
+                SmaliParser.RULE_ft2c             -> parseTypeInstructionFt2c(t as Ft2cContext)
                 SmaliParser.RULE_f23x_compare     -> parseBasicInstructionCompareF23x(t as F23x_compareContext)
                 SmaliParser.RULE_f23x_array       -> parseArrayInstructionF23x(t as F23x_arrayContext)
                 SmaliParser.RULE_f35c_method      -> parseMethodInstructionF35c(t as F35c_methodContext)
@@ -320,6 +326,16 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         return BasicInstruction.of(opcode, r1, r2, r3)
     }
 
+    private fun parseBasicInstructionMoveFx2x(ctx: Fx2x_moveContext): BasicInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val r2 = registerInfo.registerNumber(ctx.r2.text)
+
+        return BasicInstruction.of(opcode, r1, r2)
+    }
+
     private fun parseMethodInstructionF35c(ctx: F35c_methodContext): MethodInstruction {
         val mnemonic = ctx.op.text
         val opcode = DexOpCode.get(mnemonic)
@@ -358,6 +374,28 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         val r3 = registerInfo.registerNumber(ctx.r3.text)
 
         return ArrayInstruction.of(opcode, r1, r2, r3)
+    }
+
+    private fun parseArrayInstructionF12x(ctx: F12x_arrayContext): ArrayInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val r2 = registerInfo.registerNumber(ctx.r2.text)
+
+        return ArrayInstruction.of(opcode, r1, r2)
+    }
+
+    private fun parseTypeInstructionFt2c(ctx: Ft2cContext): TypeInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+        val r2 = registerInfo.registerNumber(ctx.r2.text)
+
+        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+
+        return TypeInstruction.of(opcode, typeIndex, r1, r2)
     }
 
     private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {

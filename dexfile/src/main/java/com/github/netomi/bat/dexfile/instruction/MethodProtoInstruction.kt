@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 class MethodProtoInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, _protoIndex: Int = NO_INDEX) : MethodInstruction(opcode, _methodIndex) {
 
     var protoIndex: Int = _protoIndex
-        private set
+        internal set
 
     fun getProtoID(dexFile: DexFile): ProtoID {
         return dexFile.getProtoID(protoIndex)

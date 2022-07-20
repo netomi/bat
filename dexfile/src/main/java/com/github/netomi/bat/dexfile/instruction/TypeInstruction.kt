@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 class TypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var typeIndex: Int = _typeIndex
-        private set
+        internal set
 
     fun getTypeID(dexFile: DexFile): TypeID {
         return dexFile.getTypeID(typeIndex)

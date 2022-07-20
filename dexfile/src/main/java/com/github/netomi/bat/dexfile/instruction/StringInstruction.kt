@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 class StringInstruction internal constructor(opcode: DexOpCode, _stringIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var stringIndex: Int = _stringIndex
-        private set
+        internal set
 
     fun getString(dexFile: DexFile): String {
         return dexFile.getStringID(stringIndex).stringValue
