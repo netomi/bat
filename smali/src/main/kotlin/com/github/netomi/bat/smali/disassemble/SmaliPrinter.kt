@@ -67,7 +67,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             }
         }
 
-        classDef.annotationsDirectoryAccept(dexFile, ClassAnnotationSetVisitor(this))
+        classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, this)
         classDef.classDataAccept(dexFile, this)
         printer.flush()
     }

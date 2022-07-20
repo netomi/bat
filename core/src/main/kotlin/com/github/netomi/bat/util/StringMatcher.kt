@@ -64,6 +64,10 @@ private abstract class RegexStringMatcher protected constructor(separatorCharact
         // Clean the expression first.
         var cleanedExpression = expression.replace("\\.".toRegex(), "\\\\.")
 
+        // Escape reserved chars.
+        cleanedExpression = cleanedExpression.replace("^", "\\^")
+        cleanedExpression = cleanedExpression.replace("$", "\\$")
+
         if (separatorCharacters.isNotEmpty()) {
             // '**' means to match anything till the end.
             // Replace with '@' temporarily to avoid problems with the next rule.

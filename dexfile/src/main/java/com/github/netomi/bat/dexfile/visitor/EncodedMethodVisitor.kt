@@ -31,8 +31,8 @@ fun filterMethodsByName(name: String, visitor: EncodedMethodVisitor): EncodedMet
     return MethodNameAndProtoFilter(name, null, visitor)
 }
 
-fun filterMethodsByNameAndProtoID(name: String, protoID: ProtoID, visitor: EncodedMethodVisitor): EncodedMethodVisitor {
-    return MethodNameAndProtoFilter(name, protoID, visitor)
+fun filterMethodsByNameAndProtoID(nameExpression: String, protoID: ProtoID, visitor: EncodedMethodVisitor): EncodedMethodVisitor {
+    return MethodNameAndProtoFilter(nameExpression, protoID, visitor)
 }
 
 fun allCode(visitor: CodeVisitor): EncodedMethodVisitor {

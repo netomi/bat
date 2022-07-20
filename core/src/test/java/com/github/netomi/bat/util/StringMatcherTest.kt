@@ -150,4 +150,12 @@ class SimpleNameMatcherTest : StringMatcherTest() {
 
         assertFailsWith(RuntimeException::class) { matcher("abcdef!ghi") }
     }
+
+    @Test
+    fun reservedChars() {
+        val matcher = matcher("abc\$def.ghi^")
+
+        assertTrue(matcher.matches("abc\$def.ghi^"))
+        assertFalse(matcher.matches(""))
+    }
 }
