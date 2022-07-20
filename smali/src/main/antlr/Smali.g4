@@ -286,7 +286,7 @@ sInstruction
 	| f10x
 	| fx0t_branch
 	| f21t_branch
-	| f2t
+	| f22t_branch
 	| f11x_basic
 	| fconst_int
 	| fconst_string
@@ -554,7 +554,7 @@ f21t_branch : op=
     | 'if-lez' )  r1=REGISTER ',' label=LABEL
     ;
 
-f2t	 : op=
+f22t_branch: op=
     ( 'if-eq'
     | 'if-ne'
     | 'if-lt'
