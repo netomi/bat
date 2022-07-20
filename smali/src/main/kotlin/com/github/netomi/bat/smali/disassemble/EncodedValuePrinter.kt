@@ -61,7 +61,7 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
         if (!value.isEmpty()) {
             printer.println()
             printer.levelUp()
-            value.valuesAccept(dexFile, this.joinedBy { _, _ -> printer.println(",") })
+            value.valuesAccept(dexFile, this.joinedByValueConsumer { _, _ -> printer.println(",") })
             printer.println()
             printer.levelDown()
         }

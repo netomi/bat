@@ -1,0 +1,49 @@
+#!/bin/bash
+
+function cleanTmp ()
+{
+  if [ -e "${TMPDIR}" ] ; then
+    rm -r "${TMPDIR}"
+  fi
+}
+
+function find_libdir() {
+  if [ "$(readlink "$DALVIKVM_EXECUTABLE")" = "dalvikvm64" ]; then
+    echo "lib64"
+  else
+    echo "lib"
+  fi
+}
+
+lib=-XXlib:libart.so
+
+
+PLATFORM="linux-x86"
+ANDROID_VERSION=$1
+shift
+
+ANDROID_DATA=./android-data/$ANDROID_VERSION
+ANDROID_BASE="/home/tn/workspace/netomi/runtimes/android-$ANDROID_VERSION"
+ANDROID_HOST_DIR="$ANDROID_BASE/$PLATFORM"
+DALVIKVM_EXECUTABLE=$ANDROID_HOST_DIR/bin/dalvikvm
+
+BOOTCLASSPATH=":$ANDROID_HOST_DIR/framework/core-libart-hostdex.jar:$ANDROID_HOST_DIR/framework/core-oj-hostdex.jar:$ANDROID_HOST_DIR/framework/bouncycastle-hostdex.jar:$ANDROID_HOST_DIR/framework/conscrypt-hostdex.jar:$ANDROID_HOST_DIR/framework/okhttp-hostdex.jar"
+
+LD_LIBRARY_PATH=$ANDROID_HOST_DIR/"$(find_libdir)"
+
+mkdir -p $ANDROID_DATA/dalvik-cache/{x86,x86_64}
+
+# create a temporary directory
+TMPDIR=$ANDROID_DATA/tmp-$$
+mkdir -p $TMPDIR
+trap cleanTmp 0
+
+ANDROID_DATA=$ANDROID_DATA \
+  BOOTCLASSPATH=$BOOTCLASSPATH \
+  ANDROID_ROOT=$ANDROID_HOST_DIR \
+  LD_LIBRARY_PATH=$LD_LIBRARY_PATH \
+  $DALVIKVM_EXECUTABLE -Xss1 $lib \
+  -Ximage:$ANDROID_HOST_DIR/framework/core.art "$@"
+
+EXIT_STATUS=$?
+exit $EXIT_STATUS

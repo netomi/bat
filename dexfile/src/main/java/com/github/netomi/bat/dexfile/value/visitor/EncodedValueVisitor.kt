@@ -112,7 +112,7 @@ fun interface EncodedValueVisitor {
         return multiValueVisitorOf(this, *visitors)
     }
 
-    fun joinedBy(consumer: BiConsumer<DexFile, EncodedValue>): EncodedValueVisitor {
+    fun joinedByValueConsumer(consumer: BiConsumer<DexFile, EncodedValue>): EncodedValueVisitor {
         val joiner: EncodedValueVisitor = object : EncodedValueVisitor {
             private var firstVisited = false
             override fun visitAnyValue(dexFile: DexFile, value: EncodedValue) {

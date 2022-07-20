@@ -55,7 +55,7 @@ fun interface EncodedMethodVisitor {
         return multiMethodVisitorOf(this, *visitors)
     }
 
-    fun joinedBy(consumer: BiConsumer<DexFile, EncodedMethod>): EncodedMethodVisitor {
+    fun joinedByMethodConsumer(consumer: BiConsumer<DexFile, EncodedMethod>): EncodedMethodVisitor {
         val joiner: EncodedMethodVisitor = object : EncodedMethodVisitor {
             private var firstVisited = false
             override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {

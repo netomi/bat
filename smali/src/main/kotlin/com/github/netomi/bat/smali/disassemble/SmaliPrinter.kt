@@ -89,13 +89,13 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             printer.println()
             printer.println()
             printer.println("# direct methods")
-            classData.directMethodsAccept(dexFile, classDef, joinedBy { _, _ -> printer.println() })
+            classData.directMethodsAccept(dexFile, classDef, joinedByMethodConsumer { _, _ -> printer.println() })
         }
         if (classData.virtualMethodCount > 0) {
             printer.println()
             printer.println()
             printer.println("# virtual methods")
-            classData.virtualMethodsAccept(dexFile, classDef, joinedBy { _, _ -> printer.println() })
+            classData.virtualMethodsAccept(dexFile, classDef, joinedByMethodConsumer { _, _ -> printer.println() })
         }
     }
 

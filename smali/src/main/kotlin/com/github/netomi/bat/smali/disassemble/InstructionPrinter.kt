@@ -60,7 +60,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printer.print(", call_site_" + instruction.callSiteIndex)
         val callSite = instruction.getCallSiteID(dexFile).callSite
         printer.print("(")
-        callSite.accept(dexFile, filterByStartIndex(1, CallSiteArgumentPrinter(printer).joinedBy { _, _ -> printer.print(", ") } ))
+        callSite.accept(dexFile, filterByStartIndex(1, CallSiteArgumentPrinter(printer).joinedByValueConsumer { _, _ -> printer.print(", ") } ))
         printer.print(")@")
         val methodHandle = callSite.getMethodHandle(dexFile)
         printer.print(methodHandle.getTargetClassType(dexFile))

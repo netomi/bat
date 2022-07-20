@@ -125,29 +125,31 @@ class ClassDef private constructor(
         classData.addMethod(method)
     }
 
-    fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue?) {
+    fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
 
-        val staticFieldIndex = AtomicInteger(NO_INDEX)
-        classData.staticFieldsAccept(dexFile, this) { _, _, idx, f -> if (f === field) staticFieldIndex.set(idx) }
+        val staticFieldIndex =
+            classData.staticFields.withIndex()
+                                  .filter { it.value.fieldIndex == field.fieldIndex }
+                                  .map { it.index }
+                                  .firstOrNull() ?: NO_INDEX
 
-        val fieldIndex = staticFieldIndex.get()
-        if (fieldIndex == NO_INDEX) {
+        if (staticFieldIndex == NO_INDEX) {
             throw RuntimeException("trying to add a static value for a field that does not belong to this class: " + getType(dexFile))
         }
 
         val currentStaticValues = staticValues.array.values.size
-        if (currentStaticValues <= fieldIndex) {
-            for (i in currentStaticValues until fieldIndex) {
+        if (currentStaticValues <= staticFieldIndex) {
+            for (i in currentStaticValues until staticFieldIndex) {
                 val currentField = classData.getStaticField(i)
                 val type = currentField.getFieldID(dexFile).getType(dexFile)
                 val encodedValue = getDefaultEncodedValueForType(type)
                 staticValues.array.addEncodedValue(encodedValue)
             }
-            staticValues.array.addEncodedValue(value!!)
+            staticValues.array.addEncodedValue(value)
         } else {
-            staticValues.array.setEncodedValue(fieldIndex, value!!)
+            staticValues.array.setEncodedValue(staticFieldIndex, value)
         }
     }
 

@@ -13,19 +13,20 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor
+package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.Visibility.Companion.of
 
-fun interface EncodedMemberVisitor : EncodedFieldVisitor, EncodedMethodVisitor {
+/**
+ * A base class for encoded fields and methods in a dex file
+ */
+abstract class EncodedMember protected constructor(_accessFlags: Int = 0) : DexContent() {
 
-    fun visitAnyMember(dexFile: DexFile, classDef: ClassDef, index: Int, member: EncodedMember)
+    var accessFlags: Int = _accessFlags
+        protected set
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
-        visitAnyMember(dexFile, classDef, index, field)
-    }
+    val visibility: Visibility
+        get() = of(accessFlags)
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
-        visitAnyMember(dexFile, classDef, index, method)
-    }
+    abstract fun getName(dexFile: DexFile): String
 }

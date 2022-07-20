@@ -29,18 +29,12 @@ import java.util.*
  *
  * @see [encoded method @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-method-format)
  */
-class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFlags: Int = 0): DexContent() {
+class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFlags: Int = 0): EncodedMember(_accessFlags) {
 
     private var deltaMethodIndex = 0
 
     var methodIndex: Int = _methodIndex
         internal set
-
-    var accessFlags: Int = _accessFlags
-        private set
-
-    val visibility: Visibility
-        get() = Visibility.of(accessFlags)
 
     val modifiers: EnumSet<MethodModifier>
         get() = MethodModifier.setOf(accessFlags)
@@ -62,7 +56,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
         return dexFile.getMethodID(methodIndex).getClassTypeID(dexFile).getType(dexFile)
     }
 
-    fun getName(dexFile: DexFile): String {
+    override fun getName(dexFile: DexFile): String {
         return getMethodID(dexFile).getName(dexFile)
     }
 

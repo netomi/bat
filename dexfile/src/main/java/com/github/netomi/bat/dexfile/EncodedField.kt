@@ -19,9 +19,12 @@ import com.github.netomi.bat.dexfile.FieldModifier.Companion.setOf
 import com.github.netomi.bat.dexfile.Visibility.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.github.netomi.bat.util.Classes
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -30,18 +33,12 @@ import java.util.*
  *
  * @see [encoded field @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-field-format)
  */
-class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags: Int = 0) : DexContent() {
+class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags: Int = 0) : EncodedMember(_accessFlags) {
 
     private var deltaFieldIndex = 0
 
     var fieldIndex: Int = _fieldIndex
         internal set
-
-    var accessFlags: Int = _accessFlags
-        private set
-
-    val visibility: Visibility
-        get() = of(accessFlags)
 
     val modifiers: EnumSet<FieldModifier>
         get() = setOf(accessFlags)
@@ -50,7 +47,7 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
         return dexFile.getFieldID(fieldIndex)
     }
 
-    fun getName(dexFile: DexFile): String {
+    override fun getName(dexFile: DexFile): String {
         return getFieldID(dexFile).getName(dexFile)
     }
 
