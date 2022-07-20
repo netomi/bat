@@ -93,6 +93,10 @@ class AnnotationSetRef private constructor(_annotationSet: AnnotationSet = Annot
     }
 
     companion object {
+        fun of(annotationSet: AnnotationSet): AnnotationSetRef {
+            return AnnotationSetRef(annotationSet)
+        }
+
         fun readContent(input: DexDataInput): AnnotationSetRef {
             val annotationSetRef = AnnotationSetRef()
             annotationSetRef.read(input)

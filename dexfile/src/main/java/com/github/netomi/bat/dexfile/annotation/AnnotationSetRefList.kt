@@ -33,7 +33,7 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATION_SET_REF_LIST,
     dataAlignment = 4,
     dataSection   = true)
-class AnnotationSetRefList private constructor(private val annotationSetRefs: ArrayList<AnnotationSetRef> = ArrayList(0)) : DataItem() {
+class AnnotationSetRefList private constructor(val annotationSetRefs: ArrayList<AnnotationSetRef> = ArrayList(0)) : DataItem() {
 
     val annotationSetRefCount: Int
         get() = annotationSetRefs.size
@@ -43,7 +43,7 @@ class AnnotationSetRefList private constructor(private val annotationSetRefs: Ar
     }
 
     override val isEmpty: Boolean
-        get() = !annotationSetRefs.any { !isEmpty }
+        get() = !annotationSetRefs.any { !it.isEmpty }
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()

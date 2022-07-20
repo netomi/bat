@@ -96,7 +96,7 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
         if (!method.isAbstract) {
             val codeAssembler = CodeAssembler(classDef, method, dexComposer)
-            val code = codeAssembler.parseCode(ctx.sInstruction())
+            val code = codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
             method.code = code
         } else {
             if (ctx.sInstruction().isNotEmpty()) {
@@ -111,6 +111,26 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         if (!annotationSet.isEmpty) {
             val methodAnnotation = MethodAnnotation.of(method.methodIndex, annotationSet)
             classDef.annotationsDirectory.methodAnnotations.add(methodAnnotation)
+        }
+
+        val annotationSetRefList = AnnotationSetRefList.empty()
+        ctx.sParameter().forEach { pCtx ->
+            val param = pCtx.r.text.substring(1).toInt()
+
+            while ((annotationSetRefList.annotationSetRefCount + 1) < param) {
+                annotationSetRefList.annotationSetRefs.add(AnnotationSetRef.of(AnnotationSet.empty()))
+            }
+
+            val parameterAnnotationSet = AnnotationSet.empty()
+            pCtx.sAnnotation().forEach { parameterAnnotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
+            if (!parameterAnnotationSet.isEmpty) {
+                annotationSetRefList.annotationSetRefs.add(AnnotationSetRef.of(parameterAnnotationSet))
+            }
+        }
+
+        if (!annotationSetRefList.isEmpty) {
+            val parameterAnnotation = ParameterAnnotation.of(method.methodIndex, annotationSetRefList)
+            classDef.annotationsDirectory.parameterAnnotations.add(parameterAnnotation)
         }
     }
 }

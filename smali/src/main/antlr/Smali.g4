@@ -209,10 +209,8 @@ sAnnotation
 sSubannotation
 	: '.subannotation' type=OBJECT_TYPE (sAnnotationKeyName '=' sAnnotationValue )* '.end subannotation' ;
 
-sParameter
-	: parameter=DPARAMETER (name=STRING)?  ( (sAnnotation)* '.end parameter')?
-	| param=DPARAM r=REGISTER (',' name=STRING )? (sAnnotation* '.end param')?
-	;
+sParameter: param=DPARAM r=REGISTER (',' name=STRING )? (sAnnotation* '.end param')?;
+
 sAnnotationKeyName
     : PRIMITIVE_TYPE
     | VOID_TYPE

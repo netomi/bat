@@ -38,16 +38,16 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
     private lateinit var registerInfo: RegisterInfo
     private          var labelMapping: MutableMap<String, Int> = HashMap()
 
-    fun parseCode(lCtx: List<SInstructionContext>): Code {
+    fun parseCode(iCtx: List<SInstructionContext>, pCtx: List<SParameterContext>): Code {
 
         val instructions = mutableListOf<DexInstruction>()
 
-        collectRegisterInfo(lCtx)
-        collectLabels(lCtx)
+        collectRegisterInfo(iCtx)
+        collectLabels(iCtx)
 
         var codeOffset = 0
 
-        lCtx.forEach { ctx ->
+        iCtx.forEach { ctx ->
             val t = ctx.getChild(0) as ParserRuleContext
             val insn: DexInstruction? = when (t.ruleIndex) {
                 RULE_fline -> {

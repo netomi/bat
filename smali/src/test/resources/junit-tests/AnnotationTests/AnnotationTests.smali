@@ -110,11 +110,11 @@
 .method public testMethodWithParameterAnnotation(Ljava/lang/String;)V
     .registers 2
 
-    .parameter "test"
+    .param p1, "test"
         .annotation runtime LTestAnnotationClass;
             stringValue = "Parameter Annotation Test"
         .end annotation
-    .end parameter
+    .end param
 
     return-void
 .end method
