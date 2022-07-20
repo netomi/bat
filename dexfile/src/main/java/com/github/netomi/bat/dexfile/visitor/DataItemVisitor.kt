@@ -81,16 +81,20 @@ interface DataItemVisitor {
         visitAnyDataItem(dexFile, annotationsDirectory)
     }
 
-    fun visitClassAnnotations(dexFile: DexFile, annotationsDirectory: AnnotationsDirectory, annotationSet: AnnotationSet) {
+    fun visitAnyAnnotationSet(dexFile: DexFile, annotationSet: AnnotationSet) {
         visitAnyDataItem(dexFile, annotationSet)
+    }
+
+    fun visitClassAnnotations(dexFile: DexFile, annotationsDirectory: AnnotationsDirectory, annotationSet: AnnotationSet) {
+        visitAnyAnnotationSet(dexFile, annotationSet)
     }
 
     fun visitFieldAnnotations(dexFile: DexFile, fieldAnnotation: FieldAnnotation, annotationSet: AnnotationSet) {
-        visitAnyDataItem(dexFile, annotationSet)
+        visitAnyAnnotationSet(dexFile, annotationSet)
     }
 
     fun visitMethodAnnotations(dexFile: DexFile, methodAnnotation: MethodAnnotation, annotationSet: AnnotationSet) {
-        visitAnyDataItem(dexFile, annotationSet)
+        visitAnyAnnotationSet(dexFile, annotationSet)
     }
 
     fun visitParameterAnnotations(dexFile: DexFile, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
@@ -98,7 +102,7 @@ interface DataItemVisitor {
     }
 
     fun visitAnnotationSet(dexFile: DexFile, annotationSetRef: AnnotationSetRef, annotationSet: AnnotationSet) {
-        visitAnyDataItem(dexFile, annotationSet)
+        visitAnyAnnotationSet(dexFile, annotationSet)
     }
 
     fun visitAnnotation(dexFile: DexFile, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {

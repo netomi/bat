@@ -71,7 +71,8 @@ class DexSorter : DexFileVisitor {
 
         dexFile.dataItemsAccept(object: DataItemVisitor {
             override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {}
-            override fun visitAnnotationSet(dexFile: DexFile, annotationSetRef: AnnotationSetRef, annotationSet: AnnotationSet) {
+
+            override fun visitAnyAnnotationSet(dexFile: DexFile, annotationSet: AnnotationSet) {
                 annotationSet.sort()
             }
 
