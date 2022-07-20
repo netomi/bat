@@ -24,7 +24,7 @@ import com.github.netomi.bat.dexfile.visitor.AnnotationElementVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.github.netomi.bat.util.Preconditions
+import com.google.common.base.Preconditions
 import kotlin.collections.ArrayList
 
 /**

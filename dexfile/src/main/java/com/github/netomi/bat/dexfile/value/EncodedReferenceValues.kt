@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.github.netomi.bat.util.Preconditions
+import com.google.common.base.Preconditions
 
 /**
  * A class representing a referenced string (StringID) value inside a dex file.
