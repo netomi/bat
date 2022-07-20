@@ -30,6 +30,10 @@ fun interface StringMatcher {
     }
 }
 
+fun simpleNameMatcher(regularExpression: String): StringMatcher {
+    return SimpleNameMatcher(regularExpression)
+}
+
 fun classNameMatcher(regularExpression: String): StringMatcher {
     return ClassNameMatcher(regularExpression)
 }
@@ -37,6 +41,8 @@ fun classNameMatcher(regularExpression: String): StringMatcher {
 fun fileNameMatcher(regularExpression: String): StringMatcher {
     return FileNameMatcher(regularExpression)
 }
+
+private class SimpleNameMatcher(regularExpression: String) : RegexStringMatcher("", regularExpression)
 
 private class ClassNameMatcher(regularExpression: String) : RegexStringMatcher("\\.\\/", regularExpression)
 
@@ -58,15 +64,23 @@ private abstract class RegexStringMatcher protected constructor(separatorCharact
         // Clean the expression first.
         var cleanedExpression = expression.replace("\\.".toRegex(), "\\\\.")
 
-        // '**' means to match anything till the end.
-        // Replace with '@' temporarily to avoid problems with the next rule.
-        cleanedExpression = cleanedExpression.replace("\\*\\*".toRegex(), ".@")
-        // '*' means to match anything till the next separator character.
-        cleanedExpression = cleanedExpression.replace("\\*".toRegex(), "[^$separatorCharacters]*")
-        // '?' means to match a single character till the next separator character.
-        cleanedExpression = cleanedExpression.replace("\\?".toRegex(), "[^$separatorCharacters]{1}")
-        // Replace '@' with '*' at the end.
-        cleanedExpression = cleanedExpression.replace("@".toRegex(), "*")
+        if (separatorCharacters.isNotEmpty()) {
+            // '**' means to match anything till the end.
+            // Replace with '@' temporarily to avoid problems with the next rule.
+            cleanedExpression = cleanedExpression.replace("\\*\\*".toRegex(), ".@")
+            // '*' means to match anything till the next separator character.
+            cleanedExpression = cleanedExpression.replace("\\*".toRegex(), "[^$separatorCharacters]*")
+            // '?' means to match a single character till the next separator character.
+            cleanedExpression = cleanedExpression.replace("\\?".toRegex(), "[^$separatorCharacters]{1}")
+            // Replace '@' with '*' at the end.
+            cleanedExpression = cleanedExpression.replace("@".toRegex(), "*")
+        } else {
+            // if we have no separator chars, we just convert our wildcards to regular wildcards.
+            cleanedExpression = cleanedExpression.replace("\\*\\*".toRegex(), ".@")
+            cleanedExpression = cleanedExpression.replace("\\*".toRegex(), ".*")
+            cleanedExpression = cleanedExpression.replace("\\?".toRegex(), ".{1}")
+            cleanedExpression = cleanedExpression.replace("@".toRegex(), "*")
+        }
 
         // '!' is only allowed at the start of the expression and negates it.
         if (cleanedExpression.startsWith("!")) {

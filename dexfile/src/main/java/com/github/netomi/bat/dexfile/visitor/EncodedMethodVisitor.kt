@@ -19,6 +19,8 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.ProtoID
+import com.github.netomi.bat.util.StringMatcher
+import com.github.netomi.bat.util.simpleNameMatcher
 import java.util.function.BiConsumer
 
 fun multiMethodVisitorOf(visitor: EncodedMethodVisitor, vararg visitors: EncodedMethodVisitor): EncodedMethodVisitor {
@@ -80,9 +82,19 @@ private class AllCodeVisitor(private val visitor: CodeVisitor) : EncodedMethodVi
     }
 }
 
-private class MethodNameAndProtoFilter(private val name:    String?,
-                                       private val protoID: ProtoID?,
-                                       private val visitor: EncodedMethodVisitor) : EncodedMethodVisitor {
+private class MethodNameAndProtoFilter(            nameExpression: String?,
+                                       private val protoID:        ProtoID?,
+                                       private val visitor:        EncodedMethodVisitor) : EncodedMethodVisitor {
+
+    private val nameMatcher: StringMatcher?
+
+    init {
+        nameMatcher = if (nameExpression != null) {
+            simpleNameMatcher(nameExpression)
+        } else {
+            null
+        }
+    }
 
     override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
         if (accepted(method.getName(dexFile), method.getProtoID(dexFile))) {
@@ -104,8 +116,8 @@ private class MethodNameAndProtoFilter(private val name:    String?,
 
     // Private utility methods.
     private fun accepted(name: String, protoID: ProtoID): Boolean {
-        return (this.name == null    || this.name == name) &&
-               (this.protoID == null || this.protoID == protoID)
+        return (this.nameMatcher == null || this.nameMatcher.matches(name)) &&
+               (this.protoID     == null || this.protoID == protoID)
     }
 }
 

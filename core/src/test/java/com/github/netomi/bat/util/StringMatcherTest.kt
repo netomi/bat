@@ -89,3 +89,65 @@ class ClassNameMatcherTest : StringMatcherTest() {
         assertFailsWith(RuntimeException::class) { matcher("abc/def!/ghi") }
     }
 }
+
+class SimpleNameMatcherTest : StringMatcherTest() {
+
+    override fun matcher(regularExpression: String): StringMatcher {
+        return simpleNameMatcher(regularExpression)
+    }
+
+    @Test
+    fun noWildCard() {
+        val matcher = matcher("abc")
+
+        assertTrue(matcher.matches("abc"))
+        assertFalse(matcher.matches(""))
+        assertFalse(matcher.matches("abcde"))
+        assertFalse(matcher.matches("123abc"))
+    }
+
+    @Test
+    fun singleStar() {
+        val matcher = matcher("abc*")
+
+        assertTrue(matcher.matches("abcdef"))
+        assertFalse(matcher.matches(""))
+        assertTrue(matcher.matches("abcdefgh"))
+        assertFalse(matcher.matches("123abcdef"))
+    }
+
+    @Test
+    fun doubleStar() {
+        val matcher = matcher("abcdef**")
+
+        assertTrue(matcher.matches("abcdef"))
+        assertFalse(matcher.matches(""))
+        assertTrue(matcher.matches("abcdefgh"))
+        assertFalse(matcher.matches("123abcdef"))
+        assertTrue(matcher.matches("abcdefghi"))
+    }
+
+    @Test
+    fun questionMark() {
+        val matcher = matcher("abcdef?")
+
+        assertFalse(matcher.matches("abcdef"))
+        assertFalse(matcher.matches(""))
+        assertTrue(matcher.matches("abcdefg"))
+        assertFalse(matcher.matches("abcdefgh"))
+        assertFalse(matcher.matches("123abcdef"))
+    }
+
+    @Test
+    fun exclamationMark() {
+        val matcher = matcher("!abcdef*")
+
+        assertFalse(matcher.matches("abcdef"))
+        assertTrue(matcher.matches(""))
+        assertFalse(matcher.matches("abcdefg"))
+        assertFalse(matcher.matches("abcdefgh"))
+        assertTrue(matcher.matches("123abcdef"))
+
+        assertFailsWith(RuntimeException::class) { matcher("abcdef!ghi") }
+    }
+}
