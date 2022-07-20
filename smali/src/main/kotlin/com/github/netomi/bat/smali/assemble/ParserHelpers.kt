@@ -121,6 +121,10 @@ fun parseNumber(value: String): Long {
     }
 }
 
+fun parseString(value: String): String {
+    return Strings.unescapeJavaString(value.removeSurrounding("\""))
+}
+
 fun parseChar(value: String): Char {
     return Strings.unescapeJavaString(value.removeSurrounding("'")).first()
 }
@@ -134,7 +138,7 @@ fun parseLong(value: String): Long {
 }
 
 fun parseByte(value: String): Byte {
-    return java.lang.Byte.decode(value.removeSuffix("t").removeSuffix("T"))
+    return java.lang.Short.decode(value.removeSuffix("t").removeSuffix("T")).toByte()
 }
 
 fun parseShort(value: String): Short {

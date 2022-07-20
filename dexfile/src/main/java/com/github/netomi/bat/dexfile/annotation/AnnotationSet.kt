@@ -53,6 +53,10 @@ class AnnotationSet private constructor() : DataItem() {
     override val isEmpty: Boolean
         get() = annotations.isEmpty()
 
+    internal fun sort() {
+        annotations.sortWith(compareBy { it.annotationValue.typeIndex })
+    }
+
     override fun read(input: DexDataInput) {
         val size = input.readInt()
         if (annotationOffsetEntries.size != size) {

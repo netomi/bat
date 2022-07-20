@@ -67,24 +67,16 @@ class DexSorter : DexFileVisitor {
             }
         })
 
-        dexFile.classDefsAccept { _, _, classDef ->
-            classDef.classData.staticFields.sortWith(compareBy { it.fieldIndex })
-            classDef.classData.instanceFields.sortWith(compareBy { it.fieldIndex })
-
-            classDef.classData.directMethods.sortWith(compareBy { it.methodIndex })
-            classDef.classData.virtualMethods.sortWith(compareBy { it.methodIndex })
-        }
+        dexFile.classDefsAccept { _, _, classDef -> classDef.sort(dexFile) }
 
         dexFile.dataItemsAccept(object: DataItemVisitor {
             override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {}
             override fun visitAnnotationSet(dexFile: DexFile, annotationSetRef: AnnotationSetRef, annotationSet: AnnotationSet) {
-                annotationSet.annotations.sortWith(compareBy { it.annotationValue.typeIndex })
+                annotationSet.sort()
             }
 
             override fun visitAnnotationsDirectory(dexFile: DexFile, classDef: ClassDef, annotationsDirectory: AnnotationsDirectory) {
-                annotationsDirectory.fieldAnnotations.sortWith(compareBy { it.fieldIndex })
-                annotationsDirectory.methodAnnotations.sortWith(compareBy { it.methodIndex })
-                annotationsDirectory.parameterAnnotations.sortWith(compareBy { it.methodIndex })
+                annotationsDirectory.sort()
             }
         })
 

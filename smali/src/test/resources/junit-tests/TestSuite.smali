@@ -20,6 +20,7 @@
 .end annotation
 
 .annotation runtime Lorg/junit/runners/Suite$SuiteClasses;
-    value = {   LFieldTest;
+    value = {   LFieldTest;,
+                LStaticFieldInitializerTest;
             }
 .end annotation

@@ -50,6 +50,12 @@ class AnnotationsDirectory private constructor(
                 methodAnnotations.isEmpty() &&
                 parameterAnnotations.isEmpty()
 
+    internal fun sort() {
+        fieldAnnotations.sortWith(compareBy { it.fieldIndex })
+        methodAnnotations.sortWith(compareBy { it.methodIndex })
+        parameterAnnotations.sortWith(compareBy { it.methodIndex })
+    }
+
     override fun read(input: DexDataInput) {
         classAnnotationsOffset = input.readInt()
 

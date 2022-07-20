@@ -34,13 +34,15 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
     @Suppress("UnstableApiUsage")
     override fun visitDexFile(dexFile: DexFile) {
+        // First we need to sort the date items as required by the dex format.
+        DexSorter().visitDexFile(dexFile)
+
+        // Collect all data items for bookkeeping of their offsets.
         dataItemMap = DataItemMapImpl()
         dataItemMap.collectDataItems(dexFile)
 
         dataOffset = 0
         dataSize   = 0
-
-        DexSorter().visitDexFile(dexFile)
 
         assert(dexFile.dexFormat != null)
         val header = DexHeader.of(dexFile.dexFormat!!)
@@ -97,8 +99,7 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
         writeClassDefs(dexFile, header, mapList, output)
         writeCallSiteIDs(dexFile, mapList, output)
         writeMethodHandles(dexFile, mapList, output)
-        writeDataSection(dexFile, mapList, output)
-        writeMapList(header, mapList, output)
+        writeDataSection(dexFile, header, mapList, output)
         writeLinkData(dexFile, header, output)
 
         return mapList
@@ -187,12 +188,15 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
         }
     }
 
-    private fun writeDataSection(dexFile: DexFile, mapList: MapList, output: DexDataOutput) {
+    private fun writeDataSection(dexFile: DexFile, header: DexHeader, mapList: MapList, output: DexDataOutput) {
         dataOffset = output.offset
 
         // Collect all DataItems that reside in the data section.
         dataItemMap.writeDataItems(mapList, output)
         dataItemMap.updateOffsets(dexFile)
+
+        writeMapList(header, mapList, output)
+
         dataSize = output.offset - dataOffset
     }
 

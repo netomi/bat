@@ -25,7 +25,6 @@ import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.Classes
 import com.google.common.base.Preconditions
 import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * A class representing a class def item inside a dex file.
@@ -125,16 +124,35 @@ class ClassDef private constructor(
         classData.addMethod(method)
     }
 
+    internal fun getStaticFieldIndex(field: EncodedField): Int {
+        return classData.staticFields.withIndex()
+                                     .filter { it.value.fieldIndex == field.fieldIndex }
+                                     .map { it.index }
+                                     .firstOrNull() ?: NO_INDEX
+    }
+
+    fun getStaticValue(dexFile: DexFile, field: EncodedField): EncodedValue? {
+        val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
+        Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
+
+        val staticFieldIndex = getStaticFieldIndex(field)
+        if (staticFieldIndex == NO_INDEX) {
+            throw RuntimeException("trying to get a static value for a field that does not belong to this class: " + getType(dexFile))
+        }
+
+        return if (staticFieldIndex >= 0 &&
+            staticFieldIndex < staticValues.array.values.size) {
+            staticValues.array.values[staticFieldIndex]
+        } else {
+            null
+        }
+    }
+
     fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
 
-        val staticFieldIndex =
-            classData.staticFields.withIndex()
-                                  .filter { it.value.fieldIndex == field.fieldIndex }
-                                  .map { it.index }
-                                  .firstOrNull() ?: NO_INDEX
-
+        val staticFieldIndex = getStaticFieldIndex(field)
         if (staticFieldIndex == NO_INDEX) {
             throw RuntimeException("trying to add a static value for a field that does not belong to this class: " + getType(dexFile))
         }
@@ -155,6 +173,22 @@ class ClassDef private constructor(
 
     override val isEmpty: Boolean
         get() = classIndex == NO_INDEX
+
+    internal fun sort(dexFile: DexFile) {
+        val staticValueMapping = classData.staticFields.associateWith { encodedField -> getStaticValue(dexFile, encodedField) }
+        classData.staticFields.sortWith(compareBy { it.fieldIndex })
+        classData.instanceFields.sortWith(compareBy { it.fieldIndex })
+
+        // reconstruct the static values after the staticFields have been sorted.
+        staticValues = EncodedArray.empty()
+        classData.staticFields.forEach { encodedField ->
+            val staticValue = staticValueMapping[encodedField] ?: getDefaultEncodedValueForType(encodedField.getType(dexFile))
+            setStaticValue(dexFile, encodedField, staticValue)
+        }
+
+        classData.directMethods.sortWith(compareBy { it.methodIndex })
+        classData.virtualMethods.sortWith(compareBy { it.methodIndex })
+    }
 
     public override fun read(input: DexDataInput) {
         classIndex         = input.readInt()

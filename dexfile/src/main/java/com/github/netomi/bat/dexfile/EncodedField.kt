@@ -82,6 +82,18 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
         output.writeUleb128(accessFlags)
     }
 
+    fun staticValueAccept(dexFile: DexFile, visitor: EncodedValueVisitor) {
+        if (isStatic) {
+            val className = Classes.internalClassNameFromType(getFieldID(dexFile).getClassType(dexFile))
+            val classDef  = dexFile.getClassDef(className)
+
+            classDef?.apply {
+                val staticFieldIndex = getStaticFieldIndex(this@EncodedField)
+                this.staticValueAccept(dexFile, staticFieldIndex, visitor)
+            }
+        }
+    }
+
     fun staticValueAccept(dexFile: DexFile, classDef: ClassDef, index: Int, visitor: EncodedValueVisitor) {
         if (isStatic) {
             classDef.staticValueAccept(dexFile, index, visitor)
