@@ -115,7 +115,7 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
 
         code.instructionsAccept(dexFile, classDef, method, method.code, this)
 
-        val modifiedInstructions = writeInstructions(instructions)
+        val modifiedInstructions = InstructionWriter.writeInstructions(instructions)
         val newLength = modifiedInstructions.size
 
         if (newLength == code.insnsSize) {
@@ -153,18 +153,5 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
         instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: throw RuntimeException("unable to map methodIndex ${instruction.methodIndex}")
         instruction.protoIndex  = protoIDMapping[instruction.protoIndex]   ?: throw RuntimeException("unable to map protoIndex ${instruction.protoIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
-    }
-
-    private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
-        val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a, b -> a + b }
-
-        val writer = InstructionWriter(codeLen)
-        var offset = 0
-        for (instruction in instructions) {
-            instruction.write(writer, offset)
-            offset += instruction.length
-        }
-
-        return writer.array
     }
 }

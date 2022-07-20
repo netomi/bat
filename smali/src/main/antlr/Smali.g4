@@ -291,7 +291,7 @@ sInstruction
 	| fconst_int
 	| fconst_string
 	| fconst_type
-	| ft2c
+	| ft2c_type
 	| f21c_field
 	| f22c_field
 	| f12x_conversion
@@ -396,7 +396,10 @@ f21c_field
 	| 'sput-short' ) r1=REGISTER ',' fld=FIELD_FULL
 	;
 
-ft2c :	op=('instance-of'|'new-array') r1=REGISTER ',' r2=REGISTER ',' type=(OBJECT_TYPE|ARRAY_TYPE);
+ft2c_type:	op=
+    ( 'instance-of'
+    | 'new-array') r1=REGISTER ',' r2=REGISTER ',' type=(OBJECT_TYPE|ARRAY_TYPE)
+    ;
 
 f22c_field : op=
     ( IGET

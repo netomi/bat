@@ -85,7 +85,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_f22sb_arithmetic -> parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
                 RULE_fx2x_move        -> parseBasicInstructionMoveFx2x(t as Fx2x_moveContext)
                 RULE_f12x_array       -> parseArrayInstructionF12x(t as F12x_arrayContext)
-                RULE_ft2c             -> parseTypeInstructionFt2c(t as Ft2cContext)
+                RULE_ft2c_type        -> parseTypeInstructionFt2c(t as Ft2c_typeContext)
                 RULE_f23x_compare     -> parseBasicInstructionCompareF23x(t as F23x_compareContext)
                 RULE_f23x_array       -> parseArrayInstructionF23x(t as F23x_arrayContext)
                 RULE_f35c_method      -> parseMethodInstructionF35c(t as F35c_methodContext)
@@ -102,7 +102,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
         val code = Code.of(registerInfo.registers, registerInfo.insSize, 0)
 
-        val insns = writeInstructions(instructions)
+        val insns = InstructionWriter.writeInstructions(instructions)
 
         code.insns     = insns
         code.insnsSize = insns.size
@@ -380,7 +380,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         return ArrayInstruction.of(opcode, r1, r2)
     }
 
-    private fun parseTypeInstructionFt2c(ctx: Ft2cContext): TypeInstruction {
+    private fun parseTypeInstructionFt2c(ctx: Ft2c_typeContext): TypeInstruction {
         val mnemonic = ctx.op.text
         val opcode = DexOpCode.get(mnemonic)
 
@@ -390,19 +390,6 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
 
         return TypeInstruction.of(opcode, typeIndex, r1, r2)
-    }
-
-    private fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
-        val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a, b -> a + b }
-
-        val writer = InstructionWriter(codeLen)
-        var offset = 0
-        for (instruction in instructions) {
-            instruction.write(writer, offset)
-            offset += instruction.length
-        }
-
-        return writer.array
     }
 
     private fun branchOffset(currentOffset: Int, target: String): Int {

@@ -16,6 +16,8 @@
 
 package com.github.netomi.bat.dexfile.io
 
+import com.github.netomi.bat.dexfile.instruction.DexInstruction
+
 class InstructionWriter constructor(size: Int) {
 
     val array: ShortArray = ShortArray(size)
@@ -26,5 +28,20 @@ class InstructionWriter constructor(size: Int) {
 
     fun read(offset: Int): Short {
         return array[offset]
+    }
+
+    companion object {
+        fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
+            val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a, b -> a + b }
+
+            val writer = InstructionWriter(codeLen)
+            var offset = 0
+            for (instruction in instructions) {
+                instruction.write(writer, offset)
+                offset += instruction.length
+            }
+
+            return writer.array
+        }
     }
 }
