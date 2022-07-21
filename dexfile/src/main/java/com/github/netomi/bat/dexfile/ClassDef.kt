@@ -181,9 +181,12 @@ class ClassDef private constructor(
 
         // reconstruct the static values after the staticFields have been sorted.
         staticValues = EncodedArray.empty()
-        classData.staticFields.forEach { encodedField ->
-            val staticValue = staticValueMapping[encodedField] ?: getDefaultEncodedValueForType(encodedField.getType(dexFile))
-            setStaticValue(dexFile, encodedField, staticValue)
+        for (i in classData.staticFields.indices.reversed()) {
+            val field = classData.staticFields[i]
+            val staticValue = staticValueMapping[field]
+            if (staticValue != null) {
+                setStaticValue(dexFile, field, staticValue)
+            }
         }
 
         classData.directMethods.sortWith(compareBy { it.methodIndex })
