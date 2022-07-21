@@ -16,10 +16,7 @@
 
 package com.github.netomi.bat.smali.assemble
 
-import com.github.netomi.bat.dexfile.ClassDef
-import com.github.netomi.bat.dexfile.Code
-import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.io.InstructionWriter
@@ -94,6 +91,8 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_f3rc_array        -> parseArrayTypeInstructionF3rc(t as F3rc_arrayContext)
                 RULE_f45cc_methodproto -> parseMethodProtoInstructionF45cc(t as F45cc_methodprotoContext)
                 RULE_f4rcc_methodproto -> parseMethodProtoInstructionF4rcc(t as F4rcc_methodprotoContext)
+                RULE_f21c_const_handle -> parseMethodHandleInstructionF21c(t as F21c_const_handleContext)
+                RULE_f21c_const_type   -> parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
 
                 else -> null //parserError(t, "unexpected instruction")
             }
@@ -461,6 +460,48 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         }
 
         return MethodProtoInstruction.of(opcode, methodIndex, protoIndex, *registers)
+    }
+
+    private fun parseMethodHandleInstructionF21c(ctx: F21c_const_handleContext): MethodHandleRefInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+
+        val methodHandleType =
+            MethodHandleType.of(ctx.methodHandleType.text)
+
+        val methodHandle = if (methodHandleType.targetsField) {
+            val fieldIndex = ctx.fieldOrMethod.text.let {
+                val (classType, name, type) = parseFieldObject(it)
+                dexComposer.addOrGetFieldIDIndex(classType!!, name, type)
+            }
+            MethodHandle.of(methodHandleType, fieldIndex)
+        } else {
+            val methodIndex = ctx.fieldOrMethod.text.let {
+                val (classType, methodName, parameterTypes, returnType) = parseMethodObject(it)
+                dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+            }
+            MethodHandle.of(methodHandleType, methodIndex)
+        }
+
+        val methodHandleIndex = dexFile.addMethodHandle(methodHandle)
+
+        return MethodHandleRefInstruction.of(opcode, methodHandleIndex, r1)
+    }
+
+    private fun parseMethodTypeInstructionF21c(ctx: F21c_const_typeContext): MethodTypeRefInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+
+        val protoIndex = ctx.proto.text.let {
+            val (_, _, parameterTypes, returnType) = parseMethodObject(it)
+            dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+        }
+
+        return MethodTypeRefInstruction.of(opcode, protoIndex, r1)
     }
 
     private fun branchOffset(currentOffset: Int, target: String): Int {

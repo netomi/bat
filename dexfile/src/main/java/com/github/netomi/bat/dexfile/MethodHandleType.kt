@@ -29,6 +29,13 @@ enum class MethodHandleType(val value: Int, val targetsField: Boolean, val targe
     INVOKE_INTERFACE(  METHOD_HANDLE_TYPE_INVOKE_INTERFACE,   false, true,  "invoke-interface");
 
     companion object {
+        fun of(simpleName: String): MethodHandleType {
+            for (type in MethodHandleType.values()) {
+                if (type.simpleName == simpleName) return type
+            }
+            throw IllegalArgumentException("unexpected MethodHandleType name $simpleName")
+        }
+
         fun of(value: Int): MethodHandleType {
             Preconditions.checkElementIndex(value, MethodHandleType.values().size, "unexpected MethodHandleType value $value")
             return values()[value]

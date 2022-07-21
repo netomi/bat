@@ -215,6 +215,11 @@ class DexFile {
         return methodHandles[methodHandleIndex]
     }
 
+    fun addMethodHandle(methodHandle: MethodHandle): Int {
+        methodHandles.add(methodHandle)
+        return methodHandles.size - 1
+    }
+
     fun accept(visitor: DexFileVisitor) {
         visitor.visitDexFile(this)
     }

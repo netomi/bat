@@ -159,6 +159,18 @@ ANN_VISIBLE
     | 'system'
     ;
 
+METHOD_HANDLE_TYPE
+    : 'static-put'
+    | 'static-get'
+    | 'instance-put'
+    | 'instance-get'
+    | 'invoke-static'
+    | 'invoke-instance'
+    | 'invoke-constructor'
+    | 'invoke-direct'
+    | 'invoke-interface'
+    ;
+
 REGISTER: ('v'|'V'|'p'|'P') '0'..'9'+;
 
 DPARAMETER    : '.parameter';
@@ -271,6 +283,8 @@ sInstruction
 	| fmcustomrc
 	| sLabel
 	| f31t
+	| f21c_const_handle
+	| f21c_const_type
 	| fpackageswitch
 	| fspareswitch
 	| farraydata
@@ -576,3 +590,6 @@ fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArray
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
 
 f31t : op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
+
+f21c_const_handle: op='const-method-handle' r1=REGISTER ',' methodHandleType=METHOD_HANDLE_TYPE '@' fieldOrMethod=(FIELD_FULL|METHOD_FULL) ;
+f21c_const_type: op='const-method-type' r1=REGISTER ',' proto=METHOD_PROTO ;

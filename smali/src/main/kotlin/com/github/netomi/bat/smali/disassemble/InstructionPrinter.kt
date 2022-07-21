@@ -136,8 +136,10 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
 
     override fun visitMethodHandleRefInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodHandleRefInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
-        printer.print(", invoke-instance@")
+        printer.print(", ")
         val methodHandle = instruction.getMethodHandle(dexFile)
+        printer.print(methodHandle.methodHandleType.simpleName)
+        printer.print("@")
         printer.print(methodHandle.getTargetClassType(dexFile))
         printer.print("->")
         printer.print(methodHandle.getTargetMemberName(dexFile))
