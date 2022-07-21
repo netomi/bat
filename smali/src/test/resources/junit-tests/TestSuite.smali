@@ -23,6 +23,7 @@
     value = {   LFieldTest;,
                 LStaticFieldInitializerTest;,
                 LAnnotationTests;,
-                LArrayTests;
+                LArrayTests;,
+                LFormat31t;
             }
 .end annotation

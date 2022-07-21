@@ -25,7 +25,7 @@ import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: Int = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var branchOffset = _branchOffset
-        private set
+        internal set
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)

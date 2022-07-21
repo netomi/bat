@@ -36,7 +36,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         get() = dexComposer.dexFile
 
     private lateinit var registerInfo: RegisterInfo
-    private          var labelMapping: MutableMap<String, Int> = HashMap()
+    private          var labelMapping: LinkedHashMap<String, Int> = LinkedHashMap()
 
     fun parseCode(iCtx: List<SInstructionContext>, pCtx: List<SParameterContext>): Code {
 
@@ -62,21 +62,13 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_sLabel     -> null
 
                 RULE_farraydata -> {
-                    val c = t as FarraydataContext
-
-                    val elementWidth = c.size.text.toInt()
-
-                    val encodedValues = mutableListOf<EncodedValue>()
-                    c.sBaseValue().forEach { encodedValues.add(encodedValueAssembler.parseBaseValue(it)) }
-
-                    when (elementWidth) {
-                        1 -> FillArrayPayload.of(encodedValues.map { (it as EncodedByteValue).value }.toByteArray())
-                        2 -> FillArrayPayload.of(encodedValues.map { (it as EncodedShortValue).value }.toShortArray())
-                        4 -> FillArrayPayload.of(encodedValues.map { (it as EncodedIntValue).value }.toIntArray())
-                        8 -> FillArrayPayload.of(encodedValues.map { (it as EncodedLongValue).value }.toLongArray())
-                        else -> throw RuntimeException("unexpected elementWidth $elementWidth")
+                    if (codeOffset % 2 == 1) {
+                        val nop = BasicInstruction.of(DexOpCode.NOP)
+                        codeOffset += nop.length
+                        instructions.add(nop)
                     }
 
+                    parseArrayDataPayload(t as FarraydataContext)
                 }
 
                 RULE_f10x -> {
@@ -180,8 +172,20 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     labelMapping[c.label.text] = codeOffset
                 }
 
+                RULE_farraydata -> {
+                    val lastLabel = labelMapping.entries.lastOrNull()
+                    if (lastLabel != null && lastLabel.value == codeOffset) {
+                        if (codeOffset % 2 == 1) {
+                            labelMapping[lastLabel.key] = ++codeOffset
+                        }
+                    }
+
+                    val insn = parseArrayDataPayload(t as FarraydataContext)
+                    codeOffset += insn.length
+                }
+
                 else -> {
-                    // check if its a known instruction and advance the code offset
+                    // check if it's a known instruction and advance the code offset
                     val mnemonic = t.getChild(0).text
                     val opcode   = DexOpCode.get(mnemonic)
                     if (opcode != null) {
@@ -190,6 +194,21 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     }
                 }
             }
+        }
+    }
+
+    private fun parseArrayDataPayload(ctx: FarraydataContext): FillArrayPayload {
+        val elementWidth = ctx.size.text.toInt()
+
+        val encodedValues = mutableListOf<EncodedValue>()
+        ctx.sBaseValue().forEach { encodedValues.add(encodedValueAssembler.parseBaseValue(it)) }
+
+        return when (elementWidth) {
+            1 -> FillArrayPayload.of(encodedValues.map { (it as EncodedByteValue).value }.toByteArray())
+            2 -> FillArrayPayload.of(encodedValues.map { (it as EncodedShortValue).value }.toShortArray())
+            4 -> FillArrayPayload.of(encodedValues.map { (it as EncodedIntValue).value }.toIntArray())
+            8 -> FillArrayPayload.of(encodedValues.map { (it as EncodedLongValue).value }.toLongArray())
+            else -> throw RuntimeException("unexpected elementWidth $elementWidth")
         }
     }
 
