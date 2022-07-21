@@ -18,7 +18,6 @@ package com.github.netomi.bat.smali.disassemble
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
-import com.github.netomi.bat.dexfile.util.Numbers
 import com.github.netomi.bat.dexfile.value.visitor.filterByStartIndex
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor

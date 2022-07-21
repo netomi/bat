@@ -17,7 +17,6 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.util.PrimitiveIterable
 import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
@@ -54,8 +53,8 @@ class TypeList private constructor() : DataItem(), Comparable<TypeList> {
         return typeList[index]
     }
 
-    fun getTypes(dexFile: DexFile): Iterable<String> {
-        return PrimitiveIterable.of(dexFile, { df, idx -> df.getTypeID(idx).getType(df) }, typeList)
+    fun getTypes(dexFile: DexFile): Collection<String> {
+        return typeList.map { dexFile.getTypeID(it).getType(dexFile) }.toList()
     }
 
     fun addType(typeIDIndex: Int) {

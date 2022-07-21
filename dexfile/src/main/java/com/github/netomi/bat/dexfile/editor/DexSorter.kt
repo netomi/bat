@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet
-import com.github.netomi.bat.dexfile.annotation.AnnotationSetRef
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.io.InstructionWriter
