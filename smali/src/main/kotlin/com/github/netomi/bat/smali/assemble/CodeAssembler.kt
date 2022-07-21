@@ -21,9 +21,7 @@ import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.io.InstructionWriter
 import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.value.EncodedByteValue
-import com.github.netomi.bat.dexfile.value.EncodedIntValue
-import com.github.netomi.bat.dexfile.value.EncodedValue
+import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import com.github.netomi.bat.util.toIntArray
 import org.antlr.v4.runtime.ParserRuleContext
@@ -73,7 +71,9 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
                     when (elementWidth) {
                         1 -> FillArrayPayload.of(encodedValues.map { (it as EncodedByteValue).value }.toByteArray())
+                        2 -> FillArrayPayload.of(encodedValues.map { (it as EncodedShortValue).value }.toShortArray())
                         4 -> FillArrayPayload.of(encodedValues.map { (it as EncodedIntValue).value }.toIntArray())
+                        8 -> FillArrayPayload.of(encodedValues.map { (it as EncodedLongValue).value }.toLongArray())
                         else -> throw RuntimeException("unexpected elementWidth $elementWidth")
                     }
 
