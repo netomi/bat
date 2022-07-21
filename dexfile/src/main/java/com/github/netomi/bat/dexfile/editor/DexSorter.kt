@@ -147,4 +147,9 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
         instruction.protoIndex  = protoIDMapping[instruction.protoIndex]   ?: throw RuntimeException("unable to map protoIndex ${instruction.protoIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
+
+    override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
+        instruction.typeIndex = typeIDMapping[instruction.typeIndex] ?: throw RuntimeException("unable to map typeIndex ${instruction.typeIndex}")
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
 }

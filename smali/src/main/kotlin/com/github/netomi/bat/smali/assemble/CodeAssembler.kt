@@ -90,6 +90,8 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_f23x_array       -> parseArrayInstructionF23x(t as F23x_arrayContext)
                 RULE_f35c_method      -> parseMethodInstructionF35c(t as F35c_methodContext)
                 RULE_f3rc_method      -> parseMethodInstructionF3rc(t as F3rc_methodContext)
+                RULE_f35c_array       -> parseArrayTypeInstructionF35c(t as F35c_arrayContext)
+                RULE_f3rc_array       -> parseArrayTypeInstructionF3rc(t as F3rc_arrayContext)
 
                 else -> null //parserError(t, "unexpected instruction")
             }
@@ -390,6 +392,32 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
 
         return TypeInstruction.of(opcode, typeIndex, r1, r2)
+    }
+
+    private fun parseArrayTypeInstructionF35c(ctx: F35c_arrayContext): ArrayTypeInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+
+        val registers = mutableListOf<Int>()
+        ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
+
+        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+
+        return ArrayTypeInstruction.of(opcode, typeIndex, *registers.toIntArray())
+    }
+
+    private fun parseArrayTypeInstructionF3rc(ctx: F3rc_arrayContext): ArrayTypeInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val rStart = registerInfo.registerNumber(ctx.rstart.text)
+        val rEnd   = registerInfo.registerNumber(ctx.rend.text)
+
+        val registers = (rStart..rEnd).toIntArray()
+        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+
+        return ArrayTypeInstruction.of(opcode, typeIndex, *registers)
     }
 
     private fun branchOffset(currentOffset: Int, target: String): Int {

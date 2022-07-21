@@ -22,6 +22,7 @@
 .annotation runtime Lorg/junit/runners/Suite$SuiteClasses;
     value = {   LFieldTest;,
                 LStaticFieldInitializerTest;,
-                LAnnotationTests;
+                LAnnotationTests;,
+                LArrayTests;
             }
 .end annotation

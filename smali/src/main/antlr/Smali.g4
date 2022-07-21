@@ -97,7 +97,7 @@ fragment
 FRAGMENT_METHOD_PROTO: '(' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE)* ')' ('V' | FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
 fragment
-FRAGMENT_FIELD_PART: FRAGMENT_ID ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
+FRAGMENT_FIELD_PART: FRAGMENT_MEMBER_NAME ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
 METHOD_FULL  : (FRAGMENT_OBJECT_TYPE | FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
 METHOD_PART  : FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
@@ -261,14 +261,14 @@ sInstruction
 	| f12x_array
 	| f23x_compare
 	| f23x_array
-	| ft5c
 	| f35c_method
 	| f3rc_method
+	| f35c_array
+    | f3rc_array
 	| fm45cc
 	| fm4rcc
 	| fmcustomc
 	| fmcustomrc
-	| ftrc
 	| sLabel
 	| f31t
 	| fpackageswitch
@@ -550,7 +550,8 @@ f23x_array: op=
 	| 'aput-short' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
 	;
 
-ft5c :	op='filled-new-array' '{' (REGISTER (',' REGISTER)* )? '}' ',' type=ARRAY_TYPE;
+f35c_array: op='filled-new-array' '{' (REGISTER (',' REGISTER)* )? '}' ',' type=ARRAY_TYPE;
+f3rc_array: op='filled-new-array/range' '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' type=( OBJECT_TYPE | ARRAY_TYPE );
 
 f35c_method: op=
     ( 'invoke-virtual'
@@ -572,5 +573,4 @@ fm45cc : op='invoke-polymorphic'  '{' (REGISTER (',' REGISTER)* )? '}' ',' metho
 fm4rcc : op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
 fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArrayValue;
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
-ftrc : op='filled-new-array/range' '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' type=(OBJECT_TYPE|ARRAY_TYPE);
 f31t : op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
