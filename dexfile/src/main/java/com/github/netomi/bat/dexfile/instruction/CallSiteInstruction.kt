@@ -18,13 +18,10 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-class CallSiteInstruction internal constructor(opcode: DexOpCode?) : DexInstruction(opcode) {
-    var callSiteIndex: Int
-        private set
+class CallSiteInstruction internal constructor(opcode: DexOpCode, _callSiteIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
-    init {
-        callSiteIndex = NO_INDEX
-    }
+    var callSiteIndex: Int = _callSiteIndex
+        internal set
 
     fun getCallSiteID(dexFile: DexFile): CallSiteID {
         return dexFile.getCallSiteID(callSiteIndex)
@@ -32,10 +29,25 @@ class CallSiteInstruction internal constructor(opcode: DexOpCode?) : DexInstruct
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
+
         callSiteIndex = when (opcode.format) {
-            DexInstructionFormat.FORMAT_3rc, DexInstructionFormat.FORMAT_35c -> instructions[offset + 1].toInt() and 0xffff
+            DexInstructionFormat.FORMAT_3rc,
+            DexInstructionFormat.FORMAT_35c -> instructions[offset + 1].toInt() and 0xffff
+
             else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
         }
+    }
+
+    override fun writeData(): ShortArray {
+        val data = super.writeData()
+
+        when (opcode.format) {
+            DexInstructionFormat.FORMAT_3rc,
+            DexInstructionFormat.FORMAT_35c -> data[1] = callSiteIndex.toShort()
+
+            else -> {}
+        }
+        return data
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
@@ -43,7 +55,12 @@ class CallSiteInstruction internal constructor(opcode: DexOpCode?) : DexInstruct
     }
 
     companion object {
-        fun create(opCode: DexOpCode?, ident: Byte): CallSiteInstruction {
+        fun of(opCode: DexOpCode, callSiteIndex: Int, vararg registers: Int): CallSiteInstruction {
+            return CallSiteInstruction(opCode, callSiteIndex, *registers)
+        }
+
+        @JvmStatic
+        fun create(opCode: DexOpCode, ident: Byte): CallSiteInstruction {
             return CallSiteInstruction(opCode)
         }
     }
