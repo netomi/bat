@@ -57,6 +57,10 @@ class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset:
     }
 
     companion object {
+        fun of(opCode: DexOpCode, payloadOffset: Int, register: Int): PayloadInstruction {
+            return PayloadInstruction(opCode, payloadOffset, register)
+        }
+
         @JvmStatic
         fun create(opCode: DexOpCode, ident: Byte): PayloadInstruction {
             return PayloadInstruction(opCode)

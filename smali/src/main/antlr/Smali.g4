@@ -282,7 +282,7 @@ sInstruction
 	| fmcustomc
 	| fmcustomrc
 	| sLabel
-	| f31t
+	| f31t_payload
 	| f21c_const_handle
 	| f21c_const_type
 	| fpackageswitch
@@ -589,7 +589,7 @@ f4rcc_methodproto: op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend
 fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArrayValue;
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
 
-f31t : op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
+f31t_payload: op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
 
 f21c_const_handle: op='const-method-handle' r1=REGISTER ',' methodHandleType=METHOD_HANDLE_TYPE '@' fieldOrMethod=(FIELD_FULL|METHOD_FULL) ;
 f21c_const_type: op='const-method-type' r1=REGISTER ',' proto=METHOD_PROTO ;

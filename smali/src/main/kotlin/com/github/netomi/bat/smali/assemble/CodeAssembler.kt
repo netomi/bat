@@ -93,6 +93,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_f4rcc_methodproto -> parseMethodProtoInstructionF4rcc(t as F4rcc_methodprotoContext)
                 RULE_f21c_const_handle -> parseMethodHandleInstructionF21c(t as F21c_const_handleContext)
                 RULE_f21c_const_type   -> parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
+                RULE_f31t_payload      -> parsePayloadInstructionF31t(t as F31t_payloadContext, codeOffset)
 
                 else -> null //parserError(t, "unexpected instruction")
             }
@@ -502,6 +503,18 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         }
 
         return MethodTypeRefInstruction.of(opcode, protoIndex, r1)
+    }
+
+    private fun parsePayloadInstructionF31t(ctx: F31t_payloadContext, codeOffset: Int): PayloadInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val r1 = registerInfo.registerNumber(ctx.r1.text)
+
+        val label = ctx.label.text
+        val payloadOffset = branchOffset(codeOffset, label)
+
+        return PayloadInstruction.of(opcode, payloadOffset, r1)
     }
 
     private fun branchOffset(currentOffset: Int, target: String): Int {
