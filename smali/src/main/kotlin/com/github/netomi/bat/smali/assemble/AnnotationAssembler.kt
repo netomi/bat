@@ -31,8 +31,8 @@ internal class AnnotationAssembler constructor(
     private val dexComposer:           DexComposer) {
 
     fun parseAnnotation(ctx: SmaliParser.SAnnotationContext): Annotation {
-        val annotationTypeIndex = dexComposer.addOrGetTypeIDIndex(ctx.OBJECT_TYPE().text)
-        val annotationVisibility = AnnotationVisibility.of(ctx.ANN_VISIBLE().text)
+        val annotationTypeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+        val annotationVisibility = AnnotationVisibility.of(ctx.visibility.text)
 
         val annotationElements =
             parseAnnotationAnnotationElements(ctx.sAnnotationKeyName(), ctx.sAnnotationValue(), dexComposer)
@@ -51,7 +51,7 @@ internal class AnnotationAssembler constructor(
             val sAnnotationValueContext = valueContexts[index]
 
             val annotationValue     = parseAnnotationValueContext(sAnnotationValueContext)
-            val annotationNameIndex = dexComposer.addOrGetStringIDIndex(sAnnotationKeyNameContext.text)
+            val annotationNameIndex = dexComposer.addOrGetStringIDIndex(sAnnotationKeyNameContext.name.text)
             val element             = AnnotationElement.of(annotationNameIndex, annotationValue)
             annotationElements.add(element)
         }

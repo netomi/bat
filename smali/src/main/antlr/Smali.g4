@@ -4,21 +4,21 @@ fragment
 INT_NENT:
     ('+'|'-')?
     (
-       '0'
-     | ('1'..'9') ('0'..'9')*
-     | '0' ('0'..'7')+
-     | ('0x'|'0X') HEX_DIGIT+
+        '0'
+      | ('1'..'9') ('0'..'9')*
+      | '0' ('0'..'7')+
+      | ('0x'|'0X') HEX_DIGIT+
     );
 
 fragment
 FLOAT_NENT
     : (('+'|'-')?( ('0'..'9')+ '.' ('0'..'9')* EXPONENT?
-    |   '.' ('0'..'9')+ EXPONENT?
-    |   ('0'..'9')+ EXPONENT)| ( ('+'|'-') F_INFINITY) )
+    | '.' ('0'..'9')+ EXPONENT?
+    | ('0'..'9')+ EXPONENT)| ( ('+'|'-') F_INFINITY) )
     ;
 
 fragment
-F_NAN : ('N'|'n') ('A'|'a') ('N'|'n');
+F_NAN: ('N'|'n') ('A'|'a') ('N'|'n');
 
 COMMENT
     : ('//' ~('\n'|'\r')* '\r'? '\n'
@@ -26,13 +26,13 @@ COMMENT
     | '/*' .*? '*/' ) -> skip
     ;
 
-WS : [ \t\r\n]+ -> skip;
+WS: [ \t\r\n]+ -> skip;
 
 fragment
-EXPONENT : ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
+EXPONENT: ('e'|'E') ('+'|'-')? ('0'..'9')+ ;
 
 fragment
-HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
+HEX_DIGIT: ('0'..'9'|'a'..'f'|'A'..'F') ;
 
 fragment
 ESC_SEQ
@@ -53,67 +53,71 @@ UNICODE_ESC
     : '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
 
-VOID_TYPE : 'V';
+fragment
+FRAGMENT_PRIMITIVE_TYPE: 'B' | 'Z' | 'S' | 'C' | 'I' | 'F' | 'J' | 'D' ;
 
 fragment
-FRAGMENT_PRIMITIVE_TYPE: 'B'|'Z'|'S'|'C'|'I'|'F'|'J'|'D';
+FRAGMENT_FULL_CLASS_NAME: (FRAGMENT_SIMPLE_NAME '/')* FRAGMENT_SIMPLE_NAME ;
 
 fragment
-FRAGMENT_OBJECT_TYPE: 'L' (ESC_SEQ |~(';'|':'|'\\'|' '|'\n'|'\t'|'\r'|'('|')'))+ ';' ;
+FRAGMENT_OBJECT_TYPE: 'L' FRAGMENT_FULL_CLASS_NAME ';' ;
 
 fragment
-FRAGMENT_ARRAY_TYPE: ('[')+ (FRAGMENT_PRIMITIVE_TYPE|FRAGMENT_OBJECT_TYPE);
+FRAGMENT_ARRAY_TYPE: ('[')+ (FRAGMENT_PRIMITIVE_TYPE | FRAGMENT_OBJECT_TYPE);
 
-fragment SimpleNameChar :
-	'A' .. 'Z'             |
-    'a' .. 'z'             |
-    '0' .. '9'             |
-    //' '                  | // since DEX version 040
-    '$'                    |
-    '-'                    |
-    '_'                    |
-    //'\u00a0'             | // since DEX version 040
-    '\u00a1' .. '\u1fff'   |
-    //'\u2000' .. '\u200a' | // since DEX version 040
-    '\u2010' .. '\u2027'   |
-    //'\u202f' 	           | // since DEX version 040
-    '\u2030' .. '\ud7ff'   |
-    '\ue000' .. '\uffef'
-    //'\u10000' .. '\u10ffff' // not supported by antlr
+fragment
+FRAGMENT_SIMPLE_NAME_CHAR
+    : 'A' .. 'Z'
+    | 'a' .. 'z'
+    | '0' .. '9'
+    //| ' '                    // since DEX version 040
+    | '$'
+    | '-'
+    | '_'
+    //| '\u00a0'               // since DEX version 040
+    | '\u00a1' .. '\u1fff'
+    //| '\u2000' .. '\u200a'   // since DEX version 040
+    | '\u2010' .. '\u2027'
+    //| '\u202f' 	           // since DEX version 040
+    | '\u2030' .. '\ud7ff'
+    | '\ue000' .. '\uffef'
+    //| '\u10000' .. '\u10ffff' // not supported by antlr
     ;
 
 fragment
-SimpleName : SimpleNameChar+ ;
+FRAGMENT_SIMPLE_NAME: FRAGMENT_SIMPLE_NAME_CHAR+ ;
 
 fragment
-MemberName : SimpleName | '<' SimpleName '>' ;
+FRAGMENT_MEMBER_NAME: FRAGMENT_SIMPLE_NAME | '<' FRAGMENT_SIMPLE_NAME '>' ;
 
 fragment
 FRAGMENT_ID: (ESC_SEQ| ~('\\'|'\r'|'\n'|'\t'|' '|':'|'-'|'='|','|'{'|'}'|'('|')'|'+'|'"'|'\''|'#'|'/'|'.'|';'))+;
 
 fragment
-FRAGMENT_METHOD_PROTO : '(' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE)* ')' ('V' | FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
+FRAGMENT_METHOD_PROTO: '(' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE)* ')' ('V' | FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
 fragment
-FRAGMENT_FIELD_PART : FRAGMENT_ID ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
+FRAGMENT_FIELD_PART: FRAGMENT_ID ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
-METHOD_FULL  : (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_ID FRAGMENT_METHOD_PROTO;
-METHOD_PART  : MemberName FRAGMENT_METHOD_PROTO;
+METHOD_FULL  : (FRAGMENT_OBJECT_TYPE | FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
+METHOD_PART  : FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
 METHOD_PROTO : FRAGMENT_METHOD_PROTO;
 
 FIELD_FULL : (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_FIELD_PART;
 FIELD_PART : FRAGMENT_FIELD_PART;
 LABEL      : ':' FRAGMENT_ID;
 
-SMALI_V2_LOCAL_NAME_TYPE : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
+SMALI_V2_LOCAL_NAME_TYPE : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ':' (FRAGMENT_OBJECT_TYPE | FRAGMENT_ARRAY_TYPE | FRAGMENT_PRIMITIVE_TYPE) ;
 
 F_INFINITY : ('I'|'i') ('N'|'n') ('F'|'f') ('I'|'i') ('N'|'n') ('I'|'i') ('T'|'t') ('Y'|'y') ;
 FLOAT_NAN  : F_NAN ('f'|'F');
 DOUBLE_NAN : F_NAN ('d'|'D')?;
+
 FLOAT_INFINITY  : F_INFINITY ('f'|'F');
 DOUBLE_INFINITY : F_INFINITY ('d'|'D')?;
-BASE_FLOAT  :	(('0'..'9')+|FLOAT_NENT) ('f'|'F');
+BASE_FLOAT  :	(('0'..'9')+ | FLOAT_NENT) ('f'|'F');
 BASE_DOUBLE : FLOAT_NENT ('d'|'D')? | ('0'..'9')+ ('d'|'D') ;
+
 CHAR    : '\'' ( ESC_SEQ | ~('\\'|'\'') ) '\'';
 LONG    : INT_NENT ('L'|'l');
 SHORT   : INT_NENT ('S'|'s');
@@ -125,6 +129,7 @@ STRING  : '"' ( ESC_SEQ | ~('\\'|'"') )* '"';
 OBJECT_TYPE    : FRAGMENT_OBJECT_TYPE;
 ARRAY_TYPE     : FRAGMENT_ARRAY_TYPE;
 PRIMITIVE_TYPE : FRAGMENT_PRIMITIVE_TYPE;
+NULL: 'null' ;
 
 ACC
     : 'public'
@@ -156,30 +161,12 @@ ANN_VISIBLE
 
 REGISTER: ('v'|'V'|'p'|'P') '0'..'9'+;
 
-NOP	   : 'nop';
-MOVE   : 'move';
-RETURN : 'return';
-CONST  : 'const';
-THROW  : 'throw';
-GOTO   : 'goto';
-AGET   : 'aget';
-APUT   : 'aput';
-IGET   : 'iget';
-IPUT   : 'iput';
-SGET   : 'sget';
-SPUT   : 'sput';
-NULL   : 'null';
-ID     : FRAGMENT_ID;
-
 DPARAMETER    : '.parameter';
 DENUM         : '.enum';
 DPARAM        : '.param';
-DLINENUMBER   : '.line';
-DLOCAL        : '.local';
-DENDLOCAL     : '.end local';
 DRESTARTLOCAL : '.restart local';
-DPROLOGUE     : '.prologue';
-DEPIOGUE      : '.epiogue';
+
+MEMBER_NAME: FRAGMENT_MEMBER_NAME ;
 
 sFiles : sFile+;
 sFile  : '.class' sAccList className=OBJECT_TYPE
@@ -211,32 +198,7 @@ sSubannotation
 
 sParameter: param=DPARAM r=REGISTER (',' name=STRING )? (sAnnotation* '.end param')?;
 
-sAnnotationKeyName
-    : PRIMITIVE_TYPE
-    | VOID_TYPE
-    | ANN_VISIBLE
-    | REGISTER
-    | BOOLEAN
-    | ID
-    | NULL
-    | FLOAT_INFINITY
-    | DOUBLE_INFINITY
-    | FLOAT_NAN
-    | DOUBLE_NAN
-    | NOP
-    | MOVE
-    | RETURN
-    | CONST
-    | THROW
-    | GOTO
-    | AGET
-    | APUT
-    | IGET
-    | IPUT
-    | SGET
-    | SPUT
-    | ACC
-    ;
+sAnnotationKeyName: name=MEMBER_NAME ;
 
 sAnnotationValue
 	: sSubannotation
@@ -263,7 +225,6 @@ sBaseValue
 	| OBJECT_TYPE
 	| ARRAY_TYPE
 	| PRIMITIVE_TYPE
-	| VOID_TYPE
 	| NULL
 	| DENUM FIELD_FULL
 	;
@@ -318,7 +279,7 @@ sInstruction
 fline: '.line' line=INT;
 flocal: '.local' r=REGISTER ','
             (
-                    (name1=sAnnotationKeyName |  name2=STRING) ':' type=(OBJECT_TYPE | PRIMITIVE_TYPE | ARRAY_TYPE) // normal case
+                    name=STRING ':' type=(OBJECT_TYPE | PRIMITIVE_TYPE | ARRAY_TYPE) // normal case
                 |   v1=FIELD_PART // smali 1.x
                 |   v2=SMALI_V2_LOCAL_NAME_TYPE // smali 2.x
             )
@@ -327,7 +288,7 @@ flocal: '.local' r=REGISTER ','
 fend           : '.end local' r=REGISTER;
 frestart       : '.restart local'  r=REGISTER;
 fprologue      : '.prologue';
-fepilogue       : '.epilogue';
+fepilogue      : '.epilogue';
 fregisters     : '.registers' xregisters=INT;
 flocals        : '.locals' xlocals=INT;
 fcatch         : '.catch' type=OBJECT_TYPE '{' start=LABEL '..' end=LABEL  '}' handle=LABEL;
@@ -338,12 +299,12 @@ fspareswitch   : '.sparse-switch' (INT '->' LABEL)* '.end sparse-switch';
 farraydata     : '.array-data' size=INT (sBaseValue)+ '.end array-data';
 
 f10x: op=
-    ( NOP
+    ( 'nop'
 	| 'return-void')
 	;
 
 fx0t_branch: op=
-    ( GOTO
+    ( 'goto'
     | 'goto/16'
     | 'goto/32' ) target=LABEL
 	;
@@ -353,10 +314,10 @@ f11x_basic: op=
     | 'move-result-wide'
     | 'move-result-object'
 	| 'move-exception'
-	| RETURN
+	| 'return'
 	| 'return-wide'
 	| 'return-object'
-	| THROW
+	| 'throw'
 	| 'monitor-enter'
 	| 'monitor-exit' ) r1=REGISTER
 	;
@@ -364,7 +325,7 @@ f11x_basic: op=
 fconst_int: op=
     ( 'const/4'
     | 'const/16'
-    | CONST
+    | 'const'
     | 'const/high16'
     | 'const-wide/16'
     | 'const-wide/32'
@@ -378,14 +339,14 @@ fconst_type: op=('const-class' | 'check-cast' | 'new-instance' )  r1=REGISTER ',
 
 f21c_field
     : op=
-    ( SGET
+    ( 'sget'
 	| 'sget-wide'
 	| 'sget-object'
 	| 'sget-boolean'
 	| 'sget-byte'
 	| 'sget-char'
 	| 'sget-short'
-	| SPUT
+	| 'sput'
 	| 'sput-wide'
 	| 'sput-object'
 	| 'sput-boolean'
@@ -400,14 +361,14 @@ ft2c_type:	op=
     ;
 
 f22c_field : op=
-    ( IGET
+    ( 'iget'
 	| 'iget-wide'
 	| 'iget-object'
 	| 'iget-boolean'
 	| 'iget-byte'
 	| 'iget-char'
 	| 'iget-short'
-	| IPUT
+	| 'iput'
 	| 'iput-wide'
 	| 'iput-object'
 	| 'iput-boolean'
@@ -476,7 +437,7 @@ f12x_arithmetic: op=
     ;
 
 fx2x_move: op=
-    ( MOVE
+    ( 'move'
     | 'move/from16'
     | 'move/16'
 	| 'move-wide'
@@ -573,14 +534,14 @@ f23x_compare: op=
 	;
 
 f23x_array: op=
-    ( AGET
+    ( 'aget'
 	| 'aget-wide'
 	| 'aget-object'
 	| 'aget-boolean'
 	| 'aget-byte'
 	| 'aget-char'
 	| 'aget-short'
-	| APUT
+	| 'aput'
 	| 'aput-wide'
 	| 'aput-object'
 	| 'aput-boolean'
