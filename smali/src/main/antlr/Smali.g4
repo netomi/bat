@@ -265,8 +265,8 @@ sInstruction
 	| f3rc_method
 	| f35c_array
     | f3rc_array
-	| fm45cc
-	| fm4rcc
+	| f45cc_methodproto
+	| f4rcc_methodproto
 	| fmcustomc
 	| fmcustomrc
 	| sLabel
@@ -569,8 +569,10 @@ f3rc_method: op=
     | 'invoke-interface/range' )  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL
 	;
 
-fm45cc : op='invoke-polymorphic'  '{' (REGISTER (',' REGISTER)* )? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
-fm4rcc : op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
+f45cc_methodproto: op='invoke-polymorphic'  '{' (REGISTER (',' REGISTER)* )? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
+f4rcc_methodproto: op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
+
 fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArrayValue;
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
+
 f31t : op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;

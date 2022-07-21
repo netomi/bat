@@ -70,28 +70,30 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     opcode.createInstruction(0)
                 }
 
-                RULE_f12x_conversion  -> parseConversionInstructionF12x(t as F12x_conversionContext)
-                RULE_f11x_basic       -> parseBasicInstructionF11x(t as F11x_basicContext)
-                RULE_fx0t_branch      -> parseBranchInstructionFx0t(t as Fx0t_branchContext, codeOffset)
-                RULE_f21t_branch      -> parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
-                RULE_f22t_branch      -> parseBranchInstructionF22t(t as F22t_branchContext, codeOffset)
-                RULE_f21c_field       -> parseFieldInstructionF21c(t as F21c_fieldContext)
-                RULE_f22c_field       -> parseFieldInstructionF22c(t as F22c_fieldContext)
-                RULE_fconst_int       -> parseLiteralInstructionInteger(t as Fconst_intContext)
-                RULE_fconst_string    -> parseLiteralInstructionString(t as Fconst_stringContext)
-                RULE_fconst_type      -> parseLiteralInstructionType(t as Fconst_typeContext)
-                RULE_f12x_arithmetic  -> parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
-                RULE_f23x_arithmetic  -> parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
-                RULE_f22sb_arithmetic -> parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
-                RULE_fx2x_move        -> parseBasicInstructionMoveFx2x(t as Fx2x_moveContext)
-                RULE_f12x_array       -> parseArrayInstructionF12x(t as F12x_arrayContext)
-                RULE_ft2c_type        -> parseTypeInstructionFt2c(t as Ft2c_typeContext)
-                RULE_f23x_compare     -> parseBasicInstructionCompareF23x(t as F23x_compareContext)
-                RULE_f23x_array       -> parseArrayInstructionF23x(t as F23x_arrayContext)
-                RULE_f35c_method      -> parseMethodInstructionF35c(t as F35c_methodContext)
-                RULE_f3rc_method      -> parseMethodInstructionF3rc(t as F3rc_methodContext)
-                RULE_f35c_array       -> parseArrayTypeInstructionF35c(t as F35c_arrayContext)
-                RULE_f3rc_array       -> parseArrayTypeInstructionF3rc(t as F3rc_arrayContext)
+                RULE_f12x_conversion   -> parseConversionInstructionF12x(t as F12x_conversionContext)
+                RULE_f11x_basic        -> parseBasicInstructionF11x(t as F11x_basicContext)
+                RULE_fx0t_branch       -> parseBranchInstructionFx0t(t as Fx0t_branchContext, codeOffset)
+                RULE_f21t_branch       -> parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
+                RULE_f22t_branch       -> parseBranchInstructionF22t(t as F22t_branchContext, codeOffset)
+                RULE_f21c_field        -> parseFieldInstructionF21c(t as F21c_fieldContext)
+                RULE_f22c_field        -> parseFieldInstructionF22c(t as F22c_fieldContext)
+                RULE_fconst_int        -> parseLiteralInstructionInteger(t as Fconst_intContext)
+                RULE_fconst_string     -> parseLiteralInstructionString(t as Fconst_stringContext)
+                RULE_fconst_type       -> parseLiteralInstructionType(t as Fconst_typeContext)
+                RULE_f12x_arithmetic   -> parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
+                RULE_f23x_arithmetic   -> parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
+                RULE_f22sb_arithmetic  -> parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
+                RULE_fx2x_move         -> parseBasicInstructionMoveFx2x(t as Fx2x_moveContext)
+                RULE_f12x_array        -> parseArrayInstructionF12x(t as F12x_arrayContext)
+                RULE_ft2c_type         -> parseTypeInstructionFt2c(t as Ft2c_typeContext)
+                RULE_f23x_compare      -> parseBasicInstructionCompareF23x(t as F23x_compareContext)
+                RULE_f23x_array        -> parseArrayInstructionF23x(t as F23x_arrayContext)
+                RULE_f35c_method       -> parseMethodInstructionF35c(t as F35c_methodContext)
+                RULE_f3rc_method       -> parseMethodInstructionF3rc(t as F3rc_methodContext)
+                RULE_f35c_array        -> parseArrayTypeInstructionF35c(t as F35c_arrayContext)
+                RULE_f3rc_array        -> parseArrayTypeInstructionF3rc(t as F3rc_arrayContext)
+                RULE_f45cc_methodproto -> parseMethodProtoInstructionF45cc(t as F45cc_methodprotoContext)
+                RULE_f4rcc_methodproto -> parseMethodProtoInstructionF4rcc(t as F4rcc_methodprotoContext)
 
                 else -> null //parserError(t, "unexpected instruction")
             }
@@ -398,7 +400,6 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         val mnemonic = ctx.op.text
         val opcode = DexOpCode.get(mnemonic)
 
-
         val registers = mutableListOf<Int>()
         ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
 
@@ -418,6 +419,48 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
 
         return ArrayTypeInstruction.of(opcode, typeIndex, *registers)
+    }
+
+    private fun parseMethodProtoInstructionF45cc(ctx: F45cc_methodprotoContext): MethodProtoInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val registers = mutableListOf<Int>()
+        ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
+
+        val methodIndex = ctx.method.text.let {
+            val (classType, methodName, parameterTypes, returnType) = parseMethodObject(it)
+            dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+        }
+
+        val protoIndex = ctx.proto.text.let {
+            val (_, _, parameterTypes, returnType) = parseMethodObject(it)
+            dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+        }
+
+        return MethodProtoInstruction.of(opcode, methodIndex, protoIndex, *registers.toIntArray())
+    }
+
+    private fun parseMethodProtoInstructionF4rcc(ctx: F4rcc_methodprotoContext): MethodProtoInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val rStart = registerInfo.registerNumber(ctx.rstart.text)
+        val rEnd   = registerInfo.registerNumber(ctx.rend.text)
+
+        val registers = (rStart..rEnd).toIntArray()
+
+        val methodIndex = ctx.method.text.let {
+            val (classType, methodName, parameterTypes, returnType) = parseMethodObject(it)
+            dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+        }
+
+        val protoIndex = ctx.proto.text.let {
+            val (_, _, parameterTypes, returnType) = parseMethodObject(it)
+            dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+        }
+
+        return MethodProtoInstruction.of(opcode, methodIndex, protoIndex, *registers)
     }
 
     private fun branchOffset(currentOffset: Int, target: String): Int {
