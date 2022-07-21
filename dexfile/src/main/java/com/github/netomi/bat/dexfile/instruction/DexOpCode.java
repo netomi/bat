@@ -18,11 +18,8 @@ package com.github.netomi.bat.dexfile.instruction;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*;
+import static com.github.netomi.bat.dexfile.instruction.InstructionFormat.*;
 
-/**
- * @author Thomas Neidhart
- */
 public enum DexOpCode
 {
     // basic instructions.
@@ -327,7 +324,7 @@ public enum DexOpCode
 
     private final byte                 opCode;
     private final boolean              wide;
-    private final DexInstructionFormat format;
+    private final InstructionFormat format;
     private final InstructionSupplier  supplier;
     private final String               mnemonic;
 
@@ -349,11 +346,11 @@ public enum DexOpCode
         }
     }
 
-    DexOpCode(byte opcode, DexInstructionFormat format, InstructionSupplier supplier, String mnemonic) {
+    DexOpCode(byte opcode, InstructionFormat format, InstructionSupplier supplier, String mnemonic) {
         this(opcode, format, supplier, mnemonic, false);
     }
 
-    DexOpCode(byte opcode, DexInstructionFormat format, InstructionSupplier supplier, String mnemonic, boolean wide) {
+    DexOpCode(byte opcode, InstructionFormat format, InstructionSupplier supplier, String mnemonic, boolean wide) {
         this.opCode   = opcode;
         this.format   = format;
         this.supplier = supplier;
@@ -365,7 +362,7 @@ public enum DexOpCode
         return opCode;
     }
 
-    public DexInstructionFormat getFormat() {
+    public InstructionFormat getFormat() {
         return format;
     }
 

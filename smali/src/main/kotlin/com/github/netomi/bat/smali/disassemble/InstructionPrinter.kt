@@ -17,6 +17,7 @@ package com.github.netomi.bat.smali.disassemble
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.*
+import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.util.Numbers
 import com.github.netomi.bat.dexfile.value.visitor.filterByStartIndex
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor
@@ -89,8 +90,8 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         val instructionFormat = opCode.format
 
         // FIXME: this is a hack and should be made clean.
-        if (instructionFormat == DexInstructionFormat.FORMAT_21h && opCode.targetsWideRegister() ||
-            instructionFormat == DexInstructionFormat.FORMAT_51l) {
+        if (instructionFormat == FORMAT_21h && opCode.targetsWideRegister() ||
+            instructionFormat == FORMAT_51l) {
             printer.print("L")
         }
 

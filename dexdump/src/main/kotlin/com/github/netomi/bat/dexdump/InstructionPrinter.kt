@@ -38,8 +38,8 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(", #int $literal // #")
 
         when (instruction.opcode.format) {
-            DexInstructionFormat.FORMAT_22s -> printer.print(Primitives.asHexValue(literal.toShort()))
-            DexInstructionFormat.FORMAT_22b -> printer.print(Primitives.asHexValue(literal.toByte()))
+            InstructionFormat.FORMAT_22s -> printer.print(Primitives.asHexValue(literal.toShort()))
+            InstructionFormat.FORMAT_22b -> printer.print(Primitives.asHexValue(literal.toByte()))
             else -> error("unexpected format ${instruction.opcode.format} for arithmetic literal instruction")
         }
     }
@@ -93,10 +93,10 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
 
         val value = instruction.value
         when (instruction.opcode.format) {
-            DexInstructionFormat.FORMAT_11n,
-            DexInstructionFormat.FORMAT_22b -> printer.print("#int %d // #%x".format(value, value.toByte()))
+            InstructionFormat.FORMAT_11n,
+            InstructionFormat.FORMAT_22b -> printer.print("#int %d // #%x".format(value, value.toByte()))
 
-            DexInstructionFormat.FORMAT_21h -> {
+            InstructionFormat.FORMAT_21h -> {
                 // The printed format varies a bit based on the actual opcode.
                 if (instruction.opcode == DexOpCode.CONST_HIGH16) {
                     val v = (value shr 16).toShort()
@@ -107,12 +107,12 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
                 }
             }
 
-            DexInstructionFormat.FORMAT_21s,
-            DexInstructionFormat.FORMAT_22s -> printer.print("#int %d // #%x".format(value, value.toShort()))
+            InstructionFormat.FORMAT_21s,
+            InstructionFormat.FORMAT_22s -> printer.print("#int %d // #%x".format(value, value.toShort()))
 
-            DexInstructionFormat.FORMAT_31i -> printer.print("#float %g // #%08x".format(intBitsToFloat(value.toInt()), value.toInt()))
+            InstructionFormat.FORMAT_31i -> printer.print("#float %g // #%08x".format(intBitsToFloat(value.toInt()), value.toInt()))
 
-            DexInstructionFormat.FORMAT_51l -> printer.print("#double %g // #%016x".format(longBitsToDouble(value), value))
+            InstructionFormat.FORMAT_51l -> printer.print("#double %g // #%016x".format(longBitsToDouble(value), value))
 
             else -> error("unexpected format ${instruction.opcode.format} for literal instruction")
         }

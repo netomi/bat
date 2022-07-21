@@ -16,7 +16,7 @@
 package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
+import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
 class ArrayTypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: Int = NO_INDEX, vararg registers: Int) : ArrayInstruction(opcode, *registers) {
