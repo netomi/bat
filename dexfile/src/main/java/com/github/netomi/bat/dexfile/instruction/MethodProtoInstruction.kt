@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
 class MethodProtoInstruction internal constructor(opcode:           DexOpCode,
@@ -34,8 +35,8 @@ class MethodProtoInstruction internal constructor(opcode:           DexOpCode,
         super.read(instructions, offset)
 
         protoIndex = when (opcode.format) {
-            DexInstructionFormat.FORMAT_45cc,
-            DexInstructionFormat.FORMAT_4rcc -> instructions[offset + 3].toInt() and 0xffff
+            FORMAT_45cc,
+            FORMAT_4rcc -> instructions[offset + 3].toInt() and 0xffff
 
             else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
         }
@@ -45,8 +46,8 @@ class MethodProtoInstruction internal constructor(opcode:           DexOpCode,
         val data = super.writeData()
 
         when (opcode.format) {
-            DexInstructionFormat.FORMAT_45cc,
-            DexInstructionFormat.FORMAT_4rcc -> data[3] = protoIndex.toShort()
+            FORMAT_45cc,
+            FORMAT_4rcc -> data[3] = protoIndex.toShort()
 
             else -> {}
         }

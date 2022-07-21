@@ -22,25 +22,44 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-class ConversionInstruction internal constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
+class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset: Int = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
+
+    var payloadOffset = _payloadOffset
+        internal set
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
-        check(opcode.format == FORMAT_12x) { "unexpected format for opcode " + opcode.mnemonic }
+        payloadOffset = when (opcode.format) {
+            FORMAT_31t -> (instructions[offset + 1].toInt() and 0xffff) or
+                          (instructions[offset + 2].toInt() shl 16)
+
+            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+        }
+    }
+
+    override fun writeData(): ShortArray {
+        val data = super.writeData()
+
+        when (opcode.format) {
+            FORMAT_31t -> {
+                data[1] = payloadOffset.toShort()
+                data[2] = (payloadOffset shr 16).toShort()
+            }
+
+            else -> {}
+        }
+
+        return data
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitConversionInstruction(dexFile, classDef, method, code, offset, this)
+        visitor.visitPayloadInstruction(dexFile, classDef, method, code, offset, this)
     }
 
     companion object {
-        fun of(opcode: DexOpCode, vararg registers: Int): ConversionInstruction {
-            return ConversionInstruction(opcode, *registers)
-        }
-
         @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): ConversionInstruction {
-            return ConversionInstruction(opCode)
+        fun create(opCode: DexOpCode, ident: Byte): PayloadInstruction {
+            return PayloadInstruction(opCode)
         }
     }
 }

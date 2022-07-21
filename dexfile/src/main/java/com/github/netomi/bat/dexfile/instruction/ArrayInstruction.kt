@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
 open class ArrayInstruction internal constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
@@ -27,8 +28,8 @@ open class ArrayInstruction internal constructor(opcode: DexOpCode, vararg regis
         super.read(instructions, offset)
 
         if (this.javaClass == ArrayInstruction::class.java) {
-            check(opcode.format == DexInstructionFormat.FORMAT_23x ||
-                  opcode.format == DexInstructionFormat.FORMAT_12x) { "unexpected format for opcode " + opcode.mnemonic }
+            check(opcode.format == FORMAT_23x ||
+                  opcode.format == FORMAT_12x) { "unexpected format for opcode " + opcode.mnemonic }
         }
     }
 

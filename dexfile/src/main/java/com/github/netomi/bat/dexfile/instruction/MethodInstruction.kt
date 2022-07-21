@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
 open class MethodInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
@@ -31,10 +32,10 @@ open class MethodInstruction internal constructor(opcode: DexOpCode, _methodInde
         super.read(instructions, offset)
 
         methodIndex = when (opcode.format) {
-            DexInstructionFormat.FORMAT_3rc,
-            DexInstructionFormat.FORMAT_35c,
-            DexInstructionFormat.FORMAT_45cc,
-            DexInstructionFormat.FORMAT_4rcc -> instructions[offset + 1].toInt() and 0xffff
+            FORMAT_3rc,
+            FORMAT_35c,
+            FORMAT_45cc,
+            FORMAT_4rcc -> instructions[offset + 1].toInt() and 0xffff
 
             else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
         }
@@ -44,10 +45,10 @@ open class MethodInstruction internal constructor(opcode: DexOpCode, _methodInde
         val data = super.writeData()
 
         when (opcode.format) {
-            DexInstructionFormat.FORMAT_3rc,
-            DexInstructionFormat.FORMAT_35c,
-            DexInstructionFormat.FORMAT_45cc,
-            DexInstructionFormat.FORMAT_4rcc -> data[1] = methodIndex.toShort()
+            FORMAT_3rc,
+            FORMAT_35c,
+            FORMAT_45cc,
+            FORMAT_4rcc -> data[1] = methodIndex.toShort()
 
             else -> {}
         }

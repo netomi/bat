@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
 class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
@@ -36,16 +37,16 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
         super.read(instructions, offset)
 
         value = when (opcode.format) {
-            DexInstructionFormat.FORMAT_11n -> (instructions[offset].toInt() shr 12).toLong()
+            FORMAT_11n -> (instructions[offset].toInt() shr 12).toLong()
 
-            DexInstructionFormat.FORMAT_21s -> instructions[offset + 1].toLong()
+            FORMAT_21s -> instructions[offset + 1].toLong()
 
-            DexInstructionFormat.FORMAT_31i -> {
+            FORMAT_31i -> {
                 (instructions[offset + 1].toInt() and 0xffff or
                 (instructions[offset + 2].toInt() shl 16)).toLong()
             }
 
-            DexInstructionFormat.FORMAT_21h -> {
+            FORMAT_21h -> {
                 if (opcode.targetsWideRegister()) {
                     instructions[offset + 1].toLong() shl 48
                 } else {
@@ -53,7 +54,7 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
                 }
             }
 
-            DexInstructionFormat.FORMAT_51l -> {
+            FORMAT_51l -> {
                 (instructions[offset + 1].toInt() and 0xffff).toLong()          or
                 ((instructions[offset + 2].toInt() and 0xffff).toLong() shl 16) or
                 ((instructions[offset + 3].toInt() and 0xffff).toLong() shl 32) or
@@ -68,16 +69,16 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
         val data = super.writeData()
 
         when (opcode.format) {
-            DexInstructionFormat.FORMAT_11n -> data[0] = (data[0].toInt() or (value shl 12).toInt()).toShort()
+            FORMAT_11n -> data[0] = (data[0].toInt() or (value shl 12).toInt()).toShort()
 
-            DexInstructionFormat.FORMAT_21s -> data[1] = value.toShort()
+            FORMAT_21s -> data[1] = value.toShort()
 
-            DexInstructionFormat.FORMAT_31i -> {
+            FORMAT_31i -> {
                 data[1] = value.toShort()
                 data[2] = (value shr 16).toShort()
             }
 
-            DexInstructionFormat.FORMAT_21h -> {
+            FORMAT_21h -> {
                 if (opcode.targetsWideRegister()) {
                     data[1] = (value shr 48).toShort()
                 } else {
@@ -85,7 +86,7 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
                 }
             }
 
-            DexInstructionFormat.FORMAT_51l -> {
+            FORMAT_51l -> {
                 data[1] = value.toShort()
                 data[2] = (value shr 16).toShort()
                 data[3] = (value shr 32).toShort()

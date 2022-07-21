@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.DexInstructionFormat.*
 import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
 class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: Int = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
@@ -29,14 +30,14 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
         branchOffset = when (opcode.format) {
-            DexInstructionFormat.FORMAT_10t -> instructions[offset].toInt() shr 8
+            FORMAT_10t -> instructions[offset].toInt() shr 8
 
-            DexInstructionFormat.FORMAT_20t,
-            DexInstructionFormat.FORMAT_21t,
-            DexInstructionFormat.FORMAT_22t -> instructions[offset + 1].toInt()
+            FORMAT_20t,
+            FORMAT_21t,
+            FORMAT_22t -> instructions[offset + 1].toInt()
 
-            DexInstructionFormat.FORMAT_30t,
-            DexInstructionFormat.FORMAT_31t -> instructions[offset + 1].toInt() and 0xffff or (instructions[offset + 2].toInt() shl 16)
+            FORMAT_30t,
+            FORMAT_31t -> instructions[offset + 1].toInt() and 0xffff or (instructions[offset + 2].toInt() shl 16)
 
             else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
         }
@@ -46,14 +47,14 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
         val data = super.writeData()
 
         when (opcode.format) {
-            DexInstructionFormat.FORMAT_10t -> data[0] = (data[0].toInt() or (branchOffset shl 8)).toShort()
+            FORMAT_10t -> data[0] = (data[0].toInt() or (branchOffset shl 8)).toShort()
 
-            DexInstructionFormat.FORMAT_20t,
-            DexInstructionFormat.FORMAT_21t,
-            DexInstructionFormat.FORMAT_22t -> data[1] = branchOffset.toShort()
+            FORMAT_20t,
+            FORMAT_21t,
+            FORMAT_22t -> data[1] = branchOffset.toShort()
 
-            DexInstructionFormat.FORMAT_30t,
-            DexInstructionFormat.FORMAT_31t -> {
+            FORMAT_30t,
+            FORMAT_31t -> {
                 data[1] = (branchOffset and 0xffff).toShort()
                 data[2] = (branchOffset shr 16).toShort()
             }
