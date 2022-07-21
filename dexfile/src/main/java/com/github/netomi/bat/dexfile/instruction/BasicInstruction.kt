@@ -45,7 +45,7 @@ class BasicInstruction internal constructor(opcode: DexOpCode, vararg registers:
                     } else if (ident.toInt() == 0x02) {
                         SparseSwitchPayload(opCode)
                     } else if (ident.toInt() == 0x03) {
-                        FillArrayPayload(opCode)
+                        FillArrayPayload.empty()
                     } else {
                         BasicInstruction(opCode)
                     }

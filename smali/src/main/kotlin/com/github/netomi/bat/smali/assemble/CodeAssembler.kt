@@ -21,6 +21,9 @@ import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.io.InstructionWriter
 import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.value.EncodedByteValue
+import com.github.netomi.bat.dexfile.value.EncodedIntValue
+import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import com.github.netomi.bat.util.toIntArray
 import org.antlr.v4.runtime.ParserRuleContext
@@ -28,6 +31,8 @@ import org.antlr.v4.runtime.ParserRuleContext
 internal class CodeAssembler constructor(private val classDef:    ClassDef,
                                          private val method:      EncodedMethod,
                                          private val dexComposer: DexComposer) {
+
+    private val encodedValueAssembler = EncodedValueAssembler(dexComposer)
 
     private val dexFile: DexFile
         get() = dexComposer.dexFile
@@ -57,6 +62,22 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_fepilogue  -> null
                 RULE_fregisters -> null
                 RULE_sLabel     -> null
+
+                RULE_farraydata -> {
+                    val c = t as FarraydataContext
+
+                    val elementWidth = c.size.text.toInt()
+
+                    val encodedValues = mutableListOf<EncodedValue>()
+                    c.sBaseValue().forEach { encodedValues.add(encodedValueAssembler.parseBaseValue(it)) }
+
+                    when (elementWidth) {
+                        1 -> FillArrayPayload.of(encodedValues.map { (it as EncodedByteValue).value }.toByteArray())
+                        4 -> FillArrayPayload.of(encodedValues.map { (it as EncodedIntValue).value }.toIntArray())
+                        else -> throw RuntimeException("unexpected elementWidth $elementWidth")
+                    }
+
+                }
 
                 RULE_f10x -> {
                     val c = t as F10xContext

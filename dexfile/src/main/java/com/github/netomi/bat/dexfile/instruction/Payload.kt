@@ -13,12 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.instruction;
+package com.github.netomi.bat.dexfile.instruction
 
-public abstract class Payload
-extends               DexInstruction
-{
-    Payload(DexOpCode opcode) {
-        super(opcode);
-    }
-}
+abstract class Payload protected constructor(opcode: DexOpCode) : DexInstruction(opcode)
