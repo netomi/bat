@@ -40,8 +40,8 @@ class BasicInstruction internal constructor(opcode: DexOpCode, vararg registers:
         fun create(opCode: DexOpCode, ident: Byte): DexInstruction {
             return when (opCode) {
                 DexOpCode.NOP -> {
-                    if (ident.toInt() == 0x01) {
-                        PackedSwitchPayload(opCode)
+                    if (ident.toInt() == PackedSwitchPayload.IDENT) {
+                        PackedSwitchPayload.empty()
                     } else if (ident.toInt() == SparseSwitchPayload.IDENT) {
                         SparseSwitchPayload.empty()
                     } else if (ident.toInt() == FillArrayPayload.IDENT) {

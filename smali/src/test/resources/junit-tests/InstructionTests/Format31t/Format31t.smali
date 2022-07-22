@@ -93,3 +93,37 @@
         99 -> :Label99
     .end sparse-switch
 .end method
+
+.method public test_packed-switch()V
+    .registers 1
+    .annotation runtime Lorg/junit/Test;
+    .end annotation
+
+    const v0, 12
+
+:switch
+    packed-switch v0, :PackedSwitch
+
+:Label10
+    invoke-static {}, Lorg/junit/Assert;->fail()V
+    return-void
+
+:Label11
+    invoke-static {}, Lorg/junit/Assert;->fail()V
+    return-void
+
+:Label12
+    return-void
+
+:Label13
+    invoke-static {}, Lorg/junit/Assert;->fail()V
+    return-void
+
+:PackedSwitch
+    .packed-switch 10
+        :Label10
+        :Label11
+        :Label12
+        :Label13
+    .end packed-switch
+.end method

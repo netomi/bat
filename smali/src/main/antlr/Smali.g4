@@ -285,7 +285,7 @@ sInstruction
 	| f31t_payload
 	| f21c_const_handle
 	| f21c_const_type
-	| fpackageswitch
+	| fpackedswitch
 	| fsparseswitch
 	| farraydata
 	;
@@ -308,7 +308,7 @@ flocals        : '.locals' xlocals=INT;
 fcatch         : '.catch' type=OBJECT_TYPE '{' start=LABEL '..' end=LABEL  '}' handle=LABEL;
 fcatchall      : '.catchall' '{' start=LABEL '..' end=LABEL  '}' handle=LABEL;
 sLabel         : label=LABEL;
-fpackageswitch : '.packed-switch' start=INT LABEL+ '.end packed-switch';
+fpackedswitch  : '.packed-switch' start=INT LABEL+ '.end packed-switch';
 fsparseswitch  : '.sparse-switch' (INT '->' LABEL)* '.end sparse-switch';
 farraydata     : '.array-data' size=INT (sBaseValue)+ '.end array-data';
 

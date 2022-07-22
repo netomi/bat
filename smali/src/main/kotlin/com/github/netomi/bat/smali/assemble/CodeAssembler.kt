@@ -63,25 +63,22 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_sLabel     -> null
 
                 RULE_farraydata -> {
-                    if (codeOffset % 2 == 1) {
-                        val nop = BasicInstruction.of(DexOpCode.NOP)
-                        codeOffset += nop.length
-                        instructions.add(nop)
-                    }
-
+                    codeOffset = insertNopInstructionIfUnaligned(codeOffset, instructions)
                     parseArrayDataPayload(t as FarraydataContext)
                 }
 
                 RULE_fsparseswitch -> {
-                    if (codeOffset % 2 == 1) {
-                        val nop = BasicInstruction.of(DexOpCode.NOP)
-                        codeOffset += nop.length
-                        instructions.add(nop)
-                    }
-
+                    codeOffset = insertNopInstructionIfUnaligned(codeOffset, instructions)
                     val lastLabel    = labelMapping.entries.lastOrNull()
                     val switchOffset = payloadLabelMapping[lastLabel!!.key]
                     parseSparseSwitchPayload(t as FsparseswitchContext, switchOffset!!)
+                }
+
+                RULE_fpackedswitch -> {
+                    codeOffset = insertNopInstructionIfUnaligned(codeOffset, instructions)
+                    val lastLabel    = labelMapping.entries.lastOrNull()
+                    val switchOffset = payloadLabelMapping[lastLabel!!.key]
+                    parsePackedSwitchPayload(t as FpackedswitchContext, switchOffset!!)
                 }
 
                 RULE_f10x -> {
@@ -187,26 +184,20 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 }
 
                 RULE_farraydata -> {
-                    val lastLabel = labelMapping.entries.lastOrNull()
-                    if (lastLabel != null && lastLabel.value == codeOffset) {
-                        if (codeOffset % 2 == 1) {
-                            labelMapping[lastLabel.key] = ++codeOffset
-                        }
-                    }
-
+                    codeOffset = alignPayloadLabel(codeOffset)
                     val insn = parseArrayDataPayload(t as FarraydataContext)
                     codeOffset += insn.length
                 }
 
                 RULE_fsparseswitch -> {
-                    val lastLabel = labelMapping.entries.lastOrNull()
-                    if (lastLabel != null && lastLabel.value == codeOffset) {
-                        if (codeOffset % 2 == 1) {
-                            labelMapping[lastLabel.key] = ++codeOffset
-                        }
-                    }
-
+                    codeOffset = alignPayloadLabel(codeOffset)
                     val insn = parseSparseSwitchPayload(t as FsparseswitchContext, 0)
+                    codeOffset += insn.length
+                }
+
+                RULE_fpackedswitch -> {
+                    codeOffset = alignPayloadLabel(codeOffset)
+                    val insn = parsePackedSwitchPayload(t as FpackedswitchContext, 0)
                     codeOffset += insn.length
                 }
 
@@ -221,6 +212,28 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 }
             }
         }
+    }
+
+    private fun insertNopInstructionIfUnaligned(codeOffset: Int, instructions: MutableList<DexInstruction>): Int {
+        if (codeOffset % 2 == 1) {
+            val nop = BasicInstruction.of(DexOpCode.NOP)
+            instructions.add(nop)
+            return codeOffset + nop.length
+        }
+
+        return codeOffset
+    }
+
+    private fun alignPayloadLabel(codeOffset: Int): Int {
+        val lastLabel = labelMapping.entries.lastOrNull()
+        if (lastLabel != null && lastLabel.value == codeOffset) {
+            if (codeOffset % 2 == 1) {
+                labelMapping[lastLabel.key] = codeOffset + 1
+                return codeOffset + 1
+            }
+        }
+
+        return codeOffset
     }
 
     private fun parseArrayDataPayload(ctx: FarraydataContext): FillArrayPayload {
@@ -247,6 +260,16 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         ctx.LABEL().forEachIndexed { index, node -> branchTargets[index] = branchOffset(codeOffset, node.text) }
 
         return SparseSwitchPayload.of(keys, branchTargets)
+    }
+
+    private fun parsePackedSwitchPayload(ctx: FpackedswitchContext, codeOffset: Int): PackedSwitchPayload {
+
+        val firstKey = ctx.start.text.toInt()
+
+        val branchTargets = IntArray(ctx.LABEL().size)
+        ctx.LABEL().forEachIndexed { index, node -> branchTargets[index] = branchOffset(codeOffset, node.text) }
+
+        return PackedSwitchPayload.of(firstKey, branchTargets)
     }
 
     private fun parseConversionInstructionF12x(ctx: F12x_conversionContext): ConversionInstruction {

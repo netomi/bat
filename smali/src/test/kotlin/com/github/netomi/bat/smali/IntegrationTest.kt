@@ -40,24 +40,19 @@ class IntegrationTest {
         val resourcePath = File(resource.file).parentFile.toPath()
 
         val dexFile  = DexFile.of(DexFormat.FORMAT_035)
-        val classDefs = Assembler(dexFile).assemble(resourcePath)
+        Assembler(dexFile).assemble(resourcePath)
 
         val outputPath = Path.of(resourcePath.absolutePathString(), "tests.dex")
         outputPath.outputStream().use {
             DexFileWriter(it).visitDexFile(dexFile)
         }
 
-        val df2 = DexFile()
-        outputPath.inputStream().use {
-            DexFileReader(it).visitDexFile(df2)
-        }
-
         val result = "./rundalvikvm 7.1.2 -cp junit.zip:tests.dex org.junit.runner.JUnitCore AllTests".runCommand(resourcePath.toFile())
         println(result!!)
     }
 
-    fun String.runCommand(workingDir: File): String? {
-        try {
+    private fun String.runCommand(workingDir: File): String? {
+        return try {
             val parts = this.split("\\s".toRegex())
             val proc = ProcessBuilder(*parts.toTypedArray())
                 .directory(workingDir)
@@ -66,10 +61,10 @@ class IntegrationTest {
                 .start()
 
             proc.waitFor(60, TimeUnit.MINUTES)
-            return proc.inputStream.bufferedReader().readText()
+            proc.inputStream.bufferedReader().readText()
         } catch(e: IOException) {
             e.printStackTrace()
-            return null
+            null
         }
     }
 }
