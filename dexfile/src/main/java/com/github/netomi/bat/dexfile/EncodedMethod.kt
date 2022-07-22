@@ -84,6 +84,12 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     val isDirectMethod: Boolean
         get() = isStatic || isPrivate || isConstructor
 
+    internal fun sort(dexFile: DexFile) {
+        if (code != null) {
+            code!!.tries.sortBy { it.startAddr }
+        }
+    }
+
     override fun read(input: DexDataInput) {
         deltaMethodIndex = input.readUleb128()
         accessFlags      = input.readUleb128()
@@ -138,6 +144,9 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
     {
         visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
+        if (code != null) {
+            code!!.referencedIDsAccept(dexFile, visitor)
+        }
     }
 
     override fun equals(other: Any?): Boolean {

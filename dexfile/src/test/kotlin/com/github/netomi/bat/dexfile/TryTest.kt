@@ -15,9 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.EncodedCatchHandler.Companion.of
-import com.github.netomi.bat.dexfile.Try.Companion.of
-import com.github.netomi.bat.dexfile.TypeAddrPair.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -32,8 +29,8 @@ class TryTest : DexContentTest<Try>() {
             // can not use concrete EncodedCatchHandler instances for testing
             // special case that will be covered by testing the Code item.
             arrayOf(
-                of(0, 10, of(10, of(1, 2))),
-                of(0, 65534, of(10, of(1, 2)))
+                Try.of(0, 10,    EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2))),
+                Try.of(0, 65534, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2)))
             )
 
     override val factoryMethod: Function<DexDataInput, Try>
@@ -46,11 +43,11 @@ class TryTest : DexContentTest<Try>() {
 
     @Test
     fun inputChecking() {
-        assertThrows(IllegalArgumentException::class.java) { of(-1, 100, of(10, of(1, 2))) }
-        assertThrows(IllegalArgumentException::class.java) { of(1, -1, of(10, of(1, 2))) }
-        assertThrows(IllegalArgumentException::class.java) { of(100000, 100, of(10, of(1, 2))) }
-        assertThrows(IllegalArgumentException::class.java) { of(1, 100000, of(10, of(1, 2))) }
-        assertThrows(IllegalArgumentException::class.java) { of(100, 10, of(10, of(1, 2))) }
+        assertThrows(IllegalArgumentException::class.java) { Try.of(-1, 100, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2))) }
+        assertThrows(IllegalArgumentException::class.java) { Try.of(1, -1, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2))) }
+        assertThrows(IllegalArgumentException::class.java) { Try.of(100000, 100, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2))) }
+        assertThrows(IllegalArgumentException::class.java) { Try.of(1, 100000, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2))) }
+        assertThrows(IllegalArgumentException::class.java) { Try.of(100, 10, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2))) }
     }
 
     @Test
@@ -63,10 +60,10 @@ class TryTest : DexContentTest<Try>() {
 
     @Test
     fun equals() {
-        val t1 = of(1, 10, of(10, of(1, 2)))
-        val t2 = of(2, 10, of(10, of(1, 2)))
-        val t3 = of(2, 11, of(10, of(1, 2)))
-        val t4 = of(1, 10, of(10, of(1, 2)))
+        val t1 = Try.of(1, 10, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2)))
+        val t2 = Try.of(2, 10, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2)))
+        val t3 = Try.of(2, 11, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2)))
+        val t4 = Try.of(1, 10, EncodedCatchHandler.of(10, TypeAddrPair.of(1, 2)))
         assertEquals(t1, t1)
         assertNotEquals(t1, t2)
         assertNotEquals(t2, t3)

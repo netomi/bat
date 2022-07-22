@@ -30,10 +30,10 @@ import java.util.*
 class Try private constructor(): DexContent() {
 
     var startAddr: Int = 0
-        private set
+        internal set
 
     var insnCount: Int = 0
-        private set
+        internal set
 
     lateinit var catchHandler: EncodedCatchHandler
         internal set

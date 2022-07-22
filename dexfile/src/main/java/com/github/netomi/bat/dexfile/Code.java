@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor;
+import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor;
 import com.github.netomi.bat.dexfile.visitor.TryVisitor;
 
 import java.util.*;
@@ -230,4 +231,11 @@ extends      DataItem
             visitor.visitDebugInfo(dexFile, this, debugInfo);
         }
     }
+
+    public void referencedIDsAccept(DexFile dexFile, ReferencedIDVisitor visitor) {
+        for (EncodedCatchHandler handler : catchHandlerList) {
+            handler.referencedIDsAccept(dexFile, visitor);
+        }
+    }
+
 }

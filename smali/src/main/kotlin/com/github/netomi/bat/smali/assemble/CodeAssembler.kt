@@ -42,6 +42,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
     fun parseCode(iCtx: List<SInstructionContext>, pCtx: List<SParameterContext>): Code {
 
         val instructions = mutableListOf<DexInstruction>()
+        val tryElements  = mutableListOf<Try>()
 
         collectRegisterInfo(iCtx)
         collectLabels(iCtx)
@@ -79,6 +80,18 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     val lastLabel    = labelMapping.entries.lastOrNull()
                     val switchOffset = payloadLabelMapping[lastLabel!!.key]
                     parsePackedSwitchPayload(t as FpackedswitchContext, switchOffset!!)
+                }
+
+                RULE_fcatch -> {
+                    val tryElement = parseCatchDirective(t as FcatchContext)
+                    tryElements.add(tryElement)
+                    null
+                }
+
+                RULE_fcatchall -> {
+                    val tryElement = parseCatchAllDirective(t as FcatchallContext)
+                    tryElements.add(tryElement)
+                    null
                 }
 
                 RULE_f10x -> {
@@ -138,7 +151,73 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         code.instructionsAccept(dexFile, classDef, method, code, outgoingArgumentSizeCalculator)
         code.outsSize = outgoingArgumentSizeCalculator.outgoingArgumentSize
 
+        code.tries = normalizeTries(tryElements)
+
+        val handlerList = LinkedHashSet<EncodedCatchHandler>()
+        for (tryElement in code.tries) {
+            handlerList.add(tryElement.catchHandler)
+        }
+
+        code.catchHandlerList = handlerList.toList()
+
         return code
+    }
+
+    private fun normalizeTries(tryElements: MutableList<Try>): MutableList<Try> {
+        if (tryElements.isEmpty()) {
+            return tryElements
+        }
+
+        tryElements.sortBy { it.startAddr }
+
+        val sequence = mutableListOf<Seq>()
+        tryElements.forEach {
+            sequence.add(Seq(it.startAddr, SeqType.START, it))
+            sequence.add(Seq(it.endAddr, SeqType.END, it))
+        }
+
+        sequence.sortWith(compareBy<Seq>{ it.addr }.thenByDescending { it.type })
+
+        val nonOverlappingTries = mutableListOf<Try>()
+        var currentTry: Try? = null
+
+        for (seq in sequence) {
+            when (seq.type) {
+                SeqType.START -> {
+                    currentTry = if (currentTry == null) {
+                        seq.tryElement
+                    } else {
+                        val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
+                        nonOverlappingTries.add(endingTry)
+
+                        val handler = seq.tryElement.catchHandler.add(currentTry.catchHandler)
+                        val startingTry = Try.of(seq.addr, currentTry.endAddr, handler)
+                        startingTry
+                    }
+                }
+                SeqType.END -> {
+                    if (currentTry != null) {
+                        currentTry = if (currentTry.endAddr == seq.addr) {
+                            nonOverlappingTries.add(currentTry)
+                            null
+                        } else {
+                            val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
+                            nonOverlappingTries.add(endingTry)
+
+                            val handler = currentTry.catchHandler.subtract(seq.tryElement.catchHandler)
+                            val startingTry = Try.of(seq.addr, currentTry.endAddr, handler)
+                            startingTry
+                        }
+                    } else {
+                        if (nonOverlappingTries.last().endAddr != seq.addr) {
+                            throw RuntimeException("not expected")
+                        }
+                    }
+                }
+            }
+        }
+
+        return nonOverlappingTries
     }
 
     private fun collectRegisterInfo(listCtx: List<SInstructionContext>) {
@@ -234,6 +313,40 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         }
 
         return codeOffset
+    }
+
+    private fun parseCatchDirective(ctx: FcatchContext): Try {
+        val exceptionType = ctx.type.text
+        val exceptionTypeIndex = dexComposer.addOrGetTypeIDIndex(exceptionType)
+
+        val handler  = ctx.handle.text
+        val handlerOffset = labelMapping[handler]!!
+
+        val typeAddrList     = listOf(TypeAddrPair.of(exceptionTypeIndex, handlerOffset))
+        val exceptionHandler = EncodedCatchHandler.of(typeAddrList)
+
+        val tryStart = ctx.start.text
+        val tryEnd   = ctx.end.text
+
+        val startOffset = labelMapping[tryStart]!!
+        val endOffset   = labelMapping[tryEnd]!!
+
+        return Try.of(startOffset, endOffset - 1, exceptionHandler)
+    }
+
+    private fun parseCatchAllDirective(ctx: FcatchallContext): Try {
+        val handler  = ctx.handle.text
+        val handlerOffset = labelMapping[handler]!!
+
+        val exceptionHandler = EncodedCatchHandler.of(handlerOffset)
+
+        val tryStart = ctx.start.text
+        val tryEnd   = ctx.end.text
+
+        val startOffset = labelMapping[tryStart]!!
+        val endOffset   = labelMapping[tryEnd]!!
+
+        return Try.of(startOffset, endOffset - 1, exceptionHandler)
     }
 
     private fun parseArrayDataPayload(ctx: FarraydataContext): FillArrayPayload {
@@ -637,4 +750,31 @@ private data class RegisterInfo(val registers: Int, val locals: Int, val insSize
             else -> throw RuntimeException("unknown register format $register")
         }
     }
+}
+
+data class Seq(val addr: Int, val type: SeqType, val tryElement: Try)
+
+enum class SeqType {
+    START,
+    END
+}
+
+private fun EncodedCatchHandler.subtract(other: EncodedCatchHandler): EncodedCatchHandler {
+    var newCatchAllAddr = catchAllAddr
+    if (other.catchAllAddr != NO_INDEX) {
+        newCatchAllAddr = NO_INDEX
+    }
+
+    val newHandlers = LinkedHashSet(handlers) - other.handlers.toSet()
+    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers.toList())
+}
+
+private fun EncodedCatchHandler.add(other: EncodedCatchHandler): EncodedCatchHandler {
+    var newCatchAllAddr = catchAllAddr
+    if (newCatchAllAddr == NO_INDEX) {
+        newCatchAllAddr = other.catchAllAddr
+    }
+
+    val newHandlers = handlers + other.handlers
+    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers)
 }

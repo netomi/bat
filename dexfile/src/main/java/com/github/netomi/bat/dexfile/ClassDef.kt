@@ -191,6 +191,8 @@ class ClassDef private constructor(
 
         classData.directMethods.sortWith(compareBy { it.methodIndex })
         classData.virtualMethods.sortWith(compareBy { it.methodIndex })
+
+        classData.methods.forEach { it.sort(dexFile) }
     }
 
     public override fun read(input: DexDataInput) {

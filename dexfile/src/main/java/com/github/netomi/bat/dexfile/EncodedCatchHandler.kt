@@ -72,7 +72,7 @@ class EncodedCatchHandler private constructor(
         }
     }
 
-    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+    fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         handlers.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
@@ -95,8 +95,20 @@ class EncodedCatchHandler private constructor(
     }
 
     companion object {
+        fun of(catchAllAddr: Int): EncodedCatchHandler {
+            return EncodedCatchHandler(catchAllAddr)
+        }
+
+        fun of(handlers: List<TypeAddrPair>): EncodedCatchHandler {
+            return EncodedCatchHandler(NO_INDEX, ArrayList(handlers))
+        }
+
         fun of(catchAllAddr: Int, vararg handlers: TypeAddrPair): EncodedCatchHandler {
             return EncodedCatchHandler(catchAllAddr, arrayListOf(*handlers))
+        }
+
+        fun of(catchAllAddr: Int, handlers: List<TypeAddrPair>): EncodedCatchHandler {
+            return EncodedCatchHandler(catchAllAddr, ArrayList(handlers))
         }
 
         @JvmStatic
