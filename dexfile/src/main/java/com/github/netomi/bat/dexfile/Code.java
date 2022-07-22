@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction;
 import com.github.netomi.bat.dexfile.io.DexDataInput;
 import com.github.netomi.bat.dexfile.io.DexDataOutput;
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor;
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor;
 import com.github.netomi.bat.dexfile.visitor.TryVisitor;
 
 import java.util.*;

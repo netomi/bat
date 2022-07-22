@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,34 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
-import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class ConversionInstruction internal constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
-
-    override fun read(instructions: ShortArray, offset: Int) {
-        super.read(instructions, offset)
-        check(opcode.format == FORMAT_12x) { "unexpected format for opcode " + opcode.mnemonic }
-    }
+class PackedSwitchInstruction private constructor(payloadOffset: Int = 0, register: Int = 0): SwitchInstruction(DexOpCode.PACKED_SWITCH, payloadOffset, register) {
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitConversionInstruction(dexFile, classDef, method, code, offset, this)
+        visitor.visitPackedSwitchInstruction(dexFile, classDef, method, code, offset, this)
     }
 
     companion object {
-        fun of(opcode: DexOpCode, vararg registers: Int): ConversionInstruction {
-            return ConversionInstruction(opcode, *registers)
+        fun of(payloadOffset: Int, register: Int): PackedSwitchInstruction {
+            return PackedSwitchInstruction(payloadOffset, register)
         }
 
         @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): ConversionInstruction {
-            return ConversionInstruction(opCode)
+        fun create(opCode: DexOpCode, ident: Int): PackedSwitchInstruction {
+            return PackedSwitchInstruction()
         }
     }
 }

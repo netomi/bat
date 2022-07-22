@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
 class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: ByteArray = EMPTY_VALUES) : Payload(DexOpCode.NOP) {
 

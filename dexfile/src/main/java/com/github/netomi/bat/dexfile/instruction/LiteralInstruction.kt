@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
 class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
 

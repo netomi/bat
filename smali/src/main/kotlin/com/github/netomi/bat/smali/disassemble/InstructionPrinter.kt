@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.value.visitor.filterByStartIndex
 import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.visitor.allCode
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.smali.disassemble.TryCatchPrinter.printTryCatchLabels
@@ -154,7 +154,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 
-    override fun visitPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
+    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         if (instruction.registers.isNotEmpty()) {
             printer.print(", ")

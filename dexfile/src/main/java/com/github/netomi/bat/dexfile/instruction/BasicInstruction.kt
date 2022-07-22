@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
 class BasicInstruction internal constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
 

@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.*
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.Primitives
 import java.lang.Double.longBitsToDouble
 import java.lang.Float.intBitsToFloat
@@ -154,7 +154,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(Primitives.asHexValue(instruction.protoIndex, 4))
     }
 
-    override fun visitPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
+    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
         printGeneric(instruction)
         if (instruction.registers.isNotEmpty()) {
             printer.print(", ")

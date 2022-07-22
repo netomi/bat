@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.DexFile;
 import com.github.netomi.bat.dexfile.EncodedMethod;
 import com.github.netomi.bat.dexfile.io.InstructionWriter;
 import com.github.netomi.bat.util.Primitives;
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor;
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor;
 
 /**
  * @author Thomas Neidhart

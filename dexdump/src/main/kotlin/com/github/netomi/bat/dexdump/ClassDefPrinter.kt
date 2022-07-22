@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
@@ -38,7 +39,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     AnnotationSetVisitor,
     AnnotationVisitor {
 
-    private val instructionPrinter: InstructionVisitor   = InstructionPrinter(printer)
+    private val instructionPrinter: InstructionVisitor = InstructionPrinter(printer)
     private val encodedValuePrinter: EncodedValueVisitor = EncodedValuePrinter(printer)
 
     private var fileOffset = 0

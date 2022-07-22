@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.*
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import java.util.*
 import kotlin.collections.HashMap
@@ -74,7 +74,7 @@ internal class BranchTargetPrinter : InstructionVisitor {
         addBranchInfo(target, formatBranchInstructionTarget(offset, instruction))
     }
 
-    override fun visitPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
+    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
         val target = offset + instruction.payloadOffset
         reversePayloadLookup[target] = offset
         addBranchInfo(target, formatPayloadInstructionTarget(offset, instruction))

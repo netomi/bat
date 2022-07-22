@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
 import com.github.netomi.bat.dexfile.instruction.*
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.io.InstructionWriter
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.dexfile.visitor.IDAccessor

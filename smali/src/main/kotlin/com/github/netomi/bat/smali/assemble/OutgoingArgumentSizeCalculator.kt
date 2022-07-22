@@ -23,7 +23,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.MethodInstruction
 import com.github.netomi.bat.dexfile.instruction.MethodProtoInstruction
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
 class OutgoingArgumentSizeCalculator: InstructionVisitor {
 

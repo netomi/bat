@@ -15,14 +15,10 @@
  */
 package com.github.netomi.bat.dexfile.instruction
 
-import com.github.netomi.bat.dexfile.ClassDef
-import com.github.netomi.bat.dexfile.Code
-import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
 
-class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset: Int = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset: Int, register: Int) : DexInstruction(opcode, register) {
 
     var payloadOffset = _payloadOffset
         internal set
@@ -52,18 +48,14 @@ class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset:
         return data
     }
 
-    override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitPayloadInstruction(dexFile, classDef, method, code, offset, this)
-    }
-
     companion object {
         fun of(opCode: DexOpCode, payloadOffset: Int, register: Int): PayloadInstruction {
-            return PayloadInstruction(opCode, payloadOffset, register)
-        }
-
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): PayloadInstruction {
-            return PayloadInstruction(opCode)
+            return when (opCode) {
+                FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payloadOffset, register)
+                PACKED_SWITCH   -> PackedSwitchInstruction.of(payloadOffset, register)
+                SPARSE_SWITCH   -> SparseSwitchInstruction.of(payloadOffset, register)
+                else            -> throw RuntimeException("unexpected opcode $opCode for PayloadInstruction")
+            }
         }
     }
 }

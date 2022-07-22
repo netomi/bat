@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
-import com.github.netomi.bat.dexfile.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
 class SparseSwitchPayload private constructor(_keys: IntArray = EMPTY_ARRAY, _branchTargets: IntArray = EMPTY_ARRAY) : SwitchPayload(DexOpCode.NOP) {
 

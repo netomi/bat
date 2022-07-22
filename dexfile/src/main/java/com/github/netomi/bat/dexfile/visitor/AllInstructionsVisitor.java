@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile.visitor;
 
 import com.github.netomi.bat.dexfile.*;
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor;
 
 public class AllInstructionsVisitor
 implements   CodeVisitor

@@ -87,7 +87,7 @@ public enum DexOpCode
 
     // payload instruction.
 
-    FILL_ARRAY_DATA((byte) 0x26, FORMAT_31t, PayloadInstruction::create, "fill-array-data"),
+    FILL_ARRAY_DATA((byte) 0x26, FORMAT_31t, FillArrayDataInstruction::create, "fill-array-data"),
 
     // basic instruction.
 
@@ -101,8 +101,8 @@ public enum DexOpCode
 
     // payload instructions.
 
-    PACKED_SWITCH((byte) 0x2b, FORMAT_31t, PayloadInstruction::create, "packed-switch"),
-    SPARSE_SWITCH((byte) 0x2c, FORMAT_31t, PayloadInstruction::create, "sparse-switch"),
+    PACKED_SWITCH((byte) 0x2b, FORMAT_31t, PackedSwitchInstruction::create, "packed-switch"),
+    SPARSE_SWITCH((byte) 0x2c, FORMAT_31t, SparseSwitchInstruction::create, "sparse-switch"),
 
     // basic instructions.
 
