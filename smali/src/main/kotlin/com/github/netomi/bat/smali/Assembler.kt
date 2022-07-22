@@ -18,19 +18,16 @@ package com.github.netomi.bat.smali
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.smali.assemble.ClassDefAssembler
-import com.github.netomi.bat.smali.assemble.parserError
 import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.InputMismatchException
 import org.antlr.v4.runtime.misc.IntervalSet
-import org.antlr.v4.runtime.misc.ParseCancellationException
 import java.io.IOException
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
-import java.util.*
 import java.util.function.BiPredicate
 import java.util.function.Predicate
 import kotlin.io.path.name
@@ -82,6 +79,7 @@ class Assembler(private val dexFile: DexFile) {
 }
 
 class ExceptionErrorStrategy : DefaultErrorStrategy() {
+
     override fun recover(recognizer: Parser?, e: RecognitionException?) {
         throw e!!
     }
@@ -100,6 +98,10 @@ class ExceptionErrorStrategy : DefaultErrorStrategy() {
         throw ex
     }
 
+    override fun reportUnwantedToken(recognizer: Parser) {
+        throw InputMismatchException(recognizer)
+    }
+
     override fun reportMissingToken(recognizer: Parser) {
         beginErrorCondition(recognizer)
 
@@ -113,4 +115,6 @@ class ExceptionErrorStrategy : DefaultErrorStrategy() {
 
         throw RecognitionException(msg, recognizer, recognizer.inputStream, recognizer.context)
     }
+
+
 }
