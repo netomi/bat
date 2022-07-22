@@ -54,11 +54,12 @@ class IntegrationTest {
     private fun String.runCommand(workingDir: File): String? {
         return try {
             val parts = this.split("\\s".toRegex())
-            val proc = ProcessBuilder(*parts.toTypedArray())
-                .directory(workingDir)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start()
+            val proc =
+                ProcessBuilder(*parts.toTypedArray())
+                    .directory(workingDir)
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .redirectErrorStream(true)
+                    .start()
 
             proc.waitFor(60, TimeUnit.MINUTES)
             proc.inputStream.bufferedReader().readText()
