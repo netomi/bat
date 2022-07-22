@@ -140,8 +140,8 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
     }
 
     companion object {
-        private const val IDENT        = 0x03
-        private       val EMPTY_VALUES = ByteArray(0)
+        internal const val IDENT        = 0x03
+        private        val EMPTY_VALUES = ByteArray(0)
 
         fun empty(): FillArrayPayload {
             return FillArrayPayload()

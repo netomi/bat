@@ -35,8 +35,9 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
     private val dexFile: DexFile
         get() = dexComposer.dexFile
 
-    private lateinit var registerInfo: RegisterInfo
-    private          var labelMapping: LinkedHashMap<String, Int> = LinkedHashMap()
+    private lateinit var registerInfo:        RegisterInfo
+    private          var labelMapping:        LinkedHashMap<String, Int> = LinkedHashMap()
+    private          var payloadLabelMapping: HashMap<String, Int>       = HashMap()
 
     fun parseCode(iCtx: List<SInstructionContext>, pCtx: List<SParameterContext>): Code {
 
@@ -69,6 +70,18 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     }
 
                     parseArrayDataPayload(t as FarraydataContext)
+                }
+
+                RULE_fsparseswitch -> {
+                    if (codeOffset % 2 == 1) {
+                        val nop = BasicInstruction.of(DexOpCode.NOP)
+                        codeOffset += nop.length
+                        instructions.add(nop)
+                    }
+
+                    val lastLabel    = labelMapping.entries.lastOrNull()
+                    val switchOffset = payloadLabelMapping[lastLabel!!.key]
+                    parseSparseSwitchPayload(t as FsparseswitchContext, switchOffset!!)
                 }
 
                 RULE_f10x -> {
@@ -162,6 +175,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
     private fun collectLabels(listCtx: List<SInstructionContext>) {
         labelMapping.clear()
+        payloadLabelMapping.clear()
         var codeOffset = 0
 
         listCtx.forEach { ctx ->
@@ -181,6 +195,18 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     }
 
                     val insn = parseArrayDataPayload(t as FarraydataContext)
+                    codeOffset += insn.length
+                }
+
+                RULE_fsparseswitch -> {
+                    val lastLabel = labelMapping.entries.lastOrNull()
+                    if (lastLabel != null && lastLabel.value == codeOffset) {
+                        if (codeOffset % 2 == 1) {
+                            labelMapping[lastLabel.key] = ++codeOffset
+                        }
+                    }
+
+                    val insn = parseSparseSwitchPayload(t as FsparseswitchContext, 0)
                     codeOffset += insn.length
                 }
 
@@ -210,6 +236,17 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
             8 -> FillArrayPayload.of(encodedValues.map { (it as EncodedLongValue).value }.toLongArray())
             else -> throw RuntimeException("unexpected elementWidth $elementWidth")
         }
+    }
+
+    private fun parseSparseSwitchPayload(ctx: FsparseswitchContext, codeOffset: Int): SparseSwitchPayload {
+
+        val keys = IntArray(ctx.INT().size)
+        ctx.INT().forEachIndexed { index, node -> keys[index] = node.text.toInt() }
+
+        val branchTargets = IntArray(ctx.LABEL().size)
+        ctx.LABEL().forEachIndexed { index, node -> branchTargets[index] = branchOffset(codeOffset, node.text) }
+
+        return SparseSwitchPayload.of(keys, branchTargets)
     }
 
     private fun parseConversionInstructionF12x(ctx: F12x_conversionContext): ConversionInstruction {
@@ -553,6 +590,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
         val label = ctx.label.text
         val payloadOffset = branchOffset(codeOffset, label)
+        payloadLabelMapping[label] = codeOffset
 
         return PayloadInstruction.of(opcode, payloadOffset, r1)
     }

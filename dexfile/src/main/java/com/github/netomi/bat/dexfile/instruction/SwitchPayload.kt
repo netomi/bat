@@ -13,12 +13,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.instruction;
+package com.github.netomi.bat.dexfile.instruction
 
-public abstract class SwitchPayload
-extends               Payload
-{
-    SwitchPayload(DexOpCode opcode) {
-        super(opcode);
-    }
-}
+abstract class SwitchPayload internal constructor(opcode: DexOpCode) : Payload(opcode)

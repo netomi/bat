@@ -55,3 +55,41 @@
     .end array-data
 .end method
 
+.method public test_sparse-switch()V
+    .registers 1
+    .annotation runtime Lorg/junit/Test;
+    .end annotation
+
+    const v0, 13
+
+:switch
+    sparse-switch v0, :SparseSwitch
+
+:Label10
+    invoke-static {}, Lorg/junit/Assert;->fail()V
+    return-void
+
+:Label20
+    invoke-static {}, Lorg/junit/Assert;->fail()V
+    return-void
+
+:Label15
+    invoke-static {}, Lorg/junit/Assert;->fail()V
+    return-void
+
+:Label13
+    return-void
+
+:Label99
+    invoke-static {}, Lorg/junit/Assert;->fail()V
+    return-void
+
+:SparseSwitch
+    .sparse-switch
+        10 -> :Label10
+        13 -> :Label13
+        15 -> :Label15
+        20 -> :Label20
+        99 -> :Label99
+    .end sparse-switch
+.end method
