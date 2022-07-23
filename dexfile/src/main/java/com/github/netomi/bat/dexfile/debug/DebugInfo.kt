@@ -37,13 +37,12 @@ import kotlin.collections.ArrayList
     type          = TYPE_DEBUG_INFO_ITEM,
     dataAlignment = 1,
     dataSection   = true)
-class DebugInfo private constructor() : DataItem() {
+class DebugInfo private constructor(_lineStart: Int = 0, _debugSequence: ArrayList<DebugInstruction> = ArrayList(0)) : DataItem() {
 
-    var lineStart = 0
-        private set
+    var lineStart = _lineStart
 
-    private var parameterNames                             = intArrayOf()
-    private val debugSequence: ArrayList<DebugInstruction> = ArrayList(0)
+    val debugSequence: ArrayList<DebugInstruction> = _debugSequence
+    private var parameterNames                     = intArrayOf()
 
     val parameterCount: Int
         get() = parameterNames.size
@@ -53,7 +52,7 @@ class DebugInfo private constructor() : DataItem() {
     }
 
     override val isEmpty: Boolean
-        get() = false
+        get() = parameterNames.isEmpty() && lineStart == -1 && debugSequence.isEmpty()
 
     override fun read(input: DexDataInput) {
         lineStart = input.readUleb128()
@@ -67,6 +66,7 @@ class DebugInfo private constructor() : DataItem() {
             parameterNames[i] = input.readUleb128p1()
         }
 
+        debugSequence.clear()
         var debugInstruction: DebugInstruction
 
         do {
@@ -124,6 +124,10 @@ class DebugInfo private constructor() : DataItem() {
     }
 
     companion object {
+        fun empty(): DebugInfo {
+            return DebugInfo()
+        }
+
         @JvmStatic
         fun readContent(input: DexDataInput): DebugInfo {
             val debugInfo = DebugInfo()

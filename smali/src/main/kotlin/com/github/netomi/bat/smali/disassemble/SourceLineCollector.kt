@@ -26,7 +26,7 @@ internal class SourceLineCollector(private val debugState: MutableMap<Int, Mutab
     override fun visitAnyDebugInstruction(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugInstruction) {}
 
     override fun visitSetPrologueEnd(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugSetPrologueEnd) {
-        addDebugInfo(codeOffset.toInt(), ".prologue")
+        addDebugInfo(codeOffset, ".prologue")
     }
 
     override fun visitAdvanceLine(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugAdvanceLine) {

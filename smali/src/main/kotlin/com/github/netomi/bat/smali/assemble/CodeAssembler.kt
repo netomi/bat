@@ -17,6 +17,10 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.debug.DebugAdvanceLineAndPC
+import com.github.netomi.bat.dexfile.debug.DebugAdvancePC
+import com.github.netomi.bat.dexfile.debug.DebugInfo
+import com.github.netomi.bat.dexfile.debug.DebugSetPrologueEnd
 import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.io.InstructionWriter
@@ -47,6 +51,9 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         collectRegisterInfo(iCtx)
         collectLabels(iCtx)
 
+        val debugInfo = DebugInfo.empty()
+        val debugSequenceAssembler = DebugSequenceAssembler(debugInfo)
+
         var codeOffset = 0
 
         iCtx.forEach { ctx ->
@@ -55,11 +62,21 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_fline -> {
                     val c = t as FlineContext
                     val lineNumber = c.line.text.toInt()
+
+                    debugSequenceAssembler.advanceLine(lineNumber, codeOffset)
                     null
                 }
 
-                RULE_fprologue  -> null
-                RULE_fepilogue  -> null
+                RULE_fprologue  -> {
+                    debugSequenceAssembler.prologueEnd(codeOffset)
+                    null
+                }
+
+                RULE_fepilogue  -> {
+                    debugSequenceAssembler.epilogueStart(codeOffset)
+                    null
+                }
+
                 RULE_fregisters -> null
                 RULE_sLabel     -> null
 
@@ -159,6 +176,10 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         }
 
         code.catchHandlerList = handlerList.toList()
+
+        if (!debugInfo.isEmpty) {
+            code.debugInfo = debugInfo
+        }
 
         return code
     }

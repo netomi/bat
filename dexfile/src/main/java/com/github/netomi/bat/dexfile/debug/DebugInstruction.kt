@@ -24,6 +24,7 @@ import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Represents a debug instruction as contained in the debug sequence of a debug info item.
@@ -155,7 +156,38 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
     override fun toString(): String {
         return "DebugAdvanceLineAndPC[lineDiff=${lineDiff},addrDiff=${addrDiff}]"
     }
+
+    companion object {
+        private val possibleCombinations: Map<LineAddrPair, Int> by lazy {
+            val result = HashMap<LineAddrPair, Int>()
+
+            val opCodeRange = 0x0a..0xff
+            for (opCode in opCodeRange) {
+                val insn = DebugAdvanceLineAndPC(opCode.toByte())
+                if (insn.lineDiff >= 0 && insn.addrDiff >= 0) {
+                    result[LineAddrPair(insn.lineDiff, insn.addrDiff)] = opCode
+                }
+            }
+
+            result
+        }
+
+        fun nop(): DebugAdvanceLineAndPC {
+            return createIfPossible(0, 0)!!
+        }
+
+        fun createIfPossible(lineDiff: Int, addrDiff: Int): DebugAdvanceLineAndPC? {
+            val opCode = possibleCombinations[LineAddrPair(lineDiff, addrDiff)]
+            return if (opCode != null) {
+                DebugAdvanceLineAndPC(opCode.toByte())
+            } else {
+                null
+            }
+        }
+    }
 }
+
+private data class LineAddrPair(val lineDiff: Int, val addrDiff: Int)
 
 /**
  * Represents a debug instruction that advances the address register.
