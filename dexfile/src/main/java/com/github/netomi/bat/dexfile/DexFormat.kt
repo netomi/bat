@@ -15,18 +15,27 @@
  */
 package com.github.netomi.bat.dexfile
 
-enum class DexFormat(private val bytePattern: ByteArray, val version: String) {
+enum class DexFormat(private val bytePattern: ByteArray, val version: String, val apiLevel: Int) {
 
-    FORMAT_009(byteArrayOf(0x30, 0x30, 0x39, 0x00), "009"),
-    FORMAT_013(byteArrayOf(0x30, 0x31, 0x33, 0x00), "013"),
-    FORMAT_035(byteArrayOf(0x30, 0x33, 0x35, 0x00), "035"),
-    FORMAT_037(byteArrayOf(0x30, 0x33, 0x37, 0x00), "037"),
-    FORMAT_038(byteArrayOf(0x30, 0x33, 0x38, 0x00), "038"),
-    FORMAT_039(byteArrayOf(0x30, 0x33, 0x39, 0x00), "039");
+    FORMAT_009(byteArrayOf(0x30, 0x30, 0x39, 0x00), "009", -1),
+    FORMAT_013(byteArrayOf(0x30, 0x31, 0x33, 0x00), "013", -1),
+    FORMAT_035(byteArrayOf(0x30, 0x33, 0x35, 0x00), "035", 15),
+    FORMAT_037(byteArrayOf(0x30, 0x33, 0x37, 0x00), "037", 24),
+    FORMAT_038(byteArrayOf(0x30, 0x33, 0x38, 0x00), "038", 26),
+    FORMAT_039(byteArrayOf(0x30, 0x33, 0x39, 0x00), "039", 28);
 
     val pattern: ByteArray = bytePattern.copyOf(bytePattern.size)
 
     companion object {
+        fun forApiLevel(apiLevel: Int): DexFormat {
+            for (format in values().reversed()) {
+                if (apiLevel > format.apiLevel) {
+                    return format
+                }
+            }
+            throw RuntimeException("unexpected apiLevel $apiLevel")
+        }
+
         @JvmStatic
         fun fromPattern(bytes: ByteArray, from: Int, to: Int): DexFormat? {
             val pattern = bytes.copyOfRange(from, to)

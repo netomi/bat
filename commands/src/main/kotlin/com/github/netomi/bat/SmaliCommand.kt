@@ -17,18 +17,10 @@ package com.github.netomi.bat
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
-import com.github.netomi.bat.dexfile.io.DexFileReader
 import com.github.netomi.bat.dexfile.io.DexFileWriter
-import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
-import com.github.netomi.bat.io.FileOutputStreamFactory
 import com.github.netomi.bat.smali.Assembler
-import com.github.netomi.bat.smali.Disassembler
-import com.sun.jdi.BooleanValue
 import picocli.CommandLine
 import java.io.File
-import java.io.FileInputStream
-import java.nio.file.Files
-import kotlin.io.path.exists
 
 /**
  * Command-line tool to disassemble dex files in smali format.
@@ -40,31 +32,37 @@ import kotlin.io.path.exists
     optionListHeading    = "%nOptions:%n")
 class SmaliCommand : Runnable {
 
-    @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file / directory to process (*.smali)"])
-    private var inputFile: File? = null
+    @CommandLine.Parameters(index = "0", arity = "1..*", paramLabel = "inputfile", description = ["input file / directory to process (*.smali)"])
+    private lateinit var inputFiles: Array<File>
 
-    @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out.dex", description = ["output file"])
-    private var outputFile: File? = null
+    @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out.dex", description = ["output file (default=out.dex)"])
+    private lateinit var outputFile: File
+
+    @CommandLine.Option(names = ["-a"], defaultValue = "15", description = ["api level (default=15)"])
+    private var apiLevel: Int = 0
 
     @CommandLine.Option(names = ["-v"], description = ["verbose output"])
     private var verbose: Boolean = false
 
     override fun run() {
-        inputFile?.apply {
-            val dexFile = DexFile.of(DexFormat.FORMAT_035)
+        val format = DexFormat.forApiLevel(apiLevel)
+        val dexFile = DexFile.of(format)
 
-            if (this.isDirectory) {
-                printVerbose("Assembling directory '$name' into file ${outputFile?.name} ...")
-                val assembledClasses = Assembler(dexFile).assemble(toPath())
-                printVerbose("done assembling ${assembledClasses.size} classes.")
+        printVerbose("Using format ${format.version} for generated dex file '${outputFile.name}'")
+
+        inputFiles.forEach {
+            if (it.isDirectory) {
+                printVerbose("Assembling directory '${it.name}' into file ${outputFile.name} ...")
+                val assembledClasses = Assembler(dexFile).assemble(it.toPath())
+                printVerbose("Assembled ${assembledClasses.size} class(es).")
             } else {
-                printVerbose("Assembling file '$name' into file ${outputFile?.name} ...")
-                Assembler(dexFile).assemble(toPath())
-                printVerbose("done assembling '${name}'.")
+                printVerbose("Assembling file '${it.name}' into file ${outputFile.name} ...")
+                Assembler(dexFile).assemble(it.toPath())
+                printVerbose("Assembled 1 class.")
             }
-
-            DexFileWriter(outputFile!!.outputStream()).visitDexFile(dexFile)
         }
+
+        DexFileWriter(outputFile.outputStream()).visitDexFile(dexFile)
     }
 
     private fun printVerbose(text: String) {

@@ -45,14 +45,16 @@ class ClassDumpCommand : Runnable {
     override fun run() {
         inputFile?.apply {
             FileInputStream(this).use { `is` ->
-                val output = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
-                output.use { os ->
+                val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
 
-                    println("Processing '$name'...")
+                println("Processing '$name'...")
 
-                    // TODO: currently supporting only single class files.
-                    val classFile = ClassFile.readClassFile(DataInputStream(`is`))
-                    classFile.accept(ClassFilePrinter(os))
+                // TODO: currently supporting only single class files.
+                val classFile = ClassFile.readClassFile(DataInputStream(`is`))
+                classFile.accept(ClassFilePrinter(os))
+
+                if (outputFile != null) {
+                    os.close()
                 }
             }
         }
