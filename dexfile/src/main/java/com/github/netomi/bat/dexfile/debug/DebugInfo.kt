@@ -15,9 +15,7 @@
  */
 package com.github.netomi.bat.dexfile.debug
 
-import com.github.netomi.bat.dexfile.DataItem
-import com.github.netomi.bat.dexfile.DataItemAnn
-import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.TYPE_DEBUG_INFO_ITEM
 import com.github.netomi.bat.dexfile.debug.DebugInstruction.Companion.readInstruction
 import com.github.netomi.bat.dexfile.io.DexDataInput
@@ -37,22 +35,29 @@ import kotlin.collections.ArrayList
     type          = TYPE_DEBUG_INFO_ITEM,
     dataAlignment = 1,
     dataSection   = true)
-class DebugInfo private constructor(_lineStart: Int = 0, _debugSequence: ArrayList<DebugInstruction> = ArrayList(0)) : DataItem() {
+class DebugInfo private constructor(_lineStart:      Int                         = 0,
+                                    _parameterNames: IntArray                    = intArrayOf(),
+                                    _debugSequence:  ArrayList<DebugInstruction> = ArrayList(0)) : DataItem() {
 
     var lineStart = _lineStart
 
     val debugSequence: ArrayList<DebugInstruction> = _debugSequence
-    private var parameterNames                     = intArrayOf()
+    private var parameterNames                     = _parameterNames
 
     val parameterCount: Int
         get() = parameterNames.size
 
     fun getParameterName(dexFile: DexFile, parameterIndex: Int): String? {
-        return dexFile.getStringNullable(parameterNames[parameterIndex])
+        return if (parameterIndex in 0 until  parameterCount) {
+            dexFile.getStringNullable(parameterNames[parameterIndex])
+        } else {
+            null
+        }
     }
 
     override val isEmpty: Boolean
-        get() = parameterNames.isEmpty() && lineStart == -1 && debugSequence.isEmpty()
+        get() = (parameterNames.isEmpty() || parameterNames.all { it == NO_INDEX }) &&
+                lineStart == 0 && debugSequence.isEmpty()
 
     override fun read(input: DexDataInput) {
         lineStart = input.readUleb128()
@@ -96,7 +101,7 @@ class DebugInfo private constructor(_lineStart: Int = 0, _debugSequence: ArrayLi
         }
     }
 
-    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+    fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         for (i in parameterNames.indices) {
             visitor.visitStringID(dexFile, ArrayElementAccessor(parameterNames, i))
         }
@@ -126,6 +131,10 @@ class DebugInfo private constructor(_lineStart: Int = 0, _debugSequence: ArrayLi
     companion object {
         fun empty(): DebugInfo {
             return DebugInfo()
+        }
+
+        fun empty(parameterSize: Int): DebugInfo {
+            return DebugInfo(_parameterNames = IntArray(parameterSize) { NO_INDEX })
         }
 
         @JvmStatic

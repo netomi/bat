@@ -57,17 +57,44 @@ internal class DebugSequenceAssembler internal constructor(private val debugInfo
             if (insn != null) {
                 debugSequence.add(insn)
             } else {
-                debugSequence.add(DebugAdvancePC.of(addrDiff))
-                val lineInsn = DebugAdvanceLineAndPC.createIfPossible(lineDiff, 0)
+                debugSequence.add(DebugAdvanceLine.of(lineDiff))
+                val lineInsn = DebugAdvanceLineAndPC.createIfPossible(0, addrDiff)
                 if (lineInsn != null) {
                     debugSequence.add(lineInsn)
                 } else {
-                    debugSequence.add(DebugAdvanceLine.of(lineDiff))
+                    debugSequence.add(DebugAdvancePC.of(addrDiff))
+                    debugSequence.add(DebugAdvanceLineAndPC.nop())
                 }
             }
         }
 
         lineRegister = lineNumber
         addrRegister = codeOffset
+    }
+
+    fun startLocal(registerNum: Int, nameIndex: Int, typeIndex: Int, codeOffset: Int) {
+        val addrDiff = codeOffset - addrRegister
+
+        if (addrDiff > 0) {
+            debugSequence.add(DebugAdvancePC.of(addrDiff))
+        }
+        debugSequence.add(DebugStartLocal.of(registerNum, nameIndex, typeIndex))
+
+        addrRegister = codeOffset
+    }
+
+    fun endLocal(registerNum: Int, codeOffset: Int) {
+        val addrDiff = codeOffset - addrRegister
+
+        if (addrDiff > 0) {
+            debugSequence.add(DebugAdvancePC.of(addrDiff))
+        }
+        debugSequence.add(DebugEndLocal.of(registerNum))
+    }
+
+    fun end() {
+        if (debugSequence.isNotEmpty()) {
+            debugSequence.add(DebugEndSequence)
+        }
     }
 }

@@ -233,6 +233,10 @@ extends      DataItem
     }
 
     public void referencedIDsAccept(DexFile dexFile, ReferencedIDVisitor visitor) {
+        if (debugInfo != null) {
+            debugInfo.referencedIDsAccept(dexFile, visitor);
+        }
+
         for (EncodedCatchHandler handler : catchHandlerList) {
             handler.referencedIDsAccept(dexFile, visitor);
         }
