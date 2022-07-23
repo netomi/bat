@@ -104,6 +104,8 @@ class DexDumpPrinter constructor(
         printer.println("source_file_idx   : " + getSourceFileIndex(dexFile, classDef))
         printer.levelDown()
         printer.println()
+
+        printer.flush()
     }
 
     override fun visitMethodHandle(dexFile: DexFile, index: Int, methodHandle: MethodHandle) {

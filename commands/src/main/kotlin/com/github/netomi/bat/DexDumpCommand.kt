@@ -53,22 +53,24 @@ class DexDumpCommand : Runnable {
     override fun run() {
         inputFile?.apply {
             FileInputStream(this).use { `is` ->
-                val output = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
-                output.use { os ->
-                    val reader  = DexFileReader(`is`)
-                    val dexFile = DexFile()
-                    reader.visitDexFile(dexFile)
+                val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
+                val reader  = DexFileReader(`is`)
+                val dexFile = DexFile()
+                reader.visitDexFile(dexFile)
 
-                    println("Processing '$name'...")
-                    println("Opened '$name', DEX version '${dexFile.dexFormat?.version}'")
+                println("Processing '$name'...")
+                println("Opened '$name', DEX version '${dexFile.dexFormat?.version}'")
 
-                    if (classNameFilter != null) {
-                        dexFile.classDefsAccept(
-                            filteredByExternalClassName(classNameFilter!!,
-                            DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations)))
-                    } else {
-                        dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations))
-                    }
+                if (classNameFilter != null) {
+                    dexFile.classDefsAccept(
+                        filteredByExternalClassName(classNameFilter!!,
+                        DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations)))
+                } else {
+                    dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations))
+                }
+
+                if (outputFile != null) {
+                    os.close()
                 }
             }
         }
