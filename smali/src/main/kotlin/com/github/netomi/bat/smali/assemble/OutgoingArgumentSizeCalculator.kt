@@ -25,7 +25,7 @@ import com.github.netomi.bat.dexfile.instruction.MethodInstruction
 import com.github.netomi.bat.dexfile.instruction.MethodProtoInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class OutgoingArgumentSizeCalculator: InstructionVisitor {
+internal class OutgoingArgumentSizeCalculator: InstructionVisitor {
 
     var outgoingArgumentSize: Int = 0
         private set

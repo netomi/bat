@@ -24,9 +24,9 @@ import com.github.netomi.bat.smali.parser.SmaliParser.*
 import com.github.netomi.bat.util.toIntArray
 import org.antlr.v4.runtime.ParserRuleContext
 
-class InstructionAssembler internal constructor(            listCtx:               List<SInstructionContext>,
-                                                private val registerInfo:          RegisterInfo,
-                                                private val dexComposer:           DexComposer) {
+internal class InstructionAssembler internal constructor(            listCtx:               List<SInstructionContext>,
+                                                         private val registerInfo:          RegisterInfo,
+                                                         private val dexComposer:           DexComposer) {
 
     private val encodedValueAssembler = EncodedValueAssembler(dexComposer)
 

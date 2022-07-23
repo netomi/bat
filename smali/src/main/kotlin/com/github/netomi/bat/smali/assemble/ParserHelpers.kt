@@ -23,7 +23,7 @@ import com.github.netomi.bat.util.Strings
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
 
-fun parserError(ctx: ParserRuleContext, message: String): Nothing {
+internal fun parserError(ctx: ParserRuleContext, message: String): Nothing {
     val lineNumber = ctx.getStart().line
     val column     = ctx.getStart().charPositionInLine
 
@@ -50,9 +50,9 @@ private fun fillParseContextText(node: ParseTree, list: MutableList<String>) {
     }
 }
 
-data class FieldInfo(val classType:String?, val name: String, val type: String)
+internal data class FieldInfo(val classType:String?, val name: String, val type: String)
 
-fun parseFieldObject(text: String): FieldInfo {
+internal fun parseFieldObject(text: String): FieldInfo {
     val arrowIndex = text.indexOf("->")
     val classType = if (arrowIndex != -1) {
         text.substring(0, arrowIndex)
@@ -70,9 +70,9 @@ fun parseFieldObject(text: String): FieldInfo {
     return FieldInfo(classType, name, type)
 }
 
-data class MethodInfo(val classType: String?, val methodName: String, val parameterTypes: List<String>, val returnType: String)
+internal data class MethodInfo(val classType: String?, val methodName: String, val parameterTypes: List<String>, val returnType: String)
 
-fun parseMethodObject(text: String): MethodInfo {
+internal fun parseMethodObject(text: String): MethodInfo {
     val arrowIndex = text.indexOf("->")
     val classType = if (arrowIndex != -1) {
         text.substring(0, arrowIndex)
@@ -93,7 +93,7 @@ fun parseMethodObject(text: String): MethodInfo {
     return MethodInfo(classType, name, parameterTypes, returnType)
 }
 
-fun parseAccessFlags(sAccListContext: SmaliParser.SAccListContext): Int {
+internal fun parseAccessFlags(sAccListContext: SmaliParser.SAccListContext): Int {
     var accessFlags = 0
     sAccListContext.ACC().forEach {
         val flag = DexAccessFlags.of(it.text)
@@ -102,7 +102,7 @@ fun parseAccessFlags(sAccListContext: SmaliParser.SAccListContext): Int {
     return accessFlags
 }
 
-fun parseNumber(value: String): Long {
+internal fun parseNumber(value: String): Long {
     return when(value.last()) {
         'l',
         'L',
@@ -121,34 +121,34 @@ fun parseNumber(value: String): Long {
     }
 }
 
-fun parseString(value: String): String {
+internal fun parseString(value: String): String {
     return Strings.unescapeJavaString(value.removeSurrounding("\""))
 }
 
-fun parseChar(value: String): Char {
+internal fun parseChar(value: String): Char {
     return Strings.unescapeJavaString(value.removeSurrounding("'")).first()
 }
 
-fun parseInt(value: String): Int {
+internal fun parseInt(value: String): Int {
     return Integer.decode(value)
 }
 
-fun parseLong(value: String): Long {
+internal fun parseLong(value: String): Long {
     return java.lang.Long.decode(value.removeSuffix("l").removeSuffix("L"))
 }
 
-fun parseByte(value: String): Byte {
+internal fun parseByte(value: String): Byte {
     return java.lang.Short.decode(value.removeSuffix("t").removeSuffix("T")).toByte()
 }
 
-fun parseShort(value: String): Short {
+internal fun parseShort(value: String): Short {
     return java.lang.Short.decode(value.removeSuffix("s").removeSuffix("S"))
 }
 
-fun parseFloat(value: String): Float {
+internal fun parseFloat(value: String): Float {
     return value.toFloat()
 }
 
-fun parseDouble(value: String): Double {
+internal fun parseDouble(value: String): Double {
     return value.toDouble()
 }
