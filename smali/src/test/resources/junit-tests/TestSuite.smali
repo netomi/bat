@@ -24,7 +24,9 @@
                 LStaticFieldInitializerTest;,
                 LAnnotationTests;,
                 LArrayTests;,
+                LLineTest;,
                 LFormat31t;,
-                LExceptionTest;
+                LExceptionTest;,
+                LSpecialInstructionPaddingTest;
             }
 .end annotation

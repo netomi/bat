@@ -119,7 +119,7 @@ class ClassDef private constructor(
     fun addMethod(dexFile: DexFile, method: EncodedMethod) {
         val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(methodClass == getType(dexFile), "method class does not match this class")
-        Preconditions.checkArgument(!classData.methods.contains(method), "method already exists in this class")
+        classData.methods.forEach { Preconditions.checkArgument(method.methodIndex != it.methodIndex, "method already exists in this class") }
 
         classData.addMethod(method)
     }

@@ -28,6 +28,7 @@ import java.nio.file.Path
 import java.util.TreeSet
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.deleteIfExists
 import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlin.test.Test
@@ -38,6 +39,8 @@ class IntegrationTest {
     fun runUnitTest() {
         val resource = javaClass.getResource("/junit-tests/TestSuite.smali")
         val resourcePath = File(resource.file).parentFile.toPath()
+
+        val cachePath = resourcePath.resolve("android-data").toFile().deleteRecursively()
 
         val dexFile  = DexFile.of(DexFormat.FORMAT_035)
         Assembler(dexFile).assemble(resourcePath)

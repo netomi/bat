@@ -69,7 +69,11 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
             val insn: DexInstruction? = when (t.ruleIndex) {
                 RULE_fline -> {
                     val c = t as FlineContext
-                    val lineNumber = c.line.text.toInt()
+                    val lineNumber = parseLong(c.line.text).toInt()
+
+                    if (lineNumber <= 0) {
+                        parserError(ctx, "line number too large")
+                    }
 
                     debugSequenceAssembler.advanceLine(lineNumber, codeOffset)
                     null
