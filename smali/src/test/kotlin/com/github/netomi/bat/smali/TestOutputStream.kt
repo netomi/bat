@@ -33,9 +33,9 @@ internal class TestOutputStreamFactory : OutputStreamFactory {
     }
 
     @Throws(IOException::class)
-    override fun createOutputStream(className: String): OutputStream {
+    override fun createOutputStream(internalClassName: String): OutputStream {
         val baos = ByteArrayOutputStream()
-        outputStreamMap[className] = baos
+        outputStreamMap[internalClassName] = baos
         return baos
     }
 }

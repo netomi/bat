@@ -44,8 +44,25 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         val debugInfo = DebugInfo.empty(parameters)
         val debugSequenceAssembler = DebugSequenceAssembler(debugInfo)
 
-
         var codeOffset = 0
+
+        pCtx.forEach { ctx ->
+            val parameterNumber = registerInfo.parameterNumber(ctx.r.text)
+
+            val parameterIndex = if (method.isStatic) {
+                parameterNumber
+            } else {
+                parameterNumber - 1
+            }
+
+            val nameIndex = if (ctx.name != null) {
+                dexComposer.addOrGetStringIDIndex(ctx.name.text.removeSurrounding("\""))
+            } else {
+                NO_INDEX
+            }
+
+            debugInfo.setParameterName(parameterIndex, nameIndex)
+        }
 
         iCtx.forEach { ctx ->
             val t = ctx.getChild(0) as ParserRuleContext
@@ -68,41 +85,50 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     null
                 }
 
-                RULE_flocal -> {
-                    val c = t as FlocalContext
+                RULE_fstartlocal -> {
+                    val c = t as FstartlocalContext
 
                     val register = registerInfo.registerNumber(c.r.text)
 
-                    val nameIndex: Int
-                    val typeIndex: Int
+                    var nameIndex: Int = NO_INDEX
+                    var typeIndex: Int = NO_INDEX
 
-                    if (c.name != null) {
-                        nameIndex = dexComposer.addOrGetStringIDIndex(c.name.text.removeSurrounding("\""))
-                        typeIndex = dexComposer.addOrGetTypeIDIndex(c.type.text)
-                    } else if (c.v1 != null) {
-                        val (name, type) = c.v1.text.split(":")
+                    val name = c.name.text.removeSurrounding("\"")
+                    if (name.isNotEmpty()) {
                         nameIndex = dexComposer.addOrGetStringIDIndex(name)
-                        typeIndex = dexComposer.addOrGetTypeIDIndex(type)
-                    } else {
-                        val (name, type) = c.v2.text.split(":")
-                        nameIndex = dexComposer.addOrGetStringIDIndex(name.removeSurrounding("\""))
+                    }
+
+                    if (c.type != null) {
+                        val type = c.type.text
                         typeIndex = dexComposer.addOrGetTypeIDIndex(type)
                     }
 
-                    debugSequenceAssembler.startLocal(register, nameIndex, typeIndex, codeOffset)
+                    val sigIndex = if (c.sig != null) {
+                        dexComposer.addOrGetStringIDIndex(c.sig.text)
+                    } else {
+                        NO_INDEX
+                    }
+
+                    debugSequenceAssembler.startLocal(register, nameIndex, typeIndex, sigIndex, codeOffset)
                     null
                 }
 
-                RULE_fend -> {
-                    val c = t as FendContext
+                RULE_frestart -> {
+                    val c = t as FstartlocalContext
+
+                    val register = registerInfo.registerNumber(c.r.text)
+
+                    debugSequenceAssembler.restartLocal(register, codeOffset)
+                    null
+                }
+
+                RULE_fendlocal -> {
+                    val c = t as FendlocalContext
 
                     val register = registerInfo.registerNumber(c.r.text)
                     debugSequenceAssembler.endLocal(register, codeOffset)
                     null
                 }
-
-                RULE_fregisters -> null
-                RULE_sLabel     -> null
 
                 RULE_farraydata -> {
                     codeOffset = insertNopInstructionIfUnaligned(codeOffset, instructions)
@@ -168,7 +194,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_f21c_const_type   -> instructionAssembler.parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
                 RULE_f31t_payload      -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext, codeOffset)
 
-                else -> null //parserError(t, "unexpected instruction")
+                else -> null
             }
 
             insn?.apply {
@@ -311,6 +337,16 @@ internal data class RegisterInfo(val registers: Int, val locals: Int, val insSiz
             'p' -> {
                 val number = register.substring(1).toInt()
                 return locals + number
+            }
+
+            else -> throw RuntimeException("unknown register format $register")
+        }
+    }
+
+    fun parameterNumber(register: String): Int {
+        return when (register.first()) {
+            'p' -> {
+                return register.substring(1).toInt()
             }
 
             else -> throw RuntimeException("unknown register format $register")

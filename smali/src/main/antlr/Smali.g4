@@ -57,7 +57,7 @@ fragment
 FRAGMENT_PRIMITIVE_TYPE: 'B' | 'Z' | 'S' | 'C' | 'I' | 'F' | 'J' | 'D' ;
 
 fragment
-FRAGMENT_FULL_CLASS_NAME: (FRAGMENT_SIMPLE_NAME '/')* FRAGMENT_SIMPLE_NAME ;
+FRAGMENT_FULL_CLASS_NAME: FRAGMENT_SIMPLE_NAME ('/' FRAGMENT_SIMPLE_NAME)* ;
 
 fragment
 FRAGMENT_OBJECT_TYPE: 'L' FRAGMENT_FULL_CLASS_NAME ';' ;
@@ -105,9 +105,6 @@ METHOD_PROTO : FRAGMENT_METHOD_PROTO;
 
 FIELD_FULL : (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_FIELD_PART;
 FIELD_PART : FRAGMENT_FIELD_PART;
-LABEL      : ':' FRAGMENT_ID;
-
-SMALI_V2_LOCAL_NAME_TYPE : '"' ( ESC_SEQ | ~('\\'|'"') )* '"' ':' (FRAGMENT_OBJECT_TYPE | FRAGMENT_ARRAY_TYPE | FRAGMENT_PRIMITIVE_TYPE) ;
 
 F_INFINITY : ('I'|'i') ('N'|'n') ('F'|'f') ('I'|'i') ('N'|'n') ('I'|'i') ('T'|'t') ('Y'|'y') ;
 FLOAT_NAN  : F_NAN ('f'|'F');
@@ -173,12 +170,11 @@ METHOD_HANDLE_TYPE
 
 REGISTER: ('v'|'V'|'p'|'P') '0'..'9'+;
 
-DPARAMETER    : '.parameter';
 DENUM         : '.enum';
 DPARAM        : '.param';
 DRESTARTLOCAL : '.restart local';
 
-MEMBER_NAME: FRAGMENT_MEMBER_NAME ;
+ID: FRAGMENT_ID;
 
 sFiles : sFile+;
 sFile  : '.class' sAccList className=OBJECT_TYPE
@@ -210,7 +206,7 @@ sSubannotation
 
 sParameter: param=DPARAM r=REGISTER (',' name=STRING )? (sAnnotation* '.end param')?;
 
-sAnnotationKeyName: name=MEMBER_NAME ;
+sAnnotationKeyName: name=ID ;
 
 sAnnotationValue
 	: sSubannotation
@@ -245,8 +241,8 @@ sArrayValue: '{' sAnnotationValue? (',' sAnnotationValue)* '}';
 
 sInstruction
     : fline
-    | flocal
-    | fend
+    | fstartlocal
+    | fendlocal
     | frestart
     | fprologue
     | fepilogue
@@ -291,25 +287,23 @@ sInstruction
 	;
 
 fline: '.line' line=INT;
-flocal: '.local' r=REGISTER ','
-            (
-                    name=STRING ':' type=(OBJECT_TYPE | PRIMITIVE_TYPE | ARRAY_TYPE) // normal case
-                |   v1=FIELD_PART // smali 1.x
-                |   v2=SMALI_V2_LOCAL_NAME_TYPE // smali 2.x
-            )
-         (',' sig=STRING)?
-        ;
-fend           : '.end local' r=REGISTER;
-frestart       : '.restart local'  r=REGISTER;
+
+fstartlocal: '.local' r=REGISTER ','
+    ( name=STRING
+    | name=STRING ':' type=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE)
+    ) (',' sig=STRING)? ;
+
+fendlocal      : '.end local' r=REGISTER;
+frestart       : '.restart local' r=REGISTER;
 fprologue      : '.prologue';
 fepilogue      : '.epilogue';
 fregisters     : '.registers' xregisters=INT;
 flocals        : '.locals' xlocals=INT;
-fcatch         : '.catch' type=OBJECT_TYPE '{' start=LABEL '..' end=LABEL  '}' handle=LABEL;
-fcatchall      : '.catchall' '{' start=LABEL '..' end=LABEL  '}' handle=LABEL;
-sLabel         : label=LABEL;
-fpackedswitch  : '.packed-switch' start=INT LABEL+ '.end packed-switch';
-fsparseswitch  : '.sparse-switch' (INT '->' LABEL)* '.end sparse-switch';
+fcatch         : '.catch' type=OBJECT_TYPE '{' start=sLabel '..' end=sLabel  '}' handle=sLabel;
+fcatchall      : '.catchall' '{' start=sLabel '..' end=sLabel  '}' handle=sLabel;
+sLabel         : ':' label=ID;
+fpackedswitch  : '.packed-switch' start=INT sLabel+ '.end packed-switch';
+fsparseswitch  : '.sparse-switch' (INT '->' sLabel)* '.end sparse-switch';
 farraydata     : '.array-data' size=INT (sBaseValue)+ '.end array-data';
 
 f10x: op=
@@ -320,7 +314,7 @@ f10x: op=
 fx0t_branch: op=
     ( 'goto'
     | 'goto/16'
-    | 'goto/32' ) target=LABEL
+    | 'goto/32' ) target=sLabel
 	;
 
 f11x_basic: op=
@@ -527,7 +521,7 @@ f21t_branch : op=
     | 'if-ltz'
     | 'if-gez'
     | 'if-gtz'
-    | 'if-lez' )  r1=REGISTER ',' label=LABEL
+    | 'if-lez' )  r1=REGISTER ',' label=sLabel
     ;
 
 f22t_branch: op=
@@ -536,7 +530,7 @@ f22t_branch: op=
     | 'if-lt'
     | 'if-ge'
     | 'if-gt'
-    | 'if-le' ) r1=REGISTER ',' r2=REGISTER ',' label=LABEL
+    | 'if-le' ) r1=REGISTER ',' r2=REGISTER ',' label=sLabel
     ;
 
 f23x_compare: op=
@@ -589,7 +583,7 @@ f4rcc_methodproto: op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend
 fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArrayValue;
 fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
 
-f31t_payload: op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=LABEL;
+f31t_payload: op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=sLabel;
 
 f21c_const_handle: op='const-method-handle' r1=REGISTER ',' methodHandleType=METHOD_HANDLE_TYPE '@' fieldOrMethod=(FIELD_FULL|METHOD_FULL) ;
 f21c_const_type: op='const-method-type' r1=REGISTER ',' proto=METHOD_PROTO ;

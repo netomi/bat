@@ -116,7 +116,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode.get(mnemonic)
 
-        val label = ctx.target.text
+        val label = ctx.target.label.text
         val branchOffset = branchOffset(codeOffset, label)
 
         return BranchInstruction.of(opcode, branchOffset)
@@ -126,7 +126,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode.get(mnemonic)
 
-        val label = ctx.label.text
+        val label = ctx.label.label.text
         val branchOffset = branchOffset(codeOffset, label)
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
@@ -137,7 +137,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode.get(mnemonic)
 
-        val label = ctx.label.text
+        val label = ctx.label.label.text
         val branchOffset = branchOffset(codeOffset, label)
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -432,7 +432,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
-        val label = ctx.label.text
+        val label = ctx.label.label.text
         val payloadOffset = branchOffset(codeOffset, label)
         payloadLabelMapping[label] = codeOffset
 
@@ -463,8 +463,8 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val keys = IntArray(ctx.INT().size)
         ctx.INT().forEachIndexed { index, node -> keys[index] = node.text.toInt() }
 
-        val branchTargets = IntArray(ctx.LABEL().size)
-        ctx.LABEL().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.text) }
+        val branchTargets = IntArray(ctx.sLabel().size)
+        ctx.sLabel().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.label.text) }
 
         return SparseSwitchPayload.of(keys, branchTargets)
     }
@@ -477,8 +477,8 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
         val firstKey = ctx.start.text.toInt()
 
-        val branchTargets = IntArray(ctx.LABEL().size)
-        ctx.LABEL().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.text) }
+        val branchTargets = IntArray(ctx.sLabel().size)
+        ctx.sLabel().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.label.text) }
 
         return PackedSwitchPayload.of(firstKey, branchTargets)
     }
@@ -487,14 +487,14 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val exceptionType = ctx.type.text
         val exceptionTypeIndex = dexComposer.addOrGetTypeIDIndex(exceptionType)
 
-        val handler  = ctx.handle.text
+        val handler  = ctx.handle.label.text
         val handlerOffset = labelMapping[handler]!!
 
         val typeAddrList     = listOf(TypeAddrPair.of(exceptionTypeIndex, handlerOffset))
         val exceptionHandler = EncodedCatchHandler.of(typeAddrList)
 
-        val tryStart = ctx.start.text
-        val tryEnd   = ctx.end.text
+        val tryStart = ctx.start.label.text
+        val tryEnd   = ctx.end.label.text
 
         val startOffset = labelMapping[tryStart]!!
         val endOffset   = labelMapping[tryEnd]!!
@@ -503,13 +503,13 @@ internal class InstructionAssembler internal constructor(            listCtx:   
     }
 
     fun parseCatchAllDirective(ctx: FcatchallContext): Try {
-        val handler  = ctx.handle.text
+        val handler  = ctx.handle.label.text
         val handlerOffset = labelMapping[handler]!!
 
         val exceptionHandler = EncodedCatchHandler.of(handlerOffset)
 
-        val tryStart = ctx.start.text
-        val tryEnd   = ctx.end.text
+        val tryStart = ctx.start.label.text
+        val tryEnd   = ctx.end.label.text
 
         val startOffset = labelMapping[tryStart]!!
         val endOffset   = labelMapping[tryEnd]!!

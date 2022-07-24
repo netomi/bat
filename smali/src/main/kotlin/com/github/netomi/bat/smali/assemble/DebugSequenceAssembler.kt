@@ -16,6 +16,7 @@
 
 package com.github.netomi.bat.smali.assemble
 
+import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.debug.*
 
 internal class DebugSequenceAssembler internal constructor(private val debugInfo: DebugInfo) {
@@ -72,15 +73,30 @@ internal class DebugSequenceAssembler internal constructor(private val debugInfo
         addrRegister = codeOffset
     }
 
-    fun startLocal(registerNum: Int, nameIndex: Int, typeIndex: Int, codeOffset: Int) {
+    fun startLocal(registerNum: Int, nameIndex: Int, typeIndex: Int, sigIndex: Int, codeOffset: Int) {
         val addrDiff = codeOffset - addrRegister
 
         if (addrDiff > 0) {
             debugSequence.add(DebugAdvancePC.of(addrDiff))
         }
-        debugSequence.add(DebugStartLocal.of(registerNum, nameIndex, typeIndex))
+
+        if (sigIndex != NO_INDEX) {
+            debugSequence.add(DebugStartLocalExtended.of(registerNum, nameIndex, typeIndex, sigIndex))
+        } else {
+            debugSequence.add(DebugStartLocal.of(registerNum, nameIndex, typeIndex))
+        }
 
         addrRegister = codeOffset
+    }
+
+    fun restartLocal(registerNum: Int, codeOffset: Int) {
+        val addrDiff = codeOffset - addrRegister
+
+        if (addrDiff > 0) {
+            debugSequence.add(DebugAdvancePC.of(addrDiff))
+        }
+
+        debugSequence.add(DebugRestartLocal.of(registerNum))
     }
 
     fun endLocal(registerNum: Int, codeOffset: Int) {

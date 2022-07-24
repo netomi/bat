@@ -55,6 +55,10 @@ class DebugInfo private constructor(_lineStart:      Int                        
         }
     }
 
+    fun setParameterName(parameterIndex: Int, nameIndex: Int) {
+        parameterNames[parameterIndex] = nameIndex
+    }
+
     override val isEmpty: Boolean
         get() = (parameterNames.isEmpty() || parameterNames.all { it == NO_INDEX }) &&
                 lineStart == 0 && debugSequence.isEmpty()
@@ -103,7 +107,9 @@ class DebugInfo private constructor(_lineStart:      Int                        
 
     fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         for (i in parameterNames.indices) {
-            visitor.visitStringID(dexFile, ArrayElementAccessor(parameterNames, i))
+            if (parameterNames[i] != NO_INDEX) {
+                visitor.visitStringID(dexFile, ArrayElementAccessor(parameterNames, i))
+            }
         }
 
         debugSequence.forEach { it.referencedIDsAccept(dexFile, visitor) }

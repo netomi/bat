@@ -75,20 +75,21 @@ internal class LocalVariableCollector(private val debugState:         MutableMap
             append(".local ")
             append(registerPrinter.formatRegister(registerNum))
             append(", ")
-            val name = dexFile.getStringNullable(nameIndex)
-            if (name != null) {
-                append("\"")
-                append(name)
-                append("\"")
-            } else {
-                append("null")
+
+            append("\"")
+            if (nameIndex != NO_INDEX) {
+                append(dexFile.getString(nameIndex))
+            }
+            append("\"")
+
+            if (typeIndex != NO_INDEX) {
+                append(":")
+                append(dexFile.getType(typeIndex))
             }
 
-            append(":")
-            append(dexFile.getTypeNullable(typeIndex))
             if (sigIndex != NO_INDEX) {
                 append(", \"")
-                append(dexFile.getStringNullable(sigIndex))
+                append(dexFile.getString(sigIndex))
                 append("\"")
             }
         }
