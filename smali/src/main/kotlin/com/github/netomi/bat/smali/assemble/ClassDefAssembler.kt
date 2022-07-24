@@ -115,9 +115,15 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
 
         val annotationSetRefList = AnnotationSetRefList.empty()
         ctx.sParameter().forEach { pCtx ->
-            val param = pCtx.r.text.substring(1).toInt()
+            val parameterNumber = pCtx.r.text.substring(1).toInt()
 
-            while ((annotationSetRefList.annotationSetRefCount + 1) < param) {
+            val parameterIndex = if (method.isStatic) {
+                parameterNumber
+            } else {
+                parameterNumber - 1
+            }
+
+            while (annotationSetRefList.annotationSetRefCount < parameterIndex) {
                 annotationSetRefList.annotationSetRefs.add(AnnotationSetRef.of(AnnotationSet.empty()))
             }
 
