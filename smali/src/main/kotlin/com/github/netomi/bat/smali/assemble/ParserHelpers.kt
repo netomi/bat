@@ -111,6 +111,12 @@ internal fun parseNumber(value: String): Long {
         't',
         'T'   -> parseLong(value.dropLast(1))
         '\''  -> parseChar(value).code.toLong()
+        'f',
+        'F'   -> parseFloat(value.dropLast(1)).toBits().toLong()
+
+        'd',
+        'D'   -> parseDouble(value.dropLast(1)).toBits()
+
         else  -> {
             if (value.contains(".")) {
                 parseDouble(value).toBits()

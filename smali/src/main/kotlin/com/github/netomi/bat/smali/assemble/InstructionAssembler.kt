@@ -177,7 +177,14 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val opcode = DexOpCode.get(mnemonic)
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
-        val value = parseNumber(ctx.cst.text)
+        var value = parseNumber(ctx.cst.text)
+
+        if (mnemonic.contains("high16")) {
+            val shift = if (opcode.targetsWideRegister()) 48 else 16
+            if ((value shr shift) == 0L) {
+                value = value shl shift
+            }
+        }
 
         return LiteralInstruction.of(opcode, value, r1)
     }

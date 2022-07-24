@@ -40,7 +40,7 @@ class IntegrationTest {
         val resource = javaClass.getResource("/junit-tests/TestSuite.smali")
         val resourcePath = File(resource.file).parentFile.toPath()
 
-        val cachePath = resourcePath.resolve("android-data").toFile().deleteRecursively()
+        resourcePath.resolve("android-data").toFile().deleteRecursively()
 
         val dexFile  = DexFile.of(DexFormat.FORMAT_035)
         Assembler(dexFile).assemble(resourcePath)

@@ -338,7 +338,7 @@ fconst_int: op=
     | 'const-wide/16'
     | 'const-wide/32'
     | 'const-wide/high16'
-    | 'const-wide') r1=REGISTER ',' cst=(INT|LONG|BASE_FLOAT|BASE_DOUBLE)
+    | 'const-wide') r1=REGISTER ',' cst=(INT|LONG|BYTE|SHORT|CHAR|BASE_FLOAT|BASE_DOUBLE)
 	;
 
 fconst_string: op=('const-string' | 'const-string/jumbo') r1=REGISTER ',' cst=STRING;
