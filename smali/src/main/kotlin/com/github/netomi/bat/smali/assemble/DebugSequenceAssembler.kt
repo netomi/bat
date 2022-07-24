@@ -109,7 +109,7 @@ internal class DebugSequenceAssembler internal constructor(private val debugInfo
     }
 
     fun end() {
-        if (debugSequence.isNotEmpty()) {
+        if (!debugInfo.isEmpty) {
             debugSequence.add(DebugEndSequence)
         }
     }
