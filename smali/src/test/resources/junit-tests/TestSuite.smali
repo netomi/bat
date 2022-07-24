@@ -24,7 +24,6 @@
                 LStaticFieldInitializerTest;,
                 LAnnotationTests;,
                 LArrayTests;,
-                LAutoFixTests;,
                 LLineTest;,
                 LFormat10x;,
                 LFormat10t;,
