@@ -194,6 +194,8 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                 RULE_f3rc_array        -> instructionAssembler.parseArrayTypeInstructionF3rc(t as F3rc_arrayContext)
                 RULE_f45cc_methodproto -> instructionAssembler.parseMethodProtoInstructionF45cc(t as F45cc_methodprotoContext)
                 RULE_f4rcc_methodproto -> instructionAssembler.parseMethodProtoInstructionF4rcc(t as F4rcc_methodprotoContext)
+                RULE_f35c_custom       -> instructionAssembler.parseCallSiteInstructionF35c(t as F35c_customContext)
+                RULE_f3rc_custom       -> instructionAssembler.parseCallSiteInstructionF3rc(t as F3rc_customContext)
                 RULE_f21c_const_handle -> instructionAssembler.parseMethodHandleInstructionF21c(t as F21c_const_handleContext)
                 RULE_f21c_const_type   -> instructionAssembler.parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
                 RULE_f31t_payload      -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext, codeOffset)

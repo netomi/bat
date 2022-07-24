@@ -204,6 +204,11 @@ class DexFile {
         return callSiteIDs[callSiteIndex]
     }
 
+    fun addCallSiteID(callSiteID: CallSiteID): Int {
+        callSiteIDs.add(callSiteID)
+        return callSiteIDs.size - 1
+    }
+
     val methodHandleCount: Int
         get() = methodHandles.size
 

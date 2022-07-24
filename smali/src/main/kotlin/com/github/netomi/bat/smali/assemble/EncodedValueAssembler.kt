@@ -20,7 +20,6 @@ import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser
-import com.github.netomi.bat.util.Strings
 import org.antlr.v4.runtime.tree.TerminalNode
 
 internal class EncodedValueAssembler constructor(private val dexComposer: DexComposer) {
@@ -58,6 +57,11 @@ internal class EncodedValueAssembler constructor(private val dexComposer: DexCom
                 val (classType, methodName, parameterTypes, returnType) = parseMethodObject(value.text)
                 val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
                 EncodedMethodValue.of(methodIndex)
+            }
+            SmaliLexer.METHOD_PROTO -> {
+                val (_, _, parameterTypes, returnType) = parseMethodObject(value.text)
+                val protoIndex = dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+                EncodedMethodTypeValue.of(protoIndex)
             }
             SmaliLexer.FIELD_FULL -> {
                 val (classType, fieldName, type) = parseFieldObject(value.text)

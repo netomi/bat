@@ -91,7 +91,7 @@ fragment
 FRAGMENT_MEMBER_NAME: FRAGMENT_SIMPLE_NAME | '<' FRAGMENT_SIMPLE_NAME '>' ;
 
 fragment
-FRAGMENT_ID: (ESC_SEQ| ~('\\'|'\r'|'\n'|'\t'|' '|':'|'-'|'='|','|'{'|'}'|'('|')'|'+'|'"'|'\''|'#'|'/'|'.'|';'))+;
+FRAGMENT_ID: (ESC_SEQ| ~('\\'|'\r'|'\n'|'\t'|' '|':'|'-'|'='|','|'{'|'}'|'('|')'|'+'|'"'|'\''|'#'|'/'|'.'|';'|'@'))+;
 
 fragment
 FRAGMENT_METHOD_PROTO: '(' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE)* ')' ('V' | FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
@@ -275,8 +275,8 @@ sInstruction
     | f3rc_array
 	| f45cc_methodproto
 	| f4rcc_methodproto
-	| fmcustomc
-	| fmcustomrc
+	| f35c_custom
+	| f3rc_custom
 	| sLabel
 	| f31t_payload
 	| f21c_const_handle
@@ -577,8 +577,8 @@ f3rc_method: op=
 f45cc_methodproto: op='invoke-polymorphic'  '{' (REGISTER (',' REGISTER)* )? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
 f4rcc_methodproto: op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
 
-fmcustomc  : op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' sArrayValue;
-fmcustomrc : op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' sArrayValue;
+f35c_custom: op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' ID '(' sBaseValue (',' sBaseValue)+ ')' '@' method=METHOD_FULL;
+f3rc_custom: op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' ID '(' sBaseValue (',' sBaseValue)+ ')' '@' method=METHOD_FULL;
 
 f31t_payload: op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=sLabel;
 

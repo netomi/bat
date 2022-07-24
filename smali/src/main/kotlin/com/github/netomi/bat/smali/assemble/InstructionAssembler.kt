@@ -33,6 +33,9 @@ internal class InstructionAssembler internal constructor(            listCtx:   
     private val labelMapping:        MutableMap<String, Int> = LinkedHashMap()
     private val payloadLabelMapping: MutableMap<String, Int> = HashMap()
 
+    private val dexFile: DexFile
+        get() = dexComposer.dexFile
+
     init {
         collectLabels(listCtx)
     }
@@ -431,6 +434,56 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         }
 
         return MethodTypeRefInstruction.of(opcode, protoIndex, r1)
+    }
+
+    fun parseCallSiteInstructionF35c(ctx: F35c_customContext): CallSiteInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val registers = mutableListOf<Int>()
+        ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
+
+        // id is ignored for now
+        //val id = ctx.ID().text
+
+        val encodedValues = mutableListOf<EncodedValue>()
+        ctx.sBaseValue().forEach { encodedValues.add(encodedValueAssembler.parseBaseValue(it)) }
+
+        val (classType, name, parameterTypes, returnType) = parseMethodObject(ctx.method.text)
+        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, name, parameterTypes, returnType)
+        val bootstrapMethodHandleIndex =
+            dexFile.addMethodHandle(MethodHandle.of(MethodHandleType.INVOKE_STATIC, methodIndex))
+
+        val callSite      = CallSite.of(bootstrapMethodHandleIndex, *encodedValues.toTypedArray())
+        val callSiteIndex = dexFile.addCallSiteID(CallSiteID.of(callSite))
+
+        return CallSiteInstruction.of(opcode, callSiteIndex, *registers.toIntArray())
+    }
+
+    fun parseCallSiteInstructionF3rc(ctx: F3rc_customContext): CallSiteInstruction {
+        val mnemonic = ctx.op.text
+        val opcode = DexOpCode.get(mnemonic)
+
+        val rStart = registerInfo.registerNumber(ctx.rstart.text)
+        val rEnd   = registerInfo.registerNumber(ctx.rend.text)
+
+        val registers = (rStart..rEnd).toIntArray()
+
+        // id is ignored for now
+        //val id = ctx.ID().text
+
+        val encodedValues = mutableListOf<EncodedValue>()
+        ctx.sBaseValue().forEach { encodedValues.add(encodedValueAssembler.parseBaseValue(it)) }
+
+        val (classType, name, parameterTypes, returnType) = parseMethodObject(ctx.method.text)
+        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, name, parameterTypes, returnType)
+        val bootstrapMethodHandleIndex =
+            dexFile.addMethodHandle(MethodHandle.of(MethodHandleType.INVOKE_STATIC, methodIndex))
+
+        val callSite      = CallSite.of(bootstrapMethodHandleIndex, *encodedValues.toTypedArray())
+        val callSiteIndex = dexFile.addCallSiteID(CallSiteID.of(callSite))
+
+        return CallSiteInstruction.of(opcode, callSiteIndex, *registers)
     }
 
     fun parsePayloadInstructionF31t(ctx: F31t_payloadContext, codeOffset: Int): PayloadInstruction {
