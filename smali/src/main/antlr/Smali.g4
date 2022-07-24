@@ -288,10 +288,7 @@ sInstruction
 
 fline: '.line' line=INT;
 
-fstartlocal: '.local' r=REGISTER ','
-    ( name=STRING
-    | name=STRING ':' type=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE)
-    ) (',' sig=STRING)? ;
+fstartlocal: '.local' r=REGISTER ',' name=STRING (':' type=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE))? (',' sig=STRING)? ;
 
 fendlocal      : '.end local' r=REGISTER;
 frestart       : '.restart local' r=REGISTER;

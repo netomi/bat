@@ -108,7 +108,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     }
 
                     val sigIndex = if (c.sig != null) {
-                        dexComposer.addOrGetStringIDIndex(c.sig.text)
+                        dexComposer.addOrGetStringIDIndex(c.sig.text.removeSurrounding("\""))
                     } else {
                         NO_INDEX
                     }
