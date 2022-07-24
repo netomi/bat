@@ -243,8 +243,22 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
         tryElements.sortBy { it.startAddr }
 
+        val flattenedElements = mutableListOf<Try>()
+        var lastTry: Try? = null
+        for (tryElement in tryElements) {
+            if (lastTry != null &&
+                lastTry.startAddr == tryElement.startAddr &&
+                lastTry.endAddr   == tryElement.endAddr) {
+                flattenedElements.removeLast()
+                flattenedElements.add(Try.of(lastTry.startAddr, lastTry.endAddr, lastTry.catchHandler.add(tryElement.catchHandler)))
+            } else {
+                flattenedElements.add(tryElement)
+            }
+            lastTry = tryElement
+        }
+
         val sequence = mutableListOf<Seq>()
-        tryElements.forEach {
+        flattenedElements.forEach {
             sequence.add(Seq(it.startAddr, SeqType.START, it))
             sequence.add(Seq(it.endAddr, SeqType.END, it))
         }
@@ -274,8 +288,10 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                             nonOverlappingTries.add(currentTry)
                             null
                         } else {
-                            val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
-                            nonOverlappingTries.add(endingTry)
+                            if (currentTry.startAddr < seq.addr - 1) {
+                                val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
+                                nonOverlappingTries.add(endingTry)
+                            }
 
                             val handler = currentTry.catchHandler.subtract(seq.tryElement.catchHandler)
                             val startingTry = Try.of(seq.addr, currentTry.endAddr, handler)
