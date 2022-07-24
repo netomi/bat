@@ -88,13 +88,13 @@ class CountingDexDataOutput : DexDataOutput {
         offset += bytes
     }
 
-    override fun writeUleb128(param: Int) {
-        var value = param
+    override fun writeUleb128(value: Int) {
+        var currValue = value
         var bytesWritten = 0
         do {
-            value = value shr 7
+            currValue = currValue shr 7
             bytesWritten++
-        } while (value != 0)
+        } while (currValue != 0)
         offset += bytesWritten
     }
 
@@ -102,14 +102,14 @@ class CountingDexDataOutput : DexDataOutput {
         writeUleb128(value + 1)
     }
 
-    override fun writeSleb128(param: Int) {
-        var value = param
+    override fun writeSleb128(value: Int) {
+        var currValue = value
         var bytesWritten = 0
         while (true) {
-            val b = (value and 0x7f).toByte()
-            value = value shr 7
-            if (value == 0  && b.toInt() and 0x40 == 0 ||
-                value == -1 && b.toInt() and 0x40 != 0
+            val b = (currValue and 0x7f).toByte()
+            currValue = currValue shr 7
+            if (currValue ==  0 && b.toInt() and 0x40 == 0 ||
+                currValue == -1 && b.toInt() and 0x40 != 0
             ) {
                 bytesWritten++
                 break

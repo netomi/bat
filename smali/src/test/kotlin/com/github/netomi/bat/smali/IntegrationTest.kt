@@ -18,18 +18,13 @@ package com.github.netomi.bat.smali
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
-import com.github.netomi.bat.dexfile.TypeList
-import com.github.netomi.bat.dexfile.io.DexFileReader
 import com.github.netomi.bat.dexfile.io.DexFileWriter
-import com.google.common.primitives.Ints
+import org.junit.jupiter.api.Assumptions
 import java.io.File
 import java.io.IOException
 import java.nio.file.Path
-import java.util.TreeSet
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.absolutePathString
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.inputStream
 import kotlin.io.path.outputStream
 import kotlin.test.Test
 

@@ -366,7 +366,7 @@ internal data class RegisterInfo(val registers: Int, val locals: Int, val insSiz
     fun parameterNumber(register: String): Int {
         return when (register.first()) {
             'p' -> {
-                return register.substring(1).toInt()
+                register.substring(1).toInt()
             }
 
             else -> throw RuntimeException("unknown register format $register")
