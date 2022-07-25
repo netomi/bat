@@ -55,7 +55,7 @@ class DexDumpCommand : Runnable {
             FileInputStream(this).use { `is` ->
                 val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
                 val reader  = DexFileReader(`is`)
-                val dexFile = DexFile()
+                val dexFile = DexFile.empty()
                 reader.visitDexFile(dexFile)
 
                 println("Processing '$name'...")

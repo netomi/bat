@@ -39,7 +39,7 @@ class FullDumpTest {
             javaClass.getResourceAsStream("/dex/$testFile")!!.use { `is` ->
                 val reader = DexFileReader(`is`)
 
-                val dexFile = DexFile()
+                val dexFile = DexFile.empty()
                 reader.visitDexFile(dexFile)
 
                 val baos = ByteArrayOutputStream()

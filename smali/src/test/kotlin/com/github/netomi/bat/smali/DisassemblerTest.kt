@@ -34,7 +34,7 @@ class DisassemblerTest {
             println("checking $testFile...")
 
             val reader = DexFileReader(`is`, true)
-            val dexFile = DexFile()
+            val dexFile = DexFile.empty()
             reader.visitDexFile(dexFile)
 
             val outputStreamFactory = TestOutputStreamFactory()

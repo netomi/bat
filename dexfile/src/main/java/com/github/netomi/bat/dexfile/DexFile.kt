@@ -19,18 +19,12 @@ import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.visitor.*
 import java.util.*
 
-class DexFile {
+class DexFile private constructor() {
 
     private var dexFormatInternal: DexFormat? = null
 
     val dexFormat: DexFormat?
         get() = if (header != null) header?.dexFormat else dexFormatInternal
-
-    /**
-     * Used to create a DexFile instance used to read in dex files.
-     * Use DexFile.of(DexFormat) to create an instance for an explicit dex version.
-     */
-    constructor()
 
     internal constructor(format: DexFormat): this() {
         dexFormatInternal = format
@@ -316,13 +310,22 @@ class DexFile {
     }
 
     override fun toString(): String {
-        // TODO: implement a proper version.
         val sb = StringBuilder()
-        sb.append(header)
+
+        sb.append("DexFile[format=${dexFormat},stringIDs=${stringIDCount} items," +
+                  "typeIDs=${typeIDCount} items,protoIDs=${protoIDCount} items," +
+                  "fieldIDs=${fieldIDCount} items,methodIDs=${methodIDCount} items," +
+                  "classDefs=${classDefCount} items,callsiteIDs=${callSiteIDCount} items," +
+                  "methodHandles=${methodHandleCount} items]")
+
         return sb.toString()
     }
 
     companion object {
+        fun empty(): DexFile {
+            return DexFile()
+        }
+
         @JvmStatic
         fun of(dexFormat: DexFormat): DexFile {
             return DexFile(dexFormat)

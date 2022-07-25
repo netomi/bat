@@ -54,7 +54,7 @@ class BakSmaliCommand : Runnable {
                         Files.createDirectories(outputPath)
                     }
 
-                    val dexFile = DexFile()
+                    val dexFile = DexFile.empty()
                     val reader  = DexFileReader(`is`, false)
 
                     printVerbose("Disassembling '$name' into directory $outputPath ...")
