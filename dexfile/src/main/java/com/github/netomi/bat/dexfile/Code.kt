@@ -132,7 +132,6 @@ class Code private constructor(
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeAlignmentPadding(dataAlignment)
         output.writeUnsignedShort(registersSize)
         output.writeUnsignedShort(insSize)
         output.writeUnsignedShort(outsSize)
