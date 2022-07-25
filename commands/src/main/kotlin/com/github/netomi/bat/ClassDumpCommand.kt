@@ -21,7 +21,7 @@ import picocli.CommandLine
 import java.io.*
 
 /**
- * Command-line tool to dump dex files.
+ * Command-line tool to dump class files.
  */
 @CommandLine.Command(
     name                 = "bat-classdump",

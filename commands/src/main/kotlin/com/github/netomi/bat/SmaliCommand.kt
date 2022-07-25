@@ -23,7 +23,7 @@ import picocli.CommandLine
 import java.io.File
 
 /**
- * Command-line tool to disassemble dex files in smali format.
+ * Command-line tool to assemble dex files from smali input files.
  */
 @CommandLine.Command(
     name                 = "bat-smali",
