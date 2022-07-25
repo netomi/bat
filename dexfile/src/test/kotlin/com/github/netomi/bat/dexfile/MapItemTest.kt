@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.util.function.Function
 
 class MapItemTest : DexContentTest<MapItem>() {
@@ -31,6 +32,15 @@ class MapItemTest : DexContentTest<MapItem>() {
 
     override val factoryMethod: Function<DexDataInput, MapItem>
         get() = Function { input -> MapItem.readContent(input) }
+
+    @Test
+    fun setter() {
+        assertThrows<IllegalArgumentException> { of(0, -1) }
+        assertThrows<IllegalArgumentException> {
+            val mapItem = of(0, 0)
+            mapItem.offset = -1
+        }
+    }
 
     @Test
     fun getter() {

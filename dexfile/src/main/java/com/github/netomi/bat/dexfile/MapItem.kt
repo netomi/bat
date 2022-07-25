@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -26,22 +27,22 @@ import java.util.*
  *
  * @see [map item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.map-item)
  */
-class MapItem : DexContent {
+class MapItem private constructor(_type: Int = 0, _size: Int = 0, _offset: Int = 0): DexContent() {
 
-    var type: Int = 0   // ushort
+    var type: Int = _type
         private set
 
-    var size: Int = 0   // uint
-        internal set
+    var size: Int = _size
+        internal set(value) {
+            Preconditions.checkArgument(value >= 0, "size must not be negative")
+            field = value
+        }
 
-    var offset: Int = 0 // uint
-        internal set
-
-    private constructor()
-    private constructor(type: Int, size: Int) {
-        this.type = type
-        this.size = size
-    }
+    var offset: Int = _offset
+        internal set(value) {
+            Preconditions.checkArgument(value >= 0, "offset must not be negative")
+            field = value
+        }
 
     override fun read(input: DexDataInput) {
         type = input.readUnsignedShort()
@@ -61,8 +62,9 @@ class MapItem : DexContent {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         val o = other as MapItem
-        return type == o.type &&
-               size == o.size
+        return type   == o.type &&
+               size   == o.size &&
+               offset == o.offset
     }
 
     override fun hashCode(): Int {
@@ -74,12 +76,11 @@ class MapItem : DexContent {
     }
 
     companion object {
-        @JvmStatic
         fun of(type: Int, size: Int = 0): MapItem {
+            Preconditions.checkArgument(size >= 0, "size must not be negative")
             return MapItem(type, size)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): MapItem {
             val mapItem = MapItem()
             mapItem.read(input)
