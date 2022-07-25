@@ -31,7 +31,7 @@ import com.github.netomi.bat.util.Primitives
 abstract class EncodedValue {
     abstract val valueType: EncodedValueType
 
-    abstract fun readValue(input: DexDataInput, valueArg: Int)
+    internal abstract fun readValue(input: DexDataInput, valueArg: Int)
 
     protected fun writeType(output: DexDataOutput, valueArg: Int): Int {
         val typeAndArg = valueArg shl 5 or valueType.value
@@ -41,12 +41,12 @@ abstract class EncodedValue {
 
     protected abstract fun writeType(output: DexDataOutput): Int
 
-    fun write(output: DexDataOutput) {
+    internal fun write(output: DexDataOutput) {
         val valueArg = writeType(output)
         writeValue(output, valueArg)
     }
 
-    abstract fun writeValue(output: DexDataOutput, valueArg: Int)
+    internal abstract fun writeValue(output: DexDataOutput, valueArg: Int)
 
     abstract fun accept(dexFile: DexFile, visitor: EncodedValueVisitor)
 

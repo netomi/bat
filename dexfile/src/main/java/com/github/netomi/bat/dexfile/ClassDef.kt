@@ -262,10 +262,6 @@ class ClassDef private constructor(
         classDataAccept(dexFile, allMethods(filterMethodsByName(nameExpression, visitor)))
     }
 
-    fun interfaceListAccept(dexFile: DexFile, visitor: TypeListVisitor) {
-        visitor.visitTypeList(dexFile, interfaces)
-    }
-
     fun interfacesAccept(dexFile: DexFile, visitor: TypeVisitor) {
         interfaces.typesAccept(dexFile, visitor)
     }

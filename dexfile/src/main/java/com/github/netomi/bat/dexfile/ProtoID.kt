@@ -17,7 +17,6 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
@@ -34,7 +33,9 @@ import java.util.*
     type          = TYPE_PROTO_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex: Int = NO_INDEX, private var _parameters: TypeList = TypeList.empty()) : DataItem() {
+class ProtoID private constructor(            _shortyIndex:     Int      = NO_INDEX,
+                                              _returnTypeIndex: Int      = NO_INDEX,
+                                  private var _parameters:      TypeList = TypeList.empty()) : DataItem() {
 
     var shortyIndex: Int = _shortyIndex
         internal set
@@ -99,7 +100,7 @@ class ProtoID private constructor(_shortyIndex: Int = NO_INDEX, _returnTypeIndex
 
     fun parameterTypesAccept(dexFile: DexFile, visitor: TypeVisitor) {
         for (i in 0 until _parameters.typeCount) {
-            visitor.visitType(dexFile, _parameters, i, _parameters.getType(dexFile, i))
+            visitor.visitType(dexFile, _parameters, i, _parameters.getTypeIndex(i), _parameters.getType(dexFile, i))
         }
     }
 

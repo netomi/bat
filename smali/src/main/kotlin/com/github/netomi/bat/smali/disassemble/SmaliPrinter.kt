@@ -59,12 +59,10 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             printer.println(".source \"$sourceFile\"")
         }
 
-        classDef.interfaceListAccept(dexFile) { df, typeList ->
-            if (!typeList.isEmpty) {
-                printer.println()
-                printer.println("# interfaces")
-                classDef.interfacesAccept(df) { _, _, _, type: String -> printer.println(".implements $type") }
-            }
+        if (!classDef.interfaces.isEmpty) {
+            printer.println()
+            printer.println("# interfaces")
+            classDef.interfacesAccept(dexFile) { _, _, _, _, type: String -> printer.println(".implements $type") }
         }
 
         classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, this)
@@ -77,25 +75,25 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             printer.println()
             printer.println()
             printer.println("# static fields")
-            classData.staticFieldsAccept(dexFile, classDef, joinedByFieldConsumer { _, _ -> printer.println() })
+            classData.staticFieldsAccept(dexFile, classDef, this.joinedByFieldConsumer { _, _ -> printer.println() })
         }
         if (classData.instanceFieldCount > 0) {
             printer.println()
             printer.println()
             printer.println("# instance fields")
-            classData.instanceFieldsAccept(dexFile, classDef, joinedByFieldConsumer { _, _ -> printer.println() })
+            classData.instanceFieldsAccept(dexFile, classDef, this.joinedByFieldConsumer { _, _ -> printer.println() })
         }
         if (classData.directMethodCount > 0) {
             printer.println()
             printer.println()
             printer.println("# direct methods")
-            classData.directMethodsAccept(dexFile, classDef, joinedByMethodConsumer { _, _ -> printer.println() })
+            classData.directMethodsAccept(dexFile, classDef, this.joinedByMethodConsumer { _, _ -> printer.println() })
         }
         if (classData.virtualMethodCount > 0) {
             printer.println()
             printer.println()
             printer.println("# virtual methods")
-            classData.virtualMethodsAccept(dexFile, classDef, joinedByMethodConsumer { _, _ -> printer.println() })
+            classData.virtualMethodsAccept(dexFile, classDef, this.joinedByMethodConsumer { _, _ -> printer.println() })
         }
     }
 
@@ -114,7 +112,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
 
         if (field.isStatic) {
             val detector = InitializationDetector(field.getName(dexFile), field.getType(dexFile))
-            classDef.methodsAccept(dexFile, "<clinit>", allCode(AllInstructionsVisitor(detector)))
+            classDef.methodsAccept(dexFile, "<clinit>", allCode(allInstructions(detector)))
 
             if (!detector.fieldIsSetInStaticInitializer || !field.modifiers.contains(FieldModifier.FINAL)) {
                 field.staticValueAccept(dexFile, classDef, index, EncodedValuePrinter(printer, null, " = "))
@@ -141,7 +139,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
 
         // print code.
         printer.levelUp()
-        if (method.code != null && !method.isAbstract) {
+        if (!method.isAbstract && !method.code.isEmpty) {
             method.codeAccept(dexFile, classDef, this)
         } else if (!classDef.annotationsDirectory.isEmpty) {
             var registerIndex = if (method.isStatic) 0 else 1
@@ -230,7 +228,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             printer.println()
             printer.println()
             printer.println("# annotations")
-            annotationSet.accept(dexFile, classDef, joinedByAnnotationConsumer { _, _ -> printer.println() })
+            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
         }
     }
 
@@ -238,14 +236,14 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         val annotationCount = annotationSet.annotationCount
         if (annotationCount > 0) {
             printer.levelUp()
-            annotationSet.accept(dexFile, classDef, joinedByAnnotationConsumer { _, _ -> printer.println() })
+            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printer.levelDown()
             printer.println(".end field")
         }
     }
 
     override fun visitMethodAnnotationSet(dexFile: DexFile, classDef: ClassDef, methodAnnotation: MethodAnnotation, annotationSet: AnnotationSet) {
-        annotationSet.accept(dexFile, classDef, joinedByAnnotationConsumer { _, _ -> printer.println() } )
+        annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() } )
     }
 
     override fun visitParameterAnnotationSet(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {

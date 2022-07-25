@@ -23,6 +23,10 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TryVisitor
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashSet
 
 /**
  * A class representing a code item inside a dex file.
@@ -42,10 +46,16 @@ class Code private constructor(
     _debugInfo:        DebugInfo                      = DebugInfo.empty()) : DataItem() {
 
     var registersSize = _registersSize
-        internal set
+        internal set(value) {
+            assert(registersSize >= 0)
+            field = value
+        }
 
     var insSize = _insSize
-        internal set
+        internal set(value) {
+            assert(value >= 0)
+            field = value
+        }
 
     var outsSize = _outsSize
         set(value) {
@@ -67,6 +77,10 @@ class Code private constructor(
 
     override val isEmpty: Boolean
         get() = insnsSize == 0
+
+    internal fun sort() {
+        tryList.sortBy { it.startAddr }
+    }
 
     override fun read(input: DexDataInput) {
         registersSize   = input.readUnsignedShort()
@@ -188,8 +202,34 @@ class Code private constructor(
         }
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        val o = other as Code
+
+        return registersSize == o.registersSize &&
+               insSize       == o.insSize       &&
+               outsSize      == o.outsSize      &&
+               tryList       == o.tryList       &&
+               debugInfo     == o.debugInfo     &&
+               insns.contentEquals(o.insns)
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(registersSize, insSize, outsSize, insns.contentHashCode(), tryList, debugInfo)
+    }
+
+    override fun toString(): String {
+        return "Code[registers=%d,ins=%d,outs=%d,insn=%d code units]".format(registersSize, insSize, outsSize, insSize)
+    }
+
     companion object {
         private val EMPTY_INSTRUCTIONS = ShortArray(0)
+
+        fun empty(): Code {
+            return Code()
+        }
 
         fun of(registersSize: Int, insSize: Int, outsSize: Int): Code {
             return Code(registersSize, insSize, outsSize)

@@ -13,14 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.*;
+import com.github.netomi.bat.dexfile.ClassDef
+import com.github.netomi.bat.dexfile.Code
+import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-/**
- * @author Thomas Neidhart
- */
-public interface CodeVisitor
-{
-    void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code);
+fun allInstructions(visitor: InstructionVisitor): CodeVisitor {
+    return CodeVisitor { dexFile, classDef, method, code -> code.instructionsAccept(dexFile, classDef, method, visitor) }
+}
+
+fun interface CodeVisitor {
+    fun visitCode(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code)
 }

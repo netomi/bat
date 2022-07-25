@@ -13,12 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.value.AnnotationElement;
+import com.github.netomi.bat.dexfile.CallSiteID
+import com.github.netomi.bat.dexfile.DexFile
 
-public interface AnnotationElementVisitor
-{
-    void visitAnnotationElement(DexFile dexFile, AnnotationElement element);
+fun interface CallSiteIDVisitor {
+    fun visitCallSiteID(dexFile: DexFile, index: Int, callSiteID: CallSiteID)
 }

@@ -13,19 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.TypeList;
+import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.MethodHandle
 
-/**
- * This interface specifies the methods for a visitor of {@code TypeList}
- * instances as contained inside {@code ClassDef} instances and {@code ProtoID}
- * instances.
- *
- * @author Thomas Neidhart
- */
-public interface TypeListVisitor
-{
-    void visitTypeList(DexFile dexFile, TypeList typeList);
+fun interface MethodHandleVisitor {
+    fun visitMethodHandle(dexFile: DexFile, index: Int, methodHandle: MethodHandle)
 }

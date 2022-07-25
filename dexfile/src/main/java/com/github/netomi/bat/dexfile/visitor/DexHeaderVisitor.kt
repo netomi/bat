@@ -13,12 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.DexHeader;
+import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.DexHeader
 
-public interface DexHeaderVisitor
-{
-    void visitHeader(DexFile dexFile, DexHeader header);
+fun interface DexHeaderVisitor {
+    fun visitHeader(dexFile: DexFile, header: DexHeader)
 }

@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.debug.DebugInfo
 
-interface DataItemVisitor {
+internal interface DataItemVisitor {
     fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {
         throw RuntimeException("Need to implement in class '${this.javaClass.name}'.")
     }

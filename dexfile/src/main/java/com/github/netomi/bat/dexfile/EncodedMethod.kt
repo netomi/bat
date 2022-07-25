@@ -29,7 +29,9 @@ import java.util.*
  *
  * @see [encoded method @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-method-format)
  */
-class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFlags: Int = 0): EncodedMember(_accessFlags) {
+class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
+                                        _accessFlags: Int = 0,
+                                        _code       : Code = Code.empty()): EncodedMember(_accessFlags) {
 
     private var deltaMethodIndex = 0
 
@@ -42,7 +44,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     var codeOffset = 0
         private set
 
-    var code: Code? = null
+    var code: Code = _code
 
     fun getMethodID(dexFile: DexFile): MethodID {
         return dexFile.getMethodID(methodIndex)
@@ -85,9 +87,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
         get() = isStatic || isPrivate || isConstructor
 
     internal fun sort() {
-        if (code != null) {
-            code!!.tryList.sortBy { it.startAddr }
-        }
+        code.sort()
     }
 
     override fun read(input: DexDataInput) {
@@ -100,7 +100,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
         if (codeOffset != 0) {
             input.offset = codeOffset
             code = Code.readItem(input)
-            code?.readLinkedDataItems(input)
+            code.readLinkedDataItems(input)
         }
     }
 
@@ -129,24 +129,20 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     }
 
     fun codeAccept(dexFile: DexFile, classDef: ClassDef, visitor: CodeVisitor) {
-        if (code != null) {
+        if (!isAbstract) {
             visitor.visitCode(dexFile, classDef, this, code)
         }
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        if (code != null) {
-            visitor.visitCode(dexFile, this, code!!)
-            code!!.dataItemsAccept(dexFile, visitor)
-        }
+        visitor.visitCode(dexFile, this, code)
+        code.dataItemsAccept(dexFile, visitor)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
     {
         visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
-        if (code != null) {
-            code!!.referencedIDsAccept(dexFile, visitor)
-        }
+        code.referencedIDsAccept(dexFile, visitor)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -165,7 +161,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     }
 
     override fun toString(): String {
-        return "EncodedMethod[methodIndex=%d,accessFlags=%04x,code=%d]".format(methodIndex, accessFlags, code?.insSize)
+        return "EncodedMethod[methodIndex=%d,accessFlags=%04x,code=%d units]".format(methodIndex, accessFlags, code.insSize)
     }
 
     companion object {

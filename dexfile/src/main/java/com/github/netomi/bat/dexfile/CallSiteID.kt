@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.visitor.CallSiteVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
@@ -60,6 +61,10 @@ class CallSiteID private constructor() : DataItem() {
 
     override fun write(output: DexDataOutput) {
         output.writeInt(callSiteOffset)
+    }
+
+    fun accept(dexFile: DexFile, visitor: CallSiteVisitor) {
+        callSite.accept(dexFile, visitor)
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

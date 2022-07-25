@@ -19,9 +19,9 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.value.visitor.filterByStartIndex
-import com.github.netomi.bat.dexfile.visitor.AllInstructionsVisitor
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.visitor.allCode
+import com.github.netomi.bat.dexfile.visitor.allInstructions
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.smali.disassemble.TryCatchPrinter.printTryCatchLabels
 import com.github.netomi.bat.smali.disassemble.TryCatchPrinter.printTryEndLabel
@@ -110,7 +110,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
 
         if (methodID.getName(dexFile).startsWith("access$")) {
             val methodFollower = AccessMethodFollower()
-            methodID.accept(dexFile, allCode(AllInstructionsVisitor(methodFollower)))
+            methodID.accept(dexFile, allCode(allInstructions(methodFollower)))
             if (methodFollower.explanation != null) {
                 methodFollowerExplanation = "# " + methodFollower.explanation
             }

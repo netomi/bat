@@ -84,7 +84,7 @@ class TypeList private constructor() : DataItem(), Comparable<TypeList> {
 
     fun typesAccept(dexFile: DexFile, visitor: TypeVisitor) {
         for (i in typeList.indices) {
-            visitor.visitType(dexFile, this, i, dexFile.getTypeID(typeList[i]).getType(dexFile))
+            visitor.visitType(dexFile, this, i, typeList[i], dexFile.getTypeID(typeList[i]).getType(dexFile))
         }
     }
 

@@ -64,7 +64,7 @@ class ParameterAnnotation private constructor(
         output.writeInt(annotationsOffset)
     }
 
-    fun accept(dexFile: DexFile?, classDef: ClassDef?, visitor: AnnotationSetVisitor) {
+    fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
         visitor.visitParameterAnnotationSet(dexFile, classDef, this, annotationSetRefList)
     }
 

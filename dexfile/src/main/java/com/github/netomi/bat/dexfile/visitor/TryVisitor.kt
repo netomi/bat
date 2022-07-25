@@ -13,14 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.*;
+import com.github.netomi.bat.dexfile.*
 
-/**
- * @author Thomas Neidhart
- */
-public interface TryVisitor
-{
-    void visitTry(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code, int index, Try tryObject);
+fun interface TryVisitor {
+    fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryElement: Try)
 }

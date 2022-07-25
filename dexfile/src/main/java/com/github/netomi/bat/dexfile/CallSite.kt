@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.value.EncodedMethodHandleValue
 import com.github.netomi.bat.dexfile.value.EncodedMethodTypeValue
 import com.github.netomi.bat.dexfile.value.EncodedStringValue
 import com.github.netomi.bat.dexfile.value.EncodedValue
+import com.github.netomi.bat.dexfile.visitor.CallSiteVisitor
 import com.google.common.base.Preconditions
 
 /**
@@ -48,6 +49,10 @@ class CallSite private constructor() : EncodedArray() {
 
     fun getMethodType(dexFile: DexFile): ProtoID {
         return methodType.getProtoID(dexFile)
+    }
+
+    fun accept(dexFile: DexFile, visitor: CallSiteVisitor) {
+        visitor.visitCallSite(dexFile, this)
     }
 
     override fun toString(): String {

@@ -13,22 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.*;
-import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor;
+import com.github.netomi.bat.dexfile.CallSite
+import com.github.netomi.bat.dexfile.DexFile
 
-public class AllInstructionsVisitor
-implements   CodeVisitor
-{
-    private final InstructionVisitor visitor;
-
-    public AllInstructionsVisitor(InstructionVisitor visitor) {
-        this.visitor = visitor;
-    }
-
-    @Override
-    public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
-        code.instructionsAccept(dexFile, classDef, method, visitor);
-    }
+fun interface CallSiteVisitor {
+    fun visitCallSite(dexFile: DexFile, callSite: CallSite)
 }

@@ -224,7 +224,9 @@ class DexFile private constructor() {
     }
 
     fun headerAccept(visitor: DexHeaderVisitor) {
-        visitor.visitHeader(this, header)
+        if (header != null) {
+            visitor.visitHeader(this, header!!)
+        }
     }
 
     fun classDefsAccept(visitor: ClassDefVisitor) {
@@ -243,7 +245,7 @@ class DexFile private constructor() {
         callSiteIDs.forEachIndexed { index, callSiteID -> visitor.visitCallSiteID(this, index, callSiteID) }
     }
 
-    fun dataItemsAccept(visitor: DataItemVisitor) {
+    internal fun dataItemsAccept(visitor: DataItemVisitor) {
         if (header != null) {
             visitor.visitHeader(this, header!!)
         }

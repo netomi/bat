@@ -13,19 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor;
+package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.ClassDef;
-import com.github.netomi.bat.dexfile.DexFile;
-import com.github.netomi.bat.dexfile.annotation.*;
+import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.value.AnnotationElement
 
-/**
- * This interface specifies the methods for a visitor of {@code AnnotationsDirectory}
- * instances as contained inside {@code ClassDef} instances.
- *
- * @author Thomas Neidhart
- */
-public interface AnnotationsDirectoryVisitor
-{
-    void visitAnnotationsDirectory(DexFile dexFile, ClassDef classDef, AnnotationsDirectory annotationsDirectory);
+fun interface AnnotationElementVisitor {
+    fun visitAnnotationElement(dexFile: DexFile, element: AnnotationElement)
 }

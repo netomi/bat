@@ -109,7 +109,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         printer.println("  type          : '" + method.getDescriptor(dexFile) + "'")
         printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(method.accessFlags, DexAccessFlags.Target.METHOD))
 
-        if (method.code != null) {
+        if (!method.code.isEmpty) {
             method.codeAccept(dexFile, classDef, this)
         } else {
             printer.println("  code          : (none)")
@@ -204,7 +204,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         }
     }
 
-    override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, type: String) {
+    override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: String) {
         printer.println("#%-14d : '%s'".format(index, type))
     }
 

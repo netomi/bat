@@ -35,11 +35,11 @@ abstract class DexContent {
      *
      * @param output the output stream to write to.
      */
-    abstract fun write(output: DexDataOutput)
+    internal abstract fun write(output: DexDataOutput)
 
-    open fun readLinkedDataItems(input: DexDataInput) {}
+    internal open fun readLinkedDataItems(input: DexDataInput) {}
 
-    open fun updateOffsets(dataItemMap: DataItem.Map) {}
+    internal open fun updateOffsets(dataItemMap: DataItem.Map) {}
 
     /**
      * Applies the given [DataItemVisitor] to all [DataItem]s
@@ -48,5 +48,5 @@ abstract class DexContent {
      * @param dexFile the [DexFile] associated with this instance.
      * @param visitor the visitor to apply.
      */
-    open fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {}
+    internal open fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {}
 }
