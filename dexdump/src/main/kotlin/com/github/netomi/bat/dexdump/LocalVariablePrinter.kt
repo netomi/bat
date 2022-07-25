@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.debug.*
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
 import com.github.netomi.bat.util.Primitives
 
@@ -48,20 +49,15 @@ internal class LocalVariablePrinter constructor(
         val protoID    = method.getProtoID(dexFile)
         val parameters = protoID.parameters
 
-        debugInfo?.apply {
+        debugInfo.apply {
             var i = 0
-            while (i < parameterCount && register < code.registersSize) {
+            while (i < parameterCount && i < parameters.typeCount && register < code.registersSize) {
                 val parameterName = getParameterName(dexFile, i)
-                val parameterType = if (i < parameters.typeCount) parameters.getType(dexFile, i) else null
+                val parameterType = parameters.getType(dexFile, i)
                 variableInfos[register] = LocalVariableInfo(parameterName, parameterType, null)
 
-                // TODO: extract into util class.
-                if (parameterType == "J" || parameterType == "D") {
-                    register++
-                }
-
                 i++
-                register++
+                register += DexClasses.getArgumentSizeForType(parameterType)
             }
         }
     }

@@ -84,9 +84,9 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX, _accessFla
     val isDirectMethod: Boolean
         get() = isStatic || isPrivate || isConstructor
 
-    internal fun sort(dexFile: DexFile) {
+    internal fun sort() {
         if (code != null) {
-            code!!.tries.sortBy { it.startAddr }
+            code!!.tryList.sortBy { it.startAddr }
         }
     }
 

@@ -29,6 +29,6 @@ implements   CodeVisitor
 
     @Override
     public void visitCode(DexFile dexFile, ClassDef classDef, EncodedMethod method, Code code) {
-        code.instructionsAccept(dexFile, classDef, method, code, visitor);
+        code.instructionsAccept(dexFile, classDef, method, visitor);
     }
 }

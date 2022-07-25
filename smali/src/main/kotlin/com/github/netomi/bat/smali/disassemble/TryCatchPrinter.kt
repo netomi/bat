@@ -25,7 +25,7 @@ internal object TryCatchPrinter {
     fun printTryCatchLabels(code: Code, offset: Int, printer: IndentingPrinter) {
         val labels: MutableSet<String> = HashSet()
 
-        for (currentTry in code.tries) {
+        for (currentTry in code.tryList) {
             if (currentTry.startAddr == offset) {
                 labels.add(":try_start_" + Integer.toHexString(offset))
             }
@@ -49,7 +49,7 @@ internal object TryCatchPrinter {
 
     @JvmStatic
     fun printTryEndLabel(dexFile: DexFile, code: Code, offset: Int, instructionLength: Int, printer: IndentingPrinter) {
-        for (currentTry in code.tries) {
+        for (currentTry in code.tryList) {
             if (currentTry.endAddr == offset + instructionLength - 1) {
                 printer.println(":try_end_" + Integer.toHexString(offset + instructionLength))
                 val catchHandler = currentTry.catchHandler

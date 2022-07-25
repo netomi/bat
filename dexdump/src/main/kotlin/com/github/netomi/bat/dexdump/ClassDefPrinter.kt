@@ -90,13 +90,13 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         printer.levelDown()
     }
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, encodedField: EncodedField) {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
-        printer.println("  name          : '" + encodedField.getName(dexFile) + "'")
-        printer.println("  type          : '" + encodedField.getType(dexFile) + "'")
-        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(encodedField.accessFlags, DexAccessFlags.Target.FIELD))
+        printer.println("  name          : '" + field.getName(dexFile) + "'")
+        printer.println("  type          : '" + field.getType(dexFile) + "'")
+        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(field.accessFlags, DexAccessFlags.Target.FIELD))
         val staticValues = if (!classDef.staticValues.isEmpty) classDef.staticValues.array else null
-        if (encodedField.isStatic && staticValues != null && index < staticValues.values.size) {
+        if (field.isStatic && staticValues != null && index < staticValues.values.size) {
             printer.print("  value         : ")
             staticValues.valueAccept(dexFile, index, encodedValuePrinter)
             printer.println()
@@ -138,21 +138,21 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         fileOffset += 16
         codeOffset = 0
 
-        code.instructionsAccept(dexFile, classDef, method, code, this)
+        code.instructionsAccept(dexFile, classDef, method, this)
 
         printer.levelDown()
 
-        val catchCount = if (code.tries.size == 0) "(none)" else code.tries.size.toString()
-        printer.println("  catches       : %s".format(catchCount))
-        code.triesAccept(dexFile, classDef, method, code, this)
+        val catchCount = if (code.tryList.isEmpty()) "(none)" else code.tryList.size.toString()
+        printer.println("  catches       : $catchCount")
+        code.triesAccept(dexFile, classDef, method, this)
 
         printer.println("  positions     : ")
-        if (code.debugInfo != null) {
+        if (!code.debugInfo.isEmpty) {
             code.debugInfo.debugSequenceAccept(dexFile, SourceLinePrinter(code.debugInfo.lineStart, printer))
         }
 
         printer.println("  locals        : ")
-        if (code.debugInfo != null) {
+        if (!code.debugInfo.isEmpty) {
             val localVariablePrinter = LocalVariablePrinter(dexFile, method, code, printer)
             code.debugInfo.debugSequenceAccept(dexFile, localVariablePrinter)
             localVariablePrinter.finish()

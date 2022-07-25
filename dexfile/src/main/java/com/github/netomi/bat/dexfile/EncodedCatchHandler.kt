@@ -28,7 +28,7 @@ import kotlin.math.abs
  * @see [encoded catch handler @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-catch-handler)
  */
 class EncodedCatchHandler private constructor(
-    _catchAllAddr:         Int                     = NO_INDEX,
+    _catchAllAddr:         Int                     = -1,
     private val _handlers: ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent() {
 
     var catchAllAddr: Int = _catchAllAddr
@@ -72,7 +72,7 @@ class EncodedCatchHandler private constructor(
         }
     }
 
-    fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         handlers.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
@@ -95,6 +95,10 @@ class EncodedCatchHandler private constructor(
     }
 
     companion object {
+        fun empty(): EncodedCatchHandler {
+            return EncodedCatchHandler()
+        }
+
         fun of(catchAllAddr: Int): EncodedCatchHandler {
             return EncodedCatchHandler(catchAllAddr)
         }

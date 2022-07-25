@@ -106,7 +106,7 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
     override fun visitCode(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code) {
         instructions = mutableListOf()
 
-        code.instructionsAccept(dexFile, classDef, method, method.code, this)
+        code.instructionsAccept(dexFile, classDef, method, this)
 
         val modifiedInstructions = InstructionWriter.writeInstructions(instructions)
         val newLength = modifiedInstructions.size

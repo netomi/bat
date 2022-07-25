@@ -170,7 +170,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         printer.println(".registers " + code.registersSize)
 
         val localVariableInfos = arrayOfNulls<LocalVariableInfo>(code.registersSize)
-        if (code.debugInfo != null) {
+        if (!code.debugInfo.isEmpty) {
             val localVariables = code.registersSize - code.insSize
             var registerIndex  = if (method.isStatic) 0 else 1
 
@@ -207,17 +207,17 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         val branchTargetPrinter = BranchTargetPrinter()
         val debugState: MutableMap<Int, MutableList<String>> = HashMap()
 
-        if (code.debugInfo != null) {
+        if (!code.debugInfo.isEmpty) {
             code.debugInfo.debugSequenceAccept(dexFile, SourceLineCollector(debugState, code.debugInfo.lineStart))
             code.debugInfo.debugSequenceAccept(dexFile, LocalVariableCollector(debugState, localVariableInfos, registerPrinter))
         }
 
         // collect branch target / label infos.
-        code.instructionsAccept(dexFile, classDef, method, code, branchTargetPrinter)
+        code.instructionsAccept(dexFile, classDef, method, branchTargetPrinter)
 
         // print the instructions.
         code.instructionsAccept(
-            dexFile, classDef, method, code,
+            dexFile, classDef, method,
             InstructionPrinter(printer, registerPrinter, branchTargetPrinter, debugState)
         )
     }

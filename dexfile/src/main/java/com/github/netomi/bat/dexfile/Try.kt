@@ -17,7 +17,6 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.google.common.base.Preconditions
 import java.util.*
@@ -27,29 +26,25 @@ import java.util.*
  *
  * @see [try item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-item)
  */
-class Try private constructor(): DexContent() {
+class Try private constructor(_startAddr:    Int                 = 0,
+                              _insnCount:    Int                 = 0,
+                              _catchHandler: EncodedCatchHandler = EncodedCatchHandler.empty()): DexContent() {
 
-    var startAddr: Int = 0
+    var startAddr: Int = _startAddr
         internal set
 
-    var insnCount: Int = 0
+    var insnCount: Int = _insnCount
         internal set
 
-    lateinit var catchHandler: EncodedCatchHandler
+    var catchHandler: EncodedCatchHandler = _catchHandler
         internal set
 
-    // package-private as these fields are set from the Code item.
+    // internal as this field is set from the Code item.
     var handlerOffset = 0
-        // TODO: make set internal once Code is migrated to kotlin
+        internal set
 
     val endAddr: Int
         get() = startAddr + insnCount - 1
-
-    private constructor(startAddr: Int, insnCount: Int, catchHandler: EncodedCatchHandler): this() {
-        this.startAddr    = startAddr
-        this.insnCount    = insnCount
-        this.catchHandler = catchHandler
-    }
 
     override fun read(input: DexDataInput) {
         startAddr     = input.readInt()
@@ -85,7 +80,6 @@ class Try private constructor(): DexContent() {
     }
 
     companion object {
-        @JvmStatic
         fun of(startAddr: Int, endAddr: Int, catchHandler: EncodedCatchHandler): Try {
             Preconditions.checkArgument(startAddr >= 0, "startAddr must not be negative")
             Preconditions.checkArgument(startAddr <= 65535, "startAddr must be <= 65535")
@@ -97,7 +91,6 @@ class Try private constructor(): DexContent() {
             return Try(startAddr, insnCount, catchHandler)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): Try {
             val tryItem = Try()
             tryItem.read(input)

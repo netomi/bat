@@ -213,34 +213,22 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
         val code = Code.of(registerInfo.registers, registerInfo.insSize, 0)
 
-        val insns = InstructionWriter.writeInstructions(instructions)
-
-        code.insns     = insns
-        code.insnsSize = insns.size
+        code.insns = InstructionWriter.writeInstructions(instructions)
 
         val outgoingArgumentSizeCalculator = OutgoingArgumentSizeCalculator()
-        code.instructionsAccept(dexFile, classDef, method, code, outgoingArgumentSizeCalculator)
+        code.instructionsAccept(dexFile, classDef, method, outgoingArgumentSizeCalculator)
         code.outsSize = outgoingArgumentSizeCalculator.outgoingArgumentSize
 
-        code.tries = normalizeTries(tryElements)
-
-        val handlerList = LinkedHashSet<EncodedCatchHandler>()
-        for (tryElement in code.tries) {
-            handlerList.add(tryElement.catchHandler)
-        }
-
-        code.catchHandlerList = handlerList.toList()
-
-        if (!debugInfo.isEmpty) {
-            code.debugInfo = debugInfo
-        }
+        // TODO: move this to the Try class itself
+        code.tryList = normalizeTries(tryElements)
+        code.debugInfo = debugInfo
 
         return code
     }
 
-    private fun normalizeTries(tryElements: MutableList<Try>): MutableList<Try> {
+    private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
         if (tryElements.isEmpty()) {
-            return tryElements
+            return arrayListOf()
         }
 
         tryElements.sortBy { it.startAddr }
@@ -267,7 +255,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
         sequence.sortWith(compareBy<Seq>{ it.addr }.thenByDescending { it.type })
 
-        val nonOverlappingTries = mutableListOf<Try>()
+        val nonOverlappingTries = arrayListOf<Try>()
         var currentTry: Try? = null
 
         for (seq in sequence) {

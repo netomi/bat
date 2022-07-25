@@ -105,7 +105,7 @@ class DebugInfo private constructor(_lineStart:      Int                        
         }
     }
 
-    fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
+    internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         for (i in parameterNames.indices) {
             if (parameterNames[i] != NO_INDEX) {
                 visitor.visitStringID(dexFile, ArrayElementAccessor(parameterNames, i))

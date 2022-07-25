@@ -24,11 +24,9 @@ import com.github.netomi.bat.util.Classes.externalClassNameFromInternalName
 object DexClasses {
 
     fun fullExternalMethodSignature(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): String {
-        return String.format(
-            "%s.%s:%s",
-            externalClassNameFromInternalName(classDef.getClassName(dexFile)),
-            method.getName(dexFile),
-            method.getDescriptor(dexFile)
+        return "%s.%s:%s".format(externalClassNameFromInternalName(classDef.getClassName(dexFile)),
+                                 method.getName(dexFile),
+                                 method.getDescriptor(dexFile)
         )
     }
 
@@ -67,10 +65,10 @@ object DexClasses {
     }
 
     fun toShortyFormat(type: String): String {
-        if (type.startsWith("L") || type.startsWith("[")) {
-            return "L"
+        return if (type.startsWith("L") || type.startsWith("[")) {
+            "L"
         } else {
-            return type
+            type
         }
     }
 
@@ -98,18 +96,18 @@ object DexClasses {
     }
 
     fun getArgumentSizeForType(type: String): Int {
-        when (type) {
+        return when (type) {
             "B",
             "S",
             "C",
             "I",
             "Z",
-            "F" -> return 1
+            "F"  -> 1
 
             "J",
-            "D" -> return 2
-        }
+            "D"  -> 2
 
-        return 1
+            else -> 1
+        }
     }
 }

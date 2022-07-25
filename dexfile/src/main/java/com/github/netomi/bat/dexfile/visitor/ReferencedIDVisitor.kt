@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile.visitor
 
 import com.github.netomi.bat.dexfile.DexFile
 
-interface ReferencedIDVisitor {
+internal interface ReferencedIDVisitor {
     fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {}
 
     fun visitTypeID(dexFile: DexFile, accessor: IDAccessor) {}
@@ -32,7 +32,7 @@ interface ReferencedIDVisitor {
     fun visitMethodHandle(dexFile: DexFile, accessor: IDAccessor) {}
 }
 
-interface IDAccessor {
+internal interface IDAccessor {
     fun get(): Int
     fun set(value: Int)
 }
