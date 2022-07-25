@@ -33,7 +33,7 @@ import java.io.*
 class DexDumpCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.dex)"])
-    private var inputFile: File? = null
+    private lateinit var inputFile: File
 
     @CommandLine.Option(names = ["-o"], description = ["output file name (defaults to stdout)"])
     private var outputFile: File? = null
@@ -54,30 +54,30 @@ class DexDumpCommand : Runnable {
     private var classNameFilter: String? = null
 
     override fun run() {
-        inputFile?.apply {
-            FileInputStream(this).use { `is` ->
-                val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
-                val reader  = DexFileReader(`is`)
-                val dexFile = DexFile.empty()
-                reader.visitDexFile(dexFile)
+        FileInputStream(inputFile).use { `is` ->
+            val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
+            val reader = DexFileReader(`is`)
+            val dexFile = DexFile.empty()
+            reader.visitDexFile(dexFile)
 
-                println("Processing '$name'...")
-                println("Opened '$name', DEX version '${dexFile.dexFormat?.version}'")
+            println("Processing '${inputFile.name}'...")
+            println("Opened '${inputFile.name}', DEX version '${dexFile.dexFormat?.version}'")
 
-                if (classNameFilter != null) {
-                    dexFile.classDefsAccept(
-                        filteredByExternalClassName(classNameFilter!!,
-                        DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode)))
-                } else {
-                    dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode))
-                }
+            if (classNameFilter != null) {
+                dexFile.classDefsAccept(
+                    filteredByExternalClassName(
+                        classNameFilter!!,
+                        DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode)
+                    )
+                )
+            } else {
+                dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode))
+            }
 
-                if (outputFile != null) {
-                    os.close()
-                }
+            if (outputFile != null) {
+                os.close()
             }
         }
-
     }
 
     companion object {

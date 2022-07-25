@@ -31,9 +31,9 @@ import java.io.*
 class ClassDumpCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.class / *.jar)"])
-    private var inputFile: File? = null
+    private lateinit var inputFile: File
 
-    @CommandLine.Option(names = ["-o"], description = ["output file name (defaults to stdout)"])
+    @CommandLine.Option(names = ["-o"], arity = "1", description = ["output file name (defaults to stdout)"])
     private var outputFile: File? = null
 
     @CommandLine.Option(names = ["-a"], description = ["print annotations"])
@@ -43,19 +43,17 @@ class ClassDumpCommand : Runnable {
     private var classNameFilter: String? = null
 
     override fun run() {
-        inputFile?.apply {
-            FileInputStream(this).use { `is` ->
-                val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
+        FileInputStream(inputFile).use { `is` ->
+            val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
 
-                println("Processing '$name'...")
+            println("Processing '${inputFile.name}'...")
 
-                // TODO: currently supporting only single class files.
-                val classFile = ClassFile.readClassFile(DataInputStream(`is`))
-                classFile.accept(ClassFilePrinter(os))
+            // TODO: currently supporting only single class files.
+            val classFile = ClassFile.readClassFile(DataInputStream(`is`))
+            classFile.accept(ClassFilePrinter(os))
 
-                if (outputFile != null) {
-                    os.close()
-                }
+            if (outputFile != null) {
+                os.close()
             }
         }
 

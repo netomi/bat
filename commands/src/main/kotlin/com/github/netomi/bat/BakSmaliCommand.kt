@@ -37,37 +37,35 @@ import kotlin.io.path.exists
 class BakSmaliCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.dex)"])
-    private var inputFile: File? = null
+    private lateinit var inputFile: File
 
     @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out", description = ["output directory"])
-    private var outputFile: File? = null
+    private lateinit var outputFile: File
 
     @CommandLine.Option(names = ["-v"], description = ["verbose output"])
     private var verbose: Boolean = false
 
     override fun run() {
-        inputFile?.apply {
-            FileInputStream(this).use { `is` ->
-                val outputPath = outputFile?.toPath()
-                if (outputPath != null) {
-                    if (!outputPath.exists()) {
-                        Files.createDirectories(outputPath)
-                    }
-
-                    val dexFile = DexFile.empty()
-                    val reader  = DexFileReader(`is`, false)
-
-                    printVerbose("Disassembling '$name' into directory $outputPath ...")
-                    reader.visitDexFile(dexFile)
-
-                    dexFile.classDefsAccept(multiClassDefVisitorOf(
-                            { df, _, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
-                            Disassembler(FileOutputStreamFactory(outputPath, "smali")))
-                        )
-
-                    printVerbose("done.")
-                }
+        FileInputStream(inputFile).use { `is` ->
+            val outputPath = outputFile.toPath()
+            if (!outputPath.exists()) {
+                Files.createDirectories(outputPath)
             }
+
+            val dexFile = DexFile.empty()
+            val reader = DexFileReader(`is`, false)
+
+            printVerbose("Disassembling '${inputFile.name}' into directory $outputPath ...")
+            reader.visitDexFile(dexFile)
+
+            dexFile.classDefsAccept(
+                multiClassDefVisitorOf(
+                    { df, _, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
+                    Disassembler(FileOutputStreamFactory(outputPath, "smali"))
+                )
+            )
+
+            printVerbose("done.")
         }
     }
 
