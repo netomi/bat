@@ -17,9 +17,10 @@ package com.github.netomi.bat.smali.disassemble
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.debug.*
-import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
 
-internal class SourceLineCollector(private val debugState: MutableMap<Int, MutableList<String>>, private var lineNumber: Int) : DebugSequenceVisitor {
+internal class SourceLineCollector(private val debugState: MutableMap<Int, MutableList<String>>, private var lineNumber: Int) :
+    DebugSequenceVisitor {
 
     private var codeOffset: Int = 0
 

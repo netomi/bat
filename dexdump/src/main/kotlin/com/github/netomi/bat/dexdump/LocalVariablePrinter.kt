@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.debug.*
 import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
 import com.github.netomi.bat.util.Primitives
 
 internal class LocalVariablePrinter constructor(

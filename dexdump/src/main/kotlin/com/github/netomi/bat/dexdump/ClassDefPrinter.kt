@@ -35,7 +35,6 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
     CodeVisitor,
     InstructionVisitor,
     TryVisitor,
-    DebugSequenceVisitor,
     AnnotationSetVisitor,
     AnnotationVisitor {
 

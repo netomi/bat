@@ -18,7 +18,7 @@ package com.github.netomi.bat.smali.disassemble
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.debug.*
-import com.github.netomi.bat.dexfile.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
 
 internal class LocalVariableCollector(private val debugState:         MutableMap<Int, MutableList<String>>,
                                       private val localVariableInfos: Array<LocalVariableInfo?>,
