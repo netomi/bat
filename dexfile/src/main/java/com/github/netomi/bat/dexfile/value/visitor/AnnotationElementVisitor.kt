@@ -13,16 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor
+package com.github.netomi.bat.dexfile.value.visitor
 
-import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
+import com.github.netomi.bat.dexfile.value.AnnotationElement
 
-/**
- * This interface specifies the methods for a visitor of `AnnotationsDirectory`
- * instances as contained inside `ClassDef` instances.
- */
-fun interface AnnotationsDirectoryVisitor {
-    fun visitAnnotationsDirectory(dexFile: DexFile, classDef: ClassDef, annotationsDirectory: AnnotationsDirectory)
+fun interface AnnotationElementVisitor {
+    fun visitAnnotationElement(dexFile: DexFile, element: AnnotationElement)
 }

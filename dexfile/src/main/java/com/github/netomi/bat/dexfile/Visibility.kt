@@ -27,7 +27,6 @@ enum class Visibility(val flagValue: Int) {
     PACKAGE_PRIVATE(0x0);
 
     companion object {
-        @JvmStatic
         fun of(accessFlags: Int): Visibility {
             val maskedValue = accessFlags and 0xf
             for (visibility in values()) {

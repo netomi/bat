@@ -16,6 +16,8 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationsDirectoryVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForType

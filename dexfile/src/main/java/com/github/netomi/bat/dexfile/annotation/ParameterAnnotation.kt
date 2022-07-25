@@ -16,6 +16,9 @@
 package com.github.netomi.bat.dexfile.annotation
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
+import com.github.netomi.bat.dexfile.annotation.visitor.allAnnotations
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.*
@@ -65,14 +68,18 @@ class ParameterAnnotation private constructor(
     }
 
     fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
-        visitor.visitParameterAnnotationSet(dexFile, classDef, this, annotationSetRefList)
+        visitor.visitParameterAnnotationSetRefList(dexFile, classDef, this, annotationSetRefList)
     }
 
-    fun accept(dexFile: DexFile, classDef: ClassDef, parameterIndex: Int, visitor: AnnotationVisitor) {
+    fun accept(dexFile: DexFile, classDef: ClassDef, parameterIndex: Int, visitor: AnnotationSetVisitor) {
         if (parameterIndex in 0 until annotationSetRefList.annotationSetRefCount) {
             val annotationSetRef = annotationSetRefList.getAnnotationSetRef(parameterIndex)
-            annotationSetRef.accept(dexFile, classDef, visitor)
+            visitor.visitParameterAnnotationSet(dexFile, classDef, this, parameterIndex, annotationSetRef.annotationSet)
         }
+    }
+
+    fun annotationsAccept(dexFile: DexFile, classDef: ClassDef, parameterIndex: Int, visitor: AnnotationVisitor) {
+        accept(dexFile, classDef, parameterIndex, allAnnotations(visitor))
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

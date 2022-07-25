@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.visitor
+package com.github.netomi.bat.dexfile.annotation.visitor
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet
+import com.github.netomi.bat.dexfile.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
 
 fun multiAnnotationVisitorOf(visitor: AnnotationVisitor, vararg visitors: AnnotationVisitor): AnnotationVisitor {
@@ -43,8 +44,9 @@ fun interface AnnotationVisitor {
     }
 }
 
-private class MultiAnnotationVisitor constructor(       visitor:       AnnotationVisitor,
-                                                 vararg otherVisitors: AnnotationVisitor)
+private class MultiAnnotationVisitor constructor(visitor: AnnotationVisitor,
+                                                 vararg otherVisitors: AnnotationVisitor
+)
 
     : AbstractMultiVisitor<AnnotationVisitor>(visitor, *otherVisitors), AnnotationVisitor {
 

@@ -24,7 +24,8 @@ class DexDumpPrinter constructor(
                 outputStream:     OutputStream = System.out,
     private val printFileSummary: Boolean      = true,
     private val printHeaders:     Boolean      = true,
-    private val printAnnotations: Boolean      = true) : DexFileVisitor, ClassDefVisitor, MethodHandleVisitor, CallSiteIDVisitor {
+    private val printAnnotations: Boolean      = true,
+    private val disassembleCode:  Boolean      = true) : DexFileVisitor, ClassDefVisitor, MethodHandleVisitor, CallSiteIDVisitor {
 
     private val printer: Mutf8Printer
 
@@ -34,7 +35,7 @@ class DexDumpPrinter constructor(
     init {
         printer = Mutf8Printer(outputStream)
 
-        classDefPrinter = ClassDefPrinter(printer)
+        classDefPrinter = ClassDefPrinter(printer, disassembleCode)
         callSiteArgumentPrinter = CallSiteArgumentPrinter(printer)
     }
 

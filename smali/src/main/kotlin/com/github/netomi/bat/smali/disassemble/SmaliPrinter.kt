@@ -16,10 +16,7 @@
 package com.github.netomi.bat.smali.disassemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.annotation.*
-import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.value.AnnotationElement
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.Classes
@@ -28,16 +25,10 @@ import java.io.Writer
 import java.util.*
 
 class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) :
-    ClassDefVisitor, ClassDataVisitor, AnnotationSetVisitor, AnnotationVisitor, AnnotationElementVisitor,
-    EncodedFieldVisitor, EncodedMethodVisitor, CodeVisitor {
+    ClassDefVisitor, ClassDataVisitor, EncodedFieldVisitor, EncodedMethodVisitor, CodeVisitor {
 
     private val printer: IndentingPrinter = IndentingPrinter(writer, 4)
-
-    private var printParameterInfo    = false
-    private var currentParameterIndex = 0
-    private var currentRegisterIndex  = 0
-
-    private var currentParameterType: String? = null
+    private val annotationPrinter         = AnnotationPrinter(printer)
 
     override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
         printer.print(".class")
@@ -65,7 +56,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             classDef.interfacesAccept(dexFile) { _, _, _, _, type: String -> printer.println(".implements $type") }
         }
 
-        classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, this)
+        classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, annotationPrinter)
         classDef.classDataAccept(dexFile, this)
         printer.flush()
     }
@@ -120,7 +111,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         }
 
         printer.println()
-        classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, this)
+        classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, annotationPrinter)
     }
 
     override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
@@ -142,26 +133,31 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         if (!method.isAbstract && !method.code.isEmpty) {
             method.codeAccept(dexFile, classDef, this)
         } else if (!classDef.annotationsDirectory.isEmpty) {
-            var registerIndex = if (method.isStatic) 0 else 1
-            val protoID = method.getProtoID(dexFile)
-            val parameters = protoID.parameters
-
-            for ((parameterIndex, parameterType) in parameters.getTypes(dexFile).withIndex()) {
-                printParameterInfo    = true
-                currentParameterIndex = parameterIndex
-                currentParameterType  = parameterType
-                currentRegisterIndex  = registerIndex
-                classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this)
-
-                registerIndex += DexClasses.getArgumentSizeForType(parameterType)
-            }
-
-            printParameterInfo = false
-            classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this)
+            printParameterAnnotations(dexFile, classDef, method)
+            classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, annotationPrinter)
         }
 
         printer.levelDown()
         printer.println(".end method")
+    }
+
+    private fun printParameterAnnotations(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
+        var registerIndex = if (method.isStatic) 0 else 1
+        val protoID = method.getProtoID(dexFile)
+        val parameters = protoID.parameters
+
+        for ((parameterIndex, parameterType) in parameters.getTypes(dexFile).withIndex()) {
+            annotationPrinter.apply {
+                printParameterInfo   = true
+                currentParameterType = parameterType
+                currentRegisterIndex = registerIndex
+            }
+            classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
+
+            registerIndex += DexClasses.getArgumentSizeForType(parameterType)
+        }
+
+        annotationPrinter.printParameterInfo = false
     }
 
     override fun visitCode(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code) {
@@ -181,25 +177,29 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             val parameters = protoID.parameters
 
             for ((parameterIndex, parameterType) in parameters.getTypes(dexFile).withIndex()) {
-                currentParameterIndex = parameterIndex
-                val parameterName     = code.debugInfo.getParameterName(dexFile, parameterIndex)
+                val parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex)
                 if (parameterName != null) {
                     printer.println(".param p%d, \"%s\"    # %s".format(registerIndex, parameterName, parameterType))
+                    annotationPrinter.printParameterInfo = false
                 } else {
-                    currentRegisterIndex = registerIndex
-                    currentParameterType = parameterType
-                    printParameterInfo   = true
+                    annotationPrinter.apply {
+                        printParameterInfo   = true
+                        currentRegisterIndex = registerIndex
+                        currentParameterType = parameterType
+                    }
                 }
 
                 val localVariableInfo = LocalVariableInfo(parameterName, parameterType, null)
                 localVariableInfos[localVariables + registerIndex] = localVariableInfo
-                classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, this)
+                classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
+                annotationPrinter.printParameterInfo = false
 
-                printParameterInfo = false
                 registerIndex += DexClasses.getArgumentSizeForType(parameterType)
             }
+        } else {
+            printParameterAnnotations(dexFile, classDef, method)
         }
-        classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, this)
+        classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, annotationPrinter)
 
         val registerPrinter     = RegisterPrinter(code)
         val branchTargetPrinter = BranchTargetPrinter()
@@ -218,64 +218,5 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             dexFile, classDef, method,
             InstructionPrinter(printer, registerPrinter, branchTargetPrinter, debugState)
         )
-    }
-
-    override fun visitAnyAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {}
-
-    override fun visitClassAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {
-        val annotationCount = annotationSet.annotationCount
-        if (annotationCount > 0) {
-            printer.println()
-            printer.println()
-            printer.println("# annotations")
-            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
-        }
-    }
-
-    override fun visitFieldAnnotationSet(dexFile: DexFile, classDef: ClassDef, fieldAnnotation: FieldAnnotation, annotationSet: AnnotationSet) {
-        val annotationCount = annotationSet.annotationCount
-        if (annotationCount > 0) {
-            printer.levelUp()
-            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
-            printer.levelDown()
-            printer.println(".end field")
-        }
-    }
-
-    override fun visitMethodAnnotationSet(dexFile: DexFile, classDef: ClassDef, methodAnnotation: MethodAnnotation, annotationSet: AnnotationSet) {
-        annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() } )
-    }
-
-    override fun visitParameterAnnotationSet(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
-        if (currentParameterIndex < annotationSetRefList.annotationSetRefCount) {
-            val annotationSetRef = annotationSetRefList.getAnnotationSetRef(currentParameterIndex)
-            val annotationSet = annotationSetRef.annotationSet
-            if (!annotationSet.isEmpty) {
-                if (printParameterInfo) {
-                    printer.println(".param p%d    # %s".format(currentRegisterIndex, currentParameterType))
-                }
-                printer.levelUp()
-                annotationSet.accept(dexFile, classDef, this)
-                printer.levelDown()
-                printer.println(".end param")
-            }
-        }
-    }
-
-    override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
-        printer.print(".annotation " + annotation.visibility.simpleName + " ")
-        val annotationValue = annotation.annotationValue
-        printer.println(annotationValue.getType(dexFile))
-        printer.levelUp()
-        annotationValue.annotationElementsAccept(dexFile, this)
-        printer.levelDown()
-        printer.println(".end annotation")
-    }
-
-    override fun visitAnnotationElement(dexFile: DexFile, element: AnnotationElement) {
-        printer.print(element.getName(dexFile))
-        printer.print(" = ")
-        element.value.accept(dexFile, EncodedValuePrinter(printer, this))
-        printer.println()
     }
 }

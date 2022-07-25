@@ -19,6 +19,8 @@ package com.github.netomi.bat.dexdump
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexClasses
@@ -26,7 +28,7 @@ import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.Primitives
 
-internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
+internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, private val disassembleCode: Boolean) :
     DexHeaderVisitor,
     ClassDataVisitor,
     EncodedFieldVisitor,
@@ -125,21 +127,23 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         printer.println("  insns size    : " + code.insnsSize + " 16-bit code units")
         fileOffset = method.codeOffset
 
-        printer.resetIndentation(0)
+        if (disassembleCode) {
+            printer.resetIndentation(0)
 
-        printer.println(
-            Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
-            Primitives.asHexValue(fileOffset, 6) + "] " +
-            DexClasses.fullExternalMethodSignature(dexFile, classDef, method)
-        )
+            printer.println(
+                Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
+                        Primitives.asHexValue(fileOffset, 6) + "] " +
+                        DexClasses.fullExternalMethodSignature(dexFile, classDef, method)
+            )
 
-        fileOffset = align(fileOffset, 4)
-        fileOffset += 16
-        codeOffset = 0
+            fileOffset = align(fileOffset, 4)
+            fileOffset += 16
+            codeOffset = 0
 
-        code.instructionsAccept(dexFile, classDef, method, this)
+            code.instructionsAccept(dexFile, classDef, method, this)
 
-        printer.levelDown()
+            printer.levelDown()
+        }
 
         val catchCount = if (code.tryList.isEmpty()) "(none)" else code.tryList.size.toString()
         printer.println("  catches       : $catchCount")
@@ -190,11 +194,11 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         codeOffset += instruction.length
     }
 
-    override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryObject: Try) {
-        val startAddr = Primitives.toHexString(tryObject.startAddr.toShort())
-        val endAddr = Primitives.toHexString((tryObject.startAddr + tryObject.insnCount).toShort())
+    override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryElement: Try) {
+        val startAddr = Primitives.toHexString(tryElement.startAddr.toShort())
+        val endAddr = Primitives.toHexString((tryElement.startAddr + tryElement.insnCount).toShort())
         printer.println("    %s - %s".format(startAddr, endAddr))
-        val catchHandler = tryObject.catchHandler
+        val catchHandler = tryElement.catchHandler
         for (addrPair in catchHandler.handlers) {
             printer.println("      %s -> %s".format(addrPair.getType(dexFile), Primitives.toHexString(addrPair.address.toShort())))
         }
@@ -228,7 +232,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer) :
         annotationSet.accept(dexFile, classDef, this)
     }
 
-    override fun visitParameterAnnotationSet(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
+    override fun visitParameterAnnotationSetRefList(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
         val methodID = parameterAnnotation.getMethodID(dexFile)
         printer.println("Annotations on method #" + parameterAnnotation.methodIndex + " '" + methodID.getName(dexFile) + "' parameters")
         val annotationSetRefCount = annotationSetRefList.annotationSetRefCount
