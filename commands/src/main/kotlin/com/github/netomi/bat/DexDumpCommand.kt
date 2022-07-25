@@ -44,6 +44,9 @@ class DexDumpCommand : Runnable {
     @CommandLine.Option(names = ["-f"], description = ["print file summary"])
     private var printFileSummary = false
 
+    @CommandLine.Option(names = ["-d"], description = ["disassemble code sections"])
+    private var disassembleCode = false
+
     @CommandLine.Option(names = ["-h"], description = ["print headers"])
     private var printHeaders = false
 
@@ -64,9 +67,9 @@ class DexDumpCommand : Runnable {
                 if (classNameFilter != null) {
                     dexFile.classDefsAccept(
                         filteredByExternalClassName(classNameFilter!!,
-                        DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations)))
+                        DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode)))
                 } else {
-                    dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations))
+                    dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode))
                 }
 
                 if (outputFile != null) {
