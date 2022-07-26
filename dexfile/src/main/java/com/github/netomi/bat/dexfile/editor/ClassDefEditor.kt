@@ -32,6 +32,10 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, priva
     private val classType: String
         get() = classDef.getType(dexFile)
 
+    fun addInterface(type: String) {
+        classDef.interfaces.addType(dexEditor.addOrGetTypeIDIndex(type))
+    }
+
     fun addField(fieldName: String, type: String, accessFlags: Int): EncodedField {
         val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType, fieldName, type)
         val field = EncodedField.of(fieldIDIndex, accessFlags)

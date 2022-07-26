@@ -170,7 +170,7 @@ class DexFile private constructor() {
         return classDefs[classDefIndex]
     }
 
-    internal fun addClassDef(classDef: ClassDef) {
+    internal fun addClassDef(classDef: ClassDef): Int {
         val className = classDef.getClassName(this)
         if (getClassDef(className) != null) {
             throw IllegalArgumentException("class with name $className already exists in dex file.")
@@ -178,6 +178,7 @@ class DexFile private constructor() {
 
         classDefs.add(classDef)
         classDefMap[classDef.getClassName(this)] = classDefs.size - 1
+        return classDefs.size - 1
     }
 
     val callSiteIDCount: Int

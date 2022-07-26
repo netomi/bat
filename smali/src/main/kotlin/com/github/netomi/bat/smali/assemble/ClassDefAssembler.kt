@@ -36,21 +36,11 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
         val sourceFile  = ctx.sSource().firstOrNull()?.src?.text?.removeSurrounding("\"")
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        val classTypeIndex  = dexEditor.addOrGetTypeIDIndex(classType)
-        val superTypeIndex  = if (superType != null) dexEditor.addOrGetTypeIDIndex(superType) else NO_INDEX
-        val sourceFileIndex = if (sourceFile != null) dexEditor.addOrGetStringIDIndex(sourceFile) else NO_INDEX
-
-        classDef =
-            ClassDef.of(classTypeIndex,
-                        accessFlags,
-                        superTypeIndex,
-                        sourceFileIndex)
-
-        dexEditor.addClassDef(classDef)
+        classDef = dexEditor.addClassDef(classType, accessFlags, superType, sourceFile)
         classDefEditor = ClassDefEditor.of(dexEditor, classDef)
 
         ctx.sInterface().forEach {
-            classDef.interfaces.addType(dexEditor.addOrGetTypeIDIndex(it.name.text))
+            classDefEditor.addInterface(it.name.text)
         }
 
         val annotations = mutableListOf<Annotation>()
