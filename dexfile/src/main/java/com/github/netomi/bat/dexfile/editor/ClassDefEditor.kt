@@ -109,6 +109,10 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, priva
     }
 
     companion object {
+        fun of(dexFile: DexFile, classDef: ClassDef): ClassDefEditor {
+            return of(DexEditor.of(dexFile), classDef)
+        }
+
         fun of(dexEditor: DexEditor, classDef: ClassDef): ClassDefEditor {
             return ClassDefEditor(dexEditor, classDef)
         }
