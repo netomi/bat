@@ -22,18 +22,18 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-open class ArithmeticInstruction internal constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class ArithmeticInstruction internal constructor(opCode: DexOpCode, vararg registers: Int) : DexInstruction(opCode, *registers) {
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_12x,
             FORMAT_23x -> {}
 
             FORMAT_22b,
             FORMAT_22s -> {}
 
-            else -> throw IllegalStateException("unexpected format ${opcode.format} for opcode ${opcode.mnemonic}")
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
@@ -46,8 +46,7 @@ open class ArithmeticInstruction internal constructor(opcode: DexOpCode, vararg 
             return ArithmeticInstruction(opcode, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): ArithmeticInstruction {
+        fun create(opCode: DexOpCode): ArithmeticInstruction {
             return ArithmeticInstruction(opCode)
         }
     }

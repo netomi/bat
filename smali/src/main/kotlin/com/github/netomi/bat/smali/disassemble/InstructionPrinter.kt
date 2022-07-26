@@ -85,16 +85,16 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
         printer.print(toHexString(instruction.value))
-        val opCode = instruction.opcode
+        val opCode = instruction.opCode
         val instructionFormat = opCode.format
 
         // FIXME: this is a hack and should be made clean.
-        if (instructionFormat == FORMAT_21h && opCode.targetsWideRegister() ||
+        if (instructionFormat == FORMAT_21h && opCode.targetsWideRegister ||
             instructionFormat == FORMAT_51l) {
             printer.print("L")
         }
 
-        if (instruction.opcode.targetsWideRegister()) {
+        if (instruction.opCode.targetsWideRegister) {
             printCommentIfLikelyDouble(printer, instruction.value)
         } else {
             printCommentIfLikelyFloat(printer, instruction.value.toInt())

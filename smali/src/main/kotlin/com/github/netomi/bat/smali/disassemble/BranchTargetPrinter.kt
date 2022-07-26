@@ -37,13 +37,13 @@ internal class BranchTargetPrinter : InstructionVisitor {
 
     fun formatBranchInstructionTarget(offset: Int, instruction: BranchInstruction): String {
         val target = offset + instruction.branchOffset
-        val mnemonic = instruction.opcode.mnemonic
+        val mnemonic = instruction.opCode.mnemonic
         val prefix = if (mnemonic.startsWith("goto")) "goto" else "cond"
         return ":${prefix}_${Integer.toHexString(target)}"
     }
 
     fun formatPayloadInstructionTarget(offset: Int, instruction: PayloadInstruction): String {
-        val prefix = when (instruction.opcode) {
+        val prefix = when (instruction.opCode) {
             DexOpCode.FILL_ARRAY_DATA -> "array"
             DexOpCode.PACKED_SWITCH   -> "pswitch_data"
             DexOpCode.SPARSE_SWITCH   -> "sswitch_data"

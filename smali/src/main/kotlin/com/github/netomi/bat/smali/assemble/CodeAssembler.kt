@@ -165,9 +165,8 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
                     val c = t as F10xContext
 
                     val mnemonic = c.op.text
-                    val opcode = DexOpCode.get(mnemonic)
-
-                    opcode.createInstruction(0)
+                    val opcode = DexOpCode[mnemonic]
+                    opcode.createInstruction()
                 }
 
                 RULE_f12x_conversion   -> instructionAssembler.parseConversionInstructionF12x(t as F12x_conversionContext)

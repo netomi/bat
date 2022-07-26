@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.Primitives
 
 open class MethodInstruction internal constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
@@ -31,20 +32,20 @@ open class MethodInstruction internal constructor(opcode: DexOpCode, _methodInde
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        methodIndex = when (opcode.format) {
+        methodIndex = when (opCode.format) {
             FORMAT_3rc,
             FORMAT_35c,
             FORMAT_45cc,
             FORMAT_4rcc -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_3rc,
             FORMAT_35c,
             FORMAT_45cc,
@@ -59,13 +60,16 @@ open class MethodInstruction internal constructor(opcode: DexOpCode, _methodInde
         visitor.visitMethodInstruction(dexFile, classDef, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return super.toString() + ", method@${Primitives.asHexValue(methodIndex, 4)}"
+    }
+
     companion object {
         fun of(opCode: DexOpCode, methodIndex: Int, vararg registers: Int): MethodInstruction {
             return MethodInstruction(opCode, methodIndex, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): MethodInstruction {
+        fun create(opCode: DexOpCode): MethodInstruction {
             return MethodInstruction(opCode)
         }
     }

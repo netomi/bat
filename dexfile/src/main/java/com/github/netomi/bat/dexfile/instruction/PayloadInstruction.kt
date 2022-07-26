@@ -17,26 +17,27 @@ package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
+import com.github.netomi.bat.util.Primitives
 
-open class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset: Int, register: Int) : DexInstruction(opcode, register) {
+abstract class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset: Int, register: Int) : DexInstruction(opcode, register) {
 
     var payloadOffset = _payloadOffset
         internal set
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
-        payloadOffset = when (opcode.format) {
+        payloadOffset = when (opCode.format) {
             FORMAT_31t -> (instructions[offset + 1].toInt() and 0xffff) or
                           (instructions[offset + 2].toInt() shl 16)
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_31t -> {
                 data[1] = payloadOffset.toShort()
                 data[2] = (payloadOffset shr 16).toShort()
@@ -48,13 +49,17 @@ open class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOf
         return data
     }
 
+    override fun toString(): String {
+        return super.toString() + ", ${Primitives.asSignedHexValue(payloadOffset, 8)}"
+    }
+
     companion object {
         fun of(opCode: DexOpCode, payloadOffset: Int, register: Int): PayloadInstruction {
             return when (opCode) {
                 FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payloadOffset, register)
                 PACKED_SWITCH   -> PackedSwitchInstruction.of(payloadOffset, register)
                 SPARSE_SWITCH   -> SparseSwitchInstruction.of(payloadOffset, register)
-                else            -> throw RuntimeException("unexpected opcode $opCode for PayloadInstruction")
+                else            -> throw IllegalArgumentException("unexpected opcode $opCode for PayloadInstruction")
             }
         }
     }

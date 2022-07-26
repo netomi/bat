@@ -23,10 +23,6 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
 class BasicInstruction internal constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
-    override fun read(instructions: ShortArray, offset: Int) {
-        super.read(instructions, offset)
-    }
-
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitBasicInstruction(dexFile, classDef, method, code, offset, this)
     }
@@ -36,22 +32,8 @@ class BasicInstruction internal constructor(opcode: DexOpCode, vararg registers:
             return BasicInstruction(opcode, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): DexInstruction {
-            return when (opCode) {
-                DexOpCode.NOP -> {
-                    if (ident.toInt() == PackedSwitchPayload.IDENT) {
-                        PackedSwitchPayload.empty()
-                    } else if (ident.toInt() == SparseSwitchPayload.IDENT) {
-                        SparseSwitchPayload.empty()
-                    } else if (ident.toInt() == FillArrayPayload.IDENT) {
-                        FillArrayPayload.empty()
-                    } else {
-                        BasicInstruction(opCode)
-                    }
-                }
-                else -> BasicInstruction(opCode)
-            }
+        fun create(opCode: DexOpCode): DexInstruction {
+            return BasicInstruction(opCode)
         }
     }
 }

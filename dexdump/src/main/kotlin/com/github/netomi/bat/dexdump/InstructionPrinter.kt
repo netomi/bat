@@ -37,10 +37,10 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         val literal = instruction.literal
         printer.print(", #int $literal // #")
 
-        when (instruction.opcode.format) {
+        when (instruction.opCode.format) {
             InstructionFormat.FORMAT_22s -> printer.print(Primitives.asHexValue(literal.toShort()))
             InstructionFormat.FORMAT_22b -> printer.print(Primitives.asHexValue(literal.toByte()))
-            else -> error("unexpected format ${instruction.opcode.format} for arithmetic literal instruction")
+            else -> error("unexpected format ${instruction.opCode.format} for arithmetic literal instruction")
         }
     }
 
@@ -53,7 +53,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
             printer.print(" ")
         }
 
-        if (instruction.opcode == DexOpCode.GOTO_32) {
+        if (instruction.opCode == DexOpCode.GOTO_32) {
             printer.print("#")
             if (instruction.branchOffset < 0) {
                 printer.print("-")
@@ -92,13 +92,13 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(", ")
 
         val value = instruction.value
-        when (instruction.opcode.format) {
+        when (instruction.opCode.format) {
             InstructionFormat.FORMAT_11n,
             InstructionFormat.FORMAT_22b -> printer.print("#int %d // #%x".format(value, value.toByte()))
 
             InstructionFormat.FORMAT_21h -> {
                 // The printed format varies a bit based on the actual opcode.
-                if (instruction.opcode == DexOpCode.CONST_HIGH16) {
+                if (instruction.opCode == DexOpCode.CONST_HIGH16) {
                     val v = (value shr 16).toShort()
                     printer.print("#int %d // #%x".format(value, v))
                 } else {
@@ -114,7 +114,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
 
             InstructionFormat.FORMAT_51l -> printer.print("#double %g // #%016x".format(longBitsToDouble(value), value))
 
-            else -> error("unexpected format ${instruction.opcode.format} for literal instruction")
+            else -> error("unexpected format ${instruction.opCode.format} for literal instruction")
         }
     }
 
@@ -179,7 +179,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.printAsMutf8(instruction.getString(dexFile), false)
         printer.print("\" // string@")
 
-        if (instruction.opcode == DexOpCode.CONST_STRING) {
+        if (instruction.opCode == DexOpCode.CONST_STRING) {
             printer.print(Primitives.asHexValue(instruction.stringIndex, 4))
         } else {
             printer.print(Primitives.asHexValue(instruction.stringIndex, 8))
@@ -211,7 +211,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
 
     private fun printGeneric(instruction: DexInstruction) {
         printer.print(instruction.mnemonic)
-        if (instruction.opcode == DexOpCode.NOP) {
+        if (instruction.opCode == DexOpCode.NOP) {
             printer.print(" // spacer")
         }
         printRegisters(instruction, false)

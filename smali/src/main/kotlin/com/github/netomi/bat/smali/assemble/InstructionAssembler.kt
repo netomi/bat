@@ -72,9 +72,9 @@ internal class InstructionAssembler internal constructor(            listCtx:   
                 else -> {
                     // check if it's a known instruction and advance the code offset
                     val mnemonic = t.getChild(0).text
-                    val opcode   = DexOpCode.get(mnemonic)
-                    if (opcode != null) {
-                        val insn = opcode.createInstruction(0)
+                    if (DexOpCode.isValidMnemonic(mnemonic)) {
+                        val opcode = DexOpCode[mnemonic]
+                        val insn = opcode.createInstruction()
                         codeOffset += insn.length
                     }
                 }
@@ -98,7 +98,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseConversionInstructionF12x(ctx: F12x_conversionContext): ConversionInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -108,7 +108,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseBasicInstructionF11x(ctx: F11x_basicContext): BasicInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
@@ -117,7 +117,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseBranchInstructionFx0t(ctx: Fx0t_branchContext, codeOffset: Int): BranchInstruction {
         val mnemonic = ctx.op.text
-        val opcode   = DexOpCode.get(mnemonic)
+        val opcode   = DexOpCode[mnemonic]
 
         val label = ctx.target.label.text
         val branchOffset = branchOffset(codeOffset, label)
@@ -127,7 +127,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseBranchInstructionF21t(ctx: F21t_branchContext, codeOffset: Int): BranchInstruction {
         val mnemonic = ctx.op.text
-        val opcode   = DexOpCode.get(mnemonic)
+        val opcode   = DexOpCode[mnemonic]
 
         val label = ctx.label.label.text
         val branchOffset = branchOffset(codeOffset, label)
@@ -138,7 +138,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseBranchInstructionF22t(ctx: F22t_branchContext, codeOffset: Int): BranchInstruction {
         val mnemonic = ctx.op.text
-        val opcode   = DexOpCode.get(mnemonic)
+        val opcode   = DexOpCode[mnemonic]
 
         val label = ctx.label.label.text
         val branchOffset = branchOffset(codeOffset, label)
@@ -150,7 +150,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseFieldInstructionF21c(ctx: F21c_fieldContext): FieldInstruction {
         val mnemonic = ctx.op.text
-        val opcode   = DexOpCode.get(mnemonic)
+        val opcode   = DexOpCode[mnemonic]
 
         val register = registerInfo.registerNumber(ctx.r1.text)
 
@@ -163,7 +163,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseFieldInstructionF22c(ctx: F22c_fieldContext): FieldInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -177,13 +177,13 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseLiteralInstructionInteger(ctx: Fconst_intContext): LiteralInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         var value = parseNumber(ctx.cst.text)
 
         if (mnemonic.contains("high16")) {
-            val shift = if (opcode.targetsWideRegister()) 48 else 16
+            val shift = if (opcode.targetsWideRegister) 48 else 16
             if ((value shr shift) == 0L) {
                 value = value shl shift
             }
@@ -194,7 +194,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseLiteralInstructionString(ctx: Fconst_stringContext): StringInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val stringIndex = dexComposer.addOrGetStringIDIndex(parseString(ctx.cst.text))
@@ -204,7 +204,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseLiteralInstructionType(ctx: Fconst_typeContext): TypeInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.cst.text)
@@ -214,7 +214,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseArithmeticInstructionF12x(ctx: F12x_arithmeticContext): ArithmeticInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -224,7 +224,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseArithmeticInstructionF23x(ctx: F23x_arithmeticContext): ArithmeticInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -235,7 +235,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseArithmeticLiteralInstructionF22sb(ctx: F22sb_arithmeticContext): ArithmeticInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -246,7 +246,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseBasicInstructionCompareF23x(ctx: F23x_compareContext): BasicInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -257,7 +257,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseBasicInstructionMoveFx2x(ctx: Fx2x_moveContext): BasicInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -267,7 +267,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseMethodInstructionF35c(ctx: F35c_methodContext): MethodInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
         val registers = ctx.REGISTER().map { registerInfo.registerNumber(it.text) }.toIntArray()
 
         val methodType = ctx.method.text
@@ -280,7 +280,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseMethodInstructionF3rc(ctx: F3rc_methodContext): MethodInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val rStart = registerInfo.registerNumber(ctx.rstart.text)
         val rEnd   = registerInfo.registerNumber(ctx.rend.text)
@@ -296,7 +296,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseArrayInstructionF23x(ctx: F23x_arrayContext): ArrayInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -307,7 +307,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseArrayInstructionF12x(ctx: F12x_arrayContext): ArrayInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -317,7 +317,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseTypeInstructionFt2c(ctx: Ft2c_typeContext): TypeInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -329,7 +329,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseArrayTypeInstructionF35c(ctx: F35c_arrayContext): ArrayTypeInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val registers = mutableListOf<Int>()
         ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
@@ -341,7 +341,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseArrayTypeInstructionF3rc(ctx: F3rc_arrayContext): ArrayTypeInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val rStart = registerInfo.registerNumber(ctx.rstart.text)
         val rEnd   = registerInfo.registerNumber(ctx.rend.text)
@@ -354,7 +354,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseMethodProtoInstructionF45cc(ctx: F45cc_methodprotoContext): MethodProtoInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val registers = mutableListOf<Int>()
         ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
@@ -374,7 +374,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseMethodProtoInstructionF4rcc(ctx: F4rcc_methodprotoContext): MethodProtoInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val rStart = registerInfo.registerNumber(ctx.rstart.text)
         val rEnd   = registerInfo.registerNumber(ctx.rend.text)
@@ -396,7 +396,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseMethodHandleInstructionF21c(ctx: F21c_const_handleContext): MethodHandleRefInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
@@ -424,7 +424,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseMethodTypeInstructionF21c(ctx: F21c_const_typeContext): MethodTypeRefInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
@@ -438,7 +438,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseCallSiteInstructionF35c(ctx: F35c_customContext): CallSiteInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val registers = mutableListOf<Int>()
         ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
@@ -462,7 +462,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseCallSiteInstructionF3rc(ctx: F3rc_customContext): CallSiteInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val rStart = registerInfo.registerNumber(ctx.rstart.text)
         val rEnd   = registerInfo.registerNumber(ctx.rend.text)
@@ -488,7 +488,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parsePayloadInstructionF31t(ctx: F31t_payloadContext, codeOffset: Int): PayloadInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode.get(mnemonic)
+        val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 

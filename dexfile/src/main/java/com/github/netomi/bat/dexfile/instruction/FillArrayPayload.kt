@@ -29,9 +29,8 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
     var values: ByteArray = _values
         internal set
 
-    override fun getLength(): Int {
-        return (values.size + 1) / 2 + 4
-    }
+    override val length: Int
+        get() = (values.size + 1) / 2 + 4
 
     val elements: Int
         get() = values.size / elementWidth
@@ -113,7 +112,7 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
 
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
-        data[0] = ((opcode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
         data[1] = elementWidth.toShort()
         data[2] = elements.toShort()
         data[3] = (elements shr 16).toShort()

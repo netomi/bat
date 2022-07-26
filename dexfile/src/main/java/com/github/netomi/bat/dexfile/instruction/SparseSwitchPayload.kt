@@ -29,9 +29,8 @@ class SparseSwitchPayload private constructor(_keys: IntArray = EMPTY_ARRAY, _br
     var branchTargets: IntArray = _branchTargets
         internal set
 
-    override fun getLength(): Int {
-        return branchTargets.size * 4 + 2
-    }
+    override val length: Int
+        get() = branchTargets.size * 4 + 2
 
     override fun read(instructions: ShortArray, offset: Int) {
         var currOffset = offset
@@ -53,7 +52,7 @@ class SparseSwitchPayload private constructor(_keys: IntArray = EMPTY_ARRAY, _br
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
 
-        data[0] = ((opcode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
 
         data[1] = keys.size.toShort()
         var offset = 2

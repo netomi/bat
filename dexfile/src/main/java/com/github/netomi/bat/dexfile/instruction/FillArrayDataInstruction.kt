@@ -33,8 +33,7 @@ class FillArrayDataInstruction private constructor(payloadOffset: Int = 0, regis
             return FillArrayDataInstruction(payloadOffset, register)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Int): FillArrayDataInstruction {
+        fun create(opCode: DexOpCode): FillArrayDataInstruction {
             return FillArrayDataInstruction()
         }
     }

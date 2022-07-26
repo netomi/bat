@@ -34,18 +34,18 @@ class MethodProtoInstruction internal constructor(opcode:           DexOpCode,
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        protoIndex = when (opcode.format) {
+        protoIndex = when (opCode.format) {
             FORMAT_45cc,
             FORMAT_4rcc -> instructions[offset + 3].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_45cc,
             FORMAT_4rcc -> data[3] = protoIndex.toShort()
 
@@ -63,8 +63,7 @@ class MethodProtoInstruction internal constructor(opcode:           DexOpCode,
             return MethodProtoInstruction(opcode, methodIndex, protoIndex, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): MethodProtoInstruction {
+        fun create(opCode: DexOpCode): MethodProtoInstruction {
             return MethodProtoInstruction(opCode)
         }
     }

@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.Primitives
 
 class CallSiteInstruction internal constructor(opcode: DexOpCode, _callSiteIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
@@ -31,18 +32,18 @@ class CallSiteInstruction internal constructor(opcode: DexOpCode, _callSiteIndex
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        callSiteIndex = when (opcode.format) {
+        callSiteIndex = when (opCode.format) {
             FORMAT_3rc,
             FORMAT_35c -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_3rc,
             FORMAT_35c -> data[1] = callSiteIndex.toShort()
 
@@ -55,13 +56,16 @@ class CallSiteInstruction internal constructor(opcode: DexOpCode, _callSiteIndex
         visitor.visitCallSiteInstruction(dexFile, classDef, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return super.toString() + ", callSite@${Primitives.asHexValue(callSiteIndex, 4)}"
+    }
+
     companion object {
         fun of(opCode: DexOpCode, callSiteIndex: Int, vararg registers: Int): CallSiteInstruction {
             return CallSiteInstruction(opCode, callSiteIndex, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): CallSiteInstruction {
+        fun create(opCode: DexOpCode): CallSiteInstruction {
             return CallSiteInstruction(opCode)
         }
     }

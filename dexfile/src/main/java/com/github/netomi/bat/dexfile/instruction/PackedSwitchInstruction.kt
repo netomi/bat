@@ -33,8 +33,7 @@ class PackedSwitchInstruction private constructor(payloadOffset: Int = 0, regist
             return PackedSwitchInstruction(payloadOffset, register)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Int): PackedSwitchInstruction {
+        fun create(opCode: DexOpCode): PackedSwitchInstruction {
             return PackedSwitchInstruction()
         }
     }

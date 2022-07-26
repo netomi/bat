@@ -26,9 +26,8 @@ class PackedSwitchPayload private constructor(_firstKey: Int = 0, _branchTargets
     var firstKey: Int           = _firstKey
     var branchTargets: IntArray = _branchTargets
 
-    override fun getLength(): Int {
-        return branchTargets.size * 2 + 4
-    }
+    override val length: Int
+        get() = branchTargets.size * 2 + 4
 
     override fun read(instructions: ShortArray, offset: Int) {
         var currOffset = offset
@@ -47,7 +46,7 @@ class PackedSwitchPayload private constructor(_firstKey: Int = 0, _branchTargets
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
 
-        data[0] = ((opcode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
         data[1] = branchTargets.size.toShort()
 
         var offset = 2

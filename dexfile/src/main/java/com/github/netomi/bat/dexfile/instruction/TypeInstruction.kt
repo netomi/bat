@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.Primitives
 
 class TypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
@@ -31,18 +32,18 @@ class TypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: Int = 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        typeIndex = when (opcode.format) {
+        typeIndex = when (opCode.format) {
             FORMAT_21c,
             FORMAT_22c -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format ${opcode.format} for opcode ${opcode.mnemonic}")
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_21c,
             FORMAT_22c -> data[1] = typeIndex.toShort()
 
@@ -56,13 +57,16 @@ class TypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: Int = 
         visitor.visitTypeInstruction(dexFile, classDef, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return super.toString() + ", type@${Primitives.asHexValue(typeIndex, 4)}"
+    }
+
     companion object {
         fun of(opCode: DexOpCode, typeIndex: Int, vararg registers: Int): TypeInstruction {
             return TypeInstruction(opCode, typeIndex, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): TypeInstruction {
+        fun create(opCode: DexOpCode): TypeInstruction {
             return TypeInstruction(opCode)
         }
     }

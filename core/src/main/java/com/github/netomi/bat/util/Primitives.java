@@ -93,6 +93,25 @@ public final class Primitives
         return sb.toString();
     }
 
+    public static String asSignedHexValue(int value, int digits) {
+        StringBuilder sb = new StringBuilder();
+
+        String hexValue;
+
+        if (value < 0) {
+            hexValue = Integer.toHexString(-value);
+        } else {
+            hexValue = Integer.toHexString(value);
+        }
+
+        int leadingZeros = digits - hexValue.length();
+        sb.append("0".repeat(Math.max(0, leadingZeros)));
+        sb.append(hexValue);
+
+        sb.insert(0, (value < 0 ? "-" : "+"));
+        return sb.toString();
+    }
+
     public static String asHexValue(long value, int digits) {
         StringBuilder sb = new StringBuilder();
 

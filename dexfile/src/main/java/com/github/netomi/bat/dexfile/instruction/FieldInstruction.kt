@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.Primitives
 
 class FieldInstruction internal constructor(opcode: DexOpCode, _fieldIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
@@ -31,18 +32,18 @@ class FieldInstruction internal constructor(opcode: DexOpCode, _fieldIndex: Int 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        fieldIndex = when (opcode.format) {
+        fieldIndex = when (opCode.format) {
             FORMAT_21c,
             FORMAT_22c -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_21c,
             FORMAT_22c -> data[1] = fieldIndex.toShort()
 
@@ -55,13 +56,16 @@ class FieldInstruction internal constructor(opcode: DexOpCode, _fieldIndex: Int 
         visitor.visitFieldInstruction(dexFile, classDef, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return super.toString() + ", field@${Primitives.asHexValue(fieldIndex, 4)}"
+    }
+
     companion object {
         fun of(opCode: DexOpCode, fieldIndex: Int, vararg registers: Int): FieldInstruction {
             return FieldInstruction(opCode, fieldIndex, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): FieldInstruction {
+        fun create(opCode: DexOpCode): FieldInstruction {
             return FieldInstruction(opCode)
         }
     }

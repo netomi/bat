@@ -36,7 +36,7 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        value = when (opcode.format) {
+        value = when (opCode.format) {
             FORMAT_11n -> (instructions[offset].toInt() shr 12).toLong()
 
             FORMAT_21s -> instructions[offset + 1].toLong()
@@ -47,7 +47,7 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
             }
 
             FORMAT_21h -> {
-                if (opcode.targetsWideRegister()) {
+                if (opCode.targetsWideRegister) {
                     instructions[offset + 1].toLong() shl 48
                 } else {
                     (instructions[offset + 1].toInt() shl 16).toLong()
@@ -61,14 +61,14 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
                 ((instructions[offset + 4].toInt() and 0xffff).toLong() shl 48)
             }
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_11n -> data[0] = (data[0].toInt() or (value shl 12).toInt()).toShort()
 
             FORMAT_21s -> data[1] = value.toShort()
@@ -79,7 +79,7 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
             }
 
             FORMAT_21h -> {
-                if (opcode.targetsWideRegister()) {
+                if (opCode.targetsWideRegister) {
                     data[1] = (value shr 48).toShort()
                 } else {
                     data[1] = (value shr 16).toShort()
@@ -93,7 +93,7 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
                 data[4] = (value shr 48).toShort()
             }
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format for opcode " + opCode.mnemonic)
         }
 
         return data
@@ -108,8 +108,7 @@ class LiteralInstruction internal constructor(opcode: DexOpCode, _literal: Long 
             return LiteralInstruction(opcode, value, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): LiteralInstruction {
+        fun create(opCode: DexOpCode): LiteralInstruction {
             return LiteralInstruction(opCode)
         }
     }

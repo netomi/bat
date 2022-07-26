@@ -26,7 +26,7 @@ class ConversionInstruction internal constructor(opcode: DexOpCode, vararg regis
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
-        check(opcode.format == FORMAT_12x) { "unexpected format for opcode " + opcode.mnemonic }
+        check(opCode.format == FORMAT_12x) { "unexpected format ${opCode.format} for opcode ${opCode.mnemonic}" }
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
@@ -38,8 +38,7 @@ class ConversionInstruction internal constructor(opcode: DexOpCode, vararg regis
             return ConversionInstruction(opcode, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): ConversionInstruction {
+        fun create(opCode: DexOpCode): ConversionInstruction {
             return ConversionInstruction(opCode)
         }
     }

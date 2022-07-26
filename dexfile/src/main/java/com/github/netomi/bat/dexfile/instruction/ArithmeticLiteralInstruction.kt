@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode, _literal: Int = 0, vararg registers: Int) : ArithmeticInstruction(opcode, *registers) {
+class ArithmeticLiteralInstruction internal constructor(opCode: DexOpCode, _literal: Int = 0, vararg registers: Int) : ArithmeticInstruction(opCode, *registers) {
 
     var literal = _literal
         private set
@@ -30,18 +30,18 @@ class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode, _lite
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        literal = when (opcode.format) {
+        literal = when (opCode.format) {
             FORMAT_22b -> instructions[offset + 1].toInt() shr 8
             FORMAT_22s -> instructions[offset + 1].toInt()
 
-            else -> throw IllegalStateException("unexpected format ${opcode.format} for opcode ${opcode.mnemonic}")
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_22b -> data[1] = (data[1].toInt() or (literal shl 8)).toShort()
             FORMAT_22s -> data[1] = literal.toShort()
 
@@ -59,8 +59,7 @@ class ArithmeticLiteralInstruction internal constructor(opcode: DexOpCode, _lite
             return ArithmeticLiteralInstruction(opCode, literal, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): ArithmeticLiteralInstruction {
+        fun create(opCode: DexOpCode): ArithmeticLiteralInstruction {
             return ArithmeticLiteralInstruction(opCode)
         }
     }

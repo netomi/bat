@@ -33,8 +33,7 @@ class SparseSwitchInstruction private constructor(payloadOffset: Int = 0, regist
             return SparseSwitchInstruction(payloadOffset, register)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Int): SparseSwitchInstruction {
+        fun create(opCode: DexOpCode): SparseSwitchInstruction {
             return SparseSwitchInstruction()
         }
     }

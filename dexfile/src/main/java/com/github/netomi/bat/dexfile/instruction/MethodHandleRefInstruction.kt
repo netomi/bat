@@ -33,17 +33,17 @@ class MethodHandleRefInstruction internal constructor(       opcode:            
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        methodHandleIndex = when (opcode.format) {
+        methodHandleIndex = when (opCode.format) {
             FORMAT_21c -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_21c -> data[1] = methodHandleIndex.toShort()
 
             else -> {}
@@ -60,8 +60,7 @@ class MethodHandleRefInstruction internal constructor(       opcode:            
             return MethodHandleRefInstruction(opCode, methodHandleIndex, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): MethodHandleRefInstruction {
+        fun create(opCode: DexOpCode): MethodHandleRefInstruction {
             return MethodHandleRefInstruction(opCode)
         }
     }

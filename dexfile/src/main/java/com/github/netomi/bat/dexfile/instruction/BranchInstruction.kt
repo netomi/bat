@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.Primitives
 
 class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: Int = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
@@ -29,7 +30,7 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
-        branchOffset = when (opcode.format) {
+        branchOffset = when (opCode.format) {
             FORMAT_10t -> instructions[offset].toInt() shr 8
 
             FORMAT_20t,
@@ -39,14 +40,14 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
             FORMAT_30t,
             FORMAT_31t -> instructions[offset + 1].toInt() and 0xffff or (instructions[offset + 2].toInt() shl 16)
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_10t -> data[0] = (data[0].toInt() or (branchOffset shl 8)).toShort()
 
             FORMAT_20t,
@@ -64,6 +65,12 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
         return data
     }
 
+    override fun toString(): String {
+        val separator = if (registers.isEmpty()) " " else ", "
+        val offsetString = Primitives.asSignedHexValue(branchOffset, 4)
+        return super.toString() + separator + offsetString
+    }
+
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitBranchInstruction(dexFile, classDef, method, code, offset, this)
     }
@@ -73,8 +80,7 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
             return BranchInstruction(opCode, branchOffset, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): BranchInstruction {
+        fun create(opCode: DexOpCode): BranchInstruction {
             return BranchInstruction(opCode)
         }
     }

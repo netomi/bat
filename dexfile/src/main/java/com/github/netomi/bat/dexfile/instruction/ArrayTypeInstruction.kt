@@ -31,18 +31,18 @@ class ArrayTypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: I
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        typeIndex = when (opcode.format) {
+        typeIndex = when (opCode.format) {
             FORMAT_3rc,
             FORMAT_35c -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opcode.mnemonic)
+            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }
 
     override fun writeData(): ShortArray {
         val data = super.writeData()
 
-        when (opcode.format) {
+        when (opCode.format) {
             FORMAT_3rc,
             FORMAT_35c -> data[1] = typeIndex.toShort()
 
@@ -60,8 +60,7 @@ class ArrayTypeInstruction internal constructor(opcode: DexOpCode, _typeIndex: I
             return ArrayTypeInstruction(opCode, typeIndex, *registers)
         }
 
-        @JvmStatic
-        fun create(opCode: DexOpCode, ident: Byte): ArrayTypeInstruction {
+        fun create(opCode: DexOpCode): ArrayTypeInstruction {
             return ArrayTypeInstruction(opCode)
         }
     }

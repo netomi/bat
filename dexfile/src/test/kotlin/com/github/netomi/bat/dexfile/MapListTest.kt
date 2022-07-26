@@ -51,6 +51,6 @@ class MapListTest : DexContentTest<MapList>() {
         l3.updateMapItem(1, 2, 5)
         assertEquals(l1, l1)
         assertNotEquals(l1, l2)
-        assertEquals(l1, l3)
+        assertNotEquals(l1, l3)
     }
 }
