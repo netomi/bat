@@ -110,19 +110,17 @@ class ClassDef private constructor(
         return dexFile.getStringNullable(sourceFileIndex)
     }
 
-    fun addField(dexFile: DexFile, field: EncodedField) {
+    internal fun addField(dexFile: DexFile, field: EncodedField) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
-        Preconditions.checkArgument(!classData.fields.contains(field), "field already exists in this class")
-
+        classData.fields.forEach { Preconditions.checkArgument(field.fieldIndex != it.fieldIndex, "field already exists in this class") }
         classData.addField(field)
     }
 
-    fun addMethod(dexFile: DexFile, method: EncodedMethod) {
+    internal fun addMethod(dexFile: DexFile, method: EncodedMethod) {
         val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(methodClass == getType(dexFile), "method class does not match this class")
         classData.methods.forEach { Preconditions.checkArgument(method.methodIndex != it.methodIndex, "method already exists in this class") }
-
         classData.addMethod(method)
     }
 
@@ -150,7 +148,7 @@ class ClassDef private constructor(
         }
     }
 
-    fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue) {
+    internal fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
 

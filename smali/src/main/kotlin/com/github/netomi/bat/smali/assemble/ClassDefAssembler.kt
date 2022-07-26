@@ -16,7 +16,8 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.annotation.*
+import com.github.netomi.bat.dexfile.annotation.Annotation
+import com.github.netomi.bat.dexfile.editor.ClassDefEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
@@ -26,10 +27,8 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
     private val encodedValueAssembler: EncodedValueAssembler = EncodedValueAssembler(dexEditor)
     private val annotationAssembler:   AnnotationAssembler   = AnnotationAssembler(encodedValueAssembler, dexEditor)
 
-    private val dexFile: DexFile
-        get() = dexEditor.dexFile
-
-    private lateinit var classDef: ClassDef
+    private lateinit var classDef:       ClassDef
+    private lateinit var classDefEditor: ClassDefEditor
 
     override fun visitSFile(ctx: SFileContext): ClassDef {
         val classType   = ctx.className.text
@@ -48,53 +47,47 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
                         sourceFileIndex)
 
         dexEditor.addClassDef(classDef)
+        classDefEditor = ClassDefEditor.of(dexEditor, classDef)
 
         ctx.sInterface().forEach {
             classDef.interfaces.addType(dexEditor.addOrGetTypeIDIndex(it.name.text))
         }
 
-        val annotationSet = classDef.annotationsDirectory.classAnnotations
-        ctx.sAnnotation().forEach { annotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
+        val annotations = mutableListOf<Annotation>()
+        ctx.sAnnotation().forEach { annotations.add(annotationAssembler.parseAnnotation(it)) }
+        classDefEditor.addClassAnnotations(annotations)
 
-        ctx.sField().forEach  { visitSField(it, classType) }
-        ctx.sMethod().forEach { visitSMethod(it, classType) }
+        ctx.sField().forEach  { visitSField(it) }
+        ctx.sMethod().forEach { visitSMethod(it) }
 
         return classDef
     }
 
-    private fun visitSField(ctx: SFieldContext, classType: String) {
+    override fun visitSField(ctx: SFieldContext): ClassDef {
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
-        val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType, name, type)
-        val field = EncodedField.of(fieldIDIndex, accessFlags)
-
-        classDef.addField(dexFile, field)
+        val field = classDefEditor.addField(name, type, accessFlags)
 
         if (field.isStatic && ctx.sBaseValue() != null) {
             val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
-            classDef.setStaticValue(dexFile, field, staticValue)
+            classDefEditor.setStaticValue(field, staticValue)
         }
 
-        val annotationSet = AnnotationSet.empty()
-        ctx.sAnnotation().forEach { annotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
-        if (!annotationSet.isEmpty) {
-            val fieldAnnotation = FieldAnnotation.of(field.fieldIndex, annotationSet)
-            classDef.annotationsDirectory.fieldAnnotations.add(fieldAnnotation)
+        val annotations = mutableListOf<Annotation>()
+        ctx.sAnnotation().forEach { annotations.add(annotationAssembler.parseAnnotation(it)) }
+        if (annotations.isNotEmpty()) {
+            classDefEditor.addFieldAnnotations(field, annotations)
         }
+
+        return classDef
     }
 
-    private fun visitSMethod(ctx: SMethodContext, classType: String) {
+    override fun visitSMethod(ctx: SMethodContext): ClassDef {
         val (_, name, parameterTypes, returnType) = parseMethodObject(ctx.methodObj.text)
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        val methodIDIndex =
-            dexEditor.addOrGetMethodIDIndex(classType,
-                                            name,
-                                            parameterTypes,
-                                            returnType)
-
-        val method = EncodedMethod.of(methodIDIndex, accessFlags)
+        val method = classDefEditor.addMethod(name, parameterTypes, returnType, accessFlags)
 
         if (!method.isAbstract) {
             val codeAssembler = CodeAssembler(classDef, method, dexEditor)
@@ -106,16 +99,12 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
             }
         }
 
-        classDef.addMethod(dexFile, method)
-
-        val annotationSet = AnnotationSet.empty()
-        ctx.sAnnotation().forEach { annotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
-        if (!annotationSet.isEmpty) {
-            val methodAnnotation = MethodAnnotation.of(method.methodIndex, annotationSet)
-            classDef.annotationsDirectory.methodAnnotations.add(methodAnnotation)
+        val methodAnnotations = mutableListOf<Annotation>()
+        ctx.sAnnotation().forEach { methodAnnotations.add(annotationAssembler.parseAnnotation(it)) }
+        if (methodAnnotations.isNotEmpty()) {
+            classDefEditor.addMethodAnnotations(method, methodAnnotations)
         }
 
-        val annotationSetRefList = AnnotationSetRefList.empty()
         ctx.sParameter().forEach { pCtx ->
             val parameterNumber = pCtx.r.text.substring(1).toInt()
 
@@ -125,20 +114,13 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
                 parameterNumber - 1
             }
 
-            while (annotationSetRefList.annotationSetRefCount < parameterIndex) {
-                annotationSetRefList.annotationSetRefs.add(AnnotationSetRef.of(AnnotationSet.empty()))
-            }
-
-            val parameterAnnotationSet = AnnotationSet.empty()
-            pCtx.sAnnotation().forEach { parameterAnnotationSet.addAnnotation(annotationAssembler.parseAnnotation(it)) }
-            if (!parameterAnnotationSet.isEmpty) {
-                annotationSetRefList.annotationSetRefs.add(AnnotationSetRef.of(parameterAnnotationSet))
+            val parameterAnnotations = mutableListOf<Annotation>()
+            pCtx.sAnnotation().forEach { parameterAnnotations.add(annotationAssembler.parseAnnotation(it)) }
+            if (parameterAnnotations.isNotEmpty()) {
+                classDefEditor.addParameterAnnotations(method, parameterIndex, parameterAnnotations)
             }
         }
 
-        if (!annotationSetRefList.isEmpty) {
-            val parameterAnnotation = ParameterAnnotation.of(method.methodIndex, annotationSetRefList)
-            classDef.annotationsDirectory.parameterAnnotations.add(parameterAnnotation)
-        }
+        return classDef
     }
 }

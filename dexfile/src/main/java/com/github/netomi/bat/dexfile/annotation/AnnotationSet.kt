@@ -37,17 +37,13 @@ class AnnotationSet private constructor() : DataItem() {
 
     private var annotationOffsetEntries: IntArray = intArrayOf()
 
-    val annotations: ArrayList<Annotation> = ArrayList(0)
+    internal val annotations: ArrayList<Annotation> = ArrayList(0)
 
     val annotationCount: Int
         get() = annotations.size
 
     fun getAnnotation(index: Int): Annotation {
         return annotations[index]
-    }
-
-    fun addAnnotation(annotation: Annotation) {
-        annotations.add(annotation)
     }
 
     override val isEmpty: Boolean
@@ -126,6 +122,12 @@ class AnnotationSet private constructor() : DataItem() {
     companion object {
         fun empty(): AnnotationSet {
             return AnnotationSet()
+        }
+
+        fun of(annotations: List<Annotation>): AnnotationSet {
+            val annotationSet = empty()
+            annotationSet.annotations.addAll(annotations)
+            return annotationSet
         }
 
         fun readContent(input: DexDataInput): AnnotationSet {
