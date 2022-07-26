@@ -33,7 +33,7 @@ public enum DexAccessFlags
     NATIVE               (ACC_NATIVE,                METHOD),
     INTERFACE            (ACC_INTERFACE,             CLASS),
     ABSTRACT             (ACC_ABSTRACT,              CLASS | METHOD),
-    STRICT               (ACC_STRICT,                METHOD),
+    STRICTFP             (ACC_STRICT,                METHOD),
     SYNTHETIC            (ACC_SYNTHETIC,             CLASS | FIELD | METHOD),
     ANNOTATION           (ACC_ANNOTATION,            CLASS),
     ENUM                 (ACC_ENUM,                  CLASS | FIELD),

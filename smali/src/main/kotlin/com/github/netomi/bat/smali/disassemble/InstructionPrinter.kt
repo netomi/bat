@@ -301,9 +301,16 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         if (isRangeInstruction) {
             val firstRegister = instruction.registers[0]
             val lastRegister = instruction.registers[instruction.registers.size - 1]
-            registerPrinter.printRegister(printer, firstRegister)
+            val firstRegisterString = registerPrinter.formatRegister(firstRegister)
+            printer.print(firstRegisterString)
             printer.print(" .. ")
-            registerPrinter.printRegister(printer, lastRegister)
+            // make sure that the first and last register in the range use the same format.
+            val lastRegisterString = if (firstRegisterString.startsWith("v")) {
+                registerPrinter.formatRegister(lastRegister, false)
+            } else {
+                registerPrinter.formatRegister(lastRegister)
+            }
+            printer.print(lastRegisterString)
         } else {
             for (idx in instruction.registers.indices) {
                 if (idx > 0) {

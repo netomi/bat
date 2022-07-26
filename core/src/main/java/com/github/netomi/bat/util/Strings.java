@@ -45,7 +45,7 @@ public class Strings
                     case '\n': sb.append("\\n"); continue;
                     case '\r': sb.append("\\r"); continue;
                     case '\t': sb.append("\\t"); continue;
-                    case '\b': sb.append("\\b"); continue;
+                    //case '\b': sb.append("\\b"); continue;
                 }
             }
 

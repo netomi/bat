@@ -25,7 +25,7 @@ enum class MethodModifier(val flagValue: Int) {
     VARARGS              (ACC_VARARGS),
     NATIVE               (ACC_NATIVE),
     ABSTRACT             (ACC_ABSTRACT),
-    STRICT               (ACC_STRICT),
+    STRICTFP             (ACC_STRICT),
     SYNTHETIC            (ACC_SYNTHETIC),
     CONSTRUCTOR          (ACC_CONSTRUCTOR),
     DECLARED_SYNCHRONIZED(ACC_DECLARED_SYNCHRONIZED);

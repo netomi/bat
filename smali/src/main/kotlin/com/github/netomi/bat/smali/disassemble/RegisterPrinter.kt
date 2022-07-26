@@ -21,13 +21,17 @@ import com.github.netomi.bat.io.IndentingPrinter
 internal class RegisterPrinter(code: Code) {
     private val localRegisters: Int = code.registersSize - code.insSize
 
-    fun formatRegister(registerNum: Int): String {
-        val registerPrefix = if (registerNum < localRegisters) "v" else "p"
-        val registerIndex  = if (registerNum < localRegisters) registerNum else registerNum - localRegisters
-        return registerPrefix + registerIndex
+    fun formatRegister(registerNum: Int, enableParameterFormat: Boolean = true): String {
+        return if (enableParameterFormat) {
+            val registerPrefix = if (registerNum < localRegisters) "v" else "p"
+            val registerIndex  = if (registerNum < localRegisters) registerNum else registerNum - localRegisters
+            registerPrefix + registerIndex
+        } else {
+            "v$registerNum"
+        }
     }
 
-    fun printRegister(printer: IndentingPrinter, registerNum: Int) {
-        printer.print(formatRegister(registerNum))
+    fun printRegister(printer: IndentingPrinter, registerNum: Int, enableParameterFormat: Boolean = true) {
+        printer.print(formatRegister(registerNum, enableParameterFormat))
     }
 }

@@ -66,7 +66,7 @@ internal class AnnotationPrinter(private val printer:      IndentingPrinter,
                 printer.println(".param p%d    # %s".format(currentRegisterIndex, currentParameterType))
             }
             printer.levelUp()
-            annotationSet.accept(dexFile, classDef, this)
+            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printer.levelDown()
             printer.println(".end param")
         }
