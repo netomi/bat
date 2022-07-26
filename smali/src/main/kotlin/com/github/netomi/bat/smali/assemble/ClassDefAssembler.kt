@@ -79,7 +79,7 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
 
         val method = classDefEditor.addMethod(name, parameterTypes, returnType, accessFlags)
 
-        if (!method.isAbstract) {
+        if (!method.isAbstract && !method.isNative) {
             val codeAssembler = CodeAssembler(classDef, method, dexEditor)
             val code = codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
             method.code = code

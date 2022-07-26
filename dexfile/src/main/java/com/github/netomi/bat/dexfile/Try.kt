@@ -85,7 +85,7 @@ class Try private constructor(_startAddr:    Int                 = 0,
             Preconditions.checkArgument(startAddr <= 65535, "startAddr must be <= 65535")
             Preconditions.checkArgument(endAddr >= 0, "endAddr must not be negative")
             Preconditions.checkArgument(endAddr <= 65534, "endAddr must be <= 65534")
-            Preconditions.checkArgument(endAddr > startAddr, "endAddr must be > startAddr")
+            Preconditions.checkArgument(endAddr >= startAddr, "endAddr must be > startAddr")
 
             val insnCount = endAddr - startAddr + 1
             return Try(startAddr, insnCount, catchHandler)

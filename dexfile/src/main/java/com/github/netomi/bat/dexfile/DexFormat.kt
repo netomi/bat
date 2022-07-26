@@ -29,7 +29,7 @@ enum class DexFormat(private val bytePattern: ByteArray, val version: String, va
     companion object {
         fun forApiLevel(apiLevel: Int): DexFormat {
             for (format in values().reversed()) {
-                if (apiLevel > format.apiLevel) {
+                if (apiLevel >= format.apiLevel) {
                     return format
                 }
             }

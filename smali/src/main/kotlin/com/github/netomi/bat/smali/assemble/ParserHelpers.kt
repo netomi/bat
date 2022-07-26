@@ -22,6 +22,7 @@ import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.util.Strings
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
+import java.lang.NumberFormatException
 
 internal fun parserError(ctx: ParserRuleContext, message: String): Nothing {
     val lineNumber = ctx.getStart().line
@@ -102,26 +103,32 @@ internal fun parseAccessFlags(sAccListContext: SmaliParser.SAccListContext): Int
     return accessFlags
 }
 
-internal fun parseNumber(value: String): Long {
-    return when(value.last()) {
-        'l',
-        'L',
-        's',
-        'S',
-        't',
-        'T'   -> parseLong(value.dropLast(1))
-        '\''  -> parseChar(value).code.toLong()
-        'f',
-        'F'   -> parseFloat(value.dropLast(1)).toBits().toLong()
+internal fun parseLiteral(value: String): Long {
+    return if (value.contains("0x") || value.contains("0X")) {
+        parseLong(value)
+    } else {
+        when (value.last()) {
+            'l',
+            'L',
+            's',
+            'S',
+            't',
+            'T' -> parseLong(value.dropLast(1))
 
-        'd',
-        'D'   -> parseDouble(value.dropLast(1)).toBits()
+            '\'' -> parseChar(value).code.toLong()
 
-        else  -> {
-            if (value.contains(".")) {
-                parseDouble(value).toBits()
-            } else {
-                parseLong(value)
+            'f',
+            'F' -> parseFloat(value.dropLast(1)).toBits().toLong()
+
+            'd',
+            'D' -> parseDouble(value.dropLast(1)).toBits()
+
+            else -> {
+                if (value.contains(".")) {
+                    parseDouble(value).toBits()
+                } else {
+                    parseLong(value)
+                }
             }
         }
     }

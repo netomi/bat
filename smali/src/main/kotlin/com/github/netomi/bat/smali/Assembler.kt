@@ -33,16 +33,17 @@ import java.util.function.BiPredicate
 import java.util.function.Predicate
 import kotlin.io.path.name
 
-class Assembler(private val dexFile: DexFile) {
+class Assembler(dexFile: DexFile) {
 
     private val dexEditor: DexEditor = DexEditor.of(dexFile)
 
     @Throws(IOException::class)
-    fun assemble(input: Path): Collection<ClassDef> {
+    fun assemble(input: Path, callback: (Path) -> Unit = {}): Collection<ClassDef> {
         val assembledClasses: MutableCollection<ClassDef> = mutableListOf()
 
         val assembleFile = { path: Path ->
             Files.newInputStream(path).use { `is` ->
+                callback(path)
                 val classDef = assemble(`is`)
                 assembledClasses.add(classDef)
             }

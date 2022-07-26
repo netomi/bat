@@ -21,6 +21,8 @@ import com.github.netomi.bat.dexfile.io.DexFileWriter
 import com.github.netomi.bat.smali.Assembler
 import picocli.CommandLine
 import java.io.File
+import java.nio.file.Path
+import kotlin.io.path.pathString
 
 /**
  * Command-line tool to assemble dex files from smali input files.
@@ -53,11 +55,11 @@ class SmaliCommand : Runnable {
         inputFiles.forEach {
             if (it.isDirectory) {
                 printVerbose("Assembling directory '${it.name}' into file ${outputFile.name} ...")
-                val assembledClasses = Assembler(dexFile).assemble(it.toPath())
+                val assembledClasses = Assembler(dexFile).assemble(it.toPath(), ::assembleFile)
                 printVerbose("Assembled ${assembledClasses.size} class(es).")
             } else {
                 printVerbose("Assembling file '${it.name}' into file ${outputFile.name} ...")
-                Assembler(dexFile).assemble(it.toPath())
+                Assembler(dexFile).assemble(it.toPath(), ::assembleFile)
                 printVerbose("Assembled 1 class.")
             }
         }
@@ -65,6 +67,9 @@ class SmaliCommand : Runnable {
         DexFileWriter(outputFile.outputStream()).visitDexFile(dexFile)
     }
 
+    private fun assembleFile(file: Path) {
+        printVerbose("  assembling file ${file.pathString}")
+    }
     private fun printVerbose(text: String) {
         if (verbose) {
             println(text)

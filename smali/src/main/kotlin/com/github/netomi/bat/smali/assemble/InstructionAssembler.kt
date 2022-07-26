@@ -165,6 +165,9 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
 
+        if (r1 > 15) {
+            println("register $r1 $r2")
+        }
         val field = ctx.fld.text
         val (classType, fieldName, fieldType) = parseFieldObject(field)
 
@@ -177,7 +180,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
-        var value = parseNumber(ctx.cst.text)
+        var value = parseLiteral(ctx.cst.text)
 
         if (mnemonic.contains("high16")) {
             val shift = if (opcode.targetsWideRegister) 48 else 16
@@ -236,7 +239,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
-        val value = parseNumber(ctx.lit.text).toInt()
+        val value = parseLiteral(ctx.lit.text).toInt()
 
         return ArithmeticLiteralInstruction.of(opcode, value, r1, r2)
     }
@@ -505,19 +508,32 @@ internal class InstructionAssembler internal constructor(            listCtx:   
             1 -> FillArrayPayload.of(encodedValues.map { (it as EncodedByteValue).value }.toByteArray())
             2 -> FillArrayPayload.of(encodedValues.map { (it as EncodedShortValue).value }.toShortArray())
             4 -> FillArrayPayload.of(encodedValues.map { (it as EncodedIntValue).value }.toIntArray())
-            8 -> FillArrayPayload.of(encodedValues.map { (it as EncodedLongValue).value }.toLongArray())
+            8 -> FillArrayPayload.of(encodedValues.map {
+                if (it is EncodedIntValue) it.value.toLong() else (it as EncodedLongValue).value
+            }.toLongArray())
             else -> throw RuntimeException("unexpected elementWidth $elementWidth")
         }
     }
 
     fun parseSparseSwitchPayload(ctx: FsparseswitchContext, codeOffset: Int): SparseSwitchPayload {
         val switchOffset = if (codeOffset == -1) { 0 } else {
-            val payloadLabel = labelMapping.entries.find { it.value == codeOffset }?.key ?: throw RuntimeException("unknown label for payload")
-            payloadLabelMapping[payloadLabel] ?: throw RuntimeException("payload not referenced")
-        }
+            val payloadLabels = labelMapping.entries.filter { it.value == codeOffset }.map { it.key }
+            if (payloadLabels.isEmpty()) {
+                throw RuntimeException("unknown label for sparse switch payload")
+            }
+
+            var offset: Int? = null
+            for (label in payloadLabels) {
+                offset = payloadLabelMapping[label]
+                if (offset != null) {
+                    break
+                }
+            }
+            offset
+        } ?: throw RuntimeException("payload not referenced from an instruction")
 
         val keys = IntArray(ctx.INT().size)
-        ctx.INT().forEachIndexed { index, node -> keys[index] = node.text.toInt() }
+        ctx.INT().forEachIndexed { index, node -> keys[index] = parseInt(node.text) }
 
         val branchTargets = IntArray(ctx.sLabel().size)
         ctx.sLabel().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.label.text) }
@@ -527,11 +543,22 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parsePackedSwitchPayload(ctx: FpackedswitchContext, codeOffset: Int): PackedSwitchPayload {
         val switchOffset = if (codeOffset == -1) { 0 } else {
-            val payloadLabel = labelMapping.entries.find { it.value == codeOffset }?.key ?: throw RuntimeException("unknown label for payload")
-            payloadLabelMapping[payloadLabel] ?: throw RuntimeException("payload not referenced")
-        }
+            val payloadLabels = labelMapping.entries.filter { it.value == codeOffset }.map { it.key }
+            if (payloadLabels.isEmpty()) {
+                throw RuntimeException("unknown label for packed switch payload")
+            }
 
-        val firstKey = ctx.start.text.toInt()
+            var offset: Int? = null
+            for (label in payloadLabels) {
+                offset = payloadLabelMapping[label]
+                if (offset != null) {
+                    break
+                }
+            }
+            offset
+        } ?: throw RuntimeException("payload not referenced from an instruction")
+
+        val firstKey = parseInt(ctx.start.text)
 
         val branchTargets = IntArray(ctx.sLabel().size)
         ctx.sLabel().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.label.text) }

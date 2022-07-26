@@ -59,7 +59,7 @@ class IntegrationTest {
                     .redirectErrorStream(true)
                     .start()
 
-            proc.waitFor(60, TimeUnit.MINUTES)
+            proc.waitFor(1, TimeUnit.MINUTES)
             proc.inputStream.bufferedReader().readText()
         } catch(e: IOException) {
             e.printStackTrace()

@@ -38,10 +38,27 @@ object DexClasses {
             val char = parameters[index]
 
             when (char) {
-                'L', '[' -> {
+                'L' -> {
                     val colon = parameters.indexOf(';', index)
                     result.add(parameters.substring(index, colon + 1))
                     index = colon + 1
+                }
+
+                '[' -> {
+                    var j = index + 1
+                    while (parameters[j] == '[') j++
+                    index = when (parameters[j]) {
+                        'L' -> {
+                            val colon = parameters.indexOf(';', j)
+                            result.add(parameters.substring(index, colon + 1))
+                            colon + 1
+                        }
+
+                        else -> {
+                            result.add(parameters.substring(index, j + 1))
+                            j + 1
+                        }
+                    }
                 }
 
                 else -> {

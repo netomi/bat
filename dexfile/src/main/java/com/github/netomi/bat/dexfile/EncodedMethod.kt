@@ -77,6 +77,9 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
     val isAbstract: Boolean
         get() = modifiers.contains(MethodModifier.ABSTRACT)
 
+    val isNative: Boolean
+        get() = modifiers.contains(MethodModifier.NATIVE)
+
     val isPrivate: Boolean
         get() = visibility == Visibility.PRIVATE
 

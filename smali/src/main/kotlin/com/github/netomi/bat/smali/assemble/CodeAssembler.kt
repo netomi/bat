@@ -40,7 +40,7 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
         val registerInfo         = collectRegisterInfo(iCtx)
         val instructionAssembler = InstructionAssembler(iCtx, registerInfo, dexEditor)
 
-        val parameters = method.getProtoID(dexFile).parameters.typeCount
+        val parameters = if (method.isStatic) registerInfo.insSize else registerInfo.insSize - 1
         val debugInfo = DebugInfo.empty(parameters)
         val debugSequenceAssembler = DebugSequenceAssembler(debugInfo)
 
@@ -252,7 +252,7 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
             sequence.add(Seq(it.endAddr, SeqType.END, it))
         }
 
-        sequence.sortWith(compareBy<Seq>{ it.addr }.thenByDescending { it.type })
+        sequence.sortWith(compareBy<Seq>{ it.addr }.thenBy { it.type })
 
         val nonOverlappingTries = arrayListOf<Try>()
         var currentTry: Try? = null
@@ -299,7 +299,6 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
     }
 
     private fun collectRegisterInfo(listCtx: List<SInstructionContext>): RegisterInfo {
-
         val protoID = method.getProtoID(dexFile)
         var insSize = if (method.isStatic) 0 else 1
         val argumentSize = DexClasses.getArgumentSize(protoID.parameters.getTypes(dexFile))
