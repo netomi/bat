@@ -33,9 +33,6 @@ internal class InstructionAssembler internal constructor(            listCtx:   
     private val labelMapping:        MutableMap<String, Int> = LinkedHashMap()
     private val payloadLabelMapping: MutableMap<String, Int> = HashMap()
 
-//    private val dexFile: DexFile
-//        get() = dexEditor.dexFile
-
     init {
         collectLabels(listCtx)
     }
