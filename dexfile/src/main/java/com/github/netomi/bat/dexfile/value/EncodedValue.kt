@@ -52,8 +52,11 @@ abstract class EncodedValue {
 
     internal abstract fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
 
+    abstract override fun hashCode(): Int
+
+    abstract override fun equals(other: Any?): Boolean
+
     companion object {
-        @JvmStatic
         fun read(input: DexDataInput): EncodedValue {
             val typeAndArg = input.readUnsignedByte().toInt()
             val valueArg   = typeAndArg ushr 5
@@ -65,17 +68,15 @@ abstract class EncodedValue {
 
         private fun create(valueType: Int): EncodedValue {
             return EncodedValueType.of(valueType)?.supplier?.invoke()
-                ?: throw DexFormatException("Unexpected EncodedValue type: ${Primitives.toHexString(valueType.toShort())}")
+                ?: throw DexFormatException("unexpected encoded value type: ${Primitives.toHexString(valueType.toShort())}")
         }
 
-        @JvmStatic
         fun readAnnotationValue(input: DexDataInput): EncodedAnnotationValue {
             val annotation = EncodedAnnotationValue()
             annotation.readValue(input, 0)
             return annotation
         }
 
-        @JvmStatic
         fun requiredBytesForSignedInt(value: Int): Int {
             return when (value) {
                 value shl 24 shr 24 -> 1
@@ -85,7 +86,6 @@ abstract class EncodedValue {
             }
         }
 
-        @JvmStatic
         fun requiredBytesForSignedLong(value: Long): Int {
             return when (value) {
                 value shl 56 shr 56 -> 1
@@ -99,18 +99,15 @@ abstract class EncodedValue {
             }
         }
 
-        @JvmStatic
         fun requiredBytesForSignedShort(value: Short): Int {
             val v = value.toInt()
             return if (v shl 24 shr 24 == v) 1 else 2
         }
 
-        @JvmStatic
         fun requiredBytesForUnsignedChar(value: Char): Int {
             return if (value.code shl 24 ushr 24 == value.code) 1 else 2
         }
 
-        @JvmStatic
         fun requiredBytesForUnsignedInt(value: Int): Int {
             return when (value) {
                 value shl 24 ushr 24 -> 1
@@ -120,7 +117,6 @@ abstract class EncodedValue {
             }
         }
 
-        @JvmStatic
         fun requiredBytesForFloat(value: Float): Int {
             val bits = java.lang.Float.floatToIntBits(value)
 
@@ -130,7 +126,6 @@ abstract class EncodedValue {
                    else                       4
         }
 
-        @JvmStatic
         fun requiredBytesForDouble(value: Double): Int {
             val bits = java.lang.Double.doubleToLongBits(value)
 

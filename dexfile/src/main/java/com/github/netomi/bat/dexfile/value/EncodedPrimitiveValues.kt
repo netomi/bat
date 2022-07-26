@@ -53,7 +53,6 @@ data class EncodedByteValue internal constructor(var value: Byte = 0.toByte()) :
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Byte): EncodedByteValue {
             return EncodedByteValue(value)
         }
@@ -91,7 +90,6 @@ data class EncodedIntValue internal constructor(var value: Int = 0) : EncodedVal
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Int): EncodedIntValue {
             return EncodedIntValue(value)
         }
@@ -129,7 +127,6 @@ data class EncodedCharValue internal constructor(var value: Char = 0.toChar()) :
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Char): EncodedCharValue {
             return EncodedCharValue(value)
         }
@@ -165,7 +162,6 @@ data class EncodedBooleanValue internal constructor(var value: Boolean = false) 
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Boolean): EncodedBooleanValue {
             return EncodedBooleanValue(value)
         }
@@ -203,7 +199,6 @@ data class EncodedShortValue internal constructor(var value: Short = 0.toShort()
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Short): EncodedShortValue {
             return EncodedShortValue(value)
         }
@@ -241,7 +236,6 @@ data class EncodedDoubleValue internal constructor(var value: Double = 0.0) : En
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Double): EncodedDoubleValue {
             return EncodedDoubleValue(value)
         }
@@ -279,7 +273,6 @@ data class EncodedFloatValue internal constructor(var value: Float = 0f) : Encod
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Float): EncodedFloatValue {
             return EncodedFloatValue(value)
         }
@@ -317,7 +310,6 @@ data class EncodedLongValue internal constructor(var value: Long = 0) : EncodedV
     }
 
     companion object {
-        @JvmStatic
         fun of(value: Long): EncodedLongValue {
             return EncodedLongValue(value)
         }

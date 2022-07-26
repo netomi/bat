@@ -18,19 +18,19 @@ package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.debug.DebugInfo
-import com.github.netomi.bat.dexfile.editor.DexComposer
+import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.io.InstructionWriter
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 
-internal class CodeAssembler constructor(private val classDef:    ClassDef,
-                                         private val method:      EncodedMethod,
-                                         private val dexComposer: DexComposer) {
+internal class CodeAssembler constructor(private val classDef:  ClassDef,
+                                         private val method:    EncodedMethod,
+                                         private val dexEditor: DexEditor) {
 
     private val dexFile: DexFile
-        get() = dexComposer.dexFile
+        get() = dexEditor.dexFile
 
     fun parseCode(iCtx: List<SInstructionContext>, pCtx: List<SParameterContext>): Code {
 
@@ -38,9 +38,9 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
         val tryElements  = mutableListOf<Try>()
 
         val registerInfo         = collectRegisterInfo(iCtx)
-        val instructionAssembler = InstructionAssembler(iCtx, registerInfo, dexComposer)
+        val instructionAssembler = InstructionAssembler(iCtx, registerInfo, dexEditor)
 
-        val parameters = method.getMethodID(dexFile).getProtoID(dexFile).parameters.typeCount
+        val parameters = method.getProtoID(dexFile).parameters.typeCount
         val debugInfo = DebugInfo.empty(parameters)
         val debugSequenceAssembler = DebugSequenceAssembler(debugInfo)
 
@@ -56,7 +56,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
             }
 
             val nameIndex = if (ctx.name != null) {
-                dexComposer.addOrGetStringIDIndex(ctx.name.text.removeSurrounding("\""))
+                dexEditor.addOrGetStringIDIndex(ctx.name.text.removeSurrounding("\""))
             } else {
                 NO_INDEX
             }
@@ -99,16 +99,16 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
                     val name = c.name.text.removeSurrounding("\"")
                     if (name.isNotEmpty()) {
-                        nameIndex = dexComposer.addOrGetStringIDIndex(name)
+                        nameIndex = dexEditor.addOrGetStringIDIndex(name)
                     }
 
                     if (c.type != null) {
                         val type = c.type.text
-                        typeIndex = dexComposer.addOrGetTypeIDIndex(type)
+                        typeIndex = dexEditor.addOrGetTypeIDIndex(type)
                     }
 
                     val sigIndex = if (c.sig != null) {
-                        dexComposer.addOrGetStringIDIndex(c.sig.text.removeSurrounding("\""))
+                        dexEditor.addOrGetStringIDIndex(c.sig.text.removeSurrounding("\""))
                     } else {
                         NO_INDEX
                     }
@@ -300,7 +300,7 @@ internal class CodeAssembler constructor(private val classDef:    ClassDef,
 
     private fun collectRegisterInfo(listCtx: List<SInstructionContext>): RegisterInfo {
 
-        val protoID = method.getMethodID(dexFile).getProtoID(dexFile)
+        val protoID = method.getProtoID(dexFile)
         var insSize = if (method.isStatic) 0 else 1
         val argumentSize = DexClasses.getArgumentSize(protoID.parameters.getTypes(dexFile))
         insSize += argumentSize

@@ -17,15 +17,17 @@ package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
-import com.github.netomi.bat.dexfile.editor.DexComposer
+import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 
-internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisitor<ClassDef?>() {
+internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVisitor<ClassDef?>() {
 
-    private val dexComposer:           DexComposer           = dexFile.composer
-    private val encodedValueAssembler: EncodedValueAssembler = EncodedValueAssembler(dexComposer)
-    private val annotationAssembler:   AnnotationAssembler   = AnnotationAssembler(encodedValueAssembler, dexComposer)
+    private val encodedValueAssembler: EncodedValueAssembler = EncodedValueAssembler(dexEditor)
+    private val annotationAssembler:   AnnotationAssembler   = AnnotationAssembler(encodedValueAssembler, dexEditor)
+
+    private val dexFile: DexFile
+        get() = dexEditor.dexFile
 
     private lateinit var classDef: ClassDef
 
@@ -35,9 +37,9 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val sourceFile  = ctx.sSource().firstOrNull()?.src?.text?.removeSurrounding("\"")
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        val classTypeIndex  = dexComposer.addOrGetTypeIDIndex(classType)
-        val superTypeIndex  = if (superType != null) dexComposer.addOrGetTypeIDIndex(superType) else NO_INDEX
-        val sourceFileIndex = if (sourceFile != null) dexComposer.addOrGetStringIDIndex(sourceFile) else NO_INDEX
+        val classTypeIndex  = dexEditor.addOrGetTypeIDIndex(classType)
+        val superTypeIndex  = if (superType != null) dexEditor.addOrGetTypeIDIndex(superType) else NO_INDEX
+        val sourceFileIndex = if (sourceFile != null) dexEditor.addOrGetStringIDIndex(sourceFile) else NO_INDEX
 
         classDef =
             ClassDef.of(classTypeIndex,
@@ -45,10 +47,10 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
                         superTypeIndex,
                         sourceFileIndex)
 
-        dexFile.addClassDef(classDef)
+        dexEditor.addClassDef(classDef)
 
         ctx.sInterface().forEach {
-            classDef.interfaces.addType(dexComposer.addOrGetTypeIDIndex(it.name.text))
+            classDef.interfaces.addType(dexEditor.addOrGetTypeIDIndex(it.name.text))
         }
 
         val annotationSet = classDef.annotationsDirectory.classAnnotations
@@ -64,7 +66,7 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
-        val fieldIDIndex = dexComposer.addOrGetFieldIDIndex(classType, name, type)
+        val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType, name, type)
         val field = EncodedField.of(fieldIDIndex, accessFlags)
 
         classDef.addField(dexFile, field)
@@ -87,15 +89,15 @@ internal class ClassDefAssembler(private val dexFile: DexFile) : SmaliBaseVisito
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
         val methodIDIndex =
-            dexComposer.addOrGetMethodIDIndex(classType,
-                                              name,
-                                              parameterTypes,
-                                              returnType)
+            dexEditor.addOrGetMethodIDIndex(classType,
+                                            name,
+                                            parameterTypes,
+                                            returnType)
 
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
 
         if (!method.isAbstract) {
-            val codeAssembler = CodeAssembler(classDef, method, dexComposer)
+            val codeAssembler = CodeAssembler(classDef, method, dexEditor)
             val code = codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
             method.code = code
         } else {

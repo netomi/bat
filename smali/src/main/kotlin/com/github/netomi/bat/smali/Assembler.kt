@@ -17,6 +17,7 @@ package com.github.netomi.bat.smali
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.smali.assemble.ClassDefAssembler
 import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser
@@ -33,6 +34,8 @@ import java.util.function.Predicate
 import kotlin.io.path.name
 
 class Assembler(private val dexFile: DexFile) {
+
+    private val dexEditor: DexEditor = DexEditor.of(dexFile)
 
     @Throws(IOException::class)
     fun assemble(input: Path): Collection<ClassDef> {
@@ -69,7 +72,7 @@ class Assembler(private val dexFile: DexFile) {
         parser.removeErrorListeners()
         parser.errorHandler = ExceptionErrorStrategy()
 
-        return ClassDefAssembler(dexFile).visit(parser.sFiles())!!
+        return ClassDefAssembler(dexEditor).visit(parser.sFiles())!!
     }
 
     companion object {

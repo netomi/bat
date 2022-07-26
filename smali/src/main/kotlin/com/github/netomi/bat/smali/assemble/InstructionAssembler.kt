@@ -17,24 +17,24 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.editor.DexComposer
+import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import com.github.netomi.bat.util.toIntArray
 import org.antlr.v4.runtime.ParserRuleContext
 
-internal class InstructionAssembler internal constructor(            listCtx:               List<SInstructionContext>,
-                                                         private val registerInfo:          RegisterInfo,
-                                                         private val dexComposer:           DexComposer) {
+internal class InstructionAssembler internal constructor(            listCtx:      List<SInstructionContext>,
+                                                         private val registerInfo: RegisterInfo,
+                                                         private val dexEditor:    DexEditor) {
 
-    private val encodedValueAssembler = EncodedValueAssembler(dexComposer)
+    private val encodedValueAssembler = EncodedValueAssembler(dexEditor)
 
     private val labelMapping:        MutableMap<String, Int> = LinkedHashMap()
     private val payloadLabelMapping: MutableMap<String, Int> = HashMap()
 
-    private val dexFile: DexFile
-        get() = dexComposer.dexFile
+//    private val dexFile: DexFile
+//        get() = dexEditor.dexFile
 
     init {
         collectLabels(listCtx)
@@ -157,7 +157,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val field = ctx.fld.text
         val (classType, fieldName, fieldType) = parseFieldObject(field)
 
-        val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
+        val fieldIndex = dexEditor.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
         return FieldInstruction.of(opcode, fieldIndex, register)
     }
 
@@ -171,7 +171,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val field = ctx.fld.text
         val (classType, fieldName, fieldType) = parseFieldObject(field)
 
-        val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
+        val fieldIndex = dexEditor.addOrGetFieldIDIndex(classType!!, fieldName, fieldType)
         return FieldInstruction.of(opcode, fieldIndex, r1, r2)
     }
 
@@ -197,7 +197,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
-        val stringIndex = dexComposer.addOrGetStringIDIndex(parseString(ctx.cst.text))
+        val stringIndex = dexEditor.addOrGetStringIDIndex(parseString(ctx.cst.text))
 
         return StringInstruction.of(opcode, stringIndex, r1)
     }
@@ -207,7 +207,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val opcode = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
-        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.cst.text)
+        val typeIndex = dexEditor.addOrGetTypeIDIndex(ctx.cst.text)
 
         return TypeInstruction.of(opcode, typeIndex, r1)
     }
@@ -273,7 +273,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val methodType = ctx.method.text
 
         val (classType, methodName, parameterTypes, returnType) = parseMethodObject(methodType)
-        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+        val methodIndex = dexEditor.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
 
         return MethodInstruction.of(opcode, methodIndex, *registers)
     }
@@ -288,7 +288,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val methodType = ctx.method.text
 
         val (classType, methodName, parameterTypes, returnType) = parseMethodObject(methodType)
-        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+        val methodIndex = dexEditor.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
 
         val registers = (rStart..rEnd).toIntArray()
         return MethodInstruction.of(opcode, methodIndex, *registers)
@@ -322,7 +322,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
 
-        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+        val typeIndex = dexEditor.addOrGetTypeIDIndex(ctx.type.text)
 
         return TypeInstruction.of(opcode, typeIndex, r1, r2)
     }
@@ -334,7 +334,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val registers = mutableListOf<Int>()
         ctx.REGISTER().forEach { registers.add(registerInfo.registerNumber(it.text)) }
 
-        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+        val typeIndex = dexEditor.addOrGetTypeIDIndex(ctx.type.text)
 
         return ArrayTypeInstruction.of(opcode, typeIndex, *registers.toIntArray())
     }
@@ -347,7 +347,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val rEnd   = registerInfo.registerNumber(ctx.rend.text)
 
         val registers = (rStart..rEnd).toIntArray()
-        val typeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+        val typeIndex = dexEditor.addOrGetTypeIDIndex(ctx.type.text)
 
         return ArrayTypeInstruction.of(opcode, typeIndex, *registers)
     }
@@ -361,12 +361,12 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
         val methodIndex = ctx.method.text.let {
             val (classType, methodName, parameterTypes, returnType) = parseMethodObject(it)
-            dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+            dexEditor.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
         }
 
         val protoIndex = ctx.proto.text.let {
             val (_, _, parameterTypes, returnType) = parseMethodObject(it)
-            dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+            dexEditor.addOrGetProtoIDIndex(parameterTypes, returnType)
         }
 
         return MethodProtoInstruction.of(opcode, methodIndex, protoIndex, *registers.toIntArray())
@@ -383,12 +383,12 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
         val methodIndex = ctx.method.text.let {
             val (classType, methodName, parameterTypes, returnType) = parseMethodObject(it)
-            dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+            dexEditor.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
         }
 
         val protoIndex = ctx.proto.text.let {
             val (_, _, parameterTypes, returnType) = parseMethodObject(it)
-            dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+            dexEditor.addOrGetProtoIDIndex(parameterTypes, returnType)
         }
 
         return MethodProtoInstruction.of(opcode, methodIndex, protoIndex, *registers)
@@ -406,19 +406,18 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val methodHandle = if (methodHandleType.targetsField) {
             val fieldIndex = ctx.fieldOrMethod.text.let {
                 val (classType, name, type) = parseFieldObject(it)
-                dexComposer.addOrGetFieldIDIndex(classType!!, name, type)
+                dexEditor.addOrGetFieldIDIndex(classType!!, name, type)
             }
             MethodHandle.of(methodHandleType, fieldIndex)
         } else {
             val methodIndex = ctx.fieldOrMethod.text.let {
                 val (classType, methodName, parameterTypes, returnType) = parseMethodObject(it)
-                dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+                dexEditor.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
             }
             MethodHandle.of(methodHandleType, methodIndex)
         }
 
-        val methodHandleIndex = dexComposer.dexFile.addMethodHandle(methodHandle)
-
+        val methodHandleIndex = dexEditor.addOrGetMethodHandleIndex(methodHandle)
         return MethodHandleRefInstruction.of(opcode, methodHandleIndex, r1)
     }
 
@@ -430,7 +429,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
         val protoIndex = ctx.proto.text.let {
             val (_, _, parameterTypes, returnType) = parseMethodObject(it)
-            dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+            dexEditor.addOrGetProtoIDIndex(parameterTypes, returnType)
         }
 
         return MethodTypeRefInstruction.of(opcode, protoIndex, r1)
@@ -450,14 +449,14 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         ctx.sBaseValue().forEach { encodedValues.add(encodedValueAssembler.parseBaseValue(it)) }
 
         val (classType, name, parameterTypes, returnType) = parseMethodObject(ctx.method.text)
-        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, name, parameterTypes, returnType)
+        val methodIndex = dexEditor.addOrGetMethodIDIndex(classType!!, name, parameterTypes, returnType)
         val bootstrapMethodHandleIndex =
-            dexFile.addMethodHandle(MethodHandle.of(MethodHandleType.INVOKE_STATIC, methodIndex))
+            dexEditor.addOrGetMethodHandleIndex(MethodHandle.of(MethodHandleType.INVOKE_STATIC, methodIndex))
 
-        val callSite      = CallSite.of(bootstrapMethodHandleIndex, *encodedValues.toTypedArray())
-        val callSiteIndex = dexFile.addCallSiteID(CallSiteID.of(callSite))
+        val callSite        = CallSite.of(bootstrapMethodHandleIndex, *encodedValues.toTypedArray())
+        val callSiteIDIndex = dexEditor.addOrGetCallSiteIDIndex(callSite)
 
-        return CallSiteInstruction.of(opcode, callSiteIndex, *registers.toIntArray())
+        return CallSiteInstruction.of(opcode, callSiteIDIndex, *registers.toIntArray())
     }
 
     fun parseCallSiteInstructionF3rc(ctx: F3rc_customContext): CallSiteInstruction {
@@ -476,14 +475,14 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         ctx.sBaseValue().forEach { encodedValues.add(encodedValueAssembler.parseBaseValue(it)) }
 
         val (classType, name, parameterTypes, returnType) = parseMethodObject(ctx.method.text)
-        val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, name, parameterTypes, returnType)
+        val methodIndex = dexEditor.addOrGetMethodIDIndex(classType!!, name, parameterTypes, returnType)
         val bootstrapMethodHandleIndex =
-            dexFile.addMethodHandle(MethodHandle.of(MethodHandleType.INVOKE_STATIC, methodIndex))
+            dexEditor.addOrGetMethodHandleIndex(MethodHandle.of(MethodHandleType.INVOKE_STATIC, methodIndex))
 
-        val callSite      = CallSite.of(bootstrapMethodHandleIndex, *encodedValues.toTypedArray())
-        val callSiteIndex = dexFile.addCallSiteID(CallSiteID.of(callSite))
+        val callSite        = CallSite.of(bootstrapMethodHandleIndex, *encodedValues.toTypedArray())
+        val callSiteIDIndex = dexEditor.addOrGetCallSiteIDIndex(callSite)
 
-        return CallSiteInstruction.of(opcode, callSiteIndex, *registers)
+        return CallSiteInstruction.of(opcode, callSiteIDIndex, *registers)
     }
 
     fun parsePayloadInstructionF31t(ctx: F31t_payloadContext, codeOffset: Int): PayloadInstruction {
@@ -545,7 +544,7 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseCatchDirective(ctx: FcatchContext): Try {
         val exceptionType = ctx.type.text
-        val exceptionTypeIndex = dexComposer.addOrGetTypeIDIndex(exceptionType)
+        val exceptionTypeIndex = dexEditor.addOrGetTypeIDIndex(exceptionType)
 
         val handler  = ctx.handle.label.text
         val handlerOffset = labelMapping[handler]!!

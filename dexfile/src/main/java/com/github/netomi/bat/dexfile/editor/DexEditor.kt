@@ -19,23 +19,53 @@ package com.github.netomi.bat.dexfile.editor
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.util.DexClasses
 
-class DexComposer internal constructor(val dexFile: DexFile) {
+class DexEditor private constructor(val dexFile: DexFile) {
 
-    private val stringMap   : MutableMap<String, Int>   = mutableMapOf()
-    private val typeMap     : MutableMap<String, Int>   = mutableMapOf()
-    private val protoIDMap  : MutableMap<ProtoID, Int>  = mutableMapOf()
-    private val fieldIDMap  : MutableMap<FieldID, Int>  = mutableMapOf()
-    private val methodIDMap : MutableMap<MethodID, Int> = mutableMapOf()
+    private val stringMap: MutableMap<String, Int> by lazy {
+        val map = mutableMapOf<String, Int>()
+        dexFile.stringIDs.forEachIndexed { index, stringID -> map[stringID.stringValue]  = index }
+        map
+    }
 
-    init {
-        dexFile.stringIDs.forEachIndexed { index, stringID -> stringMap[stringID.stringValue]  = index }
-        dexFile.typeIDs.forEachIndexed   { index, typeID   -> typeMap[typeID.getType(dexFile)] = index }
-        dexFile.protoIDs.forEachIndexed  { index, protoID  -> protoIDMap[protoID] = index }
-        dexFile.fieldIDs.forEachIndexed  { index, fieldID  -> fieldIDMap[fieldID]   = index }
-        dexFile.methodIDs.forEachIndexed { index, methodID -> methodIDMap[methodID] = index }
+    private val typeMap: MutableMap<String, Int> by lazy {
+        val map = mutableMapOf<String, Int>()
+        dexFile.typeIDs.forEachIndexed { index, typeID -> map[typeID.getType(dexFile)] = index }
+        map
+    }
+
+    private val protoIDMap: MutableMap<ProtoID, Int> by lazy {
+        val map = mutableMapOf<ProtoID, Int>()
+        dexFile.protoIDs.forEachIndexed { index, protoID -> map[protoID] = index }
+        map
+    }
+
+    private val fieldIDMap: MutableMap<FieldID, Int> by lazy {
+        val map = mutableMapOf<FieldID, Int>()
+        dexFile.fieldIDs.forEachIndexed { index, fieldID -> map[fieldID] = index }
+        map
+    }
+
+    private val methodIDMap: MutableMap<MethodID, Int> by lazy {
+        val map = mutableMapOf<MethodID, Int>()
+        dexFile.methodIDs.forEachIndexed { index, methodID -> map[methodID] = index }
+        map
+    }
+
+    private val callSiteIDMap: MutableMap<CallSiteID, Int> by lazy {
+        val map = mutableMapOf<CallSiteID, Int>()
+        dexFile.callSiteIDs.forEachIndexed { index, callSiteID -> map[callSiteID] = index }
+        map
+    }
+
+    private val methodHandleMap: MutableMap<MethodHandle, Int> by lazy {
+        val map = mutableMapOf<MethodHandle, Int>()
+        dexFile.methodHandles.forEachIndexed { index, methodHandle -> map[methodHandle] = index }
+        map
     }
 
     fun addOrGetStringIDIndex(string: String): Int {
+        assert(dexFile.stringIDs.size == stringMap.size)
+
         var index = stringMap[string]
         if (index == null) {
             index = dexFile.addStringID(StringID.of(string))
@@ -99,5 +129,35 @@ class DexComposer internal constructor(val dexFile: DexFile) {
             methodIDMap[methodID] = index
         }
         return index
+    }
+
+    fun addClassDef(classDef: ClassDef) {
+        dexFile.addClassDef(classDef)
+    }
+
+    fun addOrGetCallSiteIDIndex(callSite: CallSite): Int {
+        val callSiteID = CallSiteID.of(callSite)
+
+        var index = callSiteIDMap[callSiteID]
+        if (index == null) {
+            index = dexFile.addCallSiteID(callSiteID)
+            callSiteIDMap[callSiteID] = index
+        }
+        return index
+    }
+
+    fun addOrGetMethodHandleIndex(methodHandle: MethodHandle): Int {
+        var index = methodHandleMap[methodHandle]
+        if (index == null) {
+            index = dexFile.addMethodHandle(methodHandle)
+            methodHandleMap[methodHandle] = index
+        }
+        return index
+    }
+
+    companion object {
+        fun of(dexFile: DexFile): DexEditor {
+            return DexEditor(dexFile)
+        }
     }
 }

@@ -61,7 +61,6 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
     }
 
     companion object {
-        @JvmStatic
         fun of(stringIndex: Int): EncodedStringValue {
             Preconditions.checkArgument(stringIndex >= 0, "stringIndex must not be negative")
             return EncodedStringValue(stringIndex)
@@ -106,7 +105,6 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
     }
 
     companion object {
-        @JvmStatic
         fun of(fieldIndex: Int): EncodedFieldValue {
             Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative")
             return EncodedFieldValue(fieldIndex)
@@ -151,7 +149,6 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
     }
 
     companion object {
-        @JvmStatic
         fun of(methodIndex: Int): EncodedMethodValue {
             Preconditions.checkArgument(methodIndex >= 0, "methodIndex must not be negative")
             return EncodedMethodValue(methodIndex)
@@ -196,7 +193,6 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
     }
 
     companion object {
-        @JvmStatic
         fun of(typeIndex: Int): EncodedTypeValue {
             Preconditions.checkArgument(typeIndex >= 0, "typeIndex must not be negative")
             return EncodedTypeValue(typeIndex)
@@ -241,7 +237,6 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
     }
 
     companion object {
-        @JvmStatic
         fun of(fieldIndex: Int): EncodedEnumValue {
             Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative")
             return EncodedEnumValue(fieldIndex)
@@ -286,7 +281,6 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
     }
 
     companion object {
-        @JvmStatic
         fun of(handleIndex: Int): EncodedMethodHandleValue {
             Preconditions.checkArgument(handleIndex >= 0, "handleIndex must not be negative")
             return EncodedMethodHandleValue(handleIndex)
@@ -331,7 +325,6 @@ data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_
     }
 
     companion object {
-        @JvmStatic
         fun of(protoIndex: Int): EncodedMethodTypeValue {
             Preconditions.checkArgument(protoIndex >= 0, "protoIndex must not be negative")
             return EncodedMethodTypeValue(protoIndex)

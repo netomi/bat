@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.editor.DexComposer
 import com.github.netomi.bat.dexfile.visitor.*
 import java.util.*
 
@@ -55,12 +54,6 @@ class DexFile private constructor() {
     internal val methodHandles = ArrayList<MethodHandle>()
 
     private val classDefMap : MutableMap<String, Int> = mutableMapOf()
-
-    private var _composer: DexComposer? = null
-    val composer: DexComposer by lazy {
-        _composer = DexComposer(this)
-        _composer!!
-    }
 
     var linkData: ByteArray?   = null
         internal set
@@ -177,7 +170,7 @@ class DexFile private constructor() {
         return classDefs[classDefIndex]
     }
 
-    fun addClassDef(classDef: ClassDef) {
+    internal fun addClassDef(classDef: ClassDef) {
         val className = classDef.getClassName(this)
         if (getClassDef(className) != null) {
             throw IllegalArgumentException("class with name $className already exists in dex file.")
@@ -198,7 +191,7 @@ class DexFile private constructor() {
         return callSiteIDs[callSiteIndex]
     }
 
-    fun addCallSiteID(callSiteID: CallSiteID): Int {
+    internal fun addCallSiteID(callSiteID: CallSiteID): Int {
         callSiteIDs.add(callSiteID)
         return callSiteIDs.size - 1
     }
@@ -214,7 +207,7 @@ class DexFile private constructor() {
         return methodHandles[methodHandleIndex]
     }
 
-    fun addMethodHandle(methodHandle: MethodHandle): Int {
+    internal fun addMethodHandle(methodHandle: MethodHandle): Int {
         methodHandles.add(methodHandle)
         return methodHandles.size - 1
     }

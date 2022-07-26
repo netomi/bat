@@ -18,7 +18,7 @@ package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.AnnotationVisibility
-import com.github.netomi.bat.dexfile.editor.DexComposer
+import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.value.AnnotationElement
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue
 import com.github.netomi.bat.dexfile.value.EncodedArrayValue
@@ -28,14 +28,14 @@ import org.antlr.v4.runtime.ParserRuleContext
 
 internal class AnnotationAssembler constructor(
     private val encodedValueAssembler: EncodedValueAssembler,
-    private val dexComposer:           DexComposer) {
+    private val dexEditor:             DexEditor) {
 
     fun parseAnnotation(ctx: SmaliParser.SAnnotationContext): Annotation {
-        val annotationTypeIndex = dexComposer.addOrGetTypeIDIndex(ctx.type.text)
+        val annotationTypeIndex = dexEditor.addOrGetTypeIDIndex(ctx.type.text)
         val annotationVisibility = AnnotationVisibility.of(ctx.visibility.text)
 
         val annotationElements =
-            parseAnnotationAnnotationElements(ctx.sAnnotationKeyName(), ctx.sAnnotationValue(), dexComposer)
+            parseAnnotationAnnotationElements(ctx.sAnnotationKeyName(), ctx.sAnnotationValue(), dexEditor)
 
         val encodedAnnotationValue = EncodedAnnotationValue.of(annotationTypeIndex, annotationElements)
         return Annotation.of(annotationVisibility, encodedAnnotationValue)
@@ -43,7 +43,7 @@ internal class AnnotationAssembler constructor(
 
     private fun parseAnnotationAnnotationElements(keyContexts:   List<SmaliParser.SAnnotationKeyNameContext>,
                                                   valueContexts: List<SmaliParser.SAnnotationValueContext>,
-                                                  dexComposer:   DexComposer): MutableList<AnnotationElement> {
+                                                  dexComposer:   DexEditor): MutableList<AnnotationElement> {
 
         val annotationElements = mutableListOf<AnnotationElement>()
 
@@ -77,12 +77,12 @@ internal class AnnotationAssembler constructor(
                 val subAnnotationContext = t as SmaliParser.SSubannotationContext
 
                 val annotationType = subAnnotationContext.OBJECT_TYPE().text
-                val annotationTypeIndex = dexComposer.addOrGetTypeIDIndex(annotationType)
+                val annotationTypeIndex = dexEditor.addOrGetTypeIDIndex(annotationType)
 
                 val annotationElements =
                     parseAnnotationAnnotationElements(subAnnotationContext.sAnnotationKeyName(),
                                                       subAnnotationContext.sAnnotationValue(),
-                                                      dexComposer)
+                                                      dexEditor)
 
                 return EncodedAnnotationValue.of(annotationTypeIndex, annotationElements)
             }

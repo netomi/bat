@@ -16,13 +16,13 @@
 
 package com.github.netomi.bat.smali.assemble
 
-import com.github.netomi.bat.dexfile.editor.DexComposer
+import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliLexer
 import com.github.netomi.bat.smali.parser.SmaliParser
 import org.antlr.v4.runtime.tree.TerminalNode
 
-internal class EncodedValueAssembler constructor(private val dexComposer: DexComposer) {
+internal class EncodedValueAssembler constructor(private val dexEditor: DexEditor) {
 
     fun parseBaseValue(ctx: SmaliParser.SBaseValueContext): EncodedValue {
 
@@ -40,7 +40,7 @@ internal class EncodedValueAssembler constructor(private val dexComposer: DexCom
         }
 
         return when (value.type) {
-            SmaliLexer.STRING ->        EncodedStringValue.of(dexComposer.addOrGetStringIDIndex(parseString(value.text)))
+            SmaliLexer.STRING ->        EncodedStringValue.of(dexEditor.addOrGetStringIDIndex(parseString(value.text)))
             SmaliLexer.BOOLEAN ->       EncodedBooleanValue.of("true" == value.text)
             SmaliLexer.BYTE ->          EncodedByteValue.of(parseByte(value.text))
             SmaliLexer.SHORT ->         EncodedShortValue.of(parseShort(value.text))
@@ -55,21 +55,21 @@ internal class EncodedValueAssembler constructor(private val dexComposer: DexCom
             SmaliLexer.DOUBLE_NAN ->    EncodedDoubleValue.of(parseDouble(value.text))
             SmaliLexer.METHOD_FULL -> {
                 val (classType, methodName, parameterTypes, returnType) = parseMethodObject(value.text)
-                val methodIndex = dexComposer.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
+                val methodIndex = dexEditor.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
                 EncodedMethodValue.of(methodIndex)
             }
             SmaliLexer.METHOD_PROTO -> {
                 val (_, _, parameterTypes, returnType) = parseMethodObject(value.text)
-                val protoIndex = dexComposer.addOrGetProtoIDIndex(parameterTypes, returnType)
+                val protoIndex = dexEditor.addOrGetProtoIDIndex(parameterTypes, returnType)
                 EncodedMethodTypeValue.of(protoIndex)
             }
             SmaliLexer.FIELD_FULL -> {
                 val (classType, fieldName, type) = parseFieldObject(value.text)
-                val fieldIndex = dexComposer.addOrGetFieldIDIndex(classType!!, fieldName, type)
+                val fieldIndex = dexEditor.addOrGetFieldIDIndex(classType!!, fieldName, type)
 
                 if (isEnum) EncodedEnumValue.of(fieldIndex) else EncodedFieldValue.of(fieldIndex)
             }
-            SmaliLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexComposer.addOrGetTypeIDIndex(value.text))
+            SmaliLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexEditor.addOrGetTypeIDIndex(value.text))
             SmaliLexer.NULL ->          EncodedNullValue
             else -> null
         } ?: parserError(ctx, "failure to parse base value")
