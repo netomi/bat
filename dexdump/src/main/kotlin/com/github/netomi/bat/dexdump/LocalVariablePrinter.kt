@@ -139,23 +139,22 @@ private class LocalVariableInfo constructor(private val name: String?, private v
     var endAddr   = -1
 
     fun toString(registerNum: Int): String {
-        val sb = StringBuilder()
-        sb.append("    ")
-        sb.append(Primitives.toHexString(startAddr.toShort()))
-        sb.append(" - ")
-        sb.append(Primitives.toHexString(endAddr.toShort()))
-        sb.append(" reg=")
-        sb.append(registerNum)
-        sb.append(' ')
-        sb.append(name ?: "(null)")
-        sb.append(' ')
-        sb.append(type)
+        return buildString {
+            append("    ")
+            append(Primitives.toHexString(startAddr.toShort()))
+            append(" - ")
+            append(Primitives.toHexString(endAddr.toShort()))
+            append(" reg=")
+            append(registerNum)
+            append(' ')
+            append(name ?: "(null)")
+            append(' ')
+            append(type)
 
-        signature?.apply {
-            sb.append(' ')
-            sb.append(this)
+            if (signature != null) {
+                append(' ')
+                append(signature)
+            }
         }
-
-        return sb.toString()
     }
 }

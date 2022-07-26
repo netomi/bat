@@ -348,15 +348,13 @@ abstract class DexInstruction protected constructor(val opCode: DexOpCode, varar
     abstract fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor)
 
     override fun toString(): String {
-        val sb = StringBuilder()
+        return buildString {
+            append(opCode.mnemonic)
 
-        sb.append(opCode.mnemonic)
-
-        if (registers.isNotEmpty()) {
-            sb.append(" ${registers.joinToString(separator = ",", transform = { "v$it" } )}")
+            if (registers.isNotEmpty()) {
+                append(" ${registers.joinToString(separator = ",", transform = { "v$it" } )}")
+            }
         }
-
-        return sb.toString()
     }
 
     companion object {

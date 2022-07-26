@@ -37,23 +37,23 @@ internal class LocalVariableCollector(private val debugState:         MutableMap
     }
 
     override fun visitEndLocal(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugEndLocal) {
-        StringBuilder().apply {
+        val info = buildString {
             val registerNum = instruction.registerNum
             append(".end local ")
             append(registerPrinter.formatRegister(registerNum))
             handleGenericLocal(registerNum, this)
-            addDebugInfo(codeOffset, this.toString())
         }
+        addDebugInfo(codeOffset, info)
     }
 
     override fun visitRestartLocal(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugRestartLocal) {
-        val sb = StringBuilder().apply {
+        val info = buildString {
             val registerNum = instruction.registerNum
             append(".restart local ")
             append(registerPrinter.formatRegister(registerNum))
             handleGenericLocal(registerNum, this)
         }
-        addDebugInfo(codeOffset, sb.toString())
+        addDebugInfo(codeOffset, info)
     }
 
     override fun visitStartLocal(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugStartLocal) {
@@ -71,7 +71,7 @@ internal class LocalVariableCollector(private val debugState:         MutableMap
             dexFile.getStringNullable(sigIndex)
         )
 
-        val sb = StringBuilder().apply {
+        val info = buildString {
             append(".local ")
             append(registerPrinter.formatRegister(registerNum))
             append(", ")
@@ -93,7 +93,7 @@ internal class LocalVariableCollector(private val debugState:         MutableMap
                 append("\"")
             }
         }
-        addDebugInfo(codeOffset, sb.toString())
+        addDebugInfo(codeOffset, info)
     }
 
     private fun handleGenericLocal(registerNum: Int, sb: StringBuilder) {

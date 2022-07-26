@@ -306,15 +306,18 @@ class DexFile private constructor() {
     }
 
     override fun toString(): String {
-        val sb = StringBuilder()
-
-        sb.append("DexFile[format=${dexFormat},stringIDs=${stringIDCount} items," +
-                  "typeIDs=${typeIDCount} items,protoIDs=${protoIDCount} items," +
-                  "fieldIDs=${fieldIDCount} items,methodIDs=${methodIDCount} items," +
-                  "classDefs=${classDefCount} items,callsiteIDs=${callSiteIDCount} items," +
-                  "methodHandles=${methodHandleCount} items]")
-
-        return sb.toString()
+        return buildString {
+            appendLine("DexFile[")
+            appendLine("  format       : ${dexFormat}")
+            appendLine("  stringIDs    : ${stringIDCount} items")
+            appendLine("  typeIDs      : ${typeIDCount} items")
+            appendLine("  protoIDs     : ${protoIDCount} items")
+            appendLine("  fieldIDs     : ${fieldIDCount} items")
+            appendLine("  methodIDs    : ${methodIDCount} items")
+            appendLine("  classDefs    : ${classDefCount} items")
+            appendLine("  callsiteIDs  : ${callSiteIDCount} items")
+            appendLine("  methodHandles: ${methodHandleCount} items]")
+        }
     }
 
     companion object {

@@ -22,7 +22,6 @@ import com.github.netomi.bat.dexfile.io.DexFormatException
 import com.github.netomi.bat.util.Primitives
 import com.google.common.primitives.Bytes
 import java.nio.ByteOrder
-import java.util.*
 
 @DataItemAnn(
     type          = TYPE_HEADER_ITEM,
@@ -203,8 +202,8 @@ class DexHeader private constructor() : DataItem() {
     }
 
     override fun toString(): String {
-        val sb = StringBuilder().apply {
-            appendLine("DexHeader: ")
+        return buildString {
+            appendLine("DexHeader[")
             appendLine("  magic           : ${Primitives.toHexString(magic)}")
             appendLine("  checksum        : ${Primitives.toHexString(checksum.toLong())}")
             appendLine("  signature       : ${Primitives.toHexString(signature)}")
@@ -227,9 +226,8 @@ class DexHeader private constructor() : DataItem() {
             appendLine("  classDefsSize   : $classDefsSize")
             appendLine("  classDefsOffset : $classDefsOffset")
             appendLine("  dataSize        : $dataSize")
-            appendLine("  dataOffset      : $dataOffset")
+            appendLine("  dataOffset      : $dataOffset]")
         }
-        return sb.toString()
     }
 
     companion object {

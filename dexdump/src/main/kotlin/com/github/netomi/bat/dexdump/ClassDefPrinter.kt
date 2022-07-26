@@ -163,31 +163,33 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
     }
 
     override fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction) {
-        val sb = StringBuilder()
-        sb.append(Primitives.asHexValue(fileOffset, 6))
-        sb.append(": ")
-        var codeUnitOffset = offset
-        run {
-            var i = 0
-            while (i < instruction.length && i < 7) {
-                val codeUnit = code.insns[codeUnitOffset++]
-                // print code units in little endian format.
-                sb.append(Primitives.asHexValue(codeUnit.toInt() and 0xff, 2))
-                sb.append(Primitives.asHexValue(codeUnit.toInt() shr 8 and 0xff, 2))
-                sb.append(' ')
-                i++
+        val output = buildString {
+            append(Primitives.asHexValue(fileOffset, 6))
+            append(": ")
+            var codeUnitOffset = offset
+            run {
+                var i = 0
+                while (i < instruction.length && i < 7) {
+                    val codeUnit = code.insns[codeUnitOffset++]
+                    // print code units in little endian format.
+                    append(Primitives.asHexValue(codeUnit.toInt() and 0xff, 2))
+                    append(Primitives.asHexValue(codeUnit.toInt() shr 8 and 0xff, 2))
+                    append(' ')
+                    i++
+                }
             }
+            if (instruction.length >= 7) {
+                append("...")
+            }
+            for (i in length..46) {
+                append(' ')
+            }
+            append('|')
+            append(Primitives.asHexValue(codeOffset, 4))
+            append(": ")
         }
-        if (instruction.length >= 7) {
-            sb.append("...")
-        }
-        for (i in sb.length..46) {
-            sb.append(' ')
-        }
-        sb.append('|')
-        sb.append(Primitives.asHexValue(codeOffset, 4))
-        sb.append(": ")
-        printer.print(sb.toString())
+
+        printer.print(output)
         instruction.accept(dexFile, classDef, method, code, offset, instructionPrinter)
         printer.println()
         fileOffset += instruction.length * 2
