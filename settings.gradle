@@ -6,4 +6,5 @@ include 'commands'
 include 'smali'
 include 'dexdump'
 include 'core'
+include 'jasmin'
 
