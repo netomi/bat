@@ -22,7 +22,9 @@ import com.github.netomi.bat.smali.Assembler
 import picocli.CommandLine
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.name
 import kotlin.io.path.pathString
+import kotlin.io.path.relativeTo
 
 /**
  * Command-line tool to assemble dex files from smali input files.
@@ -50,25 +52,33 @@ class SmaliCommand : Runnable {
         val format = DexFormat.forApiLevel(apiLevel)
         val dexFile = DexFile.of(format)
 
-        printVerbose("Using format ${format.version} for generated dex file '${outputFile.name}'")
+        printVerbose("Using format '${format.version}' for generated dex file '${outputFile.name}'")
 
-        inputFiles.forEach {
-            if (it.isDirectory) {
-                printVerbose("Assembling directory '${it.name}' into file ${outputFile.name} ...")
-                val assembledClasses = Assembler(dexFile).assemble(it.toPath(), ::assembleFile)
+        val startTime = System.nanoTime()
+
+        inputFiles.forEach { file ->
+            val filePath = file.toPath()
+
+            if (file.isDirectory) {
+                printVerbose("Assembling directory '${file.name}' into file ${outputFile.name} ...")
+                val assembledClasses = Assembler(dexFile).assemble(filePath, ::assembleFile)
                 printVerbose("Assembled ${assembledClasses.size} class(es).")
             } else {
-                printVerbose("Assembling file '${it.name}' into file ${outputFile.name} ...")
-                Assembler(dexFile).assemble(it.toPath(), ::assembleFile)
+                printVerbose("Assembling file '${file.name}' into file ${outputFile.name} ...")
+                Assembler(dexFile).assemble(filePath, ::assembleFile)
                 printVerbose("Assembled 1 class.")
             }
         }
 
+        val endTime = System.nanoTime()
+        printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
+
         DexFileWriter(outputFile.outputStream()).visitDexFile(dexFile)
     }
 
-    private fun assembleFile(file: Path) {
-        printVerbose("  assembling file ${file.pathString}")
+    private fun assembleFile(baseDirectory: Path, file: Path) {
+        val relativePath = file.relativeTo(baseDirectory)
+        printVerbose("  assembling file '${relativePath.pathString}'")
     }
     private fun printVerbose(text: String) {
         if (verbose) {

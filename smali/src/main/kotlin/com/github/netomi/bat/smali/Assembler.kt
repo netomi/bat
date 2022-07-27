@@ -38,12 +38,12 @@ class Assembler(dexFile: DexFile) {
     private val dexEditor: DexEditor = DexEditor.of(dexFile)
 
     @Throws(IOException::class)
-    fun assemble(input: Path, callback: (Path) -> Unit = {}): Collection<ClassDef> {
+    fun assemble(input: Path, callback: (Path, Path) -> Unit = fun(_, _) {}): Collection<ClassDef> {
         val assembledClasses: MutableCollection<ClassDef> = mutableListOf()
 
         val assembleFile = { path: Path ->
             Files.newInputStream(path).use { `is` ->
-                callback(path)
+                callback(input, path)
                 val classDef = assemble(`is`)
                 assembledClasses.add(classDef)
             }
@@ -55,6 +55,7 @@ class Assembler(dexFile: DexFile) {
 
             inputFiles.use {
                 it.filter(SMALI_FILE)
+                  .sorted()
                   .forEach(assembleFile)
             }
         } else {
