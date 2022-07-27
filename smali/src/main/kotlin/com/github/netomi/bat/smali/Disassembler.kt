@@ -27,10 +27,8 @@ import java.nio.charset.StandardCharsets
 
 class Disassembler(private val outputStreamFactory: OutputStreamFactory) : ClassDefVisitor {
     override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
-        outputStreamFactory.createOutputStream(classDef.getClassName(dexFile)).use { os ->
-            BufferedWriter(OutputStreamWriter(os, StandardCharsets.UTF_8), 8192).use { out ->
-                SmaliPrinter(out).visitClassDef(dexFile, index, classDef)
-            }
+        outputStreamFactory.createOutputStream(classDef.getClassName(dexFile)).bufferedWriter().use { writer ->
+            SmaliPrinter(writer).visitClassDef(dexFile, index, classDef)
         }
     }
 }

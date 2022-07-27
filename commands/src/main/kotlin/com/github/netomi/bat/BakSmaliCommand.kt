@@ -20,9 +20,11 @@ import com.github.netomi.bat.dexfile.io.DexFileReader
 import com.github.netomi.bat.dexfile.visitor.multiClassDefVisitorOf
 import com.github.netomi.bat.io.FileOutputStreamFactory
 import com.github.netomi.bat.smali.Disassembler
+import kotlinx.coroutines.Dispatchers
 import picocli.CommandLine
 import java.io.File
 import java.io.FileInputStream
+import java.lang.Runnable
 import java.nio.file.Files
 import kotlin.io.path.exists
 
@@ -58,14 +60,17 @@ class BakSmaliCommand : Runnable {
             printVerbose("Disassembling '${inputFile.name}' into directory $outputPath ...")
             reader.visitDexFile(dexFile)
 
-            dexFile.classDefsAccept(
+            val startTime = System.nanoTime()
+
+            dexFile.parallelClassDefsAccept(Dispatchers.IO) {
                 multiClassDefVisitorOf(
                     { df, _, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
                     Disassembler(FileOutputStreamFactory(outputPath, "smali"))
                 )
-            )
+            }
 
-            printVerbose("done.")
+            val endTime = System.nanoTime()
+            printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
         }
     }
 
