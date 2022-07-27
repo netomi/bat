@@ -13,6 +13,7 @@ tasks.test {
 }
 
 dependencies {
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesVersion}")
     api("com.google.guava:guava:${Versions.guavaVersion}")
 
     testImplementation(kotlin("test"))

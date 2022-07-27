@@ -16,7 +16,9 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.visitor.*
-import java.util.*
+import com.github.netomi.bat.util.parallelForEachIndexed
+import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.CoroutineContext
 
 class DexFile private constructor() {
 
@@ -225,6 +227,14 @@ class DexFile private constructor() {
 
     fun classDefsAccept(visitor: ClassDefVisitor) {
         classDefs.forEachIndexed { index, classDef -> visitor.visitClassDef(this, index, classDef) }
+    }
+
+    fun parallelClassDefsAccept(coroutineContext: CoroutineContext = Dispatchers.Default, visitorSupplier: () -> ClassDefVisitor) {
+        val threadLocal = ThreadLocal.withInitial(visitorSupplier)
+        classDefs.parallelForEachIndexed(coroutineContext) { index, classDef ->
+            val visitor = threadLocal.get()
+            visitor.visitClassDef(this, index, classDef)
+        }
     }
 
     fun classDefAccept(className: String, visitor: ClassDefVisitor) {
