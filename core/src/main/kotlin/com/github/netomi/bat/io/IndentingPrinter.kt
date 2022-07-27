@@ -18,30 +18,35 @@ package com.github.netomi.bat.io
 import java.io.Writer
 
 open class IndentingPrinter(private val delegateWriter: Writer, private val spacesPerLevel: Int = 4) : AutoCloseable {
-    private var indentedLine      = false
-    private val indentationStack  = ArrayDeque<Int>()
-
-    private val currentIndentation
-        get() = indentationStack.first()
+    private var indentedLine       = false
+    private val indentationStack   = ArrayDeque<Int>()
+    private var currentIndentation = ""
 
     var currentPosition = 0
         private set
 
     init {
         indentationStack.addFirst(0)
+        updateCurrentIndentation()
+    }
+
+    private fun updateCurrentIndentation() {
+        currentIndentation = " ".repeat(indentationStack.first())
     }
 
     fun levelUp() {
-        val currentIndentation = indentationStack.first()
-        indentationStack.addFirst(currentIndentation + spacesPerLevel)
+        indentationStack.addFirst(indentationStack.first() + spacesPerLevel)
+        updateCurrentIndentation()
     }
 
     fun levelDown() {
         indentationStack.removeFirst()
+        updateCurrentIndentation()
     }
 
     fun resetIndentation(indentation: Int) {
         indentationStack.addFirst(indentation)
+        updateCurrentIndentation()
     }
 
     fun print(text: CharSequence) {
@@ -73,12 +78,10 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
     }
 
     private fun printIndentation() {
-        if (!indentedLine && currentIndentation > 0) {
-            val spaces = currentIndentation
-            delegateWriter.write(String.format("%" + spaces + "s", ""))
-
+        if (!indentedLine && currentIndentation.isNotEmpty()) {
+            delegateWriter.write(currentIndentation)
             indentedLine = true
-            currentPosition += spaces
+            currentPosition += currentIndentation.length
         }
     }
 }
