@@ -34,12 +34,12 @@ PRGDIR=`dirname "$PRG"`
 
 _classpath="."
 if [ `uname -a | grep -i -c cygwin` -ne 0 ]; then # Cygwin, translate the path
-    for k in "$PRGDIR"/../lib/*.jar
+    for k in "$PRGDIR"/lib/*.jar
     do
         _classpath="${_classpath};`cygpath -w ${k}`"
     done
 else
-    for k in "$PRGDIR"/../lib/*.jar
+    for k in "$PRGDIR"/lib/*.jar
     do
         _classpath="${_classpath}:${k}"
     done

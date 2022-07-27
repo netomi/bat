@@ -21,8 +21,11 @@ distributions {
                 from(tasks["jar"])
                 from(configurations.runtimeClasspath)
             }
-            from(projectDir) {
-                include("bin/")
+            into("") {
+                from("${projectDir}/bin")
+                eachFile {
+                    fileMode = 0b111101101
+                }
             }
         }
     }
