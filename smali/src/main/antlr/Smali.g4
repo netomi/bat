@@ -340,7 +340,7 @@ fconst_int: op=
 
 fconst_string: op=('const-string' | 'const-string/jumbo') r1=REGISTER ',' cst=STRING;
 
-fconst_type: op=('const-class' | 'check-cast' | 'new-instance' )  r1=REGISTER ',' cst=(OBJECT_TYPE|ARRAY_TYPE);
+fconst_type: op=('const-class' | 'check-cast' | 'new-instance' )  r1=REGISTER ',' cst=(OBJECT_TYPE|ARRAY_TYPE|PRIMITIVE_TYPE);
 
 f21c_field
     : op=

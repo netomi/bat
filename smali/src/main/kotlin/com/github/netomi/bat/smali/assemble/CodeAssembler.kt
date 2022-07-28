@@ -40,19 +40,24 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
         val registerInfo         = collectRegisterInfo(iCtx)
         val instructionAssembler = InstructionAssembler(iCtx, registerInfo, dexEditor)
 
-        val parameters = if (method.isStatic) registerInfo.insSize else registerInfo.insSize - 1
-        val debugInfo = DebugInfo.empty(parameters)
+        val parameters = method.getProtoID(dexFile).parameters
+        val debugInfo  = DebugInfo.empty(parameters.typeCount)
         val debugSequenceAssembler = DebugSequenceAssembler(debugInfo)
 
         var codeOffset = 0
 
         pCtx.forEach { ctx ->
-            val parameterNumber = registerInfo.parameterNumber(ctx.r.text)
+            val parameterRegisterNumber = ctx.r.text.substring(1).toInt()
 
-            val parameterIndex = if (method.isStatic) {
-                parameterNumber
-            } else {
-                parameterNumber - 1
+            var parameterIndex = 0
+            var currRegister   = if (method.isStatic) 0 else 1
+            for (type in parameters.getTypes(dexFile)) {
+                if (currRegister == parameterRegisterNumber) {
+                    break
+                } else {
+                    parameterIndex++
+                    currRegister += DexClasses.getArgumentSizeForType(type)
+                }
             }
 
             val nameIndex = if (ctx.name != null) {
@@ -344,17 +349,7 @@ internal data class RegisterInfo(val registers: Int, val locals: Int, val insSiz
 
             'p' -> {
                 val number = register.substring(1).toInt()
-                return locals + number
-            }
-
-            else -> throw RuntimeException("unknown register format $register")
-        }
-    }
-
-    fun parameterNumber(register: String): Int {
-        return when (register.first()) {
-            'p' -> {
-                register.substring(1).toInt()
+                locals + number
             }
 
             else -> throw RuntimeException("unknown register format $register")

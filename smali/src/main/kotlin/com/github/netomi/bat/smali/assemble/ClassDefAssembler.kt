@@ -19,10 +19,14 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.editor.ClassDefEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 
 internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVisitor<ClassDef?>() {
+
+    private val dexFile: DexFile
+        get() = dexEditor.dexFile
 
     private val encodedValueAssembler: EncodedValueAssembler = EncodedValueAssembler(dexEditor)
     private val annotationAssembler:   AnnotationAssembler   = AnnotationAssembler(encodedValueAssembler, dexEditor)
@@ -95,13 +99,19 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
             classDefEditor.addMethodAnnotations(method, methodAnnotations)
         }
 
+        val parameters = method.getProtoID(dexFile).parameters
         ctx.sParameter().forEach { pCtx ->
-            val parameterNumber = pCtx.r.text.substring(1).toInt()
+            val parameterRegisterNumber = pCtx.r.text.substring(1).toInt()
 
-            val parameterIndex = if (method.isStatic) {
-                parameterNumber
-            } else {
-                parameterNumber - 1
+            var parameterIndex = 0
+            var currRegister   = if (method.isStatic) 0 else 1
+            for (type in parameters.getTypes(dexFile)) {
+                if (currRegister == parameterRegisterNumber) {
+                    break
+                } else {
+                    parameterIndex++
+                    currRegister += DexClasses.getArgumentSizeForType(type)
+                }
             }
 
             val parameterAnnotations = mutableListOf<Annotation>()
