@@ -52,7 +52,7 @@ class DexFile private constructor() {
     internal val protoIDs      = ArrayList<ProtoID>()
     internal val fieldIDs      = ArrayList<FieldID>()
     internal val methodIDs     = ArrayList<MethodID>()
-    internal val classDefs     = ArrayList<ClassDef>()
+    internal var classDefs     = ArrayList<ClassDef>()
     internal val callSiteIDs   = ArrayList<CallSiteID>()
     internal val methodHandles = ArrayList<MethodHandle>()
 

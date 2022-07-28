@@ -34,7 +34,7 @@ import java.util.*
     dataSection   = false)
 class TypeList private constructor() : DataItem(), Comparable<TypeList> {
 
-    private var typeList: IntArray = intArrayOf()
+    internal var typeList: IntArray = intArrayOf()
 
     override val isEmpty: Boolean
         get() = typeList.isEmpty()

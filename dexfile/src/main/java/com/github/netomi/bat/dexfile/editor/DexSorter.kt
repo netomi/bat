@@ -81,6 +81,8 @@ class DexSorter : DexFileVisitor {
             }
         })
 
+        sortClassDefs(dexFile)
+
         // fix instructions that reference modified string/type/proto IDs.
         dexFile.classDefsAccept(allClassData(allMethods(allCode(InstructionFixer(stringIDMapping, typeIDMapping, protoIDMapping, fieldIDMapping, methodIDMapping)))))
 
@@ -92,6 +94,45 @@ class DexSorter : DexFileVisitor {
         list.sortWith(comparator)
         val newIndices = list.withIndex().associate { iv -> Pair(iv.value, iv.index) }
         return oldIndices.keys.associate { stringID -> Pair(oldIndices[stringID]!!, newIndices[stringID]!!) }
+    }
+
+    private fun sortClassDefs(dexFile: DexFile) {
+        // first sort the classDefs by classname
+        dexFile.classDefs.sortWith(compareBy { it.getClassName(dexFile) })
+
+        val sortedClassDefs  = ArrayList<ClassDef>(dexFile.classDefs.size)
+        val pendingClassDefs = LinkedHashSet<ClassDef>(dexFile.classDefs)
+
+        // collect the types of all classes to be written
+        val pendingClassTypes = mutableSetOf<Int>()
+        for (classDef in dexFile.classDefs) {
+            pendingClassTypes.add(classDef.classIndex)
+        }
+
+        // now iterate over all classes still to be written to the final class list,
+        // if no referenced types (super class or interfaces) are still pending,
+        // the class can be written. after each insert, start iterating from the start
+        // again to ensure classes are sorted by classname.
+        while (pendingClassDefs.isNotEmpty()) {
+            for (classDef in pendingClassDefs) {
+                if (!referencesPendingClassType(classDef, pendingClassTypes)) {
+                    sortedClassDefs.add(classDef)
+                    pendingClassDefs.remove(classDef)
+                    pendingClassTypes.remove(classDef.classIndex)
+                    break
+                }
+            }
+        }
+
+        dexFile.classDefs = sortedClassDefs
+    }
+
+    private fun referencesPendingClassType(classDef: ClassDef, pendingClassTypes: Set<Int>): Boolean {
+        if (pendingClassTypes.contains(classDef.superClassIndex)) {
+            return true
+        }
+
+        return classDef.interfaces.typeList.any { pendingClassTypes.contains(it) }
     }
 }
 
