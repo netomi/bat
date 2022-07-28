@@ -19,14 +19,12 @@ package com.github.netomi.bat.smali
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
 import com.github.netomi.bat.dexfile.editor.DexSorter
-import com.github.netomi.bat.dexfile.io.DexFileWriter
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -71,8 +69,7 @@ class AssemblerTest {
     companion object {
         @JvmStatic
         fun smaliFiles() = listOf(
-            Arguments.of("Fields/StaticFields.smali"),
-            //Arguments.of("AnnotationValues/AnnotationWithValues.smali")
+            Arguments.of("Fields/StaticFields.smali")
         )
     }
 
