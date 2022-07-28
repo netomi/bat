@@ -78,8 +78,8 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
     }
 
     fun accept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
-        val className = Classes.internalClassNameFromType(getClassType(dexFile))
-        val classDef  = dexFile.getClassDef(className)
+        val classType = getClassType(dexFile)
+        val classDef  = dexFile.getClassDefByType(classType)
 
         classDef?.methodsAccept(dexFile, filterMethodsByNameAndProtoID(getName(dexFile), getProtoID(dexFile), visitor))
     }

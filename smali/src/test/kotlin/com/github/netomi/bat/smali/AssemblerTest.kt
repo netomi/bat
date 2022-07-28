@@ -42,13 +42,14 @@ class AssemblerTest {
             val dexFile  = DexFile.of(DexFormat.FORMAT_035)
             val classDef = Assembler(dexFile).assemble(ByteArrayInputStream(baos.toByteArray()))
 
+            val classType = classDef.getType(dexFile)
             val className = classDef.getClassName(dexFile)
 
             DexSorter().visitDexFile(dexFile)
 
             val outputStreamFactory = TestOutputStreamFactory()
             val disassembler = Disassembler(outputStreamFactory)
-            dexFile.classDefAccept(className, disassembler)
+            dexFile.classDefAcceptByType(classType, disassembler)
 
             val expectedBytes = baos.toByteArray()
             val actualBytes   = outputStreamFactory.getOutputStream(className)!!.toByteArray()

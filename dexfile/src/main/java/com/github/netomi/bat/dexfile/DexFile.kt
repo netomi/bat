@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.visitor.*
+import com.github.netomi.bat.util.Classes
 import com.github.netomi.bat.util.parallelForEachIndexed
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -163,8 +164,14 @@ class DexFile private constructor() {
         return classDefs
     }
 
-    fun getClassDef(className: String): ClassDef? {
-        val index = classDefMap[className]
+    fun getClassDefByType(classType: String): ClassDef? {
+        val index = classDefMap[classType]
+        return if (index == null) null else classDefs[index]
+    }
+
+    fun getClassDefByClassName(internalClassName: String): ClassDef? {
+        val classType = Classes.internalTypeFromClassName(internalClassName)
+        val index = classDefMap[classType]
         return if (index == null) null else classDefs[index]
     }
 
@@ -173,13 +180,13 @@ class DexFile private constructor() {
     }
 
     internal fun addClassDef(classDef: ClassDef): Int {
-        val className = classDef.getClassName(this)
-        if (getClassDef(className) != null) {
-            throw IllegalArgumentException("class with name $className already exists in dex file.")
+        val classType = classDef.getType(this)
+        if (getClassDefByType(classType) != null) {
+            throw IllegalArgumentException("class with name ${Classes.internalClassNameFromType(classType)} already exists in dex file.")
         }
 
         classDefs.add(classDef)
-        classDefMap[classDef.getClassName(this)] = classDefs.size - 1
+        classDefMap[classType] = classDefs.size - 1
         return classDefs.size - 1
     }
 
@@ -237,8 +244,12 @@ class DexFile private constructor() {
         }
     }
 
-    fun classDefAccept(className: String, visitor: ClassDefVisitor) {
-        getClassDef(className)?.accept(this, visitor)
+    fun classDefAcceptByType(classType: String, visitor: ClassDefVisitor) {
+        getClassDefByType(classType)?.accept(this, visitor)
+    }
+
+    fun classDefAcceptByClassName(internalClassName: String, visitor: ClassDefVisitor) {
+        getClassDefByClassName(internalClassName)?.accept(this, visitor)
     }
 
     fun methodHandlesAccept(visitor: MethodHandleVisitor) {
@@ -312,21 +323,22 @@ class DexFile private constructor() {
     }
 
     internal fun refreshCaches() {
-        classDefs.forEachIndexed  { index, classDef  -> classDefMap[classDef.getClassName(this)] = index }
+        classDefMap.clear()
+        classDefs.forEachIndexed  { index, classDef  -> classDefMap[classDef.getType(this)] = index }
     }
 
     override fun toString(): String {
         return buildString {
             appendLine("DexFile[")
-            appendLine("  format       : ${dexFormat}")
-            appendLine("  stringIDs    : ${stringIDCount} items")
-            appendLine("  typeIDs      : ${typeIDCount} items")
-            appendLine("  protoIDs     : ${protoIDCount} items")
-            appendLine("  fieldIDs     : ${fieldIDCount} items")
-            appendLine("  methodIDs    : ${methodIDCount} items")
-            appendLine("  classDefs    : ${classDefCount} items")
-            appendLine("  callsiteIDs  : ${callSiteIDCount} items")
-            appendLine("  methodHandles: ${methodHandleCount} items]")
+            appendLine("  format       : $dexFormat")
+            appendLine("  stringIDs    : $stringIDCount items")
+            appendLine("  typeIDs      : $typeIDCount items")
+            appendLine("  protoIDs     : $protoIDCount items")
+            appendLine("  fieldIDs     : $fieldIDCount items")
+            appendLine("  methodIDs    : $methodIDCount items")
+            appendLine("  classDefs    : $classDefCount items")
+            appendLine("  callSiteIDs  : $callSiteIDCount items")
+            appendLine("  methodHandles: $methodHandleCount items]")
         }
     }
 
