@@ -99,20 +99,8 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
             classDefEditor.addMethodAnnotations(method, methodAnnotations)
         }
 
-        val parameters = method.getProtoID(dexFile).parameters
         ctx.sParameter().forEach { pCtx ->
-            val parameterRegisterNumber = pCtx.r.text.substring(1).toInt()
-
-            var parameterIndex = 0
-            var currRegister   = if (method.isStatic) 0 else 1
-            for (type in parameters.getTypes(dexFile)) {
-                if (currRegister == parameterRegisterNumber) {
-                    break
-                } else {
-                    parameterIndex++
-                    currRegister += DexClasses.getArgumentSizeForType(type)
-                }
-            }
+            val parameterIndex = parseParameterIndex(pCtx, dexFile, method)
 
             val parameterAnnotations = mutableListOf<Annotation>()
             pCtx.sAnnotation().forEach { parameterAnnotations.add(annotationAssembler.parseAnnotation(it)) }

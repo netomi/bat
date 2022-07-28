@@ -17,12 +17,14 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.DexAccessFlags
+import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser
+import com.github.netomi.bat.smali.parser.SmaliParser.SParameterContext
 import com.github.netomi.bat.util.Strings
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
-import java.lang.NumberFormatException
 
 internal fun parserError(ctx: ParserRuleContext, message: String): Nothing {
     val lineNumber = ctx.getStart().line
@@ -49,6 +51,42 @@ private fun fillParseContextText(node: ParseTree, list: MutableList<String>) {
             fillParseContextText(node.getChild(i), list)
         }
     }
+}
+
+internal fun parseParameterIndex(ctx: SParameterContext, dexFile: DexFile, method: EncodedMethod): Int {
+    // check whether the parameter number is in the following formats:
+    //  * pX where X denotes the parameter register (backwards compatible to smali 2.x)
+    //  *  X where X denotes the parameter index (0 based) from the descriptor
+
+    // when using the pX format, you have to take into account the argument size of each parameter,
+    // whereas the direct format just references the parameter from the descriptor (starting from 0),
+    // regardless of its argument size, making it more convenient to use.
+
+    var parameterIndex = 0
+
+    if (ctx.registerNumber != null) {
+        val parameterRegisterNumber = ctx.registerNumber.text.substring(1).toInt()
+
+        var currRegister = if (method.isStatic) 0 else 1
+        val parameters   = method.getProtoID(dexFile).parameters
+        for (type in parameters.getTypes(dexFile)) {
+            if (currRegister == parameterRegisterNumber) {
+                break
+            } else {
+                parameterIndex++
+                currRegister += DexClasses.getArgumentSizeForType(type)
+            }
+        }
+    } else if (ctx.parameterIndex != null) {
+        parameterIndex = ctx.parameterIndex.text.toInt()
+        if (parameterIndex < 0) {
+            parserError(ctx, "parameter number must not be negative")
+        }
+    } else {
+        parserError(ctx, "unexpected parameter number")
+    }
+
+    return parameterIndex
 }
 
 internal data class FieldInfo(val classType:String?, val name: String, val type: String)

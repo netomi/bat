@@ -204,7 +204,7 @@ sAnnotation
 sSubannotation
 	: '.subannotation' type=OBJECT_TYPE (sAnnotationKeyName '=' sAnnotationValue )* '.end subannotation' ;
 
-sParameter: param=DPARAM r=REGISTER (',' name=STRING )? (sAnnotation* '.end param')?;
+sParameter: param=DPARAM (registerNumber=REGISTER | parameterIndex=INT) (',' name=STRING )? (sAnnotation* '.end param')?;
 
 sAnnotationKeyName: name=ID ;
 

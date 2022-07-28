@@ -40,32 +40,18 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
         val registerInfo         = collectRegisterInfo(iCtx)
         val instructionAssembler = InstructionAssembler(iCtx, registerInfo, dexEditor)
 
-        val parameters = method.getProtoID(dexFile).parameters
-        val debugInfo  = DebugInfo.empty(parameters.typeCount)
+        val debugInfo = DebugInfo.empty(method.getProtoID(dexFile).parameters.typeCount)
         val debugSequenceAssembler = DebugSequenceAssembler(debugInfo)
 
         var codeOffset = 0
 
         pCtx.forEach { ctx ->
-            val parameterRegisterNumber = ctx.r.text.substring(1).toInt()
-
-            var parameterIndex = 0
-            var currRegister   = if (method.isStatic) 0 else 1
-            for (type in parameters.getTypes(dexFile)) {
-                if (currRegister == parameterRegisterNumber) {
-                    break
-                } else {
-                    parameterIndex++
-                    currRegister += DexClasses.getArgumentSizeForType(type)
-                }
-            }
-
+            val parameterIndex = parseParameterIndex(ctx, dexFile, method)
             val nameIndex = if (ctx.name != null) {
                 dexEditor.addOrGetStringIDIndex(ctx.name.text.removeSurrounding("\""))
             } else {
                 NO_INDEX
             }
-
             debugInfo.setParameterName(parameterIndex, nameIndex)
         }
 
