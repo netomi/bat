@@ -20,6 +20,8 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
 import com.github.netomi.bat.dexfile.visitor.filteredByExternalClassName
 import picocli.CommandLine
+import picocli.CommandLine.HelpCommand
+import picocli.CommandLine.Mixin
 import java.io.*
 
 /**
@@ -28,16 +30,34 @@ import java.io.*
 @CommandLine.Command(
     name                 = "bat-dexdump",
     description          = ["dumps dex files."],
+    subcommands          = [ DumpCommand::class, ListCommand::class, HelpCommand::class ],
     parameterListHeading = "%nParameters:%n",
     optionListHeading    = "%nOptions:%n")
-class DexDumpCommand : Runnable {
+class DexDumpCommand {
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            val cmdLine = CommandLine(DexDumpCommand())
+            cmdLine.execute(*args)
+        }
+    }
+}
 
+@CommandLine.Command(synopsisHeading      = "%nUsage:%n%n",
+    descriptionHeading   = "%nDescription:%n%n",
+    parameterListHeading = "%nParameters:%n%n",
+    optionListHeading    = "%nOptions:%n%n",
+    commandListHeading   = "%nCommands:%n%n")
+open class ReusableOptions {
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.dex)"])
-    private lateinit var inputFile: File
+    lateinit var inputFile: File
 
     @CommandLine.Option(names = ["-o"], description = ["output file name (defaults to stdout)"])
-    private var outputFile: File? = null
+    var outputFile: File? = null
+}
 
+@CommandLine.Command(name = "dump", aliases = [ "d", "du" ], description = ["dump the content of a dex file similar to dexdump"])
+private class DumpCommand: ReusableOptions(), Runnable {
     @CommandLine.Option(names = ["-a"], description = ["print annotations"])
     private var printAnnotations = false
 
@@ -54,12 +74,7 @@ class DexDumpCommand : Runnable {
     private var classNameFilter: String? = null
 
     override fun run() {
-        FileInputStream(inputFile).use { `is` ->
-            val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
-            val reader = DexFileReader(`is`)
-            val dexFile = DexFile.empty()
-            reader.visitDexFile(dexFile)
-
+        processInput(inputFile, outputFile) { dexFile, os ->
             println("Processing '${inputFile.name}'...")
             println("Opened '${inputFile.name}', DEX version '${dexFile.dexFormat?.version}'")
 
@@ -73,18 +88,71 @@ class DexDumpCommand : Runnable {
             } else {
                 dexFile.accept(DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode))
             }
+        }
+    }
+}
 
-            if (outputFile != null) {
-                os.close()
+@CommandLine.Command(name        = "list",
+    aliases     = [ "l"],
+    description = ["list data items inside a dex file"])
+private class ListCommand {
+
+    @CommandLine.Command(name        = "strings",
+                         description = ["list string items"])
+    fun listStrings(@Mixin opts: ReusableOptions) {
+        processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
+            val printer = PrintWriter(os, true)
+            for (string in dexFile.getStringIDs()) {
+                printer.println(string.stringValue)
             }
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            val cmdLine = CommandLine(DexDumpCommand())
-            cmdLine.execute(*args)
+    @CommandLine.Command(name        = "types",
+                         description = ["list type items"])
+    fun listTypes(@Mixin opts: ReusableOptions) {
+        processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
+            val printer = PrintWriter(os, true)
+            for (type in dexFile.getTypeIDs()) {
+                printer.println(type.getType(dexFile))
+            }
+        }
+    }
+
+    @CommandLine.Command(name        = "protos",
+                         description = ["list proto items"])
+    fun listProtos(@Mixin opts: ReusableOptions) {
+        processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
+            val printer = PrintWriter(os, true)
+            for (proto in dexFile.getProtoIDs()) {
+                printer.println(proto.getDescriptor(dexFile))
+            }
+        }
+    }
+
+    @CommandLine.Command(name        = "classes",
+                         description = ["list proto items"])
+    fun listClasses(@Mixin opts: ReusableOptions) {
+        processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
+            val printer = PrintWriter(os, true)
+            for (clazz in dexFile.getClassDefs()) {
+                printer.println(clazz.getClassName(dexFile))
+            }
+        }
+    }
+}
+
+private fun processInput(inputFile: File, outputFile: File?, callback: (DexFile, OutputStream) -> Unit) {
+    FileInputStream(inputFile).use { `is` ->
+        val os = if (outputFile == null) System.out else FileOutputStream(outputFile)
+        val reader = DexFileReader(`is`)
+        val dexFile = DexFile.empty()
+        reader.visitDexFile(dexFile)
+
+        callback(dexFile, os)
+
+        if (outputFile != null) {
+            os.close()
         }
     }
 }
