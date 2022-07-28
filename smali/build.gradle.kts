@@ -23,6 +23,9 @@ tasks {
 
 tasks.test {
     useJUnitPlatform()
+
+    // propagate the ANDROID_RUNTIMES property to test execution
+    project.properties["ANDROID_RUNTIMES"]?.let { systemProperty("ANDROID_RUNTIMES", it) }
 }
 
 configurations[JavaPlugin.API_CONFIGURATION_NAME].let { apiConfiguration ->

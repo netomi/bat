@@ -1,5 +1,12 @@
 #!/bin/bash
 
+function cleanDataDir ()
+{
+  if [ -e "${ANDROID_DATA}" ] ; then
+    rm -r "${ANDROID_DATA}"
+  fi
+}
+
 function cleanTmp ()
 {
   if [ -e "${TMPDIR}" ] ; then
@@ -17,13 +24,22 @@ function find_libdir() {
 
 lib=-XXlib:libart.so
 
+ANDROID_DATA=./android-data/$ANDROID_VERSION
 
 PLATFORM="linux-x86"
 ANDROID_VERSION=$1
 shift
 
-ANDROID_DATA=./android-data/$ANDROID_VERSION
-ANDROID_BASE="/home/tn/workspace/netomi/runtimes/android-$ANDROID_VERSION"
+if [ "$1" = "-c" ]; then
+  cleanDataDir
+  shift
+fi
+
+if [ -z "$ANDROID_RUNTIMES" ]; then
+  exit -1
+fi
+
+ANDROID_BASE="$ANDROID_RUNTIMES/android-$ANDROID_VERSION"
 ANDROID_HOST_DIR="$ANDROID_BASE/$PLATFORM"
 DALVIKVM_EXECUTABLE=$ANDROID_HOST_DIR/bin/dalvikvm
 

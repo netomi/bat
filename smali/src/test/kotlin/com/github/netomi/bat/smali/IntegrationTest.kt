@@ -32,10 +32,12 @@ class IntegrationTest {
 
     @Test
     fun runUnitTest() {
+        // only execute the test if the system property has been set
+        val androidRuntimesVariable = System.getProperty("ANDROID_RUNTIMES")
+        Assumptions.assumeTrue(androidRuntimesVariable != null)
+
         val resource = javaClass.getResource("/junit-tests/TestSuite.smali")
         val resourcePath = File(resource.file).parentFile.toPath()
-
-        resourcePath.resolve("android-data").toFile().deleteRecursively()
 
         val dexFile  = DexFile.of(DexFormat.FORMAT_035)
         Assembler(dexFile).assemble(resourcePath)
@@ -45,19 +47,26 @@ class IntegrationTest {
             DexFileWriter(it).visitDexFile(dexFile)
         }
 
-        val result = "./rundalvikvm 7.1.2 -cp junit.zip:tests.dex org.junit.runner.JUnitCore AllTests".runCommand(resourcePath.toFile())
+        val result =
+            "./rundalvikvm 7.1.2 -c -cp junit.zip:tests.dex org.junit.runner.JUnitCore AllTests"
+                .runCommand(resourcePath.toFile(), mapOf(Pair("ANDROID_RUNTIMES", androidRuntimesVariable)))
+
         println(result!!)
     }
 
-    private fun String.runCommand(workingDir: File): String? {
+    private fun String.runCommand(workingDir: File, envVariables: Map<String, String> = emptyMap()): String? {
         return try {
             val parts = this.split("\\s".toRegex())
-            val proc =
+            val builder =
                 ProcessBuilder(*parts.toTypedArray())
                     .directory(workingDir)
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
                     .redirectErrorStream(true)
-                    .start()
+
+            val env = builder.environment()
+            env.putAll(envVariables)
+
+            val proc = builder.start()
 
             proc.waitFor(1, TimeUnit.MINUTES)
             proc.inputStream.bufferedReader().readText()
