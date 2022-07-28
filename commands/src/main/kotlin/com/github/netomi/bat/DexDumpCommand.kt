@@ -140,6 +140,35 @@ private class ListCommand {
             }
         }
     }
+
+    @CommandLine.Command(name        = "fields",
+                         description = ["list field items"])
+    fun listFields(@Mixin opts: ReusableOptions) {
+        processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
+            val printer = PrintWriter(os, true)
+            for (field in dexFile.getFieldIDs()) {
+                printer.print(field.getClassType(dexFile))
+                printer.print("->")
+                printer.print(field.getName(dexFile))
+                printer.print(":")
+                printer.println(field.getType(dexFile))
+            }
+        }
+    }
+
+    @CommandLine.Command(name        = "methods",
+                         description = ["list method items"])
+    fun listMethods(@Mixin opts: ReusableOptions) {
+        processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
+            val printer = PrintWriter(os, true)
+            for (method in dexFile.getMethodIDs()) {
+                printer.print(method.getClassType(dexFile))
+                printer.print("->")
+                printer.print(method.getName(dexFile))
+                printer.println(method.getProtoID(dexFile).getDescriptor(dexFile))
+            }
+        }
+    }
 }
 
 private fun processInput(inputFile: File, outputFile: File?, callback: (DexFile, OutputStream) -> Unit) {
