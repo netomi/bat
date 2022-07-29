@@ -17,12 +17,19 @@ package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
+import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
 import com.github.netomi.bat.util.Primitives
 
-abstract class PayloadInstruction internal constructor(opcode: DexOpCode, _payloadOffset: Int, register: Int) : DexInstruction(opcode, register) {
+abstract class PayloadInstruction internal constructor(opcode:         DexOpCode,
+                                                       _payloadOffset: Int     = 0,
+                                                       _payloadLabel:  String? = null,
+                                                       register:       Int) : DexInstruction(opcode, register) {
 
     var payloadOffset = _payloadOffset
         internal set
+
+    var payloadLabel: String? = _payloadLabel
+        private set
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
@@ -31,6 +38,20 @@ abstract class PayloadInstruction internal constructor(opcode: DexOpCode, _paylo
                           (instructions[offset + 2].toInt() shl 16)
 
             else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+        }
+    }
+
+    override fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {
+        if (payloadLabel != null) {
+            // payloads must be aligned to even offsets.
+            var payloadCodeOffset = labelOffsetMap.getOffset(payloadLabel!!)
+            if (payloadCodeOffset.mod(2) == 1) {
+                payloadCodeOffset++
+            }
+            payloadOffset = payloadCodeOffset - offset
+
+            // remember the offset of the instruction using the payload
+            labelOffsetMap.setPayloadReferenceOffset(payloadCodeOffset, offset)
         }
     }
 
@@ -59,6 +80,15 @@ abstract class PayloadInstruction internal constructor(opcode: DexOpCode, _paylo
                 FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payloadOffset, register)
                 PACKED_SWITCH   -> PackedSwitchInstruction.of(payloadOffset, register)
                 SPARSE_SWITCH   -> SparseSwitchInstruction.of(payloadOffset, register)
+                else            -> throw IllegalArgumentException("unexpected opcode $opCode for PayloadInstruction")
+            }
+        }
+
+        fun of(opCode: DexOpCode, payloadLabel: String, register: Int): PayloadInstruction {
+            return when (opCode) {
+                FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payloadLabel, register)
+                PACKED_SWITCH   -> PackedSwitchInstruction.of(payloadLabel, register)
+                SPARSE_SWITCH   -> SparseSwitchInstruction.of(payloadLabel, register)
                 else            -> throw IllegalArgumentException("unexpected opcode $opCode for PayloadInstruction")
             }
         }

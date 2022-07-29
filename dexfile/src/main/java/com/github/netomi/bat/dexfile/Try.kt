@@ -28,12 +28,20 @@ import java.util.*
  */
 class Try private constructor(_startAddr:    Int                 = 0,
                               _insnCount:    Int                 = 0,
+                              _startLabel:   String?             = null,
+                              _endLabel:     String?             = null,
                               _catchHandler: EncodedCatchHandler = EncodedCatchHandler.empty()): DexContent() {
 
     var startAddr: Int = _startAddr
         internal set
 
     var insnCount: Int = _insnCount
+        internal set
+
+    var startLabel: String? = _startLabel
+        internal set
+
+    var endLabel: String?   = _endLabel
         internal set
 
     var catchHandler: EncodedCatchHandler = _catchHandler
@@ -88,7 +96,11 @@ class Try private constructor(_startAddr:    Int                 = 0,
             Preconditions.checkArgument(endAddr >= startAddr, "endAddr must be > startAddr")
 
             val insnCount = endAddr - startAddr + 1
-            return Try(startAddr, insnCount, catchHandler)
+            return Try(startAddr, insnCount, null, null, catchHandler)
+        }
+
+        fun of(startLabel: String, endLabel: String, catchHandler: EncodedCatchHandler): Try {
+            return Try(0, 0, startLabel, endLabel, catchHandler)
         }
 
         fun readContent(input: DexDataInput): Try {

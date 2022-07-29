@@ -45,6 +45,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
         private set
 
     var code: Code = _code
+        internal set
 
     fun getMethodID(dexFile: DexFile): MethodID {
         return dexFile.getMethodID(methodIndex)

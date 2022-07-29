@@ -22,80 +22,15 @@ import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import com.github.netomi.bat.util.toIntArray
-import org.antlr.v4.runtime.ParserRuleContext
 
-internal class InstructionAssembler internal constructor(            listCtx:      List<SInstructionContext>,
-                                                         private val registerInfo: RegisterInfo,
+internal class InstructionAssembler internal constructor(private val registerInfo: RegisterInfo,
                                                          private val dexEditor:    DexEditor) {
 
     private val encodedValueAssembler = EncodedValueAssembler(dexEditor)
 
-    private val labelMapping:        MutableMap<String, Int> = LinkedHashMap()
-    private val payloadLabelMapping: MutableMap<String, Int> = HashMap()
-
-    init {
-        collectLabels(listCtx)
-    }
-
-    private fun collectLabels(listCtx: List<SInstructionContext>): Pair<MutableMap<String, Int>, MutableMap<String, Int>> {
-        var codeOffset = 0
-
-        listCtx.forEach { ctx ->
-            val t = ctx.getChild(0) as ParserRuleContext
-            when (t.ruleIndex) {
-                RULE_sLabel -> {
-                    val c = t as SLabelContext
-                    labelMapping[c.label.text] = codeOffset
-                }
-
-                RULE_farraydata -> {
-                    codeOffset = alignPayloadLabel(codeOffset)
-                    val insn = parseArrayDataPayload(t as FarraydataContext)
-                    codeOffset += insn.length
-                }
-
-                RULE_fsparseswitch -> {
-                    codeOffset = alignPayloadLabel(codeOffset)
-                    val insn = parseSparseSwitchPayload(t as FsparseswitchContext, -1)
-                    codeOffset += insn.length
-                }
-
-                RULE_fpackedswitch -> {
-                    codeOffset = alignPayloadLabel(codeOffset)
-                    val insn = parsePackedSwitchPayload(t as FpackedswitchContext, -1)
-                    codeOffset += insn.length
-                }
-
-                else -> {
-                    // check if it's a known instruction and advance the code offset
-                    val mnemonic = t.getChild(0).text
-                    if (DexOpCode.isValidMnemonic(mnemonic)) {
-                        val opcode = DexOpCode[mnemonic]
-                        val insn = opcode.createInstruction()
-                        codeOffset += insn.length
-                    }
-                }
-            }
-        }
-
-        return Pair(labelMapping, payloadLabelMapping)
-    }
-
-    private fun alignPayloadLabel(codeOffset: Int): Int {
-        val lastLabel = labelMapping.entries.lastOrNull()
-        if (lastLabel != null && lastLabel.value == codeOffset) {
-            if (codeOffset % 2 == 1) {
-                labelMapping[lastLabel.key] = codeOffset + 1
-                return codeOffset + 1
-            }
-        }
-
-        return codeOffset
-    }
-
     fun parseConversionInstructionF12x(ctx: F12x_conversionContext): ConversionInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode[mnemonic]
+        val opcode   = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
@@ -105,44 +40,39 @@ internal class InstructionAssembler internal constructor(            listCtx:   
 
     fun parseBasicInstructionF11x(ctx: F11x_basicContext): BasicInstruction {
         val mnemonic = ctx.op.text
-        val opcode = DexOpCode[mnemonic]
+        val opcode   = DexOpCode[mnemonic]
 
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
         return BasicInstruction.of(opcode, r1)
     }
 
-    fun parseBranchInstructionFx0t(ctx: Fx0t_branchContext, codeOffset: Int): BranchInstruction {
+    fun parseBranchInstructionFx0t(ctx: Fx0t_branchContext): BranchInstruction {
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode[mnemonic]
-
-        val label = ctx.target.label.text
-        val branchOffset = branchOffset(codeOffset, label)
-
-        return BranchInstruction.of(opcode, branchOffset)
+        val label    = ctx.target.label.text
+        return BranchInstruction.of(opcode, label)
     }
 
-    fun parseBranchInstructionF21t(ctx: F21t_branchContext, codeOffset: Int): BranchInstruction {
+    fun parseBranchInstructionF21t(ctx: F21t_branchContext): BranchInstruction {
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode[mnemonic]
 
         val label = ctx.label.label.text
-        val branchOffset = branchOffset(codeOffset, label)
         val r1 = registerInfo.registerNumber(ctx.r1.text)
 
-        return BranchInstruction.of(opcode, branchOffset, r1)
+        return BranchInstruction.of(opcode, label, r1)
     }
 
-    fun parseBranchInstructionF22t(ctx: F22t_branchContext, codeOffset: Int): BranchInstruction {
+    fun parseBranchInstructionF22t(ctx: F22t_branchContext): BranchInstruction {
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode[mnemonic]
 
         val label = ctx.label.label.text
-        val branchOffset = branchOffset(codeOffset, label)
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
 
-        return BranchInstruction.of(opcode, branchOffset, r1, r2)
+        return BranchInstruction.of(opcode, label, r1, r2)
     }
 
     fun parseFieldInstructionF21c(ctx: F21c_fieldContext): FieldInstruction {
@@ -165,9 +95,6 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         val r1 = registerInfo.registerNumber(ctx.r1.text)
         val r2 = registerInfo.registerNumber(ctx.r2.text)
 
-        if (r1 > 15) {
-            println("register $r1 $r2")
-        }
         val field = ctx.fld.text
         val (classType, fieldName, fieldType) = parseFieldObject(field)
 
@@ -485,17 +412,14 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         return CallSiteInstruction.of(opcode, callSiteIDIndex, *registers)
     }
 
-    fun parsePayloadInstructionF31t(ctx: F31t_payloadContext, codeOffset: Int): PayloadInstruction {
+    fun parsePayloadInstructionF31t(ctx: F31t_payloadContext): PayloadInstruction {
         val mnemonic = ctx.op.text
         val opcode = DexOpCode[mnemonic]
 
-        val r1 = registerInfo.registerNumber(ctx.r1.text)
-
+        val r1    = registerInfo.registerNumber(ctx.r1.text)
         val label = ctx.label.label.text
-        val payloadOffset = branchOffset(codeOffset, label)
-        payloadLabelMapping[label] = codeOffset
 
-        return PayloadInstruction.of(opcode, payloadOffset, r1)
+        return PayloadInstruction.of(opcode, label, r1)
     }
 
     fun parseArrayDataPayload(ctx: FarraydataContext): FillArrayPayload {
@@ -515,93 +439,39 @@ internal class InstructionAssembler internal constructor(            listCtx:   
         }
     }
 
-    fun parseSparseSwitchPayload(ctx: FsparseswitchContext, codeOffset: Int): SparseSwitchPayload {
-        val switchOffset = if (codeOffset == -1) { 0 } else {
-            val payloadLabels = labelMapping.entries.filter { it.value == codeOffset }.map { it.key }
-            if (payloadLabels.isEmpty()) {
-                throw RuntimeException("unknown label for sparse switch payload")
-            }
-
-            var offset: Int? = null
-            for (label in payloadLabels) {
-                offset = payloadLabelMapping[label]
-                if (offset != null) {
-                    break
-                }
-            }
-            offset
-        } ?: throw RuntimeException("payload not referenced from an instruction")
-
-        val keys = IntArray(ctx.INT().size)
-        ctx.INT().forEachIndexed { index, node -> keys[index] = parseInt(node.text) }
-
-        val branchTargets = IntArray(ctx.sLabel().size)
-        ctx.sLabel().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.label.text) }
-
-        return SparseSwitchPayload.of(keys, branchTargets)
+    fun parseSparseSwitchPayload(ctx: FsparseswitchContext): SparseSwitchPayload {
+        val keys         = IntArray(ctx.INT().size) { i -> parseInt(ctx.INT(i).text) }
+        val branchLabels = Array<String>(ctx.sLabel().size) { i -> ctx.sLabel(i).label.text }
+        return SparseSwitchPayload.of(keys, branchLabels)
     }
 
-    fun parsePackedSwitchPayload(ctx: FpackedswitchContext, codeOffset: Int): PackedSwitchPayload {
-        val switchOffset = if (codeOffset == -1) { 0 } else {
-            val payloadLabels = labelMapping.entries.filter { it.value == codeOffset }.map { it.key }
-            if (payloadLabels.isEmpty()) {
-                throw RuntimeException("unknown label for packed switch payload")
-            }
-
-            var offset: Int? = null
-            for (label in payloadLabels) {
-                offset = payloadLabelMapping[label]
-                if (offset != null) {
-                    break
-                }
-            }
-            offset
-        } ?: throw RuntimeException("payload not referenced from an instruction")
-
-        val firstKey = parseInt(ctx.start.text)
-
-        val branchTargets = IntArray(ctx.sLabel().size)
-        ctx.sLabel().forEachIndexed { index, node -> branchTargets[index] = branchOffset(switchOffset, node.label.text) }
-
-        return PackedSwitchPayload.of(firstKey, branchTargets)
+    fun parsePackedSwitchPayload(ctx: FpackedswitchContext): PackedSwitchPayload {
+        val firstKey     = parseInt(ctx.start.text)
+        val branchLabels = Array<String>(ctx.sLabel().size) { i -> ctx.sLabel(i).label.text }
+        return PackedSwitchPayload.of(firstKey, branchLabels)
     }
 
     fun parseCatchDirective(ctx: FcatchContext): Try {
         val exceptionType = ctx.type.text
         val exceptionTypeIndex = dexEditor.addOrGetTypeIDIndex(exceptionType)
 
-        val handler  = ctx.handle.label.text
-        val handlerOffset = labelMapping[handler]!!
-
-        val typeAddrList     = listOf(TypeAddrPair.of(exceptionTypeIndex, handlerOffset))
+        val handlerLabel     = ctx.handle.label.text
+        val typeAddrList     = listOf(TypeAddrPair.of(exceptionTypeIndex, handlerLabel))
         val exceptionHandler = EncodedCatchHandler.of(typeAddrList)
 
-        val tryStart = ctx.start.label.text
-        val tryEnd   = ctx.end.label.text
+        val startLabel = ctx.start.label.text
+        val endLabel   = ctx.end.label.text
 
-        val startOffset = labelMapping[tryStart]!!
-        val endOffset   = labelMapping[tryEnd]!!
-
-        return Try.of(startOffset, endOffset - 1, exceptionHandler)
+        return Try.of(startLabel, endLabel, exceptionHandler)
     }
 
     fun parseCatchAllDirective(ctx: FcatchallContext): Try {
-        val handler  = ctx.handle.label.text
-        val handlerOffset = labelMapping[handler]!!
+        val handlerLabel    = ctx.handle.label.text
+        val exceptionHandler = EncodedCatchHandler.of(handlerLabel)
 
-        val exceptionHandler = EncodedCatchHandler.of(handlerOffset)
+        val startLabel = ctx.start.label.text
+        val endLabel   = ctx.end.label.text
 
-        val tryStart = ctx.start.label.text
-        val tryEnd   = ctx.end.label.text
-
-        val startOffset = labelMapping[tryStart]!!
-        val endOffset   = labelMapping[tryEnd]!!
-
-        return Try.of(startOffset, endOffset - 1, exceptionHandler)
-    }
-
-    private fun branchOffset(currentOffset: Int, target: String): Int {
-        val targetOffset = labelMapping[target] ?: throw RuntimeException("unknown label $target")
-        return targetOffset - currentOffset
+        return Try.of(startLabel, endLabel, exceptionHandler)
     }
 }

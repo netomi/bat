@@ -19,12 +19,21 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class PackedSwitchPayload private constructor(_firstKey: Int = 0, _branchTargets: IntArray = EMPTY_TARGETS) : SwitchPayload(DexOpCode.NOP) {
+class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
+                                              _branchTargets: IntArray      = EMPTY_TARGETS,
+                                              _branchLabels:  Array<String> = EMPTY_LABELS) : SwitchPayload(DexOpCode.NOP) {
 
-    var firstKey: Int           = _firstKey
-    var branchTargets: IntArray = _branchTargets
+    var firstKey:      Int           = _firstKey
+        internal set
+
+    var branchTargets: IntArray      = _branchTargets
+        internal set
+
+    var branchLabels:  Array<String> = _branchLabels
+        internal set
 
     override val length: Int
         get() = branchTargets.size * 2 + 4
@@ -43,10 +52,20 @@ class PackedSwitchPayload private constructor(_firstKey: Int = 0, _branchTargets
         }
     }
 
+    override fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {
+        if (branchLabels.isNotEmpty()) {
+            val switchOffset = labelOffsetMap.getPayloadReferenceOffset(offset)
+            branchTargets = IntArray(branchLabels.size)
+            for (i in branchLabels.indices) {
+                branchTargets[i] = labelOffsetMap.computeDiffToTarget(switchOffset, branchLabels[i])
+            }
+        }
+    }
+
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
 
-        data[0] = ((opCode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.opCode and 0xff) or (IDENT shl 8)).toShort()
         data[1] = branchTargets.size.toShort()
 
         var offset = 2
@@ -72,6 +91,7 @@ class PackedSwitchPayload private constructor(_firstKey: Int = 0, _branchTargets
     companion object {
         internal const val IDENT         = 0x01
         private        val EMPTY_TARGETS = IntArray(0)
+        private        val EMPTY_LABELS  = emptyArray<String>()
 
         fun empty(): PackedSwitchPayload {
             return PackedSwitchPayload()
@@ -79,6 +99,10 @@ class PackedSwitchPayload private constructor(_firstKey: Int = 0, _branchTargets
 
         fun of(firstKey: Int, branchTargets: IntArray): PackedSwitchPayload {
             return PackedSwitchPayload(firstKey, branchTargets)
+        }
+
+        fun of(firstKey: Int, branchLabels: Array<String>): PackedSwitchPayload {
+            return PackedSwitchPayload(firstKey, _branchLabels = branchLabels)
         }
     }
 }

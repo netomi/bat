@@ -20,13 +20,20 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
+import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.Primitives
 
-class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: Int = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class BranchInstruction internal constructor(opcode:           DexOpCode,
+                                                  _branchOffset:    Int     = 0,
+                                                  _branchLabel:     String? = null,
+                                                  vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var branchOffset = _branchOffset
         internal set
+
+    var branchLabel: String? = _branchLabel
+        private set
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
@@ -41,6 +48,12 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
             FORMAT_31t -> instructions[offset + 1].toInt() and 0xffff or (instructions[offset + 2].toInt() shl 16)
 
             else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+        }
+    }
+
+    override fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {
+        if (branchLabel != null) {
+            branchOffset = labelOffsetMap.computeDiffToTarget(offset, branchLabel!!)
         }
     }
 
@@ -77,7 +90,11 @@ class BranchInstruction internal constructor(opcode: DexOpCode, _branchOffset: I
 
     companion object {
         fun of(opCode: DexOpCode, branchOffset: Int, vararg registers: Int): BranchInstruction {
-            return BranchInstruction(opCode, branchOffset, *registers)
+            return BranchInstruction(opCode, branchOffset, null, *registers)
+        }
+
+        fun of(opCode: DexOpCode, branchLabel: String, vararg registers: Int): BranchInstruction {
+            return BranchInstruction(opCode, 0, branchLabel, *registers)
         }
 
         fun create(opCode: DexOpCode): BranchInstruction {

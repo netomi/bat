@@ -135,7 +135,7 @@ class DexEditor private constructor(val dexFile: DexFile) {
         return dexFile.addClassDef(classDef)
     }
 
-    fun addClassDef(classType: String, accessFlags: Int, superType: String?, sourceFile: String?): ClassDef {
+    fun addClassDef(classType: String, accessFlags: Int, superType: String?, sourceFile: String?): ClassDefEditor {
         val classTypeIndex  = addOrGetTypeIDIndex(classType)
         val superTypeIndex  = if (superType != null) addOrGetTypeIDIndex(superType) else NO_INDEX
         val sourceFileIndex = if (sourceFile != null) addOrGetStringIDIndex(sourceFile) else NO_INDEX
@@ -147,7 +147,7 @@ class DexEditor private constructor(val dexFile: DexFile) {
                         sourceFileIndex)
 
         addClassDef(classDef)
-        return classDef
+        return ClassDefEditor.of(this, classDef)
     }
 
     fun addOrGetCallSiteIDIndex(callSite: CallSite): Int {

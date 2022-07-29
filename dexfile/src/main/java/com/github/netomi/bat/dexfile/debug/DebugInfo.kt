@@ -55,7 +55,7 @@ class DebugInfo private constructor(_lineStart:      Int                        
         }
     }
 
-    fun setParameterName(parameterIndex: Int, nameIndex: Int) {
+    internal fun setParameterName(parameterIndex: Int, nameIndex: Int) {
         parameterNames[parameterIndex] = nameIndex
     }
 

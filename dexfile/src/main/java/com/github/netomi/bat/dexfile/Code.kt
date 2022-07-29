@@ -46,7 +46,7 @@ class Code private constructor(
     _debugInfo:        DebugInfo                      = DebugInfo.empty()) : DataItem() {
 
     var registersSize = _registersSize
-        internal set(value) {
+        set(value) {
             assert(registersSize >= 0)
             field = value
         }

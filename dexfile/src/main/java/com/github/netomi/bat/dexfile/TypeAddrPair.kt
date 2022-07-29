@@ -27,13 +27,18 @@ import java.util.*
  *
  * @see [type addr pair @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-type-addr-pair)
  */
-class TypeAddrPair private constructor(_typeIndex: Int = NO_INDEX, _address: Int = 0) : DexContent() {
+class TypeAddrPair private constructor(_typeIndex: Int     = NO_INDEX,
+                                       _address:   Int     = 0,
+                                       _label:     String? = null) : DexContent() {
 
     var typeIndex: Int = _typeIndex
         internal set
 
     var address: Int = _address
-        private set
+        internal set
+
+    var label: String? = _label
+        internal set
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getTypeID(typeIndex).getType(dexFile)
@@ -76,6 +81,11 @@ class TypeAddrPair private constructor(_typeIndex: Int = NO_INDEX, _address: Int
             Preconditions.checkArgument(typeIndex >= 0, "typeIndex must not be negative")
             Preconditions.checkArgument(addr >= 0, "addr must not be negative")
             return TypeAddrPair(typeIndex, addr)
+        }
+
+        fun of(typeIndex: Int, label: String): TypeAddrPair {
+            Preconditions.checkArgument(typeIndex >= 0, "typeIndex must not be negative")
+            return TypeAddrPair(typeIndex, 0, label)
         }
 
         fun readContent(input: DexDataInput): TypeAddrPair {

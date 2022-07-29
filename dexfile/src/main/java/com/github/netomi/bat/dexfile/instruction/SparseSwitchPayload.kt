@@ -19,14 +19,20 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class SparseSwitchPayload private constructor(_keys: IntArray = EMPTY_ARRAY, _branchTargets: IntArray = EMPTY_ARRAY) : SwitchPayload(DexOpCode.NOP) {
+class SparseSwitchPayload private constructor(_keys:          IntArray      = EMPTY_ARRAY,
+                                              _branchTargets: IntArray      = EMPTY_ARRAY,
+                                              _branchLabels:  Array<String> = EMPTY_LABELS) : SwitchPayload(DexOpCode.NOP) {
 
     var keys: IntArray = _keys
         internal set
 
     var branchTargets: IntArray = _branchTargets
+        internal set
+
+    var branchLabels: Array<String> = _branchLabels
         internal set
 
     override val length: Int
@@ -49,10 +55,20 @@ class SparseSwitchPayload private constructor(_keys: IntArray = EMPTY_ARRAY, _br
         }
     }
 
+    override fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {
+        if (branchLabels.isNotEmpty()) {
+            val switchOffset = labelOffsetMap.getPayloadReferenceOffset(offset)
+            branchTargets = IntArray(branchLabels.size)
+            for (i in branchLabels.indices) {
+                branchTargets[i] = labelOffsetMap.computeDiffToTarget(switchOffset, branchLabels[i])
+            }
+        }
+    }
+
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
 
-        data[0] = ((opCode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.opCode and 0xff) or (IDENT shl 8)).toShort()
 
         data[1] = keys.size.toShort()
         var offset = 2
@@ -78,15 +94,22 @@ class SparseSwitchPayload private constructor(_keys: IntArray = EMPTY_ARRAY, _br
     }
 
     companion object {
-        internal const val IDENT       = 0x02
-        private        val EMPTY_ARRAY = IntArray(0)
+        internal const val IDENT        = 0x02
+        private        val EMPTY_ARRAY  = IntArray(0)
+        private        val EMPTY_LABELS = emptyArray<String>()
 
         fun empty(): SparseSwitchPayload {
             return SparseSwitchPayload()
         }
 
         fun of(keys: IntArray, branchTargets: IntArray): SparseSwitchPayload {
+            assert(keys.size == branchTargets.size) { "keys and branchTargets have different sizes" }
             return SparseSwitchPayload(keys, branchTargets)
+        }
+
+        fun of(keys: IntArray, branchLabels: Array<String>): SparseSwitchPayload {
+            assert(keys.size == branchLabels.size) { "keys and branchLabels have different sizes" }
+            return SparseSwitchPayload(keys, _branchLabels = branchLabels)
         }
     }
 }

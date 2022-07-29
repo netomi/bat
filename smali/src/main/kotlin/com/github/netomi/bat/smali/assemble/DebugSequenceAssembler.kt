@@ -27,11 +27,11 @@ internal class DebugSequenceAssembler internal constructor(private val debugInfo
     private val debugSequence: MutableList<DebugInstruction>
         get() = debugInfo.debugSequence
 
-    fun prologueEnd(codeOffset: Int) {
+    fun prologueEnd() {
         debugSequence.add(DebugSetPrologueEnd)
     }
 
-    fun epilogueStart(codeOffset: Int) {
+    fun epilogueStart() {
         debugSequence.add(DebugSetEpilogueBegin)
     }
 

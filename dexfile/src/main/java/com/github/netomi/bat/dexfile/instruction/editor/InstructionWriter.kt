@@ -14,23 +14,49 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.dexfile.io
+package com.github.netomi.bat.dexfile.instruction.editor
 
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 
-class InstructionWriter constructor(size: Int) {
+class InstructionWriter constructor(size: Int = 8192) {
 
-    val array: ShortArray = ShortArray(size)
+    var array: ShortArray = ShortArray(size)
+
+    private var lastWrittenOffset: Int = -1
+
+    val nextWriteOffset: Int
+        get() = lastWrittenOffset + 1
+
+    fun reset() {
+        lastWrittenOffset = -1
+    }
 
     fun write(offset: Int, value: Short) {
+        ensureCapacity(offset)
         array[offset] = value
+        lastWrittenOffset = offset
     }
 
     fun read(offset: Int): Short {
+        if (offset > lastWrittenOffset) {
+            throw RuntimeException("read data at offset $offset before it was written")
+        }
         return array[offset]
     }
 
+    fun getInstructionArray(): ShortArray {
+        return array.copyOfRange(0, lastWrittenOffset + 1)
+    }
+
+    private fun ensureCapacity(offset: Int) {
+        if (offset >= array.size) {
+            array = array.copyOf(array.size + INCREMENT)
+        }
+    }
+
     companion object {
+        private const val INCREMENT = 8192
+
         fun writeInstructions(instructions: List<DexInstruction>): ShortArray {
             val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a, b -> a + b }
 

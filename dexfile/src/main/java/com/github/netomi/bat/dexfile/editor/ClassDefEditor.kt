@@ -24,7 +24,7 @@ import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.value.EncodedValue
 
-class ClassDefEditor private constructor(private val dexEditor: DexEditor, private val classDef: ClassDef) {
+class ClassDefEditor private constructor(private val dexEditor: DexEditor, val classDef: ClassDef) {
 
     private val dexFile: DexFile
         get() = dexEditor.dexFile
@@ -43,16 +43,11 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, priva
         return field
     }
 
-    fun addMethod(methodName: String, parameterTypes: List<String>, returnType: String, accessFlags: Int): EncodedMethod {
-        val methodIDIndex =
-            dexEditor.addOrGetMethodIDIndex(classType,
-                methodName,
-                parameterTypes,
-                returnType)
-
+    fun addMethod(methodName: String, parameterTypes: List<String>, returnType: String, accessFlags: Int): MethodEditor {
+        val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classType, methodName, parameterTypes, returnType)
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
         classDef.addMethod(dexFile, method)
-        return method
+        return MethodEditor.of(dexEditor, classDef, method)
     }
 
     fun setStaticValue(field: EncodedField, value: EncodedValue) {
@@ -109,10 +104,6 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, priva
     }
 
     companion object {
-        fun of(dexFile: DexFile, classDef: ClassDef): ClassDefEditor {
-            return of(DexEditor.of(dexFile), classDef)
-        }
-
         fun of(dexEditor: DexEditor, classDef: ClassDef): ClassDefEditor {
             return ClassDefEditor(dexEditor, classDef)
         }

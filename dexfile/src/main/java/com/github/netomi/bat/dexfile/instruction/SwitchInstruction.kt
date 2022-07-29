@@ -16,4 +16,8 @@
 
 package com.github.netomi.bat.dexfile.instruction
 
-abstract class SwitchInstruction protected constructor(opCode: DexOpCode, payloadOffset: Int, register: Int) : PayloadInstruction(opCode, payloadOffset, register)
+abstract class SwitchInstruction protected constructor(opCode:        DexOpCode,
+                                                       payloadOffset: Int,
+                                                       payloadLabel:  String?,
+                                                       register:      Int)
+    : PayloadInstruction(opCode, payloadOffset, payloadLabel, register)

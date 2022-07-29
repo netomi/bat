@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.editor.ClassDefEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
-import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 
@@ -31,7 +30,6 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
     private val encodedValueAssembler: EncodedValueAssembler = EncodedValueAssembler(dexEditor)
     private val annotationAssembler:   AnnotationAssembler   = AnnotationAssembler(encodedValueAssembler, dexEditor)
 
-    private lateinit var classDef:       ClassDef
     private lateinit var classDefEditor: ClassDefEditor
 
     override fun visitSFile(ctx: SFileContext): ClassDef {
@@ -40,8 +38,7 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
         val sourceFile  = ctx.sSource().firstOrNull()?.src?.text?.removeSurrounding("\"")
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        classDef = dexEditor.addClassDef(classType, accessFlags, superType, sourceFile)
-        classDefEditor = ClassDefEditor.of(dexEditor, classDef)
+        classDefEditor = dexEditor.addClassDef(classType, accessFlags, superType, sourceFile)
 
         ctx.sInterface().forEach {
             classDefEditor.addInterface(it.name.text)
@@ -54,10 +51,10 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
         ctx.sField().forEach  { visitSField(it) }
         ctx.sMethod().forEach { visitSMethod(it) }
 
-        return classDef
+        return classDefEditor.classDef
     }
 
-    override fun visitSField(ctx: SFieldContext): ClassDef {
+    override fun visitSField(ctx: SFieldContext): ClassDef? {
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
@@ -74,19 +71,20 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
             classDefEditor.addFieldAnnotations(field, annotations)
         }
 
-        return classDef
+        return null
     }
 
-    override fun visitSMethod(ctx: SMethodContext): ClassDef {
+    override fun visitSMethod(ctx: SMethodContext): ClassDef? {
         val (_, name, parameterTypes, returnType) = parseMethodObject(ctx.methodObj.text)
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        val method = classDefEditor.addMethod(name, parameterTypes, returnType, accessFlags)
+        val methodEditor = classDefEditor.addMethod(name, parameterTypes, returnType, accessFlags)
+        val method       = methodEditor.method
 
         if (!method.isAbstract && !method.isNative) {
-            val codeAssembler = CodeAssembler(classDef, method, dexEditor)
-            val code = codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
-            method.code = code
+            val codeEditor = methodEditor.addCode()
+            val codeAssembler = CodeAssembler(method, codeEditor)
+            codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
         } else {
             if (ctx.sInstruction().isNotEmpty()) {
                 parserError(ctx, "abstract method containing code instructions")
@@ -109,6 +107,6 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
             }
         }
 
-        return classDef
+        return null
     }
 }

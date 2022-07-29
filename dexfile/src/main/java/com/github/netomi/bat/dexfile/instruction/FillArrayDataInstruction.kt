@@ -22,7 +22,10 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class FillArrayDataInstruction private constructor(payloadOffset: Int = 0, register: Int = 0) : PayloadInstruction(DexOpCode.FILL_ARRAY_DATA, payloadOffset, register) {
+class FillArrayDataInstruction private constructor(payloadOffset: Int     = 0,
+                                                   payloadLabel:  String? = null,
+                                                   register:      Int     = 0)
+    : PayloadInstruction(DexOpCode.FILL_ARRAY_DATA, payloadOffset, payloadLabel, register) {
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitFillArrayDataInstruction(dexFile, classDef, method, code, offset, this)
@@ -30,7 +33,11 @@ class FillArrayDataInstruction private constructor(payloadOffset: Int = 0, regis
 
     companion object {
         fun of(payloadOffset: Int, register: Int): FillArrayDataInstruction {
-            return FillArrayDataInstruction(payloadOffset, register)
+            return FillArrayDataInstruction(payloadOffset, null, register)
+        }
+
+        fun of(payloadLabel: String, register: Int): FillArrayDataInstruction {
+            return FillArrayDataInstruction(0, payloadLabel, register)
         }
 
         fun create(opCode: DexOpCode): FillArrayDataInstruction {

@@ -22,7 +22,10 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class PackedSwitchInstruction private constructor(payloadOffset: Int = 0, register: Int = 0): SwitchInstruction(DexOpCode.PACKED_SWITCH, payloadOffset, register) {
+class PackedSwitchInstruction private constructor(payloadOffset: Int     = 0,
+                                                  payloadLabel:  String? = null,
+                                                  register:      Int     = 0)
+    : SwitchInstruction(DexOpCode.PACKED_SWITCH, payloadOffset, payloadLabel, register) {
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitPackedSwitchInstruction(dexFile, classDef, method, code, offset, this)
@@ -30,7 +33,11 @@ class PackedSwitchInstruction private constructor(payloadOffset: Int = 0, regist
 
     companion object {
         fun of(payloadOffset: Int, register: Int): PackedSwitchInstruction {
-            return PackedSwitchInstruction(payloadOffset, register)
+            return PackedSwitchInstruction(payloadOffset, null, register)
+        }
+
+        fun of(payloadLabel: String, register: Int): PackedSwitchInstruction {
+            return PackedSwitchInstruction(0, payloadLabel, register)
         }
 
         fun create(opCode: DexOpCode): PackedSwitchInstruction {

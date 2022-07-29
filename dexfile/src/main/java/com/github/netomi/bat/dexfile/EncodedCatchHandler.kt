@@ -29,10 +29,14 @@ import kotlin.math.abs
  */
 class EncodedCatchHandler private constructor(
     _catchAllAddr:         Int                     = -1,
+    _catchAllLabel:        String?                 = null,
     private val _handlers: ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent() {
 
     var catchAllAddr: Int = _catchAllAddr
-        private set
+        internal set
+
+    var catchAllLabel: String? = _catchAllLabel
+        internal set
 
     val handlers: List<TypeAddrPair>
         get() = _handlers
@@ -103,19 +107,30 @@ class EncodedCatchHandler private constructor(
             return EncodedCatchHandler(catchAllAddr)
         }
 
+        fun of(catchAllLabel: String): EncodedCatchHandler {
+            return EncodedCatchHandler(0, catchAllLabel)
+        }
+
         fun of(handlers: List<TypeAddrPair>): EncodedCatchHandler {
-            return EncodedCatchHandler(NO_INDEX, ArrayList(handlers))
+            return EncodedCatchHandler(NO_INDEX, null, ArrayList(handlers))
         }
 
         fun of(catchAllAddr: Int, vararg handlers: TypeAddrPair): EncodedCatchHandler {
-            return EncodedCatchHandler(catchAllAddr, arrayListOf(*handlers))
+            return EncodedCatchHandler(catchAllAddr, null, arrayListOf(*handlers))
+        }
+
+        fun of(catchAllLabel: String, vararg handlers: TypeAddrPair): EncodedCatchHandler {
+            return EncodedCatchHandler(0, catchAllLabel, arrayListOf(*handlers))
         }
 
         fun of(catchAllAddr: Int, handlers: List<TypeAddrPair>): EncodedCatchHandler {
-            return EncodedCatchHandler(catchAllAddr, ArrayList(handlers))
+            return EncodedCatchHandler(catchAllAddr, null, ArrayList(handlers))
         }
 
-        @JvmStatic
+        fun of(catchAllLabel: String, handlers: List<TypeAddrPair>): EncodedCatchHandler {
+            return EncodedCatchHandler(0, catchAllLabel, ArrayList(handlers))
+        }
+
         fun readContent(input: DexDataInput): EncodedCatchHandler {
             val encodedCatchHandler = EncodedCatchHandler()
             encodedCatchHandler.read(input)

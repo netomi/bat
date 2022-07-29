@@ -17,47 +17,51 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.debug.DebugInfo
+import com.github.netomi.bat.dexfile.editor.CodeEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.instruction.*
-import com.github.netomi.bat.dexfile.io.InstructionWriter
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 
-internal class CodeAssembler constructor(private val classDef:  ClassDef,
-                                         private val method:    EncodedMethod,
-                                         private val dexEditor: DexEditor) {
+internal class CodeAssembler constructor(private val method:     EncodedMethod,
+                                         private val codeEditor: CodeEditor) {
+
+    private val dexEditor: DexEditor
+        get() = codeEditor.dexEditor
 
     private val dexFile: DexFile
         get() = dexEditor.dexFile
 
-    fun parseCode(iCtx: List<SInstructionContext>, pCtx: List<SParameterContext>): Code {
+    private val code: Code
+        get() = codeEditor.code
 
-        val instructions = mutableListOf<DexInstruction>()
-        val tryElements  = mutableListOf<Try>()
+    fun parseCode(iCtx: List<SInstructionContext>, pCtx: List<SParameterContext>) {
+
+        val tryElements = mutableListOf<Try>()
 
         val registerInfo         = collectRegisterInfo(iCtx)
-        val instructionAssembler = InstructionAssembler(iCtx, registerInfo, dexEditor)
+        val instructionAssembler = InstructionAssembler(registerInfo, dexEditor)
 
-        val debugInfo = DebugInfo.empty(method.getProtoID(dexFile).parameters.typeCount)
-        val debugSequenceAssembler = DebugSequenceAssembler(debugInfo)
+        val debugSequenceAssembler = DebugSequenceAssembler(code.debugInfo)
 
         var codeOffset = 0
 
         pCtx.forEach { ctx ->
             val parameterIndex = parseParameterIndex(ctx, dexFile, method)
-            val nameIndex = if (ctx.name != null) {
-                dexEditor.addOrGetStringIDIndex(ctx.name.text.removeSurrounding("\""))
-            } else {
-                NO_INDEX
-            }
-            debugInfo.setParameterName(parameterIndex, nameIndex)
+            val name = ctx.name?.text?.removeSurrounding("\"")
+            codeEditor.setParameterName(parameterIndex, name)
         }
 
         iCtx.forEach { ctx ->
             val t = ctx.getChild(0) as ParserRuleContext
             val insn: DexInstruction? = when (t.ruleIndex) {
+                RULE_sLabel -> {
+                    val c = t as SLabelContext
+                    codeEditor.prependLabel(0, c.label.text)
+                    null
+                }
+
                 RULE_fline -> {
                     val c = t as FlineContext
                     val lineNumber = parseLong(c.line.text).toInt()
@@ -71,12 +75,12 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
                 }
 
                 RULE_fprologue  -> {
-                    debugSequenceAssembler.prologueEnd(codeOffset)
+                    debugSequenceAssembler.prologueEnd()
                     null
                 }
 
                 RULE_fepilogue  -> {
-                    debugSequenceAssembler.epilogueStart(codeOffset)
+                    debugSequenceAssembler.epilogueStart()
                     null
                 }
 
@@ -126,29 +130,27 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
                 }
 
                 RULE_farraydata -> {
-                    codeOffset = insertNopInstructionIfUnaligned(codeOffset, instructions)
+                    codeOffset = insertNopInstructionIfUnaligned(codeOffset)
                     instructionAssembler.parseArrayDataPayload(t as FarraydataContext)
                 }
 
                 RULE_fsparseswitch -> {
-                    codeOffset = insertNopInstructionIfUnaligned(codeOffset, instructions)
-                    instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext, codeOffset)
+                    codeOffset = insertNopInstructionIfUnaligned(codeOffset)
+                    instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext)
                 }
 
                 RULE_fpackedswitch -> {
-                    codeOffset = insertNopInstructionIfUnaligned(codeOffset, instructions)
-                    instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext, codeOffset)
+                    codeOffset = insertNopInstructionIfUnaligned(codeOffset)
+                    instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
                 }
 
                 RULE_fcatch -> {
-                    val tryElement = instructionAssembler.parseCatchDirective(t as FcatchContext)
-                    tryElements.add(tryElement)
+                    tryElements.add(instructionAssembler.parseCatchDirective(t as FcatchContext))
                     null
                 }
 
                 RULE_fcatchall -> {
-                    val tryElement = instructionAssembler.parseCatchAllDirective(t as FcatchallContext)
-                    tryElements.add(tryElement)
+                    tryElements.add(instructionAssembler.parseCatchAllDirective(t as FcatchallContext))
                     null
                 }
 
@@ -162,9 +164,9 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
 
                 RULE_f12x_conversion   -> instructionAssembler.parseConversionInstructionF12x(t as F12x_conversionContext)
                 RULE_f11x_basic        -> instructionAssembler.parseBasicInstructionF11x(t as F11x_basicContext)
-                RULE_fx0t_branch       -> instructionAssembler.parseBranchInstructionFx0t(t as Fx0t_branchContext, codeOffset)
-                RULE_f21t_branch       -> instructionAssembler.parseBranchInstructionF21t(t as F21t_branchContext, codeOffset)
-                RULE_f22t_branch       -> instructionAssembler.parseBranchInstructionF22t(t as F22t_branchContext, codeOffset)
+                RULE_fx0t_branch       -> instructionAssembler.parseBranchInstructionFx0t(t as Fx0t_branchContext)
+                RULE_f21t_branch       -> instructionAssembler.parseBranchInstructionF21t(t as F21t_branchContext)
+                RULE_f22t_branch       -> instructionAssembler.parseBranchInstructionF22t(t as F22t_branchContext)
                 RULE_f21c_field        -> instructionAssembler.parseFieldInstructionF21c(t as F21c_fieldContext)
                 RULE_f22c_field        -> instructionAssembler.parseFieldInstructionF22c(t as F22c_fieldContext)
                 RULE_fconst_int        -> instructionAssembler.parseLiteralInstructionInteger(t as Fconst_intContext)
@@ -188,105 +190,25 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
                 RULE_f3rc_custom       -> instructionAssembler.parseCallSiteInstructionF3rc(t as F3rc_customContext)
                 RULE_f21c_const_handle -> instructionAssembler.parseMethodHandleInstructionF21c(t as F21c_const_handleContext)
                 RULE_f21c_const_type   -> instructionAssembler.parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
-                RULE_f31t_payload      -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext, codeOffset)
+                RULE_f31t_payload      -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext)
 
                 else -> null
             }
 
-            insn?.apply {
-                codeOffset += length
-                instructions.add(this)
+            if (insn != null) {
+                codeOffset += insn.length
+                codeEditor.prependInstruction(0, insn)
             }
         }
 
         debugSequenceAssembler.end()
 
-        val code = Code.of(registerInfo.registers, registerInfo.insSize, 0)
-
-        code.insns = InstructionWriter.writeInstructions(instructions)
-
-        val outgoingArgumentSizeCalculator = OutgoingArgumentSizeCalculator()
-        code.instructionsAccept(dexFile, classDef, method, outgoingArgumentSizeCalculator)
-        code.outsSize = outgoingArgumentSizeCalculator.outgoingArgumentSize
-
-        // TODO: move this to the Try class itself
-        code.tryList = normalizeTries(tryElements)
-        code.debugInfo = debugInfo
-
-        return code
-    }
-
-    private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
-        if (tryElements.isEmpty()) {
-            return arrayListOf()
-        }
-
-        tryElements.sortBy { it.startAddr }
-
-        val flattenedElements = mutableListOf<Try>()
-        var lastTry: Try? = null
         for (tryElement in tryElements) {
-            if (lastTry != null &&
-                lastTry.startAddr == tryElement.startAddr &&
-                lastTry.endAddr   == tryElement.endAddr) {
-                flattenedElements.removeLast()
-                flattenedElements.add(Try.of(lastTry.startAddr, lastTry.endAddr, lastTry.catchHandler.add(tryElement.catchHandler)))
-            } else {
-                flattenedElements.add(tryElement)
-            }
-            lastTry = tryElement
+            codeEditor.addTryCatchElement(tryElement)
         }
 
-        val sequence = mutableListOf<Seq>()
-        flattenedElements.forEach {
-            sequence.add(Seq(it.startAddr, SeqType.START, it))
-            sequence.add(Seq(it.endAddr, SeqType.END, it))
-        }
-
-        sequence.sortWith(compareBy<Seq>{ it.addr }.thenBy { it.type })
-
-        val nonOverlappingTries = arrayListOf<Try>()
-        var currentTry: Try? = null
-
-        for (seq in sequence) {
-            when (seq.type) {
-                SeqType.START -> {
-                    currentTry = if (currentTry == null) {
-                        seq.tryElement
-                    } else {
-                        val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
-                        nonOverlappingTries.add(endingTry)
-
-                        val handler = seq.tryElement.catchHandler.add(currentTry.catchHandler)
-                        val startingTry = Try.of(seq.addr, currentTry.endAddr, handler)
-                        startingTry
-                    }
-                }
-                SeqType.END -> {
-                    if (currentTry != null) {
-                        currentTry = if (currentTry.endAddr == seq.addr) {
-                            nonOverlappingTries.add(currentTry)
-                            null
-                        } else {
-                            if (currentTry.startAddr < seq.addr - 1) {
-                                val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
-                                nonOverlappingTries.add(endingTry)
-                            }
-
-                            val handler = currentTry.catchHandler.subtract(seq.tryElement.catchHandler)
-                            val startingTry = Try.of(seq.addr, currentTry.endAddr, handler)
-                            startingTry
-                        }
-                    } else {
-                        if (nonOverlappingTries.last().endAddr != seq.addr) {
-                            throw RuntimeException("not expected")
-                        }
-                    }
-                }
-            }
-        }
-
-        return nonOverlappingTries
+        // TODO: the registersSize should actually be calculated however this is non-trivial
+        codeEditor.finishEditing(registerInfo.registers)
     }
 
     private fun collectRegisterInfo(listCtx: List<SInstructionContext>): RegisterInfo {
@@ -317,10 +239,10 @@ internal class CodeAssembler constructor(private val classDef:  ClassDef,
         throw RuntimeException("no registers / locals directive found")
     }
 
-    private fun insertNopInstructionIfUnaligned(codeOffset: Int, instructions: MutableList<DexInstruction>): Int {
+    private fun insertNopInstructionIfUnaligned(codeOffset: Int): Int {
         if (codeOffset % 2 == 1) {
             val nop = BasicInstruction.of(DexOpCode.NOP)
-            instructions.add(nop)
+            codeEditor.prependInstruction(0, nop)
             return codeOffset + nop.length
         }
 
@@ -341,31 +263,4 @@ internal data class RegisterInfo(val registers: Int, val locals: Int, val insSiz
             else -> throw RuntimeException("unknown register format $register")
         }
     }
-}
-
-data class Seq(val addr: Int, val type: SeqType, val tryElement: Try)
-
-enum class SeqType {
-    START,
-    END
-}
-
-private fun EncodedCatchHandler.subtract(other: EncodedCatchHandler): EncodedCatchHandler {
-    var newCatchAllAddr = catchAllAddr
-    if (other.catchAllAddr != NO_INDEX) {
-        newCatchAllAddr = NO_INDEX
-    }
-
-    val newHandlers = LinkedHashSet(handlers) - other.handlers.toSet()
-    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers.toList())
-}
-
-private fun EncodedCatchHandler.add(other: EncodedCatchHandler): EncodedCatchHandler {
-    var newCatchAllAddr = catchAllAddr
-    if (newCatchAllAddr == NO_INDEX) {
-        newCatchAllAddr = other.catchAllAddr
-    }
-
-    val newHandlers = handlers + other.handlers
-    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers)
 }
