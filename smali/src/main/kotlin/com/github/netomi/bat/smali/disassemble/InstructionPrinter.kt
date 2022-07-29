@@ -23,8 +23,6 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.visitor.allCode
 import com.github.netomi.bat.dexfile.visitor.allInstructions
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.smali.disassemble.TryCatchPrinter.printTryCatchLabels
-import com.github.netomi.bat.smali.disassemble.TryCatchPrinter.printTryEndLabel
 import com.github.netomi.bat.util.Strings
 
 internal class InstructionPrinter(private val printer:             IndentingPrinter,
@@ -336,12 +334,11 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
     }
 
     private fun printLabels(code: Code, offset: Int) {
-        branchTargetPrinter.printLabels(offset, printer)
-        printTryCatchLabels(code, offset, printer)
+        branchTargetPrinter.printLabels(code, offset, printer)
     }
 
     private fun printEndLabels(dexFile: DexFile, code: Code, offset: Int, instructionLength: Int) {
-        printTryEndLabel(dexFile, code, offset, instructionLength, printer)
+        TryCatchPrinter.printTryEndLabel(dexFile, code, offset, instructionLength, printer)
     }
 
     private fun printCommentIfLikelyFloat(printer: IndentingPrinter, `val`: Int) {

@@ -30,9 +30,17 @@ internal class BranchTargetPrinter : InstructionVisitor {
     private val branchInfos:          MutableMap<Int, MutableSet<String>> = HashMap()
     private val reversePayloadLookup: MutableMap<Int, Int>                = HashMap()
 
-    fun printLabels(offset: Int, printer: IndentingPrinter) {
+    fun printLabels(code: Code, offset: Int, printer: IndentingPrinter) {
         val labels = branchInfos[offset]
-        labels?.forEach { printer.println(it) }
+
+        // combine branch and try/catch labels and print them
+        // in a sorted manner.
+        val sortedLabels = TreeSet<String>()
+        if (labels != null) {
+            sortedLabels.addAll(labels)
+        }
+        sortedLabels.addAll(TryCatchPrinter.getTryCatchLabels(code, offset))
+        sortedLabels.forEach { printer.println(it) }
     }
 
     fun formatBranchInstructionTarget(offset: Int, instruction: BranchInstruction): String {

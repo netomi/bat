@@ -21,8 +21,7 @@ import com.github.netomi.bat.io.IndentingPrinter
 
 internal object TryCatchPrinter {
 
-    @JvmStatic
-    fun printTryCatchLabels(code: Code, offset: Int, printer: IndentingPrinter) {
+    fun getTryCatchLabels(code: Code, offset: Int): Set<String> {
         val labels: MutableSet<String> = HashSet()
 
         for (currentTry in code.tryList) {
@@ -42,12 +41,9 @@ internal object TryCatchPrinter {
             }
         }
 
-        for (label in labels) {
-            printer.println(label)
-        }
+        return labels
     }
 
-    @JvmStatic
     fun printTryEndLabel(dexFile: DexFile, code: Code, offset: Int, instructionLength: Int, printer: IndentingPrinter) {
         for (currentTry in code.tryList) {
             if (currentTry.endAddr == offset + instructionLength - 1) {
