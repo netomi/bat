@@ -24,17 +24,16 @@ import java.io.UTFDataFormatException
  */
 object Mutf8 {
     /**
-     * Decodes bytes from `in` into `out` until a delimiter 0x00 is
+     * Decodes bytes from `input` until a delimiter 0x00 is
      * encountered. Returns a new string containing the decoded characters.
      */
-    @JvmStatic
     @Throws(RuntimeException::class)
-    fun decode(`in`: ByteArray, utf16len: Int): String {
+    fun decode(input: ByteArray, utf16len: Int): String {
         val out = CharArray(utf16len)
         var i = 0
         var s = 0
         while (true) {
-            val a = (`in`[i++].toInt() and 0xff).toChar()
+            val a = (input[i++].toInt() and 0xff).toChar()
             if (a.code == 0) {
                 return String(out, 0, s)
             }
@@ -42,14 +41,14 @@ object Mutf8 {
             if (a < '\u0080') {
                 s++
             } else if (a.code and 0xe0 == 0xc0) {
-                val b = `in`[i++].toInt() and 0xff
+                val b = input[i++].toInt() and 0xff
                 if (b and 0xC0 != 0x80) {
                     throw RuntimeException(UTFDataFormatException("bad second byte"))
                 }
                 out[s++] = (a.code and 0x1F shl 6 or (b and 0x3F)).toChar()
             } else if (a.code and 0xf0 == 0xe0) {
-                val b = `in`[i++].toInt() and 0xff
-                val c = `in`[i++].toInt() and 0xff
+                val b = input[i++].toInt() and 0xff
+                val c = input[i++].toInt() and 0xff
                 if (b and 0xC0 != 0x80 || c and 0xC0 != 0x80) {
                     throw RuntimeException(UTFDataFormatException("bad second or third byte"))
                 }
@@ -61,7 +60,7 @@ object Mutf8 {
     }
 
     /**
-     * Returns the number of bytes the modified UTF8 representation of 's' would take.
+     * Returns the number of bytes the modified UTF8 representation of `s` would take.
      */
     @Throws(RuntimeException::class)
     private fun countBytes(s: String, shortLength: Boolean): Long {
@@ -105,9 +104,10 @@ object Mutf8 {
     }
 
     /**
-     * Returns an array containing the *modified UTF-8* form of `s`.
+     * Returns an array containing the <i>modified UTF-8</i> form of `s`, using a
+     * big-endian 16-bit length. Throws UTFDataFormatException if `s` is too long
+     * for a two-byte length.
      */
-    @JvmStatic
     fun encode(s: String): ByteArray {
         val utfCount = countBytes(s, true).toInt()
         val result   = ByteArray(utfCount)
