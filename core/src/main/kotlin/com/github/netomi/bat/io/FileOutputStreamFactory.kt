@@ -15,33 +15,31 @@
  */
 package com.github.netomi.bat.io
 
-import com.github.netomi.bat.util.Classes
 import java.io.IOException
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
 
-class FileOutputStreamFactory(private val baseDir: Path, private val extension: String) : OutputStreamFactory {
+class FileOutputStreamFactory(private val baseDir:         Path,
+                              private val extension:       String,
+                              private val pathTransformer: (String) -> Path = { Path.of(it) }) : OutputStreamFactory {
+
     @Throws(IOException::class)
-    override fun createOutputStream(internalClassName: String): OutputStream {
-        val packageComponents =
-            Classes.internalPackageNameFromInternalName(internalClassName)
-                   .split("/".toRegex())
-                   .dropLastWhile { it.isEmpty() }
-                   .toTypedArray()
+    override fun createOutputStream(element: String): OutputStream {
+        val elementPath = pathTransformer(element)
 
         var currentPath = baseDir
-        for (component in packageComponents) {
-            currentPath = currentPath.resolve(component)
+
+        if (elementPath.parent != null) {
+            currentPath = baseDir.resolve(elementPath.parent)
         }
 
         if (!currentPath.exists()) {
             Files.createDirectories(currentPath)
         }
 
-        currentPath = currentPath.resolve(Classes.simpleClassNameFromInternalName(internalClassName) + '.' + extension)
-
+        currentPath = currentPath.resolve("${elementPath.fileName}.$extension")
         return Files.newOutputStream(currentPath)
     }
 }
