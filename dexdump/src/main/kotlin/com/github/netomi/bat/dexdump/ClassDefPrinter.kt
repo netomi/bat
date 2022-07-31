@@ -54,21 +54,21 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println("file_size           : " + header.fileSize)
         printer.println("header_size         : " + header.headerSize)
         printer.println("link_size           : " + header.linkSize)
-        printer.println("link_off            : " + DexDumpPrinter.formatNumber(header.linkOffset.toLong()))
+        printer.println("link_off            : " + formatNumber(header.linkOffset.toLong()))
         printer.println("string_ids_size     : " + header.stringIDsSize)
-        printer.println("string_ids_off      : " + DexDumpPrinter.formatNumber(header.stringIDsOffsets.toLong()))
+        printer.println("string_ids_off      : " + formatNumber(header.stringIDsOffsets.toLong()))
         printer.println("type_ids_size       : " + header.typeIDsSize)
-        printer.println("type_ids_off        : " + DexDumpPrinter.formatNumber(header.typeIDsOffset.toLong()))
+        printer.println("type_ids_off        : " + formatNumber(header.typeIDsOffset.toLong()))
         printer.println("proto_ids_size      : " + header.protoIDsSize)
-        printer.println("proto_ids_off       : " + DexDumpPrinter.formatNumber(header.protoIDsOffset.toLong()))
+        printer.println("proto_ids_off       : " + formatNumber(header.protoIDsOffset.toLong()))
         printer.println("field_ids_size      : " + header.fieldIDsSize)
-        printer.println("field_ids_off       : " + DexDumpPrinter.formatNumber(header.fieldIDsOffset.toLong()))
+        printer.println("field_ids_off       : " + formatNumber(header.fieldIDsOffset.toLong()))
         printer.println("method_ids_size     : " + header.methodIDsSize)
-        printer.println("method_ids_off      : " + DexDumpPrinter.formatNumber(header.methodIDsOffset.toLong()))
+        printer.println("method_ids_off      : " + formatNumber(header.methodIDsOffset.toLong()))
         printer.println("class_defs_size     : " + header.classDefsSize)
-        printer.println("class_defs_off      : " + DexDumpPrinter.formatNumber(header.classDefsOffset.toLong()))
+        printer.println("class_defs_off      : " + formatNumber(header.classDefsOffset.toLong()))
         printer.println("data_size           : " + header.dataSize)
-        printer.println("data_off            : " + DexDumpPrinter.formatNumber(header.dataOffset.toLong()))
+        printer.println("data_off            : " + formatNumber(header.dataOffset.toLong()))
         printer.println()
     }
 
@@ -95,7 +95,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
         printer.println("  name          : '" + field.getName(dexFile) + "'")
         printer.println("  type          : '" + field.getType(dexFile) + "'")
-        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(field.accessFlags, DexAccessFlags.Target.FIELD))
+        printer.println("  access        : " + formatAccessFlags(field.accessFlags, DexAccessFlags.Target.FIELD))
         val staticValues = if (!classDef.staticValues.isEmpty) classDef.staticValues.array else null
         if (field.isStatic && staticValues != null && index < staticValues.values.size) {
             printer.print("  value         : ")
@@ -108,7 +108,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
         printer.println("  name          : '" + method.getName(dexFile) + "'")
         printer.println("  type          : '" + method.getDescriptor(dexFile) + "'")
-        printer.println("  access        : " + DexDumpPrinter.formatAccessFlags(method.accessFlags, DexAccessFlags.Target.METHOD))
+        printer.println("  access        : " + formatAccessFlags(method.accessFlags, DexAccessFlags.Target.METHOD))
 
         if (!method.code.isEmpty) {
             method.codeAccept(dexFile, classDef, this)

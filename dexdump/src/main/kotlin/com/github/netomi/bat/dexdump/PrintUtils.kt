@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,11 +13,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
 package com.github.netomi.bat.dexdump
 
+import com.github.netomi.bat.dexfile.DexAccessFlags
 import com.github.netomi.bat.dexfile.util.Mutf8
 import com.github.netomi.bat.io.IndentingPrinter
-import java.io.*
+import java.io.IOException
+import java.io.OutputStream
+import java.io.OutputStreamWriter
+
+internal fun formatNumber(number: Long): String {
+    return "%d (0x%06x)".format(number, number)
+}
+
+internal fun formatNumber(number: Int): String {
+    return "%d (0x%04x)".format(number, number)
+}
+
+internal fun formatAccessFlags(accessFlags: Int, target: Int): String {
+    return "0x%04x (%s)".format(accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags, target))
+}
 
 internal class Mutf8Printer constructor(private val outputStream: OutputStream)
     : IndentingPrinter(OutputStreamWriter(outputStream), 2) {

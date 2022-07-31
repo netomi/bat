@@ -25,19 +25,11 @@ class DexDumpPrinter constructor(
     private val printFileSummary: Boolean      = true,
     private val printHeaders:     Boolean      = true,
     private val printAnnotations: Boolean      = true,
-    private val disassembleCode:  Boolean      = true) : DexFileVisitor, ClassDefVisitor, MethodHandleVisitor, CallSiteIDVisitor {
+                disassembleCode:  Boolean      = true) : DexFileVisitor, ClassDefVisitor, MethodHandleVisitor, CallSiteIDVisitor {
 
-    private val printer: Mutf8Printer
-
-    private val classDefPrinter: ClassDefPrinter
-    private val callSiteArgumentPrinter: EncodedValueVisitor
-
-    init {
-        printer = Mutf8Printer(outputStream)
-
-        classDefPrinter = ClassDefPrinter(printer, disassembleCode)
-        callSiteArgumentPrinter = CallSiteArgumentPrinter(printer)
-    }
+    private val printer:                 Mutf8Printer        = Mutf8Printer(outputStream)
+    private val classDefPrinter:         ClassDefPrinter     = ClassDefPrinter(printer, disassembleCode)
+    private val callSiteArgumentPrinter: EncodedValueVisitor = CallSiteArgumentPrinter(printer)
 
     override fun visitDexFile(dexFile: DexFile) {
         if (printFileSummary) {
@@ -132,22 +124,9 @@ class DexDumpPrinter constructor(
     }
 
     companion object {
-        internal fun getSourceFileIndex(dexFile: DexFile, classDefItem: ClassDef): String {
+        private fun getSourceFileIndex(dexFile: DexFile, classDefItem: ClassDef): String {
             val sourceFile = classDefItem.getSourceFile(dexFile)
             return classDefItem.sourceFileIndex.toString() + " (" + (sourceFile ?: "unknown") + ")"
-        }
-
-        // private utility methods.
-        internal fun formatNumber(number: Long): String {
-            return "%d (0x%06x)".format(number, number)
-        }
-
-        internal fun formatNumber(number: Int): String {
-            return "%d (0x%04x)".format(number, number)
-        }
-
-        internal fun formatAccessFlags(accessFlags: Int, target: Int): String {
-            return "0x%04x (%s)".format(accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags, target))
         }
     }
 }
