@@ -15,8 +15,8 @@
  */
 package com.github.netomi.bat.util
 
+import com.google.common.escape.ArrayBasedCharEscaper
 import com.google.common.escape.ArrayBasedEscaperMap
-import com.google.common.escape.ArrayBasedUnicodeEscaper
 import com.google.common.escape.Escaper
 
 internal object StringEscapers {
@@ -39,13 +39,14 @@ internal object StringEscapers {
             Pair('\n',     "\\n"),
             Pair('\r',     "\\r"),
             Pair('\t',     "\\t"),
-            Pair('\u000c', "\\f"),
+            Pair('\u000c', "\\u000c"),
         )
 
     val printableAsciiEscaper: Escaper
     val javaEscaper: Escaper
 
     private fun escapeUnicode(cp: Int): CharArray {
+
         return buildString {
             append("\\u")
             append(Character.forDigit(cp shr 12, 16))
@@ -56,15 +57,15 @@ internal object StringEscapers {
     }
 
     init {
-        printableAsciiEscaper = object: ArrayBasedUnicodeEscaper(ArrayBasedEscaperMap.create(ASCII_CTRL_CHARS_ESCAPE), 0x20, 0x7e, null) {
-            override fun escapeUnsafe(cp: Int): CharArray {
-                return escapeUnicode(cp)
+        printableAsciiEscaper = object: ArrayBasedCharEscaper(ArrayBasedEscaperMap.create(ASCII_CTRL_CHARS_ESCAPE), 0x20.toChar(), 0x7e.toChar()) {
+            override fun escapeUnsafe(c: Char): CharArray {
+                return escapeUnicode(c.code)
             }
         }
 
-        javaEscaper = object: ArrayBasedUnicodeEscaper(ArrayBasedEscaperMap.create(JAVA_CTRL_CHARS_ESCAPE), 0x20, 0x7e, null) {
-            override fun escapeUnsafe(cp: Int): CharArray {
-                return escapeUnicode(cp)
+        javaEscaper = object: ArrayBasedCharEscaper(ArrayBasedEscaperMap.create(JAVA_CTRL_CHARS_ESCAPE), 0x20.toChar(), 0x7e.toChar()) {
+            override fun escapeUnsafe(c: Char): CharArray {
+                return escapeUnicode(c.code)
             }
         }
     }
