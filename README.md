@@ -1,5 +1,8 @@
 # Bytecode Analysis Toolkit
 
+![Build status](https://github.com/netomi/bat/workflows/build-status/badge.svg)
+[![GitHub license](https://img.shields.io/github/license/netomi/bat)](https://github.com/netomi/bat/blob/master/LICENSE)
+
 This goal of this project is to provide tools to work with various java related bytecode formats, mainly JVM and dalvik bytecode.
 
 The following modules are currently available
