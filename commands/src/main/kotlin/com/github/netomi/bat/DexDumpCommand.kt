@@ -43,7 +43,8 @@ class DexDumpCommand {
     }
 }
 
-@CommandLine.Command(synopsisHeading      = "%nUsage:%n%n",
+@CommandLine.Command(
+    synopsisHeading      = "%nUsage:%n%n",
     descriptionHeading   = "%nDescription:%n%n",
     parameterListHeading = "%nParameters:%n%n",
     optionListHeading    = "%nOptions:%n%n",
@@ -56,7 +57,10 @@ open class ReusableOptions {
     var outputFile: File? = null
 }
 
-@CommandLine.Command(name = "dump", aliases = [ "d", "du" ], description = ["dump the content of a dex file similar to dexdump"])
+@CommandLine.Command(
+    name        = "dump",
+    aliases     = [ "d", "du" ],
+    description = ["dump the content of a dex file similar to dexdump"])
 private class DumpCommand: ReusableOptions(), Runnable {
     @CommandLine.Option(names = ["-a"], description = ["print annotations"])
     private var printAnnotations = false
@@ -92,13 +96,15 @@ private class DumpCommand: ReusableOptions(), Runnable {
     }
 }
 
-@CommandLine.Command(name        = "list",
+@CommandLine.Command(
+    name        = "list",
     aliases     = [ "l"],
     description = ["list data items inside a dex file"])
 private class ListCommand {
 
-    @CommandLine.Command(name        = "strings",
-                         description = ["list string items"])
+    @CommandLine.Command(
+        name        = "strings",
+        description = ["list string items"])
     fun listStrings(@Mixin opts: ReusableOptions) {
         processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
             val printer = PrintWriter(os, true)
@@ -108,8 +114,9 @@ private class ListCommand {
         }
     }
 
-    @CommandLine.Command(name        = "types",
-                         description = ["list type items"])
+    @CommandLine.Command(
+        name        = "types",
+        description = ["list type items"])
     fun listTypes(@Mixin opts: ReusableOptions) {
         processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
             val printer = PrintWriter(os, true)
@@ -119,8 +126,9 @@ private class ListCommand {
         }
     }
 
-    @CommandLine.Command(name        = "protos",
-                         description = ["list proto items"])
+    @CommandLine.Command(
+        name        = "protos",
+        description = ["list proto items"])
     fun listProtos(@Mixin opts: ReusableOptions) {
         processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
             val printer = PrintWriter(os, true)
@@ -130,8 +138,9 @@ private class ListCommand {
         }
     }
 
-    @CommandLine.Command(name        = "classes",
-                         description = ["list proto items"])
+    @CommandLine.Command(
+        name        = "classes",
+        description = ["list proto items"])
     fun listClasses(@Mixin opts: ReusableOptions) {
         processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
             val printer = PrintWriter(os, true)
@@ -141,8 +150,9 @@ private class ListCommand {
         }
     }
 
-    @CommandLine.Command(name        = "fields",
-                         description = ["list field items"])
+    @CommandLine.Command(
+        name        = "fields",
+        description = ["list field items"])
     fun listFields(@Mixin opts: ReusableOptions) {
         processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
             val printer = PrintWriter(os, true)
@@ -156,8 +166,9 @@ private class ListCommand {
         }
     }
 
-    @CommandLine.Command(name        = "methods",
-                         description = ["list method items"])
+    @CommandLine.Command(
+        name        = "methods",
+        description = ["list method items"])
     fun listMethods(@Mixin opts: ReusableOptions) {
         processInput(opts.inputFile, opts.outputFile) { dexFile, os ->
             val printer = PrintWriter(os, true)
