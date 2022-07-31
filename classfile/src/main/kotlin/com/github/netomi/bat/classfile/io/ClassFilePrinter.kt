@@ -26,7 +26,8 @@ import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.Classes
-import com.github.netomi.bat.util.Strings
+import com.github.netomi.bat.util.escapeAsJavaString
+import com.github.netomi.bat.util.isAsciiPrintable
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.io.Writer
@@ -108,8 +109,8 @@ class ClassFilePrinter :
     }
 
     override fun visitUtf8Constant(classFile: ClassFile, constant: Utf8Constant) {
-        val output = if (!Strings.isAsciiPrintable(constant.value)) {
-            Strings.escapeString(constant.value)
+        val output = if (!constant.value.isAsciiPrintable()) {
+            constant.value.escapeAsJavaString()
         } else {
             constant.value
         }
@@ -239,8 +240,8 @@ class ClassFilePrinter :
     override fun visitStringElementValue(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, elementValue: ConstElementValue) {
         val value = classFile.cp.getString(elementValue.constValueIndex)
 
-        val output = if (!Strings.isAsciiPrintable(value)) {
-            Strings.escapeString(value)
+        val output = if (!value.isAsciiPrintable()) {
+            value.escapeAsJavaString()
         } else {
             value
         }

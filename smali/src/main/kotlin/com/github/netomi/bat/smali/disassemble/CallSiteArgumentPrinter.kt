@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.Strings
+import com.github.netomi.bat.util.escapeAsJavaString
 
 internal class CallSiteArgumentPrinter(private val printer: IndentingPrinter) : EncodedValueVisitor {
 
@@ -72,7 +72,7 @@ internal class CallSiteArgumentPrinter(private val printer: IndentingPrinter) : 
     }
 
     override fun visitCharValue(dexFile: DexFile, value: EncodedCharValue) {
-        printer.print("'" + Strings.escapeChar(value.value) + "'")
+        printer.print("'" + value.value.escapeAsJavaString() + "'")
     }
 
     override fun visitDoubleValue(dexFile: DexFile, value: EncodedDoubleValue) {
@@ -111,6 +111,6 @@ internal class CallSiteArgumentPrinter(private val printer: IndentingPrinter) : 
     }
 
     override fun visitStringValue(dexFile: DexFile, value: EncodedStringValue) {
-        printer.print("\"" + Strings.escapeString(value.getStringValue(dexFile)) + "\"")
+        printer.print("\"" + value.getStringValue(dexFile).escapeAsJavaString() + "\"")
     }
 }

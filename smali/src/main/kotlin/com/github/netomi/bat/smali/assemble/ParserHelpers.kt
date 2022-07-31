@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.smali.parser.SmaliParser.SParameterContext
-import com.github.netomi.bat.util.Strings
+import com.github.netomi.bat.util.unescapeJavaString
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
 
@@ -173,11 +173,11 @@ internal fun parseLiteral(value: String): Long {
 }
 
 internal fun parseString(value: String): String {
-    return Strings.unescapeJavaString(value.removeSurrounding("\""))
+    return value.removeSurrounding("\"").unescapeJavaString()
 }
 
 internal fun parseChar(value: String): Char {
-    return Strings.unescapeJavaString(value.removeSurrounding("'")).first()
+    return value.removeSurrounding("'").unescapeJavaString().first()
 }
 
 internal fun parseInt(value: String): Int {

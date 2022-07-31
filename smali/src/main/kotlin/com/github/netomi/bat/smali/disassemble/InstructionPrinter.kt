@@ -23,7 +23,7 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.visitor.allCode
 import com.github.netomi.bat.dexfile.visitor.allInstructions
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.Strings
+import com.github.netomi.bat.util.escapeAsJavaString
 
 internal class InstructionPrinter(private val printer:             IndentingPrinter,
                                   private val registerPrinter:     RegisterPrinter,
@@ -165,11 +165,9 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
 
     override fun visitStringInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: StringInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
-        var str = instruction.getString(dexFile)
-
+        val str = instruction.getString(dexFile)
         // escape some chars
-        str = Strings.escapeString(str)
-        printer.println(", \"$str\"")
+        printer.println(", \"${str.escapeAsJavaString()}\"")
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 

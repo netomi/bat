@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.AnnotationElementVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.Strings
+import com.github.netomi.bat.util.escapeAsJavaString
 
 internal class EncodedValuePrinter @JvmOverloads constructor(
     private val printer:                  IndentingPrinter,
@@ -105,11 +105,11 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
     }
 
     override fun visitCharValue(dexFile: DexFile, value: EncodedCharValue) {
-        appendWithPrefix("'" + Strings.escapeChar(value.value) + "'")
+        appendWithPrefix("'" + value.value.escapeAsJavaString() + "'")
     }
 
     override fun visitDoubleValue(dexFile: DexFile, value: EncodedDoubleValue) {
-        appendWithPrefix(java.lang.Double.toString(value.value))
+        appendWithPrefix(value.value.toString())
     }
 
     override fun visitEnumValue(dexFile: DexFile, value: EncodedEnumValue) {
@@ -144,7 +144,7 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
     }
 
     override fun visitStringValue(dexFile: DexFile, value: EncodedStringValue) {
-        appendWithPrefix("\"" + Strings.escapeString(value.getStringValue(dexFile)) + "\"")
+        appendWithPrefix("\"" + value.getStringValue(dexFile).escapeAsJavaString() + "\"")
     }
 
     // private utility methods.
