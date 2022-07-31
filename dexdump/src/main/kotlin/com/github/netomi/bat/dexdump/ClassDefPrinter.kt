@@ -27,6 +27,7 @@ import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toPrintableAsciiString
 
 internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, private val disassembleCode: Boolean) :
     DexHeaderVisitor,
@@ -48,7 +49,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
 
     override fun visitHeader(dexFile: DexFile, header: DexHeader) {
         printer.println("DEX file header:")
-        printer.println("magic               : '" + Primitives.toAsciiString(header.magic) + "'")
+        printer.println("magic               : '" + header.magic.toPrintableAsciiString() + "'")
         printer.println("checksum            : " + Primitives.asHexValue(header.checksum.toLong(), 8))
         printer.println("signature           : " + formatSignatureByteArray(header.signature))
         printer.println("file_size           : " + header.fileSize)

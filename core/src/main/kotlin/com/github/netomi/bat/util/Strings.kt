@@ -15,47 +15,75 @@
  */
 package com.github.netomi.bat.util
 
+import com.google.common.escape.ArrayBasedEscaperMap
+import com.google.common.escape.ArrayBasedUnicodeEscaper
+import com.google.common.escape.Escaper
+
+internal object StringEscapers {
+
+    private val ASCII_CTRL_CHARS_ESCAPE =
+        mapOf(
+            Pair('\b',     "\\b"),
+            Pair('\n',     "\\n"),
+            Pair('\t',     "\\t"),
+            Pair('\u000c', "\\f"),
+            Pair('\r',     "\\r"),
+            Pair('\u0000', "\\0")
+        )
+
+    private val JAVA_CTRL_CHARS_ESCAPE =
+        mapOf(
+            Pair('\'',     "\\'"),
+            Pair('\"',     "\\\""),
+            Pair('\\',     "\\\\"),
+            Pair('\n',     "\\n"),
+            Pair('\r',     "\\r"),
+            Pair('\t',     "\\t"),
+            Pair('\u000c', "\\f"),
+        )
+
+    val printableAsciiEscaper: Escaper
+    val javaEscaper: Escaper
+
+    private fun escapeUnicode(cp: Int): CharArray {
+        return buildString {
+            append("\\u")
+            append(Character.forDigit(cp shr 12, 16))
+            append(Character.forDigit(cp shr 8 and 0x0f, 16))
+            append(Character.forDigit(cp shr 4 and 0x0f, 16))
+            append(Character.forDigit(cp and 0x0f, 16))
+        }.toCharArray()
+    }
+
+    init {
+        printableAsciiEscaper = object: ArrayBasedUnicodeEscaper(ArrayBasedEscaperMap.create(ASCII_CTRL_CHARS_ESCAPE), 0x20, 0x7e, null) {
+            override fun escapeUnsafe(cp: Int): CharArray {
+                return escapeUnicode(cp)
+            }
+        }
+
+        javaEscaper = object: ArrayBasedUnicodeEscaper(ArrayBasedEscaperMap.create(JAVA_CTRL_CHARS_ESCAPE), 0x20, 0x7e, null) {
+            override fun escapeUnsafe(cp: Int): CharArray {
+                return escapeUnicode(cp)
+            }
+        }
+    }
+}
+
 fun String.isAsciiPrintable(): Boolean {
     for (c in this.toCharArray()) {
         val codePoint = c.code
-        if (codePoint < 32 || codePoint >= 128) return false
+        if (codePoint < 0x20 || codePoint >= 0x7f) return false
     }
     return true
 }
 
 fun String.escapeAsJavaString(): String {
-    val input = this
-    return buildString(input.length * 3 / 2) {
-        for (i in input.indices) {
-            append(input[i].escapeAsJavaString())
-        }
-    }
+    return StringEscapers.javaEscaper.escape(this)
 }
 
 fun Char.escapeAsJavaString(): String {
-    val c = this
-    if (c.code < 0x7f) {
-        when (c) {
-            '\'' -> return "\\'"
-            '\"' -> return "\\\""
-            '\\' -> return "\\\\"
-            '\n' -> return "\\n"
-            '\r' -> return "\\r"
-            '\t' -> return "\\t"
-        }
-    }
-
-    if ((c >= ' ') && (c.code < 0x7f)) {
-        return c.toString()
-    }
-
-    return buildString {
-        append("\\u")
-        append(Character.forDigit(c.code shr 12, 16))
-        append(Character.forDigit(c.code shr 8 and 0x0f, 16))
-        append(Character.forDigit(c.code shr 4 and 0x0f, 16))
-        append(Character.forDigit(c.code and 0x0f, 16))
-    }
+    return this.toString().escapeAsJavaString()
 }
 
 /**

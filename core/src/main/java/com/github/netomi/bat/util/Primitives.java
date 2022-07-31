@@ -19,46 +19,6 @@ public final class Primitives
 {
     private Primitives() {}
 
-    private static final String[][] JAVA_CTRL_CHARS_ESCAPE = {
-            {"\b", "\\b"},
-            {"\n", "\\n"},
-            {"\t", "\\t"},
-            {"\f", "\\f"},
-            {"\r", "\\r"},
-            {"\0", "\\0"}
-    };
-
-    public static String toAsciiString(byte[] arr) {
-        StringBuilder sb = new StringBuilder(arr.length);
-        for (byte b : arr) {
-            boolean replaced = false;
-            for (String[] replacement : JAVA_CTRL_CHARS_ESCAPE) {
-                if (replacement[0].equals(String.valueOf((char) b))) {
-                    sb.append(replacement[1]);
-                    replaced = true;
-                }
-            }
-            if (!replaced) {
-                sb.append((char) b);
-            }
-        }
-        return sb.toString();
-    }
-
-    public static String toHexString(byte[] arr) {
-        StringBuilder sb = new StringBuilder(arr.length * 4 + 2);
-        sb.append('[');
-        for (byte b : arr) {
-            sb.append(toHexString(b));
-            sb.append(',');
-        }
-        if (arr.length > 0) {
-            sb.setLength(sb.length() - 1);
-        }
-        sb.append(']');
-        return sb.toString();
-    }
-
     public static String toHexString(byte value) {
         return "0x" + asHexValue(value);
     }

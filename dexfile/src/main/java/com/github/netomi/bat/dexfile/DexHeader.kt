@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.io.DexFormatException
 import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.contentToHexString
 import com.google.common.primitives.Bytes
 import java.nio.ByteOrder
 
@@ -90,11 +91,11 @@ class DexHeader private constructor() : DataItem() {
         input.readFully(magic)
 
         if (!DEX_FILE_MAGIC.contentEquals(magic.copyOf(4))) {
-            throw DexFormatException("Invalid dex file: unexpected magic ${Primitives.toHexString(magic.copyOf(4))}")
+            throw DexFormatException("Invalid dex file: unexpected magic ${magic.copyOf(4).contentToHexString()}")
         }
 
-        val format = fromPattern(magic, 4, 8) ?:
-            throw DexFormatException("Unsupported dex format: ${Primitives.toHexString(magic.copyOfRange(4, 8))}")
+        fromPattern(magic, 4, 8) ?:
+            throw DexFormatException("Unsupported dex format: ${magic.copyOfRange(4, 8).contentToHexString()}")
 
         input.skipBytes(32)
         endianTag = input.readUnsignedInt()
@@ -204,9 +205,9 @@ class DexHeader private constructor() : DataItem() {
     override fun toString(): String {
         return buildString {
             appendLine("DexHeader[")
-            appendLine("  magic           : ${Primitives.toHexString(magic)}")
+            appendLine("  magic           : ${magic.contentToHexString()}")
             appendLine("  checksum        : ${Primitives.toHexString(checksum.toLong())}")
-            appendLine("  signature       : ${Primitives.toHexString(signature)}")
+            appendLine("  signature       : ${signature.contentToHexString()}")
             appendLine("  fileSize        : $fileSize")
             appendLine("  headerSize      : $headerSize")
             appendLine("  endianTag       : ${Primitives.toHexString(endianTag)}")

@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor
 import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.contentToHexString
 import com.google.common.hash.Hashing
 import java.io.InputStream
 
@@ -68,8 +69,8 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
         val signature = sha1Hasher.hash().asBytes()
 
         if (!signature.contentEquals(dexFile.header!!.signature)) {
-            throw DexFormatException("Calculated signature %s does not match %s.".format(Primitives.toHexString(signature),
-                                                                                         Primitives.toHexString(dexFile.header!!.signature)))
+            throw DexFormatException("Calculated signature %s does not match %s.".format(signature.contentToHexString(),
+                                                                                         dexFile.header!!.signature.contentToHexString()))
         }
     }
 
