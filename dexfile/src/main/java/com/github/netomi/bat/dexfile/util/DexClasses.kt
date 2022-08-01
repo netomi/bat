@@ -19,12 +19,37 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.value.*
-import com.github.netomi.bat.util.Classes.externalClassNameFromInternalName
+import java.util.*
 
 object DexClasses {
 
+    fun isClassType(type: String): Boolean {
+        return type.startsWith("L") && type.endsWith(";")
+    }
+
+    fun isArrayType(type: String): Boolean {
+        return type.startsWith("[")
+    }
+
+    fun internalClassNameFromInternalType(type: String): String {
+        Objects.requireNonNull(type)
+        return if (isClassType(type)) {
+            type.substring(1, type.length - 1)
+        } else type
+    }
+
+    fun internalTypeFromInternalClassName(internalClassName: String): String {
+        Objects.requireNonNull(internalClassName)
+        return "L$internalClassName;"
+    }
+
+    fun externalClassNameFromInternalClassName(internalClassName: String): String {
+        Objects.requireNonNull(internalClassName)
+        return internalClassName.replace("/".toRegex(), ".")
+    }
+
     fun fullExternalMethodSignature(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): String {
-        return "%s.%s:%s".format(externalClassNameFromInternalName(classDef.getClassName(dexFile)),
+        return "%s.%s:%s".format(externalClassNameFromInternalClassName(classDef.getClassName(dexFile)),
                                  method.getName(dexFile),
                                  method.getDescriptor(dexFile)
         )

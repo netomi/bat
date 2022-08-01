@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.*
-import com.github.netomi.bat.util.Classes
 import com.google.common.base.Preconditions
 import java.util.*
 

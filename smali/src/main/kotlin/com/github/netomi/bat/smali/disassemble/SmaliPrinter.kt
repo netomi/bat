@@ -17,9 +17,9 @@ package com.github.netomi.bat.smali.disassemble
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.util.DexClasses.internalTypeFromInternalClassName
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.Classes
 import java.io.OutputStreamWriter
 import java.io.Writer
 import java.util.*
@@ -41,7 +41,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             printer.print(" $accessFlags")
         }
 
-        printer.print(" " + Classes.internalTypeFromClassName(classDef.getClassName(dexFile)))
+        printer.print(" " + internalTypeFromInternalClassName(classDef.getClassName(dexFile)))
         printer.println()
         printer.println(".super " + classDef.getSuperClassType(dexFile))
 

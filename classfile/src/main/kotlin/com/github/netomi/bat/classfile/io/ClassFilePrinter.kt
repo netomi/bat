@@ -23,9 +23,9 @@ import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.*
 import com.github.netomi.bat.classfile.attribute.annotations.Annotation
 import com.github.netomi.bat.classfile.constant.*
+import com.github.netomi.bat.classfile.util.externalTypeFromInternalType
 import com.github.netomi.bat.classfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.Classes
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
 import java.io.OutputStream
@@ -170,7 +170,7 @@ class ClassFilePrinter :
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
         val externalModifiers = field.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
-        val externalType = Classes.externalTypeFromType(field.descriptor(classFile))
+        val externalType = externalTypeFromInternalType(field.descriptor(classFile))
         printer.println("%s %s %s;".format(externalModifiers, externalType, field.name(classFile)))
 
         printer.levelUp()
@@ -201,7 +201,7 @@ class ClassFilePrinter :
             index, annotation ->
                 printer.println("%2d: #%d()".format(index, annotation.typeIndex))
                 printer.levelUp()
-                printer.println(Classes.externalTypeFromType(classFile.cp.getString(annotation.typeIndex)))
+                printer.println(externalTypeFromInternalType(classFile.cp.getString(annotation.typeIndex)))
                 printer.levelDown()
         }
 
@@ -218,7 +218,7 @@ class ClassFilePrinter :
         attribute.annotations.forEachIndexed { index, annotation ->
             printer.println("%2d: #%d()".format(index, annotation.typeIndex))
             printer.levelUp()
-            printer.println(Classes.externalTypeFromType(annotation.type(cp)))
+            printer.println(externalTypeFromInternalType(annotation.type(cp)))
 
             printer.levelUp()
             annotation.elementValues.forEachIndexed { _, (elementName, elementValue) ->

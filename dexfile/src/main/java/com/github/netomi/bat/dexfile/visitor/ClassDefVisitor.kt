@@ -17,7 +17,7 @@ package com.github.netomi.bat.dexfile.visitor
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.util.Classes
+import com.github.netomi.bat.dexfile.util.DexClasses.externalClassNameFromInternalClassName
 import com.github.netomi.bat.util.StringMatcher
 import com.github.netomi.bat.util.classNameMatcher
 
@@ -44,7 +44,7 @@ private class ExternalClassNameFilter(regularExpression: String, private val vis
     override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
         val className = classDef.getClassName(dexFile)
 
-        if (accepted(Classes.externalClassNameFromInternalName(className))) {
+        if (accepted(externalClassNameFromInternalClassName(className))) {
             visitor.visitClassDef(dexFile, index, classDef)
         }
     }

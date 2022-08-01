@@ -20,11 +20,11 @@ import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationsDirectoryVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
-import com.github.netomi.bat.util.Classes
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -90,7 +90,7 @@ class ClassDef private constructor(
         private set
 
     fun getClassName(dexFile: DexFile): String {
-        return Classes.internalClassNameFromType(getType(dexFile))
+        return DexClasses.internalClassNameFromInternalType(getType(dexFile))
     }
 
     fun getType(dexFile: DexFile): String {
@@ -99,7 +99,7 @@ class ClassDef private constructor(
 
     fun getSuperClassName(dexFile: DexFile): String? {
         val superClassType = getSuperClassType(dexFile)
-        return if (superClassType == null) null else Classes.internalClassNameFromType(superClassType)
+        return if (superClassType == null) null else DexClasses.internalClassNameFromInternalType(superClassType)
     }
 
     fun getSuperClassType(dexFile: DexFile): String? {

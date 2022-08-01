@@ -15,8 +15,8 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.*
-import com.github.netomi.bat.util.Classes
 import com.github.netomi.bat.util.parallelForEachIndexed
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -170,7 +170,7 @@ class DexFile private constructor() {
     }
 
     fun getClassDefByClassName(internalClassName: String): ClassDef? {
-        val classType = Classes.internalTypeFromClassName(internalClassName)
+        val classType = DexClasses.internalTypeFromInternalClassName(internalClassName)
         val index = classDefMap[classType]
         return if (index == null) null else classDefs[index]
     }
@@ -182,7 +182,7 @@ class DexFile private constructor() {
     internal fun addClassDef(classDef: ClassDef): Int {
         val classType = classDef.getType(this)
         if (getClassDefByType(classType) != null) {
-            throw IllegalArgumentException("class with name ${Classes.internalClassNameFromType(classType)} already exists in dex file.")
+            throw IllegalArgumentException("class with name ${DexClasses.internalClassNameFromInternalType(classType)} already exists in dex file.")
         }
 
         classDefs.add(classDef)
@@ -347,7 +347,6 @@ class DexFile private constructor() {
             return DexFile()
         }
 
-        @JvmStatic
         fun of(dexFormat: DexFormat): DexFile {
             return DexFile(dexFormat)
         }

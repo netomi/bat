@@ -36,7 +36,6 @@ enum class DexFormat(private val bytePattern: ByteArray, val version: String, va
             throw RuntimeException("unexpected apiLevel $apiLevel")
         }
 
-        @JvmStatic
         fun fromPattern(bytes: ByteArray, from: Int, to: Int): DexFormat? {
             val pattern = bytes.copyOfRange(from, to)
             for (format in values()) {

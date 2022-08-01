@@ -16,15 +16,11 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.FieldModifier.Companion.setOf
-import com.github.netomi.bat.dexfile.Visibility.Companion.of
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.github.netomi.bat.util.Classes
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -138,7 +134,6 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
             return EncodedField(fieldIndex, accessFlags)
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput, lastIndex: Int): EncodedField {
             val encodedField = EncodedField()
             encodedField.read(input)
