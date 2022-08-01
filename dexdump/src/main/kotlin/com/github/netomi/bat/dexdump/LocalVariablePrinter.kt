@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.debug.*
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexStringWithPrefix
 
 internal class LocalVariablePrinter constructor(
                 dexFile: DexFile,
@@ -141,9 +141,9 @@ private class LocalVariableInfo constructor(private val name: String?, private v
     fun toString(registerNum: Int): String {
         return buildString {
             append("    ")
-            append(Primitives.toHexString(startAddr.toShort()))
+            append(toHexStringWithPrefix(startAddr.toShort()))
             append(" - ")
-            append(Primitives.toHexString(endAddr.toShort()))
+            append(toHexStringWithPrefix(endAddr.toShort()))
             append(" reg=")
             append(registerNum)
             append(' ')

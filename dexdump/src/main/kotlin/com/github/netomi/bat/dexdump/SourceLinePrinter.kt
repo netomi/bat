@@ -19,7 +19,7 @@ package com.github.netomi.bat.dexdump
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.debug.*
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexStringWithPrefix
 
 internal class SourceLinePrinter constructor(
     private var lineNumber: Int,
@@ -44,6 +44,6 @@ internal class SourceLinePrinter constructor(
     }
 
     private fun printPosition() {
-        printer.println("    %s line=%d".format(Primitives.toHexString(codeOffset.toShort()), lineNumber))
+        printer.println("    %s line=%d".format(toHexStringWithPrefix(codeOffset.toShort()), lineNumber))
     }
 }

@@ -21,7 +21,8 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexString
+import com.github.netomi.bat.util.toSignedHexString
 import java.lang.Double.longBitsToDouble
 import java.lang.Float.intBitsToFloat
 
@@ -38,8 +39,8 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(", #int $literal // #")
 
         when (instruction.opCode.format) {
-            InstructionFormat.FORMAT_22s -> printer.print(Primitives.asHexValue(literal.toShort()))
-            InstructionFormat.FORMAT_22b -> printer.print(Primitives.asHexValue(literal.toByte()))
+            InstructionFormat.FORMAT_22s -> printer.print(toHexString(literal.toShort()))
+            InstructionFormat.FORMAT_22b -> printer.print(toHexString(literal.toByte()))
             else -> error("unexpected format ${instruction.opCode.format} for arithmetic literal instruction")
         }
     }
@@ -57,34 +58,28 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
             printer.print("#")
             if (instruction.branchOffset < 0) {
                 printer.print("-")
-                printer.print(Primitives.asHexValue(-instruction.branchOffset, 8))
+                printer.print(toHexString(-instruction.branchOffset, 8))
             } else {
-                printer.print(Primitives.asHexValue(instruction.branchOffset, 8))
+                printer.print(toHexString(instruction.branchOffset, 8))
             }
         } else {
-            printer.print(Primitives.asHexValue(offset + instruction.branchOffset, 4))
+            printer.print(toHexString(offset + instruction.branchOffset, 4))
             printer.print(" // ")
-            if (instruction.branchOffset < 0) {
-                printer.print("-")
-                printer.print(Primitives.asHexValue(-instruction.branchOffset, 4))
-            } else {
-                printer.print("+")
-                printer.print(Primitives.asHexValue(instruction.branchOffset, 4))
-            }
+            printer.print(toSignedHexString(instruction.branchOffset, 4))
         }
     }
 
     override fun visitCallSiteInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: CallSiteInstruction) {
         printer.print(instruction.mnemonic)
         printRegisters(instruction, true)
-        printer.print(", call_site@${Primitives.asHexValue(instruction.callSiteIndex, 4)}")
+        printer.print(", call_site@${toHexString(instruction.callSiteIndex, 4)}")
     }
 
     override fun visitFieldInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: FieldInstruction) {
         printGeneric(instruction)
         val fieldID = instruction.getField(dexFile)
         printer.print(", ${fieldID.getClassType(dexFile)}.${fieldID.getName(dexFile)}:${fieldID.getType(dexFile)}")
-        printer.print(" // field@${Primitives.asHexValue(instruction.fieldIndex, 4)}")
+        printer.print(" // field@${toHexString(instruction.fieldIndex, 4)}")
     }
 
     override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
@@ -133,17 +128,17 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         }
 
         printer.print(" // method@")
-        printer.print(Primitives.asHexValue(instruction.methodIndex, 4))
+        printer.print(toHexString(instruction.methodIndex, 4))
 
         polymorphicMethodInstruction?.apply {
             printer.print(", proto@")
-            printer.print(Primitives.asHexValue(polymorphicMethodInstruction.protoIndex, 4))
+            printer.print(toHexString(polymorphicMethodInstruction.protoIndex, 4))
         }
     }
 
     override fun visitMethodHandleRefInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodHandleRefInstruction) {
         printGeneric(instruction)
-        printer.print(", method_handle@${Primitives.asHexValue(instruction.methodHandleIndex, 4)}")
+        printer.print(", method_handle@${toHexString(instruction.methodHandleIndex, 4)}")
     }
 
     override fun visitMethodTypeRefInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodTypeRefInstruction) {
@@ -151,7 +146,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(", ")
         printer.print(instruction.getProtoID(dexFile).getDescriptor(dexFile))
         printer.print(" // proto@")
-        printer.print(Primitives.asHexValue(instruction.protoIndex, 4))
+        printer.print(toHexString(instruction.protoIndex, 4))
     }
 
     override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
@@ -161,15 +156,9 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         } else {
             printer.print(" ")
         }
-        printer.print(Primitives.asHexValue(offset + instruction.payloadOffset, 8))
+        printer.print(toHexString(offset + instruction.payloadOffset, 8))
         printer.print(" // ")
-        if (instruction.payloadOffset < 0) {
-            printer.print("-")
-            printer.print(Primitives.asHexValue(-instruction.payloadOffset, 8))
-        } else {
-            printer.print("+")
-            printer.print(Primitives.asHexValue(instruction.payloadOffset, 8))
-        }
+        printer.print(toSignedHexString(instruction.payloadOffset, 8))
     }
 
     override fun visitStringInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: StringInstruction) {
@@ -180,9 +169,9 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print("\" // string@")
 
         if (instruction.opCode == DexOpCode.CONST_STRING) {
-            printer.print(Primitives.asHexValue(instruction.stringIndex, 4))
+            printer.print(toHexString(instruction.stringIndex, 4))
         } else {
-            printer.print(Primitives.asHexValue(instruction.stringIndex, 8))
+            printer.print(toHexString(instruction.stringIndex, 8))
         }
     }
 
@@ -192,7 +181,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         val typeID = instruction.getTypeID(dexFile)
         printer.print(typeID.getType(dexFile))
         printer.print(" // type@")
-        printer.print(Primitives.asHexValue(instruction.typeIndex, 4))
+        printer.print(toHexString(instruction.typeIndex, 4))
     }
 
     override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
@@ -202,7 +191,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         val typeID = instruction.getTypeID(dexFile)
         printer.print(typeID.getType(dexFile))
         printer.print(" // type@")
-        printer.print(Primitives.asHexValue(instruction.typeIndex, 4))
+        printer.print(toHexString(instruction.typeIndex, 4))
     }
 
     override fun visitAnyPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: Payload) {

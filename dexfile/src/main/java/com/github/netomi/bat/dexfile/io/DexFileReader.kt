@@ -18,8 +18,8 @@ package com.github.netomi.bat.dexfile.io
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor
-import com.github.netomi.bat.util.Primitives
 import com.github.netomi.bat.util.contentToHexString
+import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.google.common.hash.Hashing
 import java.io.InputStream
 
@@ -52,8 +52,9 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
 
         val checksum = adlerHasher.hash().asInt().toUInt()
         if (checksum != dexFile.header!!.checksum) {
-            throw DexFormatException("Calculated checksum %s does not match %s.".format(Primitives.toHexString(checksum.toLong()),
-                                                                                        Primitives.toHexString(dexFile.header!!.checksum.toLong())))
+            throw DexFormatException("Calculated checksum %s does not match %s."
+                    .format(toHexStringWithPrefix(checksum.toLong()),
+                            toHexStringWithPrefix(dexFile.header!!.checksum.toLong())))
         }
     }
 

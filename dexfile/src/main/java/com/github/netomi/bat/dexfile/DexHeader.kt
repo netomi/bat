@@ -19,8 +19,8 @@ import com.github.netomi.bat.dexfile.DexFormat.Companion.fromPattern
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.io.DexFormatException
-import com.github.netomi.bat.util.Primitives
 import com.github.netomi.bat.util.contentToHexString
+import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.google.common.primitives.Bytes
 import java.nio.ByteOrder
 
@@ -206,11 +206,11 @@ class DexHeader private constructor() : DataItem() {
         return buildString {
             appendLine("DexHeader[")
             appendLine("  magic           : ${magic.contentToHexString()}")
-            appendLine("  checksum        : ${Primitives.toHexString(checksum.toLong())}")
+            appendLine("  checksum        : ${toHexStringWithPrefix(checksum.toLong())}")
             appendLine("  signature       : ${signature.contentToHexString()}")
             appendLine("  fileSize        : $fileSize")
             appendLine("  headerSize      : $headerSize")
-            appendLine("  endianTag       : ${Primitives.toHexString(endianTag)}")
+            appendLine("  endianTag       : ${toHexStringWithPrefix(endianTag)}")
             appendLine("  linkSize        : $linkSize")
             appendLine("  linkOffset      : $linkOffset")
             appendLine("  mapOffset       : $mapOffset")

@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toSignedHexString
 
 open class BranchInstruction internal constructor(opcode:           DexOpCode,
                                                   _branchOffset:    Int     = 0,
@@ -80,7 +80,7 @@ open class BranchInstruction internal constructor(opcode:           DexOpCode,
 
     override fun toString(): String {
         val separator = if (registers.isEmpty()) " " else ", "
-        val offsetString = Primitives.asSignedHexValue(branchOffset, 4)
+        val offsetString = toSignedHexString(branchOffset, 4)
         return super.toString() + separator + offsetString
     }
 

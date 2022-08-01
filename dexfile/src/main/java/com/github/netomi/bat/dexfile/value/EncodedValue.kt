@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.io.DexFormatException
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexStringWithPrefix
 
 /**
  * An abstract base class representing an encoded value inside a dex file.
@@ -68,7 +68,7 @@ abstract class EncodedValue {
 
         private fun create(valueType: Int): EncodedValue {
             return EncodedValueType.of(valueType)?.supplier?.invoke()
-                ?: throw DexFormatException("unexpected encoded value type: ${Primitives.toHexString(valueType.toShort())}")
+                ?: throw DexFormatException("unexpected encoded value type: ${toHexStringWithPrefix(valueType.toByte())}")
         }
 
         fun readAnnotationValue(input: DexDataInput): EncodedAnnotationValue {

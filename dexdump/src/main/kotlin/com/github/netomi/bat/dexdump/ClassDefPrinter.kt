@@ -26,7 +26,8 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexString
+import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.github.netomi.bat.util.toPrintableAsciiString
 
 internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, private val disassembleCode: Boolean) :
@@ -50,7 +51,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
     override fun visitHeader(dexFile: DexFile, header: DexHeader) {
         printer.println("DEX file header:")
         printer.println("magic               : '" + header.magic.toPrintableAsciiString() + "'")
-        printer.println("checksum            : " + Primitives.asHexValue(header.checksum.toLong(), 8))
+        printer.println("checksum            : " + toHexString(header.checksum.toLong(), 8))
         printer.println("signature           : " + formatSignatureByteArray(header.signature))
         printer.println("file_size           : " + header.fileSize)
         printer.println("header_size         : " + header.headerSize)
@@ -132,8 +133,8 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
             printer.resetIndentation(0)
 
             printer.println(
-                Primitives.asHexValue(fileOffset, 6) + ":                                        |[" +
-                        Primitives.asHexValue(fileOffset, 6) + "] " +
+                toHexString(fileOffset, 6) + ":                                        |[" +
+                        toHexString(fileOffset, 6) + "] " +
                         DexClasses.fullExternalMethodSignature(dexFile, classDef, method)
             )
 
@@ -165,7 +166,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
 
     override fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction) {
         val output = buildString {
-            append(Primitives.asHexValue(fileOffset, 6))
+            append(toHexString(fileOffset, 6))
             append(": ")
             var codeUnitOffset = offset
             run {
@@ -173,8 +174,8 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
                 while (i < instruction.length && i < 7) {
                     val codeUnit = code.insns[codeUnitOffset++]
                     // print code units in little endian format.
-                    append(Primitives.asHexValue(codeUnit.toInt() and 0xff, 2))
-                    append(Primitives.asHexValue(codeUnit.toInt() shr 8 and 0xff, 2))
+                    append(toHexString(codeUnit.toInt() and 0xff, 2))
+                    append(toHexString(codeUnit.toInt() shr 8 and 0xff, 2))
                     append(' ')
                     i++
                 }
@@ -186,7 +187,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
                 append(' ')
             }
             append('|')
-            append(Primitives.asHexValue(codeOffset, 4))
+            append(toHexString(codeOffset, 4))
             append(": ")
         }
 
@@ -198,15 +199,15 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
     }
 
     override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryElement: Try) {
-        val startAddr = Primitives.toHexString(tryElement.startAddr.toShort())
-        val endAddr = Primitives.toHexString((tryElement.startAddr + tryElement.insnCount).toShort())
+        val startAddr = toHexStringWithPrefix(tryElement.startAddr.toShort())
+        val endAddr   = toHexStringWithPrefix((tryElement.startAddr + tryElement.insnCount).toShort())
         printer.println("    %s - %s".format(startAddr, endAddr))
         val catchHandler = tryElement.catchHandler
         for (addrPair in catchHandler.handlers) {
-            printer.println("      %s -> %s".format(addrPair.getType(dexFile), Primitives.toHexString(addrPair.address.toShort())))
+            printer.println("      %s -> %s".format(addrPair.getType(dexFile), toHexStringWithPrefix(addrPair.address.toShort())))
         }
         if (catchHandler.catchAllAddr != -1) {
-            printer.println("      %s -> %s".format("<any>", Primitives.toHexString(catchHandler.catchAllAddr.toShort())))
+            printer.println("      %s -> %s".format("<any>", toHexStringWithPrefix(catchHandler.catchAllAddr.toShort())))
         }
     }
 
@@ -270,11 +271,11 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         private fun formatSignatureByteArray(array: ByteArray): String {
             val sb = StringBuilder()
             val len = array.size
-            sb.append(Primitives.asHexValue(array[0]))
-            sb.append(Primitives.asHexValue(array[1]))
+            sb.append(toHexString(array[0]))
+            sb.append(toHexString(array[1]))
             sb.append("...")
-            sb.append(Primitives.asHexValue(array[len - 2]))
-            sb.append(Primitives.asHexValue(array[len - 1]))
+            sb.append(toHexString(array[len - 2]))
+            sb.append(toHexString(array[len - 1]))
             return sb.toString()
         }
     }

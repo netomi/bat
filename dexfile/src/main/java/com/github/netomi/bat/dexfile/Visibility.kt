@@ -15,7 +15,7 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexStringWithPrefix
 
 /**
  * An enum to represent the mutually exclusive visibility flag.
@@ -34,7 +34,7 @@ enum class Visibility(val flagValue: Int) {
                     return visibility
                 }
             }
-            throw IllegalArgumentException("unexpected accessFlags ${Primitives.toHexString(accessFlags)}")
+            throw IllegalArgumentException("unexpected accessFlags ${toHexStringWithPrefix(accessFlags)}")
         }
     }
 }

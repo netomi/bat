@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toSignedHexString
 
 abstract class PayloadInstruction internal constructor(opcode:         DexOpCode,
                                                        _payloadOffset: Int     = 0,
@@ -71,7 +71,7 @@ abstract class PayloadInstruction internal constructor(opcode:         DexOpCode
     }
 
     override fun toString(): String {
-        return super.toString() + ", ${Primitives.asSignedHexValue(payloadOffset, 8)}"
+        return super.toString() + ", ${toSignedHexString(payloadOffset, 8)}"
     }
 
     companion object {

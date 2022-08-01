@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexString
 
 class StringInstruction internal constructor(opcode: DexOpCode, _stringIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
@@ -64,7 +64,7 @@ class StringInstruction internal constructor(opcode: DexOpCode, _stringIndex: In
     }
 
     override fun toString(): String {
-        return super.toString() + ", string@$${Primitives.asHexValue(stringIndex, 4)}"
+        return super.toString() + ", string@$${toHexString(stringIndex, 4)}"
     }
 
     companion object {

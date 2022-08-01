@@ -15,7 +15,7 @@
  */
 package com.github.netomi.bat.dexfile.instruction
 
-import com.github.netomi.bat.util.Primitives
+import com.github.netomi.bat.util.toHexStringWithPrefix
 
 enum class DexOpCode constructor(
             val opCode:   Int,
@@ -329,7 +329,7 @@ enum class DexOpCode constructor(
         }
 
         operator fun get(opcode: Byte): DexOpCode {
-            return opcodeArray[opcode.toInt() and 0xff] ?: throw IllegalArgumentException("unknown opcode ${Primitives.toHexString(opcode)}")
+            return opcodeArray[opcode.toInt() and 0xff] ?: throw IllegalArgumentException("unknown opcode ${toHexStringWithPrefix(opcode)}")
         }
 
         operator fun get(mnemonic: String): DexOpCode {
