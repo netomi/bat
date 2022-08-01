@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
-import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 
 abstract class DexInstruction protected constructor(val opCode: DexOpCode, vararg _registers: Int) {
 
@@ -178,11 +178,11 @@ abstract class DexInstruction protected constructor(val opCode: DexOpCode, varar
         }
     }
 
-    fun write(writer: InstructionWriter, offset: Int, labelOffsetMap: LabelMap? = null) {
+    fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap? = null) {
         var currOffset = offset
 
-        if (labelOffsetMap != null) {
-            updateOffsets(offset, labelOffsetMap)
+        if (offsetMap != null) {
+            updateOffsets(offset, offsetMap)
         }
 
         val instructionData = writeData()
@@ -191,7 +191,7 @@ abstract class DexInstruction protected constructor(val opCode: DexOpCode, varar
         }
     }
 
-    protected open fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {}
+    protected open fun updateOffsets(offset: Int, offsetMap: OffsetMap) {}
 
     protected open fun writeData(): ShortArray {
         val data = ShortArray(length)

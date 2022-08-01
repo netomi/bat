@@ -17,7 +17,7 @@ package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
-import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.util.toSignedHexString
 
 abstract class PayloadInstruction internal constructor(opcode:         DexOpCode,
@@ -41,17 +41,19 @@ abstract class PayloadInstruction internal constructor(opcode:         DexOpCode
         }
     }
 
-    override fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
         if (payloadLabel != null) {
             // payloads must be aligned to even offsets.
-            var payloadCodeOffset = labelOffsetMap.getOffset(payloadLabel!!)
+            var payloadCodeOffset = offsetMap.getOffset(payloadLabel!!)
             if (payloadCodeOffset.mod(2) == 1) {
                 payloadCodeOffset++
             }
             payloadOffset = payloadCodeOffset - offset
 
             // remember the offset of the instruction using the payload
-            labelOffsetMap.setPayloadReferenceOffset(payloadCodeOffset, offset)
+            offsetMap.setPayloadReferenceOffset(payloadCodeOffset, offset)
+        } else {
+            payloadOffset = offsetMap.updateDiffToTargetOffset(offset, payloadOffset)
         }
     }
 

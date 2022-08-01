@@ -24,6 +24,7 @@ import com.github.netomi.bat.dexfile.visitor.allCode
 import com.github.netomi.bat.dexfile.visitor.allInstructions
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.escapeAsJavaString
+import com.github.netomi.bat.util.toHexString
 
 internal class InstructionPrinter(private val printer:             IndentingPrinter,
                                   private val registerPrinter:     RegisterPrinter,
@@ -38,7 +39,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
     override fun visitArithmeticLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArithmeticLiteralInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
-        printer.println(toHexString(instruction.literal))
+        printer.println(toSignedHexStringWithPrefix(instruction.literal))
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 
@@ -82,7 +83,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
     override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
-        printer.print(toHexString(instruction.value))
+        printer.print(toSignedHexStringWithPrefix(instruction.value))
         val opCode = instruction.opCode
         val instructionFormat = opCode.format
 
@@ -197,22 +198,22 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
             when (payload.elementWidth) {
                 1 -> {
                     val byteValue = payload.getElementAsByte(i)
-                    printer.print(toHexString(byteValue) + "t")
+                    printer.print(toSignedHexStringWithPrefix(byteValue) + "t")
                     printCommentIfLikelyFloat(printer, byteValue.toInt())
                 }
                 2 -> {
                     val shortValue = payload.getElementAsShort(i)
-                    printer.print(toHexString(shortValue) + "s")
+                    printer.print(toSignedHexStringWithPrefix(shortValue) + "s")
                     printCommentIfLikelyFloat(printer, shortValue.toInt())
                 }
                 4 -> {
                     val intValue = payload.getElementAsInt(i)
-                    printer.print(toHexString(intValue))
+                    printer.print(toSignedHexStringWithPrefix(intValue))
                     printCommentIfLikelyFloat(printer, intValue)
                 }
                 8 -> {
                     val longValue = payload.getElementAsLong(i)
-                    val hexString = toHexString(longValue)
+                    val hexString = toSignedHexStringWithPrefix(longValue)
                     printer.print(hexString)
                     if (longValue < Int.MIN_VALUE || longValue > Int.MAX_VALUE) {
                         printer.print("L")
@@ -230,7 +231,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printer.println()
         printDebugInfo(offset)
         printLabels(code, offset)
-        printer.println(".packed-switch " + toHexString(payload.firstKey))
+        printer.println(".packed-switch " + toSignedHexStringWithPrefix(payload.firstKey))
         printer.levelUp()
         for (branchTarget in payload.branchTargets) {
             printer.println(branchTargetPrinter.formatPackedSwitchTarget(offset, branchTarget))
@@ -249,7 +250,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
             val key    = payload.keys[i]
             val target = payload.branchTargets[i]
 
-            printer.print(toHexString(key))
+            printer.print(toSignedHexStringWithPrefix(key))
             printer.print(" -> ")
             printer.println(branchTargetPrinter.formatSparseSwitchTarget(offset, target))
         }
@@ -386,19 +387,19 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
 
     companion object {
         // private utility methods.
-        private fun toHexString(value: Long): String {
+        private fun toSignedHexStringWithPrefix(value: Long): String {
             return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
         }
 
-        private fun toHexString(value: Int): String {
+        private fun toSignedHexStringWithPrefix(value: Int): String {
             return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
         }
 
-        private fun toHexString(value: Short): String {
+        private fun toSignedHexStringWithPrefix(value: Short): String {
             return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
         }
 
-        private fun toHexString(value: Byte): String {
+        private fun toSignedHexStringWithPrefix(value: Byte): String {
             return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
         }
     }

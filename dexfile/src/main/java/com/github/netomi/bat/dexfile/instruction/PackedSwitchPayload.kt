@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
-import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
 class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
@@ -52,12 +52,12 @@ class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
         }
     }
 
-    override fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
         if (branchLabels.isNotEmpty()) {
-            val switchOffset = labelOffsetMap.getPayloadReferenceOffset(offset)
+            val switchOffset = offsetMap.getPayloadReferenceOffset(offset)
             branchTargets = IntArray(branchLabels.size)
             for (i in branchLabels.indices) {
-                branchTargets[i] = labelOffsetMap.computeDiffToTarget(switchOffset, branchLabels[i])
+                branchTargets[i] = offsetMap.computeDiffToTargetLabel(switchOffset, branchLabels[i])
             }
         }
     }

@@ -43,7 +43,10 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
 
         printer.print(" " + internalTypeFromInternalClassName(classDef.getClassName(dexFile)))
         printer.println()
-        printer.println(".super " + classDef.getSuperClassType(dexFile))
+        val superClassType = classDef.getSuperClassType(dexFile)
+        if (superClassType != null) {
+            printer.println(".super $superClassType")
+        }
 
         val sourceFile = classDef.getSourceFile(dexFile)
         if (sourceFile != null) {

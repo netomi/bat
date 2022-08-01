@@ -17,12 +17,10 @@
 package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.instruction.DexInstruction
-import com.github.netomi.bat.dexfile.instruction.MethodInstruction
-import com.github.netomi.bat.dexfile.instruction.MethodProtoInstruction
+import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
-import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.google.common.base.Preconditions
 
 class CodeEditor private constructor(        val dexEditor: DexEditor,
@@ -72,25 +70,26 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         }
 
         val instructionWriter = InstructionWriter()
-        val labelOffsetMap    = LabelMap(false)
+        val offsetMap         = OffsetMap(false)
 
         val writeInstructions = {
             if (code.insnsSize == 0) {
                 val modifications = getModificationsOrNull(0)
-                modifications?.processPrependModifications(instructionWriter, labelOffsetMap)
-                modifications?.processAppendModifications(instructionWriter, labelOffsetMap)
+                modifications?.processPrependModifications(instructionWriter, offsetMap)
+                modifications?.processAppendModifications(instructionWriter, offsetMap)
             } else {
                 code.instructionsAccept(dexFile, classDef, method) { _, _, _, _, offset, instruction ->
                     val modifications = getModificationsOrNull(offset)
 
-                    modifications?.processPrependModifications(instructionWriter, labelOffsetMap)
+                    modifications?.processPrependModifications(instructionWriter, offsetMap)
 
-                    val finishedWriting = modifications?.processInstruction(instructionWriter, labelOffsetMap) ?: false
+                    val finishedWriting = modifications?.processInstruction(instructionWriter, offsetMap) ?: false
                     if (!finishedWriting) {
-                        instruction.write(instructionWriter, instructionWriter.nextWriteOffset, labelOffsetMap)
+                        val newOffset = writeInstruction(instruction, instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
+                        offsetMap.setOldToNewOffsetMapping(offset, newOffset)
                     }
 
-                    modifications?.processAppendModifications(instructionWriter, labelOffsetMap)
+                    modifications?.processAppendModifications(instructionWriter, offsetMap)
                 }
             }
         }
@@ -100,27 +99,27 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         writeInstructions()
 
         // fail when encountering missing labels in the second pass.
-        labelOffsetMap.failOnMissingLabel = true
+        offsetMap.failOnMissingKey = true
 
         // update the offsets of each try/catch element based on the collected labels.
         for (tryElement in tryCatchList) {
-            tryElement.startAddr = labelOffsetMap.getOffset(tryElement.startLabel!!)
-            val endAddr          = labelOffsetMap.getOffset(tryElement.endLabel!!)
+            tryElement.startAddr = offsetMap.getOffset(tryElement.startLabel!!)
+            val endAddr          = offsetMap.getOffset(tryElement.endLabel!!)
             tryElement.insnCount = endAddr - tryElement.startAddr
 
             if (tryElement.catchHandler.catchAllLabel != null) {
-                tryElement.catchHandler.catchAllAddr = labelOffsetMap.getOffset(tryElement.catchHandler.catchAllLabel!!)
+                tryElement.catchHandler.catchAllAddr = offsetMap.getOffset(tryElement.catchHandler.catchAllLabel!!)
             }
 
             for (addrPair in tryElement.catchHandler.handlers) {
                 if (addrPair.label != null) {
-                    addrPair.address = labelOffsetMap.getOffset(addrPair.label!!)
+                    addrPair.address = offsetMap.getOffset(addrPair.label!!)
                 }
             }
         }
 
         // if we encountered any labels, we need to fix instructions that reference them.
-        if (!labelOffsetMap.isEmpty()) {
+        if (offsetMap.hasLabelsOrOffsetUpdates()) {
             instructionWriter.reset()
 
             // write all instructions again with now fixed offsets.
@@ -162,30 +161,44 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
     }
 }
 
+private fun writeInstruction(instruction: DexInstruction,
+                             writer:      InstructionWriter,
+                             offset:      Int,
+                             offsetMap:   OffsetMap): Int {
+    if (instruction is Payload && offset.mod(2) == 1) {
+        val nop = BasicInstruction.of(DexOpCode.NOP)
+        nop.write(writer, offset, offsetMap)
+    }
+
+    val newOffset = writer.nextWriteOffset
+    instruction.write(writer, writer.nextWriteOffset, offsetMap)
+    return newOffset
+}
+
 private class CodeModifications {
     val prependList         = mutableListOf<CodeModification>()
     val appendList          = mutableListOf<CodeModification>()
     val replaceModification = mutableListOf<CodeModification>()
     val deleteModification: Boolean = false
 
-    fun processPrependModifications(instructionWriter: InstructionWriter, labelOffsetMap: LabelMap) {
+    fun processPrependModifications(instructionWriter: InstructionWriter, labelOffsetMap: OffsetMap) {
         for (modification in prependList) {
             modification.processModification(instructionWriter, labelOffsetMap)
         }
     }
 
-    fun processAppendModifications(instructionWriter: InstructionWriter, labelOffsetMap: LabelMap) {
+    fun processAppendModifications(instructionWriter: InstructionWriter, labelOffsetMap: OffsetMap) {
         for (modification in appendList) {
             modification.processModification(instructionWriter, labelOffsetMap)
         }
     }
 
-    fun processInstruction(instructionWriter: InstructionWriter, labelOffsetMap: LabelMap): Boolean {
+    fun processInstruction(instructionWriter: InstructionWriter, offsetMap: OffsetMap): Boolean {
         return if (deleteModification) {
             true
         } else if (replaceModification.isNotEmpty()) {
             for (modification in replaceModification) {
-                modification.processModification(instructionWriter, labelOffsetMap)
+                modification.processModification(instructionWriter, offsetMap)
             }
             true
         } else {
@@ -195,12 +208,14 @@ private class CodeModifications {
 }
 
 private class CodeModification private constructor(val label: String? = null, val instruction: DexInstruction? = null) {
-    fun processModification(instructionWriter: InstructionWriter, labelOffsetMap: LabelMap) {
+    fun processModification(instructionWriter: InstructionWriter, offsetMap: OffsetMap) {
         if (label != null) {
-            labelOffsetMap.setLabel(label, instructionWriter.nextWriteOffset)
+            offsetMap.setLabel(label, instructionWriter.nextWriteOffset)
         }
 
-        instruction?.write(instructionWriter, instructionWriter.nextWriteOffset, labelOffsetMap)
+        if (instruction != null) {
+            writeInstruction(instruction, instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
+        }
     }
 
     companion object {

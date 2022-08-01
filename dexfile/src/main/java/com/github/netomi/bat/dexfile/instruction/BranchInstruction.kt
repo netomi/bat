@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
-import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexString
 
@@ -51,9 +51,11 @@ open class BranchInstruction internal constructor(opcode:           DexOpCode,
         }
     }
 
-    override fun updateOffsets(offset: Int, labelOffsetMap: LabelMap) {
-        if (branchLabel != null) {
-            branchOffset = labelOffsetMap.computeDiffToTarget(offset, branchLabel!!)
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
+        branchOffset = if (branchLabel != null) {
+            offsetMap.computeDiffToTargetLabel(offset, branchLabel!!)
+        } else {
+            offsetMap.updateDiffToTargetOffset(offset, branchOffset)
         }
     }
 

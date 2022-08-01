@@ -16,29 +16,65 @@
 
 package com.github.netomi.bat.dexfile.instruction.editor
 
-class LabelMap constructor(var failOnMissingLabel: Boolean = false) {
+class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
     private val labelOffsetMap      = mutableMapOf<String, Int>()
     private val payloadReferenceMap = mutableMapOf<Int, Int>()
 
-    fun isEmpty(): Boolean {
-        return labelOffsetMap.isEmpty()
+    private val oldToNewOffsetMap = mutableMapOf<Int, Int>()
+    private val newToOldOffsetMap = mutableMapOf<Int, Int>()
+
+    fun hasLabelsOrOffsetUpdates(): Boolean {
+        return labelOffsetMap.isNotEmpty() || newToOldOffsetMap.any { it.key != it.value }
     }
 
     fun setLabel(label: String, offset: Int) {
         labelOffsetMap[label] = offset
     }
 
+    fun setOldToNewOffsetMapping(oldOffset: Int, newOffset: Int) {
+        oldToNewOffsetMap[oldOffset] = newOffset
+        newToOldOffsetMap[newOffset] = oldOffset
+    }
+
+    fun getOldOffset(newOffset: Int): Int {
+        return if (failOnMissingKey) {
+            newToOldOffsetMap[newOffset] ?: throw RuntimeException("unknown old offset for $newOffset")
+        } else {
+            newOffset
+        }
+    }
+
+    fun getNewOffset(oldOffset: Int): Int {
+        return if (failOnMissingKey) {
+            oldToNewOffsetMap[oldOffset] ?: throw RuntimeException("unknown new offset for $oldOffset")
+        } else {
+            oldOffset
+        }
+    }
+
     fun getOffset(label: String): Int {
-        return if (failOnMissingLabel) {
+        return if (failOnMissingKey) {
             labelOffsetMap[label] ?: throw RuntimeException("unknown label $label")
         } else {
             labelOffsetMap[label] ?: 0
         }
     }
 
-    fun computeDiffToTarget(currentOffset: Int, targetLabel: String): Int {
+    fun computeDiffToTargetLabel(currentOffset: Int, targetLabel: String): Int {
         val targetOffset = getOffset(targetLabel)
         return targetOffset - currentOffset
+    }
+
+    fun updateDiffToTargetOffset(currentOffset: Int, oldTargetOffset: Int): Int {
+        val oldOffset = getOldOffset(currentOffset)
+        val oldTarget = oldOffset + oldTargetOffset
+        val newTarget = getNewOffset(oldTarget)
+
+        return if (oldOffset != currentOffset || oldTarget != newTarget) {
+            newTarget - currentOffset
+        } else {
+            oldTargetOffset
+        }
     }
 
     fun setPayloadReferenceOffset(payloadOffset: Int, referenceOffset: Int) {
@@ -46,7 +82,7 @@ class LabelMap constructor(var failOnMissingLabel: Boolean = false) {
     }
 
     fun getPayloadReferenceOffset(payloadOffset: Int): Int {
-        return if (failOnMissingLabel) {
+        return if (failOnMissingKey) {
             payloadReferenceMap[payloadOffset] ?: throw RuntimeException("unknown payload reference for payload at offset $payloadOffset")
         } else {
             payloadReferenceMap[payloadOffset] ?: 0

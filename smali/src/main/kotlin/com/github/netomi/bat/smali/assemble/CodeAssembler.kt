@@ -130,17 +130,17 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                 }
 
                 RULE_farraydata -> {
-                    codeOffset = insertNopInstructionIfUnaligned(codeOffset)
+                    codeOffset = alignOffsetForPayload(codeOffset)
                     instructionAssembler.parseArrayDataPayload(t as FarraydataContext)
                 }
 
                 RULE_fsparseswitch -> {
-                    codeOffset = insertNopInstructionIfUnaligned(codeOffset)
+                    codeOffset = alignOffsetForPayload(codeOffset)
                     instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext)
                 }
 
                 RULE_fpackedswitch -> {
-                    codeOffset = insertNopInstructionIfUnaligned(codeOffset)
+                    codeOffset = alignOffsetForPayload(codeOffset)
                     instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
                 }
 
@@ -239,14 +239,12 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
         throw RuntimeException("no registers / locals directive found")
     }
 
-    private fun insertNopInstructionIfUnaligned(codeOffset: Int): Int {
-        if (codeOffset % 2 == 1) {
-            val nop = BasicInstruction.of(DexOpCode.NOP)
-            codeEditor.prependInstruction(0, nop)
-            return codeOffset + nop.length
+    private fun alignOffsetForPayload(codeOffset: Int): Int {
+        return if (codeOffset % 2 == 1) {
+            codeOffset + 1
+        } else {
+            codeOffset
         }
-
-        return codeOffset
     }
 }
 

@@ -68,7 +68,7 @@ class IntegrationTest {
 
             val proc = builder.start()
 
-            proc.waitFor(1, TimeUnit.MINUTES)
+            proc.waitFor(5, TimeUnit.SECONDS)
             proc.inputStream.bufferedReader().readText()
         } catch(e: IOException) {
             e.printStackTrace()
