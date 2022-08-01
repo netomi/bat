@@ -34,8 +34,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         printer.print(".class")
 
         val accessFlags =
-            DexAccessFlags.formatAsHumanReadable(classDef.accessFlags, DexAccessFlags.Target.CLASS)
-                          .lowercase(Locale.getDefault())
+            formatAccessFlagsAsHumanReadable(classDef.accessFlags, DexAccessFlagTarget.CLASS).lowercase(Locale.getDefault())
 
         if (accessFlags.isNotEmpty()) {
             printer.print(" $accessFlags")
@@ -95,8 +94,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         printer.print(".field")
 
         val accessFlags =
-            DexAccessFlags.formatAsHumanReadable(field.accessFlags, DexAccessFlags.Target.FIELD)
-                          .lowercase(Locale.getDefault())
+            formatAccessFlagsAsHumanReadable(field.accessFlags, DexAccessFlagTarget.FIELD).lowercase(Locale.getDefault())
 
         if (accessFlags.isNotEmpty()) {
             printer.print(" $accessFlags")
@@ -121,9 +119,9 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         printer.print(".method")
 
         val accessFlags =
-            DexAccessFlags.formatAsHumanReadable(method.accessFlags, DexAccessFlags.Target.METHOD)
-                          .replace("_".toRegex(), "-")
-                          .lowercase(Locale.getDefault())
+            formatAccessFlagsAsHumanReadable(method.accessFlags, DexAccessFlagTarget.METHOD)
+                .replace("_".toRegex(), "-")
+                .lowercase(Locale.getDefault())
 
         if (accessFlags.isNotEmpty()) {
             printer.print(" $accessFlags")

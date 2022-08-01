@@ -155,6 +155,10 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
     }
 
     companion object {
+        fun of(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code): CodeEditor {
+            return CodeEditor(DexEditor.of(dexFile), classDef, method, code)
+        }
+
         fun of(dexEditor: DexEditor, classDef: ClassDef, method: EncodedMethod, code: Code): CodeEditor {
             return CodeEditor(dexEditor, classDef, method, code)
         }

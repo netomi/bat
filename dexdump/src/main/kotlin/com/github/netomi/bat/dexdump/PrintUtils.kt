@@ -16,7 +16,8 @@
 
 package com.github.netomi.bat.dexdump
 
-import com.github.netomi.bat.dexfile.DexAccessFlags
+import com.github.netomi.bat.dexfile.DexAccessFlagTarget
+import com.github.netomi.bat.dexfile.formatAccessFlagsAsHumanReadable
 import com.github.netomi.bat.dexfile.util.Mutf8
 import com.github.netomi.bat.io.IndentingPrinter
 import java.io.IOException
@@ -31,8 +32,8 @@ internal fun formatNumber(number: Int): String {
     return "%d (0x%04x)".format(number, number)
 }
 
-internal fun formatAccessFlags(accessFlags: Int, target: Int): String {
-    return "0x%04x (%s)".format(accessFlags, DexAccessFlags.formatAsHumanReadable(accessFlags, target))
+internal fun formatAccessFlags(accessFlags: Int, target: DexAccessFlagTarget): String {
+    return "0x%04x (%s)".format(accessFlags, formatAccessFlagsAsHumanReadable(accessFlags, target))
 }
 
 internal class Mutf8Printer constructor(private val outputStream: OutputStream)

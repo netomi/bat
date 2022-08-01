@@ -97,7 +97,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
         printer.println("  name          : '" + field.getName(dexFile) + "'")
         printer.println("  type          : '" + field.getType(dexFile) + "'")
-        printer.println("  access        : " + formatAccessFlags(field.accessFlags, DexAccessFlags.Target.FIELD))
+        printer.println("  access        : " + formatAccessFlags(field.accessFlags, DexAccessFlagTarget.FIELD))
         val staticValues = if (!classDef.staticValues.isEmpty) classDef.staticValues.array else null
         if (field.isStatic && staticValues != null && index < staticValues.values.size) {
             printer.print("  value         : ")
@@ -110,7 +110,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
         printer.println("  name          : '" + method.getName(dexFile) + "'")
         printer.println("  type          : '" + method.getDescriptor(dexFile) + "'")
-        printer.println("  access        : " + formatAccessFlags(method.accessFlags, DexAccessFlags.Target.METHOD))
+        printer.println("  access        : " + formatAccessFlags(method.accessFlags, DexAccessFlagTarget.METHOD))
 
         if (!method.code.isEmpty) {
             method.codeAccept(dexFile, classDef, this)

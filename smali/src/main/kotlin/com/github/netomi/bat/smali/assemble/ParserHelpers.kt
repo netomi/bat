@@ -16,7 +16,7 @@
 
 package com.github.netomi.bat.smali.assemble
 
-import com.github.netomi.bat.dexfile.DexAccessFlags
+import com.github.netomi.bat.dexfile.DexAccessFlag
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.util.DexClasses
@@ -135,7 +135,7 @@ internal fun parseMethodObject(text: String): MethodInfo {
 internal fun parseAccessFlags(sAccListContext: SmaliParser.SAccListContext): Int {
     var accessFlags = 0
     sAccListContext.ACC().forEach {
-        val flag = DexAccessFlags.of(it.text)
+        val flag = DexAccessFlag.of(it.text)
         accessFlags = accessFlags or flag.value
     }
     return accessFlags

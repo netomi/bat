@@ -43,6 +43,10 @@ class MethodEditor private constructor(val dexEditor: DexEditor, private val cla
     }
 
     companion object {
+        fun of(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): MethodEditor {
+            return MethodEditor(DexEditor.of(dexFile), classDef, method)
+        }
+
         fun of(dexEditor: DexEditor, classDef: ClassDef, method: EncodedMethod): MethodEditor {
             return MethodEditor(dexEditor, classDef, method)
         }

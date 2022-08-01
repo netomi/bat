@@ -17,6 +17,10 @@ package com.github.netomi.bat.dexfile
 
 import java.util.*
 
+fun accessFlagsOf(visibility: Visibility, modifiers: EnumSet<ClassModifier>): Int {
+    return visibility.flagValue or modifiers.fold(0) { acc, m -> acc or m.flagValue }
+}
+
 enum class ClassModifier(val flagValue: Int) {
     STATIC    (ACC_STATIC),
     FINAL     (ACC_FINAL),

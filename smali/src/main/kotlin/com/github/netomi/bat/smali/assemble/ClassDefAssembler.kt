@@ -58,7 +58,7 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
-        val field = classDefEditor.addField(name, type, accessFlags)
+        val field = classDefEditor.addField(name, accessFlags, type)
 
         if (field.isStatic && ctx.sBaseValue() != null) {
             val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
@@ -78,7 +78,7 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
         val (_, name, parameterTypes, returnType) = parseMethodObject(ctx.methodObj.text)
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        val methodEditor = classDefEditor.addMethod(name, parameterTypes, returnType, accessFlags)
+        val methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType)
         val method       = methodEditor.method
 
         if (!method.isAbstract && !method.isNative) {

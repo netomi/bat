@@ -78,7 +78,7 @@ class DexDumpPrinter constructor(
         printer.println("Class #%-5d        -".format(index))
         printer.levelUp()
         printer.println("Class descriptor  : '" + classDef.getType(dexFile) + "'")
-        printer.println("Access flags      : " + formatAccessFlags(classDef.accessFlags, DexAccessFlags.Target.CLASS))
+        printer.println("Access flags      : " + formatAccessFlags(classDef.accessFlags, DexAccessFlagTarget.CLASS))
         printer.println("Superclass        : '" + classDef.getSuperClassType(dexFile) + "'")
         printer.println("Interfaces        -")
         printer.levelUp()

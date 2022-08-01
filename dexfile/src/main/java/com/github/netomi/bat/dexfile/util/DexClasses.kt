@@ -15,14 +15,11 @@
  */
 package com.github.netomi.bat.dexfile.util
 
-import com.github.netomi.bat.dexfile.ClassDef
-import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.value.*
 import java.util.*
 
 object DexClasses {
-
     fun isClassType(type: String): Boolean {
         return type.startsWith("L") && type.endsWith(";")
     }
@@ -117,14 +114,14 @@ object DexClasses {
     @JvmStatic
     fun getDefaultEncodedValueForType(type: String): EncodedValue {
         when (type) {
-            "B" -> return EncodedByteValue.of(0x00.toByte())
-            "S" -> return EncodedShortValue.of(0x00.toShort())
-            "C" -> return EncodedCharValue.of(0x00.toChar())
-            "I" -> return EncodedIntValue.of(0)
-            "J" -> return EncodedLongValue.of(0L)
-            "F" -> return EncodedFloatValue.of(0.0f)
-            "D" -> return EncodedDoubleValue.of(0.0)
-            "Z" -> return EncodedBooleanValue.of(false)
+            BYTE_TYPE    -> return EncodedByteValue.of(0x00.toByte())
+            SHORT_TYPE   -> return EncodedShortValue.of(0x00.toShort())
+            CHAR_TYPE    -> return EncodedCharValue.of(0x00.toChar())
+            INT_TYPE     -> return EncodedIntValue.of(0)
+            LONG_TYPE    -> return EncodedLongValue.of(0L)
+            FLOAT_TYPE   -> return EncodedFloatValue.of(0.0f)
+            DOUBLE_TYPE  -> return EncodedDoubleValue.of(0.0)
+            BOOLEAN_TYPE -> return EncodedBooleanValue.of(false)
         }
         return if (type.startsWith("L") && type.endsWith(";")) {
             EncodedNullValue
