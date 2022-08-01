@@ -23,6 +23,7 @@ import com.github.netomi.bat.dexfile.instruction.MethodProtoInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.dexfile.instruction.editor.LabelMap
+import com.google.common.base.Preconditions
 
 class CodeEditor private constructor(        val dexEditor: DexEditor,
                                      private val classDef:  ClassDef,
@@ -46,6 +47,8 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
     }
 
     fun prependInstruction(offset: Int, instruction: DexInstruction) {
+        Preconditions.checkArgument(dexFile.supportsOpcode(instruction.opCode), "instruction '$instruction' not supported by DexFile of format '${dexFile.dexFormat}'")
+
         val modifications = getModifications(offset)
         modifications.prependList.add(CodeModification.of(instruction))
     }

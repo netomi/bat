@@ -15,22 +15,18 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.instruction.DexOpCode
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.parallelForEachIndexed
+import com.google.common.base.Preconditions
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
-class DexFile private constructor() {
+class DexFile private constructor(private var dexFormatInternal: DexFormat? = DexFormat.FORMAT_035) {
 
-    private var dexFormatInternal: DexFormat? = null
-
-    val dexFormat: DexFormat?
-        get() = if (header != null) header?.dexFormat else dexFormatInternal
-
-    internal constructor(format: DexFormat): this() {
-        dexFormatInternal = format
-    }
+    val dexFormat: DexFormat
+        get() = (if (header != null) header?.dexFormat else dexFormatInternal)!!
 
     /**
      * The DexHeader instance associated with this DexFile if it is read from an existing dex file.
@@ -60,6 +56,30 @@ class DexFile private constructor() {
 
     var linkData: ByteArray?   = null
         internal set
+
+    internal fun supportsOpcode(opCode: DexOpCode): Boolean {
+        return dexFormat >= opCode.minFormat
+    }
+
+    internal fun clear() {
+        stringIDs.clear()
+        typeIDs.clear()
+        protoIDs.clear()
+        fieldIDs.clear()
+        methodIDs.clear()
+        classDefs.clear()
+        callSiteIDs.clear()
+        methodHandles.clear()
+
+        stringMap.clear()
+        typeMap.clear()
+        protoIDMap.clear()
+        fieldIDMap.clear()
+        methodIDMap.clear()
+        classDefMap.clear()
+        callSiteIDMap.clear()
+        methodHandleMap.clear()
+    }
 
     val stringIDCount: Int
         get() = stringIDs.size
@@ -249,6 +269,8 @@ class DexFile private constructor() {
     }
 
     internal fun addCallSiteID(callSiteID: CallSiteID): Int {
+        Preconditions.checkArgument(dexFormat >= DexFormat.FORMAT_038, "DexFile of format $dexFormat does not support adding CallSiteIDs")
+
         callSiteIDs.add(callSiteID)
         val index = callSiteIDs.lastIndex
         callSiteIDMap[callSiteID] = index
@@ -273,6 +295,8 @@ class DexFile private constructor() {
     }
 
     internal fun addMethodHandle(methodHandle: MethodHandle): Int {
+        Preconditions.checkArgument(dexFormat >= DexFormat.FORMAT_038, "DexFile of format $dexFormat does not support adding MethodHandles")
+
         methodHandles.add(methodHandle)
         val index = methodHandles.lastIndex
         methodHandleMap[methodHandle] = index

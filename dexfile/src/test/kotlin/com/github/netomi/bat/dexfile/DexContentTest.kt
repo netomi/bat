@@ -55,7 +55,7 @@ abstract class DexContentTest<T : DexContent> {
 
             // write a dummy byte to avoid any data item starting at offset 0.
             output.writeByte(0x0.toByte())
-            val dexFile = DexFile(DexFormat.FORMAT_035)
+            val dexFile = DexFile.of(DexFormat.FORMAT_035)
 
             // collect all linked data items and serialize them first.
             data.dataItemsAccept(dexFile, object : DataItemVisitor {

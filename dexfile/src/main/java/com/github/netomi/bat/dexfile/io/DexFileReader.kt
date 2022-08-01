@@ -76,6 +76,8 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
     }
 
     private fun read(dexFile: DexFile) {
+        dexFile.clear()
+
         val header = readHeader()
         dexFile.header  = header
 
@@ -109,7 +111,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
         input.offset = header.stringIDsOffsets
 
         dexFile.apply {
-            stringIDs.clear()
             stringIDs.ensureCapacity(header.stringIDsSize)
             val stringIDs = mutableListOf<StringID>()
             for (i in 0 until header.stringIDsSize) {
@@ -133,7 +134,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
     private fun readTypeIDs(header: DexHeader, dexFile: DexFile) {
         input.offset = header.typeIDsOffset
         dexFile.apply {
-            typeIDs.clear()
             typeIDs.ensureCapacity(header.typeIDsSize)
             for (i in 0 until header.typeIDsSize) {
                 val typeIDItem = TypeID.readContent(input)
@@ -145,7 +145,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
     private fun readProtoIDs(header: DexHeader, dexFile: DexFile) {
         input.offset = header.protoIDsOffset
         dexFile.apply {
-            protoIDs.clear()
             protoIDs.ensureCapacity(header.protoIDsSize)
             for (i in 0 until header.protoIDsSize) {
                 val protoIDItem = ProtoID.readContent(input)
@@ -157,7 +156,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
     private fun readFieldIDs(header: DexHeader, dexFile: DexFile) {
         input.offset = header.fieldIDsOffset
         dexFile.apply {
-            fieldIDs.clear()
             fieldIDs.ensureCapacity(header.fieldIDsSize)
             for (i in 0 until header.fieldIDsSize) {
                 val fieldIDItem = FieldID.readContent(input)
@@ -169,7 +167,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
     private fun readMethodIDs(header: DexHeader, dexFile: DexFile) {
         input.offset = header.methodIDsOffset
         dexFile.apply {
-            methodIDs.clear()
             methodIDs.ensureCapacity(header.methodIDsSize)
             for (i in 0 until header.methodIDsSize) {
                 val methodIDItem = MethodID.readContent(input)
@@ -181,7 +178,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
     private fun readClassDefs(header: DexHeader, dexFile: DexFile) {
         input.offset = header.classDefsOffset
         dexFile.apply {
-            classDefs.clear()
             classDefs.ensureCapacity(header.classDefsSize)
             for (i in 0 until header.classDefsSize) {
                 val classDefItem = ClassDef.readContent(input)
@@ -195,7 +191,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
         if (mapItem != null) {
             input.offset = mapItem.offset
             dexFile.apply {
-                callSiteIDs.clear()
                 callSiteIDs.ensureCapacity(mapItem.size)
                 for (i in 0 until mapItem.size) {
                     val callSiteIDItem = CallSiteID.readContent(input)
@@ -210,7 +205,6 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
         if (mapItem != null) {
             input.offset = mapItem.offset
             dexFile.apply {
-                methodHandles.clear()
                 methodHandles.ensureCapacity(mapItem.size)
                 for (i in 0 until mapItem.size) {
                     val methodHandleItem = MethodHandle.readContent(input)

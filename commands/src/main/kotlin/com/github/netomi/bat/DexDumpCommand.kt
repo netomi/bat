@@ -80,7 +80,7 @@ private class DumpCommand: ReusableOptions(), Runnable {
     override fun run() {
         processInput(inputFile, outputFile) { dexFile, os ->
             println("Processing '${inputFile.name}'...")
-            println("Opened '${inputFile.name}', DEX version '${dexFile.dexFormat?.version}'")
+            println("Opened '${inputFile.name}', DEX version '${dexFile.dexFormat.version}'")
 
             if (classNameFilter != null) {
                 dexFile.classDefsAccept(
