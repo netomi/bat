@@ -35,7 +35,7 @@ class StringData private constructor(): DataItem(), Comparable<StringData> {
     lateinit var string: String
         private set
 
-    internal constructor(string: String): this() {
+    private constructor(string: String): this() {
         this.string = string
     }
 

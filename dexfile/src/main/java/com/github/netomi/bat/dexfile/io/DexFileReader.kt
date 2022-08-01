@@ -111,10 +111,22 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
         dexFile.apply {
             stringIDs.clear()
             stringIDs.ensureCapacity(header.stringIDsSize)
+            val stringIDs = mutableListOf<StringID>()
             for (i in 0 until header.stringIDsSize) {
                 val stringIDItem = StringID.readContent(input)
-                stringIDs.add(i, stringIDItem)
+                stringIDs.add(stringIDItem)
             }
+
+            val offset = input.offset
+
+            // immediately read the linked data items, as the string value
+            // is used for caching reasons when adding a StringID item.
+            for (stringID in stringIDs) {
+                stringID.readLinkedDataItems(input)
+                dexFile.addStringID(stringID)
+            }
+
+            input.offset = offset
         }
     }
 
@@ -213,6 +225,10 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
             override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {
                 dataItem.readLinkedDataItems(input)
             }
+
+            // no need to read the linked data items for strings again as they have
+            // been read during reading of the string ID item itself.
+            override fun visitStringID(dexFile: DexFile, stringID: StringID) {}
         })
     }
 

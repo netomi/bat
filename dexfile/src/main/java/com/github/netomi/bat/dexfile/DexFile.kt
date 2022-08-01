@@ -64,12 +64,18 @@ class DexFile private constructor() {
     val stringIDCount: Int
         get() = stringIDs.size
 
+    private val stringMap: MutableMap<String, Int> = mutableMapOf()
+
     fun getStringIDs(): Iterable<StringID> {
         return stringIDs
     }
 
     fun getStringID(index: Int): StringID {
         return stringIDs[index]
+    }
+
+    fun getStringIDIndex(string: String): Int {
+        return stringMap[string] ?: NO_INDEX
     }
 
     fun getString(index: Int): String {
@@ -82,11 +88,15 @@ class DexFile private constructor() {
 
     internal fun addStringID(stringID: StringID): Int {
         stringIDs.add(stringID)
-        return stringIDs.size - 1
+        val index = stringIDs.lastIndex
+        stringMap[stringID.stringValue] = index
+        return index
     }
 
     val typeIDCount: Int
         get() = typeIDs.size
+
+    private val typeMap: MutableMap<String, Int> = mutableMapOf()
 
     fun getTypeIDs(): Iterable<TypeID> {
         return typeIDs
@@ -94,6 +104,10 @@ class DexFile private constructor() {
 
     fun getTypeID(index: Int): TypeID {
         return typeIDs[index]
+    }
+
+    fun getTypeIDIndex(type: String): Int {
+        return typeMap[type] ?: NO_INDEX
     }
 
     fun getType(index: Int): String {
@@ -106,11 +120,15 @@ class DexFile private constructor() {
 
     internal fun addTypeID(typeID: TypeID): Int {
         typeIDs.add(typeID)
-        return typeIDs.size - 1
+        val index = typeIDs.lastIndex
+        typeMap[typeID.getType(this)] = index
+        return index
     }
 
     val protoIDCount: Int
         get() = protoIDs.size
+
+    private val protoIDMap: MutableMap<ProtoID, Int> = mutableMapOf()
 
     fun getProtoIDs(): Iterable<ProtoID> {
         return protoIDs
@@ -120,13 +138,21 @@ class DexFile private constructor() {
         return protoIDs[protoIndex]
     }
 
+    fun getProtoIDIndex(protoID: ProtoID): Int {
+        return protoIDMap[protoID] ?: NO_INDEX
+    }
+
     internal fun addProtoID(protoID: ProtoID): Int {
         protoIDs.add(protoID)
-        return protoIDs.size - 1
+        val index = protoIDs.lastIndex
+        protoIDMap[protoID] = index
+        return index
     }
 
     val fieldIDCount: Int
         get() = fieldIDs.size
+
+    private val fieldIDMap: MutableMap<FieldID, Int> = mutableMapOf()
 
     fun getFieldIDs(): Iterable<FieldID> {
         return fieldIDs
@@ -136,13 +162,21 @@ class DexFile private constructor() {
         return fieldIDs[fieldIndex]
     }
 
+    fun getFieldIDIndex(fieldID: FieldID): Int {
+        return fieldIDMap[fieldID] ?: NO_INDEX
+    }
+
     internal fun addFieldID(fieldID: FieldID): Int {
         fieldIDs.add(fieldID)
-        return fieldIDs.size - 1
+        val index = fieldIDs.lastIndex
+        fieldIDMap[fieldID] = index
+        return index
     }
 
     val methodIDCount: Int
         get() = methodIDs.size
+
+    private val methodIDMap: MutableMap<MethodID, Int> = mutableMapOf()
 
     fun getMethodIDs(): Iterable<MethodID> {
         return methodIDs
@@ -152,9 +186,15 @@ class DexFile private constructor() {
         return methodIDs[methodIndex]
     }
 
+    fun getMethodIDIndex(methodID: MethodID): Int {
+        return methodIDMap[methodID] ?: NO_INDEX
+    }
+
     internal fun addMethodID(methodID: MethodID): Int {
         methodIDs.add(methodID)
-        return methodIDs.size - 1
+        val index = methodIDs.lastIndex
+        methodIDMap[methodID] = index
+        return index
     }
 
     val classDefCount: Int
@@ -182,16 +222,19 @@ class DexFile private constructor() {
     internal fun addClassDef(classDef: ClassDef): Int {
         val classType = classDef.getType(this)
         if (getClassDefByType(classType) != null) {
-            throw IllegalArgumentException("class with name ${DexClasses.internalClassNameFromInternalType(classType)} already exists in dex file.")
+            throw IllegalArgumentException("class with name '${DexClasses.internalClassNameFromInternalType(classType)}' already exists.")
         }
 
         classDefs.add(classDef)
-        classDefMap[classType] = classDefs.size - 1
-        return classDefs.size - 1
+        val index = classDefs.lastIndex
+        classDefMap[classType] = index
+        return index
     }
 
     val callSiteIDCount: Int
         get() = callSiteIDs.size
+
+    private val callSiteIDMap: MutableMap<CallSiteID, Int> = mutableMapOf()
 
     fun getCallSiteIDs(): Iterable<CallSiteID> {
         return callSiteIDs
@@ -201,13 +244,21 @@ class DexFile private constructor() {
         return callSiteIDs[callSiteIndex]
     }
 
+    fun getCallSiteIDIndex(callSiteID: CallSiteID): Int {
+        return callSiteIDMap[callSiteID] ?: NO_INDEX
+    }
+
     internal fun addCallSiteID(callSiteID: CallSiteID): Int {
         callSiteIDs.add(callSiteID)
-        return callSiteIDs.size - 1
+        val index = callSiteIDs.lastIndex
+        callSiteIDMap[callSiteID] = index
+        return index
     }
 
     val methodHandleCount: Int
         get() = methodHandles.size
+
+    private val methodHandleMap: MutableMap<MethodHandle, Int> = mutableMapOf()
 
     fun getMethodHandles(): Iterable<MethodHandle> {
         return methodHandles
@@ -217,9 +268,15 @@ class DexFile private constructor() {
         return methodHandles[methodHandleIndex]
     }
 
+    fun getMethodHandleIndex(methodHandle: MethodHandle): Int {
+        return methodHandleMap[methodHandle] ?: NO_INDEX
+    }
+
     internal fun addMethodHandle(methodHandle: MethodHandle): Int {
         methodHandles.add(methodHandle)
-        return methodHandles.size - 1
+        val index = methodHandles.lastIndex
+        methodHandleMap[methodHandle] = index
+        return index
     }
 
     fun accept(visitor: DexFileVisitor) {

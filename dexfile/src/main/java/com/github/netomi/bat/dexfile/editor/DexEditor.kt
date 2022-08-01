@@ -21,64 +21,18 @@ import com.github.netomi.bat.dexfile.util.DexClasses
 
 class DexEditor private constructor(val dexFile: DexFile) {
 
-    private val stringMap: MutableMap<String, Int> by lazy {
-        val map = mutableMapOf<String, Int>()
-        dexFile.stringIDs.forEachIndexed { index, stringID -> map[stringID.stringValue]  = index }
-        map
-    }
-
-    private val typeMap: MutableMap<String, Int> by lazy {
-        val map = mutableMapOf<String, Int>()
-        dexFile.typeIDs.forEachIndexed { index, typeID -> map[typeID.getType(dexFile)] = index }
-        map
-    }
-
-    private val protoIDMap: MutableMap<ProtoID, Int> by lazy {
-        val map = mutableMapOf<ProtoID, Int>()
-        dexFile.protoIDs.forEachIndexed { index, protoID -> map[protoID] = index }
-        map
-    }
-
-    private val fieldIDMap: MutableMap<FieldID, Int> by lazy {
-        val map = mutableMapOf<FieldID, Int>()
-        dexFile.fieldIDs.forEachIndexed { index, fieldID -> map[fieldID] = index }
-        map
-    }
-
-    private val methodIDMap: MutableMap<MethodID, Int> by lazy {
-        val map = mutableMapOf<MethodID, Int>()
-        dexFile.methodIDs.forEachIndexed { index, methodID -> map[methodID] = index }
-        map
-    }
-
-    private val callSiteIDMap: MutableMap<CallSiteID, Int> by lazy {
-        val map = mutableMapOf<CallSiteID, Int>()
-        dexFile.callSiteIDs.forEachIndexed { index, callSiteID -> map[callSiteID] = index }
-        map
-    }
-
-    private val methodHandleMap: MutableMap<MethodHandle, Int> by lazy {
-        val map = mutableMapOf<MethodHandle, Int>()
-        dexFile.methodHandles.forEachIndexed { index, methodHandle -> map[methodHandle] = index }
-        map
-    }
-
     fun addOrGetStringIDIndex(string: String): Int {
-        assert(dexFile.stringIDs.size == stringMap.size)
-
-        var index = stringMap[string]
-        if (index == null) {
+        var index = dexFile.getStringIDIndex(string)
+        if (index == NO_INDEX) {
             index = dexFile.addStringID(StringID.of(string))
-            stringMap[string] = index
         }
         return index
     }
 
     fun addOrGetTypeIDIndex(type: String): Int {
-        var index = typeMap[type]
-        if (index == null) {
+        var index = dexFile.getTypeIDIndex(type)
+        if (index == NO_INDEX) {
             index = dexFile.addTypeID(TypeID.of(addOrGetStringIDIndex(type)))
-            typeMap[type] = index
         }
         return index
     }
@@ -91,10 +45,9 @@ class DexEditor private constructor(val dexFile: DexFile) {
 
         val protoID = ProtoID.of(shortyIndex, returnTypeIndex, *parameterTypeIndices)
 
-        var index = protoIDMap[protoID]
-        if (index == null) {
+        var index = dexFile.getProtoIDIndex(protoID)
+        if (index == NO_INDEX) {
             index = dexFile.addProtoID(protoID)
-            protoIDMap[protoID] = index
         }
         return index
     }
@@ -107,10 +60,9 @@ class DexEditor private constructor(val dexFile: DexFile) {
                 addOrGetTypeIDIndex(type)
             )
 
-        var index = fieldIDMap[fieldID]
-        if (index == null) {
+        var index = dexFile.getFieldIDIndex(fieldID)
+        if (index == NO_INDEX) {
             index = dexFile.addFieldID(fieldID)
-            fieldIDMap[fieldID] = index
         }
         return index
     }
@@ -123,16 +75,11 @@ class DexEditor private constructor(val dexFile: DexFile) {
                 addOrGetProtoIDIndex(parameterTypes, returnType)
             )
 
-        var index = methodIDMap[methodID]
-        if (index == null) {
+        var index = dexFile.getMethodIDIndex(methodID)
+        if (index == NO_INDEX) {
             index = dexFile.addMethodID(methodID)
-            methodIDMap[methodID] = index
         }
         return index
-    }
-
-    private fun addClassDef(classDef: ClassDef): Int {
-        return dexFile.addClassDef(classDef)
     }
 
     fun addClassDef(classType: String, accessFlags: Int, superType: String?, sourceFile: String?): ClassDefEditor {
@@ -146,26 +93,24 @@ class DexEditor private constructor(val dexFile: DexFile) {
                         superTypeIndex,
                         sourceFileIndex)
 
-        addClassDef(classDef)
+        dexFile.addClassDef(classDef)
         return ClassDefEditor.of(this, classDef)
     }
 
     fun addOrGetCallSiteIDIndex(callSite: CallSite): Int {
         val callSiteID = CallSiteID.of(callSite)
 
-        var index = callSiteIDMap[callSiteID]
-        if (index == null) {
+        var index = dexFile.getCallSiteIDIndex(callSiteID)
+        if (index == NO_INDEX) {
             index = dexFile.addCallSiteID(callSiteID)
-            callSiteIDMap[callSiteID] = index
         }
         return index
     }
 
     fun addOrGetMethodHandleIndex(methodHandle: MethodHandle): Int {
-        var index = methodHandleMap[methodHandle]
-        if (index == null) {
+        var index = dexFile.getMethodHandleIndex(methodHandle)
+        if (index == NO_INDEX) {
             index = dexFile.addMethodHandle(methodHandle)
-            methodHandleMap[methodHandle] = index
         }
         return index
     }

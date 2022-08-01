@@ -40,7 +40,7 @@ class StringID private constructor(): DataItem(), Comparable<StringID> {
     val stringValue: String
         get() = stringData.string
 
-    internal constructor(stringData: StringData): this() {
+    private constructor(stringData: StringData): this() {
         this.stringData = stringData
     }
 
