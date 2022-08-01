@@ -33,7 +33,7 @@ configurations[JavaPlugin.API_CONFIGURATION_NAME].let { apiConfiguration ->
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":common"))
     implementation(project(":dexfile"))
 
     // antlr

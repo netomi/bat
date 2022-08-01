@@ -5,6 +5,6 @@ include 'dexfile'
 include 'commands'
 include 'smali'
 include 'dexdump'
-include 'core'
+include 'common'
 include 'jasmin'
 

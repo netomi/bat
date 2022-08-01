@@ -13,6 +13,6 @@ tasks.test {
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation(project(":common"))
     testImplementation(kotlin("test"))
 }

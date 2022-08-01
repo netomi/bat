@@ -34,7 +34,7 @@ distributions {
 dependencies {
     implementation("info.picocli:picocli:${Versions.picocliVersion}")
 
-    implementation(project(":core"))
+    implementation(project(":common"))
     implementation(project(":classfile"))
     implementation(project(":dexfile"))
     implementation(project(":smali"))
