@@ -120,7 +120,7 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
         var i = 0
         var j = 4
         while (i < values.size) {
-            data[j] = values[i++].toShort()
+            data[j] = (values[i++].toInt() and 0xff).toShort()
             if (i < values.size) {
                 data[j] = (data[j].toInt() or ((values[i++].toInt() and 0xff) shl 8)).toShort()
             }
