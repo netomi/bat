@@ -34,6 +34,22 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, val c
         classDef.interfaces.addType(dexEditor.addOrGetTypeIDIndex(type))
     }
 
+    fun setVisibility(visibility: Visibility) {
+        classDef.accessFlags = accessFlagsOf(visibility, classDef.modifiers)
+    }
+
+    fun addModifier(modifier: ClassModifier) {
+        val currentModifiers = classDef.modifiers
+        currentModifiers.add(modifier)
+        classDef.accessFlags = accessFlagsOf(classDef.visibility, currentModifiers)
+    }
+
+    fun removeModifier(modifier: ClassModifier) {
+        val currentModifiers = classDef.modifiers
+        currentModifiers.remove(modifier)
+        classDef.accessFlags = accessFlagsOf(classDef.visibility, currentModifiers)
+    }
+
     fun addField(fieldName:  String,
                  visibility: Visibility = Visibility.PUBLIC,
                  modifiers:  EnumSet<FieldModifier> = EnumSet.noneOf(FieldModifier::class.java),

@@ -51,7 +51,7 @@ class ClassDef private constructor(
         internal set
 
     var accessFlags: Int = _accessFlags
-        private set
+        internal set
 
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
