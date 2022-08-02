@@ -142,9 +142,8 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
-        if (!super.equals(other)) return false
 
-        val o = other as DebugStartLocalExtended
+        val o = other as DebugAdvanceLineAndPC
 
         return opcode == o.opcode
     }
@@ -164,9 +163,7 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
             val opCodeRange = 0x0a..0xff
             for (opCode in opCodeRange) {
                 val insn = DebugAdvanceLineAndPC(opCode.toByte())
-                if (insn.lineDiff >= 0 && insn.addrDiff >= 0) {
-                    result[LineAddrPair(insn.lineDiff, insn.addrDiff)] = opCode
-                }
+                result[LineAddrPair(insn.lineDiff, insn.addrDiff)] = opCode
             }
 
             result

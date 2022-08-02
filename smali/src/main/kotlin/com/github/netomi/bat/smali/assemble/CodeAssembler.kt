@@ -143,6 +143,21 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                     null
                 }
 
+                RULE_farraydata -> {
+                    codeOffset = alignOffsetForPayload(codeOffset)
+                    instructionAssembler.parseArrayDataPayload(t as FarraydataContext)
+                }
+
+                RULE_fsparseswitch -> {
+                    codeOffset = alignOffsetForPayload(codeOffset)
+                    instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext)
+                }
+
+                RULE_fpackedswitch -> {
+                    codeOffset = alignOffsetForPayload(codeOffset)
+                    instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
+                }
+
                 RULE_f10x -> {
                     val c = t as F10xContext
 
@@ -186,7 +201,9 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
 
             if (insn != null) {
                 codeOffset += insn.length
-                codeEditor.prependInstruction(0, insn)
+                if (insn !is Payload) {
+                    codeEditor.prependInstruction(0, insn)
+                }
             }
         }
 

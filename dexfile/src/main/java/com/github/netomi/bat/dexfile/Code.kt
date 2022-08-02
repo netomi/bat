@@ -76,7 +76,7 @@ class Code private constructor(
     var debugInfo: DebugInfo = _debugInfo
 
     override val isEmpty: Boolean
-        get() = insnsSize == 0
+        get() = insnsSize == 0 && debugInfo.isEmpty
 
     internal fun sort() {
         tryList.sortBy { it.startAddr }

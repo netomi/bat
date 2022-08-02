@@ -58,13 +58,19 @@ internal class DebugSequenceAssembler internal constructor(private val debugInfo
             if (insn != null) {
                 debugSequence.add(insn)
             } else {
-                debugSequence.add(DebugAdvanceLine.of(lineDiff))
-                val lineInsn = DebugAdvanceLineAndPC.createIfPossible(0, addrDiff)
+                val lineInsn = DebugAdvanceLineAndPC.createIfPossible(lineDiff, 0)
                 if (lineInsn != null) {
+                    debugSequence.add(DebugAdvancePC.of(addrDiff))
                     debugSequence.add(lineInsn)
                 } else {
-                    debugSequence.add(DebugAdvancePC.of(addrDiff))
-                    debugSequence.add(DebugAdvanceLineAndPC.nop())
+                    debugSequence.add(DebugAdvanceLine.of(lineDiff))
+                    val addrInsn = DebugAdvanceLineAndPC.createIfPossible(0, addrDiff)
+                    if (addrInsn != null) {
+                        debugSequence.add(addrInsn)
+                    } else {
+                        debugSequence.add(DebugAdvancePC.of(addrDiff))
+                        debugSequence.add(DebugAdvanceLineAndPC.nop())
+                    }
                 }
             }
         }
