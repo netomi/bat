@@ -33,16 +33,16 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
         return add(BasicInstruction.of(DexOpCode.NOP))
     }
 
-    fun const(value: Long, vararg register: Int): LiteralInstruction {
-        return add(LiteralInstruction.of(DexOpCode.CONST, value, *register))
+    fun const(value: Long, destinationRegister: Int): LiteralInstruction {
+        return add(LiteralInstruction.of(DexOpCode.CONST, value, destinationRegister))
     }
 
-    fun newArray(type: String, vararg register: Int): TypeInstruction {
-        return newArray(dexEditor.addOrGetTypeIDIndex(type), *register)
+    fun newArray(type: String, destinationRegister: Int, sizeRegister: Int): TypeInstruction {
+        return newArray(dexEditor.addOrGetTypeIDIndex(type), destinationRegister, sizeRegister)
     }
 
-    fun newArray(typeIndex: Int, vararg register: Int): TypeInstruction {
-        return add(TypeInstruction.of(DexOpCode.NEW_ARRAY, typeIndex, *register))
+    fun newArray(typeIndex: Int, destinationRegister: Int, sizeRegister: Int): TypeInstruction {
+        return add(TypeInstruction.of(DexOpCode.NEW_ARRAY, typeIndex, destinationRegister, sizeRegister))
     }
 
     fun fillArrayData(payload: FillArrayPayload, register: Int): PayloadInstruction<FillArrayPayload> {
