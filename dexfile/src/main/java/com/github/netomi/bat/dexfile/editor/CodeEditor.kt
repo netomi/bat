@@ -25,8 +25,8 @@ import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.google.common.base.Preconditions
 
 class CodeEditor private constructor(        val dexEditor: DexEditor,
-                                     private val classDef:  ClassDef,
-                                     private val method:    EncodedMethod,
+                                             val classDef:  ClassDef,
+                                             val method:    EncodedMethod,
                                              val code:      Code) {
 
     private val dexFile: DexFile
@@ -46,16 +46,31 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
     }
 
     fun prependInstruction(offset: Int, instruction: DexInstruction) {
-        Preconditions.checkArgument(dexFile.supportsOpcode(instruction.opCode),
-                                    "instruction '$instruction' not supported by DexFile of format '${dexFile.dexFormat}'")
+        prependInstruction(offset, listOf(instruction))
+    }
+
+    fun prependInstruction(offset: Int, instructions: List<DexInstruction>) {
+        instructions.forEach {
+            Preconditions.checkArgument(dexFile.supportsOpcode(it.opCode),
+                "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'")
+        }
 
         val modifications = getModifications(offset)
-        modifications.prependList.add(instruction)
+        modifications.prependList.addAll(instructions)
     }
 
     fun appendInstruction(offset: Int, instruction: DexInstruction) {
+        appendInstruction(offset, listOf(instruction))
+    }
+
+    fun appendInstruction(offset: Int, instructions: List<DexInstruction>) {
+        instructions.forEach {
+            Preconditions.checkArgument(dexFile.supportsOpcode(it.opCode),
+                "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'")
+        }
+
         val modifications = getModifications(offset)
-        modifications.appendList.add(instruction)
+        modifications.appendList.addAll(instructions)
     }
 
     private fun getModifications(offset: Int): CodeModifications {
@@ -138,6 +153,10 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         // clear modifications
         modifications.clear()
         tryCatchList.clear()
+    }
+
+    internal fun acceptInstructions(visitor: InstructionVisitor) {
+        code.instructionsAccept(dexFile, classDef, method, visitor)
     }
 
     private fun collectInstructionsAndPayloads(offsetMap: OffsetMap): Pair<List<DexInstruction>, List<Payload>> {

@@ -325,8 +325,11 @@ enum class DexOpCode constructor(
 
         init {
             for (opCode in values()) {
-                opcodeArray[opCode.opCode and 0xff] = opCode
-                mnemonicToOpCodeMapping[opCode.mnemonic] = opCode
+                // ignore pseudo opcodes
+                if (opCode.format != InstructionFormat.FORMAT_00x) {
+                    opcodeArray[opCode.opCode and 0xff]      = opCode
+                    mnemonicToOpCodeMapping[opCode.mnemonic] = opCode
+                }
             }
         }
 

@@ -79,3 +79,19 @@ fun toHexString(value: Long, digits: Int): String {
 fun toHexStringWithPrefix(value: Long): String {
     return "0x" + toHexString(value)
 }
+
+fun toSignedHexStringWithPrefix(value: Long): String {
+    return if (value < 0) "-0x%x".format(-value) else "0x%x".format(value)
+}
+
+fun toSignedHexStringWithPrefix(value: Int): String {
+    return if (value < 0) "-0x%x".format(-value) else "0x%x".format(value)
+}
+
+fun toSignedHexStringWithPrefix(value: Short): String {
+    return if (value < 0) "-0x%x".format(-value) else "0x%x".format(value)
+}
+
+fun toSignedHexStringWithPrefix(value: Byte): String {
+    return if (value < 0) "-0x%x".format(-value) else "0x%x".format(value)
+}

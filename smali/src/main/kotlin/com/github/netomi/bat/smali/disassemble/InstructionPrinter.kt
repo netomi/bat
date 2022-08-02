@@ -24,7 +24,7 @@ import com.github.netomi.bat.dexfile.visitor.allCode
 import com.github.netomi.bat.dexfile.visitor.allInstructions
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.escapeAsJavaString
-import com.github.netomi.bat.util.toHexString
+import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
 internal class InstructionPrinter(private val printer:             IndentingPrinter,
                                   private val registerPrinter:     RegisterPrinter,
@@ -382,25 +382,6 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
             } else {
                 printer.print(dVal.toString())
             }
-        }
-    }
-
-    companion object {
-        // private utility methods.
-        private fun toSignedHexStringWithPrefix(value: Long): String {
-            return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
-        }
-
-        private fun toSignedHexStringWithPrefix(value: Int): String {
-            return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
-        }
-
-        private fun toSignedHexStringWithPrefix(value: Short): String {
-            return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
-        }
-
-        private fun toSignedHexStringWithPrefix(value: Byte): String {
-            return if (value < 0) String.format("-0x%x", -value) else String.format("0x%x", value)
         }
     }
 }

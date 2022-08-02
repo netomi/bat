@@ -16,6 +16,7 @@
 
 package com.github.netomi.bat.dexfile.instruction.editor
 
+import com.github.netomi.bat.dexfile.editor.CodeEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.instruction.*
 
@@ -34,6 +35,18 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
 
     fun const(value: Long, vararg register: Int): LiteralInstruction {
         return add(LiteralInstruction.of(DexOpCode.CONST, value, *register))
+    }
+
+    fun newArray(type: String, vararg register: Int): TypeInstruction {
+        return newArray(dexEditor.addOrGetTypeIDIndex(type), *register)
+    }
+
+    fun newArray(typeIndex: Int, vararg register: Int): TypeInstruction {
+        return add(TypeInstruction.of(DexOpCode.NEW_ARRAY, typeIndex, *register))
+    }
+
+    fun fillArrayData(payload: FillArrayPayload, register: Int): PayloadInstruction<FillArrayPayload> {
+        return add(FillArrayDataInstruction.of(payload, register))
     }
 
     fun returnVoid(): BasicInstruction {
@@ -55,6 +68,10 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
     }
 
     companion object {
+        fun of(codeEditor: CodeEditor): InstructionBuilder {
+            return InstructionBuilder(codeEditor.dexEditor)
+        }
+
         fun of(dexEditor: DexEditor): InstructionBuilder {
             return InstructionBuilder(dexEditor)
         }

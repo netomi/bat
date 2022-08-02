@@ -59,6 +59,7 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
         printIndentation()
         delegateWriter.write(text.toString())
         println()
+        flush()
     }
 
     fun println() {
@@ -80,8 +81,9 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
     private fun printIndentation() {
         if (!indentedLine && currentIndentation.isNotEmpty()) {
             delegateWriter.write(currentIndentation)
-            indentedLine = true
             currentPosition += currentIndentation.length
         }
+
+        indentedLine = true
     }
 }
