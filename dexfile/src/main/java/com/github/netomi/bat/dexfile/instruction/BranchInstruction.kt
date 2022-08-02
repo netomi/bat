@@ -24,10 +24,10 @@ import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexString
 
-open class BranchInstruction internal constructor(opcode:           DexOpCode,
-                                                  _branchOffset:    Int     = 0,
-                                                  _branchLabel:     String? = null,
-                                                  vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class BranchInstruction private constructor(opcode:           DexOpCode,
+                                                 _branchOffset:    Int     = 0,
+                                                 _branchLabel:     String? = null,
+                                                 vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var branchOffset = _branchOffset
         internal set

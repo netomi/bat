@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-class FieldInstruction internal constructor(opcode: DexOpCode, _fieldIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
+class FieldInstruction private constructor(opcode: DexOpCode, _fieldIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
 
     var fieldIndex: Int = _fieldIndex
         internal set

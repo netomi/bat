@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-open class ArrayInstruction internal constructor(opCode: DexOpCode, vararg registers: Int) : DexInstruction(opCode, *registers) {
+open class ArrayInstruction protected constructor(opCode: DexOpCode, vararg registers: Int) : DexInstruction(opCode, *registers) {
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)

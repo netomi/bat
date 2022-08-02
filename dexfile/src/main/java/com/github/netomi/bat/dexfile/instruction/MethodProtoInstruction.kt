@@ -19,10 +19,10 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class MethodProtoInstruction internal constructor(opcode:           DexOpCode,
-                                                  _methodIndex:     Int = NO_INDEX,
-                                                  _protoIndex:      Int = NO_INDEX,
-                                                  vararg registers: Int) : MethodInstruction(opcode, _methodIndex, *registers) {
+class MethodProtoInstruction private constructor(opcode:           DexOpCode,
+                                                 _methodIndex:     Int = NO_INDEX,
+                                                 _protoIndex:      Int = NO_INDEX,
+                                                 vararg registers: Int) : MethodInstruction(opcode, _methodIndex, *registers) {
 
     var protoIndex: Int = _protoIndex
         internal set
