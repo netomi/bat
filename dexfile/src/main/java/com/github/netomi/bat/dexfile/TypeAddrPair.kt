@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.github.netomi.bat.util.Copyable
 import com.google.common.base.Preconditions
 import java.util.*
 
@@ -29,7 +30,7 @@ import java.util.*
  */
 class TypeAddrPair private constructor(_typeIndex: Int     = NO_INDEX,
                                        _address:   Int     = 0,
-                                       _label:     String? = null) : DexContent() {
+                                       _label:     String? = null) : DexContent(), Copyable<TypeAddrPair> {
 
     var typeIndex: Int = _typeIndex
         internal set
@@ -74,6 +75,10 @@ class TypeAddrPair private constructor(_typeIndex: Int     = NO_INDEX,
 
     override fun toString(): String {
         return "TypeAddrPair[type=${typeIndex},addr=${address}]"
+    }
+
+    override fun copy(): TypeAddrPair {
+        return TypeAddrPair(typeIndex, address, label)
     }
 
     companion object {

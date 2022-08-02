@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.dexfile.instruction.editor.LabelInstruction
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
+import com.github.netomi.bat.util.deepCopy
 import com.google.common.base.Preconditions
 
 class CodeEditor private constructor(        val dexEditor: DexEditor,
@@ -311,7 +312,7 @@ private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
             lastTry.startAddr == tryElement.startAddr &&
             lastTry.endAddr   == tryElement.endAddr) {
             flattenedElements.removeLast()
-            flattenedElements.add(Try.of(lastTry.startAddr, lastTry.endAddr, lastTry.catchHandler.add(tryElement.catchHandler)))
+            flattenedElements.add(Try.of(lastTry.startAddr, lastTry.endAddr, lastTry.catchHandler.add(tryElement.catchHandler.copy())))
         } else {
             flattenedElements.add(tryElement)
         }
@@ -335,7 +336,7 @@ private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
                 currentTry = if (currentTry == null) {
                     seq.tryElement
                 } else {
-                    val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
+                    val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler.copy())
                     nonOverlappingTries.add(endingTry)
 
                     val handler = seq.tryElement.catchHandler.add(currentTry.catchHandler)
@@ -350,7 +351,7 @@ private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
                         null
                     } else {
                         if (currentTry.startAddr < seq.addr - 1) {
-                            val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler)
+                            val endingTry = Try.of(currentTry.startAddr, seq.addr - 1, currentTry.catchHandler.copy())
                             nonOverlappingTries.add(endingTry)
                         }
 
@@ -377,7 +378,7 @@ private fun EncodedCatchHandler.subtract(other: EncodedCatchHandler): EncodedCat
     }
 
     val newHandlers = LinkedHashSet(handlers) - other.handlers.toSet()
-    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers.toList())
+    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers.toList().deepCopy())
 }
 
 private fun EncodedCatchHandler.add(other: EncodedCatchHandler): EncodedCatchHandler {
@@ -387,5 +388,5 @@ private fun EncodedCatchHandler.add(other: EncodedCatchHandler): EncodedCatchHan
     }
 
     val newHandlers = handlers + other.handlers
-    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers)
+    return EncodedCatchHandler.of(newCatchAllAddr, newHandlers.deepCopy())
 }

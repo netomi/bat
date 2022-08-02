@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.github.netomi.bat.util.Copyable
+import com.github.netomi.bat.util.deepCopy
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.abs
@@ -30,7 +32,7 @@ import kotlin.math.abs
 class EncodedCatchHandler private constructor(
     _catchAllAddr:         Int                     = -1,
     _catchAllLabel:        String?                 = null,
-    private val _handlers: ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent() {
+    private val _handlers: ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent(), Copyable<EncodedCatchHandler> {
 
     var catchAllAddr: Int = _catchAllAddr
         internal set
@@ -96,6 +98,11 @@ class EncodedCatchHandler private constructor(
 
     override fun toString(): String {
         return "EncodedCatchHandler[handlers=%d,catchAllAddr=%04x]".format(_handlers.size, catchAllAddr)
+    }
+
+    override fun copy(): EncodedCatchHandler {
+        val newHandlers = handlers.deepCopy()
+        return EncodedCatchHandler(catchAllAddr, catchAllLabel, ArrayList(newHandlers))
     }
 
     companion object {

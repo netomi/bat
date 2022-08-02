@@ -21,6 +21,14 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.CoroutineContext
 
+interface Copyable<T> {
+    fun copy(): T
+}
+
+fun <T: Copyable<T>> List<T>.deepCopy(): List<T> {
+    return map { it.copy() }
+}
+
 fun <A, B> List<A>.parallelForEachIndexed(coroutineContext: CoroutineContext = Dispatchers.Default, f: suspend (Int, A) -> B): List<B> {
     return runBlocking {
         mapIndexed { index, a -> async(coroutineContext) { f(index, a) } }.map { it.await() }
