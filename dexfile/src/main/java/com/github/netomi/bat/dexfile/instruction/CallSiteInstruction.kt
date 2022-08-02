@@ -67,7 +67,7 @@ class CallSiteInstruction private constructor(opcode:           DexOpCode,
             return CallSiteInstruction(opCode, callSiteIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): CallSiteInstruction {
+        internal fun create(opCode: DexOpCode): CallSiteInstruction {
             return CallSiteInstruction(opCode)
         }
     }

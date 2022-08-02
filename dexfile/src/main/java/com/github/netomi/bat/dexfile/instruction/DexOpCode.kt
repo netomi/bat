@@ -21,7 +21,7 @@ import com.github.netomi.bat.util.toHexStringWithPrefix
 enum class DexOpCode constructor(
             val opCode:    Int,
             val format:    InstructionFormat,
-    private val supplier:  InstructionSupplier,
+    private val supplier:  InstructionSupplier?,
             val mnemonic:  String,
             val minFormat: DexFormat = DexFormat.FORMAT_009,
     private val wide:      Boolean = false) {
@@ -296,7 +296,11 @@ enum class DexOpCode constructor(
 
     // method handle and proto instructions.
     CONST_METHOD_HANDLE(0xfe, InstructionFormat.FORMAT_21c, MethodHandleRefInstruction::create, "const-method-handle", DexFormat.FORMAT_039),
-    CONST_METHOD_TYPE  (0xff, InstructionFormat.FORMAT_21c, MethodTypeRefInstruction::create, "const-method-type",     DexFormat.FORMAT_039);
+    CONST_METHOD_TYPE  (0xff, InstructionFormat.FORMAT_21c, MethodTypeRefInstruction::create, "const-method-type",     DexFormat.FORMAT_039),
+
+    // for internal use only
+    LABEL(0xffff, InstructionFormat.FORMAT_00x, null, "label");
+
 
     val length: Int
         get() = format.instructionLength
@@ -308,7 +312,7 @@ enum class DexOpCode constructor(
         get() = wide
 
     fun createInstruction(): DexInstruction {
-        return supplier.create(this)
+        return supplier?.create(this) ?: throw RuntimeException("failed to create instruction for opcode $this")
     }
 
     private fun interface InstructionSupplier {

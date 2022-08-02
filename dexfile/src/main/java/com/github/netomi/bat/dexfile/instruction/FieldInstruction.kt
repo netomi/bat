@@ -65,7 +65,7 @@ class FieldInstruction private constructor(opcode: DexOpCode, _fieldIndex: Int =
             return FieldInstruction(opCode, fieldIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): FieldInstruction {
+        internal fun create(opCode: DexOpCode): FieldInstruction {
             return FieldInstruction(opCode)
         }
     }

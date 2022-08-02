@@ -60,7 +60,7 @@ class MethodTypeRefInstruction private constructor(       opcode:      DexOpCode
             return MethodTypeRefInstruction(opCode, protoIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): MethodTypeRefInstruction {
+        internal fun create(opCode: DexOpCode): MethodTypeRefInstruction {
             return MethodTypeRefInstruction(opCode)
         }
     }

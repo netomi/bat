@@ -38,7 +38,7 @@ class ConversionInstruction private constructor(opcode: DexOpCode, vararg regist
             return ConversionInstruction(opcode, *registers)
         }
 
-        fun create(opCode: DexOpCode): ConversionInstruction {
+        internal fun create(opCode: DexOpCode): ConversionInstruction {
             return ConversionInstruction(opCode)
         }
     }

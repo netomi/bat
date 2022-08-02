@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.google.common.base.Preconditions
 
 class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
                                               _branchTargets: IntArray      = EMPTY_TARGETS,
@@ -52,12 +53,15 @@ class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
         }
     }
 
-    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
+    override fun updatePayloadOffsets(payloadInstructionOffset: Int, offsetMap: OffsetMap) {
         if (branchLabels.isNotEmpty()) {
-            val switchOffset = offsetMap.getPayloadReferenceOffset(offset)
             branchTargets = IntArray(branchLabels.size)
             for (i in branchLabels.indices) {
-                branchTargets[i] = offsetMap.computeDiffToTargetLabel(switchOffset, branchLabels[i])
+                branchTargets[i] = offsetMap.computeOffsetDiffToTargetLabel(payloadInstructionOffset, branchLabels[i])
+            }
+        } else {
+            for (i in branchTargets.indices) {
+                branchTargets[i] = offsetMap.computeOffsetDiffToTargetOffset(payloadInstructionOffset, branchTargets[i])
             }
         }
     }
@@ -103,6 +107,20 @@ class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
 
         fun of(firstKey: Int, branchLabels: Array<String>): PackedSwitchPayload {
             return PackedSwitchPayload(firstKey, _branchLabels = branchLabels)
+        }
+
+        internal fun create(instructions: ShortArray, offset: Int): PackedSwitchPayload {
+            val opcode = (instructions[offset].toInt() and 0xff).toByte()
+            val ident  = (instructions[offset].toInt() ushr 8 and 0xff)
+            val opCode = DexOpCode[opcode]
+
+            if (opCode == DexOpCode.NOP && ident == IDENT) {
+                val payload = empty()
+                payload.read(instructions, offset)
+                return payload
+            } else {
+                throw RuntimeException("expected PackedSwitchPayload at offset $offset")
+            }
         }
     }
 }

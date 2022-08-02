@@ -22,25 +22,29 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class PackedSwitchInstruction private constructor(payloadOffset: Int     = 0,
-                                                  payloadLabel:  String? = null,
-                                                  register:      Int     = 0)
-    : SwitchInstruction(DexOpCode.PACKED_SWITCH, payloadOffset, payloadLabel, register) {
+class PackedSwitchInstruction private constructor(private var _payload: PackedSwitchPayload = PackedSwitchPayload.empty(),
+                                                              register: Int = 0)
+    : SwitchInstruction<PackedSwitchPayload>(DexOpCode.PACKED_SWITCH, 0, register) {
+
+    override val payload: PackedSwitchPayload
+        get() = _payload
+
+    override fun read(instructions: ShortArray, offset: Int) {
+        super.read(instructions, offset)
+
+        _payload = PackedSwitchPayload.create(instructions, offset + payloadOffset)
+    }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitPackedSwitchInstruction(dexFile, classDef, method, code, offset, this)
     }
 
     companion object {
-        fun of(payloadOffset: Int, register: Int): PackedSwitchInstruction {
-            return PackedSwitchInstruction(payloadOffset, null, register)
+        fun of(payload: PackedSwitchPayload, register: Int): PackedSwitchInstruction {
+            return PackedSwitchInstruction(payload, register)
         }
 
-        fun of(payloadLabel: String, register: Int): PackedSwitchInstruction {
-            return PackedSwitchInstruction(0, payloadLabel, register)
-        }
-
-        fun create(opCode: DexOpCode): PackedSwitchInstruction {
+        internal fun create(opCode: DexOpCode): PackedSwitchInstruction {
             return PackedSwitchInstruction()
         }
     }

@@ -59,7 +59,7 @@ class ArithmeticLiteralInstruction private constructor(opCode: DexOpCode, _liter
             return ArithmeticLiteralInstruction(opCode, literal, *registers)
         }
 
-        fun create(opCode: DexOpCode): ArithmeticLiteralInstruction {
+        internal fun create(opCode: DexOpCode): ArithmeticLiteralInstruction {
             return ArithmeticLiteralInstruction(opCode)
         }
     }

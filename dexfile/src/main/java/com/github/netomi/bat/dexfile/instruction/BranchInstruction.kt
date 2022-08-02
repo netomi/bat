@@ -53,9 +53,9 @@ open class BranchInstruction private constructor(opcode:           DexOpCode,
 
     override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
         branchOffset = if (branchLabel != null) {
-            offsetMap.computeDiffToTargetLabel(offset, branchLabel!!)
+            offsetMap.computeOffsetDiffToTargetLabel(offset, branchLabel!!)
         } else {
-            offsetMap.updateDiffToTargetOffset(offset, branchOffset)
+            offsetMap.computeOffsetDiffToTargetOffset(offset, branchOffset)
         }
     }
 
@@ -99,7 +99,7 @@ open class BranchInstruction private constructor(opcode:           DexOpCode,
             return BranchInstruction(opCode, 0, branchLabel, *registers)
         }
 
-        fun create(opCode: DexOpCode): BranchInstruction {
+        internal fun create(opCode: DexOpCode): BranchInstruction {
             return BranchInstruction(opCode)
         }
     }

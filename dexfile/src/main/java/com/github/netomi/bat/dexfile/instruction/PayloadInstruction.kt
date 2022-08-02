@@ -20,16 +20,14 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.util.toSignedHexString
 
-abstract class PayloadInstruction protected constructor(opcode:         DexOpCode,
-                                                        _payloadOffset: Int     = 0,
-                                                        _payloadLabel:  String? = null,
-                                                        register:       Int) : DexInstruction(opcode, register) {
+abstract class PayloadInstruction<T: Payload> protected constructor(opcode:         DexOpCode,
+                                                                    _payloadOffset: Int = 0,
+                                                                    register:       Int) : DexInstruction(opcode, register) {
 
     var payloadOffset = _payloadOffset
         internal set
 
-    var payloadLabel: String? = _payloadLabel
-        private set
+    abstract val payload: T
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
@@ -42,19 +40,8 @@ abstract class PayloadInstruction protected constructor(opcode:         DexOpCod
     }
 
     override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
-        if (payloadLabel != null) {
-            // payloads must be aligned to even offsets.
-            var payloadCodeOffset = offsetMap.getOffset(payloadLabel!!)
-            if (payloadCodeOffset.mod(2) == 1) {
-                payloadCodeOffset++
-            }
-            payloadOffset = payloadCodeOffset - offset
-
-            // remember the offset of the instruction using the payload
-            offsetMap.setPayloadReferenceOffset(payloadCodeOffset, offset)
-        } else {
-            payloadOffset = offsetMap.updateDiffToTargetOffset(offset, payloadOffset)
-        }
+        payloadOffset = offsetMap.computeOffsetDiffToPayload(offset, payload)
+        payload.updatePayloadOffsets(offset, offsetMap)
     }
 
     override fun writeData(): ShortArray {
@@ -77,20 +64,11 @@ abstract class PayloadInstruction protected constructor(opcode:         DexOpCod
     }
 
     companion object {
-        fun of(opCode: DexOpCode, payloadOffset: Int, register: Int): PayloadInstruction {
+        fun of(opCode: DexOpCode, payload: Payload, register: Int): PayloadInstruction<*> {
             return when (opCode) {
-                FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payloadOffset, register)
-                PACKED_SWITCH   -> PackedSwitchInstruction.of(payloadOffset, register)
-                SPARSE_SWITCH   -> SparseSwitchInstruction.of(payloadOffset, register)
-                else            -> throw IllegalArgumentException("unexpected opcode $opCode for PayloadInstruction")
-            }
-        }
-
-        fun of(opCode: DexOpCode, payloadLabel: String, register: Int): PayloadInstruction {
-            return when (opCode) {
-                FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payloadLabel, register)
-                PACKED_SWITCH   -> PackedSwitchInstruction.of(payloadLabel, register)
-                SPARSE_SWITCH   -> SparseSwitchInstruction.of(payloadLabel, register)
+                FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payload as FillArrayPayload, register)
+                PACKED_SWITCH   -> PackedSwitchInstruction.of(payload as PackedSwitchPayload, register)
+                SPARSE_SWITCH   -> SparseSwitchInstruction.of(payload as SparseSwitchPayload, register)
                 else            -> throw IllegalArgumentException("unexpected opcode $opCode for PayloadInstruction")
             }
         }

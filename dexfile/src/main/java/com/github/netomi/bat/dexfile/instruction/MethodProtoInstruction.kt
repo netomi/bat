@@ -63,7 +63,7 @@ class MethodProtoInstruction private constructor(opcode:           DexOpCode,
             return MethodProtoInstruction(opcode, methodIndex, protoIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): MethodProtoInstruction {
+        internal fun create(opCode: DexOpCode): MethodProtoInstruction {
             return MethodProtoInstruction(opCode)
         }
     }

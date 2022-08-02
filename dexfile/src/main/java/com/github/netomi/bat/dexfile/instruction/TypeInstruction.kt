@@ -66,7 +66,7 @@ class TypeInstruction private constructor(opcode: DexOpCode, _typeIndex: Int = N
             return TypeInstruction(opCode, typeIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): TypeInstruction {
+        internal fun create(opCode: DexOpCode): TypeInstruction {
             return TypeInstruction(opCode)
         }
     }

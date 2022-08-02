@@ -42,7 +42,7 @@ open class ArrayInstruction protected constructor(opCode: DexOpCode, vararg regi
             return ArrayInstruction(opCode, *registers)
         }
 
-        fun create(opCode: DexOpCode): ArrayInstruction {
+        internal fun create(opCode: DexOpCode): ArrayInstruction {
             return ArrayInstruction(opCode)
         }
     }

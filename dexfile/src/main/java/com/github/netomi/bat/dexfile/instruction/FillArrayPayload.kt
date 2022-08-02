@@ -112,7 +112,7 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
 
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
-        data[0] = ((opCode.opCode.toInt() and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.opCode and 0xff) or (IDENT shl 8)).toShort()
         data[1] = elementWidth.toShort()
         data[2] = elements.toShort()
         data[3] = (elements shr 16).toShort()
@@ -199,6 +199,20 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
             }
 
             return FillArrayPayload(elementWidth, byteValues)
+        }
+
+        internal fun create(instructions: ShortArray, offset: Int): FillArrayPayload {
+            val opcode = (instructions[offset].toInt() and 0xff).toByte()
+            val ident  = (instructions[offset].toInt() ushr 8 and 0xff)
+            val opCode = DexOpCode[opcode]
+
+            if (opCode == DexOpCode.NOP && ident == IDENT) {
+                val payload = empty()
+                payload.read(instructions, offset)
+                return payload
+            } else {
+                throw RuntimeException("expected FillArrayPayload at offset $offset")
+            }
         }
     }
 }

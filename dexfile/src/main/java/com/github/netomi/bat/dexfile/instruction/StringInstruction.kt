@@ -72,7 +72,7 @@ class StringInstruction private constructor(opcode: DexOpCode, _stringIndex: Int
             return StringInstruction(opCode, stringIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): StringInstruction {
+        internal fun create(opCode: DexOpCode): StringInstruction {
             return StringInstruction(opCode)
         }
     }

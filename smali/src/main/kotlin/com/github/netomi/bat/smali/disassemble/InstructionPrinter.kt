@@ -153,7 +153,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 
-    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
+    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction<*>) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         if (instruction.registers.isNotEmpty()) {
             printer.print(", ")

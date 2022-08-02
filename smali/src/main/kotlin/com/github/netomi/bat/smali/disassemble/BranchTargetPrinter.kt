@@ -50,7 +50,7 @@ internal class BranchTargetPrinter : InstructionVisitor {
         return ":${prefix}_${Integer.toHexString(target)}"
     }
 
-    fun formatPayloadInstructionTarget(offset: Int, instruction: PayloadInstruction): String {
+    fun formatPayloadInstructionTarget(offset: Int, instruction: PayloadInstruction<*>): String {
         val prefix = when (instruction.opCode) {
             DexOpCode.FILL_ARRAY_DATA -> "array"
             DexOpCode.PACKED_SWITCH   -> "pswitch_data"
@@ -82,7 +82,7 @@ internal class BranchTargetPrinter : InstructionVisitor {
         addBranchInfo(target, formatBranchInstructionTarget(offset, instruction))
     }
 
-    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
+    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction<*>) {
         val target = offset + instruction.payloadOffset
         reversePayloadLookup[target] = offset
         addBranchInfo(target, formatPayloadInstructionTarget(offset, instruction))

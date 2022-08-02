@@ -149,7 +149,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(toHexString(instruction.protoIndex, 4))
     }
 
-    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
+    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction<*>) {
         printGeneric(instruction)
         if (instruction.registers.isNotEmpty()) {
             printer.print(", ")

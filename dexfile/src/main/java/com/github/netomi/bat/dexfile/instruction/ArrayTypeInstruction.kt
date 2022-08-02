@@ -60,7 +60,7 @@ class ArrayTypeInstruction private constructor(opcode: DexOpCode, _typeIndex: In
             return ArrayTypeInstruction(opCode, typeIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): ArrayTypeInstruction {
+        internal fun create(opCode: DexOpCode): ArrayTypeInstruction {
             return ArrayTypeInstruction(opCode)
         }
     }

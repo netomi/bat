@@ -44,8 +44,7 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
         dataOffset = 0
         dataSize   = 0
 
-        assert(dexFile.dexFormat != null)
-        val header = DexHeader.of(dexFile.dexFormat!!)
+        val header = DexHeader.of(dexFile.dexFormat)
 
         // In the first pass we update all the offsets.
         val countingOutput: DexDataOutput = CountingDexDataOutput()
@@ -267,7 +266,7 @@ private class DataItemMapImpl : DataItem.Map {
 
     private fun writeDataItems(mapList: MapList, output: DexDataOutput, type: Int) {
         val dataItemSet: Set<DataItem>? = dataItemMap[type]
-        if (dataItemSet != null && dataItemSet.isNotEmpty()) {
+        if (!dataItemSet.isNullOrEmpty()) {
             val item = dataItemSet.iterator().next()
             val align = item.dataAlignment
 

@@ -412,14 +412,15 @@ internal class InstructionAssembler internal constructor(private val registerInf
         return CallSiteInstruction.of(opcode, callSiteIDIndex, *registers)
     }
 
-    fun parsePayloadInstructionF31t(ctx: F31t_payloadContext): PayloadInstruction {
+    fun parsePayloadInstructionF31t(ctx: F31t_payloadContext, payloadMapping: Map<String, Payload>): PayloadInstruction<*> {
         val mnemonic = ctx.op.text
         val opcode = DexOpCode[mnemonic]
 
         val r1    = registerInfo.registerNumber(ctx.r1.text)
         val label = ctx.label.label.text
 
-        return PayloadInstruction.of(opcode, label, r1)
+        val payload = payloadMapping[label] ?: parserError(ctx, "unknown payload label $label")
+        return PayloadInstruction.of(opcode, payload, r1)
     }
 
     fun parseArrayDataPayload(ctx: FarraydataContext): FillArrayPayload {

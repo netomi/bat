@@ -108,7 +108,7 @@ class LiteralInstruction private constructor(opcode: DexOpCode, _literal: Long =
             return LiteralInstruction(opcode, value, *registers)
         }
 
-        fun create(opCode: DexOpCode): LiteralInstruction {
+        internal fun create(opCode: DexOpCode): LiteralInstruction {
             return LiteralInstruction(opCode)
         }
     }

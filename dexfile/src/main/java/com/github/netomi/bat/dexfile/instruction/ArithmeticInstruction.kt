@@ -46,7 +46,7 @@ open class ArithmeticInstruction protected constructor(opCode: DexOpCode, vararg
             return ArithmeticInstruction(opcode, *registers)
         }
 
-        fun create(opCode: DexOpCode): ArithmeticInstruction {
+        internal fun create(opCode: DexOpCode): ArithmeticInstruction {
             return ArithmeticInstruction(opCode)
         }
     }

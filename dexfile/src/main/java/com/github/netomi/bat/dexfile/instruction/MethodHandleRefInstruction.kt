@@ -60,7 +60,7 @@ class MethodHandleRefInstruction private constructor(       opcode:             
             return MethodHandleRefInstruction(opCode, methodHandleIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): MethodHandleRefInstruction {
+        internal fun create(opCode: DexOpCode): MethodHandleRefInstruction {
             return MethodHandleRefInstruction(opCode)
         }
     }

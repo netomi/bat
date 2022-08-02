@@ -53,6 +53,10 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
             codeEditor.setParameterName(parameterIndex, name)
         }
 
+        // collect all payloads in the first pass.
+        val payloadMapping = collectPayloads(iCtx, instructionAssembler)
+
+        // in the second pass, we parse the instructions.
         iCtx.forEach { ctx ->
             val t = ctx.getChild(0) as ParserRuleContext
             val insn: DexInstruction? = when (t.ruleIndex) {
@@ -129,21 +133,6 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                     null
                 }
 
-                RULE_farraydata -> {
-                    codeOffset = alignOffsetForPayload(codeOffset)
-                    instructionAssembler.parseArrayDataPayload(t as FarraydataContext)
-                }
-
-                RULE_fsparseswitch -> {
-                    codeOffset = alignOffsetForPayload(codeOffset)
-                    instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext)
-                }
-
-                RULE_fpackedswitch -> {
-                    codeOffset = alignOffsetForPayload(codeOffset)
-                    instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
-                }
-
                 RULE_fcatch -> {
                     tryElements.add(instructionAssembler.parseCatchDirective(t as FcatchContext))
                     null
@@ -190,7 +179,7 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                 RULE_f3rc_custom       -> instructionAssembler.parseCallSiteInstructionF3rc(t as F3rc_customContext)
                 RULE_f21c_const_handle -> instructionAssembler.parseMethodHandleInstructionF21c(t as F21c_const_handleContext)
                 RULE_f21c_const_type   -> instructionAssembler.parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
-                RULE_f31t_payload      -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext)
+                RULE_f31t_payload      -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext, payloadMapping)
 
                 else -> null
             }
@@ -209,6 +198,51 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
 
         // TODO: the registersSize should actually be calculated however this is non-trivial
         codeEditor.finishEditing(registerInfo.registers)
+    }
+
+    private fun collectPayloads(iCtx: List<SInstructionContext>, instructionAssembler: InstructionAssembler): Map<String, Payload> {
+        val payloadMapping = mutableMapOf<String, Payload>()
+        var lastLabel: String? = null
+
+        // in the first pass, we collect the payloads
+        iCtx.forEach { ctx ->
+            val t = ctx.getChild(0) as ParserRuleContext
+            when (t.ruleIndex) {
+                RULE_sLabel -> {
+                    val c = t as SLabelContext
+                    lastLabel = c.label.text
+                }
+
+                RULE_farraydata -> {
+                    val payload = instructionAssembler.parseArrayDataPayload(t as FarraydataContext)
+                    if (lastLabel != null) {
+                        payloadMapping[lastLabel!!] = payload
+                    } else {
+                        parserError(ctx, "unknown label for array data payload")
+                    }
+                }
+
+                RULE_fsparseswitch -> {
+                    val payload = instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext)
+                    if (lastLabel != null) {
+                        payloadMapping[lastLabel!!] = payload
+                    } else {
+                        parserError(ctx, "unknown label for array data payload")
+                    }
+                }
+
+                RULE_fpackedswitch -> {
+                    val payload = instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
+                    if (lastLabel != null) {
+                        payloadMapping[lastLabel!!] = payload
+                    } else {
+                        parserError(ctx, "unknown label for array data payload")
+                    }
+                }
+            }
+        }
+
+        return payloadMapping
     }
 
     private fun collectRegisterInfo(listCtx: List<SInstructionContext>): RegisterInfo {

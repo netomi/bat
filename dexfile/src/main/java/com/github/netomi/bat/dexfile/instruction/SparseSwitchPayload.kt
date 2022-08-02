@@ -55,12 +55,15 @@ class SparseSwitchPayload private constructor(_keys:          IntArray      = EM
         }
     }
 
-    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
+    override fun updatePayloadOffsets(payloadInstructionOffset: Int, offsetMap: OffsetMap) {
         if (branchLabels.isNotEmpty()) {
-            val switchOffset = offsetMap.getPayloadReferenceOffset(offset)
             branchTargets = IntArray(branchLabels.size)
             for (i in branchLabels.indices) {
-                branchTargets[i] = offsetMap.computeDiffToTargetLabel(switchOffset, branchLabels[i])
+                branchTargets[i] = offsetMap.computeOffsetDiffToTargetLabel(payloadInstructionOffset, branchLabels[i])
+            }
+        } else {
+            for (i in branchTargets.indices) {
+                branchTargets[i] = offsetMap.computeOffsetDiffToTargetOffset(payloadInstructionOffset, branchTargets[i])
             }
         }
     }
@@ -110,6 +113,20 @@ class SparseSwitchPayload private constructor(_keys:          IntArray      = EM
         fun of(keys: IntArray, branchLabels: Array<String>): SparseSwitchPayload {
             assert(keys.size == branchLabels.size) { "keys and branchLabels have different sizes" }
             return SparseSwitchPayload(keys, _branchLabels = branchLabels)
+        }
+
+        internal fun create(instructions: ShortArray, offset: Int): SparseSwitchPayload {
+            val opcode = (instructions[offset].toInt() and 0xff).toByte()
+            val ident  = (instructions[offset].toInt() ushr 8 and 0xff)
+            val opCode = DexOpCode[opcode]
+
+            if (opCode == DexOpCode.NOP && ident == IDENT) {
+                val payload = empty()
+                payload.read(instructions, offset)
+                return payload
+            } else {
+                throw RuntimeException("expected SparseSwitchPayload at offset $offset")
+            }
         }
     }
 }

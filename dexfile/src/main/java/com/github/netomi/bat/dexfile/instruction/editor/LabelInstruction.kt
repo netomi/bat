@@ -13,27 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile.instruction
+package com.github.netomi.bat.dexfile.instruction.editor
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.DexInstruction
+import com.github.netomi.bat.dexfile.instruction.DexOpCode
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class BasicInstruction private constructor(opcode: DexOpCode, vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class LabelInstruction private constructor(private val label: String) : DexInstruction(DexOpCode.LABEL) {
 
-    override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitBasicInstruction(dexFile, classDef, method, code, offset, this)
+    override fun read(instructions: ShortArray, offset: Int) {}
+
+    override fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap?) {
+        offsetMap?.setLabel(label, offset)
     }
 
-    companion object {
-        fun of(opcode: DexOpCode, vararg registers: Int): BasicInstruction {
-            return BasicInstruction(opcode, *registers)
-        }
+    override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {}
 
-        internal fun create(opCode: DexOpCode): DexInstruction {
-            return BasicInstruction(opCode)
+    companion object {
+        fun of(label: String): LabelInstruction {
+            return LabelInstruction(label)
         }
     }
 }

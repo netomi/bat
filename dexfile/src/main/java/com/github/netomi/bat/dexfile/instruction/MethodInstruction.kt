@@ -69,7 +69,7 @@ open class MethodInstruction protected constructor(opcode: DexOpCode, _methodInd
             return MethodInstruction(opCode, methodIndex, *registers)
         }
 
-        fun create(opCode: DexOpCode): MethodInstruction {
+        internal fun create(opCode: DexOpCode): MethodInstruction {
             return MethodInstruction(opCode)
         }
     }

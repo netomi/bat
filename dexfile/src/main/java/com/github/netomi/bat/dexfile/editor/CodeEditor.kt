@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.dexfile.instruction.editor.LabelInstruction
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.google.common.base.Preconditions
 
@@ -36,24 +37,25 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
 
     fun prependLabel(offset: Int, label: String) {
         val modifications = getModifications(offset)
-        modifications.prependList.add(CodeModification.of(label))
+        modifications.prependList.add(LabelInstruction.of(label))
     }
 
     fun appendLabel(offset: Int, label: String) {
         val modifications = getModifications(offset)
-        modifications.appendList.add(CodeModification.of(label))
+        modifications.appendList.add(LabelInstruction.of(label))
     }
 
     fun prependInstruction(offset: Int, instruction: DexInstruction) {
-        Preconditions.checkArgument(dexFile.supportsOpcode(instruction.opCode), "instruction '$instruction' not supported by DexFile of format '${dexFile.dexFormat}'")
+        Preconditions.checkArgument(dexFile.supportsOpcode(instruction.opCode),
+                                    "instruction '$instruction' not supported by DexFile of format '${dexFile.dexFormat}'")
 
         val modifications = getModifications(offset)
-        modifications.prependList.add(CodeModification.of(instruction))
+        modifications.prependList.add(instruction)
     }
 
     fun appendInstruction(offset: Int, instruction: DexInstruction) {
         val modifications = getModifications(offset)
-        modifications.appendList.add(CodeModification.of(instruction))
+        modifications.appendList.add(instruction)
     }
 
     private fun getModifications(offset: Int): CodeModifications {
@@ -72,36 +74,32 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         val instructionWriter = InstructionWriter()
         val offsetMap         = OffsetMap(false)
 
-        val writeInstructions = {
-            if (code.insnsSize == 0) {
-                val modifications = getModificationsOrNull(0)
-                modifications?.processPrependModifications(instructionWriter, offsetMap)
-                modifications?.processAppendModifications(instructionWriter, offsetMap)
-            } else {
-                code.instructionsAccept(dexFile, classDef, method) { _, _, _, _, offset, instruction ->
-                    val modifications = getModificationsOrNull(offset)
+        val writeInstructionsAndPayloads = { instructions: List<DexInstruction>, payloads: List<Payload> ->
+            for (instruction in instructions) {
+                instruction.write(instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
+            }
 
-                    modifications?.processPrependModifications(instructionWriter, offsetMap)
-
-                    val finishedWriting = modifications?.processInstruction(instructionWriter, offsetMap) ?: false
-                    if (!finishedWriting) {
-                        val newOffset = writeInstruction(instruction, instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
-                        offsetMap.setOldToNewOffsetMapping(offset, newOffset)
-                    }
-
-                    modifications?.processAppendModifications(instructionWriter, offsetMap)
+            for (payload in payloads) {
+                if (instructionWriter.nextWriteOffset.mod(2) == 1) {
+                    val nop = BasicInstruction.of(DexOpCode.NOP)
+                    nop.write(instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
                 }
+
+                payload.write(instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
             }
         }
 
-        // in the first iteration, collect label offsets and write label instructions
-        // with wrong offsets.
-        writeInstructions()
+        val (instructions, payloads) = collectInstructionsAndPayloads(offsetMap)
 
-        // fail when encountering missing labels in the second pass.
+        // in the first iteration, collect label offsets and write instructions
+        // with potentially wrong offsets, which will be corrected in a second pass.
+        writeInstructionsAndPayloads(instructions, payloads)
+
+        // fail when encountering missing labels / offsets as they should be present now.
         offsetMap.failOnMissingKey = true
 
         // update the offsets of each try/catch element based on the collected labels.
+        // TODO: handling existing try/catch elements as well
         for (tryElement in tryCatchList) {
             tryElement.startAddr = offsetMap.getOffset(tryElement.startLabel!!)
             val endAddr          = offsetMap.getOffset(tryElement.endLabel!!)
@@ -119,16 +117,20 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         }
 
         // if we encountered any labels, we need to fix instructions that reference them.
-        if (offsetMap.hasLabelsOrOffsetUpdates()) {
+        if (offsetMap.hasUpdates()) {
             instructionWriter.reset()
 
-            // write all instructions again with now fixed offsets.
-            writeInstructions()
+            // write all instructions / payloads again with fixed offsets.
+            writeInstructionsAndPayloads(instructions, payloads)
         }
 
         code.insns = instructionWriter.getInstructionArray()
 
-        code.tryList = normalizeTries(tryCatchList)
+        // TODO: also handle existing try/catch elements when editing existing code
+        //       atm we only support composing new code.
+        if (tryCatchList.isNotEmpty()) {
+            code.tryList = normalizeTries(tryCatchList)
+        }
 
         code.registersSize = registersSize
         updateCodeSizeData()
@@ -136,6 +138,48 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         // clear modifications
         modifications.clear()
         tryCatchList.clear()
+    }
+
+    private fun collectInstructionsAndPayloads(offsetMap: OffsetMap): Pair<List<DexInstruction>, List<Payload>> {
+        val instructions = mutableListOf<DexInstruction>()
+        val payloads     = mutableListOf<Payload>()
+
+        if (code.insnsSize == 0) {
+            val modifications = getModificationsOrNull(0)
+            modifications?.processPrependModifications(instructions)
+            modifications?.processAppendModifications(instructions)
+        } else {
+            var codeOffset = 0
+
+            code.instructionsAccept(dexFile, classDef, method, object: InstructionVisitor {
+                override fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction) {
+                    val modifications = getModificationsOrNull(offset)
+
+                    codeOffset += modifications?.processPrependModifications(instructions) ?: 0
+
+                    val (finishedWriting, length) = modifications?.processInstruction(instructions) ?: Pair(false, 0)
+                    codeOffset += length
+                    if (!finishedWriting) {
+                        offsetMap.setOldToNewOffsetMapping(offset, codeOffset)
+                        instructions.add(instruction)
+                        codeOffset += instruction.length
+                    }
+
+                    codeOffset += modifications?.processAppendModifications(instructions) ?: 0
+                }
+
+                // ignore payloads
+                override fun visitAnyPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: Payload) {}
+            })
+        }
+
+        // remove NOP instructions at the end, they are padding instructions that will be recreated when needed.
+        while (instructions.lastOrNull()?.opCode == DexOpCode.NOP) {
+            instructions.removeLast()
+        }
+
+        instructions.filterIsInstance<PayloadInstruction<*>>().forEach { instruction -> payloads.add(instruction.payload) }
+        return Pair(instructions, payloads)
     }
 
     fun setParameterName(parameterIndex: Int, name: String?) {
@@ -165,70 +209,42 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
     }
 }
 
-private fun writeInstruction(instruction: DexInstruction,
-                             writer:      InstructionWriter,
-                             offset:      Int,
-                             offsetMap:   OffsetMap): Int {
-    if (instruction is Payload && offset.mod(2) == 1) {
-        val nop = BasicInstruction.of(DexOpCode.NOP)
-        nop.write(writer, offset, offsetMap)
-    }
-
-    val newOffset = writer.nextWriteOffset
-    instruction.write(writer, writer.nextWriteOffset, offsetMap)
-    return newOffset
-}
-
 private class CodeModifications {
-    val prependList         = mutableListOf<CodeModification>()
-    val appendList          = mutableListOf<CodeModification>()
-    val replaceModification = mutableListOf<CodeModification>()
+    val prependList         = mutableListOf<DexInstruction>()
+    val appendList          = mutableListOf<DexInstruction>()
+    val replaceModification = mutableListOf<DexInstruction>()
     val deleteModification: Boolean = false
 
-    fun processPrependModifications(instructionWriter: InstructionWriter, labelOffsetMap: OffsetMap) {
-        for (modification in prependList) {
-            modification.processModification(instructionWriter, labelOffsetMap)
+    fun processPrependModifications(instructions: MutableList<DexInstruction>): Int {
+        var instructionLength = 0
+        for (instruction in prependList) {
+            instructions.add(instruction)
+            instructionLength += instruction.length
         }
+        return instructionLength
     }
 
-    fun processAppendModifications(instructionWriter: InstructionWriter, labelOffsetMap: OffsetMap) {
-        for (modification in appendList) {
-            modification.processModification(instructionWriter, labelOffsetMap)
+    fun processAppendModifications(instructions: MutableList<DexInstruction>): Int {
+        var instructionLength = 0
+        for (instruction in appendList) {
+            instructions.add(instruction)
+            instructionLength += instruction.length
         }
+        return instructionLength
     }
 
-    fun processInstruction(instructionWriter: InstructionWriter, offsetMap: OffsetMap): Boolean {
+    fun processInstruction(instructions: MutableList<DexInstruction>): Pair<Boolean, Int> {
         return if (deleteModification) {
-            true
+            Pair(true, 0)
         } else if (replaceModification.isNotEmpty()) {
-            for (modification in replaceModification) {
-                modification.processModification(instructionWriter, offsetMap)
+            var instructionLength = 0
+            for (instruction in replaceModification) {
+                instructions.add(instruction)
+                instructionLength += instruction.length
             }
-            true
+            Pair(true, instructionLength)
         } else {
-            false
-        }
-    }
-}
-
-private class CodeModification private constructor(val label: String? = null, val instruction: DexInstruction? = null) {
-    fun processModification(instructionWriter: InstructionWriter, offsetMap: OffsetMap) {
-        if (label != null) {
-            offsetMap.setLabel(label, instructionWriter.nextWriteOffset)
-        }
-
-        if (instruction != null) {
-            writeInstruction(instruction, instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
-        }
-    }
-
-    companion object {
-        fun of(instruction: DexInstruction): CodeModification {
-            return CodeModification(instruction = instruction)
-        }
-
-        fun of(label: String): CodeModification {
-            return CodeModification(label = label)
+            Pair(false, 0)
         }
     }
 }

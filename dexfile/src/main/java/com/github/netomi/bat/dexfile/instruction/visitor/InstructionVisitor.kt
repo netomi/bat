@@ -92,11 +92,11 @@ fun interface InstructionVisitor {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
-    fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction) {
+    fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction<*>) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
-    fun visitAnySwitchInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: SwitchInstruction) {
+    fun visitAnySwitchInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: SwitchInstruction<*>) {
         visitAnyPayloadInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
