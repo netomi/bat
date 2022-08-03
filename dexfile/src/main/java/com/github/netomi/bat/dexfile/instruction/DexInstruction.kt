@@ -320,7 +320,7 @@ abstract class DexInstruction protected constructor(val opCode: DexOpCode, varar
                         data[2] = (data[2].toInt() or (registers[0] or (registers[1] shl 4) or (registers[2] shl 8) or (registers[3] shl 12))).toShort()
                     }
                     5 -> {
-                        data[0] = (data[0].toInt() or (4 shl 12 or (registers[4] shl 8))).toShort()
+                        data[0] = (data[0].toInt() or (5 shl 12 or (registers[4] shl 8))).toShort()
                         data[2] = (data[2].toInt() or (registers[0] or (registers[1] shl 4) or (registers[2] shl 8) or (registers[3] shl 12))).toShort()
                     }
                     else -> throw IllegalStateException("unsupported register count when writing instruction with opcode $opCode")
