@@ -31,6 +31,7 @@ import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.function.BiPredicate
 import java.util.function.Predicate
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 
 class Assembler(dexFile: DexFile) {
@@ -44,7 +45,7 @@ class Assembler(dexFile: DexFile) {
         val assembleFile = { path: Path ->
             Files.newInputStream(path).use { `is` ->
                 callback(input, path)
-                val classDef = assemble(`is`)
+                val classDef = assemble(path, `is`)
                 assembledClasses.add(classDef)
             }
             Unit
@@ -65,7 +66,7 @@ class Assembler(dexFile: DexFile) {
         return assembledClasses
     }
 
-    fun assemble(inputStream: InputStream): ClassDef {
+    fun assemble(path: Path, inputStream: InputStream): ClassDef {
         val lexer       = SmaliLexer(CharStreams.fromStream(inputStream))
         val tokenStream = CommonTokenStream(lexer)
         val parser      = SmaliParser(tokenStream)
@@ -74,7 +75,11 @@ class Assembler(dexFile: DexFile) {
         parser.removeErrorListeners()
         parser.errorHandler = ExceptionErrorStrategy()
 
-        return ClassDefAssembler(dexEditor).visit(parser.sFiles())!!
+        try {
+            return ClassDefAssembler(dexEditor).visit(parser.sFiles())!!
+        } catch (exception: RuntimeException) {
+            throw SmaliAssembleException("failed to assemble file '${path.absolutePathString()}': ${exception.message}", exception)
+        }
     }
 
     companion object {

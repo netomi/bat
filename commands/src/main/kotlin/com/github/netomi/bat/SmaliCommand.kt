@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
 import com.github.netomi.bat.dexfile.io.DexFileWriter
 import com.github.netomi.bat.smali.Assembler
+import com.github.netomi.bat.smali.SmaliAssembleException
 import picocli.CommandLine
 import java.io.File
 import java.nio.file.Path
@@ -59,14 +60,19 @@ class SmaliCommand : Runnable {
         inputFiles.forEach { file ->
             val filePath = file.toPath()
 
-            if (file.isDirectory) {
-                printVerbose("Assembling directory '${file.name}' into file ${outputFile.name} ...")
-                val assembledClasses = Assembler(dexFile).assemble(filePath, ::assembleFile)
-                printVerbose("Assembled ${assembledClasses.size} class(es).")
-            } else {
-                printVerbose("Assembling file '${file.name}' into file ${outputFile.name} ...")
-                Assembler(dexFile).assemble(filePath, ::assembleFile)
-                printVerbose("Assembled 1 class.")
+            try {
+                if (file.isDirectory) {
+                    printVerbose("Assembling directory '${file.name}' into file ${outputFile.name} ...")
+                    val assembledClasses = Assembler(dexFile).assemble(filePath, ::assembleFile)
+                    printVerbose("Assembled ${assembledClasses.size} class(es).")
+                } else {
+                    printVerbose("Assembling file '${file.name}' into file ${outputFile.name} ...")
+                    Assembler(dexFile).assemble(filePath, ::assembleFile)
+                    printVerbose("Assembled 1 class.")
+                }
+            } catch (exception: SmaliAssembleException) {
+                System.err.println(exception.message)
+                System.err.println("aborting.")
             }
         }
 

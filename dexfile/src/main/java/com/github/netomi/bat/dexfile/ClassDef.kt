@@ -21,6 +21,8 @@ import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationsDirectoryVisi
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodDescriptor
+import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodSignature
 import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
@@ -120,7 +122,8 @@ class ClassDef private constructor(
     internal fun addMethod(dexFile: DexFile, method: EncodedMethod) {
         val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(methodClass == getType(dexFile), "method class does not match this class")
-        classData.methods.forEach { Preconditions.checkArgument(method.methodIndex != it.methodIndex, "method already exists in this class") }
+        classData.methods.forEach { Preconditions.checkArgument(method.methodIndex != it.methodIndex,
+            "method '${fullExternalMethodDescriptor(dexFile, method)}' already exists in this class") }
         classData.addMethod(method)
     }
 
