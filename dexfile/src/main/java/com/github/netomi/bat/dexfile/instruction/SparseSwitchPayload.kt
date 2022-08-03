@@ -36,7 +36,10 @@ class SparseSwitchPayload private constructor(_keys:          IntArray      = EM
         internal set
 
     override val length: Int
-        get() = branchTargets.size * 4 + 2
+        get() {
+            val targetsSize = branchTargets.size.coerceAtLeast(branchLabels.size)
+            return targetsSize * 4 + 2
+        }
 
     override fun read(instructions: ShortArray, offset: Int) {
         var currOffset = offset

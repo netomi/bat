@@ -37,7 +37,10 @@ class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
         internal set
 
     override val length: Int
-        get() = branchTargets.size * 2 + 4
+        get() {
+            val targetsSize = branchTargets.size.coerceAtLeast(branchLabels.size)
+            return targetsSize * 2 + 4
+        }
 
     override fun read(instructions: ShortArray, offset: Int) {
         var currOffset = offset
