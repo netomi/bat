@@ -106,12 +106,13 @@ METHOD_PROTO : FRAGMENT_METHOD_PROTO;
 FIELD_FULL : (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_FIELD_PART;
 FIELD_PART : FRAGMENT_FIELD_PART;
 
+FLOAT_INFINITY  : F_INFINITY ('f'|'F');
+DOUBLE_INFINITY : F_INFINITY ('d'|'D')?;
+
 F_INFINITY : ('I'|'i') ('N'|'n') ('F'|'f') ('I'|'i') ('N'|'n') ('I'|'i') ('T'|'t') ('Y'|'y') ;
 FLOAT_NAN  : F_NAN ('f'|'F');
 DOUBLE_NAN : F_NAN ('d'|'D')?;
 
-FLOAT_INFINITY  : F_INFINITY ('f'|'F');
-DOUBLE_INFINITY : F_INFINITY ('d'|'D')?;
 BASE_FLOAT  :	(('0'..'9')+ | FLOAT_NENT) ('f'|'F');
 BASE_DOUBLE : FLOAT_NENT ('d'|'D')? | ('0'..'9')+ ('d'|'D') ;
 
