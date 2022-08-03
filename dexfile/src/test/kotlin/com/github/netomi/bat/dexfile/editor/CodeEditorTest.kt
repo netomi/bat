@@ -82,7 +82,7 @@ class CodeEditorTest {
         codeEditor.prependInstruction(0, builder.getInstructionSequence())
         codeEditor.finishEditing(1)
 
-        printInstructions(codeEditor)
+        // printInstructions(codeEditor)
 
         codeEditor.appendInstruction(0x9, builder.nop())
         codeEditor.prependInstruction(0xd, builder.nop())
