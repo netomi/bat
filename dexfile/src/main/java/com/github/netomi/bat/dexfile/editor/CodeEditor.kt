@@ -276,18 +276,14 @@ private class CodeSizeCalculator: InstructionVisitor {
 
     override fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction) {}
 
-    override fun visitMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
+    override fun visitAnyMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
         val argumentSize = instruction.registers.size
         outgoingArgumentSize = maxOf(outgoingArgumentSize, argumentSize)
-
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
-    override fun visitMethodProtoInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodProtoInstruction) {
+    override fun visitCallSiteInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: CallSiteInstruction) {
         val argumentSize = instruction.registers.size
         outgoingArgumentSize = maxOf(outgoingArgumentSize, argumentSize)
-
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 }
 
