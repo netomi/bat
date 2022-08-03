@@ -308,11 +308,12 @@ private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
             lastTry.startAddr == tryElement.startAddr &&
             lastTry.endAddr   == tryElement.endAddr) {
             flattenedElements.removeLast()
-            flattenedElements.add(Try.of(lastTry.startAddr, lastTry.endAddr, lastTry.catchHandler.add(tryElement.catchHandler.copy())))
+            lastTry = Try.of(lastTry.startAddr, lastTry.endAddr, lastTry.catchHandler.add(tryElement.catchHandler.copy()))
+            flattenedElements.add(lastTry)
         } else {
+            lastTry = tryElement
             flattenedElements.add(tryElement)
         }
-        lastTry = tryElement
     }
 
     val sequence = mutableListOf<Seq>()
