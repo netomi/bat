@@ -121,17 +121,14 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                 }
 
                 RULE_frestart -> {
-                    val c = t as FstartlocalContext
-
+                    val c = t as FrestartContext
                     val register = registerInfo.registerNumber(c.r.text)
-
                     debugSequenceAssembler.restartLocal(register, codeOffset)
                     null
                 }
 
                 RULE_fendlocal -> {
                     val c = t as FendlocalContext
-
                     val register = registerInfo.registerNumber(c.r.text)
                     debugSequenceAssembler.endLocal(register, codeOffset)
                     null
