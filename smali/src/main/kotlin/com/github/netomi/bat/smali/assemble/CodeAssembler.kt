@@ -74,8 +74,8 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                     val c = t as FlineContext
                     val lineNumber = parseLong(c.line.text).toInt()
 
-                    if (lineNumber <= 0) {
-                        parserError(ctx, "line number too large")
+                    if (lineNumber < 0) {
+                        parserError(ctx, "negative line number")
                     }
 
                     debugSequenceAssembler.advanceLine(lineNumber, codeOffset)
