@@ -23,7 +23,6 @@ import com.github.netomi.bat.smali.SmaliAssembleException
 import picocli.CommandLine
 import java.io.File
 import java.nio.file.Path
-import kotlin.io.path.name
 import kotlin.io.path.pathString
 import kotlin.io.path.relativeTo
 

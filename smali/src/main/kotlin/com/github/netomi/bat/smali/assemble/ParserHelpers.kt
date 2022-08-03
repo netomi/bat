@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.DexAccessFlag
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.smali.SmaliParseException
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.smali.parser.SmaliParser.SParameterContext
 import com.github.netomi.bat.util.unescapeJavaString
@@ -32,7 +33,7 @@ internal fun parserError(ctx: ParserRuleContext, message: String): Nothing {
 
     val list = mutableListOf<String>()
     fillParseContextText(ctx, list)
-    throw RuntimeException("$message at line: $lineNumber col: $column -> ${list.joinToString(" ")}")
+    throw SmaliParseException("$message at line: $lineNumber col: $column -> ${list.joinToString(" ")}")
 }
 
 private fun fillParseContextText(ctx: ParserRuleContext, list: MutableList<String>) {
