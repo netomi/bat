@@ -45,7 +45,7 @@ class Assembler(dexFile: DexFile) {
         val assembleFile = { path: Path ->
             Files.newInputStream(path).use { `is` ->
                 callback(input, path)
-                val classDef = assemble(path, `is`)
+                val classDef = assemble(`is`, path.absolutePathString())
                 assembledClasses.add(classDef)
             }
             Unit
@@ -66,7 +66,7 @@ class Assembler(dexFile: DexFile) {
         return assembledClasses
     }
 
-    fun assemble(path: Path, inputStream: InputStream): ClassDef {
+    fun assemble(inputStream: InputStream, name: String? = null): ClassDef {
         val lexer       = SmaliLexer(CharStreams.fromStream(inputStream))
         val tokenStream = CommonTokenStream(lexer)
         val parser      = SmaliParser(tokenStream)
@@ -78,7 +78,11 @@ class Assembler(dexFile: DexFile) {
         try {
             return ClassDefAssembler(dexEditor).visit(parser.sFiles())!!
         } catch (exception: RuntimeException) {
-            throw SmaliAssembleException("failed to assemble file '${path.absolutePathString()}': ${exception.message}", exception)
+            if (name != null) {
+                throw SmaliAssembleException("failed to assemble input from '$name': ${exception.message}", exception)
+            } else {
+                throw SmaliAssembleException("failed to assemble input: ${exception.message}", exception)
+            }
         }
     }
 

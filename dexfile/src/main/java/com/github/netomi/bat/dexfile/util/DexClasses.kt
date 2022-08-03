@@ -64,6 +64,12 @@ object DexClasses {
                                  method.getDescriptor(dexFile))
     }
 
+    fun fullExternalFieldDescriptor(dexFile: DexFile, field: EncodedField): String {
+        return "%s.%s:%s".format(externalClassNameFromInternalType(field.getFieldID(dexFile).getClassType(dexFile)),
+                                 field.getName(dexFile),
+                                 field.getType(dexFile))
+    }
+
     fun parseParameters(parameters: String): List<String> {
         val result = mutableListOf<String>()
 

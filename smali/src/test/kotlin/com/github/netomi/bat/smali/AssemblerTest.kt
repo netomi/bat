@@ -26,6 +26,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 class AssemblerTest {

@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationsDirectoryVisi
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalFieldDescriptor
 import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodDescriptor
 import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodSignature
 import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForType
@@ -115,7 +116,8 @@ class ClassDef private constructor(
     internal fun addField(dexFile: DexFile, field: EncodedField) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
         Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
-        classData.fields.forEach { Preconditions.checkArgument(field.fieldIndex != it.fieldIndex, "field already exists in this class") }
+        classData.fields.forEach { Preconditions.checkArgument(field.fieldIndex != it.fieldIndex,
+            "field '${fullExternalFieldDescriptor(dexFile, field)}' already exists in this class") }
         classData.addField(field)
     }
 
