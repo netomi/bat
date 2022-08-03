@@ -69,8 +69,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
 
     fun getOffset(label: String): Int {
         return if (failOnMissingKey) {
-            labelOffsetMap[label] ?:
-            throw RuntimeException("unknown label $label")
+            labelOffsetMap[label] ?: throw RuntimeException("unknown label $label")
         } else {
             labelOffsetMap[label] ?: 0
         }
