@@ -62,7 +62,11 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
             val insn: DexInstruction? = when (t.ruleIndex) {
                 RULE_sLabel -> {
                     val c = t as SLabelContext
-                    codeEditor.prependLabel(0, c.label.text)
+                    val label = c.label.text
+                    // ignore payload labels as they are not needed anymore
+                    if (!payloadMapping.containsKey(label)) {
+                        codeEditor.prependLabel(0, c.label.text)
+                    }
                     null
                 }
 
