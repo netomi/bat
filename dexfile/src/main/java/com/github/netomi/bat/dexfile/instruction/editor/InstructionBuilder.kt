@@ -29,6 +29,10 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
         return instruction
     }
 
+    fun label(label: String): DexInstruction {
+        return add(LabelInstruction.of(label))
+    }
+
     fun nop(): DexInstruction {
         return add(BasicInstruction.of(DexOpCode.NOP))
     }

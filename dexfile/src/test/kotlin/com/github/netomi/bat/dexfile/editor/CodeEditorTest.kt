@@ -16,10 +16,7 @@
 
 package com.github.netomi.bat.dexfile.editor
 
-import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.DexFormat
-import com.github.netomi.bat.dexfile.MethodModifier
-import com.github.netomi.bat.dexfile.Visibility
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionBuilder
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionPrinter
@@ -59,7 +56,45 @@ class CodeEditorTest {
         val code = codeEditor.code
         assertEquals(28, code.insnsSize)
 
+        // printInstructions(codeEditor)
+    }
+
+    @Test
+    fun tryCatch() {
+        val codeEditor = editor()
+        val builder    = InstructionBuilder.of(codeEditor)
+
+        builder.apply {
+            invokeDirect("Ljava/lang/Object;", "<init>", emptyList(), "V", 0)
+            nop()
+            label("try_start")
+            const(6, 0)
+            newArray("[I", 0, 0)
+            fillArrayData(FillArrayPayload.of(intArrayOf(1, 2, 3, 4, 5, 6)), 0)
+            returnVoid()
+            label("try_end")
+            label("handler")
+            returnVoid()
+        }
+
+        codeEditor.addTryCatchElement(Try.of("try_start", "try_end", EncodedCatchHandler.of("handler")))
+
+        codeEditor.prependInstruction(0, builder.getInstructionSequence())
+        codeEditor.finishEditing(1)
+
         printInstructions(codeEditor)
+
+        codeEditor.appendInstruction(0x9, builder.nop())
+        codeEditor.prependInstruction(0xd, builder.nop())
+        codeEditor.finishEditing(1)
+
+        val code = codeEditor.code
+        assertEquals(1, code.tryList.size)
+        assertEquals(0x4, code.tryList.first().startAddr)
+        assertEquals(0xd, code.tryList.first().endAddr)
+        assertEquals(0xe, code.tryList.first().catchHandler.catchAllAddr)
+
+        // printInstructions(codeEditor)
     }
 
     private fun printInstructions(codeEditor: CodeEditor) {
@@ -67,5 +102,6 @@ class CodeEditorTest {
         val instructionPrinter = InstructionPrinter(indentingPrinter)
 
         codeEditor.acceptInstructions(instructionPrinter)
+        println(codeEditor.code.tryList)
     }
 }

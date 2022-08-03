@@ -34,7 +34,7 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         get() = dexEditor.dexFile
 
     private val modifications = mutableMapOf<Int, CodeModifications>()
-    private val tryCatchList  = mutableListOf<Try>()
+    private val addedTryList  = mutableListOf<Try>()
 
     fun prependLabel(offset: Int, label: String) {
         val modifications = getModifications(offset)
@@ -83,7 +83,7 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
     }
 
     fun finishEditing(registersSize: Int) {
-        if (modifications.isEmpty() && tryCatchList.isEmpty()) {
+        if (modifications.isEmpty() && addedTryList.isEmpty()) {
             return
         }
 
@@ -114,24 +114,6 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
         // fail when encountering missing labels / offsets as they should be present now.
         offsetMap.failOnMissingKey = true
 
-        // update the offsets of each try/catch element based on the collected labels.
-        // TODO: handling existing try/catch elements as well
-        for (tryElement in tryCatchList) {
-            tryElement.startAddr = offsetMap.getOffset(tryElement.startLabel!!)
-            val endAddr          = offsetMap.getOffset(tryElement.endLabel!!)
-            tryElement.insnCount = endAddr - tryElement.startAddr
-
-            if (tryElement.catchHandler.catchAllLabel != null) {
-                tryElement.catchHandler.catchAllAddr = offsetMap.getOffset(tryElement.catchHandler.catchAllLabel!!)
-            }
-
-            for (addrPair in tryElement.catchHandler.handlers) {
-                if (addrPair.label != null) {
-                    addrPair.address = offsetMap.getOffset(addrPair.label!!)
-                }
-            }
-        }
-
         // if we encountered any labels, we need to fix instructions that reference them.
         if (offsetMap.hasUpdates()) {
             instructionWriter.reset()
@@ -142,18 +124,16 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
 
         code.insns = instructionWriter.getInstructionArray()
 
-        // TODO: also handle existing try/catch elements when editing existing code
-        //       atm we only support composing new code.
-        if (tryCatchList.isNotEmpty()) {
-            code.tryList = normalizeTries(tryCatchList)
-        }
+        // update the offsets of each try/catch element based on the collected labels and
+        // make them non-overlapping.
+        code.tryList = updateAndNormalizeTryElements(code.tryList, addedTryList, offsetMap)
 
         code.registersSize = registersSize
         updateCodeSizeData()
 
         // clear modifications
         modifications.clear()
-        tryCatchList.clear()
+        addedTryList.clear()
     }
 
     internal fun acceptInstructions(visitor: InstructionVisitor) {
@@ -175,12 +155,13 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
                 override fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction) {
                     val modifications = getModificationsOrNull(offset)
 
+                    offsetMap.setOldToNewOffsetMapping(offset, codeOffset)
+
                     codeOffset += modifications?.processPrependModifications(instructions) ?: 0
 
                     val (finishedWriting, length) = modifications?.processInstruction(instructions) ?: Pair(false, 0)
                     codeOffset += length
                     if (!finishedWriting) {
-                        offsetMap.setOldToNewOffsetMapping(offset, codeOffset)
                         instructions.add(instruction)
                         codeOffset += instruction.length
                     }
@@ -191,6 +172,10 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
                 // ignore payloads
                 override fun visitAnyPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: Payload) {}
             })
+
+            // add a mapping of the old size to the new size in case try / catch elements go
+            // till the end of the method.
+            offsetMap.setOldToNewOffsetMapping(code.insnsSize, codeOffset)
         }
 
         // remove NOP instructions at the end, they are padding instructions that will be recreated when needed.
@@ -208,7 +193,7 @@ class CodeEditor private constructor(        val dexEditor: DexEditor,
     }
 
     fun addTryCatchElement(tryCatchElement: Try) {
-        tryCatchList.add(tryCatchElement)
+        addedTryList.add(tryCatchElement)
     }
 
     private fun updateCodeSizeData() {
@@ -294,7 +279,11 @@ private enum class SeqType {
     END
 }
 
-private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
+private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryList: MutableList<Try>, offsetMap: OffsetMap): ArrayList<Try> {
+    updateOffsetsOfTryElements(existingTryList, addedTryList, offsetMap)
+
+    val tryElements = (existingTryList + addedTryList).toMutableList()
+
     if (tryElements.isEmpty()) {
         return arrayListOf()
     }
@@ -366,6 +355,40 @@ private fun normalizeTries(tryElements: MutableList<Try>): ArrayList<Try> {
     }
 
     return nonOverlappingTries
+}
+
+private fun updateOffsetsOfTryElements(existingTryList: List<Try>, addedTryList: List<Try>, offsetMap: OffsetMap) {
+    for (tryElement in existingTryList) {
+        tryElement.startAddr = offsetMap.getNewOffset(tryElement.startAddr)
+        val endAddr          = offsetMap.getNewOffset(tryElement.endAddr + 1)
+        tryElement.insnCount = endAddr - tryElement.startAddr
+
+        if (tryElement.catchHandler.catchAllLabel != null) {
+            tryElement.catchHandler.catchAllAddr = offsetMap.getNewOffset(tryElement.catchHandler.catchAllAddr)
+        }
+
+        for (addrPair in tryElement.catchHandler.handlers) {
+            if (addrPair.label != null) {
+                addrPair.address = offsetMap.getNewOffset(addrPair.address)
+            }
+        }
+    }
+
+    for (tryElement in addedTryList) {
+        tryElement.startAddr = offsetMap.getOffset(tryElement.startLabel!!)
+        val endAddr          = offsetMap.getOffset(tryElement.endLabel!!)
+        tryElement.insnCount = endAddr - tryElement.startAddr
+
+        if (tryElement.catchHandler.catchAllLabel != null) {
+            tryElement.catchHandler.catchAllAddr = offsetMap.getOffset(tryElement.catchHandler.catchAllLabel!!)
+        }
+
+        for (addrPair in tryElement.catchHandler.handlers) {
+            if (addrPair.label != null) {
+                addrPair.address = offsetMap.getOffset(addrPair.label!!)
+            }
+        }
+    }
 }
 
 private fun EncodedCatchHandler.subtract(other: EncodedCatchHandler): EncodedCatchHandler {
