@@ -22,6 +22,7 @@ import com.github.netomi.bat.smali.Assembler
 import com.github.netomi.bat.smali.SmaliAssembleException
 import picocli.CommandLine
 import java.io.File
+import java.io.PrintWriter
 import java.nio.file.Path
 import kotlin.io.path.pathString
 import kotlin.io.path.relativeTo
@@ -45,6 +46,9 @@ class SmaliCommand : Runnable {
     @CommandLine.Option(names = ["-a"], defaultValue = "15", description = ["api level (default=15)"])
     private var apiLevel: Int = 0
 
+    @CommandLine.Option(names = ["--lenient"], description = ["enables lenient mode"])
+    private var lenientMode: Boolean = false
+
     @CommandLine.Option(names = ["-v"], description = ["verbose output"])
     private var verbose: Boolean = false
 
@@ -60,13 +64,15 @@ class SmaliCommand : Runnable {
             val filePath = file.toPath()
 
             try {
+                val assembler = Assembler(dexFile, lenientMode, PrintWriter(System.err, true))
+
                 if (file.isDirectory) {
                     printVerbose("Assembling directory '${file.name}' into file ${outputFile.name} ...")
-                    val assembledClasses = Assembler(dexFile).assemble(filePath, ::assembleFile)
+                    val assembledClasses = assembler.assemble(filePath, ::assembleFile)
                     printVerbose("Assembled ${assembledClasses.size} class(es).")
                 } else {
                     printVerbose("Assembling file '${file.name}' into file ${outputFile.name} ...")
-                    Assembler(dexFile).assemble(filePath, ::assembleFile)
+                    assembler.assemble(filePath, ::assembleFile)
                     printVerbose("Assembled 1 class.")
                 }
             } catch (exception: SmaliAssembleException) {

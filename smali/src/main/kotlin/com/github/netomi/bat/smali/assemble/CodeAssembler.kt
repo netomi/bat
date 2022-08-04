@@ -24,8 +24,9 @@ import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 
-internal class CodeAssembler constructor(private val method:     EncodedMethod,
-                                         private val codeEditor: CodeEditor) {
+internal class CodeAssembler constructor(private val method:      EncodedMethod,
+                                         private val codeEditor:  CodeEditor,
+                                         private val lenientMode: Boolean = false) {
 
     private val dexEditor: DexEditor
         get() = codeEditor.dexEditor
@@ -74,7 +75,7 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                     val c = t as FlineContext
                     val lineNumber = parseLong(c.line.text).toInt()
 
-                    if (lineNumber < 0) {
+                    if (lineNumber < 0 && !lenientMode) {
                         parserError(ctx, "negative line number")
                     }
 
@@ -245,7 +246,7 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                     if (lastLabel != null) {
                         payloadMapping[lastLabel!!] = payload
                     } else {
-                        parserError(ctx, "unknown label for array data payload")
+                        parserError(ctx, "unknown label for sparse switch payload")
                     }
                 }
 
@@ -254,7 +255,7 @@ internal class CodeAssembler constructor(private val method:     EncodedMethod,
                     if (lastLabel != null) {
                         payloadMapping[lastLabel!!] = payload
                     } else {
-                        parserError(ctx, "unknown label for array data payload")
+                        parserError(ctx, "unknown label for packed switch payload")
                     }
                 }
             }

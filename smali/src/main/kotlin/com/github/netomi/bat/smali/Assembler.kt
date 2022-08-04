@@ -26,6 +26,7 @@ import org.antlr.v4.runtime.InputMismatchException
 import org.antlr.v4.runtime.misc.IntervalSet
 import java.io.IOException
 import java.io.InputStream
+import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.BasicFileAttributes
@@ -34,7 +35,9 @@ import java.util.function.Predicate
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 
-class Assembler(dexFile: DexFile) {
+class Assembler(            dexFile:        DexFile,
+                private val lenientMode:    Boolean      = false,
+                private val warningPrinter: PrintWriter? = null) {
 
     private val dexEditor: DexEditor = DexEditor.of(dexFile)
 
@@ -76,7 +79,7 @@ class Assembler(dexFile: DexFile) {
         parser.errorHandler = ExceptionErrorStrategy()
 
         try {
-            return ClassDefAssembler(dexEditor).visit(parser.sFiles())!!
+            return ClassDefAssembler(dexEditor, lenientMode, warningPrinter).visit(parser.sFiles())!!
         } catch (exception: RuntimeException) {
             if (name != null) {
                 throw SmaliAssembleException("failed to assemble input from '$name': ${exception.message}", exception)
@@ -129,6 +132,4 @@ class ExceptionErrorStrategy : DefaultErrorStrategy() {
 
         throw RecognitionException(msg, recognizer, recognizer.inputStream, recognizer.context)
     }
-
-
 }

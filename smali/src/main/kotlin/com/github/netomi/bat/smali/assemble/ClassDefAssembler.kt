@@ -21,8 +21,11 @@ import com.github.netomi.bat.dexfile.editor.ClassDefEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
+import java.io.PrintWriter
 
-internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVisitor<ClassDef?>() {
+internal class ClassDefAssembler(private val dexEditor:      DexEditor,
+                                 private val lenientMode:    Boolean      = false,
+                                 private val warningPrinter: PrintWriter? = null) : SmaliBaseVisitor<ClassDef?>() {
 
     private val dexFile: DexFile
         get() = dexEditor.dexFile
@@ -44,9 +47,10 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
             classDefEditor.addInterface(it.name.text)
         }
 
-        val annotations = mutableListOf<Annotation>()
+        // ignore duplicate annotations that are encountered in obfuscated dex files.
+        val annotations = LinkedHashSet<Annotation>()
         ctx.sAnnotation().forEach { annotations.add(annotationAssembler.parseAnnotation(it)) }
-        classDefEditor.addClassAnnotations(annotations)
+        classDefEditor.addClassAnnotations(annotations.toList())
 
         ctx.sField().forEach  { visitSField(it) }
         ctx.sMethod().forEach { visitSMethod(it) }
@@ -58,17 +62,26 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
-        val field = classDefEditor.addField(name, accessFlags, type)
+        try {
+            val field = classDefEditor.addField(name, accessFlags, type)
 
-        if (field.isStatic && ctx.sBaseValue() != null) {
-            val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
-            classDefEditor.setStaticValue(field, staticValue)
-        }
+            if (field.isStatic && ctx.sBaseValue() != null) {
+                val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
+                classDefEditor.setStaticValue(field, staticValue)
+            }
 
-        val annotations = mutableListOf<Annotation>()
-        ctx.sAnnotation().forEach { annotations.add(annotationAssembler.parseAnnotation(it)) }
-        if (annotations.isNotEmpty()) {
-            classDefEditor.addFieldAnnotations(field, annotations)
+            // ignore duplicate annotations that are encountered in obfuscated dex files.
+            val annotations = LinkedHashSet<Annotation>()
+            ctx.sAnnotation().forEach { annotations.add(annotationAssembler.parseAnnotation(it)) }
+            if (annotations.isNotEmpty()) {
+                classDefEditor.addFieldAnnotations(field, annotations.toList())
+            }
+        } catch (exception: RuntimeException) {
+            if (lenientMode) {
+                warningPrinter?.println("warning: ${exception.message}, skipping")
+            } else {
+                throw exception
+            }
         }
 
         return null
@@ -78,32 +91,42 @@ internal class ClassDefAssembler(private val dexEditor: DexEditor) : SmaliBaseVi
         val (_, name, parameterTypes, returnType) = parseMethodObject(ctx.methodObj.text)
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        val methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType)
-        val method       = methodEditor.method
+        try {
+            val methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType)
+            val method = methodEditor.method
 
-        if (!method.isAbstract && !method.isNative) {
-            val codeEditor = methodEditor.addCode()
-            val codeAssembler = CodeAssembler(method, codeEditor)
-            codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
-        } else {
-            if (ctx.sInstruction().isNotEmpty()) {
-                parserError(ctx, "abstract method containing code instructions")
+            if (!method.isAbstract && !method.isNative) {
+                val codeEditor = methodEditor.addCode()
+                val codeAssembler = CodeAssembler(method, codeEditor, lenientMode)
+                codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
+            } else {
+                if (ctx.sInstruction().isNotEmpty()) {
+                    parserError(ctx, "abstract method containing code instructions")
+                }
             }
-        }
 
-        val methodAnnotations = mutableListOf<Annotation>()
-        ctx.sAnnotation().forEach { methodAnnotations.add(annotationAssembler.parseAnnotation(it)) }
-        if (methodAnnotations.isNotEmpty()) {
-            classDefEditor.addMethodAnnotations(method, methodAnnotations)
-        }
+            // ignore duplicate annotations that are encountered in obfuscated dex files.
+            val methodAnnotations = LinkedHashSet<Annotation>()
+            ctx.sAnnotation().forEach { methodAnnotations.add(annotationAssembler.parseAnnotation(it)) }
+            if (methodAnnotations.isNotEmpty()) {
+                classDefEditor.addMethodAnnotations(method, methodAnnotations.toList())
+            }
 
-        ctx.sParameter().forEach { pCtx ->
-            val parameterIndex = parseParameterIndex(pCtx, dexFile, method)
+            ctx.sParameter().forEach { pCtx ->
+                val parameterIndex = parseParameterIndex(pCtx, dexFile, method)
 
-            val parameterAnnotations = mutableListOf<Annotation>()
-            pCtx.sAnnotation().forEach { parameterAnnotations.add(annotationAssembler.parseAnnotation(it)) }
-            if (parameterAnnotations.isNotEmpty()) {
-                classDefEditor.addParameterAnnotations(method, parameterIndex, parameterAnnotations)
+                // ignore duplicate annotations that are encountered in obfuscated dex files.
+                val parameterAnnotations = LinkedHashSet<Annotation>()
+                pCtx.sAnnotation().forEach { parameterAnnotations.add(annotationAssembler.parseAnnotation(it)) }
+                if (parameterAnnotations.isNotEmpty()) {
+                    classDefEditor.addParameterAnnotations(method, parameterIndex, parameterAnnotations.toList())
+                }
+            }
+        } catch (exception: RuntimeException) {
+            if (lenientMode) {
+                warningPrinter?.println("warning: ${exception.message}, skipping")
+            } else {
+                throw exception
             }
         }
 
