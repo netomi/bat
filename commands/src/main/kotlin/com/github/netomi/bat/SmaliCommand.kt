@@ -63,8 +63,10 @@ class SmaliCommand : Runnable {
         inputFiles.forEach { file ->
             val filePath = file.toPath()
 
+            val warningPrinter = PrintWriter(System.err, true)
+
             try {
-                val assembler = Assembler(dexFile, lenientMode, PrintWriter(System.err, true))
+                val assembler = Assembler(dexFile, lenientMode, warningPrinter)
 
                 if (file.isDirectory) {
                     printVerbose("Assembling directory '${file.name}' into file ${outputFile.name} ...")
@@ -76,15 +78,15 @@ class SmaliCommand : Runnable {
                     printVerbose("Assembled 1 class.")
                 }
             } catch (exception: SmaliAssembleException) {
-                System.err.println(exception.message)
-                System.err.println("aborting.")
+                warningPrinter.println("error: ${exception.message}")
+                warningPrinter.println("abort assembling.")
             }
         }
 
+        DexFileWriter(outputFile.outputStream()).visitDexFile(dexFile)
+
         val endTime = System.nanoTime()
         printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
-
-        DexFileWriter(outputFile.outputStream()).visitDexFile(dexFile)
     }
 
     private fun assembleFile(baseDirectory: Path, file: Path) {
