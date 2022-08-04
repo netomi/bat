@@ -84,6 +84,8 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, val c
     }
 
     fun addClassAnnotations(annotations: List<Annotation>) {
+        // TODO: throw exception if trying to add an annotation that already exists
+
         val existingAnnotations = classDef.annotationsDirectory.classAnnotations.annotations
         existingAnnotations.addAll(annotations.filter { !existingAnnotations.contains(it) })
     }
@@ -92,6 +94,7 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, val c
         var fieldAnnotation =
             classDef.annotationsDirectory.fieldAnnotations.find { it.fieldIndex == field.fieldIndex }
 
+        // TODO: throw exception if trying to add an annotation that already exists
         if (fieldAnnotation == null) {
             fieldAnnotation = FieldAnnotation.of(field.fieldIndex, AnnotationSet.of(annotations))
             classDef.annotationsDirectory.fieldAnnotations.add(fieldAnnotation)
@@ -105,6 +108,7 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, val c
         var methodAnnotation =
             classDef.annotationsDirectory.methodAnnotations.find { it.methodIndex == method.methodIndex }
 
+        // TODO: throw exception if trying to add an annotation that already exists
         if (methodAnnotation == null) {
             methodAnnotation = MethodAnnotation.of(method.methodIndex, AnnotationSet.of(annotations))
             classDef.annotationsDirectory.methodAnnotations.add(methodAnnotation)
@@ -122,6 +126,8 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, val c
             parameterAnnotation = ParameterAnnotation.of(method.methodIndex, AnnotationSetRefList.empty())
             classDef.annotationsDirectory.parameterAnnotations.add(parameterAnnotation)
         }
+
+        // TODO: throw exception if trying to add an annotation that already exists
 
         val annotationSetRefList = parameterAnnotation.annotationSetRefList
         while (annotationSetRefList.annotationSetRefCount <= parameterIndex) {
