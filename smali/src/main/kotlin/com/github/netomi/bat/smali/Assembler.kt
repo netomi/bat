@@ -81,7 +81,6 @@ class Assembler(            dexFile:        DexFile,
         try {
             return ClassDefAssembler(dexEditor, lenientMode, warningPrinter).visit(parser.sFiles())
         } catch (exception: RuntimeException) {
-            exception.printStackTrace()
             if (name != null) {
                 throw SmaliAssembleException("failed to assemble input from '$name': ${exception.message}", exception)
             } else {
