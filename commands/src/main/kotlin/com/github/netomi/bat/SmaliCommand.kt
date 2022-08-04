@@ -46,10 +46,10 @@ class SmaliCommand : Runnable {
     @CommandLine.Option(names = ["-a"], defaultValue = "15", description = ["api level (default=15)"])
     private var apiLevel: Int = 0
 
-    @CommandLine.Option(names = ["--lenient"], description = ["enables lenient mode"])
+    @CommandLine.Option(names = ["-l", "--lenient"], description = ["enables lenient mode"])
     private var lenientMode: Boolean = false
 
-    @CommandLine.Option(names = ["-v"], description = ["verbose output"])
+    @CommandLine.Option(names = ["-v", "--verbose"], description = ["verbose output"])
     private var verbose: Boolean = false
 
     override fun run() {
@@ -63,7 +63,7 @@ class SmaliCommand : Runnable {
         inputFiles.forEach { file ->
             val filePath = file.toPath()
 
-            val warningPrinter = PrintWriter(System.err, true)
+            val warningPrinter = if (verbose) PrintWriter(System.out, true) else PrintWriter(System.err, true)
 
             try {
                 val assembler = Assembler(dexFile, lenientMode, warningPrinter)

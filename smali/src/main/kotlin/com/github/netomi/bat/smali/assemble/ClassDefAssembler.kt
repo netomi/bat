@@ -25,7 +25,7 @@ import java.io.PrintWriter
 
 internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                                  private val lenientMode:    Boolean      = false,
-                                 private val warningPrinter: PrintWriter? = null) : SmaliBaseVisitor<ClassDef?>() {
+                                 private val warningPrinter: PrintWriter? = null) : SmaliBaseVisitor<List<ClassDef>>() {
 
     private val dexFile: DexFile
         get() = dexEditor.dexFile
@@ -35,7 +35,11 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
 
     private lateinit var classDefEditor: ClassDefEditor
 
-    override fun visitSFile(ctx: SFileContext): ClassDef {
+    override fun aggregateResult(aggregate: List<ClassDef>?, nextResult: List<ClassDef>?): List<ClassDef> {
+        return (aggregate ?: emptyList()) + (nextResult ?: emptyList())
+    }
+
+    override fun visitSFile(ctx: SFileContext): List<ClassDef> {
         val classType   = ctx.className.text
         val superType   = ctx.sSuper().firstOrNull()?.name?.text
         val sourceFile  = ctx.sSource().firstOrNull()?.src?.text?.removeSurrounding("\"")
@@ -55,10 +59,10 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         ctx.sField().forEach  { visitSField(it) }
         ctx.sMethod().forEach { visitSMethod(it) }
 
-        return classDefEditor.classDef
+        return listOf(classDefEditor.classDef)
     }
 
-    override fun visitSField(ctx: SFieldContext): ClassDef? {
+    override fun visitSField(ctx: SFieldContext): List<ClassDef> {
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
@@ -84,10 +88,10 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             }
         }
 
-        return null
+        return emptyList()
     }
 
-    override fun visitSMethod(ctx: SMethodContext): ClassDef? {
+    override fun visitSMethod(ctx: SMethodContext): List<ClassDef> {
         val (_, name, parameterTypes, returnType) = parseMethodObject(ctx.methodObj.text)
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
@@ -130,6 +134,6 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             }
         }
 
-        return null
+        return emptyList()
     }
 }

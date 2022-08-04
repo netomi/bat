@@ -41,7 +41,7 @@ class AssemblerTest {
             `is`.copyTo(baos)
 
             val dexFile  = DexFile.of(DexFormat.FORMAT_035)
-            val classDef = Assembler(dexFile).assemble(ByteArrayInputStream(baos.toByteArray()))
+            val classDef = Assembler(dexFile).assemble(ByteArrayInputStream(baos.toByteArray())).first()
 
             val classType = classDef.getType(dexFile)
             val className = classDef.getClassName(dexFile)
