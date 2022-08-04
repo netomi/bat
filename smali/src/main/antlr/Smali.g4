@@ -177,7 +177,7 @@ DRESTARTLOCAL : '.restart local';
 
 ID: FRAGMENT_ID;
 
-sFiles : sFile+;
+sFiles : sFile+ EOF;
 sFile  : '.class' sAccList className=OBJECT_TYPE
          (sSuper|sInterface|sSource|sMethod|sField|sAnnotation)*
          '.end class'?
