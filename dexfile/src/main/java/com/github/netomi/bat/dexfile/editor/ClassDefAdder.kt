@@ -48,5 +48,6 @@ class ClassDefAdder constructor(private val targetDexEditor: DexEditor): ClassDe
         }
 
         classDef.fieldsAccept(dexFile, FieldAdder(targetClassDefEditor))
+        classDef.methodsAccept(dexFile, MethodAdder(targetClassDefEditor))
     }
 }

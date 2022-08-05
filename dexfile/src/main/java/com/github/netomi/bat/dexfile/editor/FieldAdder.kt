@@ -38,7 +38,7 @@ class FieldAdder constructor(private val targetClassDefEditor: ClassDefEditor): 
             if (!fieldAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetFieldAnnotationSet(addedField)
 
-                for (index in 0 .. fieldAnnotations.annotationCount) {
+                for (index in 0 until fieldAnnotations.annotationCount) {
                     val targetAnnotation = fieldAnnotations.getAnnotation(index).copyTo(dexFile, targetDexEditor)
                     targetAnnotationSet.addAnnotation(targetDexFile, targetAnnotation)
                 }
