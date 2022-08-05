@@ -38,6 +38,8 @@ class MethodAdder constructor(private val targetClassDefEditor: ClassDefEditor):
 
         val addedMethod = addedMethodEditor.method
 
+        method.codeAccept(dexFile, classDef, CodeAdder(addedMethodEditor))
+
         classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method) { _, _, methodAnnotations ->
             if (!methodAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetMethodAnnotationSet(addedMethod)

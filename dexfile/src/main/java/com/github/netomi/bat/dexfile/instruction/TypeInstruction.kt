@@ -29,6 +29,10 @@ class TypeInstruction private constructor(opcode: DexOpCode, _typeIndex: Int = N
         return dexFile.getTypeID(typeIndex)
     }
 
+    fun getType(dexFile: DexFile): String {
+        return getTypeID(dexFile).getType(dexFile)
+    }
+
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 

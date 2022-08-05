@@ -25,8 +25,12 @@ import kotlin.coroutines.CoroutineContext
 
 class DexFile private constructor(private var dexFormatInternal: DexFormat? = DexFormat.FORMAT_035) {
 
-    val dexFormat: DexFormat
+    var dexFormat: DexFormat
         get() = (if (header != null) header?.dexFormat else dexFormatInternal)!!
+        set(value) {
+            Preconditions.checkArgument(header == null, "can not set dex format for DexFile instances containing an header")
+            dexFormatInternal = value
+        }
 
     /**
      * The DexHeader instance associated with this DexFile if it is read from an existing dex file.

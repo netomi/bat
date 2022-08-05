@@ -85,24 +85,13 @@ private class EncodedValueCopier constructor(private val targetDexEditor: DexEdi
     }
 
     override fun visitEnumValue(dexFile: DexFile, value: EncodedEnumValue) {
-        val fieldID   = value.getFieldID(dexFile)
-        val classType = fieldID.getClassType(dexFile)
-        val name      = fieldID.getName(dexFile)
-        val type      = fieldID.getType(dexFile)
-
-        val targetFieldIDIndex = targetDexEditor.addOrGetFieldIDIndex(classType, name, type)
+        val targetFieldIDIndex = targetDexEditor.addOrGetFieldIDIndex(dexFile, value.getFieldID(dexFile))
         val copy = EncodedEnumValue.of(targetFieldIDIndex)
         copy.accept(targetDexFile, visitor)
     }
 
     override fun visitFieldValue(dexFile: DexFile, value: EncodedFieldValue) {
-        val fieldID   = value.getFieldID(dexFile)
-        val classType = fieldID.getClassType(dexFile)
-        val name      = fieldID.getName(dexFile)
-        val type      = fieldID.getType(dexFile)
-
-        val targetFieldIDIndex = targetDexEditor.addOrGetFieldIDIndex(classType, name, type)
-
+        val targetFieldIDIndex = targetDexEditor.addOrGetFieldIDIndex(dexFile, value.getFieldID(dexFile))
         val copy = EncodedFieldValue.of(targetFieldIDIndex)
         copy.accept(targetDexFile, visitor)
     }
@@ -127,22 +116,10 @@ private class EncodedValueCopier constructor(private val targetDexEditor: DexEdi
         val methodHandleType = methodHandle.methodHandleType
 
         val targetMethodHandle = if (methodHandleType.targetsField) {
-            val fieldID = methodHandle.getFieldID(dexFile)!!
-
-            val classType = fieldID.getClassType(dexFile)
-            val name      = fieldID.getName(dexFile)
-            val type      = fieldID.getType(dexFile)
-
-            val targetFieldIDIndex      = targetDexEditor.addOrGetFieldIDIndex(classType, name, type)
+            val targetFieldIDIndex = targetDexEditor.addOrGetFieldIDIndex(dexFile, methodHandle.getFieldID(dexFile)!!)
             MethodHandle.of(methodHandleType, targetFieldIDIndex)
         } else {
-            val methodID       = methodHandle.getMethodID(dexFile)!!
-            val classType      = methodID.getClassType(dexFile)
-            val name           = methodID.getName(dexFile)
-            val parameterTypes = methodID.getParameterTypes(dexFile)
-            val returnType     = methodID.getReturnType(dexFile)
-
-            val targetMethodIDIndex = targetDexEditor.addOrGetMethodIDIndex(classType, name, parameterTypes, returnType)
+            val targetMethodIDIndex = targetDexEditor.addOrGetMethodIDIndex(dexFile, methodHandle.getMethodID(dexFile)!!)
             MethodHandle.of(methodHandleType, targetMethodIDIndex)
         }
 
@@ -153,25 +130,13 @@ private class EncodedValueCopier constructor(private val targetDexEditor: DexEdi
     }
 
     override fun visitMethodTypeValue(dexFile: DexFile, value: EncodedMethodTypeValue) {
-        val protoID = value.getProtoID(dexFile)
-        val parameterTypes = protoID.getParameterTypes(dexFile)
-        val returnType = protoID.getReturnType(dexFile)
-
-        val targetProtoIDIndex = targetDexEditor.addOrGetProtoIDIndex(parameterTypes, returnType)
-
+        val targetProtoIDIndex = targetDexEditor.addOrGetProtoIDIndex(dexFile, value.getProtoID(dexFile))
         val copy = EncodedMethodTypeValue.of(targetProtoIDIndex)
         copy.accept(targetDexFile, visitor)
     }
 
     override fun visitMethodValue(dexFile: DexFile, value: EncodedMethodValue) {
-        val methodID       = value.getMethodID(dexFile)
-        val classType      = methodID.getClassType(dexFile)
-        val name           = methodID.getName(dexFile)
-        val parameterTypes = methodID.getParameterTypes(dexFile)
-        val returnType     = methodID.getReturnType(dexFile)
-
-        val targetMethodIDIndex = targetDexEditor.addOrGetMethodIDIndex(classType, name, parameterTypes, returnType)
-
+        val targetMethodIDIndex = targetDexEditor.addOrGetMethodIDIndex(dexFile, value.getMethodID(dexFile))
         val copy = EncodedMethodValue.of(targetMethodIDIndex)
         copy.accept(targetDexFile, visitor)
     }

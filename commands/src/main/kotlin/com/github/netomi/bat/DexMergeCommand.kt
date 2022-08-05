@@ -50,17 +50,24 @@ class DexMergeCommand : Runnable {
         val format = DexFormat.forApiLevel(apiLevel)
         val mergedDexFile = DexFile.of(format)
 
-        printVerbose("Using format '${format.version}' for merged dex file '${outputFile.name}'")
+        printVerbose("using format '${format.version}' for merged dex file '${outputFile.name}'")
 
         val startTime = System.nanoTime()
 
         inputFiles.forEach { file ->
             FileInputStream(file).use { `is` ->
-                printVerbose("Reading file '${file.name}' ...")
+                printVerbose("  reading file '${file.name}' ...")
 
                 val dexFile = DexFile.empty()
                 val reader = DexFileReader(`is`)
                 reader.visitDexFile(dexFile)
+
+                // set the dex format of the merged file to the maximum value of
+                // each individual dex file.
+                if (dexFile.dexFormat > mergedDexFile.dexFormat) {
+                    printVerbose("  updating dex format to version '${dexFile.dexFormat.version}' due to input file '${file.name}'")
+                    mergedDexFile.dexFormat = dexFile.dexFormat
+                }
 
                 dexFile.classDefsAccept(ClassDefAdder(mergedDexFile))
             }

@@ -181,7 +181,7 @@ abstract class DexInstruction protected constructor(val opCode: DexOpCode, varar
     open fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap? = null) {
         var currOffset = offset
 
-        if (offsetMap != null) {
+        if (offsetMap != null && offsetMap.hasUpdates()) {
             updateOffsets(offset, offsetMap)
         }
 

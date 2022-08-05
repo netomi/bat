@@ -358,6 +358,10 @@ private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryLi
 }
 
 private fun updateOffsetsOfTryElements(existingTryList: List<Try>, addedTryList: List<Try>, offsetMap: OffsetMap) {
+    if (!offsetMap.hasUpdates()) {
+        return
+    }
+
     for (tryElement in existingTryList) {
         tryElement.startAddr = offsetMap.getNewOffset(tryElement.startAddr)
         val endAddr          = offsetMap.getNewOffset(tryElement.endAddr + 1)

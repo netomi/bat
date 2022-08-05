@@ -38,6 +38,13 @@ class DexEditor private constructor(val dexFile: DexFile) {
         return index
     }
 
+    fun addOrGetProtoIDIndex(dexFile: DexFile, protoID: ProtoID): Int {
+        val parameterTypes = protoID.getParameterTypes(dexFile)
+        val returnType     = protoID.getReturnType(dexFile)
+
+        return addOrGetProtoIDIndex(parameterTypes, returnType)
+    }
+
     fun addOrGetProtoIDIndex(parameterTypes: List<String>, returnType: String): Int {
         val shorty               = DexClasses.toShortyFormat(parameterTypes, returnType)
         val shortyIndex          = addOrGetStringIDIndex(shorty)
@@ -53,6 +60,14 @@ class DexEditor private constructor(val dexFile: DexFile) {
         return index
     }
 
+    fun addOrGetFieldIDIndex(dexFile: DexFile, fieldID: FieldID): Int {
+        val classType = fieldID.getClassType(dexFile)
+        val name      = fieldID.getName(dexFile)
+        val type      = fieldID.getType(dexFile)
+
+        return addOrGetFieldIDIndex(classType, name, type)
+    }
+
     fun addOrGetFieldIDIndex(classType: String, name: String, type: String): Int {
         val fieldID =
             FieldID.of(
@@ -66,6 +81,15 @@ class DexEditor private constructor(val dexFile: DexFile) {
             index = dexFile.addFieldID(fieldID)
         }
         return index
+    }
+
+    fun addOrGetMethodIDIndex(dexFile: DexFile, methodID: MethodID): Int {
+        val classType      = methodID.getClassType(dexFile)
+        val name           = methodID.getName(dexFile)
+        val parameterTypes = methodID.getParameterTypes(dexFile)
+        val returnType     = methodID.getReturnType(dexFile)
+
+        return addOrGetMethodIDIndex(classType, name, parameterTypes, returnType)
     }
 
     fun addOrGetMethodIDIndex(classType: String, name: String, parameterTypes: List<String>, returnType: String): Int {
