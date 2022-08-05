@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.ByteBufferBackedDexDataOutput
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
@@ -58,12 +57,10 @@ abstract class DexContentTest<T : DexContent> {
             val dexFile = DexFile.of(DexFormat.FORMAT_035)
 
             // collect all linked data items and serialize them first.
-            data.dataItemsAccept(dexFile, object : DataItemVisitor {
-                override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {
-                    dataItemMap.setOffset(dataItem, output.offset)
-                    dataItem.write(output)
-                }
-            })
+            data.dataItemsAccept(dexFile) { _, dataItem ->
+                dataItemMap.setOffset(dataItem, output.offset)
+                dataItem.write(output)
+            }
 
             // remember the offset of the actual item to be written.
             val startOffset: Int = output.offset

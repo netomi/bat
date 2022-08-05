@@ -246,11 +246,7 @@ private class DataItemMapImpl : DataItem.Map {
     }
 
     fun updateOffsets(dexFile: DexFile) {
-        dexFile.dataItemsAccept(object : DataItemVisitor {
-            override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {
-                dataItem.updateOffsets(this@DataItemMapImpl)
-            }
-        })
+        dexFile.dataItemsAccept { _, dataItem -> dataItem.updateOffsets(this@DataItemMapImpl) }
     }
 
     fun addDataItem(dataItem: DataItem) {

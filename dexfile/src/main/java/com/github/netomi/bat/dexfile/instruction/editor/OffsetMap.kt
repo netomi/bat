@@ -40,7 +40,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
 
     private fun getPayloadOffset(payload: Payload): Int {
         return if (failOnMissingKey) {
-            payloadOffsetMap[payload] ?: throw RuntimeException("unknown payload $payload")
+            payloadOffsetMap[payload] ?: throw IllegalStateException("unknown payload $payload")
         } else {
             0
         }
@@ -53,7 +53,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
 
     fun getOldOffset(newOffset: Int): Int {
         return if (failOnMissingKey) {
-            newToOldOffsetMap[newOffset] ?: throw RuntimeException("unknown old offset for $newOffset")
+            newToOldOffsetMap[newOffset] ?: throw IllegalStateException("unknown old offset for $newOffset")
         } else {
             newOffset
         }
@@ -61,7 +61,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
 
     fun getNewOffset(oldOffset: Int): Int {
         return if (failOnMissingKey) {
-            oldToNewOffsetMap[oldOffset] ?: throw RuntimeException("unknown new offset for $oldOffset")
+            oldToNewOffsetMap[oldOffset] ?: throw IllegalStateException("unknown new offset for $oldOffset")
         } else {
             oldOffset
         }
@@ -69,7 +69,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
 
     fun getOffset(label: String): Int {
         return if (failOnMissingKey) {
-            labelOffsetMap[label] ?: throw RuntimeException("unknown label $label")
+            labelOffsetMap[label] ?: throw IllegalStateException("unknown label $label")
         } else {
             labelOffsetMap[label] ?: 0
         }

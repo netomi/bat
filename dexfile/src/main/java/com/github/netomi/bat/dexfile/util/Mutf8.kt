@@ -27,7 +27,6 @@ object Mutf8 {
      * Decodes bytes from `input` until a delimiter 0x00 is
      * encountered. Returns a new string containing the decoded characters.
      */
-    @Throws(RuntimeException::class)
     fun decode(input: ByteArray, utf16len: Int): String {
         val out = CharArray(utf16len)
         var i = 0
@@ -43,18 +42,18 @@ object Mutf8 {
             } else if (a.code and 0xe0 == 0xc0) {
                 val b = input[i++].toInt() and 0xff
                 if (b and 0xC0 != 0x80) {
-                    throw RuntimeException(UTFDataFormatException("bad second byte"))
+                    throw UTFDataFormatException("bad second byte")
                 }
                 out[s++] = (a.code and 0x1F shl 6 or (b and 0x3F)).toChar()
             } else if (a.code and 0xf0 == 0xe0) {
                 val b = input[i++].toInt() and 0xff
                 val c = input[i++].toInt() and 0xff
                 if (b and 0xC0 != 0x80 || c and 0xC0 != 0x80) {
-                    throw RuntimeException(UTFDataFormatException("bad second or third byte"))
+                    throw UTFDataFormatException("bad second or third byte")
                 }
                 out[s++] = (a.code and 0x0F shl 12 or (b and 0x3F shl 6) or (c and 0x3F)).toChar()
             } else {
-                throw RuntimeException(UTFDataFormatException("bad byte"))
+                throw UTFDataFormatException("bad byte")
             }
         }
     }
@@ -62,7 +61,6 @@ object Mutf8 {
     /**
      * Returns the number of bytes the modified UTF8 representation of `s` would take.
      */
-    @Throws(RuntimeException::class)
     private fun countBytes(s: String, shortLength: Boolean): Long {
         var result: Long = 0
         val length = s.length
@@ -76,7 +74,7 @@ object Mutf8 {
                 result += 3
             }
             if (shortLength && result > 65535) {
-                throw RuntimeException(UTFDataFormatException("String more than 65535 UTF bytes long"))
+                throw UTFDataFormatException("String more than 65535 UTF bytes long")
             }
         }
         return result

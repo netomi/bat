@@ -211,7 +211,7 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
                 payload.read(instructions, offset)
                 return payload
             } else {
-                throw RuntimeException("expected FillArrayPayload at offset $offset")
+                throw IllegalStateException("expected FillArrayPayload at offset $offset")
             }
         }
     }

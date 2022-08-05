@@ -122,7 +122,7 @@ class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
                 payload.read(instructions, offset)
                 return payload
             } else {
-                throw RuntimeException("expected PackedSwitchPayload at offset $offset")
+                throw IllegalStateException("expected PackedSwitchPayload at offset $offset")
             }
         }
     }

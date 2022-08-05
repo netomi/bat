@@ -33,7 +33,7 @@ enum class DexFormat(private val bytePattern: ByteArray, val version: String, va
                     return format
                 }
             }
-            throw RuntimeException("unexpected apiLevel $apiLevel")
+            throw IllegalArgumentException("unexpected apiLevel $apiLevel")
         }
 
         fun fromPattern(bytes: ByteArray, from: Int, to: Int): DexFormat? {

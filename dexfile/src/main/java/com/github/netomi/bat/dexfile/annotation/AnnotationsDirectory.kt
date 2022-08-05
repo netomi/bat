@@ -37,12 +37,12 @@ class AnnotationsDirectory private constructor(
     var classAnnotationsOffset = 0
         private set
 
-    var classAnnotations: AnnotationSet = _classAnnotations
+    internal var classAnnotations: AnnotationSet = _classAnnotations
         private set
 
-    val fieldAnnotations:     ArrayList<FieldAnnotation>     = _fieldAnnotations
-    val methodAnnotations:    ArrayList<MethodAnnotation>    = _methodAnnotations
-    val parameterAnnotations: ArrayList<ParameterAnnotation> = _parameterAnnotations
+    internal val fieldAnnotations:     ArrayList<FieldAnnotation>     = _fieldAnnotations
+    internal val methodAnnotations:    ArrayList<MethodAnnotation>    = _methodAnnotations
+    internal val parameterAnnotations: ArrayList<ParameterAnnotation> = _parameterAnnotations
 
     override val isEmpty: Boolean
         get() = classAnnotations.isEmpty    &&
