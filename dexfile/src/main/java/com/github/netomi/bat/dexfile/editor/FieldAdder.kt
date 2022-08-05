@@ -26,7 +26,6 @@ import com.github.netomi.bat.dexfile.visitor.EncodedFieldVisitor
 class FieldAdder constructor(private val targetClassDefEditor: ClassDefEditor): EncodedFieldVisitor {
 
     private val targetDexEditor = targetClassDefEditor.dexEditor
-    private val targetDexFile   = targetDexEditor.dexFile
 
     override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
         val addedField = targetClassDefEditor.addField(field.getName(dexFile), field.accessFlags, field.getType(dexFile))
@@ -37,11 +36,7 @@ class FieldAdder constructor(private val targetClassDefEditor: ClassDefEditor): 
         classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field) { _, _, fieldAnnotations ->
             if (!fieldAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetFieldAnnotationSet(addedField)
-
-                for (index in 0 until fieldAnnotations.annotationCount) {
-                    val targetAnnotation = fieldAnnotations.getAnnotation(index).copyTo(dexFile, targetDexEditor)
-                    targetAnnotationSet.addAnnotation(targetDexFile, targetAnnotation)
-                }
+                fieldAnnotations.copyTo(dexFile, targetDexEditor, targetAnnotationSet)
             }
         }
     }

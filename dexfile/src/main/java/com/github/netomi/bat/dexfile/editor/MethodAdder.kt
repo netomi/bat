@@ -19,13 +19,15 @@ package com.github.netomi.bat.dexfile.editor
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.annotation.AnnotationSet
+import com.github.netomi.bat.dexfile.annotation.ParameterAnnotation
 import com.github.netomi.bat.dexfile.annotation.editor.copyTo
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor
 
 class MethodAdder constructor(private val targetClassDefEditor: ClassDefEditor): EncodedMethodVisitor {
 
     private val targetDexEditor = targetClassDefEditor.dexEditor
-    private val targetDexFile   = targetDexEditor.dexFile
 
     override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
         val addedMethodEditor =
@@ -39,12 +41,19 @@ class MethodAdder constructor(private val targetClassDefEditor: ClassDefEditor):
         classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method) { _, _, methodAnnotations ->
             if (!methodAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetMethodAnnotationSet(addedMethod)
-
-                for (index in 0 until methodAnnotations.annotationCount) {
-                    val targetAnnotation = methodAnnotations.getAnnotation(index).copyTo(dexFile, targetDexEditor)
-                    targetAnnotationSet.addAnnotation(targetDexFile, targetAnnotation)
-                }
+                methodAnnotations.copyTo(dexFile, targetDexEditor, targetAnnotationSet)
             }
         }
+
+        classDef.annotationsDirectory.parameterAnnotationSetRefListAccept(dexFile, classDef, method, object: AnnotationSetVisitor {
+            override fun visitAnyAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {}
+
+            override fun visitParameterAnnotationSet(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, parameterIndex: Int, annotationSet: AnnotationSet) {
+                if (!annotationSet.isEmpty) {
+                    val targetAnnotationSet = targetClassDefEditor.addOrGetParameterAnnotationSet(addedMethod, parameterIndex)
+                    annotationSet.copyTo(dexFile, targetDexEditor, targetAnnotationSet)
+                }
+            }
+        })
     }
 }

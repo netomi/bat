@@ -23,8 +23,6 @@ import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
 
 class ClassDefAdder constructor(private val targetDexEditor: DexEditor): ClassDefVisitor {
 
-    private val targetDexFile = targetDexEditor.dexFile
-
     constructor(dexFile: DexFile): this(DexEditor.of(dexFile))
 
     override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
@@ -40,11 +38,7 @@ class ClassDefAdder constructor(private val targetDexEditor: DexEditor): ClassDe
         if (!classAnnotations.isEmpty) {
             val targetClassDef = targetClassDefEditor.classDef
             val targetAnnotationSet = targetClassDef.annotationsDirectory.classAnnotations
-
-            for (index in 0 .. classAnnotations.annotationCount) {
-                val targetAnnotation = classAnnotations.getAnnotation(index).copyTo(dexFile, targetDexEditor)
-                targetAnnotationSet.addAnnotation(targetDexFile, targetAnnotation)
-            }
+            classAnnotations.copyTo(dexFile, targetDexEditor, targetAnnotationSet)
         }
 
         classDef.fieldsAccept(dexFile, FieldAdder(targetClassDefEditor))
