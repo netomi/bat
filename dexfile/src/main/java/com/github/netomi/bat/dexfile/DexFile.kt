@@ -79,6 +79,8 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
         classDefMap.clear()
         callSiteIDMap.clear()
         methodHandleMap.clear()
+
+        linkData = null
     }
 
     val stringIDCount: Int
