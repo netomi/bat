@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 
-fun EncodedValue.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor): EncodedValue {
+internal fun EncodedValue.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor): EncodedValue {
     var result: EncodedValue? = null
     accept(originDexFile, EncodedValueCopier(targetDexEditor) { _, value -> result = value })
     return result ?: throw IllegalStateException("$this could not be copied")

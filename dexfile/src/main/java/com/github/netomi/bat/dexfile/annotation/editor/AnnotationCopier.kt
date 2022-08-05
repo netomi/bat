@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue
 import com.github.netomi.bat.dexfile.value.editor.copyTo
 
-fun Annotation.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor): Annotation {
+internal fun Annotation.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor): Annotation {
     val targetAnnotationValue = annotationValue.copyTo(originDexFile, targetDexEditor) as EncodedAnnotationValue
     return Annotation.of(visibility, targetAnnotationValue)
 }
