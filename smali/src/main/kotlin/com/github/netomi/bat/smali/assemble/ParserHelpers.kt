@@ -69,8 +69,7 @@ internal fun parseParameterIndex(ctx: SParameterContext, dexFile: DexFile, metho
         val parameterRegisterNumber = ctx.registerNumber.text.substring(1).toInt()
 
         var currRegister = if (method.isStatic) 0 else 1
-        val parameters   = method.getProtoID(dexFile).parameters
-        for (type in parameters.getTypes(dexFile)) {
+        for (type in method.getParameterTypes(dexFile)) {
             if (currRegister == parameterRegisterNumber) {
                 break
             } else {

@@ -57,8 +57,16 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
         return dexFile.getStringID(nameIndex).stringValue
     }
 
+    fun getParameterTypes(dexFile: DexFile): List<String> {
+        return getProtoID(dexFile).getParameterTypes(dexFile)
+    }
+
+    fun getReturnType(dexFile: DexFile): String {
+        return getProtoID(dexFile).getReturnType(dexFile)
+    }
+
     fun getShortyType(dexFile: DexFile): String {
-        return dexFile.getProtoID(protoIndex).getShorty(dexFile)
+        return getProtoID(dexFile).getShorty(dexFile)
     }
 
     override val isEmpty: Boolean

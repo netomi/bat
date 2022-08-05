@@ -53,7 +53,7 @@ class TypeList private constructor() : DataItem(), Comparable<TypeList> {
         return typeList[index]
     }
 
-    fun getTypes(dexFile: DexFile): Collection<String> {
+    fun getTypes(dexFile: DexFile): List<String> {
         return typeList.map { dexFile.getTypeID(it).getType(dexFile) }.toList()
     }
 

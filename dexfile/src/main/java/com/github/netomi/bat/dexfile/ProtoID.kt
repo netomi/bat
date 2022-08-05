@@ -56,12 +56,16 @@ class ProtoID private constructor(            _shortyIndex:     Int      = NO_IN
     fun getDescriptor(dexFile: DexFile): String {
         return buildString {
             append('(')
-            for (type in parameters.getTypes(dexFile)) {
+            for (type in getParameterTypes(dexFile)) {
                 append(type)
             }
             append(')')
             append(getReturnType(dexFile))
         }
+    }
+
+    fun getParameterTypes(dexFile: DexFile): List<String> {
+        return parameters.getTypes(dexFile)
     }
 
     fun getReturnTypeTypeID(dexFile: DexFile): TypeID {

@@ -144,10 +144,8 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
 
     private fun printParameterAnnotations(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
         var registerIndex = if (method.isStatic) 0 else 1
-        val protoID = method.getProtoID(dexFile)
-        val parameters = protoID.parameters
 
-        for ((parameterIndex, parameterType) in parameters.getTypes(dexFile).withIndex()) {
+        for ((parameterIndex, parameterType) in method.getParameterTypes(dexFile).withIndex()) {
             annotationPrinter.apply {
                 printParameterInfo   = true
                 currentParameterType = parameterType
@@ -174,10 +172,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
                 localVariableInfos[localVariables] = LocalVariableInfo("this", classType, null)
             }
 
-            val protoID    = method.getProtoID(dexFile)
-            val parameters = protoID.parameters
-
-            for ((parameterIndex, parameterType) in parameters.getTypes(dexFile).withIndex()) {
+            for ((parameterIndex, parameterType) in method.getParameterTypes(dexFile).withIndex()) {
                 val parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex)
                 if (parameterName != null) {
                     printer.println(".param p%d, \"%s\"    # %s".format(registerIndex, parameterName, parameterType))

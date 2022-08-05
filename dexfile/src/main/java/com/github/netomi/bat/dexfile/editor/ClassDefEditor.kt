@@ -22,9 +22,9 @@ import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import java.util.*
 
-class ClassDefEditor private constructor(private val dexEditor: DexEditor, val classDef: ClassDef) {
+class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef: ClassDef) {
 
-    private val dexFile: DexFile
+    val dexFile: DexFile
         get() = dexEditor.dexFile
 
     private val classType: String

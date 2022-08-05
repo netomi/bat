@@ -267,7 +267,7 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
     private fun collectRegisterInfo(listCtx: List<SInstructionContext>): RegisterInfo {
         val protoID = method.getProtoID(dexFile)
         var insSize = if (method.isStatic) 0 else 1
-        val argumentSize = DexClasses.getArgumentSize(protoID.parameters.getTypes(dexFile))
+        val argumentSize = DexClasses.getArgumentSize(protoID.getParameterTypes(dexFile))
         insSize += argumentSize
 
         listCtx.forEach { ctx ->

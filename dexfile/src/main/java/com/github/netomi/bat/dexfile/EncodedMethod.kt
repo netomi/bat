@@ -67,6 +67,14 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
         return getMethodID(dexFile).getProtoID(dexFile).getShorty(dexFile)
     }
 
+    fun getParameterTypes(dexFile: DexFile): List<String> {
+        return getProtoID(dexFile).getParameterTypes(dexFile)
+    }
+
+    fun getReturnType(dexFile: DexFile): String {
+        return getProtoID(dexFile).getReturnType(dexFile)
+    }
+
     fun getDescriptor(dexFile: DexFile): String {
         val protoID = getProtoID(dexFile)
         return protoID.getDescriptor(dexFile)

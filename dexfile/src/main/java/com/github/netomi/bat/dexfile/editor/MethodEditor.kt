@@ -32,7 +32,7 @@ class MethodEditor private constructor(val dexEditor: DexEditor, private val cla
         // we can already compute the insSize
         val protoID = method.getProtoID(dexFile)
         var insSize = if (method.isStatic) 0 else 1
-        val argumentSize = DexClasses.getArgumentSize(protoID.parameters.getTypes(dexFile))
+        val argumentSize = DexClasses.getArgumentSize(protoID.getParameterTypes(dexFile))
         insSize += argumentSize
 
         val code = Code.of(registersSize = 0, insSize = insSize, outsSize = 0)
