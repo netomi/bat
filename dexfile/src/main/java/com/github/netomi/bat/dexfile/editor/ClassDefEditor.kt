@@ -83,42 +83,35 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, val c
         classDef.setStaticValue(dexFile, field, value)
     }
 
-    fun addClassAnnotations(annotations: List<Annotation>) {
-        // TODO: throw exception if trying to add an annotation that already exists
-
-        val existingAnnotations = classDef.annotationsDirectory.classAnnotations.annotations
-        existingAnnotations.addAll(annotations.filter { !existingAnnotations.contains(it) })
+    fun addClassAnnotation(annotation: Annotation) {
+        classDef.annotationsDirectory.classAnnotations.addAnnotation(dexFile, annotation)
     }
 
-    fun addFieldAnnotations(field: EncodedField, annotations: List<Annotation>) {
+    fun addOrGetFieldAnnotationSet(field: EncodedField): AnnotationSet {
         var fieldAnnotation =
             classDef.annotationsDirectory.fieldAnnotations.find { it.fieldIndex == field.fieldIndex }
 
-        // TODO: throw exception if trying to add an annotation that already exists
         if (fieldAnnotation == null) {
-            fieldAnnotation = FieldAnnotation.of(field.fieldIndex, AnnotationSet.of(annotations))
+            fieldAnnotation = FieldAnnotation.of(field.fieldIndex, AnnotationSet.empty())
             classDef.annotationsDirectory.fieldAnnotations.add(fieldAnnotation)
-        } else {
-            val existingAnnotations = fieldAnnotation.annotationSet.annotations
-            existingAnnotations.addAll(annotations.filter { !existingAnnotations.contains(it) })
         }
+
+        return fieldAnnotation.annotationSet
     }
 
-    fun addMethodAnnotations(method: EncodedMethod, annotations: List<Annotation>) {
+    fun addOrGetMethodAnnotationSet(method: EncodedMethod): AnnotationSet {
         var methodAnnotation =
             classDef.annotationsDirectory.methodAnnotations.find { it.methodIndex == method.methodIndex }
 
-        // TODO: throw exception if trying to add an annotation that already exists
         if (methodAnnotation == null) {
-            methodAnnotation = MethodAnnotation.of(method.methodIndex, AnnotationSet.of(annotations))
+            methodAnnotation = MethodAnnotation.of(method.methodIndex, AnnotationSet.empty())
             classDef.annotationsDirectory.methodAnnotations.add(methodAnnotation)
-        } else {
-            val existingAnnotations = methodAnnotation.annotationSet.annotations
-            existingAnnotations.addAll(annotations.filter { !existingAnnotations.contains(it) })
         }
+
+        return methodAnnotation.annotationSet
     }
 
-    fun addParameterAnnotations(method: EncodedMethod, parameterIndex: Int, annotations: List<Annotation>) {
+    fun addOrGetParameterAnnotationSet(method: EncodedMethod, parameterIndex: Int): AnnotationSet {
         var parameterAnnotation =
             classDef.annotationsDirectory.parameterAnnotations.find { it.methodIndex == method.methodIndex }
 
@@ -127,15 +120,12 @@ class ClassDefEditor private constructor(private val dexEditor: DexEditor, val c
             classDef.annotationsDirectory.parameterAnnotations.add(parameterAnnotation)
         }
 
-        // TODO: throw exception if trying to add an annotation that already exists
-
         val annotationSetRefList = parameterAnnotation.annotationSetRefList
         while (annotationSetRefList.annotationSetRefCount <= parameterIndex) {
             annotationSetRefList.annotationSetRefs.add(AnnotationSetRef.of(AnnotationSet.empty()))
         }
 
-        val existingAnnotations = annotationSetRefList.getAnnotationSetRef(parameterIndex).annotationSet.annotations
-        existingAnnotations.addAll(annotations.filter { !existingAnnotations.contains(it) })
+        return annotationSetRefList.getAnnotationSetRef(parameterIndex).annotationSet
     }
 
     companion object {

@@ -19,6 +19,10 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.editor.ClassDefEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
+import com.github.netomi.bat.dexfile.editor.MethodEditor
+import com.github.netomi.bat.dexfile.util.DexClasses.externalClassNameFromInternalClassName
+import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalFieldDescriptor
+import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodDescriptor
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import java.io.PrintWriter
@@ -51,10 +55,21 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             classDefEditor.addInterface(it.name.text)
         }
 
-        // ignore duplicate annotations that are encountered in obfuscated dex files.
-        val annotations = LinkedHashSet<Annotation>()
-        ctx.sAnnotation().forEach { annotations.add(annotationAssembler.parseAnnotation(it)) }
-        classDefEditor.addClassAnnotations(annotations.toList())
+        ctx.sAnnotation().forEach {
+            val annotation = annotationAssembler.parseAnnotation(it)
+            try {
+                classDefEditor.addClassAnnotation(annotation)
+            } catch (exception: RuntimeException) {
+                if (lenientMode) {
+                    val className = classDefEditor.classDef.getClassName(dexFile)
+                    warningPrinter?.println(
+                        "warning: class '%s': %s, skipping annotation"
+                            .format(externalClassNameFromInternalClassName(className), exception.message))
+                } else {
+                    throw exception
+                }
+            }
+        }
 
         ctx.sField().forEach  { visitSField(it) }
         ctx.sMethod().forEach { visitSMethod(it) }
@@ -66,25 +81,42 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
+        val field: EncodedField
+
         try {
-            val field = classDefEditor.addField(name, accessFlags, type)
-
-            if (field.isStatic && ctx.sBaseValue() != null) {
-                val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
-                classDefEditor.setStaticValue(field, staticValue)
-            }
-
-            // ignore duplicate annotations that are encountered in obfuscated dex files.
-            val annotations = LinkedHashSet<Annotation>()
-            ctx.sAnnotation().forEach { annotations.add(annotationAssembler.parseAnnotation(it)) }
-            if (annotations.isNotEmpty()) {
-                classDefEditor.addFieldAnnotations(field, annotations.toList())
-            }
+            field = classDefEditor.addField(name, accessFlags, type)
         } catch (exception: RuntimeException) {
             if (lenientMode) {
-                warningPrinter?.println("warning: ${exception.message}, skipping")
+                warningPrinter?.println("warning: ${exception.message}, skipping field")
+                return emptyList()
             } else {
                 throw exception
+            }
+        }
+
+        if (field.isStatic && ctx.sBaseValue() != null) {
+            val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
+            classDefEditor.setStaticValue(field, staticValue)
+        }
+
+        val annotations = mutableListOf<Annotation>()
+        ctx.sAnnotation().forEach {
+            annotations.add(annotationAssembler.parseAnnotation(it))
+        }
+        if (annotations.isNotEmpty()) {
+            val annotationSet = classDefEditor.addOrGetFieldAnnotationSet(field)
+            for (annotation in annotations) {
+                try {
+                    annotationSet.addAnnotation(dexFile, annotation)
+                } catch (exception: RuntimeException) {
+                    if (lenientMode) {
+                        warningPrinter?.println(
+                            "warning: field '%s': %s, skipping annotation"
+                                .format(fullExternalFieldDescriptor(dexFile, field), exception.message))
+                    } else {
+                        throw exception
+                    }
+                }
             }
         }
 
@@ -95,42 +127,77 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         val (_, name, parameterTypes, returnType) = parseMethodObject(ctx.methodObj.text)
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
+        val methodEditor: MethodEditor
+
         try {
-            val methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType)
-            val method = methodEditor.method
-
-            if (!method.isAbstract && !method.isNative) {
-                val codeEditor = methodEditor.addCode()
-                val codeAssembler = CodeAssembler(method, codeEditor, lenientMode)
-                codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
-            } else {
-                if (ctx.sInstruction().isNotEmpty()) {
-                    parserError(ctx, "abstract method containing code instructions")
-                }
-            }
-
-            // ignore duplicate annotations that are encountered in obfuscated dex files.
-            val methodAnnotations = LinkedHashSet<Annotation>()
-            ctx.sAnnotation().forEach { methodAnnotations.add(annotationAssembler.parseAnnotation(it)) }
-            if (methodAnnotations.isNotEmpty()) {
-                classDefEditor.addMethodAnnotations(method, methodAnnotations.toList())
-            }
-
-            ctx.sParameter().forEach { pCtx ->
-                val parameterIndex = parseParameterIndex(pCtx, dexFile, method)
-
-                // ignore duplicate annotations that are encountered in obfuscated dex files.
-                val parameterAnnotations = LinkedHashSet<Annotation>()
-                pCtx.sAnnotation().forEach { parameterAnnotations.add(annotationAssembler.parseAnnotation(it)) }
-                if (parameterAnnotations.isNotEmpty()) {
-                    classDefEditor.addParameterAnnotations(method, parameterIndex, parameterAnnotations.toList())
-                }
-            }
+            methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType)
         } catch (exception: RuntimeException) {
             if (lenientMode) {
-                warningPrinter?.println("warning: ${exception.message}, skipping")
+                warningPrinter?.println("warning: ${exception.message}, skipping method")
+                return emptyList()
             } else {
                 throw exception
+            }
+        }
+
+        val method = methodEditor.method
+        if (!method.isAbstract && !method.isNative) {
+            val codeEditor = methodEditor.addCode()
+            val codeAssembler = CodeAssembler(method, codeEditor, lenientMode)
+            codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
+        } else {
+            if (ctx.sInstruction().isNotEmpty()) {
+                val message = "abstract method '${fullExternalMethodDescriptor(dexFile, method)}' containing code instructions"
+                if (lenientMode) {
+                    warningPrinter?.println("warning: $message, skipping code")
+                } else {
+                    parserError(ctx, message)
+                }
+            }
+        }
+
+        // ignore duplicate annotations that are encountered in obfuscated dex files.
+        val methodAnnotations = mutableListOf<Annotation>()
+        ctx.sAnnotation().forEach { methodAnnotations.add(annotationAssembler.parseAnnotation(it)) }
+        if (methodAnnotations.isNotEmpty()) {
+            val annotationSet = classDefEditor.addOrGetMethodAnnotationSet(method)
+            for (annotation in methodAnnotations) {
+                try {
+                    annotationSet.addAnnotation(dexFile, annotation)
+                } catch (exception: RuntimeException) {
+                    if (lenientMode) {
+                        warningPrinter?.println(
+                            "warning: method '%s': %s, skipping annotation"
+                                .format(fullExternalMethodDescriptor(dexFile, method), exception.message))
+                    } else {
+                        throw exception
+                    }
+                }
+            }
+        }
+
+        ctx.sParameter().forEach { pCtx ->
+            val parameterIndex = parseParameterIndex(pCtx, dexFile, method)
+
+            val parameterAnnotations = mutableListOf<Annotation>()
+            pCtx.sAnnotation().forEach { parameterAnnotations.add(annotationAssembler.parseAnnotation(it)) }
+            if (parameterAnnotations.isNotEmpty()) {
+                val annotationSet = classDefEditor.addOrGetParameterAnnotationSet(method, parameterIndex)
+                for (annotation in parameterAnnotations) {
+                    try {
+                        annotationSet.addAnnotation(dexFile, annotation)
+                    } catch (exception: RuntimeException) {
+                        if (lenientMode) {
+                            warningPrinter?.println(
+                                "warning: parameter #%d at '%s': %s, skipping annotation"
+                                    .format(parameterIndex + 1,
+                                            fullExternalMethodDescriptor(dexFile, method),
+                                            exception.message))
+                        } else {
+                            throw exception
+                        }
+                    }
+                }
             }
         }
 

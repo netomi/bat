@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.google.common.base.Preconditions
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -37,7 +38,7 @@ class AnnotationSet private constructor() : DataItem() {
 
     private var annotationOffsetEntries: IntArray = intArrayOf()
 
-    internal val annotations: ArrayList<Annotation> = ArrayList(0)
+    private val annotations: ArrayList<Annotation> = ArrayList(0)
 
     val annotationCount: Int
         get() = annotations.size
@@ -48,6 +49,12 @@ class AnnotationSet private constructor() : DataItem() {
 
     override val isEmpty: Boolean
         get() = annotations.isEmpty()
+
+    fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
+        Preconditions.checkArgument(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex },
+                                    "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet")
+        annotations.add(annotation)
+    }
 
     internal fun sort() {
         annotations.sortWith(compareBy { it.annotationValue.typeIndex })
