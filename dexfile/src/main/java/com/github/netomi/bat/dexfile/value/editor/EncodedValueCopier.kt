@@ -14,21 +14,18 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.dexfile.value.visitor
+package com.github.netomi.bat.dexfile.value.editor
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.MethodHandle
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.value.*
+import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 
 fun EncodedValue.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor): EncodedValue {
     var result: EncodedValue? = null
     accept(originDexFile, EncodedValueCopier(targetDexEditor) { _, value -> result = value })
     return result ?: throw IllegalStateException("$this could not be copied")
-}
-
-fun copyToAndVisit(targetDexEditor: DexEditor, visitor: EncodedValueVisitor): EncodedValueVisitor {
-    return EncodedValueCopier(targetDexEditor, visitor)
 }
 
 private class EncodedValueCopier constructor(private val targetDexEditor: DexEditor,

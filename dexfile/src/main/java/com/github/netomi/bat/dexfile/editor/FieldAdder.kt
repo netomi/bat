@@ -19,15 +19,30 @@ package com.github.netomi.bat.dexfile.editor
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedField
-import com.github.netomi.bat.dexfile.value.visitor.copyTo
+import com.github.netomi.bat.dexfile.annotation.editor.copyTo
+import com.github.netomi.bat.dexfile.value.editor.copyTo
 import com.github.netomi.bat.dexfile.visitor.EncodedFieldVisitor
 
 class FieldAdder constructor(private val targetClassDefEditor: ClassDefEditor): EncodedFieldVisitor {
 
+    private val targetDexEditor = targetClassDefEditor.dexEditor
+    private val targetDexFile   = targetDexEditor.dexFile
+
     override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
         val addedField = targetClassDefEditor.addField(field.getName(dexFile), field.accessFlags, field.getType(dexFile))
         field.staticValueAccept(dexFile) { _, value ->
-            targetClassDefEditor.setStaticValue(addedField, value.copyTo(dexFile, targetClassDefEditor.dexEditor))
+            targetClassDefEditor.setStaticValue(addedField, value.copyTo(dexFile, targetDexEditor))
+        }
+
+        classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field) { _, _, fieldAnnotations ->
+            if (!fieldAnnotations.isEmpty) {
+                val targetAnnotationSet = targetClassDefEditor.addOrGetFieldAnnotationSet(addedField)
+
+                for (index in 0 .. fieldAnnotations.annotationCount) {
+                    val targetAnnotation = fieldAnnotations.getAnnotation(index).copyTo(dexFile, targetDexEditor)
+                    targetAnnotationSet.addAnnotation(targetDexFile, targetAnnotation)
+                }
+            }
         }
     }
 }

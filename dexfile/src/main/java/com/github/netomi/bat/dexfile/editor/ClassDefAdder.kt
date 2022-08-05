@@ -18,20 +18,35 @@ package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.annotation.editor.copyTo
 import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
 
 class ClassDefAdder constructor(private val targetDexEditor: DexEditor): ClassDefVisitor {
 
+    private val targetDexFile = targetDexEditor.dexFile
+
     constructor(dexFile: DexFile): this(DexEditor.of(dexFile))
 
     override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
-        val classDefEditor =
+        val targetClassDefEditor =
             targetDexEditor.addClassDef(classDef.getType(dexFile),
                                         classDef.accessFlags,
                                         classDef.getSuperClassType(dexFile),
                                         classDef.getSourceFile(dexFile))
 
-        classDef.interfacesAccept(dexFile) { _, _, _, _, type -> classDefEditor.addInterface(type) }
-        classDef.fieldsAccept(dexFile, FieldAdder(classDefEditor))
+        classDef.interfacesAccept(dexFile) { _, _, _, _, type -> targetClassDefEditor.addInterface(type) }
+
+        val classAnnotations = classDef.annotationsDirectory.classAnnotations
+        if (!classAnnotations.isEmpty) {
+            val targetClassDef = targetClassDefEditor.classDef
+            val targetAnnotationSet = targetClassDef.annotationsDirectory.classAnnotations
+
+            for (index in 0 .. classAnnotations.annotationCount) {
+                val targetAnnotation = classAnnotations.getAnnotation(index).copyTo(dexFile, targetDexEditor)
+                targetAnnotationSet.addAnnotation(targetDexFile, targetAnnotation)
+            }
+        }
+
+        classDef.fieldsAccept(dexFile, FieldAdder(targetClassDefEditor))
     }
 }

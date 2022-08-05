@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.annotation
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.TYPE_ANNOTATION_ITEM
 import com.github.netomi.bat.dexfile.annotation.AnnotationVisibility.Companion.of
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.EncodedAnnotationValue
@@ -55,6 +56,10 @@ class Annotation private constructor(_visibility:      AnnotationVisibility   = 
     override fun write(output: DexDataOutput) {
         output.writeUnsignedByte(visibility.value)
         annotationValue.writeValue(output, 0)
+    }
+
+    fun accept(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, visitor: AnnotationVisitor) {
+        visitor.visitAnnotation(dexFile, classDef, annotationSet, index, this)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
