@@ -27,7 +27,15 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
     private val newToOldOffsetMap = mutableMapOf<Int, Int>()
 
     fun hasUpdates(): Boolean {
-        return labelOffsetMap.isNotEmpty() || payloadOffsetMap.isNotEmpty() || newToOldOffsetMap.any { it.key != it.value }
+        return hasLabels() || hasOffsetUpdates() || payloadOffsetMap.isNotEmpty()
+    }
+
+    fun hasLabels(): Boolean {
+        return labelOffsetMap.isNotEmpty()
+    }
+
+    fun hasOffsetUpdates(): Boolean {
+        return newToOldOffsetMap.any() { it.key != it.value }
     }
 
     fun setLabel(label: String, offset: Int) {

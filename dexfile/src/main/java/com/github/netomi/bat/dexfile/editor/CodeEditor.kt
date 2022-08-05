@@ -358,38 +358,38 @@ private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryLi
 }
 
 private fun updateOffsetsOfTryElements(existingTryList: List<Try>, addedTryList: List<Try>, offsetMap: OffsetMap) {
-    if (!offsetMap.hasUpdates()) {
-        return
-    }
+    if (offsetMap.hasOffsetUpdates()) {
+        for (tryElement in existingTryList) {
+            tryElement.startAddr = offsetMap.getNewOffset(tryElement.startAddr)
+            val endAddr = offsetMap.getNewOffset(tryElement.endAddr + 1)
+            tryElement.insnCount = endAddr - tryElement.startAddr
 
-    for (tryElement in existingTryList) {
-        tryElement.startAddr = offsetMap.getNewOffset(tryElement.startAddr)
-        val endAddr          = offsetMap.getNewOffset(tryElement.endAddr + 1)
-        tryElement.insnCount = endAddr - tryElement.startAddr
+            if (tryElement.catchHandler.catchAllLabel != null) {
+                tryElement.catchHandler.catchAllAddr = offsetMap.getNewOffset(tryElement.catchHandler.catchAllAddr)
+            }
 
-        if (tryElement.catchHandler.catchAllLabel != null) {
-            tryElement.catchHandler.catchAllAddr = offsetMap.getNewOffset(tryElement.catchHandler.catchAllAddr)
-        }
-
-        for (addrPair in tryElement.catchHandler.handlers) {
-            if (addrPair.label != null) {
-                addrPair.address = offsetMap.getNewOffset(addrPair.address)
+            for (addrPair in tryElement.catchHandler.handlers) {
+                if (addrPair.label != null) {
+                    addrPair.address = offsetMap.getNewOffset(addrPair.address)
+                }
             }
         }
     }
 
-    for (tryElement in addedTryList) {
-        tryElement.startAddr = offsetMap.getOffset(tryElement.startLabel!!)
-        val endAddr          = offsetMap.getOffset(tryElement.endLabel!!)
-        tryElement.insnCount = endAddr - tryElement.startAddr
+    if (offsetMap.hasLabels()) {
+        for (tryElement in addedTryList) {
+            tryElement.startAddr = offsetMap.getOffset(tryElement.startLabel!!)
+            val endAddr = offsetMap.getOffset(tryElement.endLabel!!)
+            tryElement.insnCount = endAddr - tryElement.startAddr
 
-        if (tryElement.catchHandler.catchAllLabel != null) {
-            tryElement.catchHandler.catchAllAddr = offsetMap.getOffset(tryElement.catchHandler.catchAllLabel!!)
-        }
+            if (tryElement.catchHandler.catchAllLabel != null) {
+                tryElement.catchHandler.catchAllAddr = offsetMap.getOffset(tryElement.catchHandler.catchAllLabel!!)
+            }
 
-        for (addrPair in tryElement.catchHandler.handlers) {
-            if (addrPair.label != null) {
-                addrPair.address = offsetMap.getOffset(addrPair.label!!)
+            for (addrPair in tryElement.catchHandler.handlers) {
+                if (addrPair.label != null) {
+                    addrPair.address = offsetMap.getOffset(addrPair.label!!)
+                }
             }
         }
     }
