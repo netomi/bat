@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor
@@ -144,6 +145,10 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
         if (!isAbstract) {
             visitor.visitCode(dexFile, classDef, this, code)
         }
+    }
+
+    fun annotationSetAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: AnnotationSetVisitor) {
+        classDef.methodAnnotationSetAccept(dexFile, classDef, method, visitor)
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

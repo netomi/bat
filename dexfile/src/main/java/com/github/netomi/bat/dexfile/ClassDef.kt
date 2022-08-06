@@ -17,13 +17,11 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
-import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationsDirectoryVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalFieldDescriptor
 import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodDescriptor
-import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodSignature
 import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
@@ -83,7 +81,7 @@ class ClassDef private constructor(
     var interfaces: TypeList = _interfaces
         private set
 
-    var annotationsDirectory: AnnotationsDirectory = _annotationsDirectory
+    internal var annotationsDirectory: AnnotationsDirectory = _annotationsDirectory
         private set
 
     var classData: ClassData = _classData
@@ -111,6 +109,10 @@ class ClassDef private constructor(
 
     fun getSourceFile(dexFile: DexFile): String? {
         return dexFile.getStringNullable(sourceFileIndex)
+    }
+
+    fun hasAnnotations(): Boolean {
+        return !annotationsDirectory.isEmpty
     }
 
     internal fun addField(dexFile: DexFile, field: EncodedField) {
@@ -279,8 +281,24 @@ class ClassDef private constructor(
         visitor.visitClassData(dexFile, this, classData)
     }
 
-    fun annotationsDirectoryAccept(dexFile: DexFile, visitor: AnnotationsDirectoryVisitor) {
-        visitor.visitAnnotationsDirectory(dexFile, this, annotationsDirectory)
+    fun classAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
+        visitor.visitClassAnnotationSet(dexFile, classDef, annotationsDirectory.classAnnotations)
+    }
+
+    fun fieldAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, field: EncodedField, visitor: AnnotationSetVisitor) {
+        annotationsDirectory.fieldAnnotations.filter { it.fieldIndex == field.fieldIndex }.map { it.accept(dexFile, classDef, visitor) }
+    }
+
+    fun methodAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: AnnotationSetVisitor) {
+        annotationsDirectory.methodAnnotations.filter { it.methodIndex == method.methodIndex }.map { it.accept(dexFile, classDef, visitor) }
+    }
+
+    fun parameterAnnotationSetRefListAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: AnnotationSetVisitor) {
+        annotationsDirectory.parameterAnnotations.filter { it.methodIndex == method.methodIndex }.map { it.accept(dexFile, classDef, visitor) }
+    }
+
+    fun parameterAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, parameterIndex: Int, visitor: AnnotationSetVisitor) {
+        annotationsDirectory.parameterAnnotations.filter { it.methodIndex == method.methodIndex }.map { it.accept(dexFile, classDef, parameterIndex, visitor) }
     }
 
     fun annotationSetsAccept(dexFile: DexFile, visitor: AnnotationSetVisitor) {

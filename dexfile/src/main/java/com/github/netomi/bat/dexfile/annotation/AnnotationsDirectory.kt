@@ -133,7 +133,7 @@ class AnnotationsDirectory private constructor(
     }
 
     fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
-        classAnnotationSetAccept(dexFile, classDef, visitor)
+        visitor.visitClassAnnotationSet(dexFile, classDef, classAnnotations)
         for (fieldAnnotation in fieldAnnotations) {
             fieldAnnotation.accept(dexFile, classDef, visitor)
         }
@@ -143,26 +143,6 @@ class AnnotationsDirectory private constructor(
         for (parameterAnnotation in parameterAnnotations) {
             parameterAnnotation.accept(dexFile, classDef, visitor)
         }
-    }
-
-    fun classAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
-        visitor.visitClassAnnotationSet(dexFile, classDef, classAnnotations)
-    }
-
-    fun fieldAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, field: EncodedField, visitor: AnnotationSetVisitor) {
-        fieldAnnotations.filter { it.fieldIndex == field.fieldIndex }.map { it.accept(dexFile, classDef, visitor) }
-    }
-
-    fun methodAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: AnnotationSetVisitor) {
-        methodAnnotations.filter { it.methodIndex == method.methodIndex }.map { it.accept(dexFile, classDef, visitor) }
-    }
-
-    fun parameterAnnotationSetRefListAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: AnnotationSetVisitor) {
-        parameterAnnotations.filter { it.methodIndex == method.methodIndex }.map { it.accept(dexFile, classDef, visitor) }
-    }
-
-    fun parameterAnnotationSetAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, parameterIndex: Int, visitor: AnnotationSetVisitor) {
-        parameterAnnotations.filter { it.methodIndex == method.methodIndex }.map { it.accept(dexFile, classDef, parameterIndex, visitor) }
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

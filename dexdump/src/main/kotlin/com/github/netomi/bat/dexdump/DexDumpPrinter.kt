@@ -69,7 +69,7 @@ class DexDumpPrinter constructor(
             printer.println()
         }
 
-        if (printAnnotations && !classDef.annotationsDirectory.isEmpty) {
+        if (printAnnotations && classDef.hasAnnotations()) {
             printer.println("Class #%d annotations:".format(index))
             classDef.annotationSetsAccept(dexFile, classDefPrinter)
             printer.println()

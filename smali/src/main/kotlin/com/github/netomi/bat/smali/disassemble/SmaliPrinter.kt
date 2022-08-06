@@ -58,7 +58,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             classDef.interfacesAccept(dexFile) { _, _, _, _, type: String -> printer.println(".implements $type") }
         }
 
-        classDef.annotationsDirectory.classAnnotationSetAccept(dexFile, classDef, annotationPrinter)
+        classDef.classAnnotationSetAccept(dexFile, classDef, annotationPrinter)
         classDef.classDataAccept(dexFile, this)
         printer.flush()
     }
@@ -112,7 +112,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         }
 
         printer.println()
-        classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field, annotationPrinter)
+        classDef.fieldAnnotationSetAccept(dexFile, classDef, field, annotationPrinter)
     }
 
     override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
@@ -133,9 +133,9 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         printer.levelUp()
         if (!method.isAbstract && !method.code.isEmpty) {
             method.codeAccept(dexFile, classDef, this)
-        } else if (!classDef.annotationsDirectory.isEmpty) {
+        } else if (classDef.hasAnnotations()) {
             printParameterAnnotations(dexFile, classDef, method)
-            classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, annotationPrinter)
+            classDef.methodAnnotationSetAccept(dexFile, classDef, method, annotationPrinter)
         }
 
         printer.levelDown()
@@ -151,7 +151,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
                 currentParameterType = parameterType
                 currentRegisterIndex = registerIndex
             }
-            classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
+            classDef.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
 
             registerIndex += DexClasses.getArgumentSizeForType(parameterType)
         }
@@ -187,7 +187,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
 
                 val localVariableInfo = LocalVariableInfo(parameterName, parameterType, null)
                 localVariableInfos[localVariables + registerIndex] = localVariableInfo
-                classDef.annotationsDirectory.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
+                classDef.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
                 annotationPrinter.printParameterInfo = false
 
                 registerIndex += DexClasses.getArgumentSizeForType(parameterType)
@@ -195,7 +195,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         } else {
             printParameterAnnotations(dexFile, classDef, method)
         }
-        classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method, annotationPrinter)
+        classDef.methodAnnotationSetAccept(dexFile, classDef, method, annotationPrinter)
 
         val registerPrinter     = RegisterPrinter(code)
         val branchTargetPrinter = BranchTargetPrinter()

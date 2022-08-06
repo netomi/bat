@@ -40,14 +40,14 @@ class MethodAdder constructor(private val targetClassDefEditor: ClassDefEditor):
 
         method.codeAccept(dexFile, classDef, CodeAdder(addedMethodEditor))
 
-        classDef.annotationsDirectory.methodAnnotationSetAccept(dexFile, classDef, method) { _, _, methodAnnotations ->
+        classDef.methodAnnotationSetAccept(dexFile, classDef, method) { _, _, methodAnnotations ->
             if (!methodAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetMethodAnnotationSet(addedMethod)
                 methodAnnotations.copyTo(dexFile, targetDexEditor, targetAnnotationSet)
             }
         }
 
-        classDef.annotationsDirectory.parameterAnnotationSetRefListAccept(dexFile, classDef, method, object: AnnotationSetVisitor {
+        classDef.parameterAnnotationSetRefListAccept(dexFile, classDef, method, object: AnnotationSetVisitor {
             override fun visitAnyAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {}
 
             override fun visitParameterAnnotationSet(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, parameterIndex: Int, annotationSet: AnnotationSet) {

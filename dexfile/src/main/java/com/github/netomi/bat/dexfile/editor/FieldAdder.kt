@@ -33,7 +33,7 @@ class FieldAdder constructor(private val targetClassDefEditor: ClassDefEditor): 
             targetClassDefEditor.setStaticValue(addedField, value.copyTo(dexFile, targetDexEditor))
         }
 
-        classDef.annotationsDirectory.fieldAnnotationSetAccept(dexFile, classDef, field) { _, _, fieldAnnotations ->
+        classDef.fieldAnnotationSetAccept(dexFile, classDef, field) { _, _, fieldAnnotations ->
             if (!fieldAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetFieldAnnotationSet(addedField)
                 fieldAnnotations.copyTo(dexFile, targetDexEditor, targetAnnotationSet)
