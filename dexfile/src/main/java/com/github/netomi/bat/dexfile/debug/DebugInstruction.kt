@@ -169,6 +169,10 @@ class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstructio
             result
         }
 
+        internal fun of(opCode: Byte): DebugAdvanceLineAndPC {
+            return DebugAdvanceLineAndPC(opCode)
+        }
+
         fun nop(): DebugAdvanceLineAndPC {
             return createIfPossible(0, 0)!!
         }
@@ -346,7 +350,7 @@ class DebugSetFile internal constructor(_nameIndex: Int = 0) : DebugInstruction(
     var nameIndex: Int = _nameIndex
         internal set
 
-    fun name(dexFile: DexFile): String? {
+    fun getName(dexFile: DexFile): String? {
         return dexFile.getStringNullable(nameIndex)
     }
 
@@ -443,11 +447,11 @@ open class DebugStartLocal : DebugInstruction {
         this.typeIndex   = typeIndex
     }
 
-    fun name(dexFile: DexFile): String? {
+    fun getName(dexFile: DexFile): String? {
         return dexFile.getStringNullable(nameIndex)
     }
 
-    fun type(dexFile: DexFile): String? {
+    fun getType(dexFile: DexFile): String? {
         return dexFile.getTypeNullable(typeIndex)
     }
 
@@ -518,7 +522,7 @@ class DebugStartLocalExtended : DebugStartLocal {
         this.sigIndex = sigIndex
     }
 
-    fun signature(dexFile: DexFile): String? {
+    fun getSignature(dexFile: DexFile): String? {
         return dexFile.getStringNullable(sigIndex)
     }
 

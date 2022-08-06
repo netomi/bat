@@ -83,16 +83,16 @@ internal class LocalVariablePrinter constructor(
     }
 
     override fun visitStartLocal(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugStartLocal) {
-        val name = instruction.name(dexFile)
-        val type = instruction.type(dexFile)
+        val name = instruction.getName(dexFile)
+        val type = instruction.getType(dexFile)
 
         handleStartLocalInstructions(instruction.registerNum, name, type, null)
     }
 
     override fun visitStartLocalExtended(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugStartLocalExtended) {
-        val name = instruction.name(dexFile)
-        val type = instruction.type(dexFile)
-        val sig  = instruction.signature(dexFile)
+        val name = instruction.getName(dexFile)
+        val type = instruction.getType(dexFile)
+        val sig  = instruction.getSignature(dexFile)
 
         handleStartLocalInstructions(instruction.registerNum, name, type, sig)
     }
