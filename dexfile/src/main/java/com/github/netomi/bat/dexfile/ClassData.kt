@@ -52,8 +52,7 @@ class ClassData private constructor(
     override val isEmpty: Boolean
         get() = fields.isEmpty() && methods.isEmpty()
 
-    fun addField(field: EncodedField) {
-        // TODO: throw exception for duplicates
+    internal fun addField(field: EncodedField) {
         if (field.isStatic) {
             _staticFields.add(field)
         } else {
@@ -61,8 +60,7 @@ class ClassData private constructor(
         }
     }
 
-    fun addMethod(method: EncodedMethod) {
-        // TODO: throw exception for duplicates
+    internal fun addMethod(method: EncodedMethod) {
         if (method.isDirectMethod) {
             _directMethods.add(method)
         } else {
@@ -237,8 +235,8 @@ class ClassData private constructor(
     }
 
     override fun toString(): String {
-        return "ClassData[staticFields=${staticFieldCount},instanceFields=${instanceFieldCount}," +
-                         "directMethods=${directMethodCount},virtualMethods=${virtualMethodCount}]"
+        return "ClassData[staticFields=${staticFieldCount} fields,instanceFields=${instanceFieldCount} fields," +
+                         "directMethods=${directMethodCount} methods,virtualMethods=${virtualMethodCount} methods]"
     }
 
     companion object {
