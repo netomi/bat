@@ -25,10 +25,10 @@ import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.util.deepCopy
 import com.google.common.base.Preconditions
 
-class CodeEditor private constructor(        val dexEditor: DexEditor,
-                                             val classDef:  ClassDef,
-                                             val method:    EncodedMethod,
-                                             val code:      Code) {
+class CodeEditor private constructor(val dexEditor: DexEditor,
+                                     val classDef:  ClassDef,
+                                     val method:    EncodedMethod,
+                                     val code:      Code) {
 
     private val dexFile: DexFile
         get() = dexEditor.dexFile
@@ -280,12 +280,16 @@ private enum class SeqType {
 }
 
 private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryList: MutableList<Try>, offsetMap: OffsetMap): ArrayList<Try> {
-    updateOffsetsOfTryElements(existingTryList, addedTryList, offsetMap)
-
     val tryElements = (existingTryList + addedTryList).toMutableList()
-
     if (tryElements.isEmpty()) {
         return arrayListOf()
+    }
+
+    // update the addresses for each Try element.
+    if (offsetMap.hasOffsetUpdates() || offsetMap.hasLabels()) {
+        for (tryElement in tryElements) {
+            tryElement.updateOffsets(offsetMap)
+        }
     }
 
     tryElements.sortBy { it.startAddr }
@@ -354,45 +358,13 @@ private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryLi
         }
     }
 
+    // we need to clear all labels now as the offsets are fixed,
+    // otherwise they would interfere the next time the code would be edited.
+    for (tryElement in nonOverlappingTries) {
+        tryElement.clearLabels()
+    }
+
     return nonOverlappingTries
-}
-
-private fun updateOffsetsOfTryElements(existingTryList: List<Try>, addedTryList: List<Try>, offsetMap: OffsetMap) {
-    if (offsetMap.hasOffsetUpdates()) {
-        for (tryElement in existingTryList) {
-            tryElement.startAddr = offsetMap.getNewOffset(tryElement.startAddr)
-            val endAddr = offsetMap.getNewOffset(tryElement.endAddr + 1)
-            tryElement.insnCount = endAddr - tryElement.startAddr
-
-            if (tryElement.catchHandler.catchAllLabel != null) {
-                tryElement.catchHandler.catchAllAddr = offsetMap.getNewOffset(tryElement.catchHandler.catchAllAddr)
-            }
-
-            for (addrPair in tryElement.catchHandler.handlers) {
-                if (addrPair.label != null) {
-                    addrPair.address = offsetMap.getNewOffset(addrPair.address)
-                }
-            }
-        }
-    }
-
-    if (offsetMap.hasLabels()) {
-        for (tryElement in addedTryList) {
-            tryElement.startAddr = offsetMap.getOffset(tryElement.startLabel!!)
-            val endAddr = offsetMap.getOffset(tryElement.endLabel!!)
-            tryElement.insnCount = endAddr - tryElement.startAddr
-
-            if (tryElement.catchHandler.catchAllLabel != null) {
-                tryElement.catchHandler.catchAllAddr = offsetMap.getOffset(tryElement.catchHandler.catchAllLabel!!)
-            }
-
-            for (addrPair in tryElement.catchHandler.handlers) {
-                if (addrPair.label != null) {
-                    addrPair.address = offsetMap.getOffset(addrPair.label!!)
-                }
-            }
-        }
-    }
 }
 
 private fun EncodedCatchHandler.subtract(other: EncodedCatchHandler): EncodedCatchHandler {

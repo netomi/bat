@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
@@ -43,6 +44,18 @@ class TypeAddrPair private constructor(_typeIndex: Int     = NO_INDEX,
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getTypeID(typeIndex).getType(dexFile)
+    }
+
+    internal fun clearLabels() {
+        label = null
+    }
+
+    internal fun updateOffsets(offsetMap: OffsetMap) {
+        address = if (label != null) {
+            offsetMap.getOffset(label!!)
+        } else {
+            offsetMap.getNewOffset(address)
+        }
     }
 
     override fun read(input: DexDataInput) {

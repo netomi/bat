@@ -35,7 +35,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
     }
 
     fun hasOffsetUpdates(): Boolean {
-        return newToOldOffsetMap.any() { it.key != it.value }
+        return newToOldOffsetMap.any { it.key != it.value }
     }
 
     fun setLabel(label: String, offset: Int) {

@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
@@ -48,6 +49,25 @@ class EncodedCatchHandler private constructor(
 
     fun getHandler(index: Int): TypeAddrPair {
         return _handlers[index]
+    }
+
+    internal fun clearLabels() {
+        catchAllLabel = null
+        for (handler in handlers) {
+            handler.clearLabels()
+        }
+    }
+
+    internal fun updateOffsets(offsetMap: OffsetMap) {
+        if (catchAllLabel != null) {
+            catchAllAddr = offsetMap.getOffset(catchAllLabel!!)
+        } else if (catchAllAddr != -1) {
+            catchAllAddr = offsetMap.getNewOffset(catchAllAddr)
+        }
+
+        for (handler in handlers) {
+            handler.updateOffsets(offsetMap)
+        }
     }
 
     override fun read(input: DexDataInput) {

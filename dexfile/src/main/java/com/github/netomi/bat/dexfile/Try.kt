@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
@@ -53,6 +54,28 @@ class Try private constructor(_startAddr:    Int                 = 0,
 
     val endAddr: Int
         get() = startAddr + insnCount - 1
+
+    internal fun clearLabels() {
+        startLabel = null
+        endLabel   = null
+
+        catchHandler.clearLabels()
+    }
+
+    internal fun updateOffsets(offsetMap: OffsetMap) {
+        if (startLabel != null) {
+            Objects.requireNonNull(endLabel)
+            startAddr   = offsetMap.getOffset(startLabel!!)
+            val endAddr = offsetMap.getOffset(endLabel!!)
+            insnCount   = endAddr - startAddr
+        } else {
+            startAddr   = offsetMap.getNewOffset(startAddr)
+            val endAddr = offsetMap.getNewOffset(endAddr + 1)
+            insnCount   = endAddr - startAddr
+        }
+
+        catchHandler.updateOffsets(offsetMap)
+    }
 
     override fun read(input: DexDataInput) {
         startAddr     = input.readInt()
