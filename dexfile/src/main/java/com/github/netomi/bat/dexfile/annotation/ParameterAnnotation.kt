@@ -41,7 +41,7 @@ class ParameterAnnotation private constructor(
     var methodIndex: Int = _methodIndex
         private set
 
-    var annotationSetRefList: AnnotationSetRefList = _annotationSetRefList
+    internal var annotationSetRefList: AnnotationSetRefList = _annotationSetRefList
         private set
 
     fun getMethodID(dexFile: DexFile): MethodID {

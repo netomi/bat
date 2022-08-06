@@ -28,7 +28,7 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATIONS_DIRECTORY_ITEM,
     dataAlignment = 4,
     dataSection   = true)
-class AnnotationsDirectory private constructor(
+internal class AnnotationsDirectory private constructor(
     _classAnnotations:     AnnotationSet                  = AnnotationSet.empty(),
     _fieldAnnotations:     ArrayList<FieldAnnotation>     = ArrayList(0),
     _methodAnnotations:    ArrayList<MethodAnnotation>    = ArrayList(0),
