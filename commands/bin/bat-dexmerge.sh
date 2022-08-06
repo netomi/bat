@@ -45,4 +45,4 @@ else
     done
 fi
 
-java -Xms512m -Xmx2048m -classpath "${_classpath}" "com.github.netomi.bat.SmaliCommand" "$@"
+java -Xms512m -Xmx2048m -classpath "${_classpath}" "com.github.netomi.bat.DexMergeCommand" "$@"
