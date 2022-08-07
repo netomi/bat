@@ -22,12 +22,11 @@ import com.github.netomi.bat.dexfile.debug.*
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 
-class DebugInstructionAdder constructor(private val dexEditor: DexEditor): DebugSequenceVisitor {
-
-    val debugSequence = mutableListOf<DebugInstruction>()
+internal class DebugSequenceAdder constructor(private val dexEditor: DexEditor,
+                                              private val debugInfo: DebugInfo): DebugSequenceVisitor {
 
     private fun addDebugInstruction(instruction: DebugInstruction) {
-        debugSequence.add(instruction)
+        debugInfo.debugSequence.add(instruction)
     }
 
     override fun visitAnyDebugInstruction(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugInstruction) {}

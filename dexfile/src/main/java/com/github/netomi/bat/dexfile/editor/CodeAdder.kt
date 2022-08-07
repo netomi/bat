@@ -17,38 +17,18 @@
 package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.debug.editor.DebugInstructionAdder
+import com.github.netomi.bat.dexfile.debug.editor.DebugInfoAdder
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionAdder
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor
 
-class CodeAdder constructor(private val targetMethodEditor: MethodEditor): CodeVisitor {
-
-    private val dexEditor = targetMethodEditor.dexEditor
+internal class CodeAdder constructor(private val targetMethodEditor: MethodEditor): CodeVisitor {
 
     override fun visitCode(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code) {
         val codeEditor = targetMethodEditor.addCode()
 
         code.instructionsAccept(dexFile, classDef, method, InstructionAdder(codeEditor))
         code.triesAccept(dexFile, classDef, method, TryAdder(codeEditor))
-
-        // TODO: move this code to a separate DebugInfoAdder
-        val oldDebugInfo = code.debugInfo
-        val newDebugInfo = codeEditor.code.debugInfo
-        newDebugInfo.lineStart = oldDebugInfo.lineStart
-
-        for (index in 0 until oldDebugInfo.parameterCount) {
-            val parameterName = oldDebugInfo.getParameterName(dexFile, index)
-            if (parameterName != null) {
-                newDebugInfo.setParameterName(index, dexEditor.addOrGetStringIDIndex(parameterName))
-            } else {
-                newDebugInfo.setParameterName(index, NO_INDEX)
-            }
-        }
-
-        val debugInstructionAdder = DebugInstructionAdder(dexEditor)
-        oldDebugInfo.debugSequenceAccept(dexFile, debugInstructionAdder)
-
-        newDebugInfo.debugSequence.addAll(debugInstructionAdder.debugSequence)
+        code.debugInfoAccept(dexFile, classDef, method, DebugInfoAdder(codeEditor))
 
         codeEditor.finishEditing(code.registersSize)
     }

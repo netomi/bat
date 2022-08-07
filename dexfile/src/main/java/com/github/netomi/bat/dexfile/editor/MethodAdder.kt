@@ -25,7 +25,7 @@ import com.github.netomi.bat.dexfile.annotation.editor.copyTo
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.visitor.EncodedMethodVisitor
 
-class MethodAdder constructor(private val targetClassDefEditor: ClassDefEditor): EncodedMethodVisitor {
+internal class MethodAdder constructor(private val targetClassDefEditor: ClassDefEditor): EncodedMethodVisitor {
 
     private val targetDexEditor = targetClassDefEditor.dexEditor
 
