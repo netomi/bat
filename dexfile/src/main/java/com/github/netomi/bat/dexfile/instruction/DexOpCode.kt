@@ -299,8 +299,7 @@ enum class DexOpCode constructor(
     CONST_METHOD_TYPE  (0xff, InstructionFormat.FORMAT_21c, MethodTypeRefInstruction::create, "const-method-type",     DexFormat.FORMAT_039),
 
     // for internal use only
-    INTERNAL_LABEL(0x100, InstructionFormat.FORMAT_00x, null, "label");
-
+    INTERNAL_LABEL       (0x100, InstructionFormat.FORMAT_00x, null, "label");
 
     val length: Int
         get() = format.instructionLength

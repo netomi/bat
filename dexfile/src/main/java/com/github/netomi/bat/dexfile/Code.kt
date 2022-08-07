@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.debug.DebugInfo
+import com.github.netomi.bat.dexfile.debug.visitor.DebugInfoVisitor
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
@@ -188,6 +189,10 @@ class Code private constructor(
 
     fun triesAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: TryVisitor) {
         tryList.forEachIndexed { index, tryElement -> visitor.visitTry(dexFile, classDef, method, this, index, tryElement) }
+    }
+
+    fun debugInfoAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: DebugInfoVisitor) {
+        visitor.visitDebugInfo(dexFile, classDef, method, this, debugInfo)
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

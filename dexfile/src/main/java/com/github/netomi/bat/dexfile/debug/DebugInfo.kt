@@ -143,7 +143,6 @@ class DebugInfo private constructor(_lineStart:      Int                        
             return DebugInfo(_parameterNames = IntArray(parameterSize) { NO_INDEX })
         }
 
-        @JvmStatic
         fun readContent(input: DexDataInput): DebugInfo {
             val debugInfo = DebugInfo()
             debugInfo.read(input)

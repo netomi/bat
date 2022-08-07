@@ -17,6 +17,7 @@
 package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.debug.editor.DebugSequenceUpdater
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
@@ -128,6 +129,9 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
         // make them non-overlapping.
         code.tryList = updateAndNormalizeTryElements(code.tryList, addedTryList, offsetMap)
 
+        // update the debug sequence
+        code.debugInfoAccept(dexFile, classDef, method, DebugSequenceUpdater(dexEditor, offsetMap))
+
         code.registersSize = registersSize
         updateCodeSizeData()
 
@@ -169,8 +173,10 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
                     codeOffset += modifications?.processAppendModifications(instructions) ?: 0
                 }
 
-                // ignore payloads
-                override fun visitAnyPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: Payload) {}
+                override fun visitAnyPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: Payload) {
+                    offsetMap.setOldToNewOffsetMapping(offset, codeOffset)
+                    codeOffset += payload.length
+                }
             })
 
             // add a mapping of the old size to the new size in case try / catch elements go
@@ -178,12 +184,15 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
             offsetMap.setOldToNewOffsetMapping(code.insnsSize, codeOffset)
         }
 
-        // remove NOP instructions at the end, they are padding instructions that will be recreated when needed.
-        while (instructions.lastOrNull()?.opCode == DexOpCode.NOP) {
-            instructions.removeLast()
+        instructions.filterIsInstance<PayloadInstruction<*>>().forEach { instruction -> payloads.add(instruction.payload) }
+
+        if (payloads.isNotEmpty()) {
+            // remove NOP instructions at the end, they are padding instructions that will be recreated when needed.
+            while (instructions.lastOrNull()?.opCode == DexOpCode.NOP) {
+                instructions.removeLast()
+            }
         }
 
-        instructions.filterIsInstance<PayloadInstruction<*>>().forEach { instruction -> payloads.add(instruction.payload) }
         return Pair(instructions, payloads)
     }
 

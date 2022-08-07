@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction
 
 class InstructionWriter constructor(size: Int = 8192) {
 
-    var array: ShortArray = ShortArray(size)
+    private var array: ShortArray = ShortArray(size)
 
     private var lastWrittenOffset: Int = -1
 
@@ -61,13 +61,11 @@ class InstructionWriter constructor(size: Int = 8192) {
             val codeLen = instructions.stream().map { a: DexInstruction -> a.length }.reduce(0) { a, b -> a + b }
 
             val writer = InstructionWriter(codeLen)
-            var offset = 0
             for (instruction in instructions) {
-                instruction.write(writer, offset)
-                offset += instruction.length
+                instruction.write(writer, writer.nextWriteOffset)
             }
 
-            return writer.array
+            return writer.getInstructionArray()
         }
     }
 }

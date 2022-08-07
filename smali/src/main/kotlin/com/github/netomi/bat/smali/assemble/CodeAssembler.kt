@@ -17,6 +17,7 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.debug.editor.DebugSequenceComposer
 import com.github.netomi.bat.dexfile.editor.CodeEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.instruction.*
@@ -44,7 +45,7 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
         val registerInfo         = collectRegisterInfo(iCtx)
         val instructionAssembler = InstructionAssembler(registerInfo, dexEditor)
 
-        val debugSequenceAssembler = DebugSequenceAssembler(code.debugInfo)
+        val debugSequenceComposer = DebugSequenceComposer.of(dexEditor, code.debugInfo)
 
         var codeOffset = 0
 
@@ -79,17 +80,17 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
                         parserError(ctx, "negative line number")
                     }
 
-                    debugSequenceAssembler.advanceLine(lineNumber, codeOffset)
+                    debugSequenceComposer.advanceLine(codeOffset, lineNumber)
                     null
                 }
 
                 RULE_fprologue  -> {
-                    debugSequenceAssembler.prologueEnd()
+                    debugSequenceComposer.prologueEnd(codeOffset)
                     null
                 }
 
                 RULE_fepilogue  -> {
-                    debugSequenceAssembler.epilogueStart()
+                    debugSequenceComposer.epilogueStart(codeOffset)
                     null
                 }
 
@@ -98,40 +99,25 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
 
                     val register = registerInfo.registerNumber(c.r.text)
 
-                    var nameIndex: Int = NO_INDEX
-                    var typeIndex: Int = NO_INDEX
+                    val name      = c.name.text.removeSurrounding("\"").ifEmpty { null }
+                    val type      = c.type?.text
+                    val signature = c.sig?.text?.removeSurrounding("\"")
 
-                    val name = c.name.text.removeSurrounding("\"")
-                    if (name.isNotEmpty()) {
-                        nameIndex = dexEditor.addOrGetStringIDIndex(name)
-                    }
-
-                    if (c.type != null) {
-                        val type = c.type.text
-                        typeIndex = dexEditor.addOrGetTypeIDIndex(type)
-                    }
-
-                    val sigIndex = if (c.sig != null) {
-                        dexEditor.addOrGetStringIDIndex(c.sig.text.removeSurrounding("\""))
-                    } else {
-                        NO_INDEX
-                    }
-
-                    debugSequenceAssembler.startLocal(register, nameIndex, typeIndex, sigIndex, codeOffset)
+                    debugSequenceComposer.startLocal(codeOffset, register, name, type, signature)
                     null
                 }
 
                 RULE_frestart -> {
                     val c = t as FrestartContext
                     val register = registerInfo.registerNumber(c.r.text)
-                    debugSequenceAssembler.restartLocal(register, codeOffset)
+                    debugSequenceComposer.restartLocal(codeOffset, register)
                     null
                 }
 
                 RULE_fendlocal -> {
                     val c = t as FendlocalContext
                     val register = registerInfo.registerNumber(c.r.text)
-                    debugSequenceAssembler.endLocal(register, codeOffset)
+                    debugSequenceComposer.endLocal(codeOffset, register)
                     null
                 }
 
@@ -209,14 +195,13 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
             }
         }
 
-        debugSequenceAssembler.end()
-
         for (tryElement in tryElements) {
             codeEditor.addTryCatchElement(tryElement)
         }
 
-        // TODO: the registersSize should actually be calculated however this is non-trivial
         codeEditor.finishEditing(registerInfo.registers)
+
+        debugSequenceComposer.finish()
     }
 
     private fun collectPayloads(iCtx: List<SInstructionContext>, instructionAssembler: InstructionAssembler): Map<String, Payload> {
