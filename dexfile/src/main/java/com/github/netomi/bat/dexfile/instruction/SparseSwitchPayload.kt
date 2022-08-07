@@ -74,7 +74,7 @@ class SparseSwitchPayload private constructor(_keys:          IntArray      = EM
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
 
-        data[0] = ((opCode.opCode and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.value and 0xff) or (IDENT shl 8)).toShort()
 
         data[1] = keys.size.toShort()
         var offset = 2

@@ -72,7 +72,7 @@ class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
 
-        data[0] = ((opCode.opCode and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.value and 0xff) or (IDENT shl 8)).toShort()
         data[1] = branchTargets.size.toShort()
 
         var offset = 2

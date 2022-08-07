@@ -112,7 +112,7 @@ class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: Byte
 
     override fun writeData(): ShortArray {
         val data = ShortArray(length)
-        data[0] = ((opCode.opCode and 0xff) or (IDENT shl 8)).toShort()
+        data[0] = ((opCode.value and 0xff) or (IDENT shl 8)).toShort()
         data[1] = elementWidth.toShort()
         data[2] = elements.toShort()
         data[3] = (elements shr 16).toShort()

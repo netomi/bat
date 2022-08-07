@@ -196,7 +196,7 @@ abstract class DexInstruction protected constructor(val opCode: DexOpCode, varar
     protected open fun writeData(): ShortArray {
         val data = ShortArray(length)
 
-        data[0] = (opCode.opCode and 0xff).toShort()
+        data[0] = (opCode.value and 0xff).toShort()
 
         when (opCode.format) {
             FORMAT_00x,

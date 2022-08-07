@@ -19,7 +19,7 @@ import com.github.netomi.bat.dexfile.DexFormat
 import com.github.netomi.bat.util.toHexStringWithPrefix
 
 enum class DexOpCode constructor(
-            val opCode:    Int,
+            val value:     Int,
             val format:    InstructionFormat,
     private val supplier:  InstructionSupplier?,
             val mnemonic:  String,
@@ -299,7 +299,7 @@ enum class DexOpCode constructor(
     CONST_METHOD_TYPE  (0xff, InstructionFormat.FORMAT_21c, MethodTypeRefInstruction::create, "const-method-type",     DexFormat.FORMAT_039),
 
     // for internal use only
-    LABEL(0xffff, InstructionFormat.FORMAT_00x, null, "label");
+    INTERNAL_LABEL(0x100, InstructionFormat.FORMAT_00x, null, "label");
 
 
     val length: Int
@@ -327,7 +327,7 @@ enum class DexOpCode constructor(
             for (opCode in values()) {
                 // ignore pseudo opcodes
                 if (opCode.format != InstructionFormat.FORMAT_00x) {
-                    opcodeArray[opCode.opCode and 0xff]      = opCode
+                    opcodeArray[opCode.value and 0xff]      = opCode
                     mnemonicToOpCodeMapping[opCode.mnemonic] = opCode
                 }
             }
