@@ -23,7 +23,7 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.DexOpCode
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-open class LabelInstruction private constructor(private val label: String) : DexInstruction(DexOpCode.INTERNAL_LABEL) {
+internal class LabelInstruction private constructor(private val label: String) : DexInstruction(DexOpCode.INTERNAL_LABEL) {
 
     override fun read(instructions: ShortArray, offset: Int) {}
 
