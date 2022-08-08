@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile.value.visitor
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.*
+import com.github.netomi.bat.dexfile.visitor.AbstractCollector
 import com.github.netomi.bat.dexfile.visitor.AbstractMultiVisitor
 import java.util.*
 import java.util.function.BiConsumer
@@ -31,6 +32,10 @@ fun filterValuesByType(acceptedType: EncodedValueType, visitor: EncodedValueVisi
 
 fun filterValuesByType(acceptedTypes: EnumSet<EncodedValueType>, visitor: EncodedValueVisitor): EncodedValueVisitor {
     return EncodedValueFilter(acceptedTypes, visitor)
+}
+
+fun valueCollector(): EncodedValueCollector {
+    return EncodedValueCollector()
 }
 
 fun interface EncodedValueVisitor {
@@ -124,6 +129,12 @@ fun interface EncodedValueVisitor {
             }
         }
         return multiValueVisitorOf(joiner, this)
+    }
+}
+
+class EncodedValueCollector: AbstractCollector<EncodedValue>(), EncodedValueVisitor {
+    override fun visitAnyValue(dexFile: DexFile, value: EncodedValue) {
+        addItem(value)
     }
 }
 

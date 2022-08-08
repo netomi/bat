@@ -32,6 +32,10 @@ fun filterFieldsByNameAndType(nameExpression: String, type: String, visitor: Enc
     return FieldNameAndTypeFilter(nameExpression, type, visitor)
 }
 
+fun fieldCollector(): EncodedFieldCollector {
+    return EncodedFieldCollector()
+}
+
 fun interface EncodedFieldVisitor {
 
     fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField)
@@ -62,6 +66,12 @@ fun interface EncodedFieldVisitor {
         return multiFieldVisitorOf(joiner, this)
     }
 
+}
+
+class EncodedFieldCollector: AbstractCollector<EncodedField>(), EncodedFieldVisitor {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+        addItem(field)
+    }
 }
 
 private class FieldNameAndTypeFilter(nameExpression:      String?,
