@@ -39,6 +39,9 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
 
     private lateinit var classDefEditor: ClassDefEditor
 
+    private val addedFields  = mutableSetOf<FieldID>()
+    private val addedMethods = mutableSetOf<MethodID>()
+
     override fun aggregateResult(aggregate: List<ClassDef>?, nextResult: List<ClassDef>?): List<ClassDef> {
         return (aggregate ?: emptyList()) + (nextResult ?: emptyList())
     }
@@ -84,7 +87,13 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         val field: EncodedField
 
         try {
+            val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classDefEditor.classType, name, type)
+            val fieldID = dexFile.getFieldID(fieldIDIndex)
+            if (addedFields.contains(fieldID)) {
+                throw RuntimeException("field '${fullExternalFieldDescriptor(dexFile, fieldID)}' already exists in this class")
+            }
             field = classDefEditor.addField(name, accessFlags, type)
+            addedFields.add(fieldID)
         } catch (exception: RuntimeException) {
             if (lenientMode) {
                 warningPrinter?.println("warning: ${exception.message}, skipping field")
@@ -130,7 +139,13 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         val methodEditor: MethodEditor
 
         try {
+            val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classDefEditor.classType, name, parameterTypes, returnType)
+            val methodID = dexFile.getMethodID(methodIDIndex)
+            if (addedMethods.contains(methodID)) {
+                throw RuntimeException("method '${fullExternalMethodDescriptor(dexFile, methodID)}' already exists in this class")
+            }
             methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType)
+            addedMethods.add(methodID)
         } catch (exception: RuntimeException) {
             if (lenientMode) {
                 warningPrinter?.println("warning: ${exception.message}, skipping method")

@@ -27,7 +27,7 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
     val dexFile: DexFile
         get() = dexEditor.dexFile
 
-    private val classType: String
+    val classType: String
         get() = classDef.getType(dexFile)
 
     fun addInterface(type: String) {

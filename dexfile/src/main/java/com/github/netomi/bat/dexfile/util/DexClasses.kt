@@ -62,21 +62,29 @@ object DexClasses {
 
     fun fullExternalMethodSignature(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): String {
         return "%s.%s:%s".format(externalClassNameFromInternalClassName(classDef.getClassName(dexFile)),
-                                 method.getName(dexFile),
-                                 method.getDescriptor(dexFile)
+                                                                        method.getName(dexFile),
+                                                                        method.getDescriptor(dexFile)
         )
     }
 
     fun fullExternalMethodDescriptor(dexFile: DexFile, method: EncodedMethod): String {
-        return "%s.%s%s".format(externalClassNameFromInternalType(method.getClassType(dexFile)),
-                                 method.getName(dexFile),
-                                 method.getDescriptor(dexFile))
+        return fullExternalMethodDescriptor(dexFile, method.getMethodID(dexFile))
+    }
+
+    fun fullExternalMethodDescriptor(dexFile: DexFile, methodID: MethodID): String {
+        return "%s.%s%s".format(externalClassNameFromInternalType(methodID.getClassType(dexFile)),
+                                                                  methodID.getName(dexFile),
+                                                                  methodID.getProtoID(dexFile).getDescriptor(dexFile))
     }
 
     fun fullExternalFieldDescriptor(dexFile: DexFile, field: EncodedField): String {
-        return "%s.%s:%s".format(externalClassNameFromInternalType(field.getFieldID(dexFile).getClassType(dexFile)),
-                                 field.getName(dexFile),
-                                 field.getType(dexFile))
+        return fullExternalFieldDescriptor(dexFile, field.getFieldID(dexFile))
+    }
+
+    fun fullExternalFieldDescriptor(dexFile: DexFile, fieldID: FieldID): String {
+        return "%s.%s:%s".format(externalClassNameFromInternalType(fieldID.getClassType(dexFile)),
+                                                                   fieldID.getName(dexFile),
+                                                                   fieldID.getType(dexFile))
     }
 
     fun parseParameters(parameters: String): List<String> {
