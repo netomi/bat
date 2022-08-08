@@ -35,9 +35,18 @@ object DexClasses {
         } else type
     }
 
+    fun internalTypeFromExternalClassName(externalClassName: String): String {
+        return internalTypeFromInternalClassName(internalClassNameFromExternalClassName(externalClassName))
+    }
+
     fun internalTypeFromInternalClassName(internalClassName: String): String {
         Objects.requireNonNull(internalClassName)
         return "L$internalClassName;"
+    }
+
+    fun internalClassNameFromExternalClassName(externalClassName: String): String {
+        Objects.requireNonNull(externalClassName)
+        return externalClassName.replace(".".toRegex(), "/")
     }
 
     fun externalClassNameFromInternalClassName(internalClassName: String): String {

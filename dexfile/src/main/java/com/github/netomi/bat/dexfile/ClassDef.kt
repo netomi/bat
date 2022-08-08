@@ -261,8 +261,16 @@ class ClassDef private constructor(
         visitor.visitClassDef(dexFile, 0, this)
     }
 
+    fun staticFieldsAccept(dexFile: DexFile, visitor: EncodedFieldVisitor) {
+        classDataAccept(dexFile, allStaticFields(visitor))
+    }
+
     fun fieldsAccept(dexFile: DexFile, visitor: EncodedFieldVisitor) {
         classDataAccept(dexFile, allFields(visitor))
+    }
+
+    fun fieldsAccept(dexFile: DexFile, nameExpression: String, visitor: EncodedFieldVisitor) {
+        classDataAccept(dexFile, allFields(filterFieldsByName(nameExpression, visitor)))
     }
 
     fun methodsAccept(dexFile: DexFile, visitor: EncodedMethodVisitor) {

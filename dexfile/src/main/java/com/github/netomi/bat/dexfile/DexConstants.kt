@@ -19,6 +19,7 @@ const val NO_INDEX = -0x1
 
 // type constants
 const val JAVA_LANG_OBJECT_TYPE = "Ljava/lang/Object;"
+const val JAVA_LANG_STRING_TYPE = "Ljava/lang/String;"
 
 const val INT_TYPE     = "I"
 const val LONG_TYPE    = "J"
