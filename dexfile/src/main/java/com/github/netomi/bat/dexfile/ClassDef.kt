@@ -114,15 +114,27 @@ class ClassDef private constructor(
         return !annotationsDirectory.isEmpty
     }
 
-    internal fun addField(dexFile: DexFile, field: EncodedField) {
-        val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
-        require(fieldClass == getType(dexFile)) { "field class does not match this class" }
+    internal fun addField(dexFile: DexFile, field: EncodedField, validate: Boolean = true) {
+        if (validate) {
+            val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
+            require(fieldClass == getType(dexFile)) { "field class does not match this class" }
+            classData.fields.forEach {
+                require(field.fieldIndex != it.fieldIndex)
+                    { "field '${fullExternalFieldDescriptor(dexFile, field)}' already exists in this class" }
+            }
+        }
         classData.addField(field)
     }
 
-    internal fun addMethod(dexFile: DexFile, method: EncodedMethod) {
-        val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
-        require(methodClass == getType(dexFile)) { "method class does not match this class" }
+    internal fun addMethod(dexFile: DexFile, method: EncodedMethod, validate: Boolean = true) {
+        if (validate) {
+            val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
+            require(methodClass == getType(dexFile)) { "method class does not match this class" }
+            classData.methods.forEach {
+                require(method.methodIndex != it.methodIndex)
+                    { "method '${fullExternalMethodDescriptor(dexFile, method)}' already exists in this class" }
+            }
+        }
         classData.addMethod(method)
     }
 

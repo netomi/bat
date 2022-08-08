@@ -57,10 +57,10 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
         return addField(fieldName, accessFlagsOf(visibility, modifiers), type)
     }
 
-    fun addField(fieldName: String, accessFlags: Int, type: String): EncodedField {
+    fun addField(fieldName: String, accessFlags: Int, type: String, validate: Boolean = true): EncodedField {
         val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType, fieldName, type)
         val field = EncodedField.of(fieldIDIndex, accessFlags)
-        classDef.addField(dexFile, field)
+        classDef.addField(dexFile, field, validate)
         return field
     }
 
@@ -72,10 +72,10 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
         return addMethod(methodName, accessFlagsOf(visibility, modifiers), parameterTypes, returnType)
     }
 
-    fun addMethod(methodName: String, accessFlags: Int, parameterTypes: List<String>, returnType: String): MethodEditor {
+    fun addMethod(methodName: String, accessFlags: Int, parameterTypes: List<String>, returnType: String, validate: Boolean = true): MethodEditor {
         val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classType, methodName, parameterTypes, returnType)
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
-        classDef.addMethod(dexFile, method)
+        classDef.addMethod(dexFile, method, validate)
         return MethodEditor.of(dexEditor, classDef, method)
     }
 

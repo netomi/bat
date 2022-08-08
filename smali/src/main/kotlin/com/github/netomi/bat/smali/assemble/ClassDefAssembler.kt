@@ -92,7 +92,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             if (addedFields.contains(fieldID)) {
                 throw RuntimeException("field '${fullExternalFieldDescriptor(dexFile, fieldID)}' already exists in this class")
             }
-            field = classDefEditor.addField(name, accessFlags, type)
+            field = classDefEditor.addField(name, accessFlags, type, false)
             addedFields.add(fieldID)
         } catch (exception: RuntimeException) {
             if (lenientMode) {
@@ -144,7 +144,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             if (addedMethods.contains(methodID)) {
                 throw RuntimeException("method '${fullExternalMethodDescriptor(dexFile, methodID)}' already exists in this class")
             }
-            methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType)
+            methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType, false)
             addedMethods.add(methodID)
         } catch (exception: RuntimeException) {
             if (lenientMode) {
