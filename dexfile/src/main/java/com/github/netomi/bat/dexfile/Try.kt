@@ -112,11 +112,11 @@ class Try private constructor(_startAddr:    Int                 = 0,
 
     companion object {
         fun of(startAddr: Int, endAddr: Int, catchHandler: EncodedCatchHandler): Try {
-            Preconditions.checkArgument(startAddr >= 0, "startAddr must not be negative")
-            Preconditions.checkArgument(startAddr <= 65535, "startAddr must be <= 65535")
-            Preconditions.checkArgument(endAddr >= 0, "endAddr must not be negative")
-            Preconditions.checkArgument(endAddr <= 65534, "endAddr must be <= 65534")
-            Preconditions.checkArgument(endAddr >= startAddr, "endAddr must be > startAddr")
+            require(startAddr >= 0) { "startAddr must not be negative" }
+            require(startAddr <= 65535) { "startAddr must be <= 65535" }
+            require(endAddr >= 0) { "endAddr must not be negative" }
+            require(endAddr <= 65534) { "endAddr must be <= 65534" }
+            require(endAddr >= startAddr) { "endAddr must be > startAddr" }
 
             val insnCount = endAddr - startAddr + 1
             return Try(startAddr, insnCount, null, null, catchHandler)

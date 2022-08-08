@@ -126,7 +126,7 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
 
     companion object {
         fun of(fieldIndex: Int, visibility: Visibility, vararg modifiers: FieldModifier): EncodedField {
-            Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative")
+            require(fieldIndex >= 0) { "fieldIndex must not be negative" }
             var accessFlags = visibility.flagValue
             for (modifier in modifiers) {
                 accessFlags = accessFlags or modifier.flagValue
@@ -135,7 +135,7 @@ class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags
         }
 
         fun of(fieldIndex: Int, accessFlags: Int): EncodedField {
-            Preconditions.checkArgument(fieldIndex >= 0, "fieldIndex must not be negative")
+            require(fieldIndex >= 0) { "fieldIndex must not be negative" }
             return EncodedField(fieldIndex, accessFlags)
         }
 

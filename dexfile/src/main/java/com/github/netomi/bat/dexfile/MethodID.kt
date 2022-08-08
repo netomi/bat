@@ -118,9 +118,9 @@ class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int
 
     companion object {
         fun of(classIndex: Int, nameIndex: Int, protoIndex: Int): MethodID {
-            Preconditions.checkArgument(classIndex >= 0, "class index must not be negative")
-            Preconditions.checkArgument(nameIndex >= 0, "name index must not be negative")
-            Preconditions.checkArgument(protoIndex >= 0, "proto index must not be negative")
+            require(classIndex >= 0) { "class index must not be negative" }
+            require(nameIndex >= 0) { "name index must not be negative" }
+            require(protoIndex >= 0) { "proto index must not be negative" }
             return MethodID(classIndex, nameIndex, protoIndex)
         }
 

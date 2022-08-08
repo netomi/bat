@@ -183,7 +183,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
 
     companion object {
         fun of(methodIndex: Int, visibility: Visibility, vararg modifiers: MethodModifier): EncodedMethod {
-            Preconditions.checkArgument(methodIndex >= 0, "methodIndex must not be negative")
+            require(methodIndex >= 0) { "methodIndex must not be negative" }
             var accessFlags = visibility.flagValue
             for (modifier in modifiers) {
                 accessFlags = accessFlags or modifier.flagValue
@@ -192,7 +192,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
         }
 
         fun of(methodIndex: Int, accessFlags: Int): EncodedMethod {
-            Preconditions.checkArgument(methodIndex >= 0, "methodIndex must not be negative")
+            require(methodIndex >= 0) { "methodIndex must not be negative" }
             return EncodedMethod(methodIndex, accessFlags)
         }
 

@@ -51,8 +51,8 @@ class AnnotationSet private constructor() : DataItem() {
         get() = annotations.isEmpty()
 
     fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
-        Preconditions.checkArgument(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex },
-                                    "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet")
+        require(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
+            { "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet" }
         annotations.add(annotation)
     }
 

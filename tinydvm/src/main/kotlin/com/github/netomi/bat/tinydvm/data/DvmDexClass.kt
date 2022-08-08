@@ -46,12 +46,12 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
     }
 
     fun getValueOfStaticField(field: EncodedField): DvmValue {
-        Preconditions.checkArgument(field.isStatic, "trying to get a value from non-static field '${field}'")
+        require(field.isStatic) { "trying to get a value from non-static field '${field}'" }
         return staticFields[field]!!
     }
 
     fun setValueForStaticField(field: EncodedField, value: DvmValue) {
-        Preconditions.checkArgument(field.isStatic, "trying to set a value for non-static field '${field}'")
+        require(field.isStatic) { "trying to set a value for non-static field '${field}'" }
         staticFields[field] = value
     }
 

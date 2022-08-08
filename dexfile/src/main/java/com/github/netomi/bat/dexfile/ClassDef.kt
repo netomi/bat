@@ -26,7 +26,6 @@ import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForTy
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -117,20 +116,20 @@ class ClassDef private constructor(
 
     internal fun addField(dexFile: DexFile, field: EncodedField) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
-        Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
+        require(fieldClass == getType(dexFile)) { "field class does not match this class" }
         classData.fields.forEach {
-            Preconditions.checkArgument(field.fieldIndex != it.fieldIndex,
-                                        "field '${fullExternalFieldDescriptor(dexFile, field)}' already exists in this class")
+            require(field.fieldIndex != it.fieldIndex)
+                { "field '${fullExternalFieldDescriptor(dexFile, field)}' already exists in this class" }
         }
         classData.addField(field)
     }
 
     internal fun addMethod(dexFile: DexFile, method: EncodedMethod) {
         val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
-        Preconditions.checkArgument(methodClass == getType(dexFile), "method class does not match this class")
+        require(methodClass == getType(dexFile)) { "method class does not match this class" }
         classData.methods.forEach {
-            Preconditions.checkArgument(method.methodIndex != it.methodIndex,
-                                        "method '${fullExternalMethodDescriptor(dexFile, method)}' already exists in this class")
+            require(method.methodIndex != it.methodIndex)
+                { "method '${fullExternalMethodDescriptor(dexFile, method)}' already exists in this class" }
         }
         classData.addMethod(method)
     }
@@ -144,12 +143,11 @@ class ClassDef private constructor(
 
     fun getStaticValue(dexFile: DexFile, field: EncodedField): EncodedValue? {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
-        Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
+        require(fieldClass == getType(dexFile)) { "field class does not match this class" }
 
         val staticFieldIndex = getStaticFieldIndex(field)
-        if (staticFieldIndex == NO_INDEX) {
-            throw IllegalArgumentException("trying to get a static value for a field that does not belong to this class: " + getType(dexFile))
-        }
+        require(staticFieldIndex != NO_INDEX)
+            { "trying to get a static value for a field that does not belong to this class: ${getType(dexFile)}" }
 
         return if (staticFieldIndex >= 0 &&
             staticFieldIndex < staticValues.array.values.size) {
@@ -161,12 +159,11 @@ class ClassDef private constructor(
 
     internal fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
-        Preconditions.checkArgument(fieldClass == getType(dexFile), "field class does not match this class")
+        require(fieldClass == getType(dexFile)) { "field class does not match this class" }
 
         val staticFieldIndex = getStaticFieldIndex(field)
-        if (staticFieldIndex == NO_INDEX) {
-            throw IllegalArgumentException("trying to add a static value for a field that does not belong to this class: " + getType(dexFile))
-        }
+        require(staticFieldIndex != NO_INDEX)
+            { "trying to add a static value for a field that does not belong to this class: ${getType(dexFile)}" }
 
         val currentStaticValues = staticValues.array.values.size
         if (currentStaticValues <= staticFieldIndex) {

@@ -103,9 +103,9 @@ class FieldID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int 
 
     companion object {
         fun of(classIndex: Int, nameIndex: Int, typeIndex: Int): FieldID {
-            Preconditions.checkArgument(classIndex >= 0, "class index must not be negative")
-            Preconditions.checkArgument(nameIndex >= 0, "name index must not be negative")
-            Preconditions.checkArgument(typeIndex >= 0, "type index must not be negative")
+            require(classIndex >= 0) { "class index must not be negative" }
+            require(nameIndex >= 0) { "name index must not be negative" }
+            require(typeIndex >= 0) { "type index must not be negative" }
             return FieldID(classIndex, nameIndex, typeIndex)
         }
 

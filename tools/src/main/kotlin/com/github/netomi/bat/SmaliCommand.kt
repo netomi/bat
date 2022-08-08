@@ -24,6 +24,7 @@ import picocli.CommandLine
 import java.io.File
 import java.io.PrintWriter
 import java.nio.file.Path
+import kotlin.io.path.isDirectory
 import kotlin.io.path.pathString
 import kotlin.io.path.relativeTo
 
@@ -90,8 +91,12 @@ class SmaliCommand : Runnable {
     }
 
     private fun assembleFile(baseDirectory: Path, file: Path) {
-        val relativePath = file.relativeTo(baseDirectory)
-        printVerbose("  assembling file '${relativePath.pathString}'")
+        val filePath = if (baseDirectory.isDirectory()) {
+            file.relativeTo(baseDirectory).pathString
+        } else {
+            file.pathString
+        }
+        printVerbose("  assembling file '${filePath}'")
     }
     private fun printVerbose(text: String) {
         if (verbose) {

@@ -34,13 +34,13 @@ class MapItem private constructor(_type: Int = 0, _size: Int = 0, _offset: Int =
 
     var size: Int = _size
         internal set(value) {
-            Preconditions.checkArgument(value >= 0, "size must not be negative")
+            require(value >= 0) { "size must not be negative" }
             field = value
         }
 
     var offset: Int = _offset
         internal set(value) {
-            Preconditions.checkArgument(value >= 0, "offset must not be negative")
+            require(value >= 0) { "offset must not be negative" }
             field = value
         }
 
@@ -77,7 +77,7 @@ class MapItem private constructor(_type: Int = 0, _size: Int = 0, _offset: Int =
 
     companion object {
         fun of(type: Int, size: Int = 0): MapItem {
-            Preconditions.checkArgument(size >= 0, "size must not be negative")
+            require(size >= 0) { "size must not be negative" }
             return MapItem(type, size)
         }
 

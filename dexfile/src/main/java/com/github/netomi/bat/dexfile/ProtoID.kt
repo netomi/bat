@@ -139,12 +139,12 @@ class ProtoID private constructor(            _shortyIndex:     Int      = NO_IN
 
     companion object {
         fun of(shortyIndex: Int, returnTypeIndex: Int, vararg parameterTypeIndices: Int): ProtoID {
-            Preconditions.checkArgument(shortyIndex >= 0, "shorty index must not be negative")
-            Preconditions.checkArgument(returnTypeIndex >= 0, "return type index must not be negative")
+            require(shortyIndex >= 0) { "shorty index must not be negative" }
+            require(returnTypeIndex >= 0) { "return type index must not be negative" }
 
             val protoID = ProtoID(shortyIndex, returnTypeIndex)
             for (index in parameterTypeIndices) {
-                Preconditions.checkArgument(index >= 0, "parameter type index must not be negative")
+                require(index >= 0) { "parameter type index must not be negative" }
                 protoID.parameters.addType(index)
             }
             return protoID

@@ -138,7 +138,7 @@ data class AnnotationElement private constructor(
 
     companion object {
         fun of(nameIndex: Int, value: EncodedValue): AnnotationElement {
-            Preconditions.checkArgument(nameIndex >= 0, "nameIndex must not be negative")
+            require(nameIndex >= 0) { "nameIndex must not be negative" }
             return AnnotationElement(nameIndex, value)
         }
 

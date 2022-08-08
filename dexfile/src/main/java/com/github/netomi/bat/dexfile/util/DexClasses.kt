@@ -46,18 +46,18 @@ object DexClasses {
 
     fun internalClassNameFromExternalClassName(externalClassName: String): String {
         Objects.requireNonNull(externalClassName)
-        return externalClassName.replace(".".toRegex(), "/")
+        return externalClassName.replace('.', '/')
     }
 
     fun externalClassNameFromInternalClassName(internalClassName: String): String {
         Objects.requireNonNull(internalClassName)
-        return internalClassName.replace("/".toRegex(), ".")
+        return internalClassName.replace('/', '.')
     }
 
     fun externalClassNameFromInternalType(internalType: String): String {
         Objects.requireNonNull(internalType)
         val className = internalClassNameFromInternalType(internalType)
-        return className.replace("/".toRegex(), ".")
+        return className.replace('/', '.')
     }
 
     fun fullExternalMethodSignature(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): String {

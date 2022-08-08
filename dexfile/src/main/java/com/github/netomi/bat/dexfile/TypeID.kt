@@ -74,7 +74,7 @@ class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() 
 
     companion object {
         fun of(descriptorIndex: Int): TypeID {
-            Preconditions.checkArgument(descriptorIndex >= 0, "descriptor index must not be negative")
+            require(descriptorIndex >= 0) { "descriptor index must not be negative" }
             return TypeID(descriptorIndex)
         }
 

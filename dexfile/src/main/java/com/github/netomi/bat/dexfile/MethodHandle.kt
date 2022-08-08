@@ -137,7 +137,7 @@ class MethodHandle private constructor(_methodHandleTypeValue: Int = -1, _fieldO
         }
 
         fun of(methodHandleType: Int, fieldOrMethodId: Int): MethodHandle {
-            Preconditions.checkArgument(fieldOrMethodId >= 0, "fieldOrMethodId must not be negative")
+            require(fieldOrMethodId >= 0) { "fieldOrMethodId must not be negative" }
             return MethodHandle(methodHandleType, fieldOrMethodId)
         }
 

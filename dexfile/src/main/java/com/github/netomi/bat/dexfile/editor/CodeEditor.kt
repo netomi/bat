@@ -53,8 +53,7 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
 
     fun prependInstruction(offset: Int, instructions: List<DexInstruction>) {
         instructions.forEach {
-            Preconditions.checkArgument(dexFile.supportsOpcode(it.opCode),
-                "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'")
+            require(dexFile.supportsOpcode(it.opCode)) { "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'" }
         }
 
         val modifications = getModifications(offset)
@@ -67,8 +66,7 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
 
     fun appendInstruction(offset: Int, instructions: List<DexInstruction>) {
         instructions.forEach {
-            Preconditions.checkArgument(dexFile.supportsOpcode(it.opCode),
-                "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'")
+            require(dexFile.supportsOpcode(it.opCode)) { "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'" }
         }
 
         val modifications = getModifications(offset)

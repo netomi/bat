@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.instruction.DexOpCode
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.parallelForEachIndexed
-import com.google.common.base.Preconditions
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
 
@@ -28,7 +27,7 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     var dexFormat: DexFormat
         get() = (if (header != null) header?.dexFormat else dexFormatInternal)!!
         set(value) {
-            Preconditions.checkArgument(header == null, "can not set dex format for DexFile instances containing an header")
+            require(header == null) { "can not set dex format for DexFile instances containing an header" }
             dexFormatInternal = value
         }
 
@@ -275,7 +274,7 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     }
 
     internal fun addCallSiteID(callSiteID: CallSiteID): Int {
-        Preconditions.checkArgument(dexFormat >= DexFormat.FORMAT_038, "DexFile of format $dexFormat does not support adding CallSiteIDs")
+        require(dexFormat >= DexFormat.FORMAT_038) { "DexFile of format $dexFormat does not support adding CallSiteIDs" }
 
         callSiteIDs.add(callSiteID)
         val index = callSiteIDs.lastIndex
@@ -301,7 +300,7 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     }
 
     internal fun addMethodHandle(methodHandle: MethodHandle): Int {
-        Preconditions.checkArgument(dexFormat >= DexFormat.FORMAT_038, "DexFile of format $dexFormat does not support adding MethodHandles")
+        require(dexFormat >= DexFormat.FORMAT_038) { "DexFile of format $dexFormat does not support adding MethodHandles" }
 
         methodHandles.add(methodHandle)
         val index = methodHandles.lastIndex

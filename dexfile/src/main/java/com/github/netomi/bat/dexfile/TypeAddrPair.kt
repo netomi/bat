@@ -96,13 +96,13 @@ class TypeAddrPair private constructor(_typeIndex: Int     = NO_INDEX,
 
     companion object {
         fun of(typeIndex: Int, addr: Int): TypeAddrPair {
-            Preconditions.checkArgument(typeIndex >= 0, "typeIndex must not be negative")
-            Preconditions.checkArgument(addr >= 0, "addr must not be negative")
+            require(typeIndex >= 0) { "typeIndex must not be negative" }
+            require(addr >= 0) { "addr must not be negative" }
             return TypeAddrPair(typeIndex, addr)
         }
 
         fun of(typeIndex: Int, label: String): TypeAddrPair {
-            Preconditions.checkArgument(typeIndex >= 0, "typeIndex must not be negative")
+            require(typeIndex >= 0) { "typeIndex must not be negative" }
             return TypeAddrPair(typeIndex, 0, label)
         }
 
