@@ -7,4 +7,5 @@ include 'smali'
 include 'dexdump'
 include 'common'
 include 'jasmin'
+include 'tinydvm'
 
