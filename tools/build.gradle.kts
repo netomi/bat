@@ -22,7 +22,7 @@ distributions {
                 from(configurations.runtimeClasspath)
             }
             into("") {
-                from("${projectDir}/bin")
+                from("${projectDir}/scripts")
                 eachFile {
                     fileMode = 0b111101101
                 }
