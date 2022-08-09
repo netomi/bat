@@ -17,7 +17,7 @@ package com.github.netomi.bat.dexfile.instruction
 
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 
-abstract class Payload protected constructor(opcode: DexOpCode) : DexInstruction(opcode) {
+abstract class Payload protected constructor(opCode: DexOpCode) : DexInstruction(opCode) {
 
     override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
         offsetMap.setPayloadOffset(this, offset)

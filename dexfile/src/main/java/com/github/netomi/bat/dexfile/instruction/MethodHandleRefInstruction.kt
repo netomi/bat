@@ -19,11 +19,11 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class MethodHandleRefInstruction private constructor(       opcode:             DexOpCode,
-                                                            _methodHandleIndex: Int = NO_INDEX,
-                                                     vararg registers:          Int) : DexInstruction(opcode, *registers) {
+class MethodHandleRefInstruction private constructor(       opcode:            DexOpCode,
+                                                            methodHandleIndex: Int = NO_INDEX,
+                                                     vararg registers:         Int) : DexInstruction(opcode, *registers) {
 
-    var methodHandleIndex: Int = _methodHandleIndex
+    var methodHandleIndex: Int = methodHandleIndex
         internal set
 
     fun getMethodHandle(dexFile: DexFile): MethodHandle {

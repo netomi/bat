@@ -24,15 +24,15 @@ import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexString
 
-open class BranchInstruction private constructor(opcode:           DexOpCode,
-                                                 _branchOffset:    Int     = 0,
-                                                 _branchLabel:     String? = null,
-                                                 vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class BranchInstruction private constructor(       opCode:       DexOpCode,
+                                                        branchOffset: Int     = 0,
+                                                        branchLabel:  String? = null,
+                                                 vararg registers:    Int) : DexInstruction(opCode, *registers) {
 
-    var branchOffset = _branchOffset
+    var branchOffset = branchOffset
         internal set
 
-    var branchLabel: String? = _branchLabel
+    var branchLabel: String? = branchLabel
         private set
 
     override fun read(instructions: ShortArray, offset: Int) {

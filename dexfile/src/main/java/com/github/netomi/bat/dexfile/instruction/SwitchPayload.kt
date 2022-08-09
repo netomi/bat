@@ -15,4 +15,4 @@
  */
 package com.github.netomi.bat.dexfile.instruction
 
-abstract class SwitchPayload internal constructor(opcode: DexOpCode) : Payload(opcode)
+abstract class SwitchPayload internal constructor(opCode: DexOpCode) : Payload(opCode)

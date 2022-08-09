@@ -24,9 +24,10 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 
-abstract class DexInstruction protected constructor(val opCode: DexOpCode, vararg _registers: Int) {
+abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
+                                                    vararg registers: Int) {
 
-    var registers: IntArray = _registers
+    var registers: IntArray = registers
         private set
 
     open val length: Int

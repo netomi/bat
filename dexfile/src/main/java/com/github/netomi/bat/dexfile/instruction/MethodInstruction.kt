@@ -20,9 +20,11 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-open class MethodInstruction protected constructor(opcode: DexOpCode, _methodIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class MethodInstruction protected constructor(opcode:           DexOpCode,
+                                                   methodIndex:      Int = NO_INDEX,
+                                                   vararg registers: Int) : DexInstruction(opcode, *registers) {
 
-    var methodIndex: Int = _methodIndex
+    var methodIndex: Int = methodIndex
         internal set
 
     fun getMethodID(dexFile: DexFile): MethodID {

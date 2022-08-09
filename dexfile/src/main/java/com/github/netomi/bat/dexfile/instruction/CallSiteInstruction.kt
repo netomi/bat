@@ -20,11 +20,11 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-class CallSiteInstruction private constructor(opcode:           DexOpCode,
-                                              _callSiteIndex:   Int = NO_INDEX,
-                                              vararg registers: Int) : DexInstruction(opcode, *registers) {
+class CallSiteInstruction private constructor(       opCode:        DexOpCode,
+                                                     callSiteIndex: Int = NO_INDEX,
+                                              vararg registers:     Int) : DexInstruction(opCode, *registers) {
 
-    var callSiteIndex: Int = _callSiteIndex
+    var callSiteIndex: Int = callSiteIndex
         internal set
 
     fun getCallSiteID(dexFile: DexFile): CallSiteID {

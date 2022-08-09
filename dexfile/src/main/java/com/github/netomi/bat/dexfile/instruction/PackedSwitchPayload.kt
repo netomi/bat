@@ -21,19 +21,18 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
-import com.google.common.base.Preconditions
 
-class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
-                                              _branchTargets: IntArray      = EMPTY_TARGETS,
-                                              _branchLabels:  Array<String> = EMPTY_LABELS) : SwitchPayload(DexOpCode.NOP) {
+class PackedSwitchPayload private constructor(firstKey:      Int           = 0,
+                                              branchTargets: IntArray      = EMPTY_TARGETS,
+                                              branchLabels:  Array<String> = EMPTY_LABELS) : SwitchPayload(DexOpCode.NOP) {
 
-    var firstKey:      Int           = _firstKey
+    var firstKey: Int = firstKey
         internal set
 
-    var branchTargets: IntArray      = _branchTargets
+    var branchTargets: IntArray = branchTargets
         internal set
 
-    var branchLabels:  Array<String> = _branchLabels
+    var branchLabels:  Array<String> = branchLabels
         internal set
 
     override val length: Int
@@ -109,7 +108,7 @@ class PackedSwitchPayload private constructor(_firstKey:      Int           = 0,
         }
 
         fun of(firstKey: Int, branchLabels: Array<String>): PackedSwitchPayload {
-            return PackedSwitchPayload(firstKey, _branchLabels = branchLabels)
+            return PackedSwitchPayload(firstKey, branchLabels = branchLabels)
         }
 
         internal fun create(instructions: ShortArray, offset: Int): PackedSwitchPayload {

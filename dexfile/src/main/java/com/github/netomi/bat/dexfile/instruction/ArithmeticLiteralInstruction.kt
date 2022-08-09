@@ -22,9 +22,11 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class ArithmeticLiteralInstruction private constructor(opCode: DexOpCode, _literal: Int = 0, vararg registers: Int) : ArithmeticInstruction(opCode, *registers) {
+class ArithmeticLiteralInstruction private constructor(       opCode:    DexOpCode,
+                                                              literal:   Int = 0,
+                                                       vararg registers: Int) : ArithmeticInstruction(opCode, *registers) {
 
-    var literal = _literal
+    var literal = literal
         private set
 
     override fun read(instructions: ShortArray, offset: Int) {

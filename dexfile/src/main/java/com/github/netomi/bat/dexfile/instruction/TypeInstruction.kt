@@ -20,9 +20,11 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-class TypeInstruction private constructor(opcode: DexOpCode, _typeIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
+class TypeInstruction private constructor(       opCode:    DexOpCode,
+                                                 typeIndex: Int = NO_INDEX,
+                                          vararg registers: Int) : DexInstruction(opCode, *registers) {
 
-    var typeIndex: Int = _typeIndex
+    var typeIndex: Int = typeIndex
         internal set
 
     fun getTypeID(dexFile: DexFile): TypeID {

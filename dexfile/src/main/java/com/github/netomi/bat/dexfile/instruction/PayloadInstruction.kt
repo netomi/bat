@@ -20,11 +20,11 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.util.toSignedHexString
 
-abstract class PayloadInstruction<T: Payload> protected constructor(opcode:         DexOpCode,
-                                                                    _payloadOffset: Int = 0,
-                                                                    register:       Int) : DexInstruction(opcode, register) {
+abstract class PayloadInstruction<T: Payload> protected constructor(opCode:        DexOpCode,
+                                                                    payloadOffset: Int = 0,
+                                                                    register:      Int) : DexInstruction(opCode, register) {
 
-    var payloadOffset = _payloadOffset
+    var payloadOffset = payloadOffset
         internal set
 
     abstract val payload: T

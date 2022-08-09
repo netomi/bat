@@ -19,9 +19,11 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class ArrayTypeInstruction private constructor(opcode: DexOpCode, _typeIndex: Int = NO_INDEX, vararg registers: Int) : ArrayInstruction(opcode, *registers) {
+class ArrayTypeInstruction private constructor(       opCode:     DexOpCode,
+                                                      typeIndex: Int = NO_INDEX,
+                                               vararg registers: Int) : ArrayInstruction(opCode, *registers) {
 
-    var typeIndex: Int = _typeIndex
+    var typeIndex: Int = typeIndex
         internal set
 
     fun getTypeID(dexFile: DexFile): TypeID {

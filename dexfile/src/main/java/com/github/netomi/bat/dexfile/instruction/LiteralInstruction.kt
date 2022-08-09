@@ -23,7 +23,9 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
-class LiteralInstruction private constructor(opCode: DexOpCode, literal: Long = 0, vararg registers: Int) : DexInstruction(opCode, *registers) {
+class LiteralInstruction private constructor(      opCode:     DexOpCode,
+                                                   literal:    Long = 0,
+                                             vararg registers: Int) : DexInstruction(opCode, *registers) {
 
     var value: Long = literal
         private set

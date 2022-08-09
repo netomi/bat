@@ -22,17 +22,17 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class SparseSwitchPayload private constructor(_keys:          IntArray      = EMPTY_ARRAY,
-                                              _branchTargets: IntArray      = EMPTY_ARRAY,
-                                              _branchLabels:  Array<String> = EMPTY_LABELS) : SwitchPayload(DexOpCode.NOP) {
+class SparseSwitchPayload private constructor(keys:          IntArray      = EMPTY_ARRAY,
+                                              branchTargets: IntArray      = EMPTY_ARRAY,
+                                              branchLabels:  Array<String> = EMPTY_LABELS) : SwitchPayload(DexOpCode.NOP) {
 
-    var keys: IntArray = _keys
+    var keys: IntArray = keys
         internal set
 
-    var branchTargets: IntArray = _branchTargets
+    var branchTargets: IntArray = branchTargets
         internal set
 
-    var branchLabels: Array<String> = _branchLabels
+    var branchLabels: Array<String> = branchLabels
         internal set
 
     override val length: Int
@@ -115,7 +115,7 @@ class SparseSwitchPayload private constructor(_keys:          IntArray      = EM
 
         fun of(keys: IntArray, branchLabels: Array<String>): SparseSwitchPayload {
             assert(keys.size == branchLabels.size) { "keys and branchLabels have different sizes" }
-            return SparseSwitchPayload(keys, _branchLabels = branchLabels)
+            return SparseSwitchPayload(keys, branchLabels = branchLabels)
         }
 
         internal fun create(instructions: ShortArray, offset: Int): SparseSwitchPayload {

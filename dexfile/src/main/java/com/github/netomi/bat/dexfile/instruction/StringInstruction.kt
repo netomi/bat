@@ -20,9 +20,11 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-class StringInstruction private constructor(opcode: DexOpCode, _stringIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
+class StringInstruction private constructor(       opCode:      DexOpCode,
+                                                   stringIndex: Int = NO_INDEX,
+                                            vararg registers:   Int) : DexInstruction(opCode, *registers) {
 
-    var stringIndex: Int = _stringIndex
+    var stringIndex: Int = stringIndex
         internal set
 
     fun getString(dexFile: DexFile): String {

@@ -20,9 +20,11 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-class FieldInstruction private constructor(opcode: DexOpCode, _fieldIndex: Int = NO_INDEX, vararg registers: Int) : DexInstruction(opcode, *registers) {
+class FieldInstruction private constructor(       opCode: DexOpCode,
+                                                  fieldIndex: Int = NO_INDEX,
+                                           vararg registers:  Int) : DexInstruction(opCode, *registers) {
 
-    var fieldIndex: Int = _fieldIndex
+    var fieldIndex: Int = fieldIndex
         internal set
 
     fun getField(dexFile: DexFile): FieldID {

@@ -19,11 +19,11 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class MethodTypeRefInstruction private constructor(       opcode:      DexOpCode,
-                                                          _protoIndex: Int = NO_INDEX,
-                                                   vararg registers:   Int) : DexInstruction(opcode, *registers) {
+class MethodTypeRefInstruction private constructor(       opcode:     DexOpCode,
+                                                          protoIndex: Int = NO_INDEX,
+                                                   vararg registers:  Int) : DexInstruction(opcode, *registers) {
 
-    var protoIndex: Int = _protoIndex
+    var protoIndex: Int = protoIndex
         internal set
 
     fun getProtoID(dexFile: DexFile): ProtoID {

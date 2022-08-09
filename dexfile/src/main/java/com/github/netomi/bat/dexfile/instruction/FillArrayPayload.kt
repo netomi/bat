@@ -21,12 +21,13 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class FillArrayPayload private constructor(_elementWidth: Int = 0, _values: ByteArray = EMPTY_VALUES) : Payload(DexOpCode.NOP) {
+class FillArrayPayload private constructor(elementWidth: Int       = 0,
+                                           values:       ByteArray = EMPTY_VALUES) : Payload(DexOpCode.NOP) {
 
-    var elementWidth = _elementWidth
+    var elementWidth = elementWidth
         internal set
 
-    var values: ByteArray = _values
+    var values: ByteArray = values
         internal set
 
     override val length: Int
