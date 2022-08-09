@@ -21,10 +21,11 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
-class LiteralInstruction private constructor(opcode: DexOpCode, _literal: Long = 0, vararg registers: Int) : DexInstruction(opcode, *registers) {
+class LiteralInstruction private constructor(opCode: DexOpCode, literal: Long = 0, vararg registers: Int) : DexInstruction(opCode, *registers) {
 
-    var value: Long = _literal
+    var value: Long = literal
         private set
 
     val valueAsFloat: Float
@@ -32,6 +33,15 @@ class LiteralInstruction private constructor(opcode: DexOpCode, _literal: Long =
 
     val valueAsDouble: Double
         get() = java.lang.Double.longBitsToDouble(value)
+
+    init {
+        when (opCode.format) {
+            FORMAT_11n -> checkRange(value, -0x8, 0x7, opCode)
+            FORMAT_21s -> checkRange(value, -0x8000, 0x7fff, opCode)
+            FORMAT_31i -> checkRange(value, -0x80000000, 0x7fffffff, opCode)
+            else -> {}
+        }
+    }
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
@@ -103,7 +113,21 @@ class LiteralInstruction private constructor(opcode: DexOpCode, _literal: Long =
         visitor.visitLiteralInstruction(dexFile, classDef, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return super.toString() + ", ${toSignedHexStringWithPrefix(value)}"
+    }
+
     companion object {
+        private fun checkRange(value: Long, minValue: Long, maxValue: Long, opCode: DexOpCode) {
+            if (value < minValue || value > maxValue) {
+                throw IllegalArgumentException("literal value '%s' exceeds allowed range [%s, %s] for opcode '%s'"
+                        .format(toSignedHexStringWithPrefix(value),
+                                toSignedHexStringWithPrefix(minValue),
+                                toSignedHexStringWithPrefix(maxValue),
+                                opCode.mnemonic))
+            }
+        }
+
         fun of(opcode: DexOpCode, value: Long, vararg registers: Int): LiteralInstruction {
             return LiteralInstruction(opcode, value, *registers)
         }
