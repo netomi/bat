@@ -18,8 +18,10 @@ package com.github.netomi.bat.tinydvm.processing
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.*
+import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.util.DexClasses.isReferenceType
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.data.*
 
@@ -37,31 +39,108 @@ class InstructionProcessor constructor(private val dvm: Dvm,
     }
 
     override fun visitFieldInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: FieldInstruction) {
+
+        val fieldID = instruction.getField(dexFile)
+        val field   = dvm.getField(dexFile, fieldID) ?:
+            throw VerifyException("[0x%x] field insn references non-existing field '%s.%s:%s'".format(offset,
+                                                                                                      fieldID.getClassType(dexFile),
+                                                                                                      fieldID.getName(dexFile),
+                                                                                                      fieldID.getType(dexFile)))
+
+        val getStaticField = { supportedTypes: Array<String> ->
+            if (!supportedTypes.contains(field.type)) {
+                throw VerifyException("[0x%x] get insn has type '%s' but expected type '%d'"
+                        .format(offset, supportedTypes.joinToString(separator = "|"), field.type))
+            }
+
+            val r = instruction.registers[0]
+            val result = field.get(null)
+
+            registers[r] = result
+            if (instruction.opCode.targetsWideRegister) {
+                registers[r + 1] = result
+            }
+        }
+
+        val setStaticField = { supportedTypes: Array<String> ->
+            if (!supportedTypes.contains(field.type)) {
+                throw VerifyException("[0x%x] get insn has type '%s' but expected type '%d'"
+                        .format(offset, supportedTypes.joinToString(separator = "|"), field.type))
+            }
+
+            val r = instruction.registers[0]
+            var dvmValue = registers[r] ?:
+                    throw VerifyException("[0x%x] unexpected value in v%d of type Undefined but expected '%s' for put"
+                            .format(offset, r, field.type))
+
+            if (instruction.opCode.targetsWideRegister) {
+                val dvmValue2 = registers[r + 1]
+                if (dvmValue != dvmValue2) {
+                    throw VerifyException("[0x%x] unexpected value in register pair v%d/v%d of type %s / %s but expected '%s' for put"
+                            .format(offset, r, r + 1, dvmValue.type, dvmValue2?.type ?: "Undefined", field.type))
+                }
+            }
+
+            dvmValue = dvmValue.withType(field.type)
+            if (!supportedTypes.contains(dvmValue.type)) {
+                throw VerifyException("[0x%x] unexpected value in v%d of type '%s' but expected '%s' for put"
+                        .format(offset, r, dvmValue.type, supportedTypes.joinToString(separator = "|")))
+            }
+
+            field.set(null, dvmValue)
+        }
+
         when (instruction.opCode) {
-            DexOpCode.SGET,
-            DexOpCode.SGET_OBJECT -> {
-                val fieldID = instruction.getField(dexFile)
-                val field   = dvm.getField(dexFile, fieldID)
-                val r       = instruction.registers[0]
+            SGET         -> getStaticField(arrayOf(INT_TYPE, FLOAT_TYPE))
+            SGET_WIDE    -> getStaticField(arrayOf(LONG_TYPE, DOUBLE_TYPE))
+            SGET_BOOLEAN -> getStaticField(arrayOf(BOOLEAN_TYPE))
+            SGET_BYTE    -> getStaticField(arrayOf(BYTE_TYPE))
+            SGET_CHAR    -> getStaticField(arrayOf(CHAR_TYPE))
+            SGET_SHORT   -> getStaticField(arrayOf(SHORT_TYPE))
+
+            SGET_OBJECT -> {
+                if (!isReferenceType(field.type)) {
+                    throw VerifyException("[0x%x] get insn has reference type but expected type '%d'".format(offset, field.type))
+                }
+                val r = instruction.registers[0]
                 registers[r] = field.get(null)
             }
 
-            DexOpCode.SPUT,
-            DexOpCode.SPUT_OBJECT -> {
-                val fieldID = instruction.getField(dexFile)
-                val field   = dvm.getField(dexFile, fieldID)
-                val r       = instruction.registers[0]
-                field.set(null, registers[r]!!)
+            SPUT         -> setStaticField(arrayOf(INT_TYPE, FLOAT_TYPE))
+            SPUT_WIDE    -> setStaticField(arrayOf(LONG_TYPE, DOUBLE_TYPE))
+            SPUT_BOOLEAN -> setStaticField(arrayOf(BOOLEAN_TYPE))
+            SPUT_BYTE    -> setStaticField(arrayOf(BYTE_TYPE))
+            SPUT_CHAR    -> setStaticField(arrayOf(CHAR_TYPE))
+            SPUT_SHORT   -> setStaticField(arrayOf(SHORT_TYPE))
+
+            SPUT_OBJECT -> {
+                if (!isReferenceType(field.type)) {
+                    throw VerifyException("[0x%x] put insn has reference type but expected type '%d'".format(offset, field.type))
+                }
+
+                val r = instruction.registers[0]
+                val dvmValue = registers[r] ?:
+                        throw VerifyException("[0x%x] unexpected value in v%d of type Undefined but expected '%s' for put"
+                                .format(offset, r, field.type))
+
+                if (dvmValue.type != field.type) {
+                    throw VerifyException("[0x%x] unexpected value in v%d of type '%s' but expected '%s' for put"
+                            .format(offset, r, dvmValue.type, field.type))
+                }
+
+                field.set(null, dvmValue)
             }
 
-            else -> {}
+            else -> {
+                throw IllegalStateException("unexpected opCode ${instruction.opCode}")
+            }
         }
     }
 
     override fun visitStringInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: StringInstruction) {
         when (instruction.opCode) {
-            DexOpCode.CONST_STRING,
-            DexOpCode.CONST_STRING_JUMBO -> {
+            CONST_STRING,
+            CONST_STRING_JUMBO -> {
                 val rA = instruction.registers[0]
                 registers[rA] = DvmReferenceValue.of(instruction.getString(dexFile), JAVA_LANG_STRING_TYPE)
             }
@@ -74,7 +153,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
 
     override fun visitMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
         when (instruction.opCode) {
-            DexOpCode.INVOKE_VIRTUAL -> {
+            INVOKE_VIRTUAL -> {
                 val methodID = instruction.getMethodID(dexFile)
                 val classType = methodID.getClassType(dexFile)
                 val methodName = methodID.getName(dexFile)
@@ -88,6 +167,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                             "J" -> java.lang.Long.TYPE
                             "B" -> java.lang.Byte.TYPE
                             "S" -> java.lang.Short.TYPE
+                            "F" -> java.lang.Float.TYPE
                             else -> Class.forName(it)
                         }
                     }.toList()

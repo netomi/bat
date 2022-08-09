@@ -34,11 +34,19 @@ class DvmPrimitiveValue private constructor(private val _value: Long, private va
             SHORT_TYPE         -> _value.toShort()
             BYTE_TYPE          -> _value.toByte()
             CHAR_TYPE          -> _value.toInt().toChar()
-            BOOLEAN_TYPE       -> _value.toInt() == 1
+            BOOLEAN_TYPE       -> _value.toInt() != 0
             FLOAT_TYPE         -> Float.fromBits(_value.toInt())
             DOUBLE_TYPE        -> Double.fromBits(_value)
             UNKNOWN.typeString -> _value
             else -> throw IllegalArgumentException("unexpected primitive type $type")
+        }
+    }
+
+    override fun withType(newType: String): DvmValue {
+        return if (newType != type) {
+            DvmPrimitiveValue(_value, PrimitiveType.of(newType))
+        } else {
+            this
         }
     }
 
@@ -90,5 +98,19 @@ enum class PrimitiveType constructor(val typeString: String) {
     BOOLEAN(BOOLEAN_TYPE),
     FLOAT  (FLOAT_TYPE),
     DOUBLE (DOUBLE_TYPE),
-    UNKNOWN("?")
+    // TODO: support imprecise types instead of just using unknown
+    //       we need to distinguish between wide values and normal ones.
+    UNKNOWN("?");
+
+    companion object {
+        fun of(type: String): PrimitiveType {
+            for (item in values()) {
+                if (type == item.typeString) {
+                    return item
+                }
+            }
+
+            throw RuntimeException("unexpected primitive type $type")
+        }
+    }
 }

@@ -38,7 +38,7 @@ class Dvm constructor(private val dexFile: DexFile) {
         }
     }
 
-    internal fun getField(dexFile: DexFile, fieldID: FieldID): DvmField {
+    internal fun getField(dexFile: DexFile, fieldID: FieldID): DvmField? {
         val name      = fieldID.getName(dexFile)
         val type      = fieldID.getType(dexFile)
         val classType = fieldID.getClassType(dexFile)

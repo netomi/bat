@@ -20,12 +20,29 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.JAVA_LANG_STRING_TYPE
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
+import com.google.common.base.Objects
 
 abstract class DvmValue {
     abstract val value: Any?
     abstract val type:  String
 
     abstract fun valueOfType(type: String): Any?
+
+    abstract fun withType(newType: String): DvmValue
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        val o = other as DvmValue
+
+        return value == o.value &&
+               type  == o.type
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hashCode(value, type)
+    }
 
     companion object {
         fun of(obj: Any, type: String): DvmValue {

@@ -28,6 +28,10 @@ object DexClasses {
         return type.startsWith("[")
     }
 
+    fun isReferenceType(type: String): Boolean {
+        return isClassType(type) || isArrayType(type)
+    }
+    
     fun internalClassNameFromInternalType(type: String): String {
         Objects.requireNonNull(type)
         return if (isClassType(type)) {

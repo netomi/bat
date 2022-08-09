@@ -39,10 +39,11 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
 
     private val staticFields = mutableMapOf<EncodedField, DvmValue>()
 
-    override fun getField(name: String, type: String): DvmField {
+    override fun getField(name: String, type: String): DvmField? {
         val fieldCollector = fieldCollector()
         classDef.fieldsAccept(dexFile, name, type, fieldCollector)
-        return DVMDexField.of(this, fieldCollector.items().single())
+        val field = fieldCollector.items().singleOrNull()
+        return if (field != null) DVMDexField.of(this, field) else null
     }
 
     fun getValueOfStaticField(field: EncodedField): DvmValue {

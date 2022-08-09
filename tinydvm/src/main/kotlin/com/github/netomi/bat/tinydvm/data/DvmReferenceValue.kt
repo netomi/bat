@@ -29,6 +29,10 @@ class DvmReferenceValue private constructor(private val reference: Any?, overrid
         return value
     }
 
+    override fun withType(newType: String): DvmValue {
+        return DvmReferenceValue(reference, newType)
+    }
+
     companion object {
         fun of(obj: Any?, type: String): DvmReferenceValue {
             return DvmReferenceValue(obj, type)

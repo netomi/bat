@@ -27,8 +27,12 @@ class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClas
     override val className: String
         get() = internalClassNameFromExternalClassName(clazz.name)
 
-    override fun getField(name: String, type: String): DvmField {
-        return DvmNativeField.of(clazz.getField(name), type)
+    override fun getField(name: String, type: String): DvmField? {
+        return try {
+            DvmNativeField.of(clazz.getField(name), type)
+        } catch (exception: NoSuchFieldException) {
+            null
+        }
     }
 
     companion object {

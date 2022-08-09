@@ -14,11 +14,6 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.processing
 
-abstract class DvmClass {
-    abstract val type:      String
-    abstract val className: String
-
-    abstract fun getField(name: String, type: String): DvmField?
-}
+class VerifyException constructor(message: String): RuntimeException(message)
