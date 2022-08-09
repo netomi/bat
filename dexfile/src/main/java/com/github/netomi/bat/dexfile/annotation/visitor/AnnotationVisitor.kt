@@ -44,10 +44,8 @@ fun interface AnnotationVisitor {
     }
 }
 
-private class MultiAnnotationVisitor constructor(visitor: AnnotationVisitor,
-                                                 vararg otherVisitors: AnnotationVisitor
-)
-
+private class MultiAnnotationVisitor constructor(       visitor:       AnnotationVisitor,
+                                                 vararg otherVisitors: AnnotationVisitor)
     : AbstractMultiVisitor<AnnotationVisitor>(visitor, *otherVisitors), AnnotationVisitor {
 
     override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
