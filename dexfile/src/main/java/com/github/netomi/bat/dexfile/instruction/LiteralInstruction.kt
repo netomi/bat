@@ -39,6 +39,7 @@ class LiteralInstruction private constructor(opCode: DexOpCode, literal: Long = 
             FORMAT_11n -> checkRange(value, -0x8, 0x7, opCode)
             FORMAT_21s -> checkRange(value, -0x8000, 0x7fff, opCode)
             FORMAT_31i -> checkRange(value, -0x80000000, 0x7fffffff, opCode)
+            FORMAT_21h -> checkRangeHigh16(value, -0x8000, 0x7fff, opCode)
             else -> {}
         }
     }
@@ -124,6 +125,24 @@ class LiteralInstruction private constructor(opCode: DexOpCode, literal: Long = 
                         .format(toSignedHexStringWithPrefix(value),
                                 toSignedHexStringWithPrefix(minValue),
                                 toSignedHexStringWithPrefix(maxValue),
+                                opCode.mnemonic))
+            }
+        }
+
+        private fun checkRangeHigh16(value: Long, minValue: Long, maxValue: Long, opCode: DexOpCode) {
+            if (((value shr 16) shl 16) != value) {
+                throw IllegalArgumentException("lower 16 bits must be cleared in literal value '%s' for opcode '%s'"
+                        .format(toSignedHexStringWithPrefix(value), opCode.mnemonic))
+            }
+
+            val shiftedValue = value shr 16
+            if (shiftedValue < minValue || shiftedValue > maxValue) {
+                val shiftedMinValue = minValue shl 16
+                val shiftedMaxValue = maxValue shl 16
+                throw IllegalArgumentException("literal value '%s' exceeds allowed range [%s, %s] for opcode '%s'"
+                        .format(toSignedHexStringWithPrefix(value),
+                                toSignedHexStringWithPrefix(shiftedMinValue),
+                                toSignedHexStringWithPrefix(shiftedMaxValue),
                                 opCode.mnemonic))
             }
         }

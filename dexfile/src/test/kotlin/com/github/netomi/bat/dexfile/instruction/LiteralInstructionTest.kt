@@ -40,6 +40,13 @@ class LiteralInstructionTest: DexInstructionTest<LiteralInstruction>() {
             LiteralInstruction.of(DexOpCode.CONST, -0x1, 0),
             LiteralInstruction.of(DexOpCode.CONST,  0x7fffffff, 0),
             LiteralInstruction.of(DexOpCode.CONST, -0x80000000, 0),
+
+            // const/high16
+            LiteralInstruction.of(DexOpCode.CONST_HIGH16,  0x0, 0),
+            LiteralInstruction.of(DexOpCode.CONST_HIGH16,  0x00010000, 0),
+            LiteralInstruction.of(DexOpCode.CONST_HIGH16,  0x7fff0000, 0),
+            LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x00010000, 0),
+            LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x80000000, 0),
         )
 
     override val failInstances: Array<() -> LiteralInstruction>
@@ -55,6 +62,12 @@ class LiteralInstructionTest: DexInstructionTest<LiteralInstruction>() {
             // const
             { LiteralInstruction.of(DexOpCode.CONST,  0x80000000, 0) },
             { LiteralInstruction.of(DexOpCode.CONST, -0x80000001, 0) },
+
+            // const/high16
+            { LiteralInstruction.of(DexOpCode.CONST_HIGH16,  0x00000001, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x00000001, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_HIGH16,  0x80000000, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x80010000, 0) },
         )
 
     override fun equals(instructionA: LiteralInstruction, instructionB: LiteralInstruction): Boolean {
