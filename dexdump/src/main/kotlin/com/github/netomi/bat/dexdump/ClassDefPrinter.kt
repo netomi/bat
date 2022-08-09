@@ -269,14 +269,14 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         }
 
         private fun formatSignatureByteArray(array: ByteArray): String {
-            val sb = StringBuilder()
-            val len = array.size
-            sb.append(toHexString(array[0]))
-            sb.append(toHexString(array[1]))
-            sb.append("...")
-            sb.append(toHexString(array[len - 2]))
-            sb.append(toHexString(array[len - 1]))
-            return sb.toString()
+            return buildString {
+                val len = array.size
+                append(toHexString(array[0]))
+                append(toHexString(array[1]))
+                append("...")
+                append(toHexString(array[len - 2]))
+                append(toHexString(array[len - 1]))
+            }
         }
     }
 }
