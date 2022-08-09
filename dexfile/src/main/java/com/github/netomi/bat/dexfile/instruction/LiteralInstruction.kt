@@ -130,15 +130,16 @@ class LiteralInstruction private constructor(opCode: DexOpCode, literal: Long = 
         }
 
         private fun checkRangeHigh16(value: Long, minValue: Long, maxValue: Long, opCode: DexOpCode) {
-            if (((value shr 16) shl 16) != value) {
-                throw IllegalArgumentException("lower 16 bits must be cleared in literal value '%s' for opcode '%s'"
-                        .format(toSignedHexStringWithPrefix(value), opCode.mnemonic))
+            val shift = if (opCode.targetsWideRegister) 48 else 16
+            if (((value shr shift) shl shift) != value) {
+                throw IllegalArgumentException("lower %d bits must be cleared in literal value '%s' for opcode '%s'"
+                        .format(shift, toSignedHexStringWithPrefix(value), opCode.mnemonic))
             }
 
-            val shiftedValue = value shr 16
+            val shiftedValue = value shr shift
             if (shiftedValue < minValue || shiftedValue > maxValue) {
-                val shiftedMinValue = minValue shl 16
-                val shiftedMaxValue = maxValue shl 16
+                val shiftedMinValue = minValue shl shift
+                val shiftedMaxValue = maxValue shl shift
                 throw IllegalArgumentException("literal value '%s' exceeds allowed range [%s, %s] for opcode '%s'"
                         .format(toSignedHexStringWithPrefix(value),
                                 toSignedHexStringWithPrefix(shiftedMinValue),
