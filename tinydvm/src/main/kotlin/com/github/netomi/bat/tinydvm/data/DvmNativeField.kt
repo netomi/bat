@@ -18,12 +18,13 @@ package com.github.netomi.bat.tinydvm.data
 
 import java.lang.reflect.Field
 
-class DvmNativeField private constructor(private val field: Field, override val type: String): DvmField() {
+class DvmNativeField private constructor(private val  field: Field,
+                                         override val type:  String): DvmField() {
 
-    override val name:String = field.name
+    override val name: String = field.name
 
     override fun get(obj: Any?): DvmValue {
-        return DvmValue.of(field.get(obj), type)
+        return DvmValue.ofNativeValue(field.get(obj), type)
     }
 
     override fun set(obj: Any?, value: DvmValue) {

@@ -21,17 +21,22 @@ import com.github.netomi.bat.dexfile.util.DexClasses.internalClassNameFromExtern
 import com.github.netomi.bat.dexfile.util.DexClasses.internalTypeFromInternalClassName
 
 class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClass() {
+
     override val type: String
         get() = internalTypeFromInternalClassName(clazz.name)
 
     override val className: String
         get() = internalClassNameFromExternalClassName(clazz.name)
 
+    private val fieldCache = mutableMapOf<String, DvmNativeField?>()
+
     override fun getField(name: String, type: String): DvmField? {
-        return try {
-            DvmNativeField.of(clazz.getField(name), type)
-        } catch (exception: NoSuchFieldException) {
-            null
+        return fieldCache.computeIfAbsent(name) { fieldName ->
+            try {
+                DvmNativeField.of(clazz.getField(fieldName), type)
+            } catch (exception: NoSuchFieldException) {
+                null
+            }
         }
     }
 

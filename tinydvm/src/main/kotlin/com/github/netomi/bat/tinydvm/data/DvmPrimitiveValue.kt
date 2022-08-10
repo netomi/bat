@@ -27,7 +27,7 @@ class DvmPrimitiveValue private constructor(private val _value: Long, private va
     override val value: Any
         get() = valueOfType(type)
 
-    override fun valueOfType(type: String): Any {
+    fun valueOfType(type: String): Any {
         return when (type) {
             INT_TYPE           -> _value.toInt()
             LONG_TYPE          -> _value
@@ -42,7 +42,7 @@ class DvmPrimitiveValue private constructor(private val _value: Long, private va
         }
     }
 
-    override fun withType(newType: String): DvmValue {
+    fun withType(newType: String): DvmValue {
         return if (newType != type) {
             DvmPrimitiveValue(_value, PrimitiveType.of(newType))
         } else {

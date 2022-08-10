@@ -20,15 +20,12 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.JAVA_LANG_STRING_TYPE
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
+import com.github.netomi.bat.tinydvm.Dvm
 import com.google.common.base.Objects
 
-abstract class DvmValue {
+sealed class DvmValue {
     abstract val value: Any?
     abstract val type:  String
-
-    abstract fun valueOfType(type: String): Any?
-
-    abstract fun withType(newType: String): DvmValue
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -45,8 +42,14 @@ abstract class DvmValue {
     }
 
     companion object {
-        fun of(obj: Any, type: String): DvmValue {
+        fun ofNativeValue(obj: Any?, type: String): DvmValue {
+            if (obj == null) {
+                return DvmReferenceValue.of(DvmNativeObject.of(null, type))
+            }
+
             return when (obj::class.java) {
+                DvmValue::class.java   -> obj as DvmValue
+
                 Integer.TYPE           -> DvmPrimitiveValue.of((obj as Number).toInt())
                 Character.TYPE         -> DvmPrimitiveValue.of((obj as Char))
                 java.lang.Long.TYPE    -> DvmPrimitiveValue.of((obj as Number).toLong())
@@ -56,7 +59,7 @@ abstract class DvmValue {
                 java.lang.Double.TYPE  -> DvmPrimitiveValue.of((obj as Number).toDouble())
                 java.lang.Boolean.TYPE -> DvmPrimitiveValue.of(obj as Boolean)
 
-                else -> DvmReferenceValue.of(obj, type)
+                else                   -> DvmReferenceValue.of(DvmNativeObject.of(obj, type))
             }
         }
     }
@@ -107,10 +110,10 @@ private class EncodedValueConverter constructor(private val type: String): Encod
     }
 
     override fun visitNullValue(dexFile: DexFile, value: EncodedNullValue) {
-        dvmValue = DvmReferenceValue.of(null, type)
+        dvmValue = DvmReferenceValue.of(DvmNativeObject.of(null, type))
     }
 
     override fun visitStringValue(dexFile: DexFile, value: EncodedStringValue) {
-        dvmValue = DvmReferenceValue.of(value.getStringValue(dexFile), JAVA_LANG_STRING_TYPE)
+        dvmValue = DvmReferenceValue.of(DvmNativeObject.of(value.getStringValue(dexFile), JAVA_LANG_STRING_TYPE))
     }
 }

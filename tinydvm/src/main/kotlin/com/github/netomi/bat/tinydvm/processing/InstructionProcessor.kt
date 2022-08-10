@@ -38,6 +38,18 @@ class InstructionProcessor constructor(private val dvm: Dvm,
         }
     }
 
+    override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+        when (instruction.opCode) {
+            NEW_INSTANCE -> {
+                val dvmClazz = dvm.getClass(instruction.getType(dexFile))
+                val r = instruction.registers[0]
+                registers[r] = DvmReferenceValue.of(DvmObject.newInstanceOf(dvmClazz))
+            }
+
+            else -> {}
+        }
+    }
+
     override fun visitFieldInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: FieldInstruction) {
 
         val fieldID = instruction.getField(dexFile)
@@ -62,7 +74,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             }
         }
 
-        val setStaticField = { supportedTypes: Array<String> ->
+        val setPrimitiveStaticField = { supportedTypes: Array<String> ->
             if (!supportedTypes.contains(field.type)) {
                 throw VerifyException("[0x%x] get insn has type '%s' but expected type '%d'"
                         .format(offset, supportedTypes.joinToString(separator = "|"), field.type))
@@ -72,6 +84,11 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             var dvmValue = registers[r] ?:
                     throw VerifyException("[0x%x] unexpected value in v%d of type Undefined but expected '%s' for put"
                             .format(offset, r, field.type))
+
+            if (dvmValue !is DvmPrimitiveValue) {
+                throw VerifyException("[0x%x] unexpected value in v%d of type '%s' but expected '%s' for put"
+                        .format(offset, r, dvmValue.type, field.type))
+            }
 
             if (instruction.opCode.targetsWideRegister) {
                 val dvmValue2 = registers[r + 1]
@@ -106,12 +123,12 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                 registers[r] = field.get(null)
             }
 
-            SPUT         -> setStaticField(arrayOf(INT_TYPE, FLOAT_TYPE))
-            SPUT_WIDE    -> setStaticField(arrayOf(LONG_TYPE, DOUBLE_TYPE))
-            SPUT_BOOLEAN -> setStaticField(arrayOf(BOOLEAN_TYPE))
-            SPUT_BYTE    -> setStaticField(arrayOf(BYTE_TYPE))
-            SPUT_CHAR    -> setStaticField(arrayOf(CHAR_TYPE))
-            SPUT_SHORT   -> setStaticField(arrayOf(SHORT_TYPE))
+            SPUT         -> setPrimitiveStaticField(arrayOf(INT_TYPE, FLOAT_TYPE))
+            SPUT_WIDE    -> setPrimitiveStaticField(arrayOf(LONG_TYPE, DOUBLE_TYPE))
+            SPUT_BOOLEAN -> setPrimitiveStaticField(arrayOf(BOOLEAN_TYPE))
+            SPUT_BYTE    -> setPrimitiveStaticField(arrayOf(BYTE_TYPE))
+            SPUT_CHAR    -> setPrimitiveStaticField(arrayOf(CHAR_TYPE))
+            SPUT_SHORT   -> setPrimitiveStaticField(arrayOf(SHORT_TYPE))
 
             SPUT_OBJECT -> {
                 if (!isReferenceType(field.type)) {
@@ -142,7 +159,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             CONST_STRING,
             CONST_STRING_JUMBO -> {
                 val rA = instruction.registers[0]
-                registers[rA] = DvmReferenceValue.of(instruction.getString(dexFile), JAVA_LANG_STRING_TYPE)
+                registers[rA] = DvmReferenceValue.of(DvmNativeObject.of(instruction.getString(dexFile), JAVA_LANG_STRING_TYPE))
             }
 
             else -> {
@@ -180,11 +197,19 @@ class InstructionProcessor constructor(private val dvm: Dvm,
 
                 val paramList = Array(instruction.registers.size - 1) { index ->
                     val r = instruction.registers[index + 1]
-                    var dvmValue = registers[r]
-                    dvmValue?.valueOfType(parameterTypes[index])
+                    val dvmValue = registers[r]
+
+                    if (dvmValue == null) {
+                        null
+                    } else {
+                        when (dvmValue) {
+                            is DvmPrimitiveValue -> dvmValue.valueOfType(parameterTypes[index])
+                            is DvmReferenceValue -> dvmValue.value.obj
+                        }
+                    }
                 }
 
-                m.invoke(registers[r1]?.value, *paramList)
+                m.invoke((registers[r1]?.value as DvmNativeObject).obj, *paramList)
             }
 
             else -> {}

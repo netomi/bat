@@ -16,7 +16,7 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-abstract class DvmField {
+sealed class DvmField {
     abstract val name: String
     abstract val type: String
 

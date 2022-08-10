@@ -16,5 +16,17 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-class DvmObject {
+sealed class DvmObject {
+    abstract val obj:  Any?
+    abstract val type: String
+
+    companion object {
+        fun newInstanceOf(clazz: DvmClass): DvmObject {
+            return when (clazz) {
+                is DvmDexClass    -> DvmDexObject.newInstanceOf(clazz)
+                is DvmNativeClass -> DvmNativeObject.newInstanceOf(clazz)
+                else -> error("unexpected DvmClass $clazz")
+            }
+        }
+    }
 }

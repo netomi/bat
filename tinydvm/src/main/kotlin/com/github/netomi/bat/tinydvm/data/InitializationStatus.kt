@@ -16,5 +16,8 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-class InitializationStatus {
+enum class InitializationStatus {
+    NOT_INITIALIZED,
+    INITIALIZING,
+    INITIALIZED
 }

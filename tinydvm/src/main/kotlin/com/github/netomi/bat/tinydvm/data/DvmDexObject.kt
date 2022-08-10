@@ -16,5 +16,37 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-class DvmDexObject constructor(val clazz: DvmDexClass) {
+import com.github.netomi.bat.dexfile.EncodedField
+
+class DvmDexObject constructor(private val clazz: DvmDexClass): DvmObject() {
+
+    override val obj: Any
+        get() = this
+
+    override val type: String
+        get() = clazz.type
+
+    private val instanceFields = mutableMapOf<EncodedField, DvmValue?>()
+
+    private var status = InitializationStatus.NOT_INITIALIZED
+
+    val isInitialized = status == InitializationStatus.INITIALIZED
+
+    fun getClass(): DvmDexClass {
+        return clazz
+    }
+
+    fun getValue(field: EncodedField): DvmValue {
+        return instanceFields[field] ?: throw RuntimeException("field $field has no value assigned")
+    }
+
+    fun setValue(field: EncodedField, value: DvmValue) {
+        instanceFields[field] = value
+    }
+
+    companion object {
+        fun newInstanceOf(clazz: DvmDexClass): DvmDexObject {
+            return DvmDexObject(clazz)
+        }
+    }
 }

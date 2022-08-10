@@ -39,11 +39,15 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
 
     private val staticFields = mutableMapOf<EncodedField, DvmValue>()
 
+    private val fieldCache = mutableMapOf<Pair<String, String>, DVMDexField?>()
+
     override fun getField(name: String, type: String): DvmField? {
-        val fieldCollector = fieldCollector()
-        classDef.fieldsAccept(dexFile, name, type, fieldCollector)
-        val field = fieldCollector.items().singleOrNull()
-        return if (field != null) DVMDexField.of(this, field) else null
+        return fieldCache.computeIfAbsent(Pair(name, type)) {
+            val fieldCollector = fieldCollector()
+            classDef.fieldsAccept(dexFile, name, type, fieldCollector)
+            val field = fieldCollector.items().singleOrNull()
+            if (field != null) DVMDexField.of(this, field) else null
+        }
     }
 
     fun getValueOfStaticField(field: EncodedField): DvmValue {
@@ -87,10 +91,4 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
             return DvmDexClass(dexFile, classDef)
         }
     }
-}
-
-enum class InitializationStatus {
-    NOT_INITIALIZED,
-    INITIALIZING,
-    INITIALIZED
 }

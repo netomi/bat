@@ -16,7 +16,7 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-abstract class DvmClass {
+sealed class DvmClass {
     abstract val type:      String
     abstract val className: String
 
