@@ -37,20 +37,19 @@ import java.util.*
     type          = TYPE_CLASS_DEF_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class ClassDef private constructor(
-    _classIndex:           Int                  = NO_INDEX,
-    _accessFlags:          Int                  = 0,
-    _superClassIndex:      Int                  = NO_INDEX,
-    _sourceFileIndex:      Int                  = NO_INDEX,
-    _interfaces:           TypeList             = TypeList.empty(),
-    _annotationsDirectory: AnnotationsDirectory = AnnotationsDirectory.empty(),
-    _classData:            ClassData            = ClassData.empty(),
-    _staticValues:         EncodedArray         = EncodedArray.empty()) : DataItem() {
+class ClassDef private constructor(            classIndex:           Int                  = NO_INDEX,
+                                               accessFlags:          Int                  = 0,
+                                               superClassIndex:      Int                  = NO_INDEX,
+                                               sourceFileIndex:      Int                  = NO_INDEX,
+                                               interfaces:           TypeList             = TypeList.empty(),
+                                               annotationsDirectory: AnnotationsDirectory = AnnotationsDirectory.empty(),
+                                               classData:            ClassData            = ClassData.empty(),
+                                   private var staticValues:         EncodedArray         = EncodedArray.empty()) : DataItem() {
 
-    var classIndex: Int = _classIndex
+    var classIndex: Int = classIndex
         internal set
 
-    var accessFlags: Int = _accessFlags
+    var accessFlags: Int = accessFlags
         internal set
 
     val visibility: Visibility
@@ -59,10 +58,10 @@ class ClassDef private constructor(
     val modifiers: EnumSet<ClassModifier>
         get() = ClassModifier.setOf(accessFlags)
 
-    var superClassIndex: Int = _superClassIndex
+    var superClassIndex: Int = superClassIndex
         internal set
 
-    var sourceFileIndex: Int = _sourceFileIndex
+    var sourceFileIndex: Int = sourceFileIndex
         internal set
 
     var interfacesOffset = 0
@@ -77,16 +76,13 @@ class ClassDef private constructor(
     var staticValuesOffset = 0
         private set
 
-    var interfaces: TypeList = _interfaces
+    var interfaces: TypeList = interfaces
         private set
 
-    internal var annotationsDirectory: AnnotationsDirectory = _annotationsDirectory
+    internal var annotationsDirectory: AnnotationsDirectory = annotationsDirectory
         private set
 
-    var classData: ClassData = _classData
-        private set
-
-    var staticValues: EncodedArray = _staticValues
+    var classData: ClassData = classData
         private set
 
     fun getClassName(dexFile: DexFile): String {
@@ -357,15 +353,7 @@ class ClassDef private constructor(
 
     companion object {
         fun of(classIndex: Int, accessFlags: Int, superClassIndex: Int = NO_INDEX, sourceFileIndex: Int = NO_INDEX): ClassDef {
-            return ClassDef(classIndex,
-                            accessFlags,
-                            superClassIndex,
-                            sourceFileIndex,
-                            TypeList.empty(),
-                            AnnotationsDirectory.empty(),
-                            ClassData.empty(),
-                            EncodedArray.empty()
-            )
+            return ClassDef(classIndex, accessFlags, superClassIndex, sourceFileIndex)
         }
 
         fun readContent(input: DexDataInput): ClassDef {

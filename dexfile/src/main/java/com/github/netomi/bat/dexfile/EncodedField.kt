@@ -19,7 +19,9 @@ import com.github.netomi.bat.dexfile.FieldModifier.Companion.setOf
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
@@ -95,6 +97,12 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
         if (isStatic) {
             classDef.staticValueAccept(dexFile, index, visitor)
         }
+    }
+
+    fun staticValueCollect(dexFile: DexFile): EncodedValue? {
+        val collector = valueCollector()
+        staticValueAccept(dexFile, collector)
+        return collector.items().singleOrNull()
     }
 
     fun annotationSetAccept(dexFile: DexFile, classDef: ClassDef, field: EncodedField, visitor: AnnotationSetVisitor) {

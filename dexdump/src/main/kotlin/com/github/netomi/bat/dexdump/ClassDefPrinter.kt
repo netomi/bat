@@ -25,6 +25,7 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.toHexString
 import com.github.netomi.bat.util.toHexStringWithPrefix
@@ -98,11 +99,13 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println("  name          : '" + field.getName(dexFile) + "'")
         printer.println("  type          : '" + field.getType(dexFile) + "'")
         printer.println("  access        : " + formatAccessFlags(field.accessFlags, DexAccessFlagTarget.FIELD))
-        val staticValues = if (!classDef.staticValues.isEmpty) classDef.staticValues.array else null
-        if (field.isStatic && staticValues != null && index < staticValues.values.size) {
-            printer.print("  value         : ")
-            staticValues.valueAccept(dexFile, index, encodedValuePrinter)
-            printer.println()
+        if (field.isStatic) {
+            val staticValue = field.staticValueCollect(dexFile)
+            if (staticValue != null) {
+                printer.print("  value         : ")
+                staticValue.accept(dexFile, encodedValuePrinter)
+                printer.println()
+            }
         }
     }
 
