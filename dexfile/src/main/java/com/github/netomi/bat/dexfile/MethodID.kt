@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.*
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -30,15 +29,17 @@ import java.util.*
     type          = TYPE_METHOD_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class MethodID private constructor(_classIndex: Int = NO_INDEX, _nameIndex:  Int = NO_INDEX, _protoIndex: Int = NO_INDEX) : DataItem() {
+class MethodID private constructor(classIndex: Int = NO_INDEX,
+                                   nameIndex:  Int = NO_INDEX,
+                                   protoIndex: Int = NO_INDEX) : DataItem() {
 
-    var classIndex: Int = _classIndex
+    var classIndex: Int = classIndex
         internal set
 
-    var nameIndex: Int = _nameIndex
+    var nameIndex: Int = nameIndex
         internal set
 
-    var protoIndex: Int = _protoIndex
+    var protoIndex: Int = protoIndex
         internal set
 
     fun getClassTypeID(dexFile: DexFile): TypeID {

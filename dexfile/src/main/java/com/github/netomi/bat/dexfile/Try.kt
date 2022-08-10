@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -27,25 +26,25 @@ import java.util.*
  *
  * @see [try item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-item)
  */
-class Try private constructor(_startAddr:    Int                 = 0,
-                              _insnCount:    Int                 = 0,
-                              _startLabel:   String?             = null,
-                              _endLabel:     String?             = null,
-                              _catchHandler: EncodedCatchHandler = EncodedCatchHandler.empty()): DexContent() {
+class Try private constructor(startAddr:    Int                 = 0,
+                              insnCount:    Int                 = 0,
+                              startLabel:   String?             = null,
+                              endLabel:     String?             = null,
+                              catchHandler: EncodedCatchHandler = EncodedCatchHandler.empty()): DexContent() {
 
-    var startAddr: Int = _startAddr
+    var startAddr: Int = startAddr
         internal set
 
-    var insnCount: Int = _insnCount
+    var insnCount: Int = insnCount
         internal set
 
-    var startLabel: String? = _startLabel
+    var startLabel: String? = startLabel
         internal set
 
-    var endLabel: String?   = _endLabel
+    var endLabel: String?   = endLabel
         internal set
 
-    var catchHandler: EncodedCatchHandler = _catchHandler
+    var catchHandler: EncodedCatchHandler = catchHandler
         internal set
 
     // internal as this field is set from the Code item.
@@ -103,11 +102,15 @@ class Try private constructor(_startAddr:    Int                 = 0,
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(startAddr, insnCount, catchHandler)
+        return Objects.hash(startAddr, insnCount, startLabel, endLabel, catchHandler)
     }
 
     override fun toString(): String {
-        return "Try[startAddr=%04x,insnCount=%d,handler=%s]".format(startAddr, insnCount, catchHandler)
+        return if (startLabel != null) {
+            "Try[startLabel=%s,endLabel=%s,handler=%s]".format(startLabel, endLabel, catchHandler)
+        } else {
+            "Try[startAddr=%04x,insnCount=%d,handler=%s]".format(startAddr, insnCount, catchHandler)
+        }
     }
 
     companion object {

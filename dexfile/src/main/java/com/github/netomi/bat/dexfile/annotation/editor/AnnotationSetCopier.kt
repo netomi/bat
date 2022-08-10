@@ -21,8 +21,8 @@ import com.github.netomi.bat.dexfile.annotation.AnnotationSet
 import com.github.netomi.bat.dexfile.editor.DexEditor
 
 internal fun AnnotationSet.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor, targetAnnotationSet: AnnotationSet) {
-    for (i in 0 until annotationCount) {
-        val targetAnnotation = getAnnotation(i).copyTo(originDexFile, targetDexEditor)
+    for (annotation in annotations) {
+        val targetAnnotation = annotation.copyTo(originDexFile, targetDexEditor)
         targetAnnotationSet.addAnnotation(targetDexEditor.dexFile, targetAnnotation)
     }
 }

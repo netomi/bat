@@ -32,9 +32,7 @@ import java.util.*
     type          = TYPE_TYPE_LIST,
     dataAlignment = 4,
     dataSection   = false)
-class TypeList private constructor() : DataItem(), Comparable<TypeList> {
-
-    internal var typeList: IntArray = intArrayOf()
+class TypeList private constructor(internal var typeList: IntArray = intArrayOf()): DataItem(), Comparable<TypeList> {
 
     override val isEmpty: Boolean
         get() = typeList.isEmpty()

@@ -33,62 +33,69 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATION_SET_REF_LIST,
     dataAlignment = 4,
     dataSection   = true)
-class AnnotationSetRefList private constructor(val annotationSetRefs: ArrayList<AnnotationSetRef> = ArrayList(0)) : DataItem() {
+class AnnotationSetRefList private constructor(private val _annotationSetRefs: ArrayList<AnnotationSetRef> = ArrayList(0)) : DataItem() {
+
+    val annotationSetRefs: List<AnnotationSetRef>
+        get() = _annotationSetRefs
 
     val annotationSetRefCount: Int
-        get() = annotationSetRefs.size
+        get() = _annotationSetRefs.size
 
     fun getAnnotationSetRef(index: Int): AnnotationSetRef {
-        return annotationSetRefs[index]
+        return _annotationSetRefs[index]
+    }
+
+    internal fun addAnnotationSetRef(annotationSetRef: AnnotationSetRef) {
+        _annotationSetRefs.add(annotationSetRef)
     }
 
     override val isEmpty: Boolean
-        get() = !annotationSetRefs.any { !it.isEmpty }
+        get() = !_annotationSetRefs.any { !it.isEmpty }
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()
-        annotationSetRefs.clear()
-        annotationSetRefs.ensureCapacity(size)
+        _annotationSetRefs.clear()
+        _annotationSetRefs.ensureCapacity(size)
         for (i in 0 until size) {
             val annotationSetRef = AnnotationSetRef.readContent(input)
-            annotationSetRefs.add(annotationSetRef)
+            _annotationSetRefs.add(annotationSetRef)
         }
     }
 
     override fun readLinkedDataItems(input: DexDataInput) {
-        for (annotationSetRef in annotationSetRefs) {
+        for (annotationSetRef in _annotationSetRefs) {
             annotationSetRef.readLinkedDataItems(input)
         }
     }
 
     override fun updateOffsets(dataItemMap: Map) {
-        for (annotationSetRef in annotationSetRefs) {
+        for (annotationSetRef in _annotationSetRefs) {
             annotationSetRef.updateOffsets(dataItemMap)
         }
     }
 
     override fun write(output: DexDataOutput) {
-        output.writeInt(annotationSetRefs.size)
-        for (annotationSetRef in annotationSetRefs) {
+        output.writeInt(_annotationSetRefs.size)
+        for (annotationSetRef in _annotationSetRefs) {
             annotationSetRef.write(output)
         }
     }
 
     fun accept(dexFile: DexFile, classDef: ClassDef, index: Int, visitor: AnnotationVisitor) {
-        if (index in 0 until annotationSetRefCount) {
-            val annotationSetRef = annotationSetRefs[index]
+        if (index in _annotationSetRefs.indices) {
+            val annotationSetRef = _annotationSetRefs[index]
             annotationSetRef.accept(dexFile, classDef, visitor)
         }
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        for (annotationSetRef in annotationSetRefs) {
+        for (annotationSetRef in _annotationSetRefs) {
             annotationSetRef.dataItemsAccept(dexFile, visitor)
         }
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        annotationSetRefs.forEach { it.referencedIDsAccept(dexFile, visitor) }
+        _annotationSetRefs.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -97,15 +104,15 @@ class AnnotationSetRefList private constructor(val annotationSetRefs: ArrayList<
 
         val o = other as AnnotationSetRefList
 
-        return annotationSetRefs == o.annotationSetRefs
+        return _annotationSetRefs == o._annotationSetRefs
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(annotationSetRefs)
+        return Objects.hash(_annotationSetRefs)
     }
 
     override fun toString(): String {
-        return "AnnotationSetRefList[annotationSetRefs=${annotationSetRefs.size} items]"
+        return "AnnotationSetRefList[annotationSetRefs=${_annotationSetRefs.size} items]"
     }
 
     companion object {

@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -33,14 +32,14 @@ import java.util.*
     type          = TYPE_PROTO_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class ProtoID private constructor(            _shortyIndex:     Int      = NO_INDEX,
-                                              _returnTypeIndex: Int      = NO_INDEX,
-                                  private var _parameters:      TypeList = TypeList.empty()) : DataItem() {
+class ProtoID private constructor(            shortyIndex:     Int      = NO_INDEX,
+                                              returnTypeIndex: Int      = NO_INDEX,
+                                  private var _parameters:     TypeList = TypeList.empty()) : DataItem() {
 
-    var shortyIndex: Int = _shortyIndex
+    var shortyIndex: Int = shortyIndex
         internal set
 
-    var returnTypeIndex: Int = _returnTypeIndex
+    var returnTypeIndex: Int = returnTypeIndex
         internal set
 
     val parameters: TypeList

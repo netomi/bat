@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -31,9 +30,9 @@ import java.util.*
     type          = TYPE_TYPE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class TypeID private constructor(_descriptorIndex: Int = NO_INDEX) : DataItem() {
+class TypeID private constructor(descriptorIndex: Int = NO_INDEX) : DataItem() {
 
-    var descriptorIndex: Int = _descriptorIndex
+    var descriptorIndex: Int = descriptorIndex
         internal set
 
     fun getType(dexFile: DexFile): String {

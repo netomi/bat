@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -34,30 +33,31 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATION_SET_ITEM,
     dataAlignment = 4,
     dataSection   = true)
-class AnnotationSet private constructor() : DataItem() {
+class AnnotationSet private constructor(private val _annotations: ArrayList<Annotation> = ArrayList(0)): DataItem() {
 
     private var annotationOffsetEntries: IntArray = intArrayOf()
 
-    private val annotations: ArrayList<Annotation> = ArrayList(0)
+    val annotations: List<Annotation>
+        get() = _annotations
 
     val annotationCount: Int
-        get() = annotations.size
+        get() = _annotations.size
 
     fun getAnnotation(index: Int): Annotation {
-        return annotations[index]
+        return _annotations[index]
+    }
+
+    fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
+        require(!_annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
+            { "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet" }
+        _annotations.add(annotation)
     }
 
     override val isEmpty: Boolean
-        get() = annotations.isEmpty()
-
-    fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
-        require(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
-            { "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet" }
-        annotations.add(annotation)
-    }
+        get() = _annotations.isEmpty()
 
     internal fun sort() {
-        annotations.sortWith(compareBy { it.annotationValue.typeIndex })
+        _annotations.sortWith(compareBy { it.annotationValue.typeIndex })
     }
 
     override fun read(input: DexDataInput) {
@@ -71,21 +71,21 @@ class AnnotationSet private constructor() : DataItem() {
     }
 
     override fun readLinkedDataItems(input: DexDataInput) {
-        annotations.clear()
-        annotations.ensureCapacity(annotationOffsetEntries.size)
+        _annotations.clear()
+        _annotations.ensureCapacity(annotationOffsetEntries.size)
         for (i in annotationOffsetEntries.indices) {
             input.offset = annotationOffsetEntries[i]
             val annotation = Annotation.readContent(input)
-            annotations.add(i, annotation)
+            _annotations.add(i, annotation)
         }
     }
 
     override fun updateOffsets(dataItemMap: Map) {
-        if (annotationOffsetEntries.size != annotations.size) {
-            annotationOffsetEntries = IntArray(annotations.size)
+        if (annotationOffsetEntries.size != _annotations.size) {
+            annotationOffsetEntries = IntArray(_annotations.size)
         }
-        for (i in annotations.indices) {
-            val offset = dataItemMap.getOffset(annotations[i])
+        for (i in _annotations.indices) {
+            val offset = dataItemMap.getOffset(_annotations[i])
             annotationOffsetEntries[i] = offset
         }
     }
@@ -98,15 +98,15 @@ class AnnotationSet private constructor() : DataItem() {
     }
 
     fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationVisitor) {
-        annotations.forEachIndexed { index, annotation -> annotation.accept(dexFile, classDef, this, index, visitor) }
+        _annotations.forEachIndexed { index, annotation -> annotation.accept(dexFile, classDef, this, index, visitor) }
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        annotations.forEachIndexed { index, annotation -> visitor.visitAnnotation(dexFile, this, index, annotation) }
+        _annotations.forEachIndexed { index, annotation -> visitor.visitAnnotation(dexFile, this, index, annotation) }
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        annotations.forEach { it.referencedIDsAccept(dexFile, visitor) }
+        _annotations.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -115,15 +115,15 @@ class AnnotationSet private constructor() : DataItem() {
 
         val o = other as AnnotationSet
 
-        return annotations == o.annotations
+        return _annotations == o._annotations
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(annotations)
+        return Objects.hash(_annotations)
     }
 
     override fun toString(): String {
-        return "AnnotationSet[annotations=${annotations.size} items]"
+        return "AnnotationSet[annotations=${_annotations.size} items]"
     }
 
     companion object {
@@ -132,9 +132,7 @@ class AnnotationSet private constructor() : DataItem() {
         }
 
         fun of(annotations: List<Annotation>): AnnotationSet {
-            val annotationSet = empty()
-            annotationSet.annotations.addAll(annotations)
-            return annotationSet
+            return AnnotationSet(ArrayList(annotations))
         }
 
         fun readContent(input: DexDataInput): AnnotationSet {

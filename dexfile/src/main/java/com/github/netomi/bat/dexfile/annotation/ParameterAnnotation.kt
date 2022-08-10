@@ -31,17 +31,16 @@ import java.util.*
  *
  * @see [parameter annotation format @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.parameter-annotation)
  */
-class ParameterAnnotation private constructor(
-    _methodIndex:          Int                  = NO_INDEX,
-    _annotationSetRefList: AnnotationSetRefList = AnnotationSetRefList.empty()) : DexContent() {
+class ParameterAnnotation private constructor(methodIndex:          Int                  = NO_INDEX,
+                                              annotationSetRefList: AnnotationSetRefList = AnnotationSetRefList.empty()) : DexContent() {
 
     var annotationsOffset = 0
         private set
 
-    var methodIndex: Int = _methodIndex
+    var methodIndex: Int = methodIndex
         private set
 
-    internal var annotationSetRefList: AnnotationSetRefList = _annotationSetRefList
+    internal var annotationSetRefList: AnnotationSetRefList = annotationSetRefList
         private set
 
     fun getMethodID(dexFile: DexFile): MethodID {
@@ -89,8 +88,8 @@ class ParameterAnnotation private constructor(
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
-        for (index in 0 until annotationSetRefList.annotationSetRefCount) {
-            annotationSetRefList.getAnnotationSetRef(index).referencedIDsAccept(dexFile, visitor)
+        for (annotationSetRef in annotationSetRefList.annotationSetRefs) {
+            annotationSetRef.referencedIDsAccept(dexFile, visitor)
         }
     }
 

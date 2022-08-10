@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -31,12 +30,13 @@ import java.util.*
     type          = TYPE_METHOD_HANDLE_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class MethodHandle private constructor(_methodHandleTypeValue: Int = -1, _fieldOrMethodId: Int = NO_INDEX) : DataItem() {
+class MethodHandle private constructor(methodHandleTypeValue: Int = -1,
+                                       fieldOrMethodId:       Int = NO_INDEX) : DataItem() {
 
-    var methodHandleTypeValue: Int = _methodHandleTypeValue
+    var methodHandleTypeValue: Int = methodHandleTypeValue
         private set
 
-    var fieldOrMethodId: Int = _fieldOrMethodId
+    var fieldOrMethodId: Int = fieldOrMethodId
         private set
 
     val methodHandleType: MethodHandleType

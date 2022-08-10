@@ -31,12 +31,12 @@ import java.util.*
  *
  * @see [annotation set ref item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.set-ref-item)
  */
-class AnnotationSetRef private constructor(_annotationSet: AnnotationSet = AnnotationSet.empty()) : DexContent() {
+class AnnotationSetRef private constructor(annotationSet: AnnotationSet = AnnotationSet.empty()) : DexContent() {
 
     var annotationsOffset = 0
         private set
 
-    var annotationSet: AnnotationSet = _annotationSet
+    var annotationSet: AnnotationSet = annotationSet
         private set
 
     override fun read(input: DexDataInput) {

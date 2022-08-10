@@ -45,7 +45,7 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
     }
 
     fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
-        for (i in 0 until array.values.size) {
+        for (i in array.values.indices) {
             array.values[i].accept(dexFile, visitor)
         }
     }

@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Copyable
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -29,17 +28,17 @@ import java.util.*
  *
  * @see [type addr pair @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-type-addr-pair)
  */
-class TypeAddrPair private constructor(_typeIndex: Int     = NO_INDEX,
-                                       _address:   Int     = 0,
-                                       _label:     String? = null) : DexContent(), Copyable<TypeAddrPair> {
+class TypeAddrPair private constructor(typeIndex: Int     = NO_INDEX,
+                                       address:   Int     = 0,
+                                       label:     String? = null) : DexContent(), Copyable<TypeAddrPair> {
 
-    var typeIndex: Int = _typeIndex
+    var typeIndex: Int = typeIndex
         internal set
 
-    var address: Int = _address
+    var address: Int = address
         internal set
 
-    var label: String? = _label
+    var label: String? = label
         internal set
 
     fun getType(dexFile: DexFile): String {
@@ -83,11 +82,15 @@ class TypeAddrPair private constructor(_typeIndex: Int     = NO_INDEX,
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(typeIndex, address)
+        return Objects.hash(typeIndex, address, label)
     }
 
     override fun toString(): String {
-        return "TypeAddrPair[type=${typeIndex},addr=${address}]"
+        return if (label != null) {
+            "TypeAddrPair[type=${typeIndex},label=${label}]"
+        } else {
+            "TypeAddrPair[type=${typeIndex},addr=${address}]"
+        }
     }
 
     override fun copy(): TypeAddrPair {

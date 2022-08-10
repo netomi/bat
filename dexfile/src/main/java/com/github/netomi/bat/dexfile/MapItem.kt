@@ -17,7 +17,6 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -27,18 +26,20 @@ import java.util.*
  *
  * @see [map item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.map-item)
  */
-class MapItem private constructor(_type: Int = 0, _size: Int = 0, _offset: Int = 0): DexContent() {
+class MapItem private constructor(type:   Int = 0,
+                                  size:   Int = 0,
+                                  offset: Int = 0): DexContent() {
 
-    var type: Int = _type
+    var type: Int = type
         private set
 
-    var size: Int = _size
+    var size: Int = size
         internal set(value) {
             require(value >= 0) { "size must not be negative" }
             field = value
         }
 
-    var offset: Int = _offset
+    var offset: Int = offset
         internal set(value) {
             require(value >= 0) { "offset must not be negative" }
             field = value

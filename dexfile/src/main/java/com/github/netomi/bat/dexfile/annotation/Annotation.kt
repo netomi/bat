@@ -35,13 +35,13 @@ import java.util.*
     type          = TYPE_ANNOTATION_ITEM,
     dataAlignment = 1,
     dataSection   = true)
-class Annotation private constructor(_visibility:      AnnotationVisibility   = AnnotationVisibility.BUILD,
-                                     _annotationValue: EncodedAnnotationValue = EncodedAnnotationValue()) : DataItem() {
+class Annotation private constructor(visibility:      AnnotationVisibility   = AnnotationVisibility.BUILD,
+                                     annotationValue: EncodedAnnotationValue = EncodedAnnotationValue()) : DataItem() {
 
-    var visibility: AnnotationVisibility = _visibility
+    var visibility: AnnotationVisibility = visibility
         private set
 
-    var annotationValue: EncodedAnnotationValue = _annotationValue
+    var annotationValue: EncodedAnnotationValue = annotationValue
         private set
 
     override val isEmpty: Boolean

@@ -22,7 +22,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -30,11 +29,12 @@ import java.util.*
  *
  * @see [encoded field @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-field-format)
  */
-class EncodedField private constructor(_fieldIndex: Int = NO_INDEX, _accessFlags: Int = 0) : EncodedMember(_accessFlags) {
+class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
+                                       accessFlags: Int = 0) : EncodedMember(accessFlags) {
 
     private var deltaFieldIndex = 0
 
-    var fieldIndex: Int = _fieldIndex
+    var fieldIndex: Int = fieldIndex
         internal set
 
     val modifiers: EnumSet<FieldModifier>

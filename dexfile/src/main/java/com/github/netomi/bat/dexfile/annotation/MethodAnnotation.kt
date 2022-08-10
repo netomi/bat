@@ -29,15 +29,16 @@ import java.util.*
  *
  * @see [method annotation format @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.method-annotation)
  */
-class MethodAnnotation private constructor(_methodIndex: Int = NO_INDEX, _annotationSet: AnnotationSet = AnnotationSet.empty()) : DexContent() {
+class MethodAnnotation private constructor(methodIndex:   Int           = NO_INDEX,
+                                           annotationSet: AnnotationSet = AnnotationSet.empty()) : DexContent() {
 
-    var methodIndex: Int = _methodIndex
+    var methodIndex: Int = methodIndex
         private set
 
     var annotationsOffset = 0
         private set
 
-    var annotationSet: AnnotationSet = _annotationSet
+    var annotationSet: AnnotationSet = annotationSet
         private set
 
     fun getMethodID(dexFile: DexFile): MethodID {

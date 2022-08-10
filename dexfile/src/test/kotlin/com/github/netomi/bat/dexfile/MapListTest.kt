@@ -35,13 +35,6 @@ class MapListTest : DexContentTest<MapList>() {
         get() = Function { input -> MapList.readMapList(input) }
 
     @Test
-    fun getter() {
-        val data = testInstances
-        assertEquals(1, data[0].getMapItem(0).type)
-        assertEquals(2, data[0].getMapItem(0).size)
-    }
-
-    @Test
     fun equals() {
         val l1 = MapList.empty()
         l1.updateMapItem(1, 2, 0)

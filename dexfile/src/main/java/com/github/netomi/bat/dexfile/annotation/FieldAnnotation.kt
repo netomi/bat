@@ -29,15 +29,16 @@ import java.util.*
  *
  * @see [field annotation format @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.field-annotation)
  */
-class FieldAnnotation private constructor(_fieldIndex: Int = NO_INDEX, _annotationSet: AnnotationSet = AnnotationSet.empty()): DexContent() {
+class FieldAnnotation private constructor(fieldIndex:    Int           = NO_INDEX,
+                                          annotationSet: AnnotationSet = AnnotationSet.empty()): DexContent() {
 
-    var fieldIndex: Int = _fieldIndex
+    var fieldIndex: Int = fieldIndex
         private set
 
     var annotationsOffset = 0
         private set
 
-    var annotationSet: AnnotationSet = _annotationSet
+    var annotationSet: AnnotationSet = annotationSet
         private set
 
     fun getFieldID(dexFile: DexFile): FieldID {

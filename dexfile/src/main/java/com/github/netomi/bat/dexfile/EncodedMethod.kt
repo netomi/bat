@@ -22,7 +22,6 @@ import com.github.netomi.bat.dexfile.visitor.CodeVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.google.common.base.Preconditions
 import java.util.*
 
 /**
@@ -30,13 +29,13 @@ import java.util.*
  *
  * @see [encoded method @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-method-format)
  */
-class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
-                                        _accessFlags: Int = 0,
-                                        _code       : Code = Code.empty()): EncodedMember(_accessFlags) {
+class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
+                                        accessFlags: Int = 0,
+                                        code       : Code = Code.empty()): EncodedMember(accessFlags) {
 
     private var deltaMethodIndex = 0
 
-    var methodIndex: Int = _methodIndex
+    var methodIndex: Int = methodIndex
         internal set
 
     val modifiers: EnumSet<MethodModifier>
@@ -45,7 +44,7 @@ class EncodedMethod private constructor(_methodIndex: Int = NO_INDEX,
     var codeOffset = 0
         private set
 
-    var code: Code = _code
+    var code: Code = code
         internal set
 
     fun getMethodID(dexFile: DexFile): MethodID {

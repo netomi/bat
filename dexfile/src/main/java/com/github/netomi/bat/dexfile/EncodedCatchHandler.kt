@@ -30,25 +30,24 @@ import kotlin.math.abs
  *
  * @see [encoded catch handler @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-catch-handler)
  */
-class EncodedCatchHandler private constructor(
-    _catchAllAddr:         Int                     = -1,
-    _catchAllLabel:        String?                 = null,
-    private val _handlers: ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent(), Copyable<EncodedCatchHandler> {
+class EncodedCatchHandler private constructor(            catchAllAddr:  Int                      = -1,
+                                                          catchAllLabel: String?                  = null,
+                                              private val _handlers:      ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent(), Copyable<EncodedCatchHandler> {
 
-    var catchAllAddr: Int = _catchAllAddr
+    var catchAllAddr: Int = catchAllAddr
         internal set
 
-    var catchAllLabel: String? = _catchAllLabel
+    var catchAllLabel: String? = catchAllLabel
         internal set
 
     val handlers: List<TypeAddrPair>
         get() = _handlers
 
     val handlerCount: Int
-        get() = _handlers.size
+        get() = handlers.size
 
     fun getHandler(index: Int): TypeAddrPair {
-        return _handlers[index]
+        return handlers[index]
     }
 
     internal fun clearLabels() {
@@ -99,7 +98,7 @@ class EncodedCatchHandler private constructor(
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        handlers.forEach { it.referencedIDsAccept(dexFile, visitor) }
+        _handlers.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -113,15 +112,19 @@ class EncodedCatchHandler private constructor(
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(catchAllAddr, _handlers)
+        return Objects.hash(catchAllAddr, catchAllLabel, _handlers)
     }
 
     override fun toString(): String {
-        return "EncodedCatchHandler[handlers=%d,catchAllAddr=%04x]".format(_handlers.size, catchAllAddr)
+        return if (catchAllLabel != null) {
+            "EncodedCatchHandler[handlers=%d items,catchAllLabel=%s]".format(_handlers.size, catchAllLabel)
+        } else {
+            "EncodedCatchHandler[handlers=%d items,catchAllAddr=%04x]".format(_handlers.size, catchAllAddr)
+        }
     }
 
     override fun copy(): EncodedCatchHandler {
-        val newHandlers = handlers.deepCopy()
+        val newHandlers = _handlers.deepCopy()
         return EncodedCatchHandler(catchAllAddr, catchAllLabel, ArrayList(newHandlers))
     }
 

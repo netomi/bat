@@ -38,27 +38,26 @@ import kotlin.collections.LinkedHashSet
     type          = TYPE_CODE_ITEM,
     dataAlignment = 4,
     dataSection   = true)
-class Code private constructor(
-    _registersSize:    Int                            = 0,
-    _insSize:          Int                            = 0,
-    _outsSize:         Int                            = 0,
-    _insns:            ShortArray                     = EMPTY_INSTRUCTIONS,
-    _tryList:          ArrayList<Try>                 = ArrayList(0),
-    _debugInfo:        DebugInfo                      = DebugInfo.empty()) : DataItem() {
+class Code private constructor(registersSize: Int            = 0,
+                               insSize:       Int            = 0,
+                               outsSize:      Int            = 0,
+                               insns:         ShortArray     = EMPTY_INSTRUCTIONS,
+                               tryList:       ArrayList<Try> = ArrayList(0),
+                               debugInfo:     DebugInfo      = DebugInfo.empty()) : DataItem() {
 
-    var registersSize = _registersSize
+    var registersSize = registersSize
         set(value) {
             assert(registersSize >= 0)
             field = value
         }
 
-    var insSize = _insSize
+    var insSize = insSize
         internal set(value) {
             assert(value >= 0)
             field = value
         }
 
-    var outsSize = _outsSize
+    var outsSize = outsSize
         set(value) {
             assert(value >= 0)
             field = value
@@ -67,14 +66,17 @@ class Code private constructor(
     val insnsSize: Int
         get() = insns.size
 
-    var insns: ShortArray = _insns
+    var insns: ShortArray = insns
+        internal set
 
-    var tryList: ArrayList<Try> = _tryList
+    var tryList: ArrayList<Try> = tryList
+        internal set
 
     var debugInfoOffset = 0
         private set
 
-    var debugInfo: DebugInfo = _debugInfo
+    var debugInfo: DebugInfo = debugInfo
+        internal set
 
     override val isEmpty: Boolean
         get() = insnsSize == 0 && debugInfo.isEmpty

@@ -31,17 +31,13 @@ import java.util.*
     type          = TYPE_CALL_SITE_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class CallSiteID private constructor() : DataItem() {
+class CallSiteID private constructor(callSite: CallSite = CallSite.empty()) : DataItem() {
 
-    var callSite: CallSite = CallSite.empty()
+    var callSite: CallSite = callSite
         private set
 
     var callSiteOffset = 0
         private set
-
-    private constructor(callSite: CallSite): this() {
-        this.callSite = callSite
-    }
 
     override val isEmpty: Boolean
         get() = callSite.isEmpty

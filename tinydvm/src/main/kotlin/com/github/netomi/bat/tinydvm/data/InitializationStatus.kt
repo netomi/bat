@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,20 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.Visibility.Companion.of
+package com.github.netomi.bat.tinydvm.data
 
-/**
- * A base class for encoded fields and methods in a dex file
- */
-abstract class EncodedMember protected constructor(accessFlags: Int = 0) : DexContent() {
-
-    var accessFlags: Int = accessFlags
-        protected set
-
-    val visibility: Visibility
-        get() = of(accessFlags)
-
-    abstract fun getName(dexFile: DexFile): String
+class InitializationStatus {
 }

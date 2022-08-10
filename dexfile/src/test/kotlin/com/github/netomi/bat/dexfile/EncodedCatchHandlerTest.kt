@@ -33,13 +33,6 @@ class EncodedCatchHandlerTest : DexContentTest<EncodedCatchHandler>() {
         get() = Function { input -> EncodedCatchHandler.readContent(input) }
 
     @Test
-    fun getter() {
-        val data = testInstances
-        assertEquals(1, data[0].catchAllAddr)
-        assertEquals(TypeAddrPair.of(1, 2), data[1].getHandler(0))
-    }
-
-    @Test
     fun equals() {
         val c1 = of(1, TypeAddrPair.of(1, 2))
         val c2 = of(1, TypeAddrPair.of(3, 4))
