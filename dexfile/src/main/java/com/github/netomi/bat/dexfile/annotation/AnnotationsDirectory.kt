@@ -28,21 +28,17 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATIONS_DIRECTORY_ITEM,
     dataAlignment = 4,
     dataSection   = true)
-internal class AnnotationsDirectory private constructor(
-    _classAnnotations:     AnnotationSet                  = AnnotationSet.empty(),
-    _fieldAnnotations:     ArrayList<FieldAnnotation>     = ArrayList(0),
-    _methodAnnotations:    ArrayList<MethodAnnotation>    = ArrayList(0),
-    _parameterAnnotations: ArrayList<ParameterAnnotation> = ArrayList(0)) : DataItem() {
+internal class AnnotationsDirectory
+    private constructor(             classAnnotations:     AnnotationSet                  = AnnotationSet.empty(),
+                        internal val fieldAnnotations:     ArrayList<FieldAnnotation>     = ArrayList(0),
+                        internal val methodAnnotations:    ArrayList<MethodAnnotation>    = ArrayList(0),
+                        internal val parameterAnnotations: ArrayList<ParameterAnnotation> = ArrayList(0)) : DataItem() {
 
     var classAnnotationsOffset = 0
         private set
 
-    internal var classAnnotations: AnnotationSet = _classAnnotations
+    internal var classAnnotations: AnnotationSet = classAnnotations
         private set
-
-    internal val fieldAnnotations:     ArrayList<FieldAnnotation>     = _fieldAnnotations
-    internal val methodAnnotations:    ArrayList<MethodAnnotation>    = _methodAnnotations
-    internal val parameterAnnotations: ArrayList<ParameterAnnotation> = _parameterAnnotations
 
     override val isEmpty: Boolean
         get() = classAnnotations.isEmpty    &&
