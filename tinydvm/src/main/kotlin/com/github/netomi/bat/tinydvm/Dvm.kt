@@ -18,17 +18,18 @@ package com.github.netomi.bat.tinydvm
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.FieldID
+import com.github.netomi.bat.dexfile.util.ClassDefPool
 import com.github.netomi.bat.tinydvm.data.*
 
-class Dvm constructor(private val dexFile: DexFile) {
+class Dvm constructor(private val classDefPool: ClassDefPool) {
 
     private val dvmDexClassMap    = mutableMapOf<String, DvmDexClass>()
     private val dvmNativeClassMap = mutableMapOf<String, DvmNativeClass>()
 
     fun getClass(type: String): DvmClass {
-        val classDef = dexFile.getClassDefByType(type)
-        return if (classDef != null) {
-            val clazz = dvmDexClassMap.computeIfAbsent(type) { DvmDexClass.of(dexFile, classDef) }
+        val classDefData = classDefPool.getClassDefByType(type)
+        return if (classDefData != null) {
+            val clazz = dvmDexClassMap.computeIfAbsent(type) { DvmDexClass.of(classDefData.dexFile, classDefData.classDef) }
             if (!clazz.isInitialized) {
                 clazz.initialize(this)
             }

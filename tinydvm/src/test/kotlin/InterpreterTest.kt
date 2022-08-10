@@ -1,4 +1,6 @@
 import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.util.ClassDefPool
+import com.github.netomi.bat.dexfile.util.classDefPoolFiller
 import com.github.netomi.bat.smali.Assembler
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.Interpreter
@@ -28,7 +30,10 @@ class InterpreterTest {
             val dexFile = DexFile.empty()
             val classDef = Assembler(dexFile).assemble(`is`).first()
 
-            val dvm = Dvm(dexFile)
+            val classDefPool = ClassDefPool.empty()
+            dexFile.classDefsAccept(classDefPoolFiller(classDefPool))
+
+            val dvm = Dvm(classDefPool)
 
             classDef.methodsAccept(dexFile, "main") { _, _, _, method ->
                 val interpreter = Interpreter.of(dvm, dexFile, classDef, method)
