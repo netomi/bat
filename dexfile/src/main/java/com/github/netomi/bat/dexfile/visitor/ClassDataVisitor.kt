@@ -21,45 +21,35 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.value.visitor.multiValueVisitorOf
 
-fun multiClassDataVisitorOf(visitor: ClassDataVisitor, vararg visitors: ClassDataVisitor): ClassDataVisitor {
+internal fun multiClassDataVisitorOf(visitor: ClassDataVisitor, vararg visitors: ClassDataVisitor): ClassDataVisitor {
     return MultiClassDataVisitor(visitor, *visitors)
 }
 
-fun allStaticFields(visitor: EncodedFieldVisitor): ClassDataVisitor {
+internal fun allStaticFieldsOfClassData(visitor: EncodedFieldVisitor): ClassDataVisitor {
     return ClassDataVisitor { dexFile, classDef, classData ->
         classData.staticFieldsAccept(dexFile, classDef, visitor)
     }
 }
 
-fun allInstanceFields(visitor: EncodedFieldVisitor): ClassDataVisitor {
+internal fun allInstanceFieldsOfClassData(visitor: EncodedFieldVisitor): ClassDataVisitor {
     return ClassDataVisitor { dexFile, classDef, classData ->
         classData.instanceFieldsAccept(dexFile, classDef, visitor)
     }
 }
 
-fun allFields(visitor: EncodedFieldVisitor): ClassDataVisitor {
-    return allStaticFields(visitor).andThen(
-           allInstanceFields(visitor))
-}
-
-fun allDirectMethods(visitor: EncodedMethodVisitor): ClassDataVisitor {
+internal fun allDirectMethodsOfClassData(visitor: EncodedMethodVisitor): ClassDataVisitor {
     return ClassDataVisitor { dexFile, classDef, classData ->
         classData.directMethodsAccept(dexFile, classDef, visitor)
     }
 }
 
-fun allVirtualMethods(visitor: EncodedMethodVisitor): ClassDataVisitor {
+internal fun allVirtualMethodsOfClassData(visitor: EncodedMethodVisitor): ClassDataVisitor {
     return ClassDataVisitor { dexFile, classDef, classData ->
         classData.virtualMethodsAccept(dexFile, classDef, visitor)
     }
 }
 
-fun allMethods(visitor: EncodedMethodVisitor): ClassDataVisitor {
-    return allDirectMethods(visitor).andThen(
-           allVirtualMethods(visitor))
-}
-
-fun interface ClassDataVisitor {
+internal fun interface ClassDataVisitor {
     fun visitClassData(dexFile: DexFile, classDef: ClassDef, classData: ClassData)
 
     fun andThen(vararg visitors: ClassDataVisitor): ClassDataVisitor {

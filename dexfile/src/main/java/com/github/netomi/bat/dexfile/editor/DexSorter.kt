@@ -84,7 +84,7 @@ class DexSorter : DexFileVisitor {
         sortClassDefs(dexFile)
 
         // fix instructions that reference modified string/type/proto IDs.
-        dexFile.classDefsAccept(allClassData(allMethods(allCode(InstructionFixer(stringIDMapping, typeIDMapping, protoIDMapping, fieldIDMapping, methodIDMapping)))))
+        dexFile.classDefsAccept(allMethods(allCode(InstructionFixer(stringIDMapping, typeIDMapping, protoIDMapping, fieldIDMapping, methodIDMapping))))
 
         dexFile.refreshCaches()
     }

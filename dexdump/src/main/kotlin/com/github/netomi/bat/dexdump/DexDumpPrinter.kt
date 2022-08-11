@@ -54,18 +54,10 @@ class DexDumpPrinter constructor(
             printer.println("annotations_off     : " + formatNumber(classDef.annotationsOffset.toLong()))
             printer.println("class_data_off      : " + formatNumber(classDef.classDataOffset.toLong()))
 
-            if (!classDef.classData.isEmpty) {
-                val classData = classDef.classData
-                printer.println("static_fields_size  : " + classData.staticFieldCount)
-                printer.println("instance_fields_size: " + classData.instanceFieldCount)
-                printer.println("direct_methods_size : " + classData.directMethodCount)
-                printer.println("virtual_methods_size: " + classData.virtualMethodCount)
-            } else {
-                printer.println("static_fields_size  : 0")
-                printer.println("instance_fields_size: 0")
-                printer.println("direct_methods_size : 0")
-                printer.println("virtual_methods_size: 0")
-            }
+            printer.println("static_fields_size  : " + classDef.staticFields.size)
+            printer.println("instance_fields_size: " + classDef.instanceFields.size)
+            printer.println("direct_methods_size : " + classDef.directMethods.size)
+            printer.println("virtual_methods_size: " + classDef.virtualMethods.size)
             printer.println()
         }
 
@@ -85,8 +77,8 @@ class DexDumpPrinter constructor(
         classDef.interfacesAccept(dexFile, classDefPrinter)
         printer.levelDown()
 
-        if (!classDef.classData.isEmpty) {
-            classDef.classDataAccept(dexFile, classDefPrinter)
+        if (classDef.hasMembers) {
+            classDef.accept(dexFile, classDefPrinter)
         } else {
             printer.println("Static fields     -")
             printer.println("Instance fields   -")

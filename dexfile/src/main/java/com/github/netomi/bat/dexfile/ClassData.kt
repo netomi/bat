@@ -18,29 +18,29 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.*
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 
 @DataItemAnn(
     type          = TYPE_CLASS_DATA_ITEM,
     dataAlignment = 1,
     dataSection   = true)
-class ClassData private constructor(
-    private val _staticFields:   ArrayList<EncodedField>  = ArrayList(0),
-    private val _instanceFields: ArrayList<EncodedField>  = ArrayList(0),
-    private val _directMethods:  ArrayList<EncodedMethod> = ArrayList(0),
-    private val _virtualMethods: ArrayList<EncodedMethod> = ArrayList(0)) : DataItem() {
+internal class ClassData
+    private constructor(private var _staticFields:   MutableList<EncodedField>  = mutableListOfCapacity(0),
+                        private var _instanceFields: MutableList<EncodedField>  = mutableListOfCapacity(0),
+                        private var _directMethods:  MutableList<EncodedMethod> = mutableListOfCapacity(0),
+                        private var _virtualMethods: MutableList<EncodedMethod> = mutableListOfCapacity(0)) : DataItem() {
 
-    val staticFields: MutableList<EncodedField>
+    val staticFields: List<EncodedField>
         get() = _staticFields
 
-    val instanceFields: MutableList<EncodedField>
+    val instanceFields: List<EncodedField>
         get() = _instanceFields
 
-    val directMethods: MutableList<EncodedMethod>
+    val directMethods: List<EncodedMethod>
         get() = _directMethods
 
-    val virtualMethods: MutableList<EncodedMethod>
+    val virtualMethods: List<EncodedMethod>
         get() = _virtualMethods
 
     val fields: List<EncodedField>
@@ -68,68 +68,50 @@ class ClassData private constructor(
         }
     }
 
-    val staticFieldCount: Int
-        get() = staticFields.size
+    internal fun sort() {
+        _staticFields.sortWith(compareBy { it.fieldIndex })
+        _instanceFields.sortWith(compareBy { it.fieldIndex })
 
-    fun getStaticField(index: Int): EncodedField {
-        return staticFields[index]
-    }
+        _directMethods.sortWith(compareBy { it.methodIndex })
+        _virtualMethods.sortWith(compareBy { it.methodIndex })
 
-    val instanceFieldCount: Int
-        get() = instanceFields.size
-
-    fun getInstanceField(index: Int): EncodedField {
-        return instanceFields[index]
-    }
-
-    val directMethodCount: Int
-        get() = directMethods.size
-
-    fun getDirectMethod(index: Int): EncodedMethod {
-        return directMethods[index]
-    }
-
-    val virtualMethodCount: Int
-        get() = virtualMethods.size
-
-    fun getVirtualMethod(index: Int): EncodedMethod {
-        return virtualMethods[index]
+        methods.forEach { it.sort() }
     }
 
     override fun read(input: DexDataInput) {
         // field/method sizes are not stored explicitly,
         // use the size() method of the corresponding list instead.
-        val staticFieldsSize = input.readUleb128()
+        val staticFieldsSize   = input.readUleb128()
         val instanceFieldsSize = input.readUleb128()
-        val directMethodsSize = input.readUleb128()
+        val directMethodsSize  = input.readUleb128()
         val virtualMethodsSize = input.readUleb128()
+
         var lastIndex = 0
-        _staticFields.clear()
-        _staticFields.ensureCapacity(staticFieldsSize)
+        _staticFields = mutableListOfCapacity(staticFieldsSize)
         for (i in 0 until staticFieldsSize) {
             val encodedField = EncodedField.readContent(input, lastIndex)
             lastIndex = encodedField.fieldIndex
             _staticFields.add(encodedField)
         }
+
         lastIndex = 0
-        _instanceFields.clear()
-        _instanceFields.ensureCapacity(instanceFieldsSize)
+        _instanceFields = mutableListOfCapacity(instanceFieldsSize)
         for (i in 0 until instanceFieldsSize) {
             val encodedField = EncodedField.readContent(input, lastIndex)
             lastIndex = encodedField.fieldIndex
             _instanceFields.add(encodedField)
         }
+
         lastIndex = 0
-        _directMethods.clear()
-        _directMethods.ensureCapacity(directMethodsSize)
+        _directMethods = mutableListOfCapacity(directMethodsSize)
         for (i in 0 until directMethodsSize) {
             val encodedMethod = EncodedMethod.readContent(input, lastIndex)
             lastIndex = encodedMethod.methodIndex
             _directMethods.add(encodedMethod)
         }
+
         lastIndex = 0
-        _virtualMethods.clear()
-        _virtualMethods.ensureCapacity(virtualMethodsSize)
+        _virtualMethods = mutableListOfCapacity(virtualMethodsSize)
         for (i in 0 until virtualMethodsSize) {
             val encodedMethod = EncodedMethod.readContent(input, lastIndex)
             lastIndex = encodedMethod.methodIndex
@@ -235,8 +217,8 @@ class ClassData private constructor(
     }
 
     override fun toString(): String {
-        return "ClassData[staticFields=${staticFieldCount} fields,instanceFields=${instanceFieldCount} fields," +
-                         "directMethods=${directMethodCount} methods,virtualMethods=${virtualMethodCount} methods]"
+        return "ClassData[staticFields=${staticFields.size} fields,instanceFields=${instanceFields.size} fields," +
+                         "directMethods=${directMethods.size} methods,virtualMethods=${virtualMethods.size} methods]"
     }
 
     companion object {

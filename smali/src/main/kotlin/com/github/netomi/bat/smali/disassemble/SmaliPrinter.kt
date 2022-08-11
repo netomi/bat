@@ -25,7 +25,7 @@ import java.io.Writer
 import java.util.*
 
 class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) :
-    ClassDefVisitor, ClassDataVisitor, EncodedFieldVisitor, EncodedMethodVisitor, CodeVisitor {
+    ClassDefVisitor, EncodedFieldVisitor, EncodedMethodVisitor, CodeVisitor {
 
     private val printer: IndentingPrinter = IndentingPrinter(writer, 4)
     private val annotationPrinter         = AnnotationPrinter(printer)
@@ -59,35 +59,33 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         }
 
         classDef.classAnnotationSetAccept(dexFile, classDef, annotationPrinter)
-        classDef.classDataAccept(dexFile, this)
-        printer.flush()
-    }
 
-    override fun visitClassData(dexFile: DexFile, classDef: ClassDef, classData: ClassData) {
-        if (classData.staticFieldCount > 0) {
+        if (classDef.staticFields.isNotEmpty()) {
             printer.println()
             printer.println()
             printer.println("# static fields")
-            classData.staticFieldsAccept(dexFile, classDef, this.joinedByFieldConsumer { _, _ -> printer.println() })
+            classDef.staticFieldsAccept(dexFile, this.joinedByFieldConsumer { _, _ -> printer.println() })
         }
-        if (classData.instanceFieldCount > 0) {
+        if (classDef.instanceFields.isNotEmpty()) {
             printer.println()
             printer.println()
             printer.println("# instance fields")
-            classData.instanceFieldsAccept(dexFile, classDef, this.joinedByFieldConsumer { _, _ -> printer.println() })
+            classDef.instanceFieldsAccept(dexFile, this.joinedByFieldConsumer { _, _ -> printer.println() })
         }
-        if (classData.directMethodCount > 0) {
+        if (classDef.directMethods.isNotEmpty()) {
             printer.println()
             printer.println()
             printer.println("# direct methods")
-            classData.directMethodsAccept(dexFile, classDef, this.joinedByMethodConsumer { _, _ -> printer.println() })
+            classDef.directMethodsAccept(dexFile, this.joinedByMethodConsumer { _, _ -> printer.println() })
         }
-        if (classData.virtualMethodCount > 0) {
+        if (classDef.virtualMethods.isNotEmpty()) {
             printer.println()
             printer.println()
             printer.println("# virtual methods")
-            classData.virtualMethodsAccept(dexFile, classDef, this.joinedByMethodConsumer { _, _ -> printer.println() })
+            classDef.virtualMethodsAccept(dexFile, this.joinedByMethodConsumer { _, _ -> printer.println() })
         }
+
+        printer.flush()
     }
 
     override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {

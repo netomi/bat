@@ -88,8 +88,29 @@ class ClassDef private constructor(            classIndex:           Int        
     internal var annotationsDirectory: AnnotationsDirectory = annotationsDirectory
         private set
 
-    var classData: ClassData = classData
+    private var classData: ClassData = classData
         private set
+
+    val hasMembers: Boolean
+        get() = !classData.isEmpty
+
+    val staticFields: List<EncodedField>
+        get() = classData.staticFields
+
+    val instanceFields: List<EncodedField>
+        get() = classData.instanceFields
+
+    val fields: List<EncodedField>
+        get() = classData.fields
+
+    val directMethods: List<EncodedMethod>
+        get() = classData.directMethods
+
+    val virtualMethods: List<EncodedMethod>
+        get() = classData.virtualMethods
+
+    val methods: List<EncodedMethod>
+        get() = classData.methods
 
     fun getClassName(dexFile: DexFile): String {
         return DexClasses.internalClassNameFromInternalType(getType(dexFile))
@@ -158,7 +179,7 @@ class ClassDef private constructor(            classIndex:           Int        
         val currentStaticValueCount = staticValues.array.valueCount
         if (currentStaticValueCount <= staticFieldIndex) {
             for (i in currentStaticValueCount until staticFieldIndex) {
-                val currentField = classData.getStaticField(i)
+                val currentField = staticFields[i]
                 val type = currentField.getFieldID(dexFile).getType(dexFile)
                 val encodedValue = getDefaultEncodedValueForType(type)
                 staticValues.array.add(encodedValue)
@@ -173,24 +194,19 @@ class ClassDef private constructor(            classIndex:           Int        
         get() = classIndex == NO_INDEX
 
     internal fun sort(dexFile: DexFile) {
-        val staticValueMapping = classData.staticFields.associateWith { encodedField -> encodedField.staticValue(dexFile) }
-        classData.staticFields.sortWith(compareBy { it.fieldIndex })
-        classData.instanceFields.sortWith(compareBy { it.fieldIndex })
+        val staticValueMapping = staticFields.associateWith { encodedField -> encodedField.staticValue(dexFile) }
+
+        classData.sort()
 
         // reconstruct the static values after the staticFields have been sorted.
         staticValues = EncodedArray.empty()
-        for (i in classData.staticFields.indices.reversed()) {
-            val field = classData.staticFields[i]
+        for (i in staticFields.indices.reversed()) {
+            val field = staticFields[i]
             val staticValue = staticValueMapping[field]
             if (staticValue != null) {
                 setStaticValue(dexFile, field, staticValue)
             }
         }
-
-        classData.directMethods.sortWith(compareBy { it.methodIndex })
-        classData.virtualMethods.sortWith(compareBy { it.methodIndex })
-
-        classData.methods.forEach { it.sort() }
     }
 
     public override fun read(input: DexDataInput) {
@@ -249,34 +265,46 @@ class ClassDef private constructor(            classIndex:           Int        
     }
 
     fun staticFieldsAccept(dexFile: DexFile, visitor: EncodedFieldVisitor) {
-        classDataAccept(dexFile, allStaticFields(visitor))
+        accept(dexFile, allStaticFields(visitor))
+    }
+
+    fun instanceFieldsAccept(dexFile: DexFile, visitor: EncodedFieldVisitor) {
+        accept(dexFile, allInstanceFields(visitor))
     }
 
     fun fieldsAccept(dexFile: DexFile, visitor: EncodedFieldVisitor) {
-        classDataAccept(dexFile, allFields(visitor))
+        accept(dexFile, allFields(visitor))
     }
 
     fun fieldsAccept(dexFile: DexFile, nameExpression: String, visitor: EncodedFieldVisitor) {
-        classDataAccept(dexFile, allFields(filterFieldsByName(nameExpression, visitor)))
+        accept(dexFile, allFields(filterFieldsByName(nameExpression, visitor)))
     }
 
     fun fieldsAccept(dexFile: DexFile, nameExpression: String, type: String, visitor: EncodedFieldVisitor) {
-        classDataAccept(dexFile, allFields(filterFieldsByNameAndType(nameExpression, type, visitor)))
+        accept(dexFile, allFields(filterFieldsByNameAndType(nameExpression, type, visitor)))
+    }
+
+    fun directMethodsAccept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
+        accept(dexFile, allDirectMethods(visitor))
+    }
+
+    fun virtualMethodsAccept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
+        accept(dexFile, allVirtualMethods(visitor))
     }
 
     fun methodsAccept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
-        classDataAccept(dexFile, allMethods(visitor))
+        accept(dexFile, allMethods(visitor))
     }
 
     fun methodsAccept(dexFile: DexFile, nameExpression: String, visitor: EncodedMethodVisitor) {
-        classDataAccept(dexFile, allMethods(filterMethodsByName(nameExpression, visitor)))
+        accept(dexFile, allMethods(filterMethodsByName(nameExpression, visitor)))
     }
 
     fun interfacesAccept(dexFile: DexFile, visitor: TypeVisitor) {
         interfaces.typesAccept(dexFile, visitor)
     }
 
-    fun classDataAccept(dexFile: DexFile, visitor: ClassDataVisitor) {
+    internal fun classDataAccept(dexFile: DexFile, visitor: ClassDataVisitor) {
         visitor.visitClassData(dexFile, this, classData)
     }
 

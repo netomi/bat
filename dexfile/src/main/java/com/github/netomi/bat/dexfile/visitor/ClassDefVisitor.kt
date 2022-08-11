@@ -29,12 +29,40 @@ fun filteredByExternalClassName(regularExpression: String, visitor: ClassDefVisi
     return ExternalClassNameFilter(regularExpression, visitor)
 }
 
-fun allClassData(visitor: ClassDataVisitor): ClassDefVisitor {
+internal fun allClassData(visitor: ClassDataVisitor): ClassDefVisitor {
     return ClassDefVisitor { dexFile, _, classDef -> classDef.classDataAccept(dexFile, visitor) }
+}
+
+fun allStaticFields(visitor: EncodedFieldVisitor): ClassDefVisitor {
+    return allClassData(allStaticFieldsOfClassData(visitor))
+}
+
+fun allInstanceFields(visitor: EncodedFieldVisitor): ClassDefVisitor {
+    return allClassData(allInstanceFieldsOfClassData(visitor))
+}
+
+fun allFields(visitor: EncodedFieldVisitor): ClassDefVisitor {
+    return allStaticFields(visitor).andThen(allInstanceFields(visitor))
+}
+
+fun allDirectMethods(visitor: EncodedMethodVisitor): ClassDefVisitor {
+    return allClassData(allDirectMethodsOfClassData(visitor))
+}
+
+fun allVirtualMethods(visitor: EncodedMethodVisitor): ClassDefVisitor {
+    return allClassData(allVirtualMethodsOfClassData(visitor))
+}
+
+fun allMethods(visitor: EncodedMethodVisitor): ClassDefVisitor {
+    return allDirectMethods(visitor).andThen(allVirtualMethods(visitor))
 }
 
 fun interface ClassDefVisitor {
     fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef)
+
+    fun andThen(vararg visitors: ClassDefVisitor): ClassDefVisitor {
+        return multiClassDefVisitorOf(this, *visitors)
+    }
 }
 
 private class ExternalClassNameFilter(regularExpression: String, private val visitor: ClassDefVisitor) : ClassDefVisitor {

@@ -25,7 +25,6 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
-import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.toHexString
 import com.github.netomi.bat.util.toHexStringWithPrefix
@@ -33,7 +32,7 @@ import com.github.netomi.bat.util.toPrintableAsciiString
 
 internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, private val disassembleCode: Boolean) :
     DexHeaderVisitor,
-    ClassDataVisitor,
+    ClassDefVisitor,
     EncodedFieldVisitor,
     EncodedMethodVisitor,
     TypeVisitor,
@@ -75,22 +74,22 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println()
     }
 
-    override fun visitClassData(dexFile: DexFile, classDef: ClassDef, classData: ClassData) {
+    override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
         printer.println("Static fields     -")
         printer.levelUp()
-        classData.staticFieldsAccept(dexFile, classDef, this)
+        classDef.staticFieldsAccept(dexFile, this)
         printer.levelDown()
         printer.println("Instance fields   -")
         printer.levelUp()
-        classData.instanceFieldsAccept(dexFile, classDef, this)
+        classDef.instanceFieldsAccept(dexFile, this)
         printer.levelDown()
         printer.println("Direct methods    -")
         printer.levelUp()
-        classData.directMethodsAccept(dexFile, classDef, this)
+        classDef.directMethodsAccept(dexFile, this)
         printer.levelDown()
         printer.println("Virtual methods   -")
         printer.levelUp()
-        classData.virtualMethodsAccept(dexFile, classDef, this)
+        classDef.virtualMethodsAccept(dexFile, this)
         printer.levelDown()
     }
 
