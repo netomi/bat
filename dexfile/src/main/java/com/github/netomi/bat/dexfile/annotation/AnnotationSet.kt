@@ -44,7 +44,7 @@ class AnnotationSet
         return annotations[index]
     }
 
-    fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
+    internal fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
         require(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
             { "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet" }
         annotations.add(annotation)

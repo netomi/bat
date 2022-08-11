@@ -56,15 +56,15 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
     fun addField(fieldName:  String,
                  visibility: Visibility = Visibility.PUBLIC,
                  modifiers:  EnumSet<FieldModifier> = EnumSet.noneOf(FieldModifier::class.java),
-                 type:       String): EncodedField {
+                 type:       String): FieldEditor {
         return addField(fieldName, accessFlagsOf(visibility, modifiers), type)
     }
 
-    fun addField(fieldName: String, accessFlags: Int, type: String, validate: Boolean = true): EncodedField {
+    fun addField(fieldName: String, accessFlags: Int, type: String, validate: Boolean = true): FieldEditor {
         val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType, fieldName, type)
         val field = EncodedField.of(fieldIDIndex, accessFlags)
         classDef.addField(dexFile, field, validate)
-        return field
+        return FieldEditor.of(dexEditor, this, field)
     }
 
     fun addMethod(methodName:     String,
@@ -79,7 +79,7 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
         val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classType, methodName, parameterTypes, returnType)
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
         classDef.addMethod(dexFile, method, validate)
-        return MethodEditor.of(dexEditor, classDef, method)
+        return MethodEditor.of(dexEditor, this, method)
     }
 
     fun setStaticValue(field: EncodedField, value: EncodedValue) {

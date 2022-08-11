@@ -20,13 +20,17 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.debug.DebugInfo
 import com.github.netomi.bat.dexfile.util.DexClasses
 
-class MethodEditor private constructor(val dexEditor: DexEditor, private val classDef: ClassDef, val method: EncodedMethod) {
+class MethodEditor private constructor(val dexEditor: DexEditor, private val classDefEditor: ClassDefEditor, val method: EncodedMethod) {
 
     private val dexFile: DexFile
         get() = dexEditor.dexFile
+
+    private val classDef: ClassDef
+        get() = classDefEditor.classDef
 
     fun addCode(): CodeEditor {
         // we can already compute the insSize
@@ -42,13 +46,24 @@ class MethodEditor private constructor(val dexEditor: DexEditor, private val cla
         return CodeEditor.of(dexEditor, classDef, method, code)
     }
 
+    fun addAnnotation(annotation: Annotation) {
+        val annotationSet = classDefEditor.addOrGetMethodAnnotationSet(method)
+        annotationSet.addAnnotation(dexFile, annotation)
+    }
+
+    fun addParameterAnnotation(parameterIndex: Int, annotation: Annotation) {
+        val annotationSet = classDefEditor.addOrGetParameterAnnotationSet(method, parameterIndex)
+        annotationSet.addAnnotation(dexFile, annotation)
+    }
+
     companion object {
         fun of(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): MethodEditor {
-            return MethodEditor(DexEditor.of(dexFile), classDef, method)
+            val dexEditor = DexEditor.of(dexFile)
+            return MethodEditor(dexEditor, ClassDefEditor.of(dexEditor, classDef), method)
         }
 
-        fun of(dexEditor: DexEditor, classDef: ClassDef, method: EncodedMethod): MethodEditor {
-            return MethodEditor(dexEditor, classDef, method)
+        fun of(dexEditor: DexEditor, classDefEditor: ClassDefEditor, method: EncodedMethod): MethodEditor {
+            return MethodEditor(dexEditor, classDefEditor, method)
         }
     }
 }

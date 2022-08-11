@@ -28,12 +28,14 @@ class FieldAdder constructor(private val targetClassDefEditor: ClassDefEditor): 
     private val targetDexEditor = targetClassDefEditor.dexEditor
 
     override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
-        val addedField = targetClassDefEditor.addField(field.getName(dexFile), field.accessFlags, field.getType(dexFile))
-        field.staticValueAccept(dexFile) { _, value ->
-            targetClassDefEditor.setStaticValue(addedField, value.copyTo(dexFile, targetDexEditor))
-        }
+        val fieldEditor =
+            targetClassDefEditor.addField(field.getName(dexFile), field.accessFlags, field.getType(dexFile))
 
-        classDef.fieldAnnotationSetAccept(dexFile, classDef, field) { _, _, fieldAnnotations ->
+        val addedField = fieldEditor.field
+
+        field.staticValue(dexFile)?.apply { fieldEditor.setStaticValue(this.copyTo(dexFile, targetDexEditor)) }
+
+        field.annotationSetAccept(dexFile, classDef) { _, _, fieldAnnotations ->
             if (!fieldAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetFieldAnnotationSet(addedField)
                 fieldAnnotations.copyTo(dexFile, targetDexEditor, targetAnnotationSet)

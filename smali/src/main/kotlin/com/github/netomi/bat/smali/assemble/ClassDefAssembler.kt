@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.editor.ClassDefEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
+import com.github.netomi.bat.dexfile.editor.FieldEditor
 import com.github.netomi.bat.dexfile.editor.MethodEditor
 import com.github.netomi.bat.dexfile.util.DexClasses.externalClassNameFromInternalClassName
 import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalFieldDescriptor
@@ -84,7 +85,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         val (_, name, type) = parseFieldObject(ctx.fieldObj.text)
         val accessFlags  = parseAccessFlags(ctx.sAccList())
 
-        val field: EncodedField
+        val fieldEditor: FieldEditor
 
         try {
             val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classDefEditor.classType, name, type)
@@ -92,7 +93,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             if (addedFields.contains(fieldID)) {
                 throw RuntimeException("field '${fullExternalFieldDescriptor(dexFile, fieldID)}' already exists in this class")
             }
-            field = classDefEditor.addField(name, accessFlags, type, false)
+            fieldEditor = classDefEditor.addField(name, accessFlags, type, false)
             addedFields.add(fieldID)
         } catch (exception: RuntimeException) {
             if (lenientMode) {
@@ -103,28 +104,23 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             }
         }
 
+        val field = fieldEditor.field
         if (field.isStatic && ctx.sBaseValue() != null) {
             val staticValue = encodedValueAssembler.parseBaseValue(ctx.sBaseValue())
-            classDefEditor.setStaticValue(field, staticValue)
+            fieldEditor.setStaticValue(staticValue)
         }
 
-        val annotations = mutableListOf<Annotation>()
         ctx.sAnnotation().forEach {
-            annotations.add(annotationAssembler.parseAnnotation(it))
-        }
-        if (annotations.isNotEmpty()) {
-            val annotationSet = classDefEditor.addOrGetFieldAnnotationSet(field)
-            for (annotation in annotations) {
-                try {
-                    annotationSet.addAnnotation(dexFile, annotation)
-                } catch (exception: RuntimeException) {
-                    if (lenientMode) {
-                        warningPrinter?.println(
-                            "warning: field '%s': %s, skipping annotation"
-                                .format(fullExternalFieldDescriptor(dexFile, field), exception.message))
-                    } else {
-                        throw exception
-                    }
+            val annotation = annotationAssembler.parseAnnotation(it)
+            try {
+                fieldEditor.addAnnotation(annotation)
+            } catch (exception: RuntimeException) {
+                if (lenientMode) {
+                    warningPrinter?.println(
+                        "warning: field '%s': %s, skipping annotation"
+                            .format(fullExternalFieldDescriptor(dexFile, field), exception.message))
+                } else {
+                    throw exception
                 }
             }
         }
@@ -171,22 +167,17 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             }
         }
 
-        // ignore duplicate annotations that are encountered in obfuscated dex files.
-        val methodAnnotations = mutableListOf<Annotation>()
-        ctx.sAnnotation().forEach { methodAnnotations.add(annotationAssembler.parseAnnotation(it)) }
-        if (methodAnnotations.isNotEmpty()) {
-            val annotationSet = classDefEditor.addOrGetMethodAnnotationSet(method)
-            for (annotation in methodAnnotations) {
-                try {
-                    annotationSet.addAnnotation(dexFile, annotation)
-                } catch (exception: RuntimeException) {
-                    if (lenientMode) {
-                        warningPrinter?.println(
-                            "warning: method '%s': %s, skipping annotation"
-                                .format(fullExternalMethodDescriptor(dexFile, method), exception.message))
-                    } else {
-                        throw exception
-                    }
+        ctx.sAnnotation().forEach {
+            val annotation = annotationAssembler.parseAnnotation(it)
+            try {
+                methodEditor.addAnnotation(annotation)
+            } catch (exception: RuntimeException) {
+                if (lenientMode) {
+                    warningPrinter?.println(
+                        "warning: method '%s': %s, skipping annotation"
+                            .format(fullExternalMethodDescriptor(dexFile, method), exception.message))
+                } else {
+                    throw exception
                 }
             }
         }
@@ -194,23 +185,19 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         ctx.sParameter().forEach { pCtx ->
             val parameterIndex = parseParameterIndex(pCtx, dexFile, method)
 
-            val parameterAnnotations = mutableListOf<Annotation>()
-            pCtx.sAnnotation().forEach { parameterAnnotations.add(annotationAssembler.parseAnnotation(it)) }
-            if (parameterAnnotations.isNotEmpty()) {
-                val annotationSet = classDefEditor.addOrGetParameterAnnotationSet(method, parameterIndex)
-                for (annotation in parameterAnnotations) {
-                    try {
-                        annotationSet.addAnnotation(dexFile, annotation)
-                    } catch (exception: RuntimeException) {
-                        if (lenientMode) {
-                            warningPrinter?.println(
-                                "warning: parameter #%d at '%s': %s, skipping annotation"
-                                    .format(parameterIndex + 1,
-                                            fullExternalMethodDescriptor(dexFile, method),
-                                            exception.message))
-                        } else {
-                            throw exception
-                        }
+            pCtx.sAnnotation().forEach {
+                val annotation = annotationAssembler.parseAnnotation(it)
+                try {
+                    methodEditor.addParameterAnnotation(parameterIndex, annotation)
+                } catch (exception: RuntimeException) {
+                    if (lenientMode) {
+                        warningPrinter?.println(
+                            "warning: parameter #%d at '%s': %s, skipping annotation"
+                                .format(parameterIndex + 1,
+                                    fullExternalMethodDescriptor(dexFile, method),
+                                    exception.message))
+                    } else {
+                        throw exception
                     }
                 }
             }

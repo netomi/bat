@@ -40,7 +40,7 @@ internal class MethodAdder constructor(private val targetClassDefEditor: ClassDe
 
         method.codeAccept(dexFile, classDef, CodeAdder(addedMethodEditor))
 
-        classDef.methodAnnotationSetAccept(dexFile, classDef, method) { _, _, methodAnnotations ->
+        method.annotationSetAccept(dexFile, classDef) { _, _, methodAnnotations ->
             if (!methodAnnotations.isEmpty) {
                 val targetAnnotationSet = targetClassDefEditor.addOrGetMethodAnnotationSet(addedMethod)
                 methodAnnotations.copyTo(dexFile, targetDexEditor, targetAnnotationSet)
