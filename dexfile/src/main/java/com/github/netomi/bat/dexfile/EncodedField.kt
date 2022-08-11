@@ -40,7 +40,7 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
     private var deltaFieldIndex = 0
 
     var fieldIndex: Int = fieldIndex
-        internal set
+        private set
 
     val modifiers: EnumSet<FieldModifier>
         get() = setOf(accessFlags)

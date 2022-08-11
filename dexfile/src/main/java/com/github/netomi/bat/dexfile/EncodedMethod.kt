@@ -39,7 +39,7 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
     private var deltaMethodIndex = 0
 
     var methodIndex: Int = methodIndex
-        internal set
+        private set
 
     val modifiers: EnumSet<MethodModifier>
         get() = MethodModifier.setOf(accessFlags)

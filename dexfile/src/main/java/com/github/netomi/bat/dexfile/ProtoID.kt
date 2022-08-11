@@ -32,18 +32,18 @@ import java.util.*
     type          = TYPE_PROTO_ID_ITEM,
     dataAlignment = 4,
     dataSection   = false)
-class ProtoID private constructor(            shortyIndex:     Int      = NO_INDEX,
-                                              returnTypeIndex: Int      = NO_INDEX,
-                                  private var _parameters:     TypeList = TypeList.empty()) : DataItem() {
+class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
+                                  returnTypeIndex: Int      = NO_INDEX,
+                                  parameters:      TypeList = TypeList.empty()) : DataItem() {
 
     var shortyIndex: Int = shortyIndex
-        internal set
+        private set
 
     var returnTypeIndex: Int = returnTypeIndex
-        internal set
+        private set
 
-    val parameters: TypeList
-        get() = _parameters
+    var parameters: TypeList = parameters
+        private set
 
     var parametersOffset: Int = 0
         private set
@@ -87,12 +87,12 @@ class ProtoID private constructor(            shortyIndex:     Int      = NO_IND
     override fun readLinkedDataItems(input: DexDataInput) {
         if (parametersOffset != 0) {
             input.offset = parametersOffset
-            _parameters  = TypeList.readContent(input)
+            parameters  = TypeList.readContent(input)
         }
     }
 
     override fun updateOffsets(dataItemMap: Map) {
-        parametersOffset = if (!_parameters.isEmpty) dataItemMap.getOffset(_parameters) else 0
+        parametersOffset = if (!parameters.isEmpty) dataItemMap.getOffset(parameters) else 0
     }
 
     override fun write(output: DexDataOutput) {
@@ -102,19 +102,19 @@ class ProtoID private constructor(            shortyIndex:     Int      = NO_IND
     }
 
     fun parameterTypesAccept(dexFile: DexFile, visitor: TypeVisitor) {
-        for (i in 0 until _parameters.typeCount) {
-            visitor.visitType(dexFile, _parameters, i, _parameters.getTypeIndex(i), _parameters.getType(dexFile, i))
+        for (i in 0 until parameters.typeCount) {
+            visitor.visitType(dexFile, parameters, i, parameters.getTypeIndex(i), parameters.getType(dexFile, i))
         }
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        visitor.visitParameterTypes(dexFile, this, _parameters)
+        visitor.visitParameterTypes(dexFile, this, parameters)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         visitor.visitStringID(dexFile, PropertyAccessor({ shortyIndex }, { shortyIndex = it }))
         visitor.visitTypeID(dexFile, PropertyAccessor({ returnTypeIndex }, { returnTypeIndex = it }))
-        _parameters.referencedIDsAccept(dexFile, visitor)
+        parameters.referencedIDsAccept(dexFile, visitor)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -125,15 +125,15 @@ class ProtoID private constructor(            shortyIndex:     Int      = NO_IND
 
         return shortyIndex     == other.shortyIndex     &&
                returnTypeIndex == other.returnTypeIndex &&
-               _parameters     == other._parameters
+               parameters      == other.parameters
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(shortyIndex, returnTypeIndex, _parameters)
+        return Objects.hash(shortyIndex, returnTypeIndex, parameters)
     }
 
     override fun toString(): String {
-        return "ProtoID[shortyIdx=${shortyIndex},returnTypeIdx=${returnTypeIndex},parameters=${_parameters}]"
+        return "ProtoID[shortyIdx=${shortyIndex},returnTypeIdx=${returnTypeIndex},parameters=${parameters}]"
     }
 
     companion object {

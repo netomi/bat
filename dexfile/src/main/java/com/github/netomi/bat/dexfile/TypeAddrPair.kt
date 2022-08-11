@@ -33,13 +33,13 @@ class TypeAddrPair private constructor(typeIndex: Int     = NO_INDEX,
                                        label:     String? = null) : DexContent(), Copyable<TypeAddrPair> {
 
     var typeIndex: Int = typeIndex
-        internal set
+        private set
 
     var address: Int = address
-        internal set
+        private set
 
     var label: String? = label
-        internal set
+        private set
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getTypeID(typeIndex).getType(dexFile)

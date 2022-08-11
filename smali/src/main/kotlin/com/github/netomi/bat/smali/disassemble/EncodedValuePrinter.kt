@@ -58,7 +58,7 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
     override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
         appendWithPrefix("{")
 
-        if (!value.isEmpty()) {
+        if (!value.isEmpty) {
             printer.println()
             printer.levelUp()
             value.valuesAccept(dexFile, this.joinedByValueConsumer { _, _ -> printer.println(",") })

@@ -35,13 +35,13 @@ class FieldID private constructor(classIndex: Int = NO_INDEX,
                                   typeIndex:  Int = NO_INDEX): DataItem() {
 
     var classIndex: Int = classIndex
-        internal set
+        private set
 
     var nameIndex: Int = nameIndex
-        internal set
+        private set
 
     var typeIndex: Int = typeIndex
-        internal set
+        private set
 
     fun getClassTypeID(dexFile: DexFile): TypeID {
         return dexFile.getTypeID(classIndex)

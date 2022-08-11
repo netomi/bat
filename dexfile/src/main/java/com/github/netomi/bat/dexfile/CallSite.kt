@@ -31,21 +31,21 @@ import com.google.common.base.Preconditions
 class CallSite private constructor() : EncodedArray() {
 
     val methodHandle: EncodedMethodHandleValue
-        get() = array.values[0] as EncodedMethodHandleValue
+        get() = array[0] as EncodedMethodHandleValue
 
     fun getMethodHandle(dexFile: DexFile): MethodHandle {
         return methodHandle.getMethodHandle(dexFile)
     }
 
     val methodName: EncodedStringValue
-        get() = array.values[1] as EncodedStringValue
+        get() = array[1] as EncodedStringValue
 
     fun getMethodName(dexFile: DexFile): String {
         return methodName.getStringValue(dexFile)
     }
 
     val methodType: EncodedMethodTypeValue
-        get() = array.values[2] as EncodedMethodTypeValue
+        get() = array[2] as EncodedMethodTypeValue
 
     fun getMethodType(dexFile: DexFile): ProtoID {
         return methodType.getProtoID(dexFile)
@@ -66,9 +66,9 @@ class CallSite private constructor() : EncodedArray() {
 
         fun of(methodHandleIndex: Int, nameIndex: Int, protoIndex: Int): CallSite {
             val callSite = CallSite()
-            callSite.array.addEncodedValue(EncodedMethodHandleValue.of(methodHandleIndex))
-            callSite.array.addEncodedValue(EncodedStringValue.of(nameIndex))
-            callSite.array.addEncodedValue(EncodedMethodTypeValue.of(protoIndex))
+            callSite.array.add(EncodedMethodHandleValue.of(methodHandleIndex))
+            callSite.array.add(EncodedStringValue.of(nameIndex))
+            callSite.array.add(EncodedMethodTypeValue.of(protoIndex))
             return callSite
         }
 
@@ -76,13 +76,13 @@ class CallSite private constructor() : EncodedArray() {
             Preconditions.checkArgument(encodedValues.size >= 2)
 
             val callSite = CallSite()
-            callSite.array.addEncodedValue(EncodedMethodHandleValue.of(methodHandleIndex))
+            callSite.array.add(EncodedMethodHandleValue.of(methodHandleIndex))
 
             Preconditions.checkArgument(encodedValues[0] is EncodedStringValue)
             Preconditions.checkArgument(encodedValues[1] is EncodedMethodTypeValue)
 
             for (encodedValue in encodedValues) {
-                callSite.array.addEncodedValue(encodedValue)
+                callSite.array.add(encodedValue)
             }
 
             return callSite

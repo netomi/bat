@@ -33,7 +33,7 @@ import java.util.*
 class TypeID private constructor(descriptorIndex: Int = NO_INDEX) : DataItem() {
 
     var descriptorIndex: Int = descriptorIndex
-        internal set
+        private set
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getStringID(descriptorIndex).stringValue

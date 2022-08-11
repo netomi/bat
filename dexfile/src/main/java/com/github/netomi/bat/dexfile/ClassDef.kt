@@ -147,22 +147,6 @@ class ClassDef private constructor(            classIndex:           Int        
                                      .firstOrNull() ?: NO_INDEX
     }
 
-    fun getStaticValue(dexFile: DexFile, field: EncodedField): EncodedValue? {
-        val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
-        require(fieldClass == getType(dexFile)) { "field class does not match this class" }
-
-        val staticFieldIndex = getStaticFieldIndex(field)
-        require(staticFieldIndex != NO_INDEX)
-            { "trying to get a static value for a field that does not belong to this class: ${getType(dexFile)}" }
-
-        return if (staticFieldIndex >= 0 &&
-            staticFieldIndex < staticValues.array.values.size) {
-            staticValues.array.values[staticFieldIndex]
-        } else {
-            null
-        }
-    }
-
     internal fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue) {
         val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
         require(fieldClass == getType(dexFile)) { "field class does not match this class" }
@@ -171,17 +155,17 @@ class ClassDef private constructor(            classIndex:           Int        
         require(staticFieldIndex != NO_INDEX)
             { "trying to add a static value for a field that does not belong to this class: ${getType(dexFile)}" }
 
-        val currentStaticValues = staticValues.array.values.size
+        val currentStaticValues = staticValues.array.size
         if (currentStaticValues <= staticFieldIndex) {
             for (i in currentStaticValues until staticFieldIndex) {
                 val currentField = classData.getStaticField(i)
                 val type = currentField.getFieldID(dexFile).getType(dexFile)
                 val encodedValue = getDefaultEncodedValueForType(type)
-                staticValues.array.addEncodedValue(encodedValue)
+                staticValues.array.add(encodedValue)
             }
-            staticValues.array.addEncodedValue(value)
+            staticValues.array.add(value)
         } else {
-            staticValues.array.setEncodedValue(staticFieldIndex, value)
+            staticValues.array[staticFieldIndex] = value
         }
     }
 
@@ -189,7 +173,7 @@ class ClassDef private constructor(            classIndex:           Int        
         get() = classIndex == NO_INDEX
 
     internal fun sort(dexFile: DexFile) {
-        val staticValueMapping = classData.staticFields.associateWith { encodedField -> getStaticValue(dexFile, encodedField) }
+        val staticValueMapping = classData.staticFields.associateWith { encodedField -> encodedField.staticValue(dexFile) }
         classData.staticFields.sortWith(compareBy { it.fieldIndex })
         classData.instanceFields.sortWith(compareBy { it.fieldIndex })
 

@@ -34,13 +34,13 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
                                    protoIndex: Int = NO_INDEX) : DataItem() {
 
     var classIndex: Int = classIndex
-        internal set
+        private set
 
     var nameIndex: Int = nameIndex
-        internal set
+        private set
 
     var protoIndex: Int = protoIndex
-        internal set
+        private set
 
     fun getClassTypeID(dexFile: DexFile): TypeID {
         return dexFile.getTypeID(classIndex)

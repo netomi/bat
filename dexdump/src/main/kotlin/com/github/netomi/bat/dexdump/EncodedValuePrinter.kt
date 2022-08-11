@@ -27,7 +27,7 @@ internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer
     }
 
     override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
-        if (value.values.isNotEmpty()) {
+        if (!value.isEmpty) {
             printer.print("{ ")
             value.valuesAccept(dexFile, joinedByValueConsumer { _, _ -> printer.print(" ") })
             printer.print(" }")

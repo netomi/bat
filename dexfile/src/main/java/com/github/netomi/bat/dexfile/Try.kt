@@ -33,17 +33,18 @@ class Try private constructor(startAddr:    Int                 = 0,
                               catchHandler: EncodedCatchHandler = EncodedCatchHandler.empty()): DexContent() {
 
     var startAddr: Int = startAddr
-        internal set
+        private set
 
     var insnCount: Int = insnCount
-        internal set
+        private set
 
     var startLabel: String? = startLabel
-        internal set
+        private set
 
     var endLabel: String?   = endLabel
-        internal set
+        private set
 
+    // internal as this field is set from the Code item.
     var catchHandler: EncodedCatchHandler = catchHandler
         internal set
 

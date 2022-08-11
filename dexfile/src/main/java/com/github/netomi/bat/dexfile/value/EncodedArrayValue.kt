@@ -27,21 +27,31 @@ import kotlin.collections.ArrayList
 /**
  * A class representing an array of values inside a dex file.
  */
-data class EncodedArrayValue internal constructor(val values: ArrayList<EncodedValue> = ArrayList(0)) : EncodedValue() {
+data class EncodedArrayValue internal constructor(private val values: ArrayList<EncodedValue> = ArrayList(0)) : EncodedValue(), Sequence<EncodedValue> {
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.ARRAY
 
-    fun isEmpty(): Boolean {
-        return values.isEmpty()
+    val isEmpty: Boolean
+        get() = values.isEmpty()
+
+    val size: Int
+        get() = values.size
+
+    operator fun get(index: Int): EncodedValue {
+        return values[index]
     }
 
-    fun addEncodedValue(value: EncodedValue) {
+    internal fun add(value: EncodedValue) {
         values.add(value)
     }
 
-    fun setEncodedValue(idx: Int, value: EncodedValue) {
+    internal operator fun set(idx: Int, value: EncodedValue) {
         values[idx] = value
+    }
+
+    override fun iterator(): Iterator<EncodedValue> {
+        return values.iterator()
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {

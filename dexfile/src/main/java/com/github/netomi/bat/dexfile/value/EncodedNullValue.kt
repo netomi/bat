@@ -25,6 +25,7 @@ import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
  * An class representing a null value inside a dex file.
  */
 object EncodedNullValue : EncodedValue() {
+
     override val valueType: EncodedValueType
         get() = EncodedValueType.NULL
 

@@ -35,10 +35,10 @@ class EncodedCatchHandler private constructor(            catchAllAddr:  Int    
                                               private val _handlers:      ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent(), Copyable<EncodedCatchHandler> {
 
     var catchAllAddr: Int = catchAllAddr
-        internal set
+        private set
 
     var catchAllLabel: String? = catchAllLabel
-        internal set
+        private set
 
     val handlers: List<TypeAddrPair>
         get() = _handlers

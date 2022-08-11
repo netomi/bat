@@ -54,9 +54,9 @@ private class EncodedValueCopier constructor(private val targetDexEditor: DexEdi
         copy.accept(targetDexFile, visitor)
     }
 
-    override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
+    override fun visitArrayValue(dexFile: DexFile, array: EncodedArrayValue) {
         val targetValues = mutableListOf<EncodedValue>()
-        for (arrayValue in value.values) {
+        for (arrayValue in array) {
             targetValues.add(arrayValue.copyTo(dexFile, targetDexEditor))
         }
 

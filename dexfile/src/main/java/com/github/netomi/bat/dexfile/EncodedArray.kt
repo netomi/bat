@@ -30,7 +30,7 @@ import java.util.*
 open class EncodedArray protected constructor(val array: EncodedArrayValue = EncodedArrayValue.empty()) : DataItem() {
 
     override val isEmpty: Boolean
-        get() = array.isEmpty()
+        get() = array.isEmpty
 
     override fun read(input: DexDataInput) {
         array.readValue(input, 0)
@@ -45,14 +45,14 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
     }
 
     fun accept(dexFile: DexFile, visitor: EncodedValueVisitor) {
-        for (i in array.values.indices) {
-            array.values[i].accept(dexFile, visitor)
+        for (i in 0 until array.size) {
+            array[i].accept(dexFile, visitor)
         }
     }
 
     fun accept(dexFile: DexFile, index: Int, visitor: EncodedValueVisitor) {
-        if (index >= 0 && index < array.values.size) {
-            array.values[index].accept(dexFile, visitor)
+        if (index in 0 until array.size) {
+            array[index].accept(dexFile, visitor)
         }
     }
 

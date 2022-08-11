@@ -29,20 +29,21 @@ import kotlin.collections.ArrayList
     type          = TYPE_MAP_LIST,
     dataAlignment = 4,
     dataSection   = true)
-class MapList private constructor(private val _mapItems: ArrayList<MapItem> = ArrayList(0)) : DataItem() {
-
-    val mapItems: List<MapItem>
-        get() = _mapItems
+class MapList private constructor(private val mapItems: ArrayList<MapItem> = ArrayList(0)) : DataItem(), Sequence<MapItem> {
 
     val mapItemCount: Int
-        get() = _mapItems.size
+        get() = mapItems.size
 
     fun getMapItem(index: Int): MapItem {
-        return _mapItems[index]
+        return mapItems[index]
+    }
+
+    override fun iterator(): Iterator<MapItem> {
+        return mapItems.iterator()
     }
 
     fun getMapItemByType(type: Int): MapItem? {
-        for (mapItem in _mapItems) {
+        for (mapItem in mapItems) {
             if (mapItem.type == type) {
                 return mapItem
             }
@@ -50,11 +51,11 @@ class MapList private constructor(private val _mapItems: ArrayList<MapItem> = Ar
         return null
     }
 
-    fun updateMapItem(type: Int, size: Int, offset: Int) {
+    internal fun updateMapItem(type: Int, size: Int, offset: Int) {
         var mapItem = getMapItemByType(type)
         if (mapItem == null) {
             mapItem = MapItem.of(type)
-            _mapItems.add(mapItem)
+            mapItems.add(mapItem)
         }
 
         mapItem.size   = size
@@ -66,17 +67,17 @@ class MapList private constructor(private val _mapItems: ArrayList<MapItem> = Ar
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()
-        _mapItems.clear()
-        _mapItems.ensureCapacity(size)
+        mapItems.clear()
+        mapItems.ensureCapacity(size)
         for (i in 0 until size) {
             val mapItem = MapItem.readContent(input)
-            _mapItems.add(mapItem)
+            mapItems.add(mapItem)
         }
     }
 
     override fun write(output: DexDataOutput) {
         // only write out map items which are not empty and sort by offset
-        val filteredMap = _mapItems.filter { it.size > 0 }.sortedBy { it.offset }
+        val filteredMap = mapItems.filter { it.size > 0 }.sortedBy { it.offset }
 
         output.writeInt(filteredMap.size)
         for (mapItem in filteredMap) {
@@ -90,15 +91,15 @@ class MapList private constructor(private val _mapItems: ArrayList<MapItem> = Ar
 
         other as MapList
 
-        return _mapItems == other._mapItems
+        return mapItems == other.mapItems
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_mapItems)
+        return Objects.hash(mapItems)
     }
 
     override fun toString(): String {
-        return "MapList[items=${_mapItems.size}]"
+        return "MapList[items=${mapItems.size}]"
     }
 
     companion object {
