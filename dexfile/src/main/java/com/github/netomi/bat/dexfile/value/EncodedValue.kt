@@ -72,7 +72,7 @@ abstract class EncodedValue {
         }
 
         fun readAnnotationValue(input: DexDataInput): EncodedAnnotationValue {
-            val annotation = EncodedAnnotationValue()
+            val annotation = EncodedAnnotationValue.empty()
             annotation.readValue(input, 0)
             return annotation
         }
@@ -142,24 +142,24 @@ abstract class EncodedValue {
 }
 
 enum class EncodedValueType constructor(val value: Int, val supplier: () -> EncodedValue) {
-    BYTE          (VALUE_BYTE,          ::EncodedByteValue),
-    SHORT         (VALUE_SHORT,         ::EncodedShortValue),
-    CHAR          (VALUE_CHAR,          ::EncodedCharValue),
-    INT           (VALUE_INT,           ::EncodedIntValue),
-    LONG          (VALUE_LONG,          ::EncodedLongValue),
-    FLOAT         (VALUE_FLOAT,         ::EncodedFloatValue),
-    DOUBLE        (VALUE_DOUBLE,        ::EncodedDoubleValue),
-    METHOD_TYPE   (VALUE_METHOD_TYPE,   ::EncodedMethodTypeValue),
-    METHOD_HANDLE (VALUE_METHOD_HANDLE, ::EncodedMethodHandleValue),
-    STRING        (VALUE_STRING,        ::EncodedStringValue),
-    TYPE          (VALUE_TYPE,          ::EncodedTypeValue),
-    FIELD         (VALUE_FIELD,         ::EncodedFieldValue),
-    METHOD        (VALUE_METHOD,        ::EncodedMethodValue),
-    ENUM          (VALUE_ENUM,          ::EncodedEnumValue),
-    ARRAY         (VALUE_ARRAY,         ::EncodedArrayValue),
-    ANNOTATION    (VALUE_ANNOTATION,    ::EncodedAnnotationValue),
+    BYTE          (VALUE_BYTE,          (EncodedByteValue)::empty),
+    SHORT         (VALUE_SHORT,         (EncodedShortValue)::empty),
+    CHAR          (VALUE_CHAR,          (EncodedCharValue)::empty),
+    INT           (VALUE_INT,           (EncodedIntValue)::empty),
+    LONG          (VALUE_LONG,          (EncodedLongValue)::empty),
+    FLOAT         (VALUE_FLOAT,         (EncodedFloatValue)::empty),
+    DOUBLE        (VALUE_DOUBLE,        (EncodedDoubleValue)::empty),
+    METHOD_TYPE   (VALUE_METHOD_TYPE,   (EncodedMethodTypeValue)::empty),
+    METHOD_HANDLE (VALUE_METHOD_HANDLE, (EncodedMethodHandleValue)::empty),
+    STRING        (VALUE_STRING,        (EncodedStringValue)::empty),
+    TYPE          (VALUE_TYPE,          (EncodedTypeValue)::empty),
+    FIELD         (VALUE_FIELD,         (EncodedFieldValue)::empty),
+    METHOD        (VALUE_METHOD,        (EncodedMethodValue)::empty),
+    ENUM          (VALUE_ENUM,          (EncodedEnumValue)::empty),
+    ARRAY         (VALUE_ARRAY,         (EncodedArrayValue)::empty),
+    ANNOTATION    (VALUE_ANNOTATION,    (EncodedAnnotationValue)::empty),
     NULL          (VALUE_NULL,          { EncodedNullValue }),
-    BOOLEAN       (VALUE_BOOLEAN,       ::EncodedBooleanValue);
+    BOOLEAN       (VALUE_BOOLEAN,       (EncodedBooleanValue)::empty);
 
     companion object {
         private val valueToTypeMap: Map<Int, EncodedValueType> by lazy {

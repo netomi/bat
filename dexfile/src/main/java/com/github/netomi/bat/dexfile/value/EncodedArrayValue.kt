@@ -35,7 +35,7 @@ data class EncodedArrayValue internal constructor(private val values: ArrayList<
     val isEmpty: Boolean
         get() = values.isEmpty()
 
-    val size: Int
+    val valueCount: Int
         get() = values.size
 
     operator fun get(index: Int): EncodedValue {
@@ -103,7 +103,7 @@ data class EncodedArrayValue internal constructor(private val values: ArrayList<
     }
 
     companion object {
-        fun empty(): EncodedArrayValue {
+        internal fun empty(): EncodedArrayValue {
             return EncodedArrayValue()
         }
 

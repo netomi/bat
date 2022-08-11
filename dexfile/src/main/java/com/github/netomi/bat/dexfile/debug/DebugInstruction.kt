@@ -55,7 +55,6 @@ abstract class DebugInstruction protected constructor(val opcode: Byte) : DexCon
         const val DBG_LINE_BASE  = -4
         const val DBG_LINE_RANGE = 15
 
-        @JvmStatic
         fun readInstruction(input: DexDataInput): DebugInstruction {
             val opCode = input.readByte()
             val debugInstruction = create(opCode)
@@ -66,16 +65,16 @@ abstract class DebugInstruction protected constructor(val opcode: Byte) : DexCon
         private fun create(opCode: Byte): DebugInstruction {
             return when (opCode) {
                 DBG_END_SEQUENCE         -> DebugEndSequence
-                DBG_ADVANCE_PC           -> DebugAdvancePC()
-                DBG_ADVANCE_LINE         -> DebugAdvanceLine()
-                DBG_START_LOCAL          -> DebugStartLocal()
-                DBG_START_LOCAL_EXTENDED -> DebugStartLocalExtended()
-                DBG_END_LOCAL            -> DebugEndLocal()
-                DBG_RESTART_LOCAL        -> DebugRestartLocal()
+                DBG_ADVANCE_PC           -> DebugAdvancePC.empty()
+                DBG_ADVANCE_LINE         -> DebugAdvanceLine.empty()
+                DBG_START_LOCAL          -> DebugStartLocal.empty()
+                DBG_START_LOCAL_EXTENDED -> DebugStartLocalExtended.empty()
+                DBG_END_LOCAL            -> DebugEndLocal.empty()
+                DBG_RESTART_LOCAL        -> DebugRestartLocal.empty()
                 DBG_SET_PROLOGUE_END     -> DebugSetPrologueEnd
                 DBG_SET_EPILOGUE_BEGIN   -> DebugSetEpilogueBegin
-                DBG_SET_FILE             -> DebugSetFile()
-                else                     -> DebugAdvanceLineAndPC(opCode)
+                DBG_SET_FILE             -> DebugSetFile.empty()
+                else                     -> DebugAdvanceLineAndPC.of(opCode)
             }
         }
     }
@@ -84,7 +83,7 @@ abstract class DebugInstruction protected constructor(val opcode: Byte) : DexCon
 /**
  * Represents a debug instruction that advances the line register.
  */
-data class DebugAdvanceLine internal constructor(private var _lineDiff: Int = 0): DebugInstruction(DBG_ADVANCE_LINE) {
+data class DebugAdvanceLine private constructor(private var _lineDiff: Int = 0): DebugInstruction(DBG_ADVANCE_LINE) {
 
     val lineDiff: Int
         get() = _lineDiff
@@ -107,6 +106,10 @@ data class DebugAdvanceLine internal constructor(private var _lineDiff: Int = 0)
     }
 
     companion object {
+        internal fun empty(): DebugAdvanceLine {
+            return DebugAdvanceLine()
+        }
+
         fun of(lineDiff: Int): DebugAdvanceLine {
             return DebugAdvanceLine(lineDiff)
         }
@@ -116,10 +119,11 @@ data class DebugAdvanceLine internal constructor(private var _lineDiff: Int = 0)
 /**
  * Represents a debug instruction that advances the line and address registers.
  */
-class DebugAdvanceLineAndPC internal constructor(opCode: Byte) : DebugInstruction(opCode) {
+class DebugAdvanceLineAndPC private constructor(opCode: Byte) : DebugInstruction(opCode) {
 
     var lineDiff = 0
         private set
+
     var addrDiff = 0
         private set
 
@@ -193,7 +197,7 @@ private data class LineAddrPair(val lineDiff: Int, val addrDiff: Int)
 /**
  * Represents a debug instruction that advances the address register.
  */
-data class DebugAdvancePC internal constructor(private var _addrDiff: Int = 0) : DebugInstruction(DBG_ADVANCE_PC) {
+data class DebugAdvancePC private constructor(private var _addrDiff: Int = 0) : DebugInstruction(DBG_ADVANCE_PC) {
 
     val addrDiff: Int
         get() = _addrDiff
@@ -216,6 +220,10 @@ data class DebugAdvancePC internal constructor(private var _addrDiff: Int = 0) :
     }
 
     companion object {
+        internal fun empty(): DebugAdvancePC {
+            return DebugAdvancePC()
+        }
+
         fun of(addrDiff: Int): DebugAdvancePC {
             return DebugAdvancePC(addrDiff)
         }
@@ -225,7 +233,7 @@ data class DebugAdvancePC internal constructor(private var _addrDiff: Int = 0) :
 /**
  * Represents a debug instruction that ends a local variable at the current address.
  */
-data class DebugEndLocal internal constructor(private var _registerNum: Int = 0) : DebugInstruction(DBG_END_LOCAL) {
+data class DebugEndLocal private constructor(private var _registerNum: Int = 0) : DebugInstruction(DBG_END_LOCAL) {
 
     val registerNum: Int
         get() = _registerNum
@@ -248,6 +256,10 @@ data class DebugEndLocal internal constructor(private var _registerNum: Int = 0)
     }
 
     companion object {
+        internal fun empty(): DebugEndLocal {
+            return DebugEndLocal()
+        }
+
         fun of(registerNum: Int): DebugEndLocal {
             return DebugEndLocal(registerNum)
         }
@@ -285,7 +297,7 @@ object DebugEndSequence : DebugInstruction(DBG_END_SEQUENCE) {
 /**
  * Represents a debug instruction that restarts a previously defined local variable at the current address.
  */
-data class DebugRestartLocal internal constructor(private var _registerNum: Int = 0) : DebugInstruction(DBG_RESTART_LOCAL) {
+data class DebugRestartLocal private constructor(private var _registerNum: Int = 0) : DebugInstruction(DBG_RESTART_LOCAL) {
 
     val registerNum: Int
         get() = _registerNum
@@ -308,6 +320,10 @@ data class DebugRestartLocal internal constructor(private var _registerNum: Int 
     }
 
     companion object {
+        internal fun empty(): DebugRestartLocal {
+            return DebugRestartLocal()
+        }
+
         fun of(registerNum: Int): DebugRestartLocal {
             return DebugRestartLocal(registerNum)
         }
@@ -345,17 +361,17 @@ object DebugSetEpilogueBegin : DebugInstruction(DBG_SET_EPILOGUE_BEGIN) {
 /**
  * Represents a debug instruction that sets associated source file for subsequent line number entries.
  */
-class DebugSetFile internal constructor(_nameIndex: Int = 0) : DebugInstruction(DBG_SET_FILE) {
+data class DebugSetFile private constructor(private var _nameIndex: Int = 0) : DebugInstruction(DBG_SET_FILE) {
 
-    var nameIndex: Int = _nameIndex
-        internal set
+    val nameIndex: Int
+        get() = _nameIndex
 
     fun getName(dexFile: DexFile): String? {
         return dexFile.getStringNullable(nameIndex)
     }
 
     override fun read(input: DexDataInput) {
-        nameIndex = input.readUleb128p1()
+        _nameIndex = input.readUleb128p1()
     }
 
     override fun write(output: DexDataOutput) {
@@ -369,21 +385,8 @@ class DebugSetFile internal constructor(_nameIndex: Int = 0) : DebugInstruction(
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         if (nameIndex != NO_INDEX) {
-            visitor.visitStringID(dexFile, PropertyAccessor({ nameIndex }, { nameIndex = it }))
+            visitor.visitStringID(dexFile, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        val o = other as DebugSetFile
-
-        return nameIndex == o.nameIndex
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hash(nameIndex)
     }
 
     override fun toString(): String {
@@ -391,6 +394,10 @@ class DebugSetFile internal constructor(_nameIndex: Int = 0) : DebugInstruction(
     }
 
     companion object {
+        internal fun empty(): DebugSetFile {
+            return DebugSetFile()
+        }
+
         fun of(nameIndex: Int): DebugSetFile {
             return DebugSetFile(nameIndex)
         }
@@ -432,12 +439,14 @@ open class DebugStartLocal : DebugInstruction {
 
     var registerNum = 0
         protected set
+
     var nameIndex = 0
         internal set
+
     var typeIndex = 0
         internal set
 
-    internal constructor() : this(DBG_START_LOCAL)
+    private constructor() : this(DBG_START_LOCAL)
 
     protected constructor(opCode: Byte) : super(opCode)
 
@@ -502,6 +511,10 @@ open class DebugStartLocal : DebugInstruction {
     }
 
     companion object {
+        internal fun empty(): DebugStartLocal {
+            return DebugStartLocal()
+        }
+
         fun of(registerNum: Int, nameIndex: Int, typeIndex: Int): DebugStartLocal {
             return DebugStartLocal(DBG_START_LOCAL, registerNum, nameIndex, typeIndex)
         }
@@ -516,7 +529,7 @@ class DebugStartLocalExtended : DebugStartLocal {
     var sigIndex = 0
         internal set
 
-    internal constructor() : super(DBG_START_LOCAL_EXTENDED)
+    private constructor() : super(DBG_START_LOCAL_EXTENDED)
 
     private constructor(registerNum: Int, nameIndex: Int, typeIndex: Int, sigIndex: Int) : super(DBG_START_LOCAL_EXTENDED, registerNum, nameIndex, typeIndex) {
         this.sigIndex = sigIndex
@@ -567,6 +580,10 @@ class DebugStartLocalExtended : DebugStartLocal {
     }
 
     companion object {
+        internal fun empty(): DebugStartLocalExtended {
+            return DebugStartLocalExtended()
+        }
+
         fun of(registerNum: Int, nameIndex: Int, typeIndex: Int, sigIndex: Int): DebugStartLocalExtended {
             return DebugStartLocalExtended(registerNum, nameIndex, typeIndex, sigIndex)
         }

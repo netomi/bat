@@ -36,7 +36,7 @@ import java.util.*
     dataAlignment = 1,
     dataSection   = true)
 class Annotation private constructor(visibility:      AnnotationVisibility   = AnnotationVisibility.BUILD,
-                                     annotationValue: EncodedAnnotationValue = EncodedAnnotationValue()) : DataItem() {
+                                     annotationValue: EncodedAnnotationValue = EncodedAnnotationValue.empty()) : DataItem() {
 
     var visibility: AnnotationVisibility = visibility
         private set

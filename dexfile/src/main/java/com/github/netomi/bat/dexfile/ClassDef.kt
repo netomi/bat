@@ -155,9 +155,9 @@ class ClassDef private constructor(            classIndex:           Int        
         require(staticFieldIndex != NO_INDEX)
             { "trying to add a static value for a field that does not belong to this class: ${getType(dexFile)}" }
 
-        val currentStaticValues = staticValues.array.size
-        if (currentStaticValues <= staticFieldIndex) {
-            for (i in currentStaticValues until staticFieldIndex) {
+        val currentStaticValueCount = staticValues.array.valueCount
+        if (currentStaticValueCount <= staticFieldIndex) {
+            for (i in currentStaticValueCount until staticFieldIndex) {
                 val currentField = classData.getStaticField(i)
                 val type = currentField.getFieldID(dexFile).getType(dexFile)
                 val encodedValue = getDefaultEncodedValueForType(type)

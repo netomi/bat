@@ -26,7 +26,10 @@ import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 /**
  * A class representing a referenced string (StringID) value inside a dex file.
  */
-data class EncodedStringValue internal constructor(var stringIndex: Int = NO_INDEX) : EncodedValue() {
+data class EncodedStringValue private constructor(private var _stringIndex: Int = NO_INDEX) : EncodedValue() {
+
+    val stringIndex: Int
+        get() = _stringIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.STRING
@@ -36,7 +39,7 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        stringIndex = input.readUnsignedInt(valueArg + 1)
+        _stringIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -52,7 +55,7 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitStringID(dexFile, PropertyAccessor({ stringIndex }, { stringIndex = it }))
+        visitor.visitStringID(dexFile, PropertyAccessor({ _stringIndex }, { _stringIndex = it }))
     }
 
     override fun toString(): String {
@@ -60,6 +63,10 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
     }
 
     companion object {
+        internal fun empty(): EncodedStringValue {
+            return EncodedStringValue()
+        }
+
         fun of(stringIndex: Int): EncodedStringValue {
             require(stringIndex >= 0) { "stringIndex must not be negative" }
             return EncodedStringValue(stringIndex)
@@ -70,7 +77,10 @@ data class EncodedStringValue internal constructor(var stringIndex: Int = NO_IND
 /**
  * A class representing a referenced field (FieldID) value inside a dex file.
  */
-data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX) : EncodedValue() {
+data class EncodedFieldValue private constructor(private var _fieldIndex: Int = NO_INDEX) : EncodedValue() {
+
+    val fieldIndex: Int
+        get() = _fieldIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.FIELD
@@ -80,7 +90,7 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        fieldIndex = input.readUnsignedInt(valueArg + 1)
+        _fieldIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -96,7 +106,7 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitFieldID(dexFile, PropertyAccessor({ fieldIndex }, { fieldIndex = it }))
+        visitor.visitFieldID(dexFile, PropertyAccessor({ _fieldIndex }, { _fieldIndex = it }))
     }
 
     override fun toString(): String {
@@ -104,6 +114,10 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
     }
 
     companion object {
+        internal fun empty(): EncodedFieldValue {
+            return EncodedFieldValue()
+        }
+
         fun of(fieldIndex: Int): EncodedFieldValue {
             require(fieldIndex >= 0) { "fieldIndex must not be negative" }
             return EncodedFieldValue(fieldIndex)
@@ -114,7 +128,10 @@ data class EncodedFieldValue internal constructor(var fieldIndex: Int = NO_INDEX
 /**
  * A class representing a referenced method (MethodID) value inside a dex file.
  */
-data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_INDEX) : EncodedValue() {
+data class EncodedMethodValue private constructor(private var _methodIndex: Int = NO_INDEX) : EncodedValue() {
+
+    val methodIndex: Int
+        get() = _methodIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.METHOD
@@ -124,7 +141,7 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        methodIndex = input.readUnsignedInt(valueArg + 1)
+        _methodIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -140,7 +157,7 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
+        visitor.visitMethodID(dexFile, PropertyAccessor({ _methodIndex }, { _methodIndex = it }))
     }
 
     override fun toString(): String {
@@ -148,6 +165,10 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
     }
 
     companion object {
+        internal fun empty(): EncodedMethodValue {
+            return EncodedMethodValue()
+        }
+
         fun of(methodIndex: Int): EncodedMethodValue {
             require(methodIndex >= 0) { "methodIndex must not be negative" }
             return EncodedMethodValue(methodIndex)
@@ -158,7 +179,10 @@ data class EncodedMethodValue internal constructor(var methodIndex: Int = NO_IND
 /**
  * A class representing a referenced type (TypeID) value inside a dex file.
  */
-data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) : EncodedValue() {
+data class EncodedTypeValue private constructor(private var _typeIndex: Int = NO_INDEX) : EncodedValue() {
+
+    val typeIndex: Int
+        get() = _typeIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.TYPE
@@ -168,7 +192,7 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        typeIndex = input.readUnsignedInt(valueArg + 1)
+        _typeIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -184,7 +208,7 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor({ typeIndex }, { typeIndex = it }))
+        visitor.visitTypeID(dexFile, PropertyAccessor({ _typeIndex }, { _typeIndex = it }))
     }
 
     override fun toString(): String {
@@ -192,6 +216,10 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
     }
 
     companion object {
+        internal fun empty(): EncodedTypeValue {
+            return EncodedTypeValue()
+        }
+
         fun of(typeIndex: Int): EncodedTypeValue {
             require(typeIndex >= 0) { "typeIndex must not be negative" }
             return EncodedTypeValue(typeIndex)
@@ -202,7 +230,10 @@ data class EncodedTypeValue internal constructor(var typeIndex: Int = NO_INDEX) 
 /**
  * A class representing a referenced enum (FieldID) value inside a dex file.
  */
-data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX) : EncodedValue() {
+data class EncodedEnumValue private constructor(private var _fieldIndex: Int = NO_INDEX) : EncodedValue() {
+
+    val fieldIndex: Int
+        get() = _fieldIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.ENUM
@@ -212,7 +243,7 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        fieldIndex = input.readUnsignedInt(valueArg + 1)
+        _fieldIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -228,7 +259,7 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitFieldID(dexFile, PropertyAccessor({ fieldIndex }, { fieldIndex = it }))
+        visitor.visitFieldID(dexFile, PropertyAccessor({ _fieldIndex }, { _fieldIndex = it }))
     }
 
     override fun toString(): String {
@@ -236,6 +267,10 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
     }
 
     companion object {
+        internal fun empty(): EncodedEnumValue {
+            return EncodedEnumValue()
+        }
+
         fun of(fieldIndex: Int): EncodedEnumValue {
             require(fieldIndex >= 0) { "fieldIndex must not be negative" }
             return EncodedEnumValue(fieldIndex)
@@ -246,7 +281,10 @@ data class EncodedEnumValue internal constructor(var fieldIndex: Int = NO_INDEX)
 /**
  * A class representing a referenced method handle (MethodHandle) value inside a dex file.
  */
-data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = NO_INDEX) : EncodedValue() {
+data class EncodedMethodHandleValue private constructor(private var _handleIndex: Int = NO_INDEX) : EncodedValue() {
+
+    val handleIndex: Int
+        get() = _handleIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.METHOD_HANDLE
@@ -256,7 +294,7 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        handleIndex = input.readUnsignedInt(valueArg + 1)
+        _handleIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -272,7 +310,7 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitMethodHandle(dexFile, PropertyAccessor({ handleIndex }, { handleIndex = it }))
+        visitor.visitMethodHandle(dexFile, PropertyAccessor({ _handleIndex }, { _handleIndex = it }))
     }
 
     override fun toString(): String {
@@ -280,6 +318,10 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
     }
 
     companion object {
+        internal fun empty(): EncodedMethodHandleValue {
+            return EncodedMethodHandleValue()
+        }
+
         fun of(handleIndex: Int): EncodedMethodHandleValue {
             require(handleIndex >= 0) { "handleIndex must not be negative" }
             return EncodedMethodHandleValue(handleIndex)
@@ -290,7 +332,10 @@ data class EncodedMethodHandleValue internal constructor(var handleIndex: Int = 
 /**
  * A class representing a referenced method type (ProtoID) value inside a dex file.
  */
-data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_INDEX) : EncodedValue() {
+data class EncodedMethodTypeValue private constructor(private var _protoIndex: Int = NO_INDEX) : EncodedValue() {
+
+    val protoIndex: Int
+        get() = _protoIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.METHOD_TYPE
@@ -300,7 +345,7 @@ data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        protoIndex = input.readUnsignedInt(valueArg + 1)
+        _protoIndex = input.readUnsignedInt(valueArg + 1)
     }
 
     override fun writeType(output: DexDataOutput): Int {
@@ -316,7 +361,7 @@ data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitProtoID(dexFile, PropertyAccessor({ protoIndex }, { protoIndex = it }))
+        visitor.visitProtoID(dexFile, PropertyAccessor({ _protoIndex }, { _protoIndex = it }))
     }
 
     override fun toString(): String {
@@ -324,6 +369,10 @@ data class EncodedMethodTypeValue internal constructor(var protoIndex: Int = NO_
     }
 
     companion object {
+        internal fun empty(): EncodedMethodTypeValue {
+            return EncodedMethodTypeValue()
+        }
+
         fun of(protoIndex: Int): EncodedMethodTypeValue {
             require(protoIndex >= 0) { "protoIndex must not be negative" }
             return EncodedMethodTypeValue(protoIndex)

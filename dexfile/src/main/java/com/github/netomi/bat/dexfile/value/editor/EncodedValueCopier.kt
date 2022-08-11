@@ -43,7 +43,7 @@ private class EncodedValueCopier constructor(private val targetDexEditor: DexEdi
         val targetTypeIndex = targetDexEditor.addOrGetTypeIDIndex(type)
         val targetElements = mutableListOf<AnnotationElement>()
 
-        for (annotationElement in value.elements) {
+        for (annotationElement in value) {
             val name = annotationElement.getName(dexFile)
 
             val targetNameIndex = targetDexEditor.addOrGetStringIDIndex(name)
@@ -54,9 +54,9 @@ private class EncodedValueCopier constructor(private val targetDexEditor: DexEdi
         copy.accept(targetDexFile, visitor)
     }
 
-    override fun visitArrayValue(dexFile: DexFile, array: EncodedArrayValue) {
+    override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
         val targetValues = mutableListOf<EncodedValue>()
-        for (arrayValue in array) {
+        for (arrayValue in value) {
             targetValues.add(arrayValue.copyTo(dexFile, targetDexEditor))
         }
 

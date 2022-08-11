@@ -205,6 +205,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                         when (dvmValue) {
                             is DvmPrimitiveValue -> dvmValue.valueOfType(parameterTypes[index])
                             is DvmReferenceValue -> dvmValue.value.obj
+                            else -> {}
                         }
                     }
                 }

@@ -24,15 +24,17 @@ import com.github.netomi.bat.dexfile.value.visitor.AnnotationElementVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import com.google.common.base.Preconditions
 import kotlin.collections.ArrayList
 
 /**
  * A class representing an annotation value (TypeID + AnnotationElements) inside a dex file.
  */
-data class EncodedAnnotationValue internal constructor(
-    var typeIndex: Int                          = NO_INDEX,
-    val elements:  ArrayList<AnnotationElement> = ArrayList(0)): EncodedValue() {
+data class EncodedAnnotationValue
+    private constructor(private var _typeIndex: Int                          = NO_INDEX,
+                        private val elements:   ArrayList<AnnotationElement> = ArrayList(0)): EncodedValue(), Sequence<AnnotationElement> {
+
+    val typeIndex: Int
+        get() = _typeIndex
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.ANNOTATION
@@ -41,12 +43,19 @@ data class EncodedAnnotationValue internal constructor(
         return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 
-    fun addAnnotationElement(element: AnnotationElement) {
-        elements.add(element)
+    val annotationElementCount: Int
+        get() = elements.size
+
+    fun getAnnotationElement(index: Int): AnnotationElement {
+        return elements[index]
+    }
+
+    override fun iterator(): Iterator<AnnotationElement> {
+        return elements.iterator()
     }
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
-        typeIndex = input.readUleb128()
+        _typeIndex = input.readUleb128()
         val size = input.readUleb128()
         elements.clear()
         elements.ensureCapacity(size)
@@ -73,7 +82,7 @@ data class EncodedAnnotationValue internal constructor(
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor({ typeIndex }, { typeIndex = it }))
+        visitor.visitTypeID(dexFile, PropertyAccessor({ _typeIndex }, { _typeIndex = it }))
         elements.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
@@ -88,16 +97,16 @@ data class EncodedAnnotationValue internal constructor(
     }
 
     companion object {
+        internal fun empty(): EncodedAnnotationValue {
+            return EncodedAnnotationValue()
+        }
+
         fun of(typeIndex: Int, elements: Collection<AnnotationElement>): EncodedAnnotationValue {
-            val annotationValue = EncodedAnnotationValue(typeIndex)
-            annotationValue.elements.addAll(elements)
-            return annotationValue
+            return EncodedAnnotationValue(typeIndex, ArrayList(elements))
         }
 
         fun of(typeIndex: Int, vararg elements: AnnotationElement): EncodedAnnotationValue {
-            val annotationValue = EncodedAnnotationValue(typeIndex)
-            annotationValue.elements.addAll(elements)
-            return annotationValue
+            return EncodedAnnotationValue(typeIndex, ArrayList(elements.toList()))
         }
     }
 }
@@ -105,17 +114,22 @@ data class EncodedAnnotationValue internal constructor(
 /**
  * A class representing an annotation element inside a dex file.
  */
-data class AnnotationElement private constructor(
-    var nameIndex: Int =          NO_INDEX,
-    var value:     EncodedValue = EncodedNullValue) : DexContent() {
+data class AnnotationElement private constructor(private var _nameIndex: Int          = NO_INDEX,
+                                                 private var _value:     EncodedValue = EncodedNullValue) : DexContent() {
+
+    val nameIndex: Int
+        get() = _nameIndex
+
+    val value: EncodedValue
+        get() = _value
 
     fun getName(dexFile: DexFile): String {
         return dexFile.getStringID(nameIndex).stringValue
     }
 
     override fun read(input: DexDataInput) {
-        nameIndex = input.readUleb128()
-        value     = EncodedValue.read(input)
+        _nameIndex = input.readUleb128()
+        _value     = EncodedValue.read(input)
     }
 
     override fun write(output: DexDataOutput) {
@@ -128,7 +142,7 @@ data class AnnotationElement private constructor(
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitStringID(dexFile, PropertyAccessor({ nameIndex }, { nameIndex = it }))
+        visitor.visitStringID(dexFile, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
         value.referencedIDsAccept(dexFile, visitor)
     }
 
