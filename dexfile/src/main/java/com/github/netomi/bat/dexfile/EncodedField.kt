@@ -99,7 +99,7 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
         }
     }
 
-    fun staticValueCollect(dexFile: DexFile): EncodedValue? {
+    fun staticValue(dexFile: DexFile): EncodedValue? {
         val collector = valueCollector()
         staticValueAccept(dexFile, collector)
         return collector.items().singleOrNull()

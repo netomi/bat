@@ -100,7 +100,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println("  type          : '" + field.getType(dexFile) + "'")
         printer.println("  access        : " + formatAccessFlags(field.accessFlags, DexAccessFlagTarget.FIELD))
         if (field.isStatic) {
-            val staticValue = field.staticValueCollect(dexFile)
+            val staticValue = field.staticValue(dexFile)
             if (staticValue != null) {
                 printer.print("  value         : ")
                 staticValue.accept(dexFile, encodedValuePrinter)
