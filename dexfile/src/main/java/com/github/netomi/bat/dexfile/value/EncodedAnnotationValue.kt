@@ -59,7 +59,7 @@ data class EncodedAnnotationValue
         val size = input.readUleb128()
         elements = mutableListOfCapacity(size)
         for (i in 0 until size) {
-            val element = AnnotationElement.readContent(input)
+            val element = AnnotationElement.read(input)
             elements.add(element)
         }
     }
@@ -155,7 +155,7 @@ data class AnnotationElement private constructor(private var _nameIndex: Int    
             return AnnotationElement(nameIndex, value)
         }
 
-        fun readContent(input: DexDataInput): AnnotationElement {
+        internal fun read(input: DexDataInput): AnnotationElement {
             val annotationElement = AnnotationElement()
             annotationElement.read(input)
             return annotationElement

@@ -120,7 +120,7 @@ class TypeList private constructor(private var typeList: IntArray = intArrayOf()
         /**
          * Returns a new empty TypeList instance.
          */
-        fun empty(): TypeList {
+        internal fun empty(): TypeList {
             return TypeList()
         }
 
@@ -139,7 +139,7 @@ class TypeList private constructor(private var typeList: IntArray = intArrayOf()
             return typeList
         }
 
-        fun readContent(input: DexDataInput): TypeList {
+        internal fun read(input: DexDataInput): TypeList {
             val typeList = TypeList()
             typeList.read(input)
             return typeList

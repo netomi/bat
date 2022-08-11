@@ -69,7 +69,7 @@ class MapList
         val size = input.readInt()
         mapItems = mutableListOfCapacity(size)
         for (i in 0 until size) {
-            val mapItem = MapItem.readContent(input)
+            val mapItem = MapItem.read(input)
             mapItems.add(mapItem)
         }
     }
@@ -106,7 +106,7 @@ class MapList
             return MapList()
         }
 
-        internal fun readMapList(input: DexDataInput): MapList {
+        internal fun read(input: DexDataInput): MapList {
             val mapList = MapList()
             mapList.read(input)
             return mapList

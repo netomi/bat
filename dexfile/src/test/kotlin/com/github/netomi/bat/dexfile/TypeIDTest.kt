@@ -29,7 +29,7 @@ class TypeIDTest : DexContentTest<TypeID>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, TypeID>
-        get() = Function { input -> TypeID.readContent(input) }
+        get() = Function { input -> TypeID.read(input) }
 
     @Test
     fun inputChecking() {

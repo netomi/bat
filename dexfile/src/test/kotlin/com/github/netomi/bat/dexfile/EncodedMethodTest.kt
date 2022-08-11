@@ -32,7 +32,7 @@ class EncodedMethodTest : DexContentTest<EncodedMethod>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, EncodedMethod>
-        get() = Function { input -> EncodedMethod.readContent(input, 0) }
+        get() = Function { input -> EncodedMethod.read(input, 0) }
 
     override fun getWriteMethod(data: EncodedMethod): Consumer<DexDataOutput> {
         return Consumer { output -> data.write(output, 0) }

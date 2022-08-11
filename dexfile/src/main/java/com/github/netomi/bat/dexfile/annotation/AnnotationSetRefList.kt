@@ -56,7 +56,7 @@ class AnnotationSetRefList
         val size = input.readInt()
         _annotationSetRefs = mutableListOfCapacity(size)
         for (i in 0 until size) {
-            val annotationSetRef = AnnotationSetRef.readContent(input)
+            val annotationSetRef = AnnotationSetRef.read(input)
             _annotationSetRefs.add(annotationSetRef)
         }
     }
@@ -115,11 +115,11 @@ class AnnotationSetRefList
     }
 
     companion object {
-        fun empty(): AnnotationSetRefList {
+        internal fun empty(): AnnotationSetRefList {
             return AnnotationSetRefList()
         }
 
-        fun readContent(input: DexDataInput): AnnotationSetRefList {
+        internal fun read(input: DexDataInput): AnnotationSetRefList {
             val annotationSetRefList = AnnotationSetRefList()
             annotationSetRefList.read(input)
             return annotationSetRefList

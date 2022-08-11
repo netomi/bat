@@ -30,7 +30,7 @@ class ProtoIDTest : DexContentTest<ProtoID>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, ProtoID>
-        get() = Function { input -> ProtoID.readContent(input) }
+        get() = Function { input -> ProtoID.read(input) }
 
     @Test
     fun inputChecking() {

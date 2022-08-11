@@ -30,7 +30,7 @@ class EncodedCatchHandlerTest : DexContentTest<EncodedCatchHandler>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, EncodedCatchHandler>
-        get() = Function { input -> EncodedCatchHandler.readContent(input) }
+        get() = Function { input -> EncodedCatchHandler.read(input) }
 
     @Test
     fun equals() {

@@ -147,15 +147,15 @@ class DebugInfo
     }
 
     companion object {
-        fun empty(): DebugInfo {
+        internal fun empty(): DebugInfo {
             return DebugInfo()
         }
 
-        fun empty(parameterSize: Int): DebugInfo {
+        internal fun empty(parameterSize: Int): DebugInfo {
             return DebugInfo(_parameterNames = IntArray(parameterSize) { NO_INDEX })
         }
 
-        fun readContent(input: DexDataInput): DebugInfo {
+        internal fun read(input: DexDataInput): DebugInfo {
             val debugInfo = DebugInfo()
             debugInfo.read(input)
             return debugInfo

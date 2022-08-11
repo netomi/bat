@@ -53,7 +53,7 @@ class StringID private constructor(): DataItem(), Comparable<StringID> {
 
     override fun readLinkedDataItems(input: DexDataInput) {
         input.offset = stringDataOffset
-        stringData = StringData.readContent(input)
+        stringData = StringData.read(input)
     }
 
     override fun updateOffsets(dataItemMap: Map) {
@@ -94,7 +94,7 @@ class StringID private constructor(): DataItem(), Comparable<StringID> {
             return StringID(StringData.of(value))
         }
 
-        fun readContent(input: DexDataInput): StringID {
+        internal fun read(input: DexDataInput): StringID {
             val stringID = StringID()
             stringID.read(input)
             return stringID

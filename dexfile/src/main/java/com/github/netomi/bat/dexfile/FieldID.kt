@@ -110,7 +110,7 @@ class FieldID private constructor(classIndex: Int = NO_INDEX,
             return FieldID(classIndex, nameIndex, typeIndex)
         }
 
-        fun readContent(input: DexDataInput): FieldID {
+        internal fun read(input: DexDataInput): FieldID {
             val fieldID = FieldID()
             fieldID.read(input)
             return fieldID

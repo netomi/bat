@@ -223,22 +223,22 @@ class ClassDef private constructor(            classIndex:           Int        
     override fun readLinkedDataItems(input: DexDataInput) {
         if (interfacesOffset != 0) {
             input.offset = interfacesOffset
-            interfaces = TypeList.readContent(input)
+            interfaces = TypeList.read(input)
         }
 
         if (annotationsOffset != 0) {
             input.offset = annotationsOffset
-            annotationsDirectory = AnnotationsDirectory.readContent(input)
+            annotationsDirectory = AnnotationsDirectory.read(input)
         }
 
         if (classDataOffset != 0) {
             input.offset = classDataOffset
-            classData = ClassData.readContent(input)
+            classData = ClassData.read(input)
         }
 
         if (staticValuesOffset != 0) {
             input.offset = staticValuesOffset
-            staticValues = EncodedArray.readContent(input)
+            staticValues = EncodedArray.read(input)
         }
     }
 
@@ -374,7 +374,7 @@ class ClassDef private constructor(            classIndex:           Int        
             return ClassDef(classIndex, accessFlags, superClassIndex, sourceFileIndex)
         }
 
-        fun readContent(input: DexDataInput): ClassDef {
+        internal fun read(input: DexDataInput): ClassDef {
             val classDef = ClassDef()
             classDef.read(input)
             return classDef

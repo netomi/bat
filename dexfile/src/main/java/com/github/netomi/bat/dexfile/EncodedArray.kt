@@ -75,11 +75,11 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
     }
 
     companion object {
-        fun empty(): EncodedArray {
+        internal fun empty(): EncodedArray {
             return EncodedArray()
         }
 
-        fun readContent(input: DexDataInput): EncodedArray {
+        internal fun read(input: DexDataInput): EncodedArray {
             val encodedArray = EncodedArray()
             encodedArray.read(input)
             return encodedArray

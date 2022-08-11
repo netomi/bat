@@ -16,7 +16,6 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.EncodedField.Companion.of
-import com.github.netomi.bat.dexfile.EncodedField.Companion.readContent
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import org.junit.jupiter.api.Assertions.*
@@ -34,7 +33,7 @@ class EncodedFieldTest : DexContentTest<EncodedField>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, EncodedField>
-        get() = Function { input -> readContent(input, 0) }
+        get() = Function { input -> EncodedField.read(input, 0) }
 
     override fun getWriteMethod(data: EncodedField): Consumer<DexDataOutput> {
         return Consumer { output -> data.write(output, 0) }

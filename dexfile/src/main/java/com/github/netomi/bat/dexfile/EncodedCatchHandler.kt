@@ -66,7 +66,7 @@ class EncodedCatchHandler
         val size = abs(readSize)
         _handlers = mutableListOfCapacity(size)
         for (i in 0 until size) {
-            val typeAddrPair = TypeAddrPair.readContent(input)
+            val typeAddrPair = TypeAddrPair.read(input)
             _handlers.add(typeAddrPair)
         }
         if (readSize <= 0) {
@@ -121,7 +121,7 @@ class EncodedCatchHandler
     }
 
     companion object {
-        fun empty(): EncodedCatchHandler {
+        internal fun empty(): EncodedCatchHandler {
             return EncodedCatchHandler()
         }
 
@@ -153,7 +153,7 @@ class EncodedCatchHandler
             return EncodedCatchHandler(0, catchAllLabel, handlers.toMutableList())
         }
 
-        fun readContent(input: DexDataInput): EncodedCatchHandler {
+        internal fun read(input: DexDataInput): EncodedCatchHandler {
             val encodedCatchHandler = EncodedCatchHandler()
             encodedCatchHandler.read(input)
             return encodedCatchHandler

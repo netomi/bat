@@ -141,7 +141,7 @@ class MethodHandle private constructor(methodHandleTypeValue: Int = -1,
             return MethodHandle(methodHandleType, fieldOrMethodId)
         }
 
-        fun readContent(input: DexDataInput): MethodHandle {
+        internal fun read(input: DexDataInput): MethodHandle {
             val methodHandle = MethodHandle()
             methodHandle.read(input)
             return methodHandle

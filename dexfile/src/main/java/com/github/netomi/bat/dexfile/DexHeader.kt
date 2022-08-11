@@ -240,7 +240,7 @@ class DexHeader private constructor() : DataItem() {
             return DexHeader(format)
         }
 
-        internal fun readHeader(input: DexDataInput): DexHeader {
+        internal fun read(input: DexDataInput): DexHeader {
             val header = DexHeader()
             header.read(input)
             return header

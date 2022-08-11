@@ -103,7 +103,7 @@ class TypeAddrPair private constructor(            typeIndex: Int     = NO_INDEX
             return TypeAddrPair(typeIndex, 0, label)
         }
 
-        fun readContent(input: DexDataInput): TypeAddrPair {
+        internal fun read(input: DexDataInput): TypeAddrPair {
             val typeAddrPair = TypeAddrPair()
             typeAddrPair.read(input)
             return typeAddrPair

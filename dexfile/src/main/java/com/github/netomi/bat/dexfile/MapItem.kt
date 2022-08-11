@@ -82,7 +82,7 @@ class MapItem private constructor(type:   Int = 0,
             return MapItem(type, size)
         }
 
-        fun readContent(input: DexDataInput): MapItem {
+        internal fun read(input: DexDataInput): MapItem {
             val mapItem = MapItem()
             mapItem.read(input)
             return mapItem

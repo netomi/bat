@@ -48,7 +48,7 @@ class AnnotationSetRef private constructor(annotationSet: AnnotationSet = Annota
     override fun readLinkedDataItems(input: DexDataInput) {
         if (annotationsOffset != 0) {
             input.offset = annotationsOffset
-            annotationSet = AnnotationSet.readContent(input)
+            annotationSet = AnnotationSet.read(input)
             annotationSet.readLinkedDataItems(input)
         }
     }
@@ -96,7 +96,7 @@ class AnnotationSetRef private constructor(annotationSet: AnnotationSet = Annota
             return AnnotationSetRef(annotationSet)
         }
 
-        fun readContent(input: DexDataInput): AnnotationSetRef {
+        internal fun read(input: DexDataInput): AnnotationSetRef {
             val annotationSetRef = AnnotationSetRef()
             annotationSetRef.read(input)
             return annotationSetRef

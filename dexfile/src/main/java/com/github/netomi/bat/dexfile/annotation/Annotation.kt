@@ -89,7 +89,7 @@ class Annotation private constructor(visibility:      AnnotationVisibility   = A
             return Annotation(visibility, value)
         }
 
-        fun readContent(input: DexDataInput): Annotation {
+        internal fun read(input: DexDataInput): Annotation {
             val annotation = Annotation()
             annotation.read(input)
             return annotation

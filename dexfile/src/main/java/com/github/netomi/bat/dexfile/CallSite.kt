@@ -60,7 +60,7 @@ class CallSite private constructor() : EncodedArray() {
     }
 
     companion object {
-        fun empty(): CallSite {
+        internal fun empty(): CallSite {
             return CallSite()
         }
 
@@ -88,7 +88,7 @@ class CallSite private constructor() : EncodedArray() {
             return callSite
         }
 
-        fun readContent(input: DexDataInput): CallSite {
+        internal fun read(input: DexDataInput): CallSite {
             val callSite = CallSite()
             callSite.read(input)
             return callSite

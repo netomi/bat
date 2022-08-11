@@ -31,7 +31,7 @@ class MapItemTest : DexContentTest<MapItem>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, MapItem>
-        get() = Function { input -> MapItem.readContent(input) }
+        get() = Function { input -> MapItem.read(input) }
 
     @Test
     fun setter() {

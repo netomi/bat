@@ -156,7 +156,7 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
             return EncodedField(fieldIndex, accessFlags)
         }
 
-        fun readContent(input: DexDataInput, lastIndex: Int): EncodedField {
+        internal fun read(input: DexDataInput, lastIndex: Int): EncodedField {
             val encodedField = EncodedField()
             encodedField.read(input)
             encodedField.updateFieldIndex(lastIndex)

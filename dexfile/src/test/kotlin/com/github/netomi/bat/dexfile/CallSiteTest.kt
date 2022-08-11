@@ -33,7 +33,7 @@ class CallSiteTest : DexContentTest<CallSite>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, CallSite>
-        get() = Function { input -> CallSite.readContent(input) }
+        get() = Function { input -> CallSite.read(input) }
 
     @Test
     fun getter() {

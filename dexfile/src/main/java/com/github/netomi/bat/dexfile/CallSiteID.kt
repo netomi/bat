@@ -47,7 +47,7 @@ class CallSiteID private constructor(callSite: CallSite = CallSite.empty()) : Da
 
     override fun readLinkedDataItems(input: DexDataInput) {
         input.offset = callSiteOffset
-        callSite = CallSite.readContent(input)
+        callSite = CallSite.read(input)
     }
 
     override fun updateOffsets(dataItemMap: Map) {
@@ -92,7 +92,7 @@ class CallSiteID private constructor(callSite: CallSite = CallSite.empty()) : Da
             return CallSiteID(callSite)
         }
 
-        fun readContent(input: DexDataInput): CallSiteID {
+        internal fun read(input: DexDataInput): CallSiteID {
             val callSiteID = CallSiteID()
             callSiteID.read(input)
             return callSiteID

@@ -32,7 +32,7 @@ class MapListTest : DexContentTest<MapList>() {
         }
 
     override val factoryMethod: Function<DexDataInput, MapList>
-        get() = Function { input -> MapList.readMapList(input) }
+        get() = Function { input -> MapList.read(input) }
 
     @Test
     fun equals() {

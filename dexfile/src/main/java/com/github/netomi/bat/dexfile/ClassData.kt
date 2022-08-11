@@ -89,7 +89,7 @@ internal class ClassData
         var lastIndex = 0
         _staticFields = mutableListOfCapacity(staticFieldsSize)
         for (i in 0 until staticFieldsSize) {
-            val encodedField = EncodedField.readContent(input, lastIndex)
+            val encodedField = EncodedField.read(input, lastIndex)
             lastIndex = encodedField.fieldIndex
             _staticFields.add(encodedField)
         }
@@ -97,7 +97,7 @@ internal class ClassData
         lastIndex = 0
         _instanceFields = mutableListOfCapacity(instanceFieldsSize)
         for (i in 0 until instanceFieldsSize) {
-            val encodedField = EncodedField.readContent(input, lastIndex)
+            val encodedField = EncodedField.read(input, lastIndex)
             lastIndex = encodedField.fieldIndex
             _instanceFields.add(encodedField)
         }
@@ -105,7 +105,7 @@ internal class ClassData
         lastIndex = 0
         _directMethods = mutableListOfCapacity(directMethodsSize)
         for (i in 0 until directMethodsSize) {
-            val encodedMethod = EncodedMethod.readContent(input, lastIndex)
+            val encodedMethod = EncodedMethod.read(input, lastIndex)
             lastIndex = encodedMethod.methodIndex
             _directMethods.add(encodedMethod)
         }
@@ -113,7 +113,7 @@ internal class ClassData
         lastIndex = 0
         _virtualMethods = mutableListOfCapacity(virtualMethodsSize)
         for (i in 0 until virtualMethodsSize) {
-            val encodedMethod = EncodedMethod.readContent(input, lastIndex)
+            val encodedMethod = EncodedMethod.read(input, lastIndex)
             lastIndex = encodedMethod.methodIndex
             _virtualMethods.add(encodedMethod)
         }
@@ -222,11 +222,11 @@ internal class ClassData
     }
 
     companion object {
-        fun empty(): ClassData {
+        internal fun empty(): ClassData {
             return ClassData()
         }
 
-        fun readContent(input: DexDataInput): ClassData {
+        internal fun read(input: DexDataInput): ClassData {
             val classData = ClassData()
             classData.read(input)
             return classData

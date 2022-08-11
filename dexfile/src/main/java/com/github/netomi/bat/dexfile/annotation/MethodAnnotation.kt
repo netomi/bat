@@ -52,7 +52,7 @@ class MethodAnnotation private constructor(methodIndex:   Int           = NO_IND
 
     override fun readLinkedDataItems(input: DexDataInput) {
         input.offset = annotationsOffset
-        annotationSet = AnnotationSet.readContent(input)
+        annotationSet = AnnotationSet.read(input)
     }
 
     override fun updateOffsets(dataItemMap: DataItem.Map) {
@@ -101,7 +101,7 @@ class MethodAnnotation private constructor(methodIndex:   Int           = NO_IND
             return MethodAnnotation(methodIndex, annotationSet)
         }
 
-        fun readContent(input: DexDataInput): MethodAnnotation {
+        internal fun read(input: DexDataInput): MethodAnnotation {
             val methodAnnotation = MethodAnnotation()
             methodAnnotation.read(input)
             return methodAnnotation

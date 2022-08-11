@@ -87,7 +87,7 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
     override fun readLinkedDataItems(input: DexDataInput) {
         if (parametersOffset != 0) {
             input.offset = parametersOffset
-            parameters  = TypeList.readContent(input)
+            parameters  = TypeList.read(input)
         }
     }
 
@@ -143,7 +143,7 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
             return ProtoID(shortyIndex, returnTypeIndex, TypeList.of(*parameterTypeIndices))
         }
 
-        fun readContent(input: DexDataInput): ProtoID {
+        internal fun read(input: DexDataInput): ProtoID {
             val protoID = ProtoID()
             protoID.read(input)
             return protoID

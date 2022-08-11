@@ -75,7 +75,7 @@ class AnnotationSet
         annotations = mutableListOfCapacity(annotationOffsetEntries.size)
         for (i in annotationOffsetEntries.indices) {
             input.offset = annotationOffsetEntries[i]
-            val annotation = Annotation.readContent(input)
+            val annotation = Annotation.read(input)
             annotations.add(i, annotation)
         }
     }
@@ -127,7 +127,7 @@ class AnnotationSet
     }
 
     companion object {
-        fun empty(): AnnotationSet {
+        internal fun empty(): AnnotationSet {
             return AnnotationSet()
         }
 
@@ -135,7 +135,7 @@ class AnnotationSet
             return AnnotationSet(annotations.toMutableList())
         }
 
-        fun readContent(input: DexDataInput): AnnotationSet {
+        internal fun read(input: DexDataInput): AnnotationSet {
             val annotationSet = AnnotationSet()
             annotationSet.read(input)
             return annotationSet

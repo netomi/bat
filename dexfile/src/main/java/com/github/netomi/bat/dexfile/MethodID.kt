@@ -125,7 +125,7 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
             return MethodID(classIndex, nameIndex, protoIndex)
         }
 
-        fun readContent(input: DexDataInput): MethodID {
+        internal fun read(input: DexDataInput): MethodID {
             val methodID = MethodID()
             methodID.read(input)
             return methodID

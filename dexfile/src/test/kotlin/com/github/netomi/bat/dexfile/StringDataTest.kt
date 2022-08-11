@@ -31,7 +31,7 @@ class StringDataTest : DexContentTest<StringData>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, StringData>
-        get() = Function { input -> StringData.readContent(input) }
+        get() = Function { input -> StringData.read(input) }
 
     @Test
     fun getter() {

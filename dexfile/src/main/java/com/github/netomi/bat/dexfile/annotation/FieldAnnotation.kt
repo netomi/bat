@@ -52,7 +52,7 @@ class FieldAnnotation private constructor(fieldIndex:    Int           = NO_INDE
 
     override fun readLinkedDataItems(input: DexDataInput) {
         input.offset = annotationsOffset
-        annotationSet = AnnotationSet.readContent(input)
+        annotationSet = AnnotationSet.read(input)
     }
 
     override fun updateOffsets(dataItemMap: DataItem.Map) {
@@ -101,7 +101,7 @@ class FieldAnnotation private constructor(fieldIndex:    Int           = NO_INDE
             return FieldAnnotation(fieldIndex, annotationSet)
         }
 
-        fun readContent(input: DexDataInput): FieldAnnotation {
+        internal fun read(input: DexDataInput): FieldAnnotation {
             val fieldAnnotation = FieldAnnotation()
             fieldAnnotation.read(input)
             return fieldAnnotation

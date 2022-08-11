@@ -107,7 +107,7 @@ class Code private constructor(            registersSize: Int              = 0,
         if (triesSize > 0) {
             _tryList = mutableListOfCapacity(triesSize)
             for (i in 0 until triesSize) {
-                _tryList.add(Try.readContent(input))
+                _tryList.add(Try.read(input))
             }
 
             val startOffset = input.offset
@@ -115,7 +115,7 @@ class Code private constructor(            registersSize: Int              = 0,
             val offsetMap = HashMap<Int, EncodedCatchHandler>()
             for (i in 0 until catchHandlerSize) {
                 val currentOffset = input.offset
-                val encodedCatchHandler = EncodedCatchHandler.readContent(input)
+                val encodedCatchHandler = EncodedCatchHandler.read(input)
                 offsetMap[currentOffset - startOffset] = encodedCatchHandler
             }
 
@@ -129,7 +129,7 @@ class Code private constructor(            registersSize: Int              = 0,
     override fun readLinkedDataItems(input: DexDataInput) {
         if (debugInfoOffset != 0) {
             input.offset = debugInfoOffset
-            debugInfo = DebugInfo.readContent(input)
+            debugInfo = DebugInfo.read(input)
         }
     }
 
@@ -236,7 +236,7 @@ class Code private constructor(            registersSize: Int              = 0,
     companion object {
         private val EMPTY_INSTRUCTIONS = ShortArray(0)
 
-        fun empty(): Code {
+        internal fun empty(): Code {
             return Code()
         }
 
@@ -244,7 +244,7 @@ class Code private constructor(            registersSize: Int              = 0,
             return Code(registersSize, insSize, outsSize)
         }
 
-        fun readItem(input: DexDataInput): Code {
+        internal fun read(input: DexDataInput): Code {
             val code = Code()
             code.read(input)
             return code

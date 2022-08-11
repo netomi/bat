@@ -29,7 +29,7 @@ class TypeAddrPairTest : DexContentTest<TypeAddrPair>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, TypeAddrPair>
-        get() = Function { input -> TypeAddrPair.readContent(input) }
+        get() = Function { input -> TypeAddrPair.read(input) }
 
     @Test
     fun inputChecking() {

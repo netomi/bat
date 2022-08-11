@@ -123,7 +123,7 @@ class Try private constructor(    startAddr:    Int                 = 0,
             return Try(0, 0, startLabel, endLabel, catchHandler)
         }
 
-        fun readContent(input: DexDataInput): Try {
+        internal fun read(input: DexDataInput): Try {
             val tryItem = Try()
             tryItem.read(input)
             return tryItem

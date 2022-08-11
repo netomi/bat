@@ -76,7 +76,7 @@ class TypeID private constructor(descriptorIndex: Int = NO_INDEX) : DataItem() {
             return TypeID(descriptorIndex)
         }
 
-        fun readContent(input: DexDataInput): TypeID {
+        internal fun read(input: DexDataInput): TypeID {
             val typeID = TypeID()
             typeID.read(input)
             return typeID

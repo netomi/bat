@@ -70,19 +70,19 @@ internal class AnnotationsDirectory
 
         fieldAnnotations = mutableListOfCapacity(fieldAnnotationsSize)
         for (i in 0 until fieldAnnotationsSize) {
-            val fieldAnnotation = FieldAnnotation.readContent(input)
+            val fieldAnnotation = FieldAnnotation.read(input)
             fieldAnnotations.add(fieldAnnotation)
         }
 
         methodAnnotations = mutableListOfCapacity(methodAnnotationsSize)
         for (i in 0 until methodAnnotationsSize) {
-            val methodAnnotation = MethodAnnotation.readContent(input)
+            val methodAnnotation = MethodAnnotation.read(input)
             methodAnnotations.add(methodAnnotation)
         }
 
         parameterAnnotations = mutableListOfCapacity(parameterAnnotationSize)
         for (i in 0 until parameterAnnotationSize) {
-            val parameterAnnotation = ParameterAnnotation.readContent(input)
+            val parameterAnnotation = ParameterAnnotation.read(input)
             parameterAnnotations.add(parameterAnnotation)
         }
     }
@@ -90,7 +90,7 @@ internal class AnnotationsDirectory
     override fun readLinkedDataItems(input: DexDataInput) {
         if (classAnnotationsOffset != 0) {
             input.offset = classAnnotationsOffset
-            classAnnotations = AnnotationSet.readContent(input)
+            classAnnotations = AnnotationSet.read(input)
         }
 
         for (fieldAnnotation in fieldAnnotations) {
@@ -197,11 +197,11 @@ internal class AnnotationsDirectory
     }
 
     companion object {
-        fun empty(): AnnotationsDirectory {
+        internal fun empty(): AnnotationsDirectory {
             return AnnotationsDirectory()
         }
 
-        fun readContent(input: DexDataInput): AnnotationsDirectory {
+        internal fun read(input: DexDataInput): AnnotationsDirectory {
             val annotationsDirectory = AnnotationsDirectory()
             annotationsDirectory.read(input)
             return annotationsDirectory

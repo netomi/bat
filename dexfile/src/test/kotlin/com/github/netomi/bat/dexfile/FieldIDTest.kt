@@ -29,7 +29,7 @@ class FieldIDTest : DexContentTest<FieldID>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, FieldID>
-        get() = Function { input -> FieldID.readContent(input) }
+        get() = Function { input -> FieldID.read(input) }
 
     @Test
     fun inputChecking() {

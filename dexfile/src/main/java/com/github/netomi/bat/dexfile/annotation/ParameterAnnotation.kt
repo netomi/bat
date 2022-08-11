@@ -54,7 +54,7 @@ class ParameterAnnotation private constructor(methodIndex:          Int         
 
     override fun readLinkedDataItems(input: DexDataInput) {
         input.offset = annotationsOffset
-        annotationSetRefList = AnnotationSetRefList.readContent(input)
+        annotationSetRefList = AnnotationSetRefList.read(input)
     }
 
     override fun updateOffsets(dataItemMap: DataItem.Map) {
@@ -116,7 +116,7 @@ class ParameterAnnotation private constructor(methodIndex:          Int         
             return ParameterAnnotation(methodIndex, annotationSetRefList)
         }
 
-        fun readContent(input: DexDataInput): ParameterAnnotation {
+        internal fun read(input: DexDataInput): ParameterAnnotation {
             val parameterAnnotation = ParameterAnnotation()
             parameterAnnotation.read(input)
             return parameterAnnotation

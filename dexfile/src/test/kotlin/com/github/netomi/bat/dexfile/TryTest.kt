@@ -34,7 +34,7 @@ class TryTest : DexContentTest<Try>() {
             )
 
     override val factoryMethod: Function<DexDataInput, Try>
-        get() = Function { input -> Try.readContent(input) }
+        get() = Function { input -> Try.read(input) }
 
     override fun getReadLinkedMethod(data: Try, oldData: Try): Consumer<DexDataInput> {
         // we just set the catch handler manually, as it is not serialized in the Try element itself.

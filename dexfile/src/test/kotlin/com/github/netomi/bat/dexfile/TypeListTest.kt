@@ -33,7 +33,7 @@ class TypeListTest : DexContentTest<TypeList>() {
         )
 
     override val factoryMethod: Function<DexDataInput, TypeList>
-        get() = Function { input -> TypeList.readContent(input) }
+        get() = Function { input -> TypeList.read(input) }
 
     @Test
     fun getter() {

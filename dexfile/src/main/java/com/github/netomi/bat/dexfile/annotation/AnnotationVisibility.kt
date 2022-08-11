@@ -26,7 +26,6 @@ enum class AnnotationVisibility(val value: Short, val simpleName: String) {
     SYSTEM (VISIBILITY_SYSTEM,  "system");
 
     companion object {
-        @JvmStatic
         fun of(simpleName: String): AnnotationVisibility {
             for (visibility in values()) {
                 if (visibility.simpleName == simpleName) return visibility
@@ -34,7 +33,6 @@ enum class AnnotationVisibility(val value: Short, val simpleName: String) {
             throw IllegalArgumentException("unexpected annotation visibility name $simpleName")
         }
 
-        @JvmStatic
         fun of(value: Int): AnnotationVisibility {
             Preconditions.checkElementIndex(value, values().size, "unexpected annotation visibility value $value")
             // the values correspond to the enum ordinals, thus we can lookup by index.

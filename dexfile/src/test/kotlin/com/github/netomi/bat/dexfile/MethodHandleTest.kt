@@ -30,7 +30,7 @@ class MethodHandleTest : DexContentTest<MethodHandle>() {
                 )
 
     override val factoryMethod: Function<DexDataInput, MethodHandle>
-        get() = Function { input -> MethodHandle.readContent(input) }
+        get() = Function { input -> MethodHandle.read(input) }
 
     @Test
     fun inputChecking() {

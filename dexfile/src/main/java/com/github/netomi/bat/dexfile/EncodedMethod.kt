@@ -114,7 +114,7 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
     override fun readLinkedDataItems(input: DexDataInput) {
         if (codeOffset != 0) {
             input.offset = codeOffset
-            code = Code.readItem(input)
+            code = Code.read(input)
             code.readLinkedDataItems(input)
         }
     }
@@ -204,7 +204,7 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
             return EncodedMethod(methodIndex, accessFlags)
         }
 
-        fun readContent(input: DexDataInput, lastIndex: Int): EncodedMethod {
+        internal fun read(input: DexDataInput, lastIndex: Int): EncodedMethod {
             val encodedMethod = EncodedMethod()
             encodedMethod.read(input)
             encodedMethod.updateMethodIndex(lastIndex)

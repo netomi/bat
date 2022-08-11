@@ -81,7 +81,7 @@ class StringData private constructor(): DataItem(), Comparable<StringData> {
             return StringData(value)
         }
 
-        fun readContent(input: DexDataInput): StringData {
+        internal fun read(input: DexDataInput): StringData {
             val stringData = StringData()
             stringData.read(input)
             return stringData
