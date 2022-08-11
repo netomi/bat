@@ -22,12 +22,13 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.visitor.EncodedArrayVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import kotlin.collections.ArrayList
+import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
  * A class representing an array of values inside a dex file.
  */
-data class EncodedArrayValue internal constructor(private val values: ArrayList<EncodedValue> = ArrayList(0)) : EncodedValue(), Sequence<EncodedValue> {
+data class EncodedArrayValue
+    internal constructor(private var values: MutableList<EncodedValue> = mutableListOfCapacity(0)) : EncodedValue(), Sequence<EncodedValue> {
 
     override val valueType: EncodedValueType
         get() = EncodedValueType.ARRAY
@@ -56,8 +57,7 @@ data class EncodedArrayValue internal constructor(private val values: ArrayList<
 
     override fun readValue(input: DexDataInput, valueArg: Int) {
         val size = input.readUleb128()
-        values.clear()
-        values.ensureCapacity(size)
+        values   = mutableListOfCapacity(size)
         for (i in 0 until size) {
             values.add(read(input))
         }
@@ -107,8 +107,8 @@ data class EncodedArrayValue internal constructor(private val values: ArrayList<
             return EncodedArrayValue()
         }
 
-        fun of(values: Collection<EncodedValue>): EncodedArrayValue {
-            return EncodedArrayValue(ArrayList(values))
+        fun of(values: List<EncodedValue>): EncodedArrayValue {
+            return EncodedArrayValue(values.toMutableList())
         }
 
         fun of(vararg values: EncodedValue): EncodedArrayValue {

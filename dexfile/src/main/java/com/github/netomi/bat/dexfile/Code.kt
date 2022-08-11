@@ -24,8 +24,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TryVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashSet
 
@@ -38,12 +38,12 @@ import kotlin.collections.LinkedHashSet
     type          = TYPE_CODE_ITEM,
     dataAlignment = 4,
     dataSection   = true)
-class Code private constructor(registersSize: Int            = 0,
-                               insSize:       Int            = 0,
-                               outsSize:      Int            = 0,
-                               insns:         ShortArray     = EMPTY_INSTRUCTIONS,
-                               tryList:       ArrayList<Try> = ArrayList(0),
-                               debugInfo:     DebugInfo      = DebugInfo.empty()) : DataItem() {
+class Code private constructor(            registersSize: Int              = 0,
+                                           insSize:       Int              = 0,
+                                           outsSize:      Int              = 0,
+                                           insns:         ShortArray       = EMPTY_INSTRUCTIONS,
+                               private var _tryList:      MutableList<Try> = mutableListOfCapacity(0),
+                                           debugInfo:     DebugInfo        = DebugInfo.empty()) : DataItem() {
 
     var registersSize = registersSize
         set(value) {
@@ -69,8 +69,8 @@ class Code private constructor(registersSize: Int            = 0,
     var insns: ShortArray = insns
         internal set
 
-    var tryList: ArrayList<Try> = tryList
-        internal set
+    val tryList: List<Try>
+        get() = _tryList
 
     var debugInfoOffset = 0
         private set
@@ -81,8 +81,12 @@ class Code private constructor(registersSize: Int            = 0,
     override val isEmpty: Boolean
         get() = insnsSize == 0 && debugInfo.isEmpty
 
+    internal fun setTryList(tryList: List<Try>) {
+        _tryList = tryList.toMutableList()
+    }
+
     internal fun sort() {
-        tryList.sortBy { it.startAddr }
+        _tryList.sortBy { it.startAddr }
     }
 
     override fun read(input: DexDataInput) {
@@ -101,10 +105,9 @@ class Code private constructor(registersSize: Int            = 0,
             input.readUnsignedShort()
         }
         if (triesSize > 0) {
-            tryList.clear()
-            tryList.ensureCapacity(triesSize)
+            _tryList = mutableListOfCapacity(triesSize)
             for (i in 0 until triesSize) {
-                tryList.add(Try.readContent(input))
+                _tryList.add(Try.readContent(input))
             }
 
             val startOffset = input.offset
@@ -117,7 +120,7 @@ class Code private constructor(registersSize: Int            = 0,
             }
 
             // initialize the associated catch handlers for each try
-            for (currentTry in tryList) {
+            for (currentTry in _tryList) {
                 currentTry.catchHandler = offsetMap[currentTry.handlerOffset]!!
             }
         }

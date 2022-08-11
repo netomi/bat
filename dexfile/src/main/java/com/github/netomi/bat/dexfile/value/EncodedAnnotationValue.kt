@@ -24,14 +24,14 @@ import com.github.netomi.bat.dexfile.value.visitor.AnnotationElementVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import kotlin.collections.ArrayList
+import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
  * A class representing an annotation value (TypeID + AnnotationElements) inside a dex file.
  */
 data class EncodedAnnotationValue
-    private constructor(private var _typeIndex: Int                          = NO_INDEX,
-                        private val elements:   ArrayList<AnnotationElement> = ArrayList(0)): EncodedValue(), Sequence<AnnotationElement> {
+    private constructor(private var _typeIndex: Int                            = NO_INDEX,
+                        private var elements:   MutableList<AnnotationElement> = mutableListOfCapacity(0)): EncodedValue(), Sequence<AnnotationElement> {
 
     val typeIndex: Int
         get() = _typeIndex
@@ -57,8 +57,7 @@ data class EncodedAnnotationValue
     override fun readValue(input: DexDataInput, valueArg: Int) {
         _typeIndex = input.readUleb128()
         val size = input.readUleb128()
-        elements.clear()
-        elements.ensureCapacity(size)
+        elements = mutableListOfCapacity(size)
         for (i in 0 until size) {
             val element = AnnotationElement.readContent(input)
             elements.add(element)
@@ -102,11 +101,11 @@ data class EncodedAnnotationValue
         }
 
         fun of(typeIndex: Int, elements: Collection<AnnotationElement>): EncodedAnnotationValue {
-            return EncodedAnnotationValue(typeIndex, ArrayList(elements))
+            return EncodedAnnotationValue(typeIndex, elements.toMutableList())
         }
 
         fun of(typeIndex: Int, vararg elements: AnnotationElement): EncodedAnnotationValue {
-            return EncodedAnnotationValue(typeIndex, ArrayList(elements.toList()))
+            return EncodedAnnotationValue(typeIndex, elements.toMutableList())
         }
     }
 }

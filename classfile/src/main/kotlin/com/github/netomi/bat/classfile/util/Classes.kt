@@ -16,8 +16,6 @@
 
 package com.github.netomi.bat.classfile.util
 
-import java.util.*
-
 fun isClassType(type: String): Boolean {
     return type.startsWith("L") && type.endsWith(";")
 }
@@ -27,24 +25,20 @@ fun isArrayType(type: String): Boolean {
 }
 
 fun internalClassNameFromInternalType(type: String): String {
-    Objects.requireNonNull(type)
     return if (isClassType(type)) {
         type.substring(1, type.length - 1)
     } else type
 }
 
 fun internalTypeFromInternalClassName(internalClassName: String): String {
-    Objects.requireNonNull(internalClassName)
     return "L$internalClassName;"
 }
 
 fun internalClassNameFromExternalClassName(externalClassName: String): String {
-    Objects.requireNonNull(externalClassName)
     return externalClassName.replace(".".toRegex(), "/")
 }
 
 fun externalClassNameFromInternalClassName(internalClassName: String): String {
-    Objects.requireNonNull(internalClassName)
     return internalClassName.replace("/".toRegex(), ".")
 }
 
@@ -59,7 +53,6 @@ fun internalPackageNameFromInternalClassName(internalClassName: String): String 
 }
 
 fun externalTypeFromInternalType(internalType: String): String {
-    Objects.requireNonNull(internalType)
     return if (isClassType(internalType)) {
         val className = internalClassNameFromInternalType(internalType)
         externalClassNameFromInternalClassName(className)

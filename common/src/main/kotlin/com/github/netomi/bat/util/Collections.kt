@@ -29,6 +29,10 @@ fun <T: Copyable<T>> List<T>.deepCopy(): List<T> {
     return map { it.copy() }
 }
 
+fun <T> mutableListOfCapacity(size: Int): MutableList<T> {
+    return ArrayList(size)
+}
+
 fun <A, B> List<A>.parallelForEachIndexed(coroutineContext: CoroutineContext = Dispatchers.Default, f: suspend (Int, A) -> B): List<B> {
     return runBlocking {
         mapIndexed { index, a -> async(coroutineContext) { f(index, a) } }.map { it.await() }

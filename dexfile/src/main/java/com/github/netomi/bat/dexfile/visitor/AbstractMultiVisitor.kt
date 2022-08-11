@@ -20,13 +20,12 @@ abstract class AbstractMultiVisitor<V> @SafeVarargs protected constructor(visito
     private val _visitors: List<V>
 
     init {
-        val visitorList = ArrayList<V>()
+        val visitorList = mutableListOf<V>()
         addVisitor(visitor, visitorList)
         for (nextVisitor in otherVisitors) {
             addVisitor(nextVisitor, visitorList)
         }
-        visitorList.trimToSize()
-        _visitors = visitorList
+        _visitors = visitorList.toMutableList()
     }
 
     val visitors: Iterable<V>

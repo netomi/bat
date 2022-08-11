@@ -24,7 +24,6 @@ import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.dexfile.instruction.editor.LabelInstruction
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.util.deepCopy
-import com.google.common.base.Preconditions
 
 class CodeEditor private constructor(val dexEditor: DexEditor,
                                      val classDef:  ClassDef,
@@ -125,7 +124,7 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
 
         // update the offsets of each try/catch element based on the collected labels and
         // make them non-overlapping.
-        code.tryList = updateAndNormalizeTryElements(code.tryList, addedTryList, offsetMap)
+        code.setTryList(updateAndNormalizeTryElements(code.tryList, addedTryList, offsetMap))
 
         // update the debug sequence
         code.debugInfoAccept(dexFile, classDef, method, DebugSequenceUpdater(dexEditor, offsetMap))
@@ -286,7 +285,7 @@ private enum class SeqType {
     END
 }
 
-private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryList: MutableList<Try>, offsetMap: OffsetMap): ArrayList<Try> {
+private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryList: MutableList<Try>, offsetMap: OffsetMap): List<Try> {
     val tryElements = (existingTryList + addedTryList).toMutableList()
     if (tryElements.isEmpty()) {
         return arrayListOf()
@@ -365,13 +364,7 @@ private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryLi
         }
     }
 
-    // we need to clear all labels now as the offsets are fixed,
-    // otherwise they would interfere the next time the code would be edited.
-    for (tryElement in nonOverlappingTries) {
-        tryElement.clearLabels()
-    }
-
-    return nonOverlappingTries
+    return nonOverlappingTries.map { it.copyWithoutLabels() }
 }
 
 private fun EncodedCatchHandler.subtract(other: EncodedCatchHandler): EncodedCatchHandler {

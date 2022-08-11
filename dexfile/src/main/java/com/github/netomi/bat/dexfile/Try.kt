@@ -26,22 +26,16 @@ import java.util.*
  *
  * @see [try item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-item)
  */
-class Try private constructor(startAddr:    Int                 = 0,
-                              insnCount:    Int                 = 0,
-                              startLabel:   String?             = null,
-                              endLabel:     String?             = null,
-                              catchHandler: EncodedCatchHandler = EncodedCatchHandler.empty()): DexContent() {
+class Try private constructor(    startAddr:    Int                 = 0,
+                                  insnCount:    Int                 = 0,
+                              val startLabel:   String?             = null,
+                              val endLabel:     String?             = null,
+                                  catchHandler: EncodedCatchHandler = EncodedCatchHandler.empty()): DexContent() {
 
     var startAddr: Int = startAddr
         private set
 
     var insnCount: Int = insnCount
-        private set
-
-    var startLabel: String? = startLabel
-        private set
-
-    var endLabel: String?   = endLabel
         private set
 
     // internal as this field is set from the Code item.
@@ -55,18 +49,15 @@ class Try private constructor(startAddr:    Int                 = 0,
     val endAddr: Int
         get() = startAddr + insnCount - 1
 
-    internal fun clearLabels() {
-        startLabel = null
-        endLabel   = null
-
-        catchHandler.clearLabels()
+    internal fun copyWithoutLabels(): Try {
+        return of(startAddr, insnCount, catchHandler.copyWithoutLabels())
     }
 
     internal fun updateOffsets(offsetMap: OffsetMap) {
         if (startLabel != null) {
-            Objects.requireNonNull(endLabel)
-            startAddr   = offsetMap.getOffset(startLabel!!)
-            val endAddr = offsetMap.getOffset(endLabel!!)
+            requireNotNull(endLabel)
+            startAddr   = offsetMap.getOffset(startLabel)
+            val endAddr = offsetMap.getOffset(endLabel)
             insnCount   = endAddr - startAddr
         } else {
             startAddr   = offsetMap.getNewOffset(startAddr)
@@ -97,8 +88,10 @@ class Try private constructor(startAddr:    Int                 = 0,
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         val o = other as Try
-        return startAddr    == o.startAddr &&
-               insnCount    == o.insnCount &&
+        return startAddr    == o.startAddr  &&
+               insnCount    == o.insnCount  &&
+               startLabel   == o.startLabel &&
+               endLabel     == o.endLabel   &&
                catchHandler == o.catchHandler
     }
 

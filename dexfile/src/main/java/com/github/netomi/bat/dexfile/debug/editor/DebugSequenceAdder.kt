@@ -26,7 +26,7 @@ internal class DebugSequenceAdder constructor(private val dexEditor: DexEditor,
                                               private val debugInfo: DebugInfo): DebugSequenceVisitor {
 
     private fun addDebugInstruction(instruction: DebugInstruction) {
-        debugInfo.debugSequence.add(instruction)
+        debugInfo.addDebugInstruction(instruction)
     }
 
     override fun visitAnyDebugInstruction(dexFile: DexFile, debugInfo: DebugInfo, instruction: DebugInstruction) {}

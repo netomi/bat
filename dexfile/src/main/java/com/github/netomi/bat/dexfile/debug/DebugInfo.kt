@@ -23,8 +23,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * A class representing a debug info item inside a dex file.
@@ -35,13 +35,17 @@ import kotlin.collections.ArrayList
     type          = TYPE_DEBUG_INFO_ITEM,
     dataAlignment = 1,
     dataSection   = true)
-class DebugInfo private constructor(_lineStart:      Int                         = 0,
-                                    _parameterNames: IntArray                    = intArrayOf(),
-                                    _debugSequence:  ArrayList<DebugInstruction> = ArrayList(0)) : DataItem() {
+class DebugInfo
+    private constructor(            _lineStart:      Int                           = 0,
+                                    _parameterNames: IntArray                      = intArrayOf(),
+                        private var _debugSequence:  MutableList<DebugInstruction> = mutableListOfCapacity(0)) : DataItem() {
 
     var lineStart = _lineStart
+        internal set
 
-    val debugSequence: ArrayList<DebugInstruction> = _debugSequence
+    val debugSequence: List<DebugInstruction>
+        get() = _debugSequence
+
     private var parameterNames                     = _parameterNames
 
     val parameterCount: Int
@@ -63,6 +67,14 @@ class DebugInfo private constructor(_lineStart:      Int                        
         get() = (parameterNames.isEmpty() || parameterNames.all { it == NO_INDEX }) &&
                 lineStart == 0 && debugSequence.isEmpty()
 
+    internal fun addDebugInstruction(debugInstruction: DebugInstruction) {
+        _debugSequence.add(debugInstruction)
+    }
+
+    internal fun setDebugSequence(debugSequence: List<DebugInstruction>) {
+        _debugSequence = debugSequence.toMutableList()
+    }
+
     override fun read(input: DexDataInput) {
         lineStart = input.readUleb128()
 
@@ -75,15 +87,15 @@ class DebugInfo private constructor(_lineStart:      Int                        
             parameterNames[i] = input.readUleb128p1()
         }
 
-        debugSequence.clear()
+        val instructionList = mutableListOf<DebugInstruction>()
         var debugInstruction: DebugInstruction
 
         do {
             debugInstruction = readInstruction(input)
-            debugSequence.add(debugInstruction)
+            instructionList.add(debugInstruction)
         } while (debugInstruction.opcode != DebugInstruction.DBG_END_SEQUENCE)
 
-        debugSequence.trimToSize()
+        _debugSequence = instructionList.toMutableList()
     }
 
     override fun write(output: DexDataOutput) {

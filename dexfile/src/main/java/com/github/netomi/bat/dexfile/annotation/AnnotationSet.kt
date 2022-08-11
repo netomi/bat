@@ -21,8 +21,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * A class representing an annotation set item inside a dex file.
@@ -33,7 +33,8 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATION_SET_ITEM,
     dataAlignment = 4,
     dataSection   = true)
-class AnnotationSet private constructor(private val annotations: ArrayList<Annotation> = ArrayList(0)): DataItem(), Sequence<Annotation> {
+class AnnotationSet
+    private constructor(private var annotations: MutableList<Annotation> = mutableListOfCapacity(0)): DataItem(), Sequence<Annotation> {
 
     private var annotationOffsetEntries: IntArray = intArrayOf()
 
@@ -72,8 +73,7 @@ class AnnotationSet private constructor(private val annotations: ArrayList<Annot
     }
 
     override fun readLinkedDataItems(input: DexDataInput) {
-        annotations.clear()
-        annotations.ensureCapacity(annotationOffsetEntries.size)
+        annotations = mutableListOfCapacity(annotationOffsetEntries.size)
         for (i in annotationOffsetEntries.indices) {
             input.offset = annotationOffsetEntries[i]
             val annotation = Annotation.readContent(input)
@@ -133,7 +133,7 @@ class AnnotationSet private constructor(private val annotations: ArrayList<Annot
         }
 
         fun of(annotations: List<Annotation>): AnnotationSet {
-            return AnnotationSet(ArrayList(annotations))
+            return AnnotationSet(annotations.toMutableList())
         }
 
         fun readContent(input: DexDataInput): AnnotationSet {

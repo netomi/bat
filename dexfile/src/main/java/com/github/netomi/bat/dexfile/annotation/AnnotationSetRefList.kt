@@ -21,8 +21,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * A class representing an annotation set ref list inside a dex file.
@@ -33,7 +33,8 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATION_SET_REF_LIST,
     dataAlignment = 4,
     dataSection   = true)
-class AnnotationSetRefList private constructor(private val _annotationSetRefs: ArrayList<AnnotationSetRef> = ArrayList(0)) : DataItem() {
+class AnnotationSetRefList
+    private constructor(private var _annotationSetRefs: MutableList<AnnotationSetRef> = mutableListOfCapacity(0)) : DataItem() {
 
     val annotationSetRefs: List<AnnotationSetRef>
         get() = _annotationSetRefs
@@ -54,8 +55,7 @@ class AnnotationSetRefList private constructor(private val _annotationSetRefs: A
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()
-        _annotationSetRefs.clear()
-        _annotationSetRefs.ensureCapacity(size)
+        _annotationSetRefs = mutableListOfCapacity(size)
         for (i in 0 until size) {
             val annotationSetRef = AnnotationSetRef.readContent(input)
             _annotationSetRefs.add(annotationSetRef)

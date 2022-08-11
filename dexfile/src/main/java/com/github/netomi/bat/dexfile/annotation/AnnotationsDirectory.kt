@@ -21,23 +21,32 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 
 @DataItemAnn(
     type          = TYPE_ANNOTATIONS_DIRECTORY_ITEM,
     dataAlignment = 4,
     dataSection   = true)
 internal class AnnotationsDirectory
-    private constructor(             classAnnotations:     AnnotationSet                  = AnnotationSet.empty(),
-                        internal val fieldAnnotations:     ArrayList<FieldAnnotation>     = ArrayList(0),
-                        internal val methodAnnotations:    ArrayList<MethodAnnotation>    = ArrayList(0),
-                        internal val parameterAnnotations: ArrayList<ParameterAnnotation> = ArrayList(0)) : DataItem() {
+    private constructor(classAnnotations:     AnnotationSet                    = AnnotationSet.empty(),
+                        fieldAnnotations:     MutableList<FieldAnnotation>     = mutableListOfCapacity(0),
+                        methodAnnotations:    MutableList<MethodAnnotation>    = mutableListOfCapacity(0),
+                        parameterAnnotations: MutableList<ParameterAnnotation> = mutableListOfCapacity(0)) : DataItem() {
 
     var classAnnotationsOffset = 0
         private set
 
     internal var classAnnotations: AnnotationSet = classAnnotations
+        private set
+
+    internal var fieldAnnotations: MutableList<FieldAnnotation> = fieldAnnotations
+        private set
+
+    internal var methodAnnotations: MutableList<MethodAnnotation> = methodAnnotations
+        private set
+
+    internal var parameterAnnotations: MutableList<ParameterAnnotation> = parameterAnnotations
         private set
 
     override val isEmpty: Boolean
@@ -59,22 +68,19 @@ internal class AnnotationsDirectory
         val methodAnnotationsSize   = input.readInt()
         val parameterAnnotationSize = input.readInt()
 
-        fieldAnnotations.clear()
-        fieldAnnotations.ensureCapacity(fieldAnnotationsSize)
+        fieldAnnotations = mutableListOfCapacity(fieldAnnotationsSize)
         for (i in 0 until fieldAnnotationsSize) {
             val fieldAnnotation = FieldAnnotation.readContent(input)
             fieldAnnotations.add(fieldAnnotation)
         }
 
-        methodAnnotations.clear()
-        methodAnnotations.ensureCapacity(methodAnnotationsSize)
+        methodAnnotations = mutableListOfCapacity(methodAnnotationsSize)
         for (i in 0 until methodAnnotationsSize) {
             val methodAnnotation = MethodAnnotation.readContent(input)
             methodAnnotations.add(methodAnnotation)
         }
 
-        parameterAnnotations.clear()
-        parameterAnnotations.ensureCapacity(parameterAnnotationSize)
+        parameterAnnotations = mutableListOfCapacity(parameterAnnotationSize)
         for (i in 0 until parameterAnnotationSize) {
             val parameterAnnotation = ParameterAnnotation.readContent(input)
             parameterAnnotations.add(parameterAnnotation)

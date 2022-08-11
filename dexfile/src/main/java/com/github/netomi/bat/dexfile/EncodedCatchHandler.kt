@@ -21,8 +21,8 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Copyable
 import com.github.netomi.bat.util.deepCopy
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.math.abs
 
 /**
@@ -30,14 +30,12 @@ import kotlin.math.abs
  *
  * @see [encoded catch handler @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-catch-handler)
  */
-class EncodedCatchHandler private constructor(            catchAllAddr:  Int                      = -1,
-                                                          catchAllLabel: String?                  = null,
-                                              private val _handlers:      ArrayList<TypeAddrPair> = ArrayList(0)) : DexContent(), Copyable<EncodedCatchHandler> {
+class EncodedCatchHandler
+    private constructor(            catchAllAddr:  Int                       = -1,
+                        private val catchAllLabel: String?                   = null,
+                        private var _handlers:     MutableList<TypeAddrPair> = mutableListOfCapacity(0)) : DexContent(), Copyable<EncodedCatchHandler> {
 
     var catchAllAddr: Int = catchAllAddr
-        private set
-
-    var catchAllLabel: String? = catchAllLabel
         private set
 
     val handlers: List<TypeAddrPair>
@@ -50,19 +48,13 @@ class EncodedCatchHandler private constructor(            catchAllAddr:  Int    
         return handlers[index]
     }
 
-    internal fun clearLabels() {
-        catchAllLabel = null
-        for (handler in handlers) {
-            handler.clearLabels()
-        }
+    internal fun copyWithoutLabels(): EncodedCatchHandler {
+        return of(catchAllAddr, handlers.map { it.copyWithoutLabels() })
     }
 
     internal fun updateOffsets(offsetMap: OffsetMap) {
-        if (catchAllLabel != null) {
-            catchAllAddr = offsetMap.getOffset(catchAllLabel!!)
-        } else if (catchAllAddr != -1) {
-            catchAllAddr = offsetMap.getNewOffset(catchAllAddr)
-        }
+        catchAllAddr =
+            catchAllLabel?.let { offsetMap.getOffset(catchAllLabel) } ?: offsetMap.getNewOffset(catchAllAddr)
 
         for (handler in handlers) {
             handler.updateOffsets(offsetMap)
@@ -72,8 +64,7 @@ class EncodedCatchHandler private constructor(            catchAllAddr:  Int    
     override fun read(input: DexDataInput) {
         val readSize = input.readSleb128()
         val size = abs(readSize)
-        _handlers.clear()
-        _handlers.ensureCapacity(size)
+        _handlers = mutableListOfCapacity(size)
         for (i in 0 until size) {
             val typeAddrPair = TypeAddrPair.readContent(input)
             _handlers.add(typeAddrPair)
@@ -107,8 +98,9 @@ class EncodedCatchHandler private constructor(            catchAllAddr:  Int    
 
         other as EncodedCatchHandler
 
-        return catchAllAddr == other.catchAllAddr &&
-               _handlers    == other._handlers
+        return catchAllAddr  == other.catchAllAddr &&
+               catchAllLabel == other.catchAllLabel &&
+               _handlers     == other._handlers
     }
 
     override fun hashCode(): Int {
@@ -125,7 +117,7 @@ class EncodedCatchHandler private constructor(            catchAllAddr:  Int    
 
     override fun copy(): EncodedCatchHandler {
         val newHandlers = _handlers.deepCopy()
-        return EncodedCatchHandler(catchAllAddr, catchAllLabel, ArrayList(newHandlers))
+        return EncodedCatchHandler(catchAllAddr, catchAllLabel, newHandlers.toMutableList())
     }
 
     companion object {
@@ -142,23 +134,23 @@ class EncodedCatchHandler private constructor(            catchAllAddr:  Int    
         }
 
         fun of(handlers: List<TypeAddrPair>): EncodedCatchHandler {
-            return EncodedCatchHandler(NO_INDEX, null, ArrayList(handlers))
+            return EncodedCatchHandler(NO_INDEX, null, handlers.toMutableList())
         }
 
         fun of(catchAllAddr: Int, vararg handlers: TypeAddrPair): EncodedCatchHandler {
-            return EncodedCatchHandler(catchAllAddr, null, arrayListOf(*handlers))
+            return EncodedCatchHandler(catchAllAddr, null, mutableListOf(*handlers))
         }
 
         fun of(catchAllLabel: String, vararg handlers: TypeAddrPair): EncodedCatchHandler {
-            return EncodedCatchHandler(0, catchAllLabel, arrayListOf(*handlers))
+            return EncodedCatchHandler(0, catchAllLabel, mutableListOf(*handlers))
         }
 
         fun of(catchAllAddr: Int, handlers: List<TypeAddrPair>): EncodedCatchHandler {
-            return EncodedCatchHandler(catchAllAddr, null, ArrayList(handlers))
+            return EncodedCatchHandler(catchAllAddr, null, handlers.toMutableList())
         }
 
         fun of(catchAllLabel: String, handlers: List<TypeAddrPair>): EncodedCatchHandler {
-            return EncodedCatchHandler(0, catchAllLabel, ArrayList(handlers))
+            return EncodedCatchHandler(0, catchAllLabel, handlers.toMutableList())
         }
 
         fun readContent(input: DexDataInput): EncodedCatchHandler {

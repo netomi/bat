@@ -28,9 +28,9 @@ import java.util.*
  *
  * @see [type addr pair @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-type-addr-pair)
  */
-class TypeAddrPair private constructor(typeIndex: Int     = NO_INDEX,
-                                       address:   Int     = 0,
-                                       label:     String? = null) : DexContent(), Copyable<TypeAddrPair> {
+class TypeAddrPair private constructor(            typeIndex: Int     = NO_INDEX,
+                                                   address:   Int     = 0,
+                                       private val label:     String? = null) : DexContent(), Copyable<TypeAddrPair> {
 
     var typeIndex: Int = typeIndex
         private set
@@ -38,23 +38,16 @@ class TypeAddrPair private constructor(typeIndex: Int     = NO_INDEX,
     var address: Int = address
         private set
 
-    var label: String? = label
-        private set
-
     fun getType(dexFile: DexFile): String {
         return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 
-    internal fun clearLabels() {
-        label = null
+    internal fun copyWithoutLabels(): TypeAddrPair {
+        return of(typeIndex, address)
     }
 
     internal fun updateOffsets(offsetMap: OffsetMap) {
-        address = if (label != null) {
-            offsetMap.getOffset(label!!)
-        } else {
-            offsetMap.getNewOffset(address)
-        }
+        address = label?.let { offsetMap.getOffset(it) } ?: offsetMap.getNewOffset(address)
     }
 
     override fun read(input: DexDataInput) {
@@ -75,10 +68,11 @@ class TypeAddrPair private constructor(typeIndex: Int     = NO_INDEX,
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as TypeAddrPair
+        val o = other as TypeAddrPair
 
-        return typeIndex == other.typeIndex &&
-               address   == other.address
+        return typeIndex == o.typeIndex &&
+               address   == o.address   &&
+               label     == o.label
     }
 
     override fun hashCode(): Int {

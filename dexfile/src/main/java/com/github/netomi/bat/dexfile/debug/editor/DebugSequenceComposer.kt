@@ -150,8 +150,7 @@ class DebugSequenceComposer private constructor(val dexEditor: DexEditor,
             debugSequence.add(DebugEndSequence)
 
             debugInfo.lineStart = lineStart
-            debugInfo.debugSequence.clear()
-            debugInfo.debugSequence.addAll(debugSequence)
+            debugInfo.setDebugSequence(debugSequence)
         }
     }
 

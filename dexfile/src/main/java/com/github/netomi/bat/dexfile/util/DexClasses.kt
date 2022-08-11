@@ -17,7 +17,6 @@ package com.github.netomi.bat.dexfile.util
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.value.*
-import java.util.*
 
 object DexClasses {
     fun isClassType(type: String): Boolean {
@@ -33,7 +32,6 @@ object DexClasses {
     }
     
     fun internalClassNameFromInternalType(type: String): String {
-        Objects.requireNonNull(type)
         return if (isClassType(type)) {
             type.substring(1, type.length - 1)
         } else type
@@ -44,22 +42,18 @@ object DexClasses {
     }
 
     fun internalTypeFromInternalClassName(internalClassName: String): String {
-        Objects.requireNonNull(internalClassName)
         return "L$internalClassName;"
     }
 
     fun internalClassNameFromExternalClassName(externalClassName: String): String {
-        Objects.requireNonNull(externalClassName)
         return externalClassName.replace('.', '/')
     }
 
     fun externalClassNameFromInternalClassName(internalClassName: String): String {
-        Objects.requireNonNull(internalClassName)
         return internalClassName.replace('/', '.')
     }
 
     fun externalClassNameFromInternalType(internalType: String): String {
-        Objects.requireNonNull(internalType)
         val className = internalClassNameFromInternalType(internalType)
         return className.replace('/', '.')
     }

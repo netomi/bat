@@ -17,8 +17,8 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
-import kotlin.collections.ArrayList
 
 /**
  * A class representing a map list item inside a dex file.
@@ -29,7 +29,8 @@ import kotlin.collections.ArrayList
     type          = TYPE_MAP_LIST,
     dataAlignment = 4,
     dataSection   = true)
-class MapList private constructor(private val mapItems: ArrayList<MapItem> = ArrayList(0)) : DataItem(), Sequence<MapItem> {
+class MapList
+    private constructor(private var mapItems: MutableList<MapItem> = mutableListOfCapacity(0)) : DataItem(), Sequence<MapItem> {
 
     val mapItemCount: Int
         get() = mapItems.size
@@ -67,8 +68,7 @@ class MapList private constructor(private val mapItems: ArrayList<MapItem> = Arr
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()
-        mapItems.clear()
-        mapItems.ensureCapacity(size)
+        mapItems = mutableListOfCapacity(size)
         for (i in 0 until size) {
             val mapItem = MapItem.readContent(input)
             mapItems.add(mapItem)
