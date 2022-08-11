@@ -30,14 +30,6 @@ class DebugSequenceComposer private constructor(val dexEditor: DexEditor,
 
     private val debugSequence = mutableListOf<DebugInstruction>()
 
-    fun reset() {
-        lineRegister = 0
-        addrRegister = 0
-        lineStart    = 0
-
-        debugSequence.clear()
-    }
-
     fun prologueEnd(codeOffset: Int) {
         debugSequence.add(DebugSetPrologueEnd)
     }
