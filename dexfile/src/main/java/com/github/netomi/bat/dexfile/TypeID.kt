@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import java.util.*
 
 /**
  * A class representing a type id item inside a dex file.
@@ -64,7 +63,7 @@ class TypeID private constructor(descriptorIndex: Int = NO_INDEX) : DataItem() {
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(descriptorIndex)
+        return descriptorIndex.hashCode()
     }
 
     override fun toString(): String {

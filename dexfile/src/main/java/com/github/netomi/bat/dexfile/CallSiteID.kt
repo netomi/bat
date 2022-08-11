@@ -20,7 +20,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.CallSiteVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import java.util.*
 
 /**
  * A class representing a callsite id item inside a dex file.
@@ -81,7 +80,7 @@ class CallSiteID private constructor(callSite: CallSite = CallSite.empty()) : Da
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(callSite)
+        return callSite.hashCode()
     }
 
     override fun toString(): String {

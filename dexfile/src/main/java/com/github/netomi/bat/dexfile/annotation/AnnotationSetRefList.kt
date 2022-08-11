@@ -22,7 +22,6 @@ import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.util.*
 
 /**
  * A class representing an annotation set ref list inside a dex file.
@@ -108,7 +107,7 @@ class AnnotationSetRefList
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_annotationSetRefs)
+        return _annotationSetRefs.hashCode()
     }
 
     override fun toString(): String {

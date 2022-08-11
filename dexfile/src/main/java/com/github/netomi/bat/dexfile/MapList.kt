@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.util.*
 
 /**
  * A class representing a map list item inside a dex file.
@@ -95,7 +94,7 @@ class MapList
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(mapItems)
+        return mapItems.hashCode()
     }
 
     override fun toString(): String {

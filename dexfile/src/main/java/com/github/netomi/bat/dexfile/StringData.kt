@@ -19,7 +19,6 @@ import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.Mutf8.decode
 import com.github.netomi.bat.dexfile.util.Mutf8.encode
-import java.util.*
 
 /**
  * A class representing a string data item inside a dex file.
@@ -70,7 +69,7 @@ class StringData private constructor(): DataItem(), Comparable<StringData> {
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(string)
+        return string.hashCode()
     }
 
     override fun toString(): String {

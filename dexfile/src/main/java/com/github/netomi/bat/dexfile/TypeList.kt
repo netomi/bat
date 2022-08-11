@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
 import com.google.common.primitives.Ints
-import java.util.*
 
 /**
  * A class representing a list of type ids inside a dex file.
@@ -110,7 +109,7 @@ class TypeList private constructor(private var typeList: IntArray = intArrayOf()
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(typeList.contentHashCode())
+        return typeList.contentHashCode()
     }
 
     override fun toString(): String {

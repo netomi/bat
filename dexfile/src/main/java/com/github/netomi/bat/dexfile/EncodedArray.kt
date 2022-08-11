@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.value.EncodedArrayValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedArrayVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import java.util.*
 
 @DataItemAnn(
     type          = TYPE_ENCODED_ARRAY_ITEM,
@@ -68,7 +67,7 @@ open class EncodedArray protected constructor(val array: EncodedArrayValue = Enc
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(array)
+        return array.hashCode()
     }
 
     override fun toString(): String {

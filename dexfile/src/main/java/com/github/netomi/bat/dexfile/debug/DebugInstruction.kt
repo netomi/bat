@@ -153,7 +153,7 @@ class DebugAdvanceLineAndPC private constructor(opCode: Byte) : DebugInstruction
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(opcode)
+        return opcode.hashCode()
     }
 
     override fun toString(): String {

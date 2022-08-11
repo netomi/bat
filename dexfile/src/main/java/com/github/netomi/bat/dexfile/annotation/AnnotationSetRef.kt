@@ -24,7 +24,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
-import java.util.*
 
 /**
  * A class representing an annotation set ref item inside a dex file.
@@ -85,7 +84,7 @@ class AnnotationSetRef private constructor(annotationSet: AnnotationSet = Annota
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(annotationSet)
+        return annotationSet.hashCode()
     }
 
     override fun toString(): String {
