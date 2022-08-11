@@ -19,8 +19,13 @@ import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet
+import com.github.netomi.bat.dexfile.visitor.AbstractCollector
 import com.github.netomi.bat.dexfile.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
+
+fun annotationCollector(): AnnotationCollector {
+    return AnnotationCollector()
+}
 
 fun multiAnnotationVisitorOf(visitor: AnnotationVisitor, vararg visitors: AnnotationVisitor): AnnotationVisitor {
     return MultiAnnotationVisitor(visitor, *visitors)
@@ -41,6 +46,12 @@ fun interface AnnotationVisitor {
             }
         }
         return multiAnnotationVisitorOf(joiner, this)
+    }
+}
+
+class AnnotationCollector: AbstractCollector<Annotation>(), AnnotationVisitor {
+    override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
+        addItem(annotation)
     }
 }
 

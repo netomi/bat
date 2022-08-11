@@ -140,13 +140,7 @@ class ProtoID private constructor(            shortyIndex:     Int      = NO_IND
         fun of(shortyIndex: Int, returnTypeIndex: Int, vararg parameterTypeIndices: Int): ProtoID {
             require(shortyIndex >= 0) { "shorty index must not be negative" }
             require(returnTypeIndex >= 0) { "return type index must not be negative" }
-
-            val protoID = ProtoID(shortyIndex, returnTypeIndex)
-            for (index in parameterTypeIndices) {
-                require(index >= 0) { "parameter type index must not be negative" }
-                protoID.parameters.addType(index)
-            }
-            return protoID
+            return ProtoID(shortyIndex, returnTypeIndex, TypeList.of(*parameterTypeIndices))
         }
 
         fun readContent(input: DexDataInput): ProtoID {

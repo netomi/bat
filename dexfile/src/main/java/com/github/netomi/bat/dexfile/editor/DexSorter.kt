@@ -132,7 +132,7 @@ class DexSorter : DexFileVisitor {
             return true
         }
 
-        return classDef.interfaces.typeList.any { pendingClassTypes.contains(it) }
+        return classDef.interfaces.any { pendingClassTypes.contains(it) }
     }
 }
 

@@ -31,7 +31,10 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
         get() = classDef.getType(dexFile)
 
     fun addInterface(type: String) {
-        classDef.interfaces.addType(dexEditor.addOrGetTypeIDIndex(type))
+        val typeIndex = dexEditor.addOrGetTypeIDIndex(type)
+        if (!classDef.interfaces.contains(typeIndex)) {
+            classDef.interfaces.addType(typeIndex)
+        }
     }
 
     fun setVisibility(visibility: Visibility) {

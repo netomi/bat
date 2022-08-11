@@ -33,31 +33,32 @@ import kotlin.collections.ArrayList
     type          = TYPE_ANNOTATION_SET_ITEM,
     dataAlignment = 4,
     dataSection   = true)
-class AnnotationSet private constructor(private val _annotations: ArrayList<Annotation> = ArrayList(0)): DataItem() {
+class AnnotationSet private constructor(private val annotations: ArrayList<Annotation> = ArrayList(0)): DataItem(), Sequence<Annotation> {
 
     private var annotationOffsetEntries: IntArray = intArrayOf()
 
-    val annotations: List<Annotation>
-        get() = _annotations
-
     val annotationCount: Int
-        get() = _annotations.size
+        get() = annotations.size
 
     fun getAnnotation(index: Int): Annotation {
-        return _annotations[index]
+        return annotations[index]
     }
 
     fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
-        require(!_annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
+        require(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
             { "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet" }
-        _annotations.add(annotation)
+        annotations.add(annotation)
+    }
+
+    override fun iterator(): Iterator<Annotation> {
+        return annotations.iterator()
     }
 
     override val isEmpty: Boolean
-        get() = _annotations.isEmpty()
+        get() = annotations.isEmpty()
 
     internal fun sort() {
-        _annotations.sortWith(compareBy { it.annotationValue.typeIndex })
+        annotations.sortWith(compareBy { it.annotationValue.typeIndex })
     }
 
     override fun read(input: DexDataInput) {
@@ -71,21 +72,21 @@ class AnnotationSet private constructor(private val _annotations: ArrayList<Anno
     }
 
     override fun readLinkedDataItems(input: DexDataInput) {
-        _annotations.clear()
-        _annotations.ensureCapacity(annotationOffsetEntries.size)
+        annotations.clear()
+        annotations.ensureCapacity(annotationOffsetEntries.size)
         for (i in annotationOffsetEntries.indices) {
             input.offset = annotationOffsetEntries[i]
             val annotation = Annotation.readContent(input)
-            _annotations.add(i, annotation)
+            annotations.add(i, annotation)
         }
     }
 
     override fun updateOffsets(dataItemMap: Map) {
-        if (annotationOffsetEntries.size != _annotations.size) {
-            annotationOffsetEntries = IntArray(_annotations.size)
+        if (annotationOffsetEntries.size != annotations.size) {
+            annotationOffsetEntries = IntArray(annotations.size)
         }
-        for (i in _annotations.indices) {
-            val offset = dataItemMap.getOffset(_annotations[i])
+        for (i in annotations.indices) {
+            val offset = dataItemMap.getOffset(annotations[i])
             annotationOffsetEntries[i] = offset
         }
     }
@@ -98,15 +99,15 @@ class AnnotationSet private constructor(private val _annotations: ArrayList<Anno
     }
 
     fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationVisitor) {
-        _annotations.forEachIndexed { index, annotation -> annotation.accept(dexFile, classDef, this, index, visitor) }
+        annotations.forEachIndexed { index, annotation -> annotation.accept(dexFile, classDef, this, index, visitor) }
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {
-        _annotations.forEachIndexed { index, annotation -> visitor.visitAnnotation(dexFile, this, index, annotation) }
+        annotations.forEachIndexed { index, annotation -> visitor.visitAnnotation(dexFile, this, index, annotation) }
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        _annotations.forEach { it.referencedIDsAccept(dexFile, visitor) }
+        annotations.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -115,15 +116,15 @@ class AnnotationSet private constructor(private val _annotations: ArrayList<Anno
 
         val o = other as AnnotationSet
 
-        return _annotations == o._annotations
+        return annotations == o.annotations
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_annotations)
+        return Objects.hash(annotations)
     }
 
     override fun toString(): String {
-        return "AnnotationSet[annotations=${_annotations.size} items]"
+        return "AnnotationSet[annotations=${annotations.size} items]"
     }
 
     companion object {

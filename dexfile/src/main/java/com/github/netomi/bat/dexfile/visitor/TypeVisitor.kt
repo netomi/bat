@@ -18,6 +18,16 @@ package com.github.netomi.bat.dexfile.visitor
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.TypeList
 
+fun typeCollector(): TypeCollector {
+    return TypeCollector()
+}
+
 fun interface TypeVisitor {
     fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: String)
+}
+
+class TypeCollector: AbstractCollector<String>(), TypeVisitor {
+    override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: String) {
+        addItem(type)
+    }
 }

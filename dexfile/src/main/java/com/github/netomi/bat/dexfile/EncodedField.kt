@@ -16,7 +16,10 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.FieldModifier.Companion.setOf
+import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
+import com.github.netomi.bat.dexfile.annotation.visitor.allAnnotations
+import com.github.netomi.bat.dexfile.annotation.visitor.annotationCollector
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.value.EncodedValue
@@ -105,8 +108,14 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
         return collector.items().singleOrNull()
     }
 
-    fun annotationSetAccept(dexFile: DexFile, classDef: ClassDef, field: EncodedField, visitor: AnnotationSetVisitor) {
-        classDef.fieldAnnotationSetAccept(dexFile, classDef, field, visitor)
+    fun annotations(dexFile: DexFile, classDef: ClassDef): List<Annotation> {
+        val collector = annotationCollector()
+        annotationSetAccept(dexFile, classDef, allAnnotations(collector))
+        return collector.items()
+    }
+
+    fun annotationSetAccept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
+        classDef.fieldAnnotationSetAccept(dexFile, classDef, this, visitor)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)

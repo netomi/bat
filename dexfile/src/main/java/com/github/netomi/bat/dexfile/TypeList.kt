@@ -32,7 +32,7 @@ import java.util.*
     type          = TYPE_TYPE_LIST,
     dataAlignment = 4,
     dataSection   = false)
-class TypeList private constructor(internal var typeList: IntArray = intArrayOf()): DataItem(), Comparable<TypeList> {
+class TypeList private constructor(private var typeList: IntArray = intArrayOf()): DataItem(), Comparable<TypeList>, Sequence<Int> {
 
     override val isEmpty: Boolean
         get() = typeList.isEmpty()
@@ -55,10 +55,14 @@ class TypeList private constructor(internal var typeList: IntArray = intArrayOf(
         return typeList.map { dexFile.getTypeID(it).getType(dexFile) }.toList()
     }
 
-    fun addType(typeIDIndex: Int) {
+    internal fun addType(typeIDIndex: Int) {
         val oldSize = typeList.size
         typeList = typeList.copyOf(oldSize + 1)
         typeList[oldSize] = typeIDIndex
+    }
+
+    override fun iterator(): IntIterator {
+        return typeList.iterator()
     }
 
     override fun read(input: DexDataInput) {
@@ -130,6 +134,7 @@ class TypeList private constructor(internal var typeList: IntArray = intArrayOf(
         fun of(vararg typeIndices: Int): TypeList {
             val typeList = TypeList()
             for (typeIndex in typeIndices) {
+                require(typeIndex >= 0) { "type index must not be negative" }
                 typeList.addType(typeIndex)
             }
             return typeList

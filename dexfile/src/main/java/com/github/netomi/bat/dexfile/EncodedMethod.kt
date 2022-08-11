@@ -15,7 +15,10 @@
  */
 package com.github.netomi.bat.dexfile
 
+import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
+import com.github.netomi.bat.dexfile.annotation.visitor.allAnnotations
+import com.github.netomi.bat.dexfile.annotation.visitor.annotationCollector
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor
@@ -146,8 +149,14 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
         }
     }
 
-    fun annotationSetAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: AnnotationSetVisitor) {
-        classDef.methodAnnotationSetAccept(dexFile, classDef, method, visitor)
+    fun annotations(dexFile: DexFile, classDef: ClassDef): List<Annotation> {
+        val collector = annotationCollector()
+        annotationSetAccept(dexFile, classDef, allAnnotations(collector))
+        return collector.items()
+    }
+
+    fun annotationSetAccept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationSetVisitor) {
+        classDef.methodAnnotationSetAccept(dexFile, classDef, this, visitor)
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

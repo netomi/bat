@@ -112,7 +112,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         }
 
         printer.println()
-        classDef.fieldAnnotationSetAccept(dexFile, classDef, field, annotationPrinter)
+        field.annotationSetAccept(dexFile, classDef, annotationPrinter)
     }
 
     override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
@@ -135,7 +135,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             method.codeAccept(dexFile, classDef, this)
         } else if (classDef.hasAnnotations()) {
             printParameterAnnotations(dexFile, classDef, method)
-            classDef.methodAnnotationSetAccept(dexFile, classDef, method, annotationPrinter)
+            method.annotationSetAccept(dexFile, classDef, annotationPrinter)
         }
 
         printer.levelDown()

@@ -79,6 +79,12 @@ class ClassDef private constructor(            classIndex:           Int        
     var interfaces: TypeList = interfaces
         private set
 
+    fun interfaces(dexFile: DexFile): List<String> {
+        val collector = typeCollector()
+        interfacesAccept(dexFile, collector)
+        return collector.items()
+    }
+
     internal var annotationsDirectory: AnnotationsDirectory = annotationsDirectory
         private set
 
