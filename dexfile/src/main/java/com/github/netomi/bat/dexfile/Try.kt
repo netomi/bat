@@ -50,7 +50,7 @@ class Try private constructor(    startAddr:    Int                 = 0,
         get() = startAddr + insnCount - 1
 
     internal fun copyWithoutLabels(): Try {
-        return of(startAddr, insnCount, catchHandler.copyWithoutLabels())
+        return of(startAddr, endAddr, catchHandler.copyWithoutLabels())
     }
 
     internal fun updateOffsets(offsetMap: OffsetMap) {
