@@ -26,7 +26,7 @@ import com.github.netomi.bat.util.toHexStringWithPrefix
 /**
  * An abstract base class representing an encoded value inside a dex file.
  *
- * @see [value encoding @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoding)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoding">value encoding @ dex format</a>
  */
 abstract class EncodedValue {
     abstract val valueType: EncodedValueType

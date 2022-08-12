@@ -26,7 +26,7 @@ import java.util.*
 /**
  * A class representing a proto id item inside a dex file.
  *
- * @see [proto id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.proto-id-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#proto-id-item">proto id item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_PROTO_ID_ITEM,

@@ -24,7 +24,7 @@ import java.util.*
  *
  * Note: this class is not intended for general use, its automatically created when writing dex files.
  *
- * @see [map item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.map-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#map-item">map item @ dex format</a>
  */
 class MapItem private constructor(type:   Int = 0,
                                   size:   Int = 0,

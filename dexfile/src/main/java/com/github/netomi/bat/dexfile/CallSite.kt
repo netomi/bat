@@ -26,7 +26,7 @@ import com.google.common.base.Preconditions
 /**
  * A class representing a callsite item inside a dex file.
  *
- * @see [callsite item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.call-site-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#call-site-item">callsite item @ dex format</a>
  */
 class CallSite private constructor() : EncodedArray() {
 

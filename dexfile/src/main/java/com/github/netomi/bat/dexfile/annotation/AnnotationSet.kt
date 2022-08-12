@@ -26,7 +26,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 /**
  * A class representing an annotation set item inside a dex file.
  *
- * @see [annotation set item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.annotation-set-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#annotation-set-item">annotation set item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_ANNOTATION_SET_ITEM,

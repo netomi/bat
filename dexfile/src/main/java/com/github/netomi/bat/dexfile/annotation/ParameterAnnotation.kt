@@ -29,7 +29,7 @@ import java.util.*
 /**
  * A class representing a parameter annotation format inside a dex file.
  *
- * @see [parameter annotation format @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.parameter-annotation)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#parameter-annotation">parameter annotation format @ dex format</a>
  */
 class ParameterAnnotation private constructor(methodIndex:          Int                  = NO_INDEX,
                                               annotationSetRefList: AnnotationSetRefList = AnnotationSetRefList.empty()) : DexContent() {

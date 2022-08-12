@@ -22,7 +22,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 /**
  * A class representing a map list item inside a dex file.
  *
- * @see [map list item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.map-list)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#map-list">map list item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_MAP_LIST,

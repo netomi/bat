@@ -22,9 +22,6 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 
-/**
- * @author Thomas Neidhart
- */
 public class ByteBufferBackedDexDataOutput
 implements   DexDataOutput
 {

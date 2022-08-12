@@ -26,7 +26,7 @@ import java.util.*
 /**
  * A class representing an encoded type address pair inside a dex file.
  *
- * @see [type addr pair @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-type-addr-pair)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-type-addr-pair">type addr pair @ dex format</a>
  */
 class TypeAddrPair private constructor(            typeIndex: Int     = NO_INDEX,
                                                    address:   Int     = 0,

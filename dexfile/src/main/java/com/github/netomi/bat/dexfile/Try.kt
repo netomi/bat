@@ -24,7 +24,7 @@ import java.util.*
 /**
  * A class representing a try item inside a dex file.
  *
- * @see [try item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-item">try item @ dex format</a>
  */
 class Try private constructor(    startAddr:    Int                 = 0,
                                   insnCount:    Int                 = 0,

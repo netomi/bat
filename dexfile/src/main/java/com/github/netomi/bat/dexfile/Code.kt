@@ -32,7 +32,7 @@ import kotlin.collections.LinkedHashSet
 /**
  * A class representing a code item inside a dex file.
  *
- * @see [code item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format#code-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#code-item">code item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_CODE_ITEM,

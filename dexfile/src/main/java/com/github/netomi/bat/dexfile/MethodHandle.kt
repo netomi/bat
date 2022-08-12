@@ -24,7 +24,7 @@ import java.util.*
 /**
  * A class representing a method handle item inside a dex file.
  *
- * @see [method handle item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.method-handle-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-handle-item">method handle item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_METHOD_HANDLE_ITEM,

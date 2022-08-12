@@ -23,7 +23,7 @@ import java.util.*
 /**
  * A class representing a string id item inside a dex file.
  *
- * @see [string id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.string-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#string-item">string id item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_STRING_ID_ITEM,

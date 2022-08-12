@@ -23,7 +23,7 @@ import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 /**
  * A class representing a type id item inside a dex file.
  *
- * @see [type id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-id-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-id-item">type id item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_TYPE_ID_ITEM,

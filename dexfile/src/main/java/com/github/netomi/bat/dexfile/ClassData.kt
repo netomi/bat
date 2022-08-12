@@ -21,6 +21,14 @@ import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.util.*
 
+/**
+ * A class representing a class data item inside a dex file.
+ *
+ * This class is intentionally marked as internal as its main purpose is to serve as a container for
+ * fields and methods. These members can be accessed directly from a [ClassDef] item.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#class-data-item">class data item @ dex format</a>
+ */
 @DataItemAnn(
     type          = TYPE_CLASS_DATA_ITEM,
     dataAlignment = 1,

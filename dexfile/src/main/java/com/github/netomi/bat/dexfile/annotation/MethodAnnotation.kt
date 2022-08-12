@@ -27,7 +27,7 @@ import java.util.*
 /**
  * A class representing a method annotation format inside a dex file.
  *
- * @see [method annotation format @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.method-annotation)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-annotation">method annotation format @ dex format</a>
  */
 class MethodAnnotation private constructor(methodIndex:   Int           = NO_INDEX,
                                            annotationSet: AnnotationSet = AnnotationSet.empty()) : DexContent() {

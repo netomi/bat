@@ -27,7 +27,7 @@ import java.util.*
 /**
  * A class representing a field annotation format inside a dex file.
  *
- * @see [field annotation format @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.field-annotation)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#field-annotation">field annotation format @ dex format</a>
  */
 class FieldAnnotation private constructor(fieldIndex:    Int           = NO_INDEX,
                                           annotationSet: AnnotationSet = AnnotationSet.empty()): DexContent() {

@@ -28,7 +28,7 @@ import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 /**
  * A class representing an annotation set ref item inside a dex file.
  *
- * @see [annotation set ref item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.set-ref-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#set-ref-item">annotation set ref item @ dex format</a>
  */
 class AnnotationSetRef private constructor(annotationSet: AnnotationSet = AnnotationSet.empty()) : DexContent() {
 

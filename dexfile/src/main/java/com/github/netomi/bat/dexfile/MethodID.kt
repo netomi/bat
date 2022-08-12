@@ -23,7 +23,7 @@ import java.util.*
 /**
  * A class representing a method id item inside a dex file.
  *
- * @see [method id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.method-id-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#method-id-item">method id item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_METHOD_ID_ITEM,

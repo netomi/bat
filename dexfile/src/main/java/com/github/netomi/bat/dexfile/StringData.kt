@@ -23,7 +23,7 @@ import com.github.netomi.bat.dexfile.util.Mutf8.encode
 /**
  * A class representing a string data item inside a dex file.
  *
- * @see [string data item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.string-data-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#string-data-item">string data item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_STRING_DATA_ITEM,

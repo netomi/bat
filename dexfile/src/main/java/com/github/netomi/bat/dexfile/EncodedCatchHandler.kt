@@ -28,7 +28,7 @@ import kotlin.math.abs
 /**
  * A class representing an encoded catch handler inside a dex file.
  *
- * @see [encoded catch handler @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.encoded-catch-handler)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#encoded-catch-handler">encoded catch handler @ dex format</a>
  */
 class EncodedCatchHandler
     private constructor(            catchAllAddr:  Int                       = -1,

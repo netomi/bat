@@ -29,7 +29,7 @@ import java.util.*
 /**
  * A class representing a debug info item inside a dex file.
  *
- * @see [debug info item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.debug-info-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#debug-info-item">debug info item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_DEBUG_INFO_ITEM,

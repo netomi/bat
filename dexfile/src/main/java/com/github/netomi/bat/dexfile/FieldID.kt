@@ -24,7 +24,7 @@ import java.util.*
 /**
  * A class representing a field id item inside a dex file.
  *
- * @see [field id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.field-id-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#field-id-item">field id item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_FIELD_ID_ITEM,

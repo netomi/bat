@@ -26,7 +26,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 /**
  * A class representing an annotation set ref list inside a dex file.
  *
- * @see [annotation set ref list @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.set-ref-list)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#set-ref-list">annotation set ref list @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_ANNOTATION_SET_REF_LIST,

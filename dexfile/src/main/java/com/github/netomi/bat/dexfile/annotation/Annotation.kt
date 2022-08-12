@@ -29,7 +29,7 @@ import java.util.*
 /**
  * A class representing an annotation item inside a dex file.
  *
- * @see [annotation item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.annotation-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#annotation-item">annotation item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_ANNOTATION_ITEM,

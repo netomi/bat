@@ -24,7 +24,7 @@ import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 /**
  * A class representing a callsite id item inside a dex file.
  *
- * @see [callsite id item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.call-site-id-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#call-site-id-item">callsite id item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_CALL_SITE_ID_ITEM,

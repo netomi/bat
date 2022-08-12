@@ -24,6 +24,11 @@ import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.google.common.primitives.Bytes
 import java.nio.ByteOrder
 
+/**
+ * A class representing a dex header item inside a dex file.
+ *
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#header-item">header item @ dex format</a>
+ */
 @DataItemAnn(
     type          = TYPE_HEADER_ITEM,
     dataAlignment = 4,

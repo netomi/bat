@@ -31,7 +31,7 @@ import java.util.*
 /**
  * A class representing a class def item inside a dex file.
  *
- * @see [class def item @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.class-def-item)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#class-def-item">class def item @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_CLASS_DEF_ITEM,

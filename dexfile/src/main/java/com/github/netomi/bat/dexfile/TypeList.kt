@@ -25,7 +25,7 @@ import com.google.common.primitives.Ints
 /**
  * A class representing a list of type ids inside a dex file.
  *
- * @see [type list @ dex format](https://source.android.com/devices/tech/dalvik/dex-format.type-list)
+ * @see <a href="https://source.android.com/devices/tech/dalvik/dex-format#type-list">type list @ dex format</a>
  */
 @DataItemAnn(
     type          = TYPE_TYPE_LIST,
