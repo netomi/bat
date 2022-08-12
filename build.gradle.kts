@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = "org.github.netomi.bat"
-    version = "0.1-SNAPSHOT"
+    version = "0.1.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
