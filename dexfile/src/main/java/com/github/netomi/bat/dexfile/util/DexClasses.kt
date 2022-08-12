@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile.util
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.value.*
+import com.github.netomi.bat.util.*
 
 object DexClasses {
     fun isClassType(type: String): Boolean {

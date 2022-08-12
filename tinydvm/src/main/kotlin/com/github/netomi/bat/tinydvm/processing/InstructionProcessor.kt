@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.util.DexClasses.isReferenceType
+import com.github.netomi.bat.util.*
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.data.*
 

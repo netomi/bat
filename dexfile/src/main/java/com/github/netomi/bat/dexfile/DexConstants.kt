@@ -17,20 +17,6 @@ package com.github.netomi.bat.dexfile
 
 const val NO_INDEX = -0x1
 
-// type constants
-const val JAVA_LANG_OBJECT_TYPE = "Ljava/lang/Object;"
-const val JAVA_LANG_STRING_TYPE = "Ljava/lang/String;"
-
-const val INT_TYPE     = "I"
-const val LONG_TYPE    = "J"
-const val SHORT_TYPE   = "S"
-const val BYTE_TYPE    = "B"
-const val BOOLEAN_TYPE = "Z"
-const val CHAR_TYPE    = "C"
-const val FLOAT_TYPE   = "F"
-const val DOUBLE_TYPE  = "D"
-const val VOID_TYPE    = "V"
-
 // internal constants
 
 internal       val DEX_FILE_MAGIC          = byteArrayOf(0x64, 0x65, 0x78, 0x0a)

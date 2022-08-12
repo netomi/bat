@@ -17,10 +17,9 @@
 package com.github.netomi.bat.tinydvm.data
 
 import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.JAVA_LANG_STRING_TYPE
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
-import com.github.netomi.bat.tinydvm.Dvm
+import com.github.netomi.bat.util.*
 import com.google.common.base.Objects
 
 sealed class DvmValue {

@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.value.EncodedValue
+import com.github.netomi.bat.util.VOID_TYPE
 import java.util.*
 
 class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef: ClassDef) {

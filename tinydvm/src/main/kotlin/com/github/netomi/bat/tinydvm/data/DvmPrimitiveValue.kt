@@ -16,8 +16,8 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.tinydvm.data.PrimitiveType.*
+import com.github.netomi.bat.util.*
 
 class DvmPrimitiveValue private constructor(private val _value: Long, private val primitiveType: PrimitiveType): DvmValue() {
 

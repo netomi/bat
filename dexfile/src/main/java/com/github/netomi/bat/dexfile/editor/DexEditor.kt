@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
 import java.util.*
 
 class DexEditor private constructor(val dexFile: DexFile) {
