@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = "org.github.netomi.bat"
-    version = "0.1.0-SNAPSHOT"
+    version = property("version") ?: "undefined"
 
     repositories {
         mavenCentral()
