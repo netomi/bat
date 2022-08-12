@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.value.EncodedMethodTypeValue
 import com.github.netomi.bat.dexfile.value.EncodedStringValue
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.visitor.CallSiteVisitor
-import com.google.common.base.Preconditions
 
 /**
  * A class representing a callsite item inside a dex file.
@@ -73,13 +72,13 @@ class CallSite private constructor() : EncodedArray() {
         }
 
         fun of(methodHandleIndex: Int, vararg encodedValues: EncodedValue): CallSite {
-            Preconditions.checkArgument(encodedValues.size >= 2)
+            require(encodedValues.size >= 2)
 
             val callSite = CallSite()
             callSite.array.add(EncodedMethodHandleValue.of(methodHandleIndex))
 
-            Preconditions.checkArgument(encodedValues[0] is EncodedStringValue)
-            Preconditions.checkArgument(encodedValues[1] is EncodedMethodTypeValue)
+            require(encodedValues[0] is EncodedStringValue)
+            require(encodedValues[1] is EncodedMethodTypeValue)
 
             for (encodedValue in encodedValues) {
                 callSite.array.add(encodedValue)
