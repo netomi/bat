@@ -21,11 +21,12 @@ import com.github.netomi.bat.dexfile.MethodHandle
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
+import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 
 internal fun EncodedValue.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor): EncodedValue {
-    var result: EncodedValue? = null
-    accept(originDexFile, EncodedValueCopier(targetDexEditor) { _, value -> result = value })
-    return result ?: throw IllegalStateException("$this could not be copied")
+    val collector = valueCollector()
+    accept(originDexFile, EncodedValueCopier(targetDexEditor, collector))
+    return collector.items().singleOrNull() ?: throw IllegalStateException("$this could not be copied")
 }
 
 private class EncodedValueCopier constructor(private val targetDexEditor: DexEditor,
