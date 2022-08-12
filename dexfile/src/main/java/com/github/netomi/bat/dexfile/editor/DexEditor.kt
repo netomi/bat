@@ -17,7 +17,7 @@
 package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.util.DexClasses
+import com.github.netomi.bat.dexfile.util.toShortyFormat
 import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
 import java.util.*
 
@@ -47,7 +47,7 @@ class DexEditor private constructor(val dexFile: DexFile) {
     }
 
     fun addOrGetProtoIDIndex(parameterTypes: List<String>, returnType: String): Int {
-        val shorty               = DexClasses.toShortyFormat(parameterTypes, returnType)
+        val shorty               = toShortyFormat(parameterTypes, returnType)
         val shortyIndex          = addOrGetStringIDIndex(shorty)
         val returnTypeIndex      = addOrGetTypeIDIndex(returnType)
         val parameterTypeIndices = parameterTypes.map { addOrGetTypeIDIndex(it) }.toIntArray()

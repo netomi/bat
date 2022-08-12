@@ -16,17 +16,16 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-import com.github.netomi.bat.dexfile.util.DexClasses.externalClassNameFromInternalType
-import com.github.netomi.bat.dexfile.util.DexClasses.internalClassNameFromExternalClassName
-import com.github.netomi.bat.dexfile.util.DexClasses.internalTypeFromInternalClassName
+import com.github.netomi.bat.util.asExternalJavaClassName
+import com.github.netomi.bat.util.asJavaType
 
 class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClass() {
 
     override val type: String
-        get() = internalTypeFromInternalClassName(clazz.name)
+        get() = clazz.name.asExternalJavaClassName().toInternalType()
 
     override val className: String
-        get() = internalClassNameFromExternalClassName(clazz.name)
+        get() = clazz.name.asExternalJavaClassName().toInternalClassName()
 
     private val fieldCache = mutableMapOf<String, DvmNativeField?>()
 
@@ -42,7 +41,7 @@ class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClas
 
     companion object {
         fun of(type: String): DvmNativeClass {
-            val externalClassName = externalClassNameFromInternalType(type)
+            val externalClassName = type.asJavaType().toExternalClassName()
             return DvmNativeClass(Class.forName(externalClassName) as Class<Any>)
         }
     }

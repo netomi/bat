@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.*
 import java.util.*
 
@@ -68,6 +69,12 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
 
     fun getShortyType(dexFile: DexFile): String {
         return getProtoID(dexFile).getShorty(dexFile)
+    }
+
+    fun getFullExternalMethodDescriptor(dexFile: DexFile): String {
+        return "%s.%s%s".format(getClassType(dexFile).asDexType().toExternalClassName(),
+                                getName(dexFile),
+                                getProtoID(dexFile).getDescriptor(dexFile))
     }
 
     override val isEmpty: Boolean

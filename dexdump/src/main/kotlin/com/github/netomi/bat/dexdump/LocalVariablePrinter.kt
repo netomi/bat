@@ -20,8 +20,8 @@ import com.github.netomi.bat.dexfile.Code
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.debug.*
-import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.util.getArgumentSizeForType
 import com.github.netomi.bat.util.toHexStringWithPrefix
 
 internal class LocalVariablePrinter constructor(
@@ -57,7 +57,7 @@ internal class LocalVariablePrinter constructor(
                 variableInfos[register] = LocalVariableInfo(parameterName, parameterType, null)
 
                 i++
-                register += DexClasses.getArgumentSizeForType(parameterType)
+                register += getArgumentSizeForType(parameterType)
             }
         }
     }

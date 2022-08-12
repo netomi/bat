@@ -20,8 +20,6 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.*
 import com.github.netomi.bat.dexfile.instruction.DexOpCode.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.util.DexClasses.isReferenceType
 import com.github.netomi.bat.util.*
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.data.*
@@ -59,6 +57,8 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                                                                                                       fieldID.getClassType(dexFile),
                                                                                                       fieldID.getName(dexFile),
                                                                                                       fieldID.getType(dexFile)))
+
+        val javaFieldType = field.type.asJavaType()
 
         val getStaticField = { supportedTypes: Array<String> ->
             if (!supportedTypes.contains(field.type)) {
@@ -117,7 +117,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             SGET_SHORT   -> getStaticField(arrayOf(SHORT_TYPE))
 
             SGET_OBJECT -> {
-                if (!isReferenceType(field.type)) {
+                if (!javaFieldType.isReferenceType) {
                     throw VerifyException("[0x%x] get insn has reference type but expected type '%d'".format(offset, field.type))
                 }
                 val r = instruction.registers[0]
@@ -132,7 +132,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             SPUT_SHORT   -> setPrimitiveStaticField(arrayOf(SHORT_TYPE))
 
             SPUT_OBJECT -> {
-                if (!isReferenceType(field.type)) {
+                if (!javaFieldType.isReferenceType) {
                     throw VerifyException("[0x%x] put insn has reference type but expected type '%d'".format(offset, field.type))
                 }
 
@@ -178,19 +178,27 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                 val proto = methodID.getProtoID(dexFile)
                 val parameterTypes = proto.getParameterTypes(dexFile)
 
-                val parameterTypeClasses = parameterTypes.map { DexClasses.externalClassNameFromInternalType(it) }
+                val parameterTypeClasses = parameterTypes.map { it.asJavaType() }
                     .map {
-                        when (it) {
-                            "I" -> Integer.TYPE
-                            "J" -> java.lang.Long.TYPE
-                            "B" -> java.lang.Byte.TYPE
-                            "S" -> java.lang.Short.TYPE
-                            "F" -> java.lang.Float.TYPE
-                            else -> Class.forName(it)
+                        if (it.isClassType) {
+                            Class.forName(it.toExternalClassName())
+                        } else if (it.isPrimitiveType) {
+                            when (it.type) {
+                                INT_TYPE     -> Integer.TYPE
+                                LONG_TYPE    -> java.lang.Long.TYPE
+                                BYTE_TYPE    -> java.lang.Byte.TYPE
+                                SHORT_TYPE   -> java.lang.Short.TYPE
+                                BOOLEAN_TYPE -> java.lang.Boolean.TYPE
+                                FLOAT_TYPE   -> java.lang.Float.TYPE
+                                DOUBLE_TYPE  -> java.lang.Float.TYPE
+                                else         -> { TODO("implement")}
+                            }
+                        } else {
+                            TODO("handle array types")
                         }
                     }.toList()
-                val className = DexClasses.externalClassNameFromInternalType(classType)
-                val clazz = Class.forName(className)
+                val externalClassName = classType.asJavaType().toExternalClassName()
+                val clazz = Class.forName(externalClassName)
 
                 val m = clazz.getMethod(methodName, *parameterTypeClasses.toTypedArray())
 

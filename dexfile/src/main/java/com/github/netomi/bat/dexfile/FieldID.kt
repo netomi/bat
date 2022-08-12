@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
@@ -59,8 +60,14 @@ class FieldID private constructor(classIndex: Int = NO_INDEX,
         return dexFile.getStringID(nameIndex).stringValue
     }
 
+    fun getFullExternalFieldDescriptor(dexFile: DexFile): String {
+        return "%s.%s:%s".format(getClassType(dexFile).asDexType().toExternalClassName(),
+                                 getName(dexFile),
+                                 getType(dexFile))
+    }
+
     /**
-     * This item is considered to be empty only if its an uninitialized instance.
+     * This item is considered to be empty only if it's an uninitialized instance.
      */
     override val isEmpty: Boolean
         get() = classIndex == NO_INDEX

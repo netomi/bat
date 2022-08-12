@@ -16,8 +16,7 @@
 package com.github.netomi.bat.smali.disassemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.util.DexClasses.internalTypeFromInternalClassName
+import com.github.netomi.bat.dexfile.util.getArgumentSizeForType
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import java.io.OutputStreamWriter
@@ -40,7 +39,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             printer.print(" $accessFlags")
         }
 
-        printer.print(" " + internalTypeFromInternalClassName(classDef.getClassName(dexFile)))
+        printer.print(" ${classDef.getType(dexFile)}")
         printer.println()
         val superClassType = classDef.getSuperClassType(dexFile)
         if (superClassType != null) {
@@ -151,7 +150,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             }
             classDef.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
 
-            registerIndex += DexClasses.getArgumentSizeForType(parameterType)
+            registerIndex += getArgumentSizeForType(parameterType)
         }
 
         annotationPrinter.printParameterInfo = false
@@ -188,7 +187,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
                 classDef.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
                 annotationPrinter.printParameterInfo = false
 
-                registerIndex += DexClasses.getArgumentSizeForType(parameterType)
+                registerIndex += getArgumentSizeForType(parameterType)
             }
         } else {
             printParameterAnnotations(dexFile, classDef, method)

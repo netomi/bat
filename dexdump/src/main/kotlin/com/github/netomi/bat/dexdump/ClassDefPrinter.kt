@@ -23,9 +23,9 @@ import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.dexfile.util.DexClasses
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
+import com.github.netomi.bat.util.asInternalJavaClassName
 import com.github.netomi.bat.util.toHexString
 import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.github.netomi.bat.util.toPrintableAsciiString
@@ -136,8 +136,8 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
 
             printer.println(
                 toHexString(fileOffset, 6) + ":                                        |[" +
-                        toHexString(fileOffset, 6) + "] " +
-                        DexClasses.fullExternalMethodSignature(dexFile, classDef, method)
+                toHexString(fileOffset, 6) + "] " +
+                fullExternalMethodSignature(dexFile, classDef, method)
             )
 
             fileOffset = align(fileOffset, 4)
@@ -278,6 +278,13 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
                 append(toHexString(array[len - 2]))
                 append(toHexString(array[len - 1]))
             }
+        }
+
+        private fun fullExternalMethodSignature(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): String {
+            return "%s.%s:%s".format(classDef.getClassName(dexFile).asInternalJavaClassName().toExternalClassName(),
+                                     method.getName(dexFile),
+                                     method.getDescriptor(dexFile)
+            )
         }
     }
 }

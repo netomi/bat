@@ -19,10 +19,7 @@ import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
-import com.github.netomi.bat.dexfile.util.DexClasses
-import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalFieldDescriptor
-import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodDescriptor
-import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForType
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
@@ -113,7 +110,7 @@ class ClassDef private constructor(            classIndex:           Int        
         get() = classData.methods
 
     fun getClassName(dexFile: DexFile): String {
-        return DexClasses.internalClassNameFromInternalType(getType(dexFile))
+        return getType(dexFile).asDexType().toInternalClassName()
     }
 
     fun getType(dexFile: DexFile): String {
@@ -121,8 +118,7 @@ class ClassDef private constructor(            classIndex:           Int        
     }
 
     fun getSuperClassName(dexFile: DexFile): String? {
-        val superClassType = getSuperClassType(dexFile)
-        return if (superClassType == null) null else DexClasses.internalClassNameFromInternalType(superClassType)
+        return getSuperClassType(dexFile)?.asDexType()?.toInternalClassName()
     }
 
     fun getSuperClassType(dexFile: DexFile): String? {
@@ -139,11 +135,12 @@ class ClassDef private constructor(            classIndex:           Int        
 
     internal fun addField(dexFile: DexFile, field: EncodedField, validate: Boolean = true) {
         if (validate) {
-            val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
+            val fieldID    = field.getFieldID(dexFile)
+            val fieldClass = fieldID.getClassType(dexFile)
             require(fieldClass == getType(dexFile)) { "field class does not match this class" }
             classData.fields.forEach {
                 require(field.fieldIndex != it.fieldIndex)
-                    { "field '${fullExternalFieldDescriptor(dexFile, field)}' already exists in this class" }
+                    { "field '${fieldID.getFullExternalFieldDescriptor(dexFile)}' already exists in this class" }
             }
         }
         classData.addField(field)
@@ -151,11 +148,12 @@ class ClassDef private constructor(            classIndex:           Int        
 
     internal fun addMethod(dexFile: DexFile, method: EncodedMethod, validate: Boolean = true) {
         if (validate) {
-            val methodClass = method.getMethodID(dexFile).getClassType(dexFile)
+            val methodID    = method.getMethodID(dexFile)
+            val methodClass = methodID.getClassType(dexFile)
             require(methodClass == getType(dexFile)) { "method class does not match this class" }
             classData.methods.forEach {
                 require(method.methodIndex != it.methodIndex)
-                    { "method '${fullExternalMethodDescriptor(dexFile, method)}' already exists in this class" }
+                    { "method '${methodID.getFullExternalMethodDescriptor(dexFile)}' already exists in this class" }
             }
         }
         classData.addMethod(method)
@@ -181,7 +179,7 @@ class ClassDef private constructor(            classIndex:           Int        
             for (i in currentStaticValueCount until staticFieldIndex) {
                 val currentField = staticFields[i]
                 val type = currentField.getFieldID(dexFile).getType(dexFile)
-                val encodedValue = getDefaultEncodedValueForType(type)
+                val encodedValue = type.asDexType().getDefaultEncodedValueForType()
                 staticValues.array.add(encodedValue)
             }
             staticValues.array.add(value)

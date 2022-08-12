@@ -19,11 +19,10 @@ package com.github.netomi.bat.tinydvm.data
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedField
-import com.github.netomi.bat.dexfile.util.DexClasses.getDefaultEncodedValueForType
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 import com.github.netomi.bat.dexfile.visitor.fieldCollector
 import com.github.netomi.bat.tinydvm.Dvm
-import com.google.common.base.Preconditions
 
 class DvmDexClass private constructor(val dexFile: DexFile, private val classDef: ClassDef): DvmClass() {
 
@@ -76,7 +75,7 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
             val collector = valueCollector()
             field.staticValueAccept(dexFile, collector)
 
-            val initialValue = collector.items().singleOrNull() ?: getDefaultEncodedValueForType(field.getType(dexFile))
+            val initialValue = collector.items().singleOrNull() ?: field.getType(dexFile).asDexType().getDefaultEncodedValueForType()
             staticFields[field] = initialValue.toDVMValue(dexFile, field.getType(dexFile))
         }
 

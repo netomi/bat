@@ -16,8 +16,6 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-import com.github.netomi.bat.dexfile.util.DexClasses.isArrayType
-
 class DvmReferenceValue private constructor(private val reference: DvmObject): DvmValue() {
 
     override val value: DvmObject
@@ -25,8 +23,6 @@ class DvmReferenceValue private constructor(private val reference: DvmObject): D
 
     override val type: String
         get() = value.type
-
-    val isArrayValue = isArrayType(type)
 
     companion object {
         fun of(obj: DvmObject): DvmReferenceValue {

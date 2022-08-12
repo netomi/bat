@@ -16,16 +16,13 @@
 package com.github.netomi.bat.smali.assemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.editor.ClassDefEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.editor.FieldEditor
 import com.github.netomi.bat.dexfile.editor.MethodEditor
-import com.github.netomi.bat.dexfile.util.DexClasses.externalClassNameFromInternalClassName
-import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalFieldDescriptor
-import com.github.netomi.bat.dexfile.util.DexClasses.fullExternalMethodDescriptor
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
+import com.github.netomi.bat.util.asInternalJavaClassName
 import java.io.PrintWriter
 
 internal class ClassDefAssembler(private val dexEditor:      DexEditor,
@@ -65,10 +62,11 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                 classDefEditor.addClassAnnotation(annotation)
             } catch (exception: RuntimeException) {
                 if (lenientMode) {
-                    val className = classDefEditor.classDef.getClassName(dexFile)
+                    val externalClassName =
+                        classDefEditor.classDef.getClassName(dexFile).asInternalJavaClassName().toExternalClassName()
                     warningPrinter?.println(
                         "warning: class '%s': %s, skipping annotation"
-                            .format(externalClassNameFromInternalClassName(className), exception.message))
+                            .format(externalClassName, exception.message))
                 } else {
                     throw exception
                 }
@@ -89,9 +87,9 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
 
         try {
             val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classDefEditor.classType, name, type)
-            val fieldID = dexFile.getFieldID(fieldIDIndex)
+            val fieldID      = dexFile.getFieldID(fieldIDIndex)
             if (addedFields.contains(fieldID)) {
-                throw RuntimeException("field '${fullExternalFieldDescriptor(dexFile, fieldID)}' already exists in this class")
+                throw RuntimeException("field '${fieldID.getFullExternalFieldDescriptor(dexFile)}' already exists in this class")
             }
             fieldEditor = classDefEditor.addField(name, accessFlags, type, false)
             addedFields.add(fieldID)
@@ -116,9 +114,10 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                 fieldEditor.addAnnotation(annotation)
             } catch (exception: RuntimeException) {
                 if (lenientMode) {
+                    val fieldID = field.getFieldID(dexFile)
                     warningPrinter?.println(
                         "warning: field '%s': %s, skipping annotation"
-                            .format(fullExternalFieldDescriptor(dexFile, field), exception.message))
+                            .format(fieldID.getFullExternalFieldDescriptor(dexFile), exception.message))
                 } else {
                     throw exception
                 }
@@ -136,9 +135,9 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
 
         try {
             val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classDefEditor.classType, name, parameterTypes, returnType)
-            val methodID = dexFile.getMethodID(methodIDIndex)
+            val methodID      = dexFile.getMethodID(methodIDIndex)
             if (addedMethods.contains(methodID)) {
-                throw RuntimeException("method '${fullExternalMethodDescriptor(dexFile, methodID)}' already exists in this class")
+                throw RuntimeException("method '${methodID.getFullExternalMethodDescriptor(dexFile)}' already exists in this class")
             }
             methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType, false)
             addedMethods.add(methodID)
@@ -158,7 +157,8 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
         } else {
             if (ctx.sInstruction().isNotEmpty()) {
-                val message = "abstract method '${fullExternalMethodDescriptor(dexFile, method)}' containing code instructions"
+                val methodDescriptor = method.getMethodID(dexFile).getFullExternalMethodDescriptor(dexFile)
+                val message = "abstract method '$methodDescriptor' containing code instructions"
                 if (lenientMode) {
                     warningPrinter?.println("warning: $message, skipping code")
                 } else {
@@ -173,9 +173,10 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                 methodEditor.addAnnotation(annotation)
             } catch (exception: RuntimeException) {
                 if (lenientMode) {
+                    val methodID = method.getMethodID(dexFile)
                     warningPrinter?.println(
                         "warning: method '%s': %s, skipping annotation"
-                            .format(fullExternalMethodDescriptor(dexFile, method), exception.message))
+                            .format(methodID.getFullExternalMethodDescriptor(dexFile), exception.message))
                 } else {
                     throw exception
                 }
@@ -191,10 +192,11 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                     methodEditor.addParameterAnnotation(parameterIndex, annotation)
                 } catch (exception: RuntimeException) {
                     if (lenientMode) {
+                        val methodID = method.getMethodID(dexFile)
                         warningPrinter?.println(
                             "warning: parameter #%d at '%s': %s, skipping annotation"
                                 .format(parameterIndex + 1,
-                                    fullExternalMethodDescriptor(dexFile, method),
+                                    methodID.getFullExternalMethodDescriptor(dexFile),
                                     exception.message))
                     } else {
                         throw exception
