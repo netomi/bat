@@ -21,11 +21,14 @@ import com.github.netomi.bat.util.*
 
 class DvmPrimitiveValue private constructor(private val _value: Long, private val primitiveType: PrimitiveType): DvmValue() {
 
+    override val value: Any
+        get() = valueOfType(type)
+
     override val type: String
         get() = primitiveType.typeString
 
-    override val value: Any
-        get() = valueOfType(type)
+    override val isNullReference: Boolean
+        get() = false
 
     fun valueOfType(type: String): Any {
         return when (type) {
@@ -48,6 +51,10 @@ class DvmPrimitiveValue private constructor(private val _value: Long, private va
         } else {
             this
         }
+    }
+
+    override fun toString(): String {
+        return "Primitive[value=${value}, type=${type}]"
     }
 
     companion object {

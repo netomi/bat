@@ -24,6 +24,13 @@ class DvmReferenceValue private constructor(private val reference: DvmObject): D
     override val type: String
         get() = value.type
 
+    override val isNullReference: Boolean
+        get() = false
+
+    override fun toString(): String {
+        return "Reference[ref=${value}]"
+    }
+
     companion object {
         fun of(obj: DvmObject): DvmReferenceValue {
             return DvmReferenceValue(obj)

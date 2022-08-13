@@ -24,14 +24,19 @@ class DvmNativeObject private constructor(private var _obj:  Any? = null,
 
     override val type: String = _type
 
-    val isNull: Boolean = _obj == null
+    override val isInitialized: Boolean
+        get() = obj != null
+
+    override fun toString(): String {
+        return "NativeObject[obj=${obj}, type=${type}]"
+    }
 
     companion object {
         fun newInstanceOf(clazz: DvmNativeClass): DvmNativeObject {
             return DvmNativeObject(_type = clazz.type)
         }
 
-        fun of(obj: Any?, type: String): DvmNativeObject {
+        fun of(obj: Any, type: String): DvmNativeObject {
             return DvmNativeObject(obj, type)
         }
     }

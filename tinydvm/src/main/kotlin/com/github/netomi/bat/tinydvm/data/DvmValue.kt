@@ -26,6 +26,8 @@ sealed class DvmValue {
     abstract val value: Any?
     abstract val type:  String
 
+    abstract val isNullReference: Boolean
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -41,9 +43,13 @@ sealed class DvmValue {
     }
 
     companion object {
+        fun ofUnitValue(): DvmValue {
+            return DvmUnitValue
+        }
+
         fun ofNativeValue(obj: Any?, type: String): DvmValue {
             if (obj == null) {
-                return DvmReferenceValue.of(DvmNativeObject.of(null, type))
+                return DvmNullReferenceValue.of(type)
             }
 
             return when (obj::class.java) {
@@ -109,7 +115,7 @@ private class EncodedValueConverter constructor(private val type: String): Encod
     }
 
     override fun visitNullValue(dexFile: DexFile, value: EncodedNullValue) {
-        dvmValue = DvmReferenceValue.of(DvmNativeObject.of(null, type))
+        dvmValue = DvmNullReferenceValue.of(type)
     }
 
     override fun visitStringValue(dexFile: DexFile, value: EncodedStringValue) {

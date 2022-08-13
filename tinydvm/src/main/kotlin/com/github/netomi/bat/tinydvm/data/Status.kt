@@ -16,19 +16,13 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-sealed class DvmObject {
-    abstract val obj:  Any?
-    abstract val type: String
+enum class ClassInitializationStatus {
+    UNINITIALIZED,
+    INITIALIZING,
+    INITIALIZED
+}
 
-    abstract val isInitialized: Boolean
-
-    companion object {
-        fun newInstanceOf(clazz: DvmClass): DvmObject {
-            return when (clazz) {
-                is DvmDexClass    -> DvmDexObject.newInstanceOf(clazz)
-                is DvmNativeClass -> DvmNativeObject.newInstanceOf(clazz)
-                else -> error("unexpected DvmClass $clazz")
-            }
-        }
-    }
+enum class ObjectInitializationStatus {
+    UNINITIALIZED,
+    INITIALIZED
 }

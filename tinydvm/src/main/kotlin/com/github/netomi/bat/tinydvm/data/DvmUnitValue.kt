@@ -16,8 +16,20 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-enum class InitializationStatus {
-    NOT_INITIALIZED,
-    INITIALIZING,
-    INITIALIZED
+import com.github.netomi.bat.util.VOID_TYPE
+
+object DvmUnitValue: DvmValue() {
+
+    override val value: Any
+        get() = this
+
+    override val type: String
+        get() = VOID_TYPE
+
+    override val isNullReference: Boolean
+        get() = false
+
+    override fun toString(): String {
+        return "Unit"
+    }
 }

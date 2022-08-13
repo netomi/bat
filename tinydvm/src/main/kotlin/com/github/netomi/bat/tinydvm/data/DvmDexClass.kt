@@ -24,7 +24,9 @@ import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 import com.github.netomi.bat.dexfile.visitor.fieldCollector
 import com.github.netomi.bat.tinydvm.Dvm
 
-class DvmDexClass private constructor(val dexFile: DexFile, private val classDef: ClassDef): DvmClass() {
+class DvmDexClass private constructor(        val dexFile:  DexFile,
+                                      private val classDef: ClassDef,
+                                      private var status:   ClassInitializationStatus = ClassInitializationStatus.UNINITIALIZED): DvmClass() {
 
     override val type: String
         get() = classDef.getType(dexFile)
@@ -32,9 +34,7 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
     override val className: String
         get() = classDef.getClassName(dexFile)
 
-    private var status: InitializationStatus = InitializationStatus.NOT_INITIALIZED
-
-    val isInitialized: Boolean = status == InitializationStatus.INITIALIZED
+    val isInitialized: Boolean = status == ClassInitializationStatus.INITIALIZED
 
     private val staticFields = mutableMapOf<EncodedField, DvmValue>()
 
@@ -60,11 +60,11 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
     }
 
     internal fun initialize(dvm: Dvm) {
-        if (status != InitializationStatus.NOT_INITIALIZED) {
+        if (status != ClassInitializationStatus.UNINITIALIZED) {
             return
         }
 
-        status = InitializationStatus.INITIALIZING
+        status = ClassInitializationStatus.INITIALIZING
 
         val superType = classDef.getSuperClassType(dexFile)
         if (superType != null) {
@@ -82,7 +82,7 @@ class DvmDexClass private constructor(val dexFile: DexFile, private val classDef
 
         // TODO: execute <clinit> method to complete initialization
 
-        status = InitializationStatus.INITIALIZED
+        status = ClassInitializationStatus.INITIALIZED
     }
 
     companion object {

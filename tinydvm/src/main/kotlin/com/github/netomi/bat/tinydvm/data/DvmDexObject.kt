@@ -18,7 +18,8 @@ package com.github.netomi.bat.tinydvm.data
 
 import com.github.netomi.bat.dexfile.EncodedField
 
-class DvmDexObject constructor(private val clazz: DvmDexClass): DvmObject() {
+class DvmDexObject constructor(private val clazz:  DvmDexClass,
+                               private var status: ObjectInitializationStatus = ObjectInitializationStatus.UNINITIALIZED): DvmObject() {
 
     override val obj: Any
         get() = this
@@ -28,9 +29,8 @@ class DvmDexObject constructor(private val clazz: DvmDexClass): DvmObject() {
 
     private val instanceFields = mutableMapOf<EncodedField, DvmValue?>()
 
-    private var status = InitializationStatus.NOT_INITIALIZED
-
-    val isInitialized = status == InitializationStatus.INITIALIZED
+    override val isInitialized
+        get() = status == ObjectInitializationStatus.INITIALIZED
 
     fun getClass(): DvmDexClass {
         return clazz
@@ -42,6 +42,10 @@ class DvmDexObject constructor(private val clazz: DvmDexClass): DvmObject() {
 
     fun setValue(field: EncodedField, value: DvmValue) {
         instanceFields[field] = value
+    }
+
+    override fun toString(): String {
+        return "DexObject[type=${type}]"
     }
 
     companion object {

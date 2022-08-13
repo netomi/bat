@@ -32,8 +32,9 @@ class Interpreter private constructor(private val dvm:      Dvm,
     private val registers: Array<DvmValue?> = arrayOfNulls(code.registersSize)
     private val processor = InstructionProcessor(dvm, registers)
 
-    fun invoke(vararg parameters: Any) {
+    fun invoke(vararg parameters: Any): DvmValue {
         code.instructionsAccept(dexFile, classDef, method, processor)
+        return DvmValue.ofUnitValue()
     }
 
     companion object {

@@ -16,19 +16,20 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-sealed class DvmObject {
-    abstract val obj:  Any?
-    abstract val type: String
+class DvmNullReferenceValue private constructor(override val type: String): DvmValue() {
+    override val value: Any?
+        get() = null
 
-    abstract val isInitialized: Boolean
+    override val isNullReference: Boolean
+        get() = true
+
+    override fun toString(): String {
+        return "Reference[null]"
+    }
 
     companion object {
-        fun newInstanceOf(clazz: DvmClass): DvmObject {
-            return when (clazz) {
-                is DvmDexClass    -> DvmDexObject.newInstanceOf(clazz)
-                is DvmNativeClass -> DvmNativeObject.newInstanceOf(clazz)
-                else -> error("unexpected DvmClass $clazz")
-            }
+        fun of(type: String): DvmValue {
+            return DvmNullReferenceValue(type)
         }
     }
 }
