@@ -75,9 +75,9 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
         byteBuffer.put(header.signature)
         byteBuffer.position(12)
         adlerChecksum.putBytes(byteBuffer)
-        header.checksum = adlerChecksum.hash().asInt().toLong().toUInt()
+        header.checksum = adlerChecksum.hash().asInt()
         byteBuffer.position(8)
-        byteBuffer.putInt(header.checksum.toInt())
+        byteBuffer.putInt(header.checksum)
 
         output.copy(outputStream)
         outputStream.flush()

@@ -41,7 +41,7 @@ class DexHeader private constructor() : DataItem() {
 
     var magic: ByteArray = ByteArray(8) // ubyte[8]
         internal set
-    var checksum: UInt = 0u // uint
+    var checksum: Int = 0 // uint
         internal set
     var signature: ByteArray = ByteArray(20) // ubyte[20]
         internal set
@@ -109,7 +109,7 @@ class DexHeader private constructor() : DataItem() {
         }
 
         input.offset = 8
-        checksum = input.readUnsignedInt().toUInt()
+        checksum = input.readInt()
         input.readFully(signature)
 
         fileSize = input.readUnsignedInt()
@@ -140,7 +140,7 @@ class DexHeader private constructor() : DataItem() {
     override fun write(output: DexDataOutput) {
         output.apply {
             writeBytes(magic)
-            writeUnsignedInt(checksum.toLong())
+            writeInt(checksum)
             writeBytes(signature)
             writeUnsignedInt(fileSize)
             writeUnsignedInt(headerSize)
@@ -211,7 +211,7 @@ class DexHeader private constructor() : DataItem() {
         return buildString {
             appendLine("DexHeader[")
             appendLine("  magic           : ${magic.contentToHexString()}")
-            appendLine("  checksum        : ${toHexStringWithPrefix(checksum.toLong())}")
+            appendLine("  checksum        : ${toHexStringWithPrefix(checksum)}")
             appendLine("  signature       : ${signature.contentToHexString()}")
             appendLine("  fileSize        : $fileSize")
             appendLine("  headerSize      : $headerSize")

@@ -50,11 +50,11 @@ class DexFileReader(`is`: InputStream, verifyChecksum: Boolean = true) : DexFile
         input.offset = 12
         input.update(adlerHasher)
 
-        val checksum = adlerHasher.hash().asInt().toUInt()
+        val checksum = adlerHasher.hash().asInt()
         if (checksum != dexFile.header!!.checksum) {
             throw DexFormatException("Calculated checksum %s does not match %s."
-                    .format(toHexStringWithPrefix(checksum.toLong()),
-                            toHexStringWithPrefix(dexFile.header!!.checksum.toLong())))
+                    .format(toHexStringWithPrefix(checksum),
+                            toHexStringWithPrefix(dexFile.header!!.checksum)))
         }
     }
 
