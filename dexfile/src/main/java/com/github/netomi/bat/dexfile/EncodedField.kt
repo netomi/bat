@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.annotation.visitor.allAnnotations
 import com.github.netomi.bat.dexfile.annotation.visitor.annotationCollector
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.value.visitor.valueCollector
@@ -55,6 +56,10 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
 
     fun getType(dexFile: DexFile): String {
         return getFieldID(dexFile).getType(dexFile)
+    }
+
+    fun getDexType(dexFile: DexFile): DexType {
+        return getFieldID(dexFile).getDexType(dexFile)
     }
 
     val isStatic: Boolean

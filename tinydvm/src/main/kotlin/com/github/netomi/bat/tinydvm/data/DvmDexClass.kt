@@ -19,8 +19,6 @@ package com.github.netomi.bat.tinydvm.data
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedField
-import com.github.netomi.bat.dexfile.util.asDexType
-import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 import com.github.netomi.bat.dexfile.visitor.fieldCollector
 import com.github.netomi.bat.tinydvm.Dvm
 
@@ -34,7 +32,7 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
     override val className: String
         get() = classDef.getClassName(dexFile)
 
-    val isInitialized: Boolean = status == ClassInitializationStatus.INITIALIZED
+    val isInitialized = status == ClassInitializationStatus.INITIALIZED
 
     private val staticFields = mutableMapOf<EncodedField, DvmValue>()
 
@@ -50,12 +48,12 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
     }
 
     fun getValueOfStaticField(field: EncodedField): DvmValue {
-        require(field.isStatic) { "trying to get a value from non-static field '${field}'" }
+        require(field.isStatic) { "trying to get a value from non-static field '$field'" }
         return staticFields[field]!!
     }
 
     fun setValueForStaticField(field: EncodedField, value: DvmValue) {
-        require(field.isStatic) { "trying to set a value for non-static field '${field}'" }
+        require(field.isStatic) { "trying to set a value for non-static field '$field'" }
         staticFields[field] = value
     }
 
@@ -71,11 +69,8 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
             dvm.getClass(superType)
         }
 
-        classDef.staticFieldsAccept(dexFile) { _, _, _, field ->
-            val collector = valueCollector()
-            field.staticValueAccept(dexFile, collector)
-
-            val initialValue = collector.items().singleOrNull() ?: field.getType(dexFile).asDexType().getDefaultEncodedValueForType()
+        classDef.staticFields.forEach { field ->
+            val initialValue = field.staticValue(dexFile) ?: field.getDexType(dexFile).getDefaultEncodedValueForType()
             staticFields[field] = initialValue.toDVMValue(dexFile, field.getType(dexFile))
         }
 
