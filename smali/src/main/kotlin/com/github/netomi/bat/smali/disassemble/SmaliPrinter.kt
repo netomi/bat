@@ -16,7 +16,6 @@
 package com.github.netomi.bat.smali.disassemble
 
 import com.github.netomi.bat.dexfile.*
-import com.github.netomi.bat.dexfile.util.getArgumentSizeForType
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import java.io.OutputStreamWriter
@@ -142,15 +141,15 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
     private fun printParameterAnnotations(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
         var registerIndex = if (method.isStatic) 0 else 1
 
-        for ((parameterIndex, parameterType) in method.getParameterTypes(dexFile).withIndex()) {
+        for ((parameterIndex, parameterType) in method.getParameterDexTypes(dexFile).withIndex()) {
             annotationPrinter.apply {
                 printParameterInfo   = true
-                currentParameterType = parameterType
+                currentParameterType = parameterType.type
                 currentRegisterIndex = registerIndex
             }
             classDef.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
 
-            registerIndex += getArgumentSizeForType(parameterType)
+            registerIndex += parameterType.getArgumentSize()
         }
 
         annotationPrinter.printParameterInfo = false
@@ -169,7 +168,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
                 localVariableInfos[localVariables] = LocalVariableInfo("this", classType, null)
             }
 
-            for ((parameterIndex, parameterType) in method.getParameterTypes(dexFile).withIndex()) {
+            for ((parameterIndex, parameterType) in method.getParameterDexTypes(dexFile).withIndex()) {
                 val parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex)
                 if (parameterName != null) {
                     printer.println(".param p%d, \"%s\"    # %s".format(registerIndex, parameterName, parameterType))
@@ -178,16 +177,16 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
                     annotationPrinter.apply {
                         printParameterInfo   = true
                         currentRegisterIndex = registerIndex
-                        currentParameterType = parameterType
+                        currentParameterType = parameterType.type
                     }
                 }
 
-                val localVariableInfo = LocalVariableInfo(parameterName, parameterType, null)
+                val localVariableInfo = LocalVariableInfo(parameterName, parameterType.type, null)
                 localVariableInfos[localVariables + registerIndex] = localVariableInfo
                 classDef.parameterAnnotationSetAccept(dexFile, classDef, method, parameterIndex, annotationPrinter)
                 annotationPrinter.printParameterInfo = false
 
-                registerIndex += getArgumentSizeForType(parameterType)
+                registerIndex += parameterType.getArgumentSize()
             }
         } else {
             printParameterAnnotations(dexFile, classDef, method)

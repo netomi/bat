@@ -29,21 +29,37 @@ class DexType private constructor(type: String): JavaType(type) {
         return if (isClassType || isArrayType) "L" else type
     }
 
-    fun getDefaultEncodedValueForType(): EncodedValue {
-        when (type) {
-            BYTE_TYPE    -> return EncodedByteValue.of(0x00.toByte())
-            SHORT_TYPE   -> return EncodedShortValue.of(0x00.toShort())
-            CHAR_TYPE    -> return EncodedCharValue.of(0x00.toChar())
-            INT_TYPE     -> return EncodedIntValue.of(0)
-            LONG_TYPE    -> return EncodedLongValue.of(0L)
-            FLOAT_TYPE   -> return EncodedFloatValue.of(0.0f)
-            DOUBLE_TYPE  -> return EncodedDoubleValue.of(0.0)
-            BOOLEAN_TYPE -> return EncodedBooleanValue.of(false)
+    fun getArgumentSize(): Int {
+        return when (type) {
+            BYTE_TYPE,
+            SHORT_TYPE,
+            CHAR_TYPE,
+            INT_TYPE,
+            BOOLEAN_TYPE,
+            FLOAT_TYPE  -> 1
+
+            LONG_TYPE,
+            DOUBLE_TYPE -> 2
+
+            else -> 1
         }
-        return if (type.startsWith("L") && type.endsWith(";")) {
+    }
+
+    fun getDefaultEncodedValueForType(): EncodedValue {
+        return if (isClassType) {
             EncodedNullValue
         } else {
-            EncodedNullValue
+            when (type) {
+                BYTE_TYPE    -> EncodedByteValue.of(0x00.toByte())
+                SHORT_TYPE   -> EncodedShortValue.of(0x00.toShort())
+                CHAR_TYPE    -> EncodedCharValue.of(0x00.toChar())
+                INT_TYPE     -> EncodedIntValue.of(0)
+                LONG_TYPE    -> EncodedLongValue.of(0L)
+                FLOAT_TYPE   -> EncodedFloatValue.of(0.0f)
+                DOUBLE_TYPE  -> EncodedDoubleValue.of(0.0)
+                BOOLEAN_TYPE -> EncodedBooleanValue.of(false)
+                else         -> EncodedNullValue
+            }
         }
     }
 
@@ -54,7 +70,7 @@ class DexType private constructor(type: String): JavaType(type) {
     }
 }
 
-fun toShortyFormat(parameterTypes: List<String>, returnType: String): String {
+internal fun toShortyFormat(parameterTypes: List<String>, returnType: String): String {
     var result = returnType.asDexType().toShortyFormat()
 
     for (parameter in parameterTypes) {
@@ -64,22 +80,6 @@ fun toShortyFormat(parameterTypes: List<String>, returnType: String): String {
     return result
 }
 
-fun getArgumentSize(parameterTypes: Iterable<String>): Int {
-    return parameterTypes.fold(0) { size, type -> size + getArgumentSizeForType(type) }
-}
-
-fun getArgumentSizeForType(type: String): Int {
-    return when (type) {
-        BYTE_TYPE,
-        SHORT_TYPE,
-        CHAR_TYPE,
-        INT_TYPE,
-        BOOLEAN_TYPE,
-        FLOAT_TYPE  -> 1
-
-        LONG_TYPE,
-        DOUBLE_TYPE -> 2
-
-        else -> 1
-    }
+fun Iterable<DexType>.getArgumentSize(): Int {
+    return fold(0) { size, type -> size + type.getArgumentSize() }
 }

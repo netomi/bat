@@ -17,6 +17,8 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
@@ -44,6 +46,10 @@ class TypeList private constructor(private var typeList: IntArray = intArrayOf()
 
     fun getType(dexFile: DexFile, index: Int): String {
         return dexFile.getTypeID(typeList[index]).getType(dexFile)
+    }
+
+    fun getDexType(dexFile: DexFile, index: Int): DexType {
+        return getType(dexFile, index).asDexType()
     }
 
     fun getTypeIndex(index: Int): Int {

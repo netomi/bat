@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.debug.*
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
-import com.github.netomi.bat.dexfile.util.getArgumentSizeForType
 import com.github.netomi.bat.util.toHexStringWithPrefix
 
 internal class LocalVariablePrinter constructor(
@@ -53,11 +52,11 @@ internal class LocalVariablePrinter constructor(
             var i = 0
             while (i < parameterCount && i < parameters.typeCount && register < code.registersSize) {
                 val parameterName = getParameterName(dexFile, i)
-                val parameterType = parameters.getType(dexFile, i)
-                variableInfos[register] = LocalVariableInfo(parameterName, parameterType, null)
+                val parameterType = parameters.getDexType(dexFile, i)
+                variableInfos[register] = LocalVariableInfo(parameterName, parameterType.type, null)
 
                 i++
-                register += getArgumentSizeForType(parameterType)
+                register += parameterType.getArgumentSize()
             }
         }
     }

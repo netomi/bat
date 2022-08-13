@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.debug.editor.DebugSequenceComposer
 import com.github.netomi.bat.dexfile.editor.CodeEditor
 import com.github.netomi.bat.dexfile.editor.DexEditor
 import com.github.netomi.bat.dexfile.instruction.*
-import com.github.netomi.bat.dexfile.util.getArgumentSize
 import com.github.netomi.bat.smali.parser.SmaliParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -252,7 +251,7 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
     private fun collectRegisterInfo(listCtx: List<SInstructionContext>): RegisterInfo {
         val protoID = method.getProtoID(dexFile)
         var insSize = if (method.isStatic) 0 else 1
-        val argumentSize = getArgumentSize(protoID.getParameterTypes(dexFile))
+        val argumentSize = protoID.getParametersArgumentSize(dexFile)
         insSize += argumentSize
 
         listCtx.forEach { ctx ->

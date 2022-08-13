@@ -21,6 +21,8 @@ import com.github.netomi.bat.dexfile.annotation.visitor.allAnnotations
 import com.github.netomi.bat.dexfile.annotation.visitor.annotationCollector
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
@@ -72,6 +74,10 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
 
     fun getParameterTypes(dexFile: DexFile): List<String> {
         return getProtoID(dexFile).getParameterTypes(dexFile)
+    }
+
+    fun getParameterDexTypes(dexFile: DexFile): List<DexType> {
+        return getProtoID(dexFile).getParameterDexTypes(dexFile)
     }
 
     fun getReturnType(dexFile: DexFile): String {

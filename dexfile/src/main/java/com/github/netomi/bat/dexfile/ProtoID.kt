@@ -17,6 +17,9 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.dexfile.util.asDexType
+import com.github.netomi.bat.dexfile.util.getArgumentSize
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
@@ -65,6 +68,14 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
 
     fun getParameterTypes(dexFile: DexFile): List<String> {
         return parameters.getTypes(dexFile)
+    }
+
+    fun getParameterDexTypes(dexFile: DexFile): List<DexType> {
+        return getParameterTypes(dexFile).map { it.asDexType() }
+    }
+
+    fun getParametersArgumentSize(dexFile: DexFile): Int {
+        return getParameterDexTypes(dexFile).getArgumentSize()
     }
 
     fun getReturnTypeTypeID(dexFile: DexFile): TypeID {

@@ -19,7 +19,6 @@ package com.github.netomi.bat.smali.assemble
 import com.github.netomi.bat.dexfile.DexAccessFlag
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
-import com.github.netomi.bat.dexfile.util.getArgumentSizeForType
 import com.github.netomi.bat.smali.SmaliParseException
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.smali.parser.SmaliParser.SParameterContext
@@ -69,12 +68,12 @@ internal fun parseParameterIndex(ctx: SParameterContext, dexFile: DexFile, metho
         val parameterRegisterNumber = ctx.registerNumber.text.substring(1).toInt()
 
         var currRegister = if (method.isStatic) 0 else 1
-        for (type in method.getParameterTypes(dexFile)) {
+        for (type in method.getParameterDexTypes(dexFile)) {
             if (currRegister == parameterRegisterNumber) {
                 break
             } else {
                 parameterIndex++
-                currRegister += getArgumentSizeForType(type)
+                currRegister += type.getArgumentSize()
             }
         }
     } else if (ctx.parameterIndex != null) {
