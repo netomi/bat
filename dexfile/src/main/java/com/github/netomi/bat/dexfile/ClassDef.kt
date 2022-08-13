@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.annotation.AnnotationsDirectory
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
@@ -110,19 +111,27 @@ class ClassDef private constructor(            classIndex:           Int        
         get() = classData.methods
 
     fun getClassName(dexFile: DexFile): String {
-        return getType(dexFile).asDexType().toInternalClassName()
+        return getDexType(dexFile).toInternalClassName()
     }
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getTypeID(classIndex).getType(dexFile)
     }
 
+    fun getDexType(dexFile: DexFile): DexType {
+        return getType(dexFile).asDexType()
+    }
+
     fun getSuperClassName(dexFile: DexFile): String? {
-        return getSuperClassType(dexFile)?.asDexType()?.toInternalClassName()
+        return getSuperClassDexType(dexFile)?.toInternalClassName()
     }
 
     fun getSuperClassType(dexFile: DexFile): String? {
         return dexFile.getTypeNullable(superClassIndex)
+    }
+
+    fun getSuperClassDexType(dexFile: DexFile): DexType? {
+        return getSuperClassType(dexFile)?.asDexType()
     }
 
     fun getSourceFile(dexFile: DexFile): String? {

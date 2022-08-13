@@ -16,11 +16,11 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.util.externalClassNameFromInternalClassName
 import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
+import com.github.netomi.bat.util.asInternalJavaClassName
 import java.io.DataInput
 import java.io.IOException
 import java.util.*
@@ -55,7 +55,7 @@ class ClassFile internal constructor() {
         get() = cp.getClassName(thisClassIndex)
 
     val externalClassName: String
-        get() = externalClassNameFromInternalClassName(className)
+        get() = className.asInternalJavaClassName().toExternalClassName()
 
     val superClassName: String
         get() = cp.getClassName(superClassIndex)

@@ -86,6 +86,10 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
         return getReturnTypeTypeID(dexFile).getType(dexFile)
     }
 
+    fun getReturnDexType(dexFile: DexFile): DexType {
+        return getReturnTypeTypeID(dexFile).getDexType(dexFile)
+    }
+
     override val isEmpty: Boolean
         get() = shortyIndex == NO_INDEX
 

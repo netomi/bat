@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.*
 import java.util.*
@@ -51,6 +52,10 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
         return getClassTypeID(dexFile).getType(dexFile)
     }
 
+    fun getClassDexType(dexFile: DexFile): DexType {
+        return getClassTypeID(dexFile).getDexType(dexFile)
+    }
+
     fun getProtoID(dexFile: DexFile): ProtoID {
         return dexFile.getProtoID(protoIndex)
     }
@@ -63,8 +68,16 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
         return getProtoID(dexFile).getParameterTypes(dexFile)
     }
 
+    fun getParameterDexTypes(dexFile: DexFile): List<DexType> {
+        return getProtoID(dexFile).getParameterDexTypes(dexFile)
+    }
+
     fun getReturnType(dexFile: DexFile): String {
         return getProtoID(dexFile).getReturnType(dexFile)
+    }
+
+    fun getReturnDexType(dexFile: DexFile): DexType {
+        return getProtoID(dexFile).getReturnDexType(dexFile)
     }
 
     fun getShortyType(dexFile: DexFile): String {
@@ -72,9 +85,14 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
     }
 
     fun getFullExternalMethodDescriptor(dexFile: DexFile): String {
-        return "%s.%s%s".format(getClassType(dexFile).asDexType().toExternalClassName(),
-                                getName(dexFile),
-                                getProtoID(dexFile).getDescriptor(dexFile))
+        return buildString {
+            append(getReturnDexType(dexFile).toExternalType())
+            append(' ')
+            append(getClassDexType(dexFile).toExternalClassName())
+            append('.')
+            append(getName(dexFile))
+            append(getParameterDexTypes(dexFile).joinToString(separator = ",", prefix = "(", postfix = ")") { it.toExternalType() })
+        }
     }
 
     override val isEmpty: Boolean

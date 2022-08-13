@@ -80,6 +80,31 @@ open class JavaType protected constructor(val type: String) {
         return toInternalClassName().replace("/", ".")
     }
 
+    fun toExternalType(): String {
+        return if (isClassType) {
+            toExternalClassName()
+        } else if (isArrayType) {
+            val dimension = type.takeWhile { ch -> ch == '[' }.count()
+            val arrayType = type.substring(dimension)
+            var result    = arrayType.asJavaType().toExternalType()
+            result       += "[]".repeat(dimension)
+            result
+        } else {
+            when (type) {
+                INT_TYPE     -> "int"
+                LONG_TYPE    -> "long"
+                SHORT_TYPE   -> "short"
+                BYTE_TYPE    -> "byte"
+                CHAR_TYPE    -> "char"
+                FLOAT_TYPE   -> "float"
+                DOUBLE_TYPE  -> "double"
+                BOOLEAN_TYPE -> "boolean"
+                VOID_TYPE    -> "void"
+                else -> type
+            }
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is JavaType) return false

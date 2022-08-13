@@ -17,6 +17,8 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 
@@ -36,6 +38,10 @@ class TypeID private constructor(descriptorIndex: Int = NO_INDEX) : DataItem() {
 
     fun getType(dexFile: DexFile): String {
         return dexFile.getStringID(descriptorIndex).stringValue
+    }
+
+    fun getDexType(dexFile: DexFile): DexType {
+        return getType(dexFile).asDexType()
     }
 
     override val isEmpty: Boolean
