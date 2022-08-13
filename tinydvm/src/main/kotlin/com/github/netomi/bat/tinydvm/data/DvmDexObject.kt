@@ -37,10 +37,12 @@ class DvmDexObject constructor(private val clazz:  DvmDexClass,
     }
 
     fun getValue(field: EncodedField): DvmValue {
+        require(!field.isStatic) { "trying to get a value from static field '$field' via a DvmDexObject" }
         return instanceFields[field] ?: throw RuntimeException("field $field has no value assigned")
     }
 
     fun setValue(field: EncodedField, value: DvmValue) {
+        require(!field.isStatic) { "trying to set a value for a static field '$field' via a DvmDexObject" }
         instanceFields[field] = value
     }
 

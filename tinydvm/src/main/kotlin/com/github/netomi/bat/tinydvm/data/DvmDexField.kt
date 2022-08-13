@@ -30,7 +30,8 @@ class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
         return if (field.isStatic) {
             dvmDexClass.getValueOfStaticField(field)
         } else {
-            TODO("Not yet implemented")
+            require(obj is DvmDexObject)
+            return obj.getValue(field)
         }
     }
 
@@ -38,7 +39,8 @@ class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
         if (field.isStatic) {
             dvmDexClass.setValueForStaticField(field, value)
         } else {
-            TODO("Not yet implemented")
+            require(obj is DvmDexObject)
+            obj.setValue(field, value)
         }
     }
 
