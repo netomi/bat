@@ -58,7 +58,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                                                                                                       fieldID.getName(dexFile),
                                                                                                       fieldID.getType(dexFile)))
 
-        val javaFieldType = field.type.asJavaType()
+        val javaFieldType = field.type.asJvmType()
 
         val getStaticField = { supportedTypes: Array<String> ->
             if (!supportedTypes.contains(field.type)) {
@@ -67,7 +67,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             }
 
             val r = instruction.registers[0]
-            val result = field.get(null)
+            val result = field.get(dvm, null)
 
             registers[r] = result
             if (instruction.opCode.targetsWideRegister) {
@@ -105,7 +105,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                         .format(offset, r, dvmValue.type, supportedTypes.joinToString(separator = "|")))
             }
 
-            field.set(null, dvmValue)
+            field.set(dvm, null, dvmValue)
         }
 
         when (instruction.opCode) {
@@ -121,7 +121,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                     throw VerifyException("[0x%x] get insn has reference type but expected type '%d'".format(offset, field.type))
                 }
                 val r = instruction.registers[0]
-                registers[r] = field.get(null)
+                registers[r] = field.get(dvm, null)
             }
 
             SPUT         -> setPrimitiveStaticField(arrayOf(INT_TYPE, FLOAT_TYPE))
@@ -146,7 +146,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                             .format(offset, r, dvmValue.type, field.type))
                 }
 
-                field.set(null, dvmValue)
+                field.set(dvm, null, dvmValue)
             }
 
             else -> {
@@ -160,7 +160,8 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             CONST_STRING,
             CONST_STRING_JUMBO -> {
                 val rA = instruction.registers[0]
-                registers[rA] = DvmReferenceValue.of(DvmNativeObject.of(instruction.getString(dexFile), JAVA_LANG_STRING_TYPE))
+
+                registers[rA] = DvmReferenceValue.of(DvmNativeObject.of(instruction.getString(dexFile), dvm.getClass(JAVA_LANG_STRING_TYPE)))
             }
 
             else -> {
@@ -178,7 +179,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                 val proto = methodID.getProtoID(dexFile)
                 val parameterTypes = proto.getParameterTypes(dexFile)
 
-                val parameterTypeClasses = parameterTypes.map { it.asJavaType() }
+                val parameterTypeClasses = parameterTypes.map { it.asJvmType() }
                     .map {
                         if (it.isClassType) {
                             Class.forName(it.toExternalClassName())
@@ -197,7 +198,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                             TODO("handle array types")
                         }
                     }.toList()
-                val externalClassName = classType.asJavaType().toExternalClassName()
+                val externalClassName = classType.asJvmType().toExternalClassName()
                 val clazz = Class.forName(externalClassName)
 
                 val m = clazz.getMethod(methodName, *parameterTypeClasses.toTypedArray())

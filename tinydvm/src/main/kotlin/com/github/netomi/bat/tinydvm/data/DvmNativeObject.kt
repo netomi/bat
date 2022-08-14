@@ -17,12 +17,13 @@
 package com.github.netomi.bat.tinydvm.data
 
 class DvmNativeObject private constructor(private var _obj:  Any? = null,
-                                                      _type: String): DvmObject() {
+                                          private val clazz: DvmNativeClass): DvmObject() {
 
     override val obj: Any?
         get() = _obj
 
-    override val type: String = _type
+    override val type: String
+        get() = clazz.type
 
     override val isInitialized: Boolean
         get() = obj != null
@@ -33,11 +34,12 @@ class DvmNativeObject private constructor(private var _obj:  Any? = null,
 
     companion object {
         fun newInstanceOf(clazz: DvmNativeClass): DvmNativeObject {
-            return DvmNativeObject(_type = clazz.type)
+            return DvmNativeObject(clazz = clazz)
         }
 
-        fun of(obj: Any, type: String): DvmNativeObject {
-            return DvmNativeObject(obj, type)
+        fun of(obj: Any, clazz: DvmClass): DvmNativeObject {
+            require(clazz is DvmNativeClass)
+            return DvmNativeObject(obj, clazz)
         }
     }
 }

@@ -71,7 +71,7 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
 
         classDef.staticFields.forEach { field ->
             val initialValue = field.staticValue(dexFile) ?: field.getDexType(dexFile).getDefaultEncodedValueForType()
-            staticFields[field] = initialValue.toDVMValue(dexFile, field.getType(dexFile))
+            staticFields[field] = initialValue.toDVMValue(dvm, dexFile, field.getType(dexFile))
         }
 
 

@@ -17,7 +17,7 @@
 package com.github.netomi.bat.tinydvm.data
 
 import com.github.netomi.bat.util.asExternalJavaClassName
-import com.github.netomi.bat.util.asJavaType
+import com.github.netomi.bat.util.asJvmType
 
 class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClass() {
 
@@ -41,7 +41,7 @@ class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClas
 
     companion object {
         fun of(type: String): DvmNativeClass {
-            val externalClassName = type.asJavaType().toExternalClassName()
+            val externalClassName = type.asJvmType().toExternalClassName()
             return DvmNativeClass(Class.forName(externalClassName) as Class<Any>)
         }
     }

@@ -17,6 +17,7 @@
 package com.github.netomi.bat.tinydvm.data
 
 import com.github.netomi.bat.dexfile.EncodedField
+import com.github.netomi.bat.tinydvm.Dvm
 
 class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
                                       private val field:       EncodedField): DvmField() {
@@ -26,7 +27,7 @@ class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
     override val name = field.getName(dexFile)
     override val type = field.getType(dexFile)
 
-    override fun get(obj: Any?): DvmValue {
+    override fun get(dvm: Dvm, obj: Any?): DvmValue {
         return if (field.isStatic) {
             dvmDexClass.getValueOfStaticField(field)
         } else {
@@ -35,7 +36,7 @@ class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
         }
     }
 
-    override fun set(obj: Any?, value: DvmValue) {
+    override fun set(dvm: Dvm, obj: Any?, value: DvmValue) {
         if (field.isStatic) {
             dvmDexClass.setValueForStaticField(field, value)
         } else {

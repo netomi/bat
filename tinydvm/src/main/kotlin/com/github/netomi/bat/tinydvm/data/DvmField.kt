@@ -16,10 +16,12 @@
 
 package com.github.netomi.bat.tinydvm.data
 
+import com.github.netomi.bat.tinydvm.Dvm
+
 sealed class DvmField {
     abstract val name: String
     abstract val type: String
 
-    abstract fun get(obj: Any?): DvmValue
-    abstract fun set(obj: Any?, value: DvmValue)
+    abstract fun get(dvm: Dvm, obj: Any?): DvmValue
+    abstract fun set(dvm: Dvm, obj: Any?, value: DvmValue)
 }

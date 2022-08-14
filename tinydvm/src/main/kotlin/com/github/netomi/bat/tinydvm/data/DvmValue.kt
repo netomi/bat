@@ -19,6 +19,7 @@ package com.github.netomi.bat.tinydvm.data
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
+import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.util.*
 import com.google.common.base.Objects
 
@@ -47,7 +48,7 @@ sealed class DvmValue {
             return DvmUnitValue
         }
 
-        fun ofNativeValue(obj: Any?, type: String): DvmValue {
+        fun ofNativeValue(dvm: Dvm, obj: Any?, type: String): DvmValue {
             if (obj == null) {
                 return DvmNullReferenceValue.of(type)
             }
@@ -64,19 +65,19 @@ sealed class DvmValue {
                 java.lang.Double.TYPE  -> DvmPrimitiveValue.of((obj as Number).toDouble())
                 java.lang.Boolean.TYPE -> DvmPrimitiveValue.of(obj as Boolean)
 
-                else                   -> DvmReferenceValue.of(DvmNativeObject.of(obj, type))
+                else                   -> DvmReferenceValue.of(DvmNativeObject.of(obj, dvm.getClass(type)))
             }
         }
     }
 }
 
-internal fun EncodedValue.toDVMValue(dexFile: DexFile, type: String): DvmValue {
-    val converter = EncodedValueConverter(type)
+internal fun EncodedValue.toDVMValue(dvm: Dvm, dexFile: DexFile, type: String): DvmValue {
+    val converter = EncodedValueConverter(dvm, type)
     accept(dexFile, converter)
     return converter.dvmValue
 }
 
-private class EncodedValueConverter constructor(private val type: String): EncodedValueVisitor {
+private class EncodedValueConverter constructor(private val dvm: Dvm, private val type: String): EncodedValueVisitor {
 
     lateinit var dvmValue: DvmValue
 
@@ -119,6 +120,6 @@ private class EncodedValueConverter constructor(private val type: String): Encod
     }
 
     override fun visitStringValue(dexFile: DexFile, value: EncodedStringValue) {
-        dvmValue = DvmReferenceValue.of(DvmNativeObject.of(value.getStringValue(dexFile), JAVA_LANG_STRING_TYPE))
+        dvmValue = DvmReferenceValue.of(DvmNativeObject.of(value.getStringValue(dexFile), dvm.getClass(JAVA_LANG_STRING_TYPE)))
     }
 }
