@@ -25,7 +25,7 @@ import com.github.netomi.bat.classfile.attribute.annotations.Annotation
 import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.asJavaType
+import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
 import java.io.OutputStream
@@ -170,7 +170,7 @@ class ClassFilePrinter :
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
         val externalModifiers = field.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
-        val externalType = field.descriptor(classFile).asJavaType().toExternalType()
+        val externalType = field.descriptor(classFile).asJvmType().toExternalType()
         printer.println("%s %s %s;".format(externalModifiers, externalType, field.name(classFile)))
 
         printer.levelUp()
@@ -201,7 +201,7 @@ class ClassFilePrinter :
             index, annotation ->
                 printer.println("%2d: #%d()".format(index, annotation.typeIndex))
                 printer.levelUp()
-                printer.println(annotation.type(classFile.cp).asJavaType().toExternalType())
+                printer.println(annotation.type(classFile.cp).asJvmType().toExternalType())
                 printer.levelDown()
         }
 
@@ -218,7 +218,7 @@ class ClassFilePrinter :
         attribute.annotations.forEachIndexed { index, annotation ->
             printer.println("%2d: #%d()".format(index, annotation.typeIndex))
             printer.levelUp()
-            printer.println(annotation.type(cp).asJavaType().toExternalType())
+            printer.println(annotation.type(cp).asJvmType().toExternalType())
 
             printer.levelUp()
             annotation.elementValues.forEachIndexed { _, (elementName, elementValue) ->

@@ -33,8 +33,8 @@ const val VOID_TYPE    = "V"
 
 // utility functions for java types
 
-fun String.asJavaType(): JavaType {
-    return JavaType.of(this)
+fun String.asJvmType(): JvmType {
+    return JvmType.of(this)
 }
 
 fun String.asInternalJavaClassName(): JavaClassName {
@@ -45,7 +45,7 @@ fun String.asExternalJavaClassName(): JavaClassName {
     return JavaClassName.ofExternal(this)
 }
 
-open class JavaType protected constructor(val type: String) {
+open class JvmType protected constructor(val type: String) {
 
     val isClassType: Boolean
         get() = type.startsWith("L") && type.endsWith(";")
@@ -86,7 +86,7 @@ open class JavaType protected constructor(val type: String) {
         } else if (isArrayType) {
             val dimension = type.takeWhile { ch -> ch == '[' }.count()
             val arrayType = type.substring(dimension)
-            var result    = arrayType.asJavaType().toExternalType()
+            var result    = arrayType.asJvmType().toExternalType()
             result       += "[]".repeat(dimension)
             result
         } else {
@@ -107,7 +107,7 @@ open class JavaType protected constructor(val type: String) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is JavaType) return false
+        if (other !is JvmType) return false
 
         if (type != other.type) return false
 
@@ -123,8 +123,8 @@ open class JavaType protected constructor(val type: String) {
     }
 
     companion object {
-        fun of(type: String): JavaType {
-            return JavaType(type)
+        fun of(type: String): JvmType {
+            return JvmType(type)
         }
     }
 }

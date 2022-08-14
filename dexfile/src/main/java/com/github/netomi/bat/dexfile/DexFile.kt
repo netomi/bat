@@ -16,9 +16,9 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.instruction.DexOpCode
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.asInternalJavaClassName
-import com.github.netomi.bat.util.asJavaType
 import com.github.netomi.bat.util.parallelForEachIndexed
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -248,7 +248,7 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     internal fun addClassDef(classDef: ClassDef): Int {
         val classType = classDef.getType(this)
         if (getClassDefByType(classType) != null) {
-            val className = classType.asJavaType().toInternalClassName()
+            val className = classType.asDexType().toInternalClassName()
             throw IllegalArgumentException("class with name '$className' already exists")
         }
 

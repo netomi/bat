@@ -23,7 +23,7 @@ fun String.asDexType(): DexType {
     return DexType.of(this)
 }
 
-class DexType private constructor(type: String): JavaType(type) {
+class DexType private constructor(type: String): JvmType(type) {
 
     fun toShortyFormat(): String {
         return if (isClassType || isArrayType) "L" else type
