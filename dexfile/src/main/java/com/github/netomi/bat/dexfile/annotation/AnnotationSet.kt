@@ -97,8 +97,8 @@ class AnnotationSet
         }
     }
 
-    fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationVisitor) {
-        annotations.forEachIndexed { index, annotation -> annotation.accept(dexFile, classDef, this, index, visitor) }
+    fun accept(dexFile: DexFile, visitor: AnnotationVisitor) {
+        annotations.forEach { annotation -> annotation.accept(dexFile, visitor) }
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile.annotation
 
-import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DataItem
 import com.github.netomi.bat.dexfile.DexContent
 import com.github.netomi.bat.dexfile.DexFile
@@ -61,8 +60,8 @@ class AnnotationSetRef private constructor(annotationSet: AnnotationSet = Annota
         output.writeInt(annotationsOffset)
     }
 
-    fun accept(dexFile: DexFile, classDef: ClassDef, visitor: AnnotationVisitor) {
-        annotationSet.accept(dexFile, classDef, visitor)
+    fun accept(dexFile: DexFile, visitor: AnnotationVisitor) {
+        annotationSet.accept(dexFile, visitor)
     }
 
     override fun dataItemsAccept(dexFile: DexFile, visitor: DataItemVisitor) {

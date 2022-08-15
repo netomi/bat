@@ -58,8 +58,8 @@ class Annotation private constructor(visibility:      AnnotationVisibility   = A
         annotationValue.writeValue(output, 0)
     }
 
-    fun accept(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, visitor: AnnotationVisitor) {
-        visitor.visitAnnotation(dexFile, classDef, annotationSet, index, this)
+    fun accept(dexFile: DexFile, visitor: AnnotationVisitor) {
+        visitor.visitAnnotation(dexFile, this)
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {

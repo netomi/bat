@@ -80,10 +80,16 @@ class AnnotationSetRefList
         }
     }
 
-    fun accept(dexFile: DexFile, classDef: ClassDef, index: Int, visitor: AnnotationVisitor) {
+    fun accept(dexFile: DexFile, visitor: AnnotationVisitor) {
+        for (annotationSetRef in _annotationSetRefs) {
+            annotationSetRef.accept(dexFile, visitor)
+        }
+    }
+
+    fun accept(dexFile: DexFile, index: Int, visitor: AnnotationVisitor) {
         if (index in _annotationSetRefs.indices) {
             val annotationSetRef = _annotationSetRefs[index]
-            annotationSetRef.accept(dexFile, classDef, visitor)
+            annotationSetRef.accept(dexFile, visitor)
         }
     }
 

@@ -42,7 +42,7 @@ internal class AnnotationPrinter(private val printer:      IndentingPrinter,
             printer.println()
             printer.println()
             printer.println("# annotations")
-            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
+            annotationSet.accept(dexFile, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
         }
     }
 
@@ -50,14 +50,14 @@ internal class AnnotationPrinter(private val printer:      IndentingPrinter,
         val annotationCount = annotationSet.annotationCount
         if (annotationCount > 0) {
             printer.levelUp()
-            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
+            annotationSet.accept(dexFile, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printer.levelDown()
             printer.println(".end field")
         }
     }
 
     override fun visitMethodAnnotationSet(dexFile: DexFile, classDef: ClassDef, methodAnnotation: MethodAnnotation, annotationSet: AnnotationSet) {
-        annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() } )
+        annotationSet.accept(dexFile, this.joinedByAnnotationConsumer { _, _ -> printer.println() } )
     }
 
     override fun visitParameterAnnotationSet(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, parameterIndex: Int, annotationSet: AnnotationSet) {
@@ -66,13 +66,13 @@ internal class AnnotationPrinter(private val printer:      IndentingPrinter,
                 printer.println(".param p%d    # %s".format(currentRegisterIndex, currentParameterType))
             }
             printer.levelUp()
-            annotationSet.accept(dexFile, classDef, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
+            annotationSet.accept(dexFile, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printer.levelDown()
             printer.println(".end param")
         }
     }
 
-    override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
+    override fun visitAnnotation(dexFile: DexFile, annotation: Annotation) {
         printer.print(".annotation " + annotation.visibility.simpleName + " ")
         val annotationValue = annotation.annotationValue
         printer.println(annotationValue.getType(dexFile))

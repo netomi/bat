@@ -20,7 +20,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.annotation.*
 
 fun allAnnotations(visitor: AnnotationVisitor): AnnotationSetVisitor {
-    return AnnotationSetVisitor { dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet -> annotationSet.accept(dexFile, classDef, visitor) }
+    return AnnotationSetVisitor { dexFile: DexFile, _: ClassDef, annotationSet: AnnotationSet -> annotationSet.accept(dexFile, visitor) }
 }
 
 fun interface AnnotationSetVisitor {

@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile.annotation.visitor
 
 import com.github.netomi.bat.dexfile.ClassDef
+import com.github.netomi.bat.dexfile.DataItem
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.AnnotationSet
@@ -32,12 +33,12 @@ fun multiAnnotationVisitorOf(visitor: AnnotationVisitor, vararg visitors: Annota
 }
 
 fun interface AnnotationVisitor {
-    fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation)
+    fun visitAnnotation(dexFile: DexFile, annotation: Annotation)
 
     fun joinedByAnnotationConsumer(consumer: BiConsumer<DexFile, Annotation>): AnnotationVisitor {
         val joiner: AnnotationVisitor = object : AnnotationVisitor {
             private var firstVisited = false
-            override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
+            override fun visitAnnotation(dexFile: DexFile, annotation: Annotation) {
                 if (firstVisited) {
                     consumer.accept(dexFile, annotation)
                 } else {
@@ -50,7 +51,7 @@ fun interface AnnotationVisitor {
 }
 
 class AnnotationCollector: AbstractCollector<Annotation>(), AnnotationVisitor {
-    override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
+    override fun visitAnnotation(dexFile: DexFile, annotation: Annotation) {
         addItem(annotation)
     }
 }
@@ -59,9 +60,9 @@ private class MultiAnnotationVisitor constructor(       visitor:       Annotatio
                                                  vararg otherVisitors: AnnotationVisitor)
     : AbstractMultiVisitor<AnnotationVisitor>(visitor, *otherVisitors), AnnotationVisitor {
 
-    override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
+    override fun visitAnnotation(dexFile: DexFile, annotation: Annotation) {
         for (visitor in visitors) {
-            visitor.visitAnnotation(dexFile, classDef, annotationSet, index, annotation)
+            visitor.visitAnnotation(dexFile, annotation)
         }
     }
 }

@@ -222,20 +222,20 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
     override fun visitClassAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {
         if (!annotationSet.isEmpty) {
             printer.println("Annotations on class")
-            annotationSet.accept(dexFile, classDef, this)
+            annotationSet.accept(dexFile, this)
         }
     }
 
     override fun visitFieldAnnotationSet(dexFile: DexFile, classDef: ClassDef, fieldAnnotation: FieldAnnotation, annotationSet: AnnotationSet) {
         val fieldID = fieldAnnotation.getFieldID(dexFile)
         printer.println("Annotations on field #" + fieldAnnotation.fieldIndex + " '" + fieldID.getName(dexFile) + "'")
-        annotationSet.accept(dexFile, classDef, this)
+        annotationSet.accept(dexFile, this)
     }
 
     override fun visitMethodAnnotationSet(dexFile: DexFile, classDef: ClassDef, methodAnnotation: MethodAnnotation, annotationSet: AnnotationSet) {
         val methodID = methodAnnotation.getMethodID(dexFile)
         printer.println("Annotations on method #" + methodAnnotation.methodIndex + " '" + methodID.getName(dexFile) + "'")
-        annotationSet.accept(dexFile, classDef, this)
+        annotationSet.accept(dexFile, this)
     }
 
     override fun visitParameterAnnotationSetRefList(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
@@ -244,14 +244,14 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         for (i in 0 until annotationSetRefList.annotationSetRefCount) {
             printer.println("#$i")
             val annotationSetRef = annotationSetRefList.getAnnotationSetRef(i)
-            annotationSetRef.accept(dexFile, classDef, this)
+            annotationSetRef.accept(dexFile, this)
             if (annotationSetRef.annotationSet.annotationCount == 0) {
                 printer.println("   empty-annotation-set")
             }
         }
     }
 
-    override fun visitAnnotation(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet, index: Int, annotation: Annotation) {
+    override fun visitAnnotation(dexFile: DexFile, annotation: Annotation) {
         printer.print("  VISIBILITY_${annotation.visibility} ")
         val annotationValue = annotation.annotationValue
         annotationValue.accept(dexFile, encodedValuePrinter)
