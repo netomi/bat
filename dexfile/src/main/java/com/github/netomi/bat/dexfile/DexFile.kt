@@ -321,11 +321,11 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     }
 
     fun classDefsAccept(visitor: ClassDefVisitor) {
-        classDefs.forEach { classDef -> visitor.visitClassDef(this, classDef) }
+        classDefs.forEach { classDef -> classDef.accept(this, visitor) }
     }
 
     fun classDefsAcceptIndexed(visitor: ClassDefVisitorIndexed) {
-        classDefs.forEachIndexed { index, classDef -> visitor.visitClassDef(this, index, classDef) }
+        classDefs.forEachIndexed { index, classDef -> classDef.accept(this, index, visitor) }
     }
 
     fun parallelClassDefsAccept(coroutineContext: CoroutineContext = Dispatchers.Default, visitorSupplier: () -> ClassDefVisitor) {
