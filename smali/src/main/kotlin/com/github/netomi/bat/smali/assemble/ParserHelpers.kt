@@ -26,6 +26,15 @@ import com.github.netomi.bat.util.unescapeJavaString
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
 
+internal fun parserError(ctx: ParserRuleContext, cause: Throwable): Nothing {
+    val lineNumber = ctx.getStart().line
+    val column     = ctx.getStart().charPositionInLine
+
+    val list = mutableListOf<String>()
+    fillParseContextText(ctx, list)
+    throw SmaliParseException("${cause.message} at line: $lineNumber col: $column -> ${list.joinToString(" ")}")
+}
+
 internal fun parserError(ctx: ParserRuleContext, message: String): Nothing {
     val lineNumber = ctx.getStart().line
     val column     = ctx.getStart().charPositionInLine

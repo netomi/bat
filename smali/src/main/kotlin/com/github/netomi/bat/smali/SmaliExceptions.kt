@@ -16,7 +16,10 @@
 
 package com.github.netomi.bat.smali
 
-class SmaliAssembleException constructor(message: String, cause: Throwable): RuntimeException(message, cause)
+class SmaliAssembleException: RuntimeException {
+    constructor(message: String): super(message)
+    constructor(message: String, cause: Throwable): super(message, cause)
+}
 
 class SmaliParseException: RuntimeException {
     constructor(message: String): super(message)

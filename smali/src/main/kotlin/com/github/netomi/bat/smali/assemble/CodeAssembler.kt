@@ -59,138 +59,142 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
 
         // in the second pass, we parse the instructions.
         iCtx.forEach { ctx ->
-            val t = ctx.getChild(0) as ParserRuleContext
-            val insn: DexInstruction? = when (t.ruleIndex) {
-                RULE_sLabel -> {
-                    val c = t as SLabelContext
-                    val label = c.label.text
-                    // ignore payload labels as they are not needed anymore
-                    if (!payloadMapping.containsKey(label)) {
-                        codeEditor.prependLabel(0, c.label.text)
-                    }
-                    null
-                }
-
-                RULE_fline -> {
-                    val c = t as FlineContext
-                    val lineNumber = parseLong(c.line.text).toInt()
-
-                    if (lineNumber < 0 && !lenientMode) {
-                        parserError(ctx, "negative line number")
+            try {
+                val t = ctx.getChild(0) as ParserRuleContext
+                val insn: DexInstruction? = when (t.ruleIndex) {
+                    RULE_sLabel -> {
+                        val c = t as SLabelContext
+                        val label = c.label.text
+                        // ignore payload labels as they are not needed anymore
+                        if (!payloadMapping.containsKey(label)) {
+                            codeEditor.prependLabel(0, c.label.text)
+                        }
+                        null
                     }
 
-                    debugSequenceComposer.advanceLine(codeOffset, lineNumber)
-                    null
+                    RULE_fline -> {
+                        val c = t as FlineContext
+                        val lineNumber = parseLong(c.line.text).toInt()
+
+                        if (lineNumber < 0 && !lenientMode) {
+                            parserError(ctx, "negative line number")
+                        }
+
+                        debugSequenceComposer.advanceLine(codeOffset, lineNumber)
+                        null
+                    }
+
+                    RULE_fprologue -> {
+                        debugSequenceComposer.prologueEnd(codeOffset)
+                        null
+                    }
+
+                    RULE_fepilogue -> {
+                        debugSequenceComposer.epilogueStart(codeOffset)
+                        null
+                    }
+
+                    RULE_fstartlocal -> {
+                        val c = t as FstartlocalContext
+
+                        val register = registerInfo.registerNumber(c.r.text)
+
+                        val name = c.name.text.removeSurrounding("\"").ifEmpty { null }
+                        val type = c.type?.text
+                        val signature = c.sig?.text?.removeSurrounding("\"")
+
+                        debugSequenceComposer.startLocal(codeOffset, register, name, type, signature)
+                        null
+                    }
+
+                    RULE_frestart -> {
+                        val c = t as FrestartContext
+                        val register = registerInfo.registerNumber(c.r.text)
+                        debugSequenceComposer.restartLocal(codeOffset, register)
+                        null
+                    }
+
+                    RULE_fendlocal -> {
+                        val c = t as FendlocalContext
+                        val register = registerInfo.registerNumber(c.r.text)
+                        debugSequenceComposer.endLocal(codeOffset, register)
+                        null
+                    }
+
+                    RULE_fcatch -> {
+                        tryElements.add(instructionAssembler.parseCatchDirective(t as FcatchContext))
+                        null
+                    }
+
+                    RULE_fcatchall -> {
+                        tryElements.add(instructionAssembler.parseCatchAllDirective(t as FcatchallContext))
+                        null
+                    }
+
+                    RULE_farraydata -> {
+                        codeOffset = alignOffsetForPayload(codeOffset)
+                        instructionAssembler.parseArrayDataPayload(t as FarraydataContext)
+                    }
+
+                    RULE_fsparseswitch -> {
+                        codeOffset = alignOffsetForPayload(codeOffset)
+                        instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext)
+                    }
+
+                    RULE_fpackedswitch -> {
+                        codeOffset = alignOffsetForPayload(codeOffset)
+                        instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
+                    }
+
+                    RULE_f10x -> {
+                        val c = t as F10xContext
+
+                        val mnemonic = c.op.text
+                        val opcode = DexOpCode[mnemonic]
+                        opcode.createInstruction()
+                    }
+
+                    RULE_f12x_conversion -> instructionAssembler.parseConversionInstructionF12x(t as F12x_conversionContext)
+                    RULE_f11x_basic -> instructionAssembler.parseBasicInstructionF11x(t as F11x_basicContext)
+                    RULE_fx0t_branch -> instructionAssembler.parseBranchInstructionFx0t(t as Fx0t_branchContext)
+                    RULE_f21t_branch -> instructionAssembler.parseBranchInstructionF21t(t as F21t_branchContext)
+                    RULE_f22t_branch -> instructionAssembler.parseBranchInstructionF22t(t as F22t_branchContext)
+                    RULE_f21c_field -> instructionAssembler.parseFieldInstructionF21c(t as F21c_fieldContext)
+                    RULE_f22c_field -> instructionAssembler.parseFieldInstructionF22c(t as F22c_fieldContext)
+                    RULE_fconst_int -> instructionAssembler.parseLiteralInstructionInteger(t as Fconst_intContext)
+                    RULE_fconst_string -> instructionAssembler.parseLiteralInstructionString(t as Fconst_stringContext)
+                    RULE_fconst_type -> instructionAssembler.parseLiteralInstructionType(t as Fconst_typeContext)
+                    RULE_f12x_arithmetic -> instructionAssembler.parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
+                    RULE_f23x_arithmetic -> instructionAssembler.parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
+                    RULE_f22sb_arithmetic -> instructionAssembler.parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
+                    RULE_fx2x_move -> instructionAssembler.parseBasicInstructionMoveFx2x(t as Fx2x_moveContext)
+                    RULE_f12x_array -> instructionAssembler.parseArrayInstructionF12x(t as F12x_arrayContext)
+                    RULE_ft2c_type -> instructionAssembler.parseTypeInstructionFt2c(t as Ft2c_typeContext)
+                    RULE_f23x_compare -> instructionAssembler.parseBasicInstructionCompareF23x(t as F23x_compareContext)
+                    RULE_f23x_array -> instructionAssembler.parseArrayInstructionF23x(t as F23x_arrayContext)
+                    RULE_f35c_method -> instructionAssembler.parseMethodInstructionF35c(t as F35c_methodContext)
+                    RULE_f3rc_method -> instructionAssembler.parseMethodInstructionF3rc(t as F3rc_methodContext)
+                    RULE_f35c_array -> instructionAssembler.parseArrayTypeInstructionF35c(t as F35c_arrayContext)
+                    RULE_f3rc_array -> instructionAssembler.parseArrayTypeInstructionF3rc(t as F3rc_arrayContext)
+                    RULE_f45cc_methodproto -> instructionAssembler.parseMethodProtoInstructionF45cc(t as F45cc_methodprotoContext)
+                    RULE_f4rcc_methodproto -> instructionAssembler.parseMethodProtoInstructionF4rcc(t as F4rcc_methodprotoContext)
+                    RULE_f35c_custom -> instructionAssembler.parseCallSiteInstructionF35c(t as F35c_customContext)
+                    RULE_f3rc_custom -> instructionAssembler.parseCallSiteInstructionF3rc(t as F3rc_customContext)
+                    RULE_f21c_const_handle -> instructionAssembler.parseMethodHandleInstructionF21c(t as F21c_const_handleContext)
+                    RULE_f21c_const_type -> instructionAssembler.parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
+                    RULE_f31t_payload -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext, payloadMapping)
+
+                    else -> null
                 }
 
-                RULE_fprologue  -> {
-                    debugSequenceComposer.prologueEnd(codeOffset)
-                    null
+                if (insn != null) {
+                    codeOffset += insn.length
+                    if (insn !is Payload) {
+                        codeEditor.prependInstruction(0, insn)
+                    }
                 }
-
-                RULE_fepilogue  -> {
-                    debugSequenceComposer.epilogueStart(codeOffset)
-                    null
-                }
-
-                RULE_fstartlocal -> {
-                    val c = t as FstartlocalContext
-
-                    val register = registerInfo.registerNumber(c.r.text)
-
-                    val name      = c.name.text.removeSurrounding("\"").ifEmpty { null }
-                    val type      = c.type?.text
-                    val signature = c.sig?.text?.removeSurrounding("\"")
-
-                    debugSequenceComposer.startLocal(codeOffset, register, name, type, signature)
-                    null
-                }
-
-                RULE_frestart -> {
-                    val c = t as FrestartContext
-                    val register = registerInfo.registerNumber(c.r.text)
-                    debugSequenceComposer.restartLocal(codeOffset, register)
-                    null
-                }
-
-                RULE_fendlocal -> {
-                    val c = t as FendlocalContext
-                    val register = registerInfo.registerNumber(c.r.text)
-                    debugSequenceComposer.endLocal(codeOffset, register)
-                    null
-                }
-
-                RULE_fcatch -> {
-                    tryElements.add(instructionAssembler.parseCatchDirective(t as FcatchContext))
-                    null
-                }
-
-                RULE_fcatchall -> {
-                    tryElements.add(instructionAssembler.parseCatchAllDirective(t as FcatchallContext))
-                    null
-                }
-
-                RULE_farraydata -> {
-                    codeOffset = alignOffsetForPayload(codeOffset)
-                    instructionAssembler.parseArrayDataPayload(t as FarraydataContext)
-                }
-
-                RULE_fsparseswitch -> {
-                    codeOffset = alignOffsetForPayload(codeOffset)
-                    instructionAssembler.parseSparseSwitchPayload(t as FsparseswitchContext)
-                }
-
-                RULE_fpackedswitch -> {
-                    codeOffset = alignOffsetForPayload(codeOffset)
-                    instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
-                }
-
-                RULE_f10x -> {
-                    val c = t as F10xContext
-
-                    val mnemonic = c.op.text
-                    val opcode = DexOpCode[mnemonic]
-                    opcode.createInstruction()
-                }
-
-                RULE_f12x_conversion   -> instructionAssembler.parseConversionInstructionF12x(t as F12x_conversionContext)
-                RULE_f11x_basic        -> instructionAssembler.parseBasicInstructionF11x(t as F11x_basicContext)
-                RULE_fx0t_branch       -> instructionAssembler.parseBranchInstructionFx0t(t as Fx0t_branchContext)
-                RULE_f21t_branch       -> instructionAssembler.parseBranchInstructionF21t(t as F21t_branchContext)
-                RULE_f22t_branch       -> instructionAssembler.parseBranchInstructionF22t(t as F22t_branchContext)
-                RULE_f21c_field        -> instructionAssembler.parseFieldInstructionF21c(t as F21c_fieldContext)
-                RULE_f22c_field        -> instructionAssembler.parseFieldInstructionF22c(t as F22c_fieldContext)
-                RULE_fconst_int        -> instructionAssembler.parseLiteralInstructionInteger(t as Fconst_intContext)
-                RULE_fconst_string     -> instructionAssembler.parseLiteralInstructionString(t as Fconst_stringContext)
-                RULE_fconst_type       -> instructionAssembler.parseLiteralInstructionType(t as Fconst_typeContext)
-                RULE_f12x_arithmetic   -> instructionAssembler.parseArithmeticInstructionF12x(t as F12x_arithmeticContext)
-                RULE_f23x_arithmetic   -> instructionAssembler.parseArithmeticInstructionF23x(t as F23x_arithmeticContext)
-                RULE_f22sb_arithmetic  -> instructionAssembler.parseArithmeticLiteralInstructionF22sb(t as F22sb_arithmeticContext)
-                RULE_fx2x_move         -> instructionAssembler.parseBasicInstructionMoveFx2x(t as Fx2x_moveContext)
-                RULE_f12x_array        -> instructionAssembler.parseArrayInstructionF12x(t as F12x_arrayContext)
-                RULE_ft2c_type         -> instructionAssembler.parseTypeInstructionFt2c(t as Ft2c_typeContext)
-                RULE_f23x_compare      -> instructionAssembler.parseBasicInstructionCompareF23x(t as F23x_compareContext)
-                RULE_f23x_array        -> instructionAssembler.parseArrayInstructionF23x(t as F23x_arrayContext)
-                RULE_f35c_method       -> instructionAssembler.parseMethodInstructionF35c(t as F35c_methodContext)
-                RULE_f3rc_method       -> instructionAssembler.parseMethodInstructionF3rc(t as F3rc_methodContext)
-                RULE_f35c_array        -> instructionAssembler.parseArrayTypeInstructionF35c(t as F35c_arrayContext)
-                RULE_f3rc_array        -> instructionAssembler.parseArrayTypeInstructionF3rc(t as F3rc_arrayContext)
-                RULE_f45cc_methodproto -> instructionAssembler.parseMethodProtoInstructionF45cc(t as F45cc_methodprotoContext)
-                RULE_f4rcc_methodproto -> instructionAssembler.parseMethodProtoInstructionF4rcc(t as F4rcc_methodprotoContext)
-                RULE_f35c_custom       -> instructionAssembler.parseCallSiteInstructionF35c(t as F35c_customContext)
-                RULE_f3rc_custom       -> instructionAssembler.parseCallSiteInstructionF3rc(t as F3rc_customContext)
-                RULE_f21c_const_handle -> instructionAssembler.parseMethodHandleInstructionF21c(t as F21c_const_handleContext)
-                RULE_f21c_const_type   -> instructionAssembler.parseMethodTypeInstructionF21c(t as F21c_const_typeContext)
-                RULE_f31t_payload      -> instructionAssembler.parsePayloadInstructionF31t(t as F31t_payloadContext, payloadMapping)
-
-                else -> null
-            }
-
-            if (insn != null) {
-                codeOffset += insn.length
-                if (insn !is Payload) {
-                    codeEditor.prependInstruction(0, insn)
-                }
+            } catch (exception: RuntimeException) {
+                parserError(ctx, exception)
             }
         }
 
