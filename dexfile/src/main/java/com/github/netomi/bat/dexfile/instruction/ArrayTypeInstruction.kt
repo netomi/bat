@@ -27,6 +27,7 @@ class ArrayTypeInstruction: ArrayInstruction {
     private constructor(opCode: DexOpCode): super(opCode)
 
     private constructor(opCode: DexOpCode, typeIndex: Int, vararg registers: Int): super(opCode, *registers) {
+        require(typeIndex >= 0) { "typeIndex must not be negative for instruction ${opCode.mnemonic}" }
         this.typeIndex = typeIndex
     }
 
