@@ -30,7 +30,7 @@ class ArithmeticLiteralInstruction: ArithmeticInstruction {
 
     private constructor(opCode: DexOpCode): super(opCode)
 
-    private constructor(opCode: DexOpCode, literal: Int, vararg registers: Int): super(opCode, *registers) {
+    private constructor(opCode: DexOpCode, literal: Int, rA: Int, rB: Int): super(opCode, rA, rB) {
         when (opCode.format) {
             FORMAT_22b -> checkRange(literal, -0x80, 0x7f, opCode)
             FORMAT_22s -> checkRange(literal, -0x8000, 0x7fff, opCode)
@@ -79,8 +79,8 @@ class ArithmeticLiteralInstruction: ArithmeticInstruction {
             }
         }
 
-        fun of(opCode: DexOpCode, literal: Int, vararg registers: Int): ArithmeticLiteralInstruction {
-            return ArithmeticLiteralInstruction(opCode, literal, *registers)
+        fun of(opCode: DexOpCode, literal: Int, rA: Int, rB: Int): ArithmeticLiteralInstruction {
+            return ArithmeticLiteralInstruction(opCode, literal, rA, rB)
         }
 
         internal fun create(opCode: DexOpCode): ArithmeticLiteralInstruction {

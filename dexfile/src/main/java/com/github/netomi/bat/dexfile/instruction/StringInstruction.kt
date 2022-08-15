@@ -27,7 +27,7 @@ class StringInstruction: DexInstruction {
 
     private constructor(opCode: DexOpCode): super(opCode)
 
-    private constructor(opCode: DexOpCode, stringIndex: Int, vararg registers: Int): super(opCode, *registers) {
+    private constructor(opCode: DexOpCode, stringIndex: Int, register: Int): super(opCode, register) {
         require(stringIndex >= 0) { "stringIndex must not be negative for instruction ${opCode.mnemonic}" }
         this.stringIndex = stringIndex
     }
@@ -75,8 +75,8 @@ class StringInstruction: DexInstruction {
     }
 
     companion object {
-        fun of(opCode: DexOpCode, stringIndex: Int, vararg registers: Int): StringInstruction {
-            return StringInstruction(opCode, stringIndex, *registers)
+        fun of(opCode: DexOpCode, stringIndex: Int, register: Int): StringInstruction {
+            return StringInstruction(opCode, stringIndex, register)
         }
 
         internal fun create(opCode: DexOpCode): StringInstruction {
