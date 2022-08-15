@@ -138,7 +138,7 @@ fun String.unescapeJavaString(): String {
                         } else {
                             val code = input.substring(i + 2, i + 6).toInt(16)
                             append(Character.toChars(code))
-                            i += 5
+                            i += 6
                             continue
                         }
                     }
