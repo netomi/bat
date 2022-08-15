@@ -47,6 +47,34 @@ class LiteralInstructionTest: DexInstructionTest<LiteralInstruction>() {
             LiteralInstruction.of(DexOpCode.CONST_HIGH16,  0x7fff0000, 0),
             LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x00010000, 0),
             LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x80000000, 0),
+
+            // const-wide/16
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_16,  0x0, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_16,  0x1, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_16, -0x1, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_16,  0x7fff, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_16, -0x8000, 0),
+
+            // const-wide/32
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_32,  0x0, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_32,  0x1, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_32, -0x1, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_32,  0x7fffffff, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_32, -0x80000000, 0),
+
+            // const-wide
+            LiteralInstruction.of(DexOpCode.CONST_WIDE,  0x0, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE,  0x1, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE, -0x1, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE,  0x7fffffffffffffff, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE,  Long.MIN_VALUE, 0),
+
+            // const-wide/high16
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16,  0x0, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16,  0x0001000000000000, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16,  0x7fff000000000000, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16, -0x0001000000000000, 0),
+            LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16, -0x7fff000000000000, 0)
         )
 
     override val failInstances: Array<() -> LiteralInstruction>
@@ -68,6 +96,20 @@ class LiteralInstructionTest: DexInstructionTest<LiteralInstruction>() {
             { LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x00000001, 0) },
             { LiteralInstruction.of(DexOpCode.CONST_HIGH16,  0x80000000, 0) },
             { LiteralInstruction.of(DexOpCode.CONST_HIGH16, -0x80010000, 0) },
+
+            // const-wide/16
+            { LiteralInstruction.of(DexOpCode.CONST_16,  0x8000, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_16, -0x8001, 0) },
+
+            // const-wide/32
+            { LiteralInstruction.of(DexOpCode.CONST_WIDE_32,  0x80000000, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_WIDE_32, -0x80000001, 0) },
+
+            // const-wide/high16
+            { LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16,  0x00000001, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16, -0x00000001, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16,  0x80000000, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_WIDE_HIGH16, -0x80010000, 0) }
         )
 
     override fun equals(instructionA: LiteralInstruction, instructionB: LiteralInstruction): Boolean {

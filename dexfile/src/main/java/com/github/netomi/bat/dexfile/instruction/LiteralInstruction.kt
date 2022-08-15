@@ -42,6 +42,7 @@ class LiteralInstruction private constructor(      opCode:     DexOpCode,
             FORMAT_21s -> checkRange(value, -0x8000, 0x7fff, opCode)
             FORMAT_31i -> checkRange(value, -0x80000000, 0x7fffffff, opCode)
             FORMAT_21h -> checkRangeHigh16(value, -0x8000, 0x7fff, opCode)
+            FORMAT_51l -> {} // no need to check as it conforms to the range [Long.MIN_VALUE, Long.MAX_VALUE]
             else -> {}
         }
     }
