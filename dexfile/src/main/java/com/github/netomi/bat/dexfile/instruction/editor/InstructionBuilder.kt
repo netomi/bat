@@ -33,7 +33,7 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
         return add(LabelInstruction.of(label))
     }
 
-    fun nop(): DexInstruction {
+    fun nop(): BasicInstruction {
         return add(BasicInstruction.of(DexOpCode.NOP))
     }
 
@@ -53,8 +53,8 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
         return add(FillArrayDataInstruction.of(payload, register))
     }
 
-    fun returnVoid(): BasicInstruction {
-        return add(BasicInstruction.of(DexOpCode.RETURN_VOID))
+    fun returnVoid(): ReturnInstruction {
+        return add(ReturnInstruction.of(DexOpCode.RETURN_VOID))
     }
 
     fun invokeDirect(methodIndex: Int, vararg registers: Int): MethodInstruction {

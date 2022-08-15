@@ -60,7 +60,15 @@ fun interface InstructionVisitor {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
+    fun visitCompareInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: CompareInstruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
     fun visitConversionInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ConversionInstruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitExceptionInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ExceptionInstruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
@@ -92,6 +100,14 @@ fun interface InstructionVisitor {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
+    fun visitMonitorInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MonitorInstruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitMoveInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MoveInstruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
     fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction<*>) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
@@ -110,6 +126,10 @@ fun interface InstructionVisitor {
 
     fun visitFillArrayDataInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: FillArrayDataInstruction) {
         visitAnyPayloadInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitReturnInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ReturnInstruction) {
+        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitStringInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: StringInstruction) {

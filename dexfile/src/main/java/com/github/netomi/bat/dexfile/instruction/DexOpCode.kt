@@ -28,23 +28,27 @@ enum class DexOpCode constructor(
 
     // basic instructions.
     NOP               (0x00, InstructionFormat.FORMAT_10x, BasicInstruction::create, "nop"),
-    MOVE              (0x01, InstructionFormat.FORMAT_12x, BasicInstruction::create, "move"),
-    MOVE_FROM16       (0x02, InstructionFormat.FORMAT_22x, BasicInstruction::create, "move/from16"),
-    MOVE_16           (0x03, InstructionFormat.FORMAT_32x, BasicInstruction::create, "move/16"),
-    MOVE_WIDE         (0x04, InstructionFormat.FORMAT_12x, BasicInstruction::create, "move-wide", wide = true),
-    MOVE_WIDE_FROM16  (0x05, InstructionFormat.FORMAT_22x, BasicInstruction::create, "move-wide/from16", wide = true),
-    MOVE_WIDE_16      (0x06, InstructionFormat.FORMAT_32x, BasicInstruction::create, "move-wide/16", wide = true),
-    MOVE_OBJECT       (0x07, InstructionFormat.FORMAT_12x, BasicInstruction::create, "move-object"),
-    MOVE_OBJECT_FROM16(0x08, InstructionFormat.FORMAT_22x, BasicInstruction::create, "move-object/from16"),
-    MOVE_OBJECT_16    (0x09, InstructionFormat.FORMAT_32x, BasicInstruction::create, "move-object/16"),
-    MOVE_RESULT       (0x0a, InstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result"),
-    MOVE_RESULT_WIDE  (0x0b, InstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result-wide", wide = true),
-    MOVE_RESULT_OBJECT(0x0c, InstructionFormat.FORMAT_11x, BasicInstruction::create, "move-result-object"),
-    MOVE_EXCEPTION    (0x0d, InstructionFormat.FORMAT_11x, BasicInstruction::create, "move-exception"),
-    RETURN_VOID       (0x0e, InstructionFormat.FORMAT_10x, BasicInstruction::create, "return-void"),
-    RETURN            (0x0f, InstructionFormat.FORMAT_11x, BasicInstruction::create, "return"),
-    RETURN_WIDE       (0x10, InstructionFormat.FORMAT_11x, BasicInstruction::create, "return-wide", wide = true),
-    RETURN_OBJECT     (0x11, InstructionFormat.FORMAT_11x, BasicInstruction::create, "return-object"),
+
+    // move instructions.
+    MOVE              (0x01, InstructionFormat.FORMAT_12x, MoveInstruction::create, "move"),
+    MOVE_FROM16       (0x02, InstructionFormat.FORMAT_22x, MoveInstruction::create, "move/from16"),
+    MOVE_16           (0x03, InstructionFormat.FORMAT_32x, MoveInstruction::create, "move/16"),
+    MOVE_WIDE         (0x04, InstructionFormat.FORMAT_12x, MoveInstruction::create, "move-wide", wide = true),
+    MOVE_WIDE_FROM16  (0x05, InstructionFormat.FORMAT_22x, MoveInstruction::create, "move-wide/from16", wide = true),
+    MOVE_WIDE_16      (0x06, InstructionFormat.FORMAT_32x, MoveInstruction::create, "move-wide/16", wide = true),
+    MOVE_OBJECT       (0x07, InstructionFormat.FORMAT_12x, MoveInstruction::create, "move-object"),
+    MOVE_OBJECT_FROM16(0x08, InstructionFormat.FORMAT_22x, MoveInstruction::create, "move-object/from16"),
+    MOVE_OBJECT_16    (0x09, InstructionFormat.FORMAT_32x, MoveInstruction::create, "move-object/16"),
+    MOVE_RESULT       (0x0a, InstructionFormat.FORMAT_11x, MoveInstruction::create, "move-result"),
+    MOVE_RESULT_WIDE  (0x0b, InstructionFormat.FORMAT_11x, MoveInstruction::create, "move-result-wide", wide = true),
+    MOVE_RESULT_OBJECT(0x0c, InstructionFormat.FORMAT_11x, MoveInstruction::create, "move-result-object"),
+    MOVE_EXCEPTION    (0x0d, InstructionFormat.FORMAT_11x, MoveInstruction::create, "move-exception"),
+
+    // return instructions.
+    RETURN_VOID       (0x0e, InstructionFormat.FORMAT_10x, ReturnInstruction::create, "return-void"),
+    RETURN            (0x0f, InstructionFormat.FORMAT_11x, ReturnInstruction::create, "return"),
+    RETURN_WIDE       (0x10, InstructionFormat.FORMAT_11x, ReturnInstruction::create, "return-wide", wide = true),
+    RETURN_OBJECT     (0x11, InstructionFormat.FORMAT_11x, ReturnInstruction::create, "return-object"),
 
     // literal instructions.
     CONST_4          (0x12, InstructionFormat.FORMAT_11n, LiteralInstruction::create, "const/4"),
@@ -63,9 +67,9 @@ enum class DexOpCode constructor(
     // type instructions.
     CONST_CLASS(0x1c, InstructionFormat.FORMAT_21c, TypeInstruction::create, "const-class"),
 
-    // basic instructions.
-    MONITOR_ENTER(0x1d, InstructionFormat.FORMAT_11x, BasicInstruction::create, "monitor-enter"),
-    MONITOR_EXIT (0x1e, InstructionFormat.FORMAT_11x, BasicInstruction::create, "monitor-exit"),
+    // monitor instructions.
+    MONITOR_ENTER(0x1d, InstructionFormat.FORMAT_11x, MonitorInstruction::create, "monitor-enter"),
+    MONITOR_EXIT (0x1e, InstructionFormat.FORMAT_11x, MonitorInstruction::create, "monitor-exit"),
 
     // type instructions.
     CHECK_CAST (0x1f, InstructionFormat.FORMAT_21c, TypeInstruction::create, "check-cast"),
@@ -85,8 +89,8 @@ enum class DexOpCode constructor(
     // payload instruction.
     FILL_ARRAY_DATA(0x26, InstructionFormat.FORMAT_31t, FillArrayDataInstruction::create, "fill-array-data"),
 
-    // basic instruction.
-    THROW(0x27, InstructionFormat.FORMAT_11x, BasicInstruction::create, "throw"),
+    // exception instruction.
+    THROW(0x27, InstructionFormat.FORMAT_11x, ExceptionInstruction::create, "throw"),
 
     // branch instructions.
     GOTO   (0x28, InstructionFormat.FORMAT_10t, BranchInstruction::create, "goto"),
@@ -97,12 +101,12 @@ enum class DexOpCode constructor(
     PACKED_SWITCH(0x2b, InstructionFormat.FORMAT_31t, PackedSwitchInstruction::create, "packed-switch"),
     SPARSE_SWITCH(0x2c, InstructionFormat.FORMAT_31t, SparseSwitchInstruction::create, "sparse-switch"),
 
-    // basic instructions.
-    CMPL_FLOAT (0x2d, InstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpl-float"),
-    CMPG_FLOAT (0x2e, InstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpg-float"),
-    CMPL_DOUBLE(0x2f, InstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpl-double", wide = true),
-    CMPG_DOUBLE(0x30, InstructionFormat.FORMAT_23x, BasicInstruction::create, "cmpg-double", wide = true),
-    CMP_LONG   (0x31, InstructionFormat.FORMAT_23x, BasicInstruction::create, "cmp-long",    wide = true),
+    // compare instructions.
+    CMPL_FLOAT (0x2d, InstructionFormat.FORMAT_23x, CompareInstruction::create, "cmpl-float"),
+    CMPG_FLOAT (0x2e, InstructionFormat.FORMAT_23x, CompareInstruction::create, "cmpg-float"),
+    CMPL_DOUBLE(0x2f, InstructionFormat.FORMAT_23x, CompareInstruction::create, "cmpl-double", wide = true),
+    CMPG_DOUBLE(0x30, InstructionFormat.FORMAT_23x, CompareInstruction::create, "cmpg-double", wide = true),
+    CMP_LONG   (0x31, InstructionFormat.FORMAT_23x, CompareInstruction::create, "cmp-long",    wide = true),
 
     // branch instructions.
     IF_EQ (0x32, InstructionFormat.FORMAT_22t, BranchInstruction::create, "if-eq"),

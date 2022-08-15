@@ -255,7 +255,10 @@ sInstruction
 	| fx0t_branch
 	| f21t_branch
 	| f22t_branch
-	| f11x_basic
+	| f11x_move
+    | f11x_return
+    | f11x_exception
+    | f11x_monitor
 	| fconst_int
 	| fconst_string
 	| fconst_type
@@ -315,16 +318,23 @@ fx0t_branch: op=
     | 'goto/32' ) target=sLabel
 	;
 
-f11x_basic: op=
+f11x_move: op=
     ( 'move-result'
     | 'move-result-wide'
     | 'move-result-object'
-	| 'move-exception'
-	| 'return'
+	| 'move-exception' ) r1=REGISTER
+	;
+
+f11x_return: op=
+	( 'return'
 	| 'return-wide'
-	| 'return-object'
-	| 'throw'
-	| 'monitor-enter'
+	| 'return-object' ) r1=REGISTER
+    ;
+
+f11x_exception: op='throw' r1=REGISTER;
+
+f11x_monitor: op=
+	( 'monitor-enter'
 	| 'monitor-exit' ) r1=REGISTER
 	;
 
