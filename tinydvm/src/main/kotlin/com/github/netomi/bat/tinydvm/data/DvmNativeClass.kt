@@ -16,8 +16,10 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-import com.github.netomi.bat.util.asExternalJavaClassName
-import com.github.netomi.bat.util.asJvmType
+import com.github.netomi.bat.dexfile.DexFile
+import com.github.netomi.bat.dexfile.ProtoID
+import com.github.netomi.bat.tinydvm.overrides.Override
+import com.github.netomi.bat.util.*
 
 class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClass() {
 
@@ -39,7 +41,39 @@ class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClas
         }
     }
 
+    override fun getDirectMethod(dexFile: DexFile, name: String, protoID: ProtoID): DvmMethod? {
+        val parameterClasses = protoID.getParameterDexTypes(dexFile).map { it.toJvmClass() }.toMutableList()
+
+        return try {
+            var methodName = name
+
+            val ann = clazz.getDeclaredAnnotation(Override::class.java)
+            if (ann != null) {
+                for (mapping in ann.names) {
+                    if (mapping.name == name) {
+                        methodName = mapping.overrideName
+
+                        parameterClasses.add(0, mapping.overrideDescriptor.asJvmType().toJvmClass())
+                    }
+                }
+            }
+
+            val method = clazz.getDeclaredMethod(methodName, *parameterClasses.toTypedArray())
+            DvmNativeMethod.of(method, dexFile, protoID)
+        } catch (exception: NoSuchMethodException) {
+            null
+        }
+    }
+
+    override fun toString(): String {
+        return "DvmNativeClass[type=$type]"
+    }
+
     companion object {
+        internal fun of(clazz: Class<out Any>): DvmNativeClass {
+            return DvmNativeClass(clazz as Class<Any>)
+        }
+
         fun of(type: String): DvmNativeClass {
             val externalClassName = type.asJvmType().toExternalClassName()
             return DvmNativeClass(Class.forName(externalClassName) as Class<Any>)

@@ -16,24 +16,12 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-class DvmReferenceValue private constructor(private val reference: DvmObject): DvmValue() {
+import com.github.netomi.bat.dexfile.ProtoID
+import com.github.netomi.bat.tinydvm.Dvm
 
-    override val value: Any
-        get() = reference.obj
+abstract class DvmMethod {
+    abstract val name:    String
+    abstract val protoID: ProtoID
 
-    override val type: String
-        get() = reference.type
-
-    override val isNullReference: Boolean
-        get() = false
-
-    override fun toString(): String {
-        return "Reference[ref=${value}]"
-    }
-
-    companion object {
-        fun of(obj: DvmObject): DvmReferenceValue {
-            return DvmReferenceValue(obj)
-        }
-    }
+    abstract fun invoke(dvm: Dvm, vararg parameters: DvmValue): DvmValue
 }

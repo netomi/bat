@@ -32,6 +32,10 @@ class DvmDexObject constructor(private val clazz:  DvmDexClass,
     override val isInitialized
         get() = status == ObjectInitializationStatus.INITIALIZED
 
+    internal fun setInitialized() {
+        status = ObjectInitializationStatus.INITIALIZED
+    }
+
     fun getClass(): DvmDexClass {
         return clazz
     }

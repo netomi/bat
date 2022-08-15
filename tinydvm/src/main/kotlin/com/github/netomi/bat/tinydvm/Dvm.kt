@@ -20,11 +20,17 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.FieldID
 import com.github.netomi.bat.dexfile.util.ClassDefPool
 import com.github.netomi.bat.tinydvm.data.*
+import com.github.netomi.bat.tinydvm.overrides.ObjectOverride
+import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
 
 class Dvm constructor(private val classDefPool: ClassDefPool) {
 
     private val dvmDexClassMap    = mutableMapOf<String, DvmDexClass>()
     private val dvmNativeClassMap = mutableMapOf<String, DvmNativeClass>()
+
+    init {
+        dvmNativeClassMap[JAVA_LANG_OBJECT_TYPE] = DvmNativeClass.of(ObjectOverride::class.java)
+    }
 
     fun getClass(type: String): DvmClass {
         val classDefData = classDefPool.getClassDefByType(type)

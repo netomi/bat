@@ -14,26 +14,18 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.processing
 
-class DvmReferenceValue private constructor(private val reference: DvmObject): DvmValue() {
+import com.github.netomi.bat.tinydvm.data.DvmValue
 
-    override val value: Any
-        get() = reference.obj
+class InterpreterState private constructor(registersSize: Int) {
 
-    override val type: String
-        get() = reference.type
-
-    override val isNullReference: Boolean
-        get() = false
-
-    override fun toString(): String {
-        return "Reference[ref=${value}]"
-    }
+    val registers: Array<DvmValue?> = arrayOfNulls(registersSize)
+    var invocationResult: DvmValue? = null
 
     companion object {
-        fun of(obj: DvmObject): DvmReferenceValue {
-            return DvmReferenceValue(obj)
+        fun of(registersSize: Int): InterpreterState {
+            return InterpreterState(registersSize)
         }
     }
 }

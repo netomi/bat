@@ -19,8 +19,8 @@ package com.github.netomi.bat.tinydvm.data
 class DvmNativeObject private constructor(private var _obj:  Any? = null,
                                           private val clazz: DvmNativeClass): DvmObject() {
 
-    override val obj: Any?
-        get() = _obj
+    override val obj: Any
+        get() = _obj!!
 
     override val type: String
         get() = clazz.type

@@ -19,8 +19,11 @@ package com.github.netomi.bat.tinydvm
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
+import com.github.netomi.bat.dexfile.instruction.DexInstruction
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.tinydvm.data.DvmValue
 import com.github.netomi.bat.tinydvm.processing.InstructionProcessor
+import com.github.netomi.bat.tinydvm.processing.InterpreterState
 
 class Interpreter private constructor(private val dvm:      Dvm,
                                       private val dexFile:  DexFile,
@@ -29,12 +32,30 @@ class Interpreter private constructor(private val dvm:      Dvm,
 
     private val code = method.code
 
-    private val registers: Array<DvmValue?> = arrayOfNulls(code.registersSize)
-    private val processor = InstructionProcessor(dvm, registers)
+    private val state: InterpreterState = InterpreterState.of(code.registersSize)
+    private val processor               = InstructionProcessor(dvm, state)
 
-    fun invoke(vararg parameters: Any): DvmValue {
-        code.instructionsAccept(dexFile, classDef, method, processor)
+    fun invoke(vararg parameters: DvmValue): DvmValue {
+        setParameterRegisters(*parameters)
+
+        var offset = 0
+        while (offset < code.insnsSize) {
+            val instruction = DexInstruction.create(code.insns, offset)
+            instruction.accept(dexFile, classDef, method, code, offset, processor)
+            offset += instruction.length
+        }
+
         return DvmValue.ofUnitValue()
+    }
+
+    private fun setParameterRegisters(vararg parameters: DvmValue) {
+        val localRegisters = code.registersSize - code.insSize
+
+        var paramRegister = localRegisters
+        for (parameter in parameters) {
+            state.registers[paramRegister] = parameter
+            paramRegister += parameter.type.asDexType().getArgumentSize()
+        }
     }
 
     companion object {

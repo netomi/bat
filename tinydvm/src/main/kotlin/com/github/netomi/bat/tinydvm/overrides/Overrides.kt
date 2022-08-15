@@ -14,26 +14,11 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.overrides
 
-class DvmReferenceValue private constructor(private val reference: DvmObject): DvmValue() {
+@Retention(AnnotationRetention.RUNTIME)
+annotation class MethodMapping(val name: String, val overrideName: String, val overrideDescriptor: String)
 
-    override val value: Any
-        get() = reference.obj
-
-    override val type: String
-        get() = reference.type
-
-    override val isNullReference: Boolean
-        get() = false
-
-    override fun toString(): String {
-        return "Reference[ref=${value}]"
-    }
-
-    companion object {
-        fun of(obj: DvmObject): DvmReferenceValue {
-            return DvmReferenceValue(obj)
-        }
-    }
-}
+@Retention(AnnotationRetention.RUNTIME)
+@Target(AnnotationTarget.CLASS)
+annotation class Override(val names: Array<MethodMapping>)

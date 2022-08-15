@@ -17,7 +17,7 @@
 package com.github.netomi.bat.tinydvm.data
 
 sealed class DvmObject {
-    abstract val obj:  Any?
+    abstract val obj:  Any
     abstract val type: String
 
     abstract val isInitialized: Boolean

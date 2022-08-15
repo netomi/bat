@@ -19,7 +19,10 @@ package com.github.netomi.bat.tinydvm.data
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedField
+import com.github.netomi.bat.dexfile.ProtoID
 import com.github.netomi.bat.dexfile.visitor.fieldCollector
+import com.github.netomi.bat.dexfile.visitor.filterMethodsByNameAndProtoID
+import com.github.netomi.bat.dexfile.visitor.methodCollector
 import com.github.netomi.bat.tinydvm.Dvm
 
 class DvmDexClass private constructor(        val dexFile:  DexFile,
@@ -45,6 +48,13 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
             val field = fieldCollector.items().singleOrNull()
             if (field != null) DVMDexField.of(this, field) else null
         }
+    }
+
+    override fun getDirectMethod(dexFile: DexFile, name: String, protoID: ProtoID): DvmMethod? {
+        val methodCollector = methodCollector()
+        classDef.directMethodsAccept(dexFile, filterMethodsByNameAndProtoID(name, protoID, methodCollector))
+        val method = methodCollector.items().singleOrNull()
+        return if (method != null) DvmDexMethod.of(this, classDef, method) else null
     }
 
     fun getValueOfStaticField(field: EncodedField): DvmValue {
@@ -78,6 +88,10 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
         // TODO: execute <clinit> method to complete initialization
 
         status = ClassInitializationStatus.INITIALIZED
+    }
+
+    override fun toString(): String {
+        return "DvmDexClass[type=$type]"
     }
 
     companion object {

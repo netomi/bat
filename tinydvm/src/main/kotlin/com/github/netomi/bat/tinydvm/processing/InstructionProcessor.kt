@@ -24,16 +24,16 @@ import com.github.netomi.bat.util.*
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.data.*
 
-class InstructionProcessor constructor(private val dvm: Dvm,
-                                       private val registers: Array<DvmValue?>) : InstructionVisitor {
+class InstructionProcessor constructor(private val dvm:   Dvm,
+                                       private val state: InterpreterState) : InstructionVisitor {
 
     override fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction) {}
 
     override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         val rA = instruction.registers[0]
-        registers[rA] = DvmPrimitiveValue.ofUnknownType(instruction.value)
+        state.registers[rA] = DvmPrimitiveValue.ofUnknownType(instruction.value)
         if (instruction.opCode.targetsWideRegister) {
-            registers[rA + 1] = registers[rA]
+            state.registers[rA + 1] = state.registers[rA]
         }
     }
 
@@ -42,7 +42,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             NEW_INSTANCE -> {
                 val dvmClazz = dvm.getClass(instruction.getType(dexFile))
                 val r = instruction.registers[0]
-                registers[r] = DvmReferenceValue.of(DvmObject.newInstanceOf(dvmClazz))
+                state.registers[r] = DvmReferenceValue.of(DvmObject.newInstanceOf(dvmClazz))
             }
 
             else -> {}
@@ -69,9 +69,9 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             val r = instruction.registers[0]
             val result = field.get(dvm, null)
 
-            registers[r] = result
+            state.registers[r] = result
             if (instruction.opCode.targetsWideRegister) {
-                registers[r + 1] = result
+                state.registers[r + 1] = result
             }
         }
 
@@ -82,7 +82,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             }
 
             val r = instruction.registers[0]
-            var dvmValue = registers[r] ?:
+            var dvmValue = state.registers[r] ?:
                     throw VerifyException("[0x%x] unexpected value in v%d of type Undefined but expected '%s' for put"
                             .format(offset, r, field.type))
 
@@ -92,7 +92,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             }
 
             if (instruction.opCode.targetsWideRegister) {
-                val dvmValue2 = registers[r + 1]
+                val dvmValue2 = state.registers[r + 1]
                 if (dvmValue != dvmValue2) {
                     throw VerifyException("[0x%x] unexpected value in register pair v%d/v%d of type %s / %s but expected '%s' for put"
                             .format(offset, r, r + 1, dvmValue.type, dvmValue2?.type ?: "Undefined", field.type))
@@ -121,7 +121,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                     throw VerifyException("[0x%x] get insn has reference type but expected type '%d'".format(offset, field.type))
                 }
                 val r = instruction.registers[0]
-                registers[r] = field.get(dvm, null)
+                state.registers[r] = field.get(dvm, null)
             }
 
             SPUT         -> setPrimitiveStaticField(arrayOf(INT_TYPE, FLOAT_TYPE))
@@ -137,7 +137,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
                 }
 
                 val r = instruction.registers[0]
-                val dvmValue = registers[r] ?:
+                val dvmValue = state.registers[r] ?:
                         throw VerifyException("[0x%x] unexpected value in v%d of type Undefined but expected '%s' for put"
                                 .format(offset, r, field.type))
 
@@ -161,7 +161,7 @@ class InstructionProcessor constructor(private val dvm: Dvm,
             CONST_STRING_JUMBO -> {
                 val rA = instruction.registers[0]
 
-                registers[rA] = DvmReferenceValue.of(DvmNativeObject.of(instruction.getString(dexFile), dvm.getClass(JAVA_LANG_STRING_TYPE)))
+                state.registers[rA] = DvmReferenceValue.of(DvmNativeObject.of(instruction.getString(dexFile), dvm.getClass(JAVA_LANG_STRING_TYPE)))
             }
 
             else -> {
@@ -171,33 +171,23 @@ class InstructionProcessor constructor(private val dvm: Dvm,
     }
 
     override fun visitMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
-        when (instruction.opCode) {
-            INVOKE_VIRTUAL -> {
-                val methodID = instruction.getMethodID(dexFile)
-                val classType = methodID.getClassType(dexFile)
-                val methodName = methodID.getName(dexFile)
-                val proto = methodID.getProtoID(dexFile)
-                val parameterTypes = proto.getParameterTypes(dexFile)
+        val methodID   = instruction.getMethodID(dexFile)
+        val classType  = methodID.getClassType(dexFile)
+        val methodName = methodID.getName(dexFile)
+        val proto      = methodID.getProtoID(dexFile)
+        val parameterTypes = proto.getParameterDexTypes(dexFile)
 
-                val parameterTypeClasses = parameterTypes.map { it.asJvmType() }
-                    .map {
-                        if (it.isClassType) {
-                            Class.forName(it.toExternalClassName())
-                        } else if (it.isPrimitiveType) {
-                            when (it.type) {
-                                INT_TYPE     -> Integer.TYPE
-                                LONG_TYPE    -> java.lang.Long.TYPE
-                                BYTE_TYPE    -> java.lang.Byte.TYPE
-                                SHORT_TYPE   -> java.lang.Short.TYPE
-                                BOOLEAN_TYPE -> java.lang.Boolean.TYPE
-                                FLOAT_TYPE   -> java.lang.Float.TYPE
-                                DOUBLE_TYPE  -> java.lang.Float.TYPE
-                                else         -> { TODO("implement")}
-                            }
-                        } else {
-                            TODO("handle array types")
-                        }
-                    }.toList()
+        when (instruction.opCode) {
+            INVOKE_DIRECT  -> {
+                val dvmClazz     = dvm.getClass(classType)
+                val dvmMethod = dvmClazz.getDirectMethod(dexFile, methodName, proto)
+
+                val parameters = Array(instruction.registers.size) { index -> state.registers[instruction.registers[index]]!! }
+                dvmMethod?.invoke(dvm, *parameters)
+            }
+
+            INVOKE_VIRTUAL -> {
+                val parameterTypeClasses = parameterTypes.map { it.toJvmClass() }
                 val externalClassName = classType.asJvmType().toExternalClassName()
                 val clazz = Class.forName(externalClassName)
 
@@ -207,20 +197,20 @@ class InstructionProcessor constructor(private val dvm: Dvm,
 
                 val paramList = Array(instruction.registers.size - 1) { index ->
                     val r = instruction.registers[index + 1]
-                    val dvmValue = registers[r]
+                    val dvmValue = state.registers[r]
 
                     if (dvmValue == null) {
                         null
                     } else {
                         when (dvmValue) {
-                            is DvmPrimitiveValue -> dvmValue.valueOfType(parameterTypes[index])
-                            is DvmReferenceValue -> dvmValue.value.obj
+                            is DvmPrimitiveValue -> dvmValue.valueOfType(parameterTypes[index].type)
+                            is DvmReferenceValue -> dvmValue.value
                             else -> {}
                         }
                     }
                 }
 
-                m.invoke((registers[r1]?.value as DvmNativeObject).obj, *paramList)
+                m.invoke(state.registers[r1]?.value, *paramList)
             }
 
             else -> {}

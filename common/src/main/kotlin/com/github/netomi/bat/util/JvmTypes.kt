@@ -105,6 +105,27 @@ open class JvmType protected constructor(val type: String) {
         }
     }
 
+    fun toJvmClass(): Class<out Any>? {
+        return if (isClassType) {
+            Class.forName(toExternalClassName())
+        } else if (isPrimitiveType) {
+            when (type) {
+                INT_TYPE     -> Integer.TYPE
+                LONG_TYPE    -> java.lang.Long.TYPE
+                BYTE_TYPE    -> java.lang.Byte.TYPE
+                SHORT_TYPE   -> java.lang.Short.TYPE
+                CHAR_TYPE    -> Character.TYPE
+                BOOLEAN_TYPE -> java.lang.Boolean.TYPE
+                FLOAT_TYPE   -> java.lang.Float.TYPE
+                DOUBLE_TYPE  -> java.lang.Double.TYPE
+                else         -> { error("unexpected primitive type $type") }
+            }
+        } else {
+            TODO("handle array types")
+        }
+
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is JvmType) return false

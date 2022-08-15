@@ -15,10 +15,7 @@
  */
 package com.github.netomi.bat.dexfile.visitor
 
-import com.github.netomi.bat.dexfile.ClassDef
-import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.EncodedMethod
-import com.github.netomi.bat.dexfile.ProtoID
+import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.util.StringMatcher
 import com.github.netomi.bat.util.simpleNameMatcher
 import java.util.function.BiConsumer
@@ -37,6 +34,10 @@ fun filterMethodsByNameAndProtoID(nameExpression: String, protoID: ProtoID, visi
 
 fun allCode(visitor: CodeVisitor): EncodedMethodVisitor {
     return EncodedMethodVisitor { dexFile, classDef, method -> method.codeAccept(dexFile, classDef, visitor) }
+}
+
+fun methodCollector(): EncodedMethodCollector {
+    return EncodedMethodCollector()
 }
 
 fun interface EncodedMethodVisitor {
@@ -67,6 +68,12 @@ fun interface EncodedMethodVisitor {
             }
         }
         return multiMethodVisitorOf(joiner, this)
+    }
+}
+
+class EncodedMethodCollector: AbstractCollector<EncodedMethod>(), EncodedMethodVisitor {
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
+        addItem(method)
     }
 }
 
