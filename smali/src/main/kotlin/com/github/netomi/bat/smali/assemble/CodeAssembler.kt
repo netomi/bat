@@ -292,11 +292,17 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
 internal data class RegisterInfo(val registers: Int, val locals: Int, val insSize: Int) {
     fun registerNumber(register: String): Int {
         return when (register.first()) {
-            'v' -> register.substring(1).toInt()
+            'v' -> {
+                val registerNumber = register.substring(1).toInt()
+                require(registerNumber in 0 until registers) { "register '$register' exceeds specified registerSize of $registers" }
+                registerNumber
+            }
 
             'p' -> {
                 val number = register.substring(1).toInt()
-                locals + number
+                val registerNumber = locals + number
+                require(registerNumber in 0 until registers) { "register '$register=v$registerNumber' exceeds specified registerSize of $registers" }
+                registerNumber
             }
 
             else -> throw RuntimeException("unknown register format $register")
