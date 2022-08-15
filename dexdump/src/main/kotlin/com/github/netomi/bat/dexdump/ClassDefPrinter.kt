@@ -31,16 +31,8 @@ import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.github.netomi.bat.util.toPrintableAsciiString
 
 internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, private val disassembleCode: Boolean) :
-    DexHeaderVisitor,
-    ClassDefVisitor,
-    EncodedFieldVisitor,
-    EncodedMethodVisitor,
-    TypeVisitor,
-    CodeVisitor,
-    InstructionVisitor,
-    TryVisitor,
-    AnnotationSetVisitor,
-    AnnotationVisitor {
+    DexHeaderVisitor, ClassDefVisitor, EncodedFieldVisitor, EncodedMethodVisitor, TypeVisitor, CodeVisitor,
+    InstructionVisitor, TryVisitor, AnnotationSetVisitor, AnnotationVisitor {
 
     private val instructionPrinter: InstructionVisitor = InstructionPrinter(printer)
     private val encodedValuePrinter: EncodedValueVisitor = EncodedValuePrinter(printer)
@@ -93,22 +85,41 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.levelDown()
     }
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {}
+
+    override fun visitStaticField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+        visitAnyFieldWithIndex(dexFile, classDef, index, field)
+
+        val staticValue = field.staticValue(dexFile)
+        if (staticValue != null) {
+            printer.print("  value         : ")
+            staticValue.accept(dexFile, encodedValuePrinter)
+            printer.println()
+        }
+    }
+
+    override fun visitInstanceField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+        visitAnyFieldWithIndex(dexFile, classDef, index, field)
+    }
+
+    private fun visitAnyFieldWithIndex(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
         printer.println("  name          : '" + field.getName(dexFile) + "'")
         printer.println("  type          : '" + field.getType(dexFile) + "'")
         printer.println("  access        : " + formatAccessFlags(field.accessFlags, DexAccessFlagTarget.FIELD))
-        if (field.isStatic) {
-            val staticValue = field.staticValue(dexFile)
-            if (staticValue != null) {
-                printer.print("  value         : ")
-                staticValue.accept(dexFile, encodedValuePrinter)
-                printer.println()
-            }
-        }
     }
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {}
+
+    override fun visitDirectMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+        visitAnyMethodWithIndex(dexFile, classDef, index, method)
+    }
+
+    override fun visitVirtualMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+        visitAnyMethodWithIndex(dexFile, classDef, index, method)
+    }
+
+    private fun visitAnyMethodWithIndex(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
         printer.println("#%-14d : (in %s)".format(index, classDef.getType(dexFile)))
         printer.println("  name          : '" + method.getName(dexFile) + "'")
         printer.println("  type          : '" + method.getDescriptor(dexFile) + "'")

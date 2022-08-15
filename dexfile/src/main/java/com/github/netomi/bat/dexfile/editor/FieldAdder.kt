@@ -27,7 +27,7 @@ class FieldAdder constructor(private val targetClassDefEditor: ClassDefEditor): 
 
     private val targetDexEditor = targetClassDefEditor.dexEditor
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {
         val fieldEditor =
             targetClassDefEditor.addField(field.getName(dexFile), field.accessFlags, field.getType(dexFile))
 

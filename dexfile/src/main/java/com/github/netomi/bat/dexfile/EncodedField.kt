@@ -101,9 +101,9 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
         }
     }
 
-    fun staticValueAccept(dexFile: DexFile, classDef: ClassDef, index: Int, visitor: EncodedValueVisitor) {
+    fun staticValueAccept(dexFile: DexFile, classDef: ClassDef, visitor: EncodedValueVisitor) {
         if (isStatic) {
-            classDef.staticValueAccept(dexFile, index, visitor)
+            classDef.staticValueAccept(dexFile, this, visitor)
         }
     }
 

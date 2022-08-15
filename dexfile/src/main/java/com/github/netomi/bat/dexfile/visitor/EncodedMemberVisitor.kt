@@ -19,13 +19,13 @@ import com.github.netomi.bat.dexfile.*
 
 fun interface EncodedMemberVisitor : EncodedFieldVisitor, EncodedMethodVisitor {
 
-    fun visitAnyMember(dexFile: DexFile, classDef: ClassDef, index: Int, member: EncodedMember)
+    fun visitAnyMember(dexFile: DexFile, classDef: ClassDef, member: EncodedMember)
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
-        visitAnyMember(dexFile, classDef, index, field)
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {
+        visitAnyMember(dexFile, classDef, field)
     }
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
-        visitAnyMember(dexFile, classDef, index, method)
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
+        visitAnyMember(dexFile, classDef, method)
     }
 }

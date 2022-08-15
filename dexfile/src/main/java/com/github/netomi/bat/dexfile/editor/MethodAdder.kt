@@ -29,7 +29,7 @@ internal class MethodAdder constructor(private val targetClassDefEditor: ClassDe
 
     private val targetDexEditor = targetClassDefEditor.dexEditor
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
         val addedMethodEditor =
             targetClassDefEditor.addMethod(method.getName(dexFile),
                                            method.accessFlags,

@@ -343,6 +343,13 @@ class ClassDef private constructor(            classIndex:           Int        
         annotationsDirectory.accept(dexFile, this, visitor)
     }
 
+    fun staticValueAccept(dexFile: DexFile, field: EncodedField, visitor: EncodedValueVisitor) {
+        val staticFieldIndex = getStaticFieldIndex(field)
+        require(staticFieldIndex != NO_INDEX)
+            { "trying to call staticValueAccept for a field that does not belong to this class: ${getType(dexFile)}" }
+        staticValueAccept(dexFile, staticFieldIndex, visitor)
+    }
+
     fun staticValueAccept(dexFile: DexFile, index: Int, visitor: EncodedValueVisitor) {
         staticValues.accept(dexFile, index, visitor)
     }

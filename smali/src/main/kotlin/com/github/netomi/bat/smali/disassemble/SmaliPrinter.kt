@@ -22,8 +22,7 @@ import java.io.OutputStreamWriter
 import java.io.Writer
 import java.util.*
 
-class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) :
-    ClassDefVisitor, EncodedFieldVisitor, EncodedMethodVisitor, CodeVisitor {
+class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) : ClassDefVisitor, EncodedFieldVisitor, EncodedMethodVisitor, CodeVisitor {
 
     private val printer: IndentingPrinter = IndentingPrinter(writer, 4)
     private val annotationPrinter         = AnnotationPrinter(printer)
@@ -86,7 +85,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         printer.flush()
     }
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {
         printer.print(".field")
 
         val accessFlags =
@@ -103,7 +102,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
             classDef.methodsAccept(dexFile, "<clinit>", allCode(allInstructions(detector)))
 
             if (!detector.fieldIsSetInStaticInitializer || !field.modifiers.contains(FieldModifier.FINAL)) {
-                field.staticValueAccept(dexFile, classDef, index, EncodedValuePrinter(printer, null, " = "))
+                field.staticValueAccept(dexFile, classDef, EncodedValuePrinter(printer, null, " = "))
             }
         }
 
@@ -111,7 +110,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         field.annotationSetAccept(dexFile, classDef, annotationPrinter)
     }
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
         printer.print(".method")
 
         val accessFlags =

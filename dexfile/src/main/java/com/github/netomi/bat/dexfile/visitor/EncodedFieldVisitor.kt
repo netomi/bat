@@ -38,14 +38,14 @@ fun fieldCollector(): EncodedFieldCollector {
 
 fun interface EncodedFieldVisitor {
 
-    fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField)
+    fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField)
 
     fun visitStaticField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
-        visitAnyField(dexFile, classDef, index, field)
+        visitAnyField(dexFile, classDef, field)
     }
 
     fun visitInstanceField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
-        visitAnyField(dexFile, classDef, index, field)
+        visitAnyField(dexFile, classDef, field)
     }
 
     fun andThen(vararg visitors: EncodedFieldVisitor): EncodedFieldVisitor {
@@ -55,7 +55,7 @@ fun interface EncodedFieldVisitor {
     fun joinedByFieldConsumer(consumer: BiConsumer<DexFile, EncodedField>): EncodedFieldVisitor {
         val joiner: EncodedFieldVisitor = object : EncodedFieldVisitor {
             private var firstVisited = false
-            override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+            override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {
                 if (firstVisited) {
                     consumer.accept(dexFile, field)
                 } else {
@@ -69,7 +69,7 @@ fun interface EncodedFieldVisitor {
 }
 
 class EncodedFieldCollector: AbstractCollector<EncodedField>(), EncodedFieldVisitor {
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {
         addItem(field)
     }
 }
@@ -88,9 +88,9 @@ private class FieldNameAndTypeFilter(nameExpression:      String?,
         }
     }
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {
         if (accepted(field.getName(dexFile), field.getType(dexFile))) {
-            visitor.visitAnyField(dexFile, classDef, index, field)
+            visitor.visitAnyField(dexFile, classDef, field)
         }
     }
 
@@ -117,9 +117,9 @@ private class MultiFieldVisitor constructor(       visitor:       EncodedFieldVi
                                             vararg otherVisitors: EncodedFieldVisitor)
     : AbstractMultiVisitor<EncodedFieldVisitor>(visitor, *otherVisitors), EncodedFieldVisitor {
 
-    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, index: Int, field: EncodedField) {
+    override fun visitAnyField(dexFile: DexFile, classDef: ClassDef, field: EncodedField) {
         for (visitor in visitors) {
-            visitor.visitAnyField(dexFile, classDef, index, field)
+            visitor.visitAnyField(dexFile, classDef, field)
         }
     }
 

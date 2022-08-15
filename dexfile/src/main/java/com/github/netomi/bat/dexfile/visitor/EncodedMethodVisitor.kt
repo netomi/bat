@@ -36,19 +36,19 @@ fun filterMethodsByNameAndProtoID(nameExpression: String, protoID: ProtoID, visi
 }
 
 fun allCode(visitor: CodeVisitor): EncodedMethodVisitor {
-    return AllCodeVisitor(visitor)
+    return EncodedMethodVisitor { dexFile, classDef, method -> method.codeAccept(dexFile, classDef, visitor) }
 }
 
 fun interface EncodedMethodVisitor {
 
-    fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod)
+    fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod)
 
     fun visitDirectMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
-        visitAnyMethod(dexFile, classDef, index, method)
+        visitAnyMethod(dexFile, classDef, method)
     }
 
     fun visitVirtualMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
-        visitAnyMethod(dexFile, classDef, index, method)
+        visitAnyMethod(dexFile, classDef, method)
     }
 
     fun andThen(vararg visitors: EncodedMethodVisitor): EncodedMethodVisitor {
@@ -58,7 +58,7 @@ fun interface EncodedMethodVisitor {
     fun joinedByMethodConsumer(consumer: BiConsumer<DexFile, EncodedMethod>): EncodedMethodVisitor {
         val joiner: EncodedMethodVisitor = object : EncodedMethodVisitor {
             private var firstVisited = false
-            override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+            override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
                 if (firstVisited) {
                     consumer.accept(dexFile, method)
                 } else {
@@ -67,18 +67,6 @@ fun interface EncodedMethodVisitor {
             }
         }
         return multiMethodVisitorOf(joiner, this)
-    }
-}
-
-private class AllCodeVisitor(private val visitor: CodeVisitor) : EncodedMethodVisitor {
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {}
-
-    override fun visitDirectMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
-        method.codeAccept(dexFile, classDef, visitor)
-    }
-
-    override fun visitVirtualMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
-        method.codeAccept(dexFile, classDef, visitor)
     }
 }
 
@@ -96,9 +84,9 @@ private class MethodNameAndProtoFilter(            nameExpression: String?,
         }
     }
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
         if (accepted(method.getName(dexFile), method.getProtoID(dexFile))) {
-            visitor.visitAnyMethod(dexFile, classDef, index, method)
+            visitor.visitAnyMethod(dexFile, classDef, method)
         }
     }
 
@@ -125,9 +113,9 @@ private class MultiMethodVisitor constructor(       visitor:       EncodedMethod
                                              vararg otherVisitors: EncodedMethodVisitor)
     : AbstractMultiVisitor<EncodedMethodVisitor>(visitor, *otherVisitors), EncodedMethodVisitor {
 
-    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, index: Int, method: EncodedMethod) {
+    override fun visitAnyMethod(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
         for (visitor in visitors) {
-            visitor.visitAnyMethod(dexFile, classDef, index, method)
+            visitor.visitAnyMethod(dexFile, classDef, method)
         }
     }
 
