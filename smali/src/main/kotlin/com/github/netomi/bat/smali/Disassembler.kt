@@ -20,15 +20,11 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
 import com.github.netomi.bat.io.OutputStreamFactory
 import com.github.netomi.bat.smali.disassemble.SmaliPrinter
-import java.io.BufferedWriter
-import java.io.IOException
-import java.io.OutputStreamWriter
-import java.nio.charset.StandardCharsets
 
 class Disassembler(private val outputStreamFactory: OutputStreamFactory) : ClassDefVisitor {
-    override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+    override fun visitClassDef(dexFile: DexFile, classDef: ClassDef) {
         outputStreamFactory.createOutputStream(classDef.getClassName(dexFile)).bufferedWriter().use { writer ->
-            SmaliPrinter(writer).visitClassDef(dexFile, index, classDef)
+            SmaliPrinter(writer).visitClassDef(dexFile, classDef)
         }
     }
 }

@@ -28,7 +28,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
     private val printer: IndentingPrinter = IndentingPrinter(writer, 4)
     private val annotationPrinter         = AnnotationPrinter(printer)
 
-    override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+    override fun visitClassDef(dexFile: DexFile, classDef: ClassDef) {
         printer.print(".class")
 
         val accessFlags =

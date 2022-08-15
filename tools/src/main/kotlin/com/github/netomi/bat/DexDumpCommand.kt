@@ -83,7 +83,7 @@ private class DumpCommand: ReusableOptions(), Runnable {
             println("Opened '${inputFile.name}', DEX version '${dexFile.dexFormat.version}'")
 
             if (classNameFilter != null) {
-                dexFile.classDefsAccept(
+                dexFile.classDefsAcceptIndexed(
                     filteredByExternalClassName(
                         classNameFilter!!,
                         DexDumpPrinter(os, printFileSummary, printHeaders, printAnnotations, disassembleCode)

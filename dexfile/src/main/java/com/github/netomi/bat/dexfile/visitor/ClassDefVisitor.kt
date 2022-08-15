@@ -25,12 +25,16 @@ fun multiClassDefVisitorOf(visitor: ClassDefVisitor, vararg visitors: ClassDefVi
     return MultiClassDefVisitor(visitor, *visitors)
 }
 
-fun filteredByExternalClassName(regularExpression: String, visitor: ClassDefVisitor): ClassDefVisitor {
+fun filteredByExternalClassName(regularExpression: String, visitor: ClassDefVisitorIndexed): ClassDefVisitorIndexed {
     return ExternalClassNameFilter(regularExpression, visitor)
 }
 
+fun filteredByExternalClassName(regularExpression: String, visitor: ClassDefVisitor): ClassDefVisitor {
+    return ExternalClassNameFilter(regularExpression, visitor).toClassDefVisitor()
+}
+
 internal fun allClassData(visitor: ClassDataVisitor): ClassDefVisitor {
-    return ClassDefVisitor { dexFile, _, classDef -> classDef.classDataAccept(dexFile, visitor) }
+    return ClassDefVisitor { dexFile, classDef -> classDef.classDataAccept(dexFile, visitor) }
 }
 
 fun allStaticFields(visitor: EncodedFieldVisitor): ClassDefVisitor {
@@ -57,15 +61,27 @@ fun allMethods(visitor: EncodedMethodVisitor): ClassDefVisitor {
     return allDirectMethods(visitor).andThen(allVirtualMethods(visitor))
 }
 
-fun interface ClassDefVisitor {
+fun interface ClassDefVisitorIndexed {
     fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef)
+}
+
+fun interface ClassDefVisitor: ClassDefVisitorIndexed {
+    fun visitClassDef(dexFile: DexFile, classDef: ClassDef)
+
+    override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+        visitClassDef(dexFile, classDef)
+    }
 
     fun andThen(vararg visitors: ClassDefVisitor): ClassDefVisitor {
         return multiClassDefVisitorOf(this, *visitors)
     }
 }
 
-private class ExternalClassNameFilter(regularExpression: String, private val visitor: ClassDefVisitor) : ClassDefVisitor {
+private fun ClassDefVisitorIndexed.toClassDefVisitor(): ClassDefVisitor {
+    return ClassDefVisitor { dexFile, classDef -> this@toClassDefVisitor.visitClassDef(dexFile, 0, classDef) }
+}
+
+private class ExternalClassNameFilter(regularExpression: String, private val visitor: ClassDefVisitorIndexed) : ClassDefVisitorIndexed {
 
     private val matcher: StringMatcher = classNameMatcher(regularExpression)
 
@@ -86,9 +102,9 @@ private class MultiClassDefVisitor constructor(       visitor:       ClassDefVis
 
     : AbstractMultiVisitor<ClassDefVisitor>(visitor, *otherVisitors), ClassDefVisitor {
 
-    override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+    override fun visitClassDef(dexFile: DexFile, classDef: ClassDef) {
         for (visitor in visitors) {
-            visitor.visitClassDef(dexFile, index, classDef)
+            visitor.visitClassDef(dexFile, classDef)
         }
     }
 }

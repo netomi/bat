@@ -268,7 +268,11 @@ class ClassDef private constructor(            classIndex:           Int        
     }
 
     fun accept(dexFile: DexFile, visitor: ClassDefVisitor) {
-        visitor.visitClassDef(dexFile, 0, this)
+        visitor.visitClassDef(dexFile, this)
+    }
+
+    fun accept(dexFile: DexFile, index: Int, visitor: ClassDefVisitorIndexed) {
+        visitor.visitClassDef(dexFile, index, this)
     }
 
     fun staticFieldsAccept(dexFile: DexFile, visitor: EncodedFieldVisitor) {

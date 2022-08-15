@@ -64,7 +64,7 @@ class BakSmaliCommand : Runnable {
 
             dexFile.parallelClassDefsAccept(Dispatchers.IO) {
                 multiClassDefVisitorOf(
-                    { df, _, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
+                    { df, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
                     Disassembler(FileOutputStreamFactory(outputPath, "smali"))
                 )
             }

@@ -67,7 +67,7 @@ class DexSorter : DexFileVisitor {
             }
         })
 
-        dexFile.classDefsAccept { _, _, classDef -> classDef.sort(dexFile) }
+        dexFile.classDefsAccept { _, classDef -> classDef.sort(dexFile) }
 
         dexFile.dataItemsAccept(object: DataItemVisitor {
             override fun visitAnyDataItem(dexFile: DexFile, dataItem: DataItem) {}

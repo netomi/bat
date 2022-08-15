@@ -74,7 +74,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         printer.println()
     }
 
-    override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+    override fun visitClassDef(dexFile: DexFile, classDef: ClassDef) {
         printer.println("Static fields     -")
         printer.levelUp()
         classDef.staticFieldsAccept(dexFile, this)

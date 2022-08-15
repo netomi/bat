@@ -321,14 +321,18 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     }
 
     fun classDefsAccept(visitor: ClassDefVisitor) {
+        classDefs.forEach { classDef -> visitor.visitClassDef(this, classDef) }
+    }
+
+    fun classDefsAcceptIndexed(visitor: ClassDefVisitorIndexed) {
         classDefs.forEachIndexed { index, classDef -> visitor.visitClassDef(this, index, classDef) }
     }
 
     fun parallelClassDefsAccept(coroutineContext: CoroutineContext = Dispatchers.Default, visitorSupplier: () -> ClassDefVisitor) {
         val threadLocal = ThreadLocal.withInitial(visitorSupplier)
-        classDefs.parallelForEachIndexed(coroutineContext) { index, classDef ->
+        classDefs.parallelForEachIndexed(coroutineContext) { _, classDef ->
             val visitor = threadLocal.get()
-            visitor.visitClassDef(this, index, classDef)
+            visitor.visitClassDef(this, classDef)
         }
     }
 

@@ -22,7 +22,7 @@ import com.github.netomi.bat.util.asInternalJavaClassName
 import java.util.*
 
 fun classDefPoolFiller(pool: ClassDefPool): ClassDefVisitor {
-    return ClassDefVisitor { dexFile, index, classDef -> pool.addClassDef(dexFile, index, classDef) }
+    return ClassDefVisitor { dexFile, classDef -> pool.addClassDef(dexFile, classDef) }
 }
 
 class ClassDefPool private constructor() {
@@ -31,9 +31,9 @@ class ClassDefPool private constructor() {
     val size: Int
         get() = classDefMap.size
 
-    fun addClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+    fun addClassDef(dexFile: DexFile, classDef: ClassDef) {
         val className = classDef.getType(dexFile)
-        classDefMap.computeIfAbsent(className) { ClassDefData(dexFile, index, classDef) }
+        classDefMap.computeIfAbsent(className) { ClassDefData(dexFile, classDef) }
     }
 
     fun getClassDefByType(type: String): ClassDefData? {
@@ -47,7 +47,7 @@ class ClassDefPool private constructor() {
 
     fun classDefsAccept(visitor: ClassDefVisitor) {
         for ((_, data) in classDefMap) {
-            visitor.visitClassDef(data.dexFile, data.index, data.classDef)
+            visitor.visitClassDef(data.dexFile, data.classDef)
         }
     }
 
@@ -58,5 +58,5 @@ class ClassDefPool private constructor() {
     }
 
     // Inner helper classes.
-    inner class ClassDefData internal constructor(val dexFile: DexFile, val index: Int, val classDef: ClassDef)
+    inner class ClassDefData internal constructor(val dexFile: DexFile, val classDef: ClassDef)
 }

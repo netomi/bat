@@ -25,7 +25,7 @@ class ClassDefAdder constructor(private val targetDexEditor: DexEditor): ClassDe
 
     constructor(dexFile: DexFile): this(DexEditor.of(dexFile))
 
-    override fun visitClassDef(dexFile: DexFile, index: Int, classDef: ClassDef) {
+    override fun visitClassDef(dexFile: DexFile, classDef: ClassDef) {
         val targetClassDefEditor =
             targetDexEditor.addClassDef(classDef.getType(dexFile),
                                         classDef.accessFlags,
