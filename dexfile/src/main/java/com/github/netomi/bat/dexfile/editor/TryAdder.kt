@@ -23,7 +23,7 @@ class TryAdder constructor(private val targetCodeEditor: CodeEditor): TryVisitor
 
     private val targetDexEditor = targetCodeEditor.dexEditor
 
-    override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryElement: Try) {
+    override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, tryElement: Try) {
         val copiedHandlers = mutableListOf<TypeAddrPair>()
         for (typeAddrPair in tryElement.catchHandler.handlers) {
             copiedHandlers.add(

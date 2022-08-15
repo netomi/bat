@@ -18,5 +18,5 @@ package com.github.netomi.bat.dexfile.visitor
 import com.github.netomi.bat.dexfile.*
 
 fun interface TryVisitor {
-    fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryElement: Try)
+    fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, tryElement: Try)
 }

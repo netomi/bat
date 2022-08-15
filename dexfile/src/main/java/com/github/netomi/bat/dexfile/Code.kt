@@ -193,7 +193,7 @@ class Code private constructor(            registersSize: Int              = 0,
     }
 
     fun triesAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: TryVisitor) {
-        tryList.forEachIndexed { index, tryElement -> visitor.visitTry(dexFile, classDef, method, this, index, tryElement) }
+        tryList.forEach { tryElement -> visitor.visitTry(dexFile, classDef, method, this, tryElement) }
     }
 
     fun debugInfoAccept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, visitor: DebugInfoVisitor) {

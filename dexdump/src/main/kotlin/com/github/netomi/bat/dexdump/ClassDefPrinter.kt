@@ -211,7 +211,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         codeOffset += instruction.length
     }
 
-    override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, index: Int, tryElement: Try) {
+    override fun visitTry(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, tryElement: Try) {
         val startAddr = toHexStringWithPrefix(tryElement.startAddr.toShort())
         val endAddr   = toHexStringWithPrefix((tryElement.startAddr + tryElement.insnCount).toShort())
         printer.println("    %s - %s".format(startAddr, endAddr))
