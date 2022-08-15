@@ -22,12 +22,18 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class PackedSwitchInstruction private constructor(private var _payload: PackedSwitchPayload = PackedSwitchPayload.empty(),
-                                                              register: Int = 0)
-    : SwitchInstruction<PackedSwitchPayload>(DexOpCode.PACKED_SWITCH, 0, register) {
+class PackedSwitchInstruction: SwitchInstruction<PackedSwitchPayload> {
+
+    private var _payload: PackedSwitchPayload = PackedSwitchPayload.empty()
 
     override val payload: PackedSwitchPayload
         get() = _payload
+
+    private constructor(): super(DexOpCode.PACKED_SWITCH)
+
+    private constructor(payload: PackedSwitchPayload, register: Int): super(DexOpCode.PACKED_SWITCH, register) {
+        this._payload = payload
+    }
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)

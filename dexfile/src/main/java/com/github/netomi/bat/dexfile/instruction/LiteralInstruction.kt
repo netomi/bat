@@ -23,11 +23,9 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
-class LiteralInstruction private constructor(      opCode:     DexOpCode,
-                                                   literal:    Long = 0,
-                                             vararg registers: Int) : DexInstruction(opCode, *registers) {
+class LiteralInstruction: DexInstruction {
 
-    var value: Long = literal
+    var value: Long = 0
         private set
 
     val valueAsFloat: Float
@@ -36,15 +34,19 @@ class LiteralInstruction private constructor(      opCode:     DexOpCode,
     val valueAsDouble: Double
         get() = java.lang.Double.longBitsToDouble(value)
 
-    init {
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, literal: Long, vararg registers: Int): super(opCode, *registers) {
         when (opCode.format) {
-            FORMAT_11n -> checkRange(value, -0x8, 0x7, opCode)
-            FORMAT_21s -> checkRange(value, -0x8000, 0x7fff, opCode)
-            FORMAT_31i -> checkRange(value, -0x80000000, 0x7fffffff, opCode)
-            FORMAT_21h -> checkRangeHigh16(value, -0x8000, 0x7fff, opCode)
+            FORMAT_11n -> checkRange(literal, -0x8, 0x7, opCode)
+            FORMAT_21s -> checkRange(literal, -0x8000, 0x7fff, opCode)
+            FORMAT_31i -> checkRange(literal, -0x80000000, 0x7fffffff, opCode)
+            FORMAT_21h -> checkRangeHigh16(literal, -0x8000, 0x7fff, opCode)
             FORMAT_51l -> {} // no need to check as it conforms to the range [Long.MIN_VALUE, Long.MAX_VALUE]
             else -> {}
         }
+
+        this.value = literal
     }
 
     override fun read(instructions: ShortArray, offset: Int) {

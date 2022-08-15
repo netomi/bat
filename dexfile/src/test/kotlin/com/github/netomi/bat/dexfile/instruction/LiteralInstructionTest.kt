@@ -82,6 +82,7 @@ class LiteralInstructionTest: DexInstructionTest<LiteralInstruction>() {
             // const/4
             { LiteralInstruction.of(DexOpCode.CONST_4,  0x8, 0) },
             { LiteralInstruction.of(DexOpCode.CONST_4, -0x9, 0) },
+            { LiteralInstruction.of(DexOpCode.CONST_4, -0x1, 20) },
 
             // const/16
             { LiteralInstruction.of(DexOpCode.CONST_16,  0x8000, 0) },

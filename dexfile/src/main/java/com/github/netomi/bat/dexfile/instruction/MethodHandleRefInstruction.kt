@@ -19,12 +19,17 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class MethodHandleRefInstruction private constructor(       opcode:            DexOpCode,
-                                                            methodHandleIndex: Int = NO_INDEX,
-                                                     vararg registers:         Int) : DexInstruction(opcode, *registers) {
+class MethodHandleRefInstruction: DexInstruction {
 
-    var methodHandleIndex: Int = methodHandleIndex
+    var methodHandleIndex: Int = NO_INDEX
         internal set
+
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, methodHandleIndex: Int, vararg registers: Int): super(opCode, *registers) {
+        require(methodHandleIndex >= 0) { "methodHandleIndex must not be negative for instruction ${opCode.mnemonic}" }
+        this.methodHandleIndex = methodHandleIndex
+    }
 
     fun getMethodHandle(dexFile: DexFile): MethodHandle {
         return dexFile.getMethodHandle(methodHandleIndex)

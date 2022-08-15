@@ -21,8 +21,11 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class BasicInstruction private constructor(       opCode:    DexOpCode,
-                                           vararg registers: Int) : DexInstruction(opCode, *registers) {
+class BasicInstruction: DexInstruction {
+
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, vararg registers: Int): super(opCode, *registers)
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitBasicInstruction(dexFile, classDef, method, code, offset, this)

@@ -22,8 +22,11 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class ConversionInstruction private constructor(       opCode:    DexOpCode,
-                                                vararg registers: Int) : DexInstruction(opCode, *registers) {
+class ConversionInstruction: DexInstruction {
+
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, rA: Int, rB: Int): super(opCode, rA, rB)
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
@@ -35,8 +38,8 @@ class ConversionInstruction private constructor(       opCode:    DexOpCode,
     }
 
     companion object {
-        fun of(opcode: DexOpCode, vararg registers: Int): ConversionInstruction {
-            return ConversionInstruction(opcode, *registers)
+        fun of(opcode: DexOpCode, rA: Int, rB: Int): ConversionInstruction {
+            return ConversionInstruction(opcode, rA, rB)
         }
 
         internal fun create(opCode: DexOpCode): ConversionInstruction {

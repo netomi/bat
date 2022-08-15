@@ -22,12 +22,18 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class FillArrayDataInstruction private constructor(private var _payload: FillArrayPayload = FillArrayPayload.empty(),
-                                                               register: Int = 0)
-    : PayloadInstruction<FillArrayPayload>(DexOpCode.FILL_ARRAY_DATA, 0, register) {
+class FillArrayDataInstruction: PayloadInstruction<FillArrayPayload> {
+
+    private var _payload: FillArrayPayload = FillArrayPayload.empty()
 
     override val payload: FillArrayPayload
         get() = _payload
+
+    private constructor(): super(DexOpCode.FILL_ARRAY_DATA)
+
+    private constructor(payload: FillArrayPayload, register: Int): super(DexOpCode.FILL_ARRAY_DATA, register) {
+        this._payload = payload
+    }
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)

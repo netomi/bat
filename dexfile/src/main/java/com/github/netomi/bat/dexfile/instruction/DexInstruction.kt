@@ -23,11 +23,17 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
+import com.github.netomi.bat.util.toHexString
+import com.github.netomi.bat.util.toHexStringWithPrefix
+import com.github.netomi.bat.util.toSignedHexStringWithPrefix
+import kotlin.math.max
+import kotlin.math.min
 
-abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
-                                                    vararg registers: Int) {
+abstract class DexInstruction {
 
-    var registers: IntArray = registers
+    val opCode: DexOpCode
+
+    var registers: IntArray
         private set
 
     open val length: Int
@@ -35,6 +41,16 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
 
     val mnemonic: String
         get() = opCode.mnemonic
+
+    protected constructor(opCode: DexOpCode) {
+        this.opCode    = opCode
+        this.registers = EMPTY_REGISTERS
+    }
+
+    protected constructor(opCode: DexOpCode, vararg registers: Int): this(opCode) {
+        checkRegisters(opCode, registers)
+        this.registers = registers
+    }
 
     open fun read(instructions: ShortArray, offset: Int) {
         registers = when (opCode.format) {
@@ -199,6 +215,8 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
 
         data[0] = (opCode.value and 0xff).toShort()
 
+        checkRegisters(opCode, registers)
+
         when (opCode.format) {
             FORMAT_00x,
             FORMAT_10x,
@@ -208,9 +226,6 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
 
             FORMAT_11n -> {
                 val a = registers[0] and 0xf
-                if (a != registers[0]) {
-                    throw IllegalStateException("register number " + registers[0] + " too big for opcode format")
-                }
                 data[0] = (data[0].toInt() or (a shl 8)).toShort()
             }
 
@@ -220,12 +235,6 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
             FORMAT_22t -> {
                 val a = registers[0] and 0xf
                 val b = registers[1] and 0xf
-                if (a != registers[0]) {
-                    throw IllegalStateException("register number " + registers[0] + " too big for opcode format")
-                }
-                if (b != registers[1]) {
-                    throw IllegalStateException("register number " + registers[1] + " too big for opcode format")
-                }
                 data[0] = (data[0].toInt() or (a shl 8 or (b shl 12))).toShort()
             }
 
@@ -239,21 +248,12 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
             FORMAT_31t,
             FORMAT_51l -> {
                 val a = registers[0] and 0xff
-                if (a != registers[0]) {
-                    throw IllegalStateException("register number " + registers[0] + " too big for opcode format")
-                }
                 data[0] = (data[0].toInt() or (a shl 8)).toShort()
             }
 
             FORMAT_22b -> {
                 val a = registers[0] and 0xff
                 val b = registers[1] and 0xff
-                if (a != registers[0]) {
-                    throw IllegalStateException("register number " + registers[0] + " too big for opcode format")
-                }
-                if (b != registers[1]) {
-                    throw IllegalStateException("register number " + registers[1] + " too big for opcode format")
-                }
                 data[0] = (data[0].toInt() or (a shl 8)).toShort()
                 data[1] = (data[1].toInt() or b).toShort()
             }
@@ -261,12 +261,6 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
             FORMAT_22x -> {
                 val a = registers[0] and 0xff
                 val b = registers[1] and 0xffff
-                if (a != registers[0]) {
-                    throw IllegalStateException("register number " + registers[0] + " too big for opcode format")
-                }
-                if (b != registers[1]) {
-                    throw IllegalStateException("register number " + registers[1] + " too big for opcode format")
-                }
                 data[0] = (data[0].toInt() or (a shl 8)).toShort()
                 data[1] = (data[1].toInt() or b).toShort()
             }
@@ -275,15 +269,6 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
                 val a = registers[0] and 0xff
                 val b = registers[1] and 0xff
                 val c = registers[2] and 0xff
-                if (a != registers[0]) {
-                    throw IllegalStateException("register number " + registers[0] + " too big for opcode format")
-                }
-                if (b != registers[1]) {
-                    throw IllegalStateException("register number " + registers[1] + " too big for opcode format")
-                }
-                if (c != registers[2]) {
-                    throw IllegalStateException("register number " + registers[2] + " too big for opcode format")
-                }
                 data[0] = (data[0].toInt() or (a shl 8)).toShort()
                 data[1] = (data[1].toInt() or (b or (c shl 8))).toShort()
             }
@@ -291,12 +276,6 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
             FORMAT_32x -> {
                 val a = registers[0] and 0xffff
                 val b = registers[1] and 0xffff
-                if (a != registers[0]) {
-                    throw IllegalStateException("register number " + registers[0] + " too big for opcode format")
-                }
-                if (b != registers[1]) {
-                    throw IllegalStateException("register number " + registers[1] + " too big for opcode format")
-                }
                 data[1] = (data[1].toInt() or a).toShort()
                 data[2] = (data[2].toInt() or b).toShort()
             }
@@ -393,6 +372,103 @@ abstract class DexInstruction protected constructor(val    opCode:    DexOpCode,
 
             instruction.read(instructions, offset)
             return instruction
+        }
+
+        private fun checkRegisters(opCode: DexOpCode, registers: IntArray) {
+            when (opCode.format) {
+                FORMAT_00x,
+                FORMAT_10x,
+                FORMAT_10t,
+                FORMAT_20t,
+                FORMAT_30t -> {
+                    require(registers.isEmpty()) { "instruction '$opCode' supports no registers" }
+                }
+
+                FORMAT_11n -> {
+                    require(registers.size == 1) { "instruction '$opCode' requires exactly 1 register" }
+                    checkRegister(registers[0], 0, 0xf, opCode)
+                }
+
+                FORMAT_12x,
+                FORMAT_22c,
+                FORMAT_22s,
+                FORMAT_22t -> {
+                    require(registers.size == 2) { "instruction '$opCode' requires exactly 2 registers" }
+                    checkRegister(registers[0], 0, 0xf, opCode)
+                    checkRegister(registers[1], 0, 0xf, opCode)
+                }
+
+                FORMAT_11x,
+                FORMAT_21c,
+                FORMAT_21t,
+                FORMAT_21s,
+                FORMAT_21h,
+                FORMAT_31c,
+                FORMAT_31i,
+                FORMAT_31t,
+                FORMAT_51l -> {
+                    require(registers.size == 1) { "instruction '$opCode' only supports a single register" }
+                    checkRegister(registers[0], 0, 0xff, opCode)
+                }
+
+                FORMAT_22b -> {
+                    require(registers.size == 2) { "instruction '$opCode' requires exactly 2 registers" }
+                    checkRegister(registers[0], 0, 0xff, opCode)
+                    checkRegister(registers[1], 0, 0xff, opCode)
+                }
+
+                FORMAT_22x -> {
+                    require(registers.size == 2) { "instruction '$opCode' requires exactly 2 registers" }
+                    checkRegister(registers[0], 0, 0xff, opCode)
+                    checkRegister(registers[1], 0, 0xffff, opCode)
+                }
+
+                FORMAT_23x -> {
+                    require(registers.size == 3) { "instruction '$opCode' requires exactly 3 registers" }
+                    checkRegister(registers[0], 0, 0xff, opCode)
+                    checkRegister(registers[1], 0, 0xff, opCode)
+                    checkRegister(registers[2], 0, 0xff, opCode)
+                }
+
+                FORMAT_32x -> {
+                    require(registers.size == 2) { "instruction '$opCode' requires exactly 2 registers" }
+                    checkRegister(registers[0], 0, 0xffff, opCode)
+                    checkRegister(registers[1], 0, 0xffff, opCode)
+                }
+
+                FORMAT_35c -> {
+                    require(registers.size in 0 .. 5) { "instruction '$opCode' supports 0 .. 5 registers" }
+                    for (index in registers.indices) {
+                        checkRegister(registers[index], 0, 0xf, opCode)
+                    }
+                }
+
+                FORMAT_3rc,
+                FORMAT_4rcc -> {
+                    require(registers.size in 0 .. 255) { "instruction '$opCode' supports 0 .. 255 registers" }
+                    for (index in registers.indices) {
+                        checkRegister(registers[index], 0, 0xffff, opCode)
+                    }
+                }
+
+                FORMAT_45cc -> {
+                    require(registers.size in 1 .. 5) { "instruction '$opCode' supports 1 .. 5 registers" }
+                    for (index in registers.indices) {
+                        checkRegister(registers[index], 0, 0xf, opCode)
+                    }
+                }
+
+                else -> {}
+            }
+        }
+
+        private fun checkRegister(registerNumber: Int, minValue: Int, maxValue: Int, opCode: DexOpCode) {
+            require(registerNumber in minValue..maxValue)
+                { "register number '%d' exceeds allowed range [%s, %s] for opcode '%s'"
+                    .format(registerNumber,
+                            toSignedHexStringWithPrefix(minValue),
+                            toSignedHexStringWithPrefix(maxValue),
+                            opCode.mnemonic) }
         }
     }
 }

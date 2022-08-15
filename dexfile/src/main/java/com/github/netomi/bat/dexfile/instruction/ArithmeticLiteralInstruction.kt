@@ -21,13 +21,24 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
-class ArithmeticLiteralInstruction private constructor(       opCode:    DexOpCode,
-                                                              literal:   Int = 0,
-                                                       vararg registers: Int) : ArithmeticInstruction(opCode, *registers) {
+class ArithmeticLiteralInstruction: ArithmeticInstruction {
 
-    var literal = literal
+    var literal = 0
         private set
+
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, literal: Int, vararg registers: Int): super(opCode, *registers) {
+        when (opCode.format) {
+            FORMAT_22b -> checkRange(literal, -0x80, 0x7f, opCode)
+            FORMAT_22s -> checkRange(literal, -0x8000, 0x7fff, opCode)
+            else -> {}
+        }
+
+        this.literal = literal
+    }
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
@@ -57,6 +68,17 @@ class ArithmeticLiteralInstruction private constructor(       opCode:    DexOpCo
     }
 
     companion object {
+        private fun checkRange(value: Int, minValue: Int, maxValue: Int, opCode: DexOpCode) {
+            if (value < minValue || value > maxValue) {
+                throw IllegalArgumentException("literal value '%s' exceeds allowed range [%s, %s] for opcode '%s'"
+                    .format(
+                        toSignedHexStringWithPrefix(value),
+                        toSignedHexStringWithPrefix(minValue),
+                        toSignedHexStringWithPrefix(maxValue),
+                        opCode.mnemonic))
+            }
+        }
+
         fun of(opCode: DexOpCode, literal: Int, vararg registers: Int): ArithmeticLiteralInstruction {
             return ArithmeticLiteralInstruction(opCode, literal, *registers)
         }

@@ -20,12 +20,17 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-open class MethodInstruction protected constructor(opcode:           DexOpCode,
-                                                   methodIndex:      Int = NO_INDEX,
-                                                   vararg registers: Int) : DexInstruction(opcode, *registers) {
+open class MethodInstruction: DexInstruction {
 
-    var methodIndex: Int = methodIndex
+    var methodIndex: Int = NO_INDEX
         internal set
+
+    protected constructor(opCode: DexOpCode): super(opCode)
+
+    protected constructor(opCode: DexOpCode, methodIndex: Int, vararg registers: Int): super(opCode, *registers) {
+        require(methodIndex >= 0) { "methodIndex must not be negative for instruction ${opCode.mnemonic}" }
+        this.methodIndex = methodIndex
+    }
 
     fun getMethodID(dexFile: DexFile): MethodID {
         return dexFile.getMethodID(methodIndex)

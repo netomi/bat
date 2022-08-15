@@ -22,12 +22,18 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class SparseSwitchInstruction private constructor(private var _payload: SparseSwitchPayload = SparseSwitchPayload.empty(),
-                                                              register: Int = 0)
-    : SwitchInstruction<SparseSwitchPayload>(DexOpCode.SPARSE_SWITCH, 0, register) {
+class SparseSwitchInstruction: SwitchInstruction<SparseSwitchPayload> {
+
+    private var _payload: SparseSwitchPayload = SparseSwitchPayload.empty()
 
     override val payload: SparseSwitchPayload
         get() = _payload
+
+    private constructor(): super(DexOpCode.SPARSE_SWITCH)
+
+    private constructor(payload: SparseSwitchPayload, register: Int): super(DexOpCode.SPARSE_SWITCH, register) {
+        this._payload = payload
+    }
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)

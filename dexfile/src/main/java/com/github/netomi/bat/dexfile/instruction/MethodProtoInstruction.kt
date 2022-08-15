@@ -19,13 +19,17 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class MethodProtoInstruction private constructor(opcode:           DexOpCode,
-                                                 methodIndex:      Int = NO_INDEX,
-                                                 protoIndex:       Int = NO_INDEX,
-                                                 vararg registers: Int) : MethodInstruction(opcode, methodIndex, *registers) {
+class MethodProtoInstruction: MethodInstruction {
 
-    var protoIndex: Int = protoIndex
+    var protoIndex: Int = NO_INDEX
         internal set
+
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, methodIndex: Int, protoIndex: Int, vararg registers: Int): super(opCode, methodIndex, *registers) {
+        require(protoIndex >= 0) { "protoIndex must not be negative for instruction ${opCode.mnemonic}" }
+        this.protoIndex = protoIndex
+    }
 
     fun getProtoID(dexFile: DexFile): ProtoID {
         return dexFile.getProtoID(protoIndex)

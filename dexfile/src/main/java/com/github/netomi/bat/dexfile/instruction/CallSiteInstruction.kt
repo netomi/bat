@@ -20,12 +20,17 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-class CallSiteInstruction private constructor(       opCode:        DexOpCode,
-                                                     callSiteIndex: Int = NO_INDEX,
-                                              vararg registers:     Int) : DexInstruction(opCode, *registers) {
+class CallSiteInstruction: DexInstruction {
 
-    var callSiteIndex: Int = callSiteIndex
+    var callSiteIndex: Int = NO_INDEX
         internal set
+
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, callSiteIndex: Int, vararg registers: Int): super(opCode, *registers) {
+        require(callSiteIndex >= 0) { "callSiteIndex must not be negative for instruction ${opCode.mnemonic}" }
+        this.callSiteIndex = callSiteIndex
+    }
 
     fun getCallSiteID(dexFile: DexFile): CallSiteID {
         return dexFile.getCallSiteID(callSiteIndex)

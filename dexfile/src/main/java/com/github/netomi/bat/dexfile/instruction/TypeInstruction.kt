@@ -20,12 +20,17 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toHexString
 
-class TypeInstruction private constructor(       opCode:    DexOpCode,
-                                                 typeIndex: Int = NO_INDEX,
-                                          vararg registers: Int) : DexInstruction(opCode, *registers) {
+class TypeInstruction: DexInstruction {
 
-    var typeIndex: Int = typeIndex
+    var typeIndex: Int = NO_INDEX
         internal set
+
+    private constructor(opCode: DexOpCode): super(opCode)
+
+    private constructor(opCode: DexOpCode, typeIndex: Int, vararg registers: Int): super(opCode, *registers) {
+        require(typeIndex >= 0) { "typeIndex must not be negative for instruction ${opCode.mnemonic}" }
+        this.typeIndex = typeIndex
+    }
 
     fun getTypeID(dexFile: DexFile): TypeID {
         return dexFile.getTypeID(typeIndex)
