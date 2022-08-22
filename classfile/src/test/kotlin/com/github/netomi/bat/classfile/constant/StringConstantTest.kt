@@ -16,23 +16,18 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
-import org.junit.jupiter.api.Assertions
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class StringConstantTest : ConstantBaseTest() {
 
-    override fun createEmptyConstant(): StringConstant {
-        return StringConstant.create(constantPool)
-    }
-
     override fun createConstants(): List<StringConstant> {
-        return listOf(StringConstant.create(constantPool, 10),
-                StringConstant.create(constantPool, 0),
-                StringConstant.create(constantPool, 100))
+        return listOf(StringConstant.of(10),
+                      StringConstant.of(0),
+                      StringConstant.of(100))
     }
 
     @Test
@@ -61,8 +56,8 @@ class StringConstantTest : ConstantBaseTest() {
             }
         })
 
-        Assertions.assertTrue(wrongMethod == 0)
-        Assertions.assertTrue(correctMethod == 1)
+        assertTrue(wrongMethod == 0)
+        assertTrue(correctMethod == 1)
     }
 
     @Test
@@ -82,7 +77,7 @@ class StringConstantTest : ConstantBaseTest() {
             }
         })
 
-        Assertions.assertTrue(wrongMethod == 0)
-        Assertions.assertTrue(correctMethod == 1)
+        assertTrue(wrongMethod == 0)
+        assertTrue(correctMethod == 1)
     }
 }

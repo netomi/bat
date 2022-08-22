@@ -16,9 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,17 +26,15 @@ import java.io.IOException
  * A constant representing a CONSTANT_Class_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.1">CONSTANT_Class_info Structure</a>
- *
- * @author Thomas Neidhart
  */
-data class ClassConstant internal constructor(override val owner:     ConstantPool,
-                                                       var nameIndex: Int = -1) : Constant() {
+data class ClassConstant private constructor(var nameIndex: Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.CLASS
 
-    val className: String
-        get() = owner.getString(nameIndex)
+    fun getClassName(cp: ConstantPool): String {
+        return cp.getString(nameIndex)
+    }
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -49,26 +46,21 @@ data class ClassConstant internal constructor(override val owner:     ConstantPo
         output.writeShort(nameIndex)
     }
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitClassConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitClassConstant(classFile, index, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(owner: ConstantPool): ClassConstant {
-            return ClassConstant(owner)
+        internal fun empty(): ClassConstant {
+            return ClassConstant()
         }
 
-        @JvmStatic
-        fun create(owner: ConstantPool, nameIndex: Int): ClassConstant {
-            return ClassConstant(owner, nameIndex)
+        fun of(nameIndex: Int): ClassConstant {
+            return ClassConstant(nameIndex)
         }
     }
 }

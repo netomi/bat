@@ -16,9 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,17 +26,15 @@ import java.io.IOException
  * A constant representing a CONSTANT_Package_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.12">CONSTANT_Package_info Structure</a>
- *
- * @author Thomas Neidhart
  */
-data class PackageConstant internal constructor(override val owner:     ConstantPool,
-                                                         var nameIndex: Int = -1): Constant() {
+data class PackageConstant private constructor(var nameIndex: Int = -1): Constant() {
 
     override val type: Type
         get() = Type.PACKAGE
 
-    val packageName: String
-        get() = owner.getString(nameIndex)
+    fun getPackageName(cp: ConstantPool): String {
+        return cp.getString(nameIndex)
+    }
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -49,26 +46,21 @@ data class PackageConstant internal constructor(override val owner:     Constant
         output.writeShort(nameIndex)
     }
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitPackageConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitPackageConstant(classFile, index, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(owner: ConstantPool): PackageConstant {
-            return PackageConstant(owner)
+        internal fun empty(): PackageConstant {
+            return PackageConstant()
         }
 
-        @JvmStatic
-        fun create(owner: ConstantPool, nameIndex: Int): PackageConstant {
-            return PackageConstant(owner, nameIndex)
+        fun of(nameIndex: Int): PackageConstant {
+            return PackageConstant(nameIndex)
         }
     }
 }

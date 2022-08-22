@@ -23,6 +23,8 @@ import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.*
 import com.github.netomi.bat.classfile.attribute.annotations.Annotation
 import com.github.netomi.bat.classfile.constant.*
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.asJvmType
@@ -124,9 +126,9 @@ class ClassFilePrinter :
     }
 
     override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
-        val className  = refConstant.className
-        val memberName = refConstant.memberName
-        val descriptor = refConstant.descriptor
+        val className  = refConstant.getClassName(classFile.cp)
+        val memberName = refConstant.getMemberName(classFile.cp)
+        val descriptor = refConstant.getDescriptor(classFile.cp)
 
         val str = "$className.$memberName:$descriptor"
         var type = "Unknown"
@@ -164,7 +166,7 @@ class ClassFilePrinter :
     }
 
     override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
-        val str = constant.packageName
+        val str = constant.getPackageName(classFile.cp)
         printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, str))
     }
 

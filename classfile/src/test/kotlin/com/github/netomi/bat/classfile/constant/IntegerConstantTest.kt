@@ -19,20 +19,15 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 
 class IntegerConstantTest : ConstantBaseTest() {
 
-    override fun createEmptyConstant(): IntegerConstant {
-        return IntegerConstant.create(constantPool)
-    }
-
     override fun createConstants(): List<IntegerConstant> {
-        return listOf(IntegerConstant.create(constantPool, 0),
-                IntegerConstant.create(constantPool, 100),
-                IntegerConstant.create(constantPool, Integer.MIN_VALUE))
+        return listOf(IntegerConstant.of(0),
+                      IntegerConstant.of(100),
+                      IntegerConstant.of(Integer.MIN_VALUE))
     }
 
     @Test

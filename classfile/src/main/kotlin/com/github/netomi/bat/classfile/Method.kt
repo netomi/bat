@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.constant.ConstantPool
 import java.io.DataInput
 import java.io.IOException
 

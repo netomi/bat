@@ -16,23 +16,18 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class LongConstantTest : ConstantBaseTest() {
 
-    override fun createEmptyConstant(): LongConstant {
-        return LongConstant.create(constantPool)
-    }
-
     override fun createConstants(): List<LongConstant> {
-        return listOf(LongConstant.create(constantPool, 0),
-                LongConstant.create(constantPool, 100),
-                LongConstant.create(constantPool, Long.MIN_VALUE))
+        return listOf(LongConstant.of(0),
+                      LongConstant.of(100),
+                      LongConstant.of(Long.MIN_VALUE))
     }
 
     @Test

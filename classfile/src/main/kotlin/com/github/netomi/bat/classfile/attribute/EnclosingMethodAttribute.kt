@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
+import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
@@ -26,8 +26,6 @@ import java.io.IOException
  * A class representing a EnclosingMethod attribute in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.7">Enclosing Method Attribute</a>
- *
- * @author Thomas Neidhart
  */
 data class EnclosingMethodAttribute internal constructor(override var attributeNameIndex: Int = -1,
                                                                   var classIndex:         Int = -1,
@@ -41,24 +39,24 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
     }
 
     fun getMethodName(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(methodIndex).memberName;
+        return constantPool.getNameAndType(methodIndex).getMemberName(constantPool);
     }
 
     fun getMethodType(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(methodIndex).descriptor
+        return constantPool.getNameAndType(methodIndex).getDescriptor(constantPool)
     }
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
-        assert(length == 4)
+        assert(length == ATTRIBUTE_LENGTH)
         classIndex  = input.readUnsignedShort()
         methodIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(4)
+        output.writeInt(ATTRIBUTE_LENGTH)
         output.writeShort(classIndex)
         output.writeShort(methodIndex)
     }
@@ -68,6 +66,8 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
     }
 
     companion object {
+        private const val ATTRIBUTE_LENGTH = 4
+
         @JvmStatic
         fun create(attributeNameIndex: Int): EnclosingMethodAttribute {
             return EnclosingMethodAttribute(attributeNameIndex)

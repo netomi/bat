@@ -16,46 +16,37 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 
 
 /**
  * A constant representing a CONSTANT_Fieldref_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2">CONSTANT_Fieldref_info Structure</a>
- *
- * @author Thomas Neidhart
  */
-data class FieldrefConstant internal constructor(
-    override val owner:            ConstantPool,
+data class FieldrefConstant private constructor(
     override var classIndex:       Int = -1,
-    override var nameAndTypeIndex: Int = -1) : RefConstant(owner, classIndex, nameAndTypeIndex) {
+    override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
 
     override val type: Type
         get() = Type.FIELD_REF
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitFieldRefConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitFieldRefConstant(classFile, index, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(owner: ConstantPool): FieldrefConstant {
-            return FieldrefConstant(owner)
+        internal fun empty(): FieldrefConstant {
+            return FieldrefConstant()
         }
 
-        @JvmStatic
-        fun create(owner: ConstantPool, classIndex: Int, nameAndTypeIndex: Int): FieldrefConstant {
-            return FieldrefConstant(owner, classIndex, nameAndTypeIndex)
+        fun of(classIndex: Int, nameAndTypeIndex: Int): FieldrefConstant {
+            return FieldrefConstant(classIndex, nameAndTypeIndex)
         }
     }
 }

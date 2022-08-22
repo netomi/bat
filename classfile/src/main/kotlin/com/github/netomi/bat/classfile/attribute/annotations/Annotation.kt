@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
+import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.visitor.ElementValueVisitor
 import java.io.DataInput
 import java.io.DataOutput

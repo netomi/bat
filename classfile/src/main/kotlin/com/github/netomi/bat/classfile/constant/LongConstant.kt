@@ -16,9 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,11 +26,8 @@ import java.io.IOException
  * A constant representing a CONSTANT_Long_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.5">CONSTANT_Long_info Structure</a>
- *
- * @author Thomas Neidhart
  */
-data class LongConstant internal constructor(override val owner: ConstantPool,
-                                                      var value: Long = 0) : Constant() {
+data class LongConstant private constructor(var value: Long = 0) : Constant() {
 
     override val type: Type
         get() = Type.LONG
@@ -51,24 +47,21 @@ data class LongConstant internal constructor(override val owner: ConstantPool,
         output.writeInt(lowBytes)
     }
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitLongConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitLongConstant(classFile, index, this)
     }
 
     companion object {
-        fun create(owner: ConstantPool) : LongConstant {
-            return LongConstant(owner)
+        internal fun empty() : LongConstant {
+            return LongConstant()
         }
 
-        fun create(owner: ConstantPool, value: Long) : LongConstant {
-            return LongConstant(owner, value)
+        fun of(value: Long) : LongConstant {
+            return LongConstant(value)
         }
     }
 }

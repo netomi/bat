@@ -16,9 +16,10 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.asInternalJavaClassName
 import java.io.DataInput
@@ -44,7 +45,7 @@ class ClassFile internal constructor() {
     var superClassIndex = -1
         private set
 
-    val cp: ConstantPool   = ConstantPool()
+    internal val cp: ConstantPool = ConstantPool()
 
     private val interfaces = mutableListOf<Int>()
     private val fields     = mutableListOf<Field>()

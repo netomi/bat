@@ -16,9 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,22 +26,21 @@ import java.io.IOException
  * A constant representing a CONSTANT_NameAndType_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.6">CONSTANT_NameAndType_info Structure</a>
- *
- * @author Thomas Neidhart
  */
 data class NameAndTypeConstant internal constructor(
-    override val owner:           ConstantPool,
-             var nameIndex:       Int = -1,
-             var descriptorIndex: Int = -1) : Constant() {
+    var nameIndex:       Int = -1,
+    var descriptorIndex: Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.NAME_AND_TYPE
 
-    val memberName: String
-        get() = owner.getString(nameIndex)
+    fun getMemberName(cp: ConstantPool): String {
+        return cp.getString(nameIndex)
+    }
 
-    val descriptor: String
-        get() = owner.getString(descriptorIndex)
+    fun getDescriptor(cp: ConstantPool): String {
+        return cp.getString(descriptorIndex)
+    }
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -56,26 +54,21 @@ data class NameAndTypeConstant internal constructor(
         output.writeShort(descriptorIndex)
     }
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitNameAndTypeConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitNameAndTypeConstant(classFile, index, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(owner: ConstantPool): NameAndTypeConstant {
-            return NameAndTypeConstant(owner)
+        internal fun empty(): NameAndTypeConstant {
+            return NameAndTypeConstant()
         }
 
-        @JvmStatic
-        fun create(owner: ConstantPool, nameIndex: Int, descriptorIndex: Int): NameAndTypeConstant {
-            return NameAndTypeConstant(owner, nameIndex, descriptorIndex)
+        fun of(nameIndex: Int, descriptorIndex: Int): NameAndTypeConstant {
+            return NameAndTypeConstant(nameIndex, descriptorIndex)
         }
     }
 }

@@ -16,23 +16,18 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
-import org.junit.jupiter.api.Assertions
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class Utf8ConstantTest : ConstantBaseTest() {
 
-    override fun createEmptyConstant(): Utf8Constant {
-        return Utf8Constant.create(constantPool)
-    }
-
     override fun createConstants(): List<Utf8Constant> {
-        return listOf(Utf8Constant.create(constantPool, "some content"),
-                Utf8Constant.create(constantPool, ""),
-                Utf8Constant.create(constantPool, "\u0033"))
+        return listOf(Utf8Constant.of("some content"),
+                      Utf8Constant.of(""),
+                      Utf8Constant.of("\u0033"))
     }
 
     @Test
@@ -61,8 +56,8 @@ class Utf8ConstantTest : ConstantBaseTest() {
             }
         })
 
-        Assertions.assertTrue(wrongMethod == 0)
-        Assertions.assertTrue(correctMethod == 1)
+        assertTrue(wrongMethod == 0)
+        assertTrue(correctMethod == 1)
     }
 
     @Test
@@ -82,7 +77,7 @@ class Utf8ConstantTest : ConstantBaseTest() {
             }
         })
 
-        Assertions.assertTrue(wrongMethod == 0)
-        Assertions.assertTrue(correctMethod == 1)
+        assertTrue(wrongMethod == 0)
+        assertTrue(correctMethod == 1)
     }
 }

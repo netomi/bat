@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,11 +13,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile
+package com.github.netomi.bat.classfile.constant
 
-import com.github.netomi.bat.classfile.constant.*
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -38,7 +38,7 @@ class ConstantPool {
     }
 
     fun getClassName(classIndex: Int): String {
-        return (constants[classIndex] as ClassConstant).className
+        return (constants[classIndex] as ClassConstant).getClassName(this)
     }
 
     fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
@@ -47,13 +47,13 @@ class ConstantPool {
 
     @Throws(IOException::class)
     fun read(input: DataInput) {
-        check(constants.isEmpty()) { "Trying to populate a non-empty ConstantPool." }
+        check(constants.isEmpty()) { "trying to populate a non-empty ConstantPool" }
 
         val entries = input.readUnsignedShort()
         constants.add(null)
         var i = 1
         while (i < entries) {
-            val constant = Constant.read(input, this)
+            val constant = Constant.read(input)
             constants.add(constant)
             if (constant.type.constantPoolSize > 1) {
                 constants.add(null)
@@ -85,7 +85,7 @@ class ConstantPool {
     }
 
     fun constantAccept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
-        check(constants[index] != null) { "Trying to accept a null constant at index $index" }
+        require(constants[index] != null) { "trying to accept a null constant at index $index" }
         constants[index]?.accept(classFile, visitor)
     }
 }

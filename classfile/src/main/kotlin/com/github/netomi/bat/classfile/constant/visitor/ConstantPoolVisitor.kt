@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,18 +13,18 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.visitor
+package com.github.netomi.bat.classfile.constant.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
+import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.constant.*
 
-interface ConstantPoolVisitor {
+fun interface ConstantPoolVisitor {
     fun visitConstantPoolStart(classFile: ClassFile, constantPool: ConstantPool) {}
 
     fun visitConstantPoolEnd(classFile: ClassFile, constantPool: ConstantPool) {}
 
-    fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {}
+    fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant)
 
     fun visitAnyRefConstant(classFile: ClassFile, index: Int, constant: RefConstant) {
         visitAnyConstant(classFile, index, constant)

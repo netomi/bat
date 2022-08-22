@@ -15,32 +15,32 @@
  */
 package com.github.netomi.bat.classfile.constant
 
-import com.github.netomi.bat.classfile.ConstantPool
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
 /**
- * An abstract base class for constants representing a member reference, i.e Fieldref, Methodref or
- * InterfaceMethodref.
- *
- * @author Thomas Neidhart
+ * An abstract base class for constants representing a member reference,
+ * i.e. Fieldref, Methodref or InterfaceMethodref.
  */
-abstract class RefConstant(override val owner:            ConstantPool,
-                               open var classIndex:       Int = -1,
-                               open var nameAndTypeIndex: Int = -1): Constant() {
+abstract class RefConstant(open var classIndex:       Int = -1,
+                           open var nameAndTypeIndex: Int = -1): Constant() {
 
-    val className: String
-        get() = owner.getClassName(classIndex)
+    fun getClassName(cp: ConstantPool): String {
+        return cp.getClassName(classIndex)
+    }
 
-    val nameAndType: NameAndTypeConstant
-        get() = owner.getNameAndType(nameAndTypeIndex)
+    private fun getNameAndTypeConstant(cp: ConstantPool): NameAndTypeConstant {
+        return cp.getNameAndType(nameAndTypeIndex)
+    }
 
-    val memberName: String
-        get() = nameAndType.memberName
+    fun getMemberName(cp: ConstantPool): String {
+        return getNameAndTypeConstant(cp).getMemberName(cp)
+    }
 
-    val descriptor: String
-        get() = nameAndType.descriptor
+    fun getDescriptor(cp: ConstantPool): String {
+        return getNameAndTypeConstant(cp).getDescriptor(cp)
+    }
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {

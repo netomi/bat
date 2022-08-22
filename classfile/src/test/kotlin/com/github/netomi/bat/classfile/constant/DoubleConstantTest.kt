@@ -16,24 +16,19 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class DoubleConstantTest : ConstantBaseTest() {
 
-    override fun createEmptyConstant(): DoubleConstant {
-        return DoubleConstant.create(constantPool)
-    }
-
     override fun createConstants(): List<DoubleConstant> {
-        return listOf(DoubleConstant.create(constantPool, 0.0),
-                DoubleConstant.create(constantPool, 100.0),
-                DoubleConstant.create(constantPool, Double.MIN_VALUE),
-                DoubleConstant.create(constantPool, Double.NEGATIVE_INFINITY))
+        return listOf(DoubleConstant.of(0.0),
+                      DoubleConstant.of(100.0),
+                      DoubleConstant.of(Double.MIN_VALUE),
+                      DoubleConstant.of(Double.NEGATIVE_INFINITY))
     }
 
     @Test

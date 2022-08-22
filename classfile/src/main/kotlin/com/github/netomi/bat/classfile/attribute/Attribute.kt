@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
+import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.visitor.AttributeVisitor
@@ -34,10 +34,10 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
     abstract val type: Type
 
     @Throws(IOException::class)
-    abstract fun readAttributeData(input: DataInput)
+    protected abstract fun readAttributeData(input: DataInput)
 
     @Throws(IOException::class)
-    abstract fun writeAttributeData(output: DataOutput)
+    protected abstract fun writeAttributeData(output: DataOutput)
 
     @Throws(IOException::class)
     fun writeAttribute(output: DataOutput) {

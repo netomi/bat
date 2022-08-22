@@ -16,53 +16,47 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
+import java.io.IOException
 
 /**
  * A constant representing a CONSTANT_Utf8_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
- *
- * @author Thomas Neidhart
  */
-data class Utf8Constant internal constructor(override val owner: ConstantPool,
-                                                      var value: String = ""): Constant() {
+data class Utf8Constant private constructor(var value: String = ""): Constant() {
 
     override val type: Type
         get() = Type.UTF8
 
+    @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
         value = input.readUTF()
     }
 
+    @Throws(IOException::class)
     override fun writeConstantInfo(output: DataOutput) {
         output.writeUTF(value)
     }
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this);
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitUtf8Constant(classFile, index, this);
     }
 
     companion object {
-        @JvmStatic
-        fun create(owner: ConstantPool) : Utf8Constant {
-            return Utf8Constant(owner)
+        internal fun empty() : Utf8Constant {
+            return Utf8Constant()
         }
 
-        @JvmStatic
-        fun create(owner: ConstantPool, value: String) : Utf8Constant {
-            return Utf8Constant(owner, value)
+        fun of(value: String) : Utf8Constant {
+            return Utf8Constant(value)
         }
     }
 }

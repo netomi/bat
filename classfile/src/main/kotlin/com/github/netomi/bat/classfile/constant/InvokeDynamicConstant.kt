@@ -16,9 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,13 +26,10 @@ import java.io.IOException
  * A constant representing a CONSTANT_InvokeDynamic_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.10">CONSTANT_InvokeDynamic_info Structure</a>
- *
- * @author Thomas Neidhart
  */
-data class InvokeDynamicConstant internal constructor(
-    override val owner:                    ConstantPool,
-             var bootstrapMethodAttrIndex: Int = -1,
-             var nameAndTypeIndex:         Int = -1) : Constant() {
+data class InvokeDynamicConstant private constructor(
+    var bootstrapMethodAttrIndex: Int = -1,
+    var nameAndTypeIndex:         Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.INVOKE_DYNAMIC
@@ -50,26 +46,21 @@ data class InvokeDynamicConstant internal constructor(
         output.writeShort(nameAndTypeIndex)
     }
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitInvokeDynamicConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitInvokeDynamicConstant(classFile, index, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(owner: ConstantPool): InvokeDynamicConstant {
-            return InvokeDynamicConstant(owner)
+        internal fun empty(): InvokeDynamicConstant {
+            return InvokeDynamicConstant()
         }
 
-        @JvmStatic
-        fun create(owner: ConstantPool, bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): InvokeDynamicConstant {
-            return InvokeDynamicConstant(owner, bootstrapMethodAttrIndex, nameAndTypeIndex)
+        fun of(bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): InvokeDynamicConstant {
+            return InvokeDynamicConstant(bootstrapMethodAttrIndex, nameAndTypeIndex)
         }
     }
 }

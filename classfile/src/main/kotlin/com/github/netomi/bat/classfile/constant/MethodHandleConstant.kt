@@ -16,9 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.ConstantPool
-import com.github.netomi.bat.classfile.visitor.ConstantPoolVisitor
-import com.github.netomi.bat.classfile.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,13 +26,10 @@ import java.io.IOException
  * A constant representing a CONSTANT_MethodHandle_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.8">CONSTANT_MethodHandle_info Structure</a>
- *
- * @author Thomas Neidhart
  */
-data class MethodHandleConstant internal constructor(
-    override val owner:          ConstantPool,
-             var referenceKind:  Int =  0,
-             var referenceIndex: Int = -1) : Constant() {
+data class MethodHandleConstant private constructor(
+    var referenceKind:  Int =  0,
+    var referenceIndex: Int = -1) : Constant() {
 
     override val type: Type
         get() = Type.METHOD_HANDLE
@@ -50,26 +46,21 @@ data class MethodHandleConstant internal constructor(
         output.writeShort(referenceIndex)
     }
 
-    override fun accept(classFile: ClassFile,
-                        visitor:   ConstantVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitMethodHandleConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile,
-                        index:     Int,
-                        visitor:   ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
         visitor.visitMethodHandleConstant(classFile, index, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(owner: ConstantPool): MethodHandleConstant {
-            return MethodHandleConstant(owner)
+        internal fun empty(): MethodHandleConstant {
+            return MethodHandleConstant()
         }
 
-        @JvmStatic
-        fun create(owner: ConstantPool, referenceKind: Int, referenceIndex: Int): MethodHandleConstant {
-            return MethodHandleConstant(owner, referenceKind, referenceIndex)
+        fun of(referenceKind: Int, referenceIndex: Int): MethodHandleConstant {
+            return MethodHandleConstant(referenceKind, referenceIndex)
         }
     }
 }

@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.classfile.constant
 
-import com.github.netomi.bat.classfile.ConstantPool
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
@@ -25,9 +24,6 @@ import java.io.DataOutputStream
 
 abstract class ConstantBaseTest {
 
-    val constantPool: ConstantPool = ConstantPool()
-
-    abstract fun createEmptyConstant(): Constant
     abstract fun createConstants(): List<Constant>
 
     @Test
@@ -52,7 +48,7 @@ abstract class ConstantBaseTest {
 
     private fun deserializeConstant(content: ByteArray): Constant {
         DataInputStream(ByteArrayInputStream(content)).use {
-            return Constant.read(it, constantPool)
+            return Constant.read(it)
         }
     }
 }
