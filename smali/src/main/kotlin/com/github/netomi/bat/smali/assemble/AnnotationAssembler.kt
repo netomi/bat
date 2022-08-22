@@ -35,15 +35,14 @@ internal class AnnotationAssembler constructor(
         val annotationVisibility = AnnotationVisibility.of(ctx.visibility.text)
 
         val annotationElements =
-            parseAnnotationAnnotationElements(ctx.sAnnotationKeyName(), ctx.sAnnotationValue(), dexEditor)
+            parseAnnotationAnnotationElements(ctx.sAnnotationKeyName(), ctx.sAnnotationValue())
 
         val encodedAnnotationValue = EncodedAnnotationValue.of(annotationTypeIndex, annotationElements)
         return Annotation.of(annotationVisibility, encodedAnnotationValue)
     }
 
     private fun parseAnnotationAnnotationElements(keyContexts:   List<SmaliParser.SAnnotationKeyNameContext>,
-                                                  valueContexts: List<SmaliParser.SAnnotationValueContext>,
-                                                  dexComposer:   DexEditor): MutableList<AnnotationElement> {
+                                                  valueContexts: List<SmaliParser.SAnnotationValueContext>): MutableList<AnnotationElement> {
 
         val annotationElements = mutableListOf<AnnotationElement>()
 
@@ -51,7 +50,7 @@ internal class AnnotationAssembler constructor(
             val sAnnotationValueContext = valueContexts[index]
 
             val annotationValue     = parseAnnotationValueContext(sAnnotationValueContext)
-            val annotationNameIndex = dexComposer.addOrGetStringIDIndex(sAnnotationKeyNameContext.name.text)
+            val annotationNameIndex = dexEditor.addOrGetStringIDIndex(sAnnotationKeyNameContext.name.text)
             val element             = AnnotationElement.of(annotationNameIndex, annotationValue)
             annotationElements.add(element)
         }
@@ -81,8 +80,7 @@ internal class AnnotationAssembler constructor(
 
                 val annotationElements =
                     parseAnnotationAnnotationElements(subAnnotationContext.sAnnotationKeyName(),
-                                                      subAnnotationContext.sAnnotationValue(),
-                                                      dexEditor)
+                                                      subAnnotationContext.sAnnotationValue())
 
                 return EncodedAnnotationValue.of(annotationTypeIndex, annotationElements)
             }
