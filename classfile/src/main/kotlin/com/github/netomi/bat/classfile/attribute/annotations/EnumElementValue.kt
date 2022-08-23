@@ -6,17 +6,22 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-data class EnumElementValue internal constructor(
-    var typeNameIndex:  Int = -1,
-    var constNameIndex: Int = -1) : ElementValue() {
+data class EnumElementValue private constructor(private var _typeNameIndex:  Int = -1,
+                                                private var _constNameIndex: Int = -1) : ElementValue() {
 
     override val type: ElementValueType
         get() = ElementValueType.ENUM
 
+    val typeNameIndex: Int
+        get() = _typeNameIndex
+
+    val constNameIndex: Int
+        get() = _constNameIndex
+
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
-        typeNameIndex  = input.readUnsignedShort()
-        constNameIndex = input.readUnsignedShort()
+        _typeNameIndex  = input.readUnsignedShort()
+        _constNameIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

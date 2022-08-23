@@ -146,26 +146,7 @@ class ClassFilePrinter :
         printer.levelDown()
     }
 
-    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        printer.println("RuntimeInvisibleAnnotations:")
-        printer.levelUp()
-
-        val referencedIndexPrinter = ReferencedIndexPrinter(printer)
-
-        attribute.annotations.forEachIndexed { index, annotation ->
-            printer.print("${index}: ")
-            referencedIndexPrinter.visitAnnotation(classFile, annotation)
-            printer.println()
-            printer.levelUp()
-            printer.println(annotation.getJvmType(classFile).toExternalType())
-            printer.levelDown()
-        }
-
-        printer.levelDown()
-    }
-
-    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        printer.println("RuntimeVisibleAnnotations:")
+    override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         printer.levelUp()
 
         val referencedIndexPrinter = ReferencedIndexPrinter(printer)
@@ -190,6 +171,16 @@ class ClassFilePrinter :
         printer.levelDown()
     }
 
+    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        printer.println("RuntimeInvisibleAnnotations:")
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+        printer.println("RuntimeVisibleAnnotations:")
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
     override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
 
     override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
@@ -210,7 +201,7 @@ class ClassFilePrinter :
 
     override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
         printer.print("[")
-        elementValue.acceptElementValues(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
+        elementValue.elementValuesAccept(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
         printer.print("]")
     }
 }

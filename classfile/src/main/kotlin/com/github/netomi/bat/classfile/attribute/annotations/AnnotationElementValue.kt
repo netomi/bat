@@ -21,14 +21,17 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-data class AnnotationElementValue internal constructor(var annotation: Annotation = Annotation()) : ElementValue() {
+data class AnnotationElementValue private constructor(private var _annotation: Annotation = Annotation.empty()) : ElementValue() {
 
     override val type: ElementValueType
         get() = ElementValueType.ANNOTATION
 
+    val annotation: Annotation
+        get() = _annotation
+
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
-        annotation = Annotation.readAnnotation(input)
+        _annotation = Annotation.readAnnotation(input)
     }
 
     @Throws(IOException::class)

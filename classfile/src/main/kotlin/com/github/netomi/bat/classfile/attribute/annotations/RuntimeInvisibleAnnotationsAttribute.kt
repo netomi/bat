@@ -16,39 +16,22 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
-import java.io.DataInput
-import java.io.DataOutput
-import java.io.IOException
+import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
  * A class representing a RuntimeInvisibleAnnotations attribute in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.17">RuntimeInvisibleAnnotations Attribute</a>
  */
-data class RuntimeInvisibleAnnotationsAttribute private constructor(
-    override val attributeNameIndex: Int,
-             var annotations:        MutableList<Annotation> = mutableListOf()) : Attribute(attributeNameIndex) {
+data class RuntimeInvisibleAnnotationsAttribute
+    private constructor(override val attributeNameIndex: Int,
+                        override var _annotations:       MutableList<Annotation> = mutableListOfCapacity(0))
+    : RuntimeAnnotationsAttribute(attributeNameIndex, _annotations) {
 
     override val type: AttributeType
         get() = AttributeType.RUNTIME_INVISIBLE_ANNOTATIONS
-
-    @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
-        val length = input.readInt()
-
-        val annotationCount = input.readUnsignedShort()
-        for (i in 0 until annotationCount) {
-            annotations.add(Annotation.readAnnotation(input))
-        }
-    }
-
-    @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(0)
-    }
 
     override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
         visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, this)

@@ -48,7 +48,7 @@ internal class ReferencedIndexPrinter constructor(private val printer: Indenting
 
     override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
         printer.print("[")
-        elementValue.acceptElementValues(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
+        elementValue.elementValuesAccept(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
         printer.print("]")
     }
 

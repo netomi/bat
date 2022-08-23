@@ -19,13 +19,19 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.asJvmType
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-data class Annotation internal constructor(
-    var typeIndex:     Int                                  = -1,
-    var elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOf()) {
+data class Annotation private constructor(private var _typeIndex:     Int                                  = -1,
+                                          private var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)) {
+
+    val typeIndex: Int
+        get() = _typeIndex
+
+    val elementValues: List<Pair<Int, ElementValue>>
+        get() = _elementValues
 
     fun getType(classFile: ClassFile): String {
         return classFile.getString(typeIndex)
@@ -37,12 +43,13 @@ data class Annotation internal constructor(
 
     @Throws(IOException::class)
     private fun read(input: DataInput) {
-        typeIndex = input.readUnsignedShort()
+        _typeIndex = input.readUnsignedShort()
 
         val elementValuesCount = input.readUnsignedShort()
+        _elementValues = mutableListOfCapacity(elementValuesCount)
         for (i in 0 until elementValuesCount) {
             val elementNameIndex = input.readUnsignedShort()
-            elementValues.add(Pair(elementNameIndex, ElementValue.read(input)))
+            _elementValues.add(Pair(elementNameIndex, ElementValue.read(input)))
         }
     }
 
@@ -56,11 +63,15 @@ data class Annotation internal constructor(
         }
     }
 
-    fun acceptElementValues(classFile: ClassFile, visitor: ElementValueVisitor) {
+    fun elementValuesAccept(classFile: ClassFile, visitor: ElementValueVisitor) {
         elementValues.forEach { (_, elementValue) -> elementValue.accept(classFile, visitor) }
     }
 
     companion object {
+        internal fun empty(): Annotation {
+            return Annotation()
+        }
+
         internal fun readAnnotation(input: DataInput): Annotation {
             val annotation = Annotation()
             annotation.read(input)

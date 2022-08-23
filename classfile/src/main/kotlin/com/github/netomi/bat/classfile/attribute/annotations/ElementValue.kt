@@ -11,10 +11,10 @@ abstract class ElementValue {
     internal abstract val type: ElementValueType
 
     @Throws(IOException::class)
-    abstract fun readElementValue(input: DataInput)
+    protected abstract fun readElementValue(input: DataInput)
 
     @Throws(IOException::class)
-    abstract fun writeElementValue(output: DataOutput)
+    protected abstract fun writeElementValue(output: DataOutput)
 
     @Throws(IOException::class)
     fun write(output: DataOutput) {

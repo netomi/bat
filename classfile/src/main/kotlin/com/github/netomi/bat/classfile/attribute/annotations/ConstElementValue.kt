@@ -6,12 +6,15 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-data class ConstElementValue internal constructor(override val type:   ElementValueType,
-                                                  var constValueIndex: Int = -1) : ElementValue() {
+data class ConstElementValue private constructor(override val type:             ElementValueType,
+                                                  private var _constValueIndex: Int = -1) : ElementValue() {
+
+    val constValueIndex: Int
+        get() = _constValueIndex
 
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
-        constValueIndex = input.readUnsignedShort()
+        _constValueIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

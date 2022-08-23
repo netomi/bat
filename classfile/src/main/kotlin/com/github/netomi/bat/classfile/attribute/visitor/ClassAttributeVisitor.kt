@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.attribute.annotations.RuntimeAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 
@@ -34,12 +35,16 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+    fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
     fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitAnyAttribute(classFile, attribute)
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
     fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
@@ -64,6 +69,10 @@ private class ClassAttributeAdapter private constructor(val visitor: ClassAttrib
 
     override fun visitEnclosingMethodAttribute(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
         visitor.visitEnclosingMethodAttribute(classFile, attribute)
+    }
+
+    override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
+        visitor.visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
     override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
