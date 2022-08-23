@@ -59,6 +59,10 @@ private class MethodAttributeAdapter private constructor(val visitor: MethodAttr
         visitor.visitDeprecatedAttribute(classFile, attribute)
     }
 
+    override fun visitExceptionsAttributes(classFile: ClassFile, attribute: ExceptionsAttribute) {
+        visitor.visitExceptionsAttributes(classFile, attribute)
+    }
+
     override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, attribute)
     }
