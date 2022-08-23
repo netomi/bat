@@ -21,26 +21,10 @@ import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 
-fun interface AttributeVisitor: ClassAttributeVisitor, FieldAttributeVisitor, MethodAttributeVisitor {
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute)
+fun interface AnyAttributeVisitor {
+    fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute)
 
-    override fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
-        visitAnyAttribute(classFile, attribute)
-    }
-
-    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitAnyAttribute(classFile, attribute)
-    }
-
-    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitAnyAttribute(classFile, attribute)
-    }
-
-    override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
-        visitAnyAttribute(classFile, attribute)
-    }
-
-    override fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+    fun visitUnknownAttribute(classFile: ClassFile, attribute: UnknownAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 }

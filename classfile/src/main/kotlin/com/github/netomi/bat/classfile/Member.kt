@@ -69,7 +69,9 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
     }
 
     fun attributesAccept(classFile: ClassFile, visitor: AttributeVisitor) {
-        attributes.forEach { it.accept(classFile, visitor) }
+        for (attribute in attributes) {
+            attribute.accept(classFile, visitor)
+        }
     }
 
     override fun equals(other: Any?): Boolean {

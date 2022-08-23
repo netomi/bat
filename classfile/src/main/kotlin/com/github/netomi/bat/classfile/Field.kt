@@ -15,6 +15,10 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.classAttributes
+import com.github.netomi.bat.classfile.attribute.visitor.fieldAttributes
 import com.github.netomi.bat.util.toHexString
 import java.io.DataInput
 import java.io.IOException
@@ -28,6 +32,13 @@ class Field private constructor(): Member() {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.FIELD
+
+    fun attributesAccept(classFile: ClassFile, visitor: FieldAttributeVisitor) {
+        val adapter = if (visitor is AttributeVisitor) visitor else fieldAttributes(visitor)
+        for (attribute in attributes) {
+            attribute.accept(classFile, adapter)
+        }
+    }
 
     override fun toString(): String {
         return "Field[nameIndex=%d,descriptorIndex=%d,accessFlags=%s]".format(nameIndex, descriptorIndex, toHexString(accessFlags, 4))
