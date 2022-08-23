@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile
 
 const val MAGIC : Int = 0xCA_FE_BA_BE.toInt() // need to explicitly convert to int due to KT-4749
 
+const val MAJOR_VERSION_1_0  = 45
 const val MAJOR_VERSION_1_1  = 45
 const val MAJOR_VERSION_1_2  = 46
 const val MAJOR_VERSION_1_3  = 47
@@ -30,6 +31,10 @@ const val MAJOR_VERSION_10_0 = 54
 const val MAJOR_VERSION_11_0 = 55
 const val MAJOR_VERSION_12_0 = 56
 const val MAJOR_VERSION_13_0 = 57
+const val MAJOR_VERSION_14_0 = 58
+const val MAJOR_VERSION_15_0 = 59
+const val MAJOR_VERSION_16_0 = 60
+const val MAJOR_VERSION_17_0 = 61
 
 // General access flags (for class / fields / methods).
 const val ACC_PUBLIC       = 0x0001
