@@ -16,7 +16,7 @@
 package com.github.netomi.bat
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.io.ClassFilePrinter
+import com.github.netomi.bat.classfile.printer.ClassFilePrinter
 import picocli.CommandLine
 import java.io.*
 
