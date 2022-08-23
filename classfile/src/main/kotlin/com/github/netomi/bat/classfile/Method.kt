@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.util.toHexString
 import java.io.DataInput
 import java.io.IOException
 
@@ -27,6 +28,10 @@ class Method private constructor(): Member() {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.METHOD
+
+    override fun toString(): String {
+        return "Method[nameIndex=%d,descriptorIndex=%d,accessFlags=%s]".format(nameIndex, descriptorIndex, toHexString(accessFlags, 4))
+    }
 
     companion object {
         @Throws(IOException::class)

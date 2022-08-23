@@ -16,14 +16,28 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.constant.ConstantPool
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.IOException
 import java.util.*
 
-abstract class Member {
-    var accessFlags: Int = 0
+abstract class Member protected constructor(accessFlags:               Int =  0,
+                                            nameIndex:                 Int = -1,
+                                            descriptorIndex:           Int = -1,
+                                            protected var _attributes: MutableList<Attribute> = mutableListOfCapacity(0)) {
+
+    var accessFlags: Int = accessFlags
         private set
+
+    var nameIndex: Int = nameIndex
+        private set
+
+    var descriptorIndex: Int = descriptorIndex
+        private set
+
+    val attributes: List<Attribute>
+        get() = _attributes
 
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
@@ -31,21 +45,13 @@ abstract class Member {
     val modifiers: EnumSet<AccessFlag>
         get() = accessFlagModifiers(accessFlags, accessFlagTarget)
 
-    var nameIndex: Int = 0
-        private set
-
-    var descriptorIndex: Int = 0
-        private set
-
-    protected val attributes = mutableListOf<Attribute>()
-
     protected abstract val accessFlagTarget: AccessFlagTarget
 
-    fun name(classFile: ClassFile): String {
+    fun getName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
     }
 
-    fun descriptor(classFile: ClassFile): String {
+    fun getDescriptor(classFile: ClassFile): String {
         return classFile.getString(descriptorIndex)
     }
 
@@ -56,8 +62,27 @@ abstract class Member {
         descriptorIndex = input.readUnsignedShort()
 
         val attributeCount = input.readUnsignedShort()
+        _attributes = mutableListOfCapacity(attributeCount)
         for (i in 0 until attributeCount) {
-            attributes.add(Attribute.readAttribute(input, classFile))
+            _attributes.add(Attribute.readAttribute(input, classFile))
         }
+    }
+
+    fun attributesAccept(classFile: ClassFile, visitor: AttributeVisitor) {
+        attributes.forEach { it.accept(classFile, visitor) }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Member) return false
+
+        return accessFlags     == other.accessFlags &&
+               nameIndex       == other.nameIndex &&
+               descriptorIndex == other.descriptorIndex &&
+               _attributes     == other._attributes
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(accessFlags, nameIndex, descriptorIndex, _attributes)
     }
 }

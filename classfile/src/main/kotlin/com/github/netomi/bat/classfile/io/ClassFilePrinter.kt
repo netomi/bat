@@ -180,12 +180,12 @@ class ClassFilePrinter :
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
         val externalModifiers = field.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
-        val externalType = field.descriptor(classFile).asJvmType().toExternalType()
-        printer.println("%s %s %s;".format(externalModifiers, externalType, field.name(classFile)))
+        val externalType = field.getDescriptor(classFile).asJvmType().toExternalType()
+        printer.println("%s %s %s;".format(externalModifiers, externalType, field.getName(classFile)))
 
         printer.levelUp()
 
-        printer.println("descriptor: %s".format(field.descriptor(classFile)))
+        printer.println("descriptor: %s".format(field.getDescriptor(classFile)))
 
         val modifiers = field.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
         printer.println("flags: (0x%04x) %s".format(field.accessFlags, modifiers))
