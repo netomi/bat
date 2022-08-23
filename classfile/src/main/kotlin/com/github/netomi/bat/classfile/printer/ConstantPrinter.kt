@@ -55,8 +55,7 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
     }
 
     override fun visitStringConstant(classFile: ClassFile, constant: StringConstant) {
-        val str = classFile.getString(constant.stringIndex)
-        printer.print("%-19s %-15s // %s".format("String", "#" + constant.stringIndex, str))
+        printer.print("%-19s %-15s // %s".format("String", "#" + constant.stringIndex, constant.getString(classFile)))
     }
 
     override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
@@ -78,8 +77,7 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
     }
 
     override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {
-        val str = classFile.getString(constant.nameIndex)
-        printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, str))
+        printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, constant.getClassName(classFile)))
     }
 
     override fun visitNameAndTypeConstant(classFile: ClassFile, constant: NameAndTypeConstant) {
@@ -92,12 +90,10 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
     }
 
     override fun visitModuleConstant(classFile: ClassFile, constant: ModuleConstant) {
-        val str = constant.getModuleName(classFile)
-        printer.print(String.format("%-19s %-15s // %s", "Module", "#" + constant.nameIndex, str))
+        printer.print(String.format("%-19s %-15s // %s", "Module", "#" + constant.nameIndex, constant.getModuleName(classFile)))
     }
 
     override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
-        val str = constant.getPackageName(classFile)
-        printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, str))
+        printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, constant.getPackageName(classFile)))
     }
 }
