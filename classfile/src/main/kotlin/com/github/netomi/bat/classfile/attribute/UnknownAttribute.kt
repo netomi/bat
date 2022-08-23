@@ -20,29 +20,35 @@ import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
+import java.util.*
 
 /**
  * A class representing an unknown attribute in a class file.
  */
 data class UnknownAttribute internal constructor(override val attributeNameIndex: Int,
-                                                          var info:               ByteArray = ByteArray(0)) : Attribute(attributeNameIndex) {
+                                                  private var _data:              ByteArray = ByteArray(0)) : Attribute(attributeNameIndex) {
 
     override val type: AttributeType
         get() = AttributeType.UNKNOWN
 
+    val data: ByteArray
+        get() = _data
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
-        info = ByteArray(length)
-        input.readFully(info)
+        _data = ByteArray(length)
+        input.readFully(_data)
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        info.let {
-            output.writeInt(info.size)
-            output.write(info)
-        }
+        output.writeInt(data.size)
+        output.write(data)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+        visitor.visitUnknownAttribute(classFile, this)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -51,20 +57,12 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
 
         other as UnknownAttribute
 
-        if (attributeNameIndex != other.attributeNameIndex) return false
-        if (!info.contentEquals(other.info)) return false
-
-        return true
+        return attributeNameIndex == other.attributeNameIndex &&
+                _data.contentEquals(other._data)
     }
 
     override fun hashCode(): Int {
-        var result = attributeNameIndex
-        result = 31 * result + info.contentHashCode()
-        return result
-    }
-
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
-        visitor.visitUnknownAttribute(classFile, this)
+        return Objects.hash(attributeNameIndex, _data.contentHashCode())
     }
 
     companion object {

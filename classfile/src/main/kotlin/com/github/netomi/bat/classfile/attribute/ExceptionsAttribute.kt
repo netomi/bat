@@ -22,6 +22,7 @@ import com.github.netomi.bat.util.asInternalClassName
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
+import java.util.*
 
 /**
  * A class representing an Exceptions attribute in a class file.
@@ -63,6 +64,18 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
 
     override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
         visitor.visitExceptionsAttributes(classFile, this)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ExceptionsAttribute) return false
+
+        return attributeNameIndex == other.attributeNameIndex &&
+               _exceptions.contentEquals(other._exceptions)
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(attributeNameIndex, _exceptions.contentHashCode())
     }
 
     companion object {

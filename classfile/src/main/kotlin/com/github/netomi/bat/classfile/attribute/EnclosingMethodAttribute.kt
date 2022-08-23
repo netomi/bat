@@ -27,11 +27,17 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.7">Enclosing Method Attribute</a>
  */
 data class EnclosingMethodAttribute internal constructor(override val attributeNameIndex: Int,
-                                                                  var classIndex:         Int = -1,
-                                                                  var methodIndex:        Int = -1) : Attribute(attributeNameIndex) {
+                                                          private var _classIndex:        Int = -1,
+                                                          private var _methodIndex:       Int = -1) : Attribute(attributeNameIndex) {
 
     override val type: AttributeType
         get() = AttributeType.ENCLOSING_METHOD
+
+    val classIndex: Int
+        get() = _classIndex
+
+    val methodIndex: Int
+        get() = _methodIndex
 
     fun getClassName(classFile: ClassFile): String {
         return classFile.getClassName(classIndex)
@@ -49,8 +55,8 @@ data class EnclosingMethodAttribute internal constructor(override val attributeN
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
-        classIndex  = input.readUnsignedShort()
-        methodIndex = input.readUnsignedShort()
+        _classIndex  = input.readUnsignedShort()
+        _methodIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

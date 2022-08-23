@@ -27,10 +27,13 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.9">Signature Attribute</a>
  */
 data class SignatureAttribute internal constructor(override val attributeNameIndex: Int,
-                                                            var signatureIndex:     Int = -1) : Attribute(attributeNameIndex) {
+                                                    private var _signatureIndex:    Int = -1) : Attribute(attributeNameIndex) {
 
     override val type: AttributeType
         get() = AttributeType.SIGNATURE
+
+    val signatureIndex: Int
+        get() = _signatureIndex
 
     fun getSignature(classFile: ClassFile): String {
         return classFile.getString(signatureIndex)
@@ -40,7 +43,7 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
-        signatureIndex = input.readUnsignedShort()
+        _signatureIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

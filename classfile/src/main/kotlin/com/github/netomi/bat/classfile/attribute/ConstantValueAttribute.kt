@@ -27,16 +27,19 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2">ConstantValue Attribute</a>
  */
 data class ConstantValueAttribute internal constructor(override val attributeNameIndex: Int,
-                                                                var constantValueIndex: Int = -1) : Attribute(attributeNameIndex) {
+                                                        private var _constantValueIndex: Int = -1) : Attribute(attributeNameIndex) {
 
     override val type: AttributeType
         get() = AttributeType.CONSTANT_VALUE
+
+    val constantValueIndex: Int
+        get() = _constantValueIndex
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
-        constantValueIndex = input.readUnsignedShort()
+        _constantValueIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

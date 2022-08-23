@@ -27,10 +27,13 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.10">SourceFile Attribute</a>
  */
 data class SourceFileAttribute internal constructor(override val attributeNameIndex: Int,
-                                                             var sourceFileIndex:    Int = -1) : Attribute(attributeNameIndex) {
+                                                     private var _sourceFileIndex:   Int = -1) : Attribute(attributeNameIndex) {
 
     override val type: AttributeType
         get() = AttributeType.SOURCE_FILE
+
+    val sourceFileIndex: Int
+        get() = _sourceFileIndex
 
     fun getSourceFile(classFile: ClassFile): String {
         return classFile.getString(sourceFileIndex)
@@ -40,7 +43,7 @@ data class SourceFileAttribute internal constructor(override val attributeNameIn
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
-        sourceFileIndex = input.readUnsignedShort()
+        _sourceFileIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
