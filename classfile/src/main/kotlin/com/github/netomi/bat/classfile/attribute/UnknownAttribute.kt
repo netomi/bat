@@ -23,14 +23,12 @@ import java.io.IOException
 
 /**
  * A class representing an unknown attribute in a class file.
- * 
- * @author Thomas Neidhart
  */
-data class UnknownAttribute internal constructor(override val attributeNameIndex: Int = -1,
+data class UnknownAttribute internal constructor(override val attributeNameIndex: Int,
                                                           var info:               ByteArray = ByteArray(0)) : Attribute(attributeNameIndex) {
 
-    override val type: AnnotationType
-        get() = AnnotationType.UNKNOWN
+    override val type: AttributeType
+        get() = AttributeType.UNKNOWN
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
@@ -70,7 +68,7 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
     }
 
     companion object {
-        internal fun of(attributeNameIndex: Int): UnknownAttribute {
+        internal fun empty(attributeNameIndex: Int): UnknownAttribute {
             return UnknownAttribute(attributeNameIndex)
         }
     }

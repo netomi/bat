@@ -25,14 +25,12 @@ import java.io.IOException
  * A class representing a SourceFile attribute in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.10">SourceFile Attribute</a>
- *
- * @author Thomas Neidhart
  */
-data class SourceFileAttribute internal constructor(override var attributeNameIndex: Int,
+data class SourceFileAttribute internal constructor(override val attributeNameIndex: Int,
                                                              var sourceFileIndex:    Int = -1) : Attribute(attributeNameIndex) {
 
-    override val type: AnnotationType
-        get() = AnnotationType.SOURCE_FILE
+    override val type: AttributeType
+        get() = AttributeType.SOURCE_FILE
 
     fun getSourceFile(classFile: ClassFile): String {
         return classFile.getString(sourceFileIndex)
@@ -41,13 +39,13 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
-        assert(length == 2)
+        assert(length == ATTRIBUTE_LENGTH)
         sourceFileIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(2)
+        output.writeInt(ATTRIBUTE_LENGTH)
         output.writeShort(sourceFileIndex)
     }
 
@@ -56,7 +54,9 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
     }
 
     companion object {
-        internal fun of(attributeNameIndex: Int): SourceFileAttribute {
+        private const val ATTRIBUTE_LENGTH = 2
+
+        internal fun empty(attributeNameIndex: Int): SourceFileAttribute {
             return SourceFileAttribute(attributeNameIndex)
         }
     }

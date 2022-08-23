@@ -19,7 +19,9 @@ import java.io.DataInput
 import java.io.IOException
 
 /**
- * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.6
+ * A class representing a method in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.6">Method_info structure</a>
  */
 class Method private constructor(): Member() {
 

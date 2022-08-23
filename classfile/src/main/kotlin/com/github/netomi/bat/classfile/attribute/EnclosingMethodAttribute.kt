@@ -26,12 +26,12 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.7">Enclosing Method Attribute</a>
  */
-data class EnclosingMethodAttribute internal constructor(override var attributeNameIndex: Int = -1,
+data class EnclosingMethodAttribute internal constructor(override val attributeNameIndex: Int,
                                                                   var classIndex:         Int = -1,
                                                                   var methodIndex:        Int = -1) : Attribute(attributeNameIndex) {
 
-    override val type: AnnotationType
-        get() = AnnotationType.ENCLOSING_METHOD
+    override val type: AttributeType
+        get() = AttributeType.ENCLOSING_METHOD
 
     fun getClassName(classFile: ClassFile): String {
         return classFile.getClassName(classIndex)
@@ -41,7 +41,7 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
         return classFile.getNameAndType(methodIndex).getMemberName(classFile);
     }
 
-    fun getMethodType(classFile: ClassFile): String {
+    fun getMethodDescriptor(classFile: ClassFile): String {
         return classFile.getNameAndType(methodIndex).getDescriptor(classFile)
     }
 
@@ -67,7 +67,7 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
     companion object {
         private const val ATTRIBUTE_LENGTH = 4
 
-        internal fun of(attributeNameIndex: Int): EnclosingMethodAttribute {
+        internal fun empty(attributeNameIndex: Int): EnclosingMethodAttribute {
             return EnclosingMethodAttribute(attributeNameIndex)
         }
     }

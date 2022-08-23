@@ -25,14 +25,12 @@ import java.io.IOException
  * A class representing a Signature attribute in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.9">Signature Attribute</a>
- *
- * @author Thomas Neidhart
  */
-data class SignatureAttribute internal constructor(override var attributeNameIndex: Int,
+data class SignatureAttribute internal constructor(override val attributeNameIndex: Int,
                                                             var signatureIndex:     Int = -1) : Attribute(attributeNameIndex) {
 
-    override val type: AnnotationType
-        get() = AnnotationType.SIGNATURE
+    override val type: AttributeType
+        get() = AttributeType.SIGNATURE
 
     fun getSignature(classFile: ClassFile): String {
         return classFile.getString(signatureIndex)
@@ -41,13 +39,13 @@ data class SignatureAttribute internal constructor(override var attributeNameInd
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
-        assert(length == 2)
+        assert(length == ATTRIBUTE_LENGTH)
         signatureIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(2)
+        output.writeInt(ATTRIBUTE_LENGTH)
         output.writeShort(signatureIndex)
     }
 
@@ -56,7 +54,9 @@ data class SignatureAttribute internal constructor(override var attributeNameInd
     }
 
     companion object {
-        internal fun of(attributeNameIndex: Int): SignatureAttribute {
+        private const val ATTRIBUTE_LENGTH = 2
+
+        internal fun empty(attributeNameIndex: Int): SignatureAttribute {
             return SignatureAttribute(attributeNameIndex)
         }
     }

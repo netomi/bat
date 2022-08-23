@@ -25,23 +25,21 @@ import java.io.IOException
  * A class representing a Synthetic attribute in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.8">Synthetic Attribute</a>
- *
- * @author Thomas Neidhart
  */
-data class SyntheticAttribute internal constructor(override var attributeNameIndex: Int = -1) : Attribute(attributeNameIndex) {
+data class SyntheticAttribute internal constructor(override val attributeNameIndex: Int) : Attribute(attributeNameIndex) {
 
-    override val type: AnnotationType
-        get() = AnnotationType.SYNTHETIC
+    override val type: AttributeType
+        get() = AttributeType.SYNTHETIC
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
         val length = input.readInt()
-        assert(length == 0)
+        assert(length == ATTRIBUTE_LENGTH)
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(0)
+        output.writeInt(ATTRIBUTE_LENGTH)
     }
 
     override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
@@ -49,7 +47,9 @@ data class SyntheticAttribute internal constructor(override var attributeNameInd
     }
 
     companion object {
-        internal fun of(attributeNameIndex: Int): SyntheticAttribute {
+        private const val ATTRIBUTE_LENGTH = 0
+
+        internal fun empty(attributeNameIndex: Int): SyntheticAttribute {
             return SyntheticAttribute(attributeNameIndex)
         }
     }

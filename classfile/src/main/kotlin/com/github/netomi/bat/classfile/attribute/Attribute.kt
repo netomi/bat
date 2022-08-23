@@ -28,7 +28,11 @@ import java.io.IOException
  */
 abstract class Attribute protected constructor(open val attributeNameIndex: Int) {
 
-    internal abstract val type: AnnotationType
+    internal abstract val type: AttributeType
+
+    fun getAttributeName(classFile: ClassFile): String {
+        return classFile.getString(attributeNameIndex)
+    }
 
     @Throws(IOException::class)
     protected abstract fun readAttributeData(input: DataInput)
@@ -49,7 +53,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
             val attributeNameIndex = input.readUnsignedShort()
             val attributeName      = classFile.getString(attributeNameIndex)
 
-            val attribute = AnnotationType.of(attributeName).createAttribute(attributeNameIndex)
+            val attribute = AttributeType.of(attributeName).createAttribute(attributeNameIndex)
             attribute.readAttributeData(input)
 
             return attribute
@@ -60,27 +64,27 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
 /**
  * Known constant types as contained in a java class file.
  */
-internal enum class AnnotationType constructor(val attributeName: String, private val supplier: ((Int) -> Attribute)?) {
+internal enum class AttributeType constructor(val attributeName: String, private val supplier: ((Int) -> Attribute)?) {
 
     // Predefined attributes:
     // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7-300
 
-    CONSTANT_VALUE("ConstantValue", ConstantValueAttribute.Companion::of),
+    CONSTANT_VALUE("ConstantValue", ConstantValueAttribute.Companion::empty),
     CODE("Code", null),
     STACK_MAP_TABLE("StackMapTable", null),
     EXCEPTIONS("Exceptions", null),
     INNER_CLASSES("InnerClasses", null),
-    ENCLOSING_METHOD("EnclosingMethod", EnclosingMethodAttribute.Companion::of),
-    SYNTHETIC("Synthetic", SyntheticAttribute.Companion::of),
-    SIGNATURE("Signature", SignatureAttribute.Companion::of),
-    SOURCE_FILE("SourceFile", SourceFileAttribute.Companion::of),
+    ENCLOSING_METHOD("EnclosingMethod", EnclosingMethodAttribute.Companion::empty),
+    SYNTHETIC("Synthetic", SyntheticAttribute.Companion::empty),
+    SIGNATURE("Signature", SignatureAttribute.Companion::empty),
+    SOURCE_FILE("SourceFile", SourceFileAttribute.Companion::empty),
     SOURCE_DEBUG_EXTENSION("SourceDebugExtension", null),
     LINE_NUMBER_TABLE("LineNumberTable", null),
     LOCAL_VARIABLE_TABLE("LocalVariableTable", null),
     LOCAL_VARIABLE_TYPE_TABLE("LocalVariableTypeTable", null),
-    DEPRECATED("Deprecated", DeprecatedAttribute.Companion::of),
-    RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::of),
-    RUNTIME_INVISIBLE_ANNOTATIONS("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::of),
+    DEPRECATED("Deprecated", DeprecatedAttribute.Companion::empty),
+    RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::empty),
+    RUNTIME_INVISIBLE_ANNOTATIONS("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::empty),
     RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS("RuntimeVisibleParameterAnnotations", null),
     RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", null),
     RUNTIME_VISIBLE_TYPE_ANNOTATIONS("RuntimeVisibleTypeAnnotations", null),
@@ -93,14 +97,14 @@ internal enum class AnnotationType constructor(val attributeName: String, privat
     MODULE_MAIN_CLASS("ModuleMainClass", null),
     NEST_HOST("NestHost", null),
     NEST_MEMBERS("NestMembers", null),
-    UNKNOWN("Unknown", UnknownAttribute.Companion::of);
+    UNKNOWN("Unknown", UnknownAttribute.Companion::empty);
 
     companion object {
-        private val nameToAttributeMap: Map<String, AnnotationType> by lazy {
+        private val nameToAttributeMap: Map<String, AttributeType> by lazy {
             values().associateBy { it.attributeName }
         }
 
-        fun of(name: String) : AnnotationType {
+        fun of(name: String) : AttributeType {
             return nameToAttributeMap[name] ?: UNKNOWN
         }
     }

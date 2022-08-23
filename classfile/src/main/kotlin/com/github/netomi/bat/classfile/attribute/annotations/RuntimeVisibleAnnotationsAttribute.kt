@@ -16,8 +16,8 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.AnnotationType
 import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
@@ -29,11 +29,11 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.16">RuntimeVisibleAnnotations Attribute</a>
  */
 data class RuntimeVisibleAnnotationsAttribute internal constructor(
-    override var attributeNameIndex: Int,
+    override val attributeNameIndex: Int,
              var annotations: MutableList<Annotation> = mutableListOf()) : Attribute(attributeNameIndex) {
 
-    override val type: AnnotationType
-        get() = AnnotationType.RUNTIME_VISIBLE_ANNOTATIONS
+    override val type: AttributeType
+        get() = AttributeType.RUNTIME_VISIBLE_ANNOTATIONS
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
@@ -55,7 +55,7 @@ data class RuntimeVisibleAnnotationsAttribute internal constructor(
     }
 
     companion object {
-        internal fun of(attributeNameIndex: Int): RuntimeVisibleAnnotationsAttribute {
+        internal fun empty(attributeNameIndex: Int): RuntimeVisibleAnnotationsAttribute {
             return RuntimeVisibleAnnotationsAttribute(attributeNameIndex)
         }
     }

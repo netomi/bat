@@ -20,7 +20,9 @@ import java.io.DataInput
 import java.io.IOException
 
 /**
- * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.5
+ * A class representing a field in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.5">Field_info structure</a>
  */
 class Field private constructor(): Member() {
 
