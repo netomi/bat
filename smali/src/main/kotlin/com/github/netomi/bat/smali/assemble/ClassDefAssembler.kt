@@ -89,7 +89,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classDefEditor.classType, name, type)
             val fieldID      = dexFile.getFieldID(fieldIDIndex)
             if (addedFields.contains(fieldID)) {
-                throw RuntimeException("field '${fieldID.getFullExternalFieldDescriptor(dexFile)}' already exists in this class")
+                throw RuntimeException("field '${fieldID.getFullExternalFieldSignature(dexFile)}' already exists in this class")
             }
             fieldEditor = classDefEditor.addField(name, accessFlags, type, false)
             addedFields.add(fieldID)
@@ -117,7 +117,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                     val fieldID = field.getFieldID(dexFile)
                     warningPrinter?.println(
                         "warning: field '%s': %s, skipping annotation"
-                            .format(fieldID.getFullExternalFieldDescriptor(dexFile), exception.message))
+                            .format(fieldID.getFullExternalFieldSignature(dexFile), exception.message))
                 } else {
                     throw exception
                 }
@@ -137,7 +137,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classDefEditor.classType, name, parameterTypes, returnType)
             val methodID      = dexFile.getMethodID(methodIDIndex)
             if (addedMethods.contains(methodID)) {
-                throw RuntimeException("method '${methodID.getFullExternalMethodDescriptor(dexFile)}' already exists in this class")
+                throw RuntimeException("method '${methodID.getFullExternalMethodSignature(dexFile)}' already exists in this class")
             }
             methodEditor = classDefEditor.addMethod(name, accessFlags, parameterTypes, returnType, false)
             addedMethods.add(methodID)
@@ -157,7 +157,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             codeAssembler.parseCode(ctx.sInstruction(), ctx.sParameter())
         } else {
             if (ctx.sInstruction().isNotEmpty()) {
-                val methodDescriptor = method.getMethodID(dexFile).getFullExternalMethodDescriptor(dexFile)
+                val methodDescriptor = method.getMethodID(dexFile).getFullExternalMethodSignature(dexFile)
                 val message = "abstract method '$methodDescriptor' containing code instructions"
                 if (lenientMode) {
                     warningPrinter?.println("warning: $message, skipping code")
@@ -176,7 +176,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                     val methodID = method.getMethodID(dexFile)
                     warningPrinter?.println(
                         "warning: method '%s': %s, skipping annotation"
-                            .format(methodID.getFullExternalMethodDescriptor(dexFile), exception.message))
+                            .format(methodID.getFullExternalMethodSignature(dexFile), exception.message))
                 } else {
                     throw exception
                 }
@@ -196,7 +196,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
                         warningPrinter?.println(
                             "warning: parameter #%d at '%s': %s, skipping annotation"
                                 .format(parameterIndex + 1,
-                                    methodID.getFullExternalMethodDescriptor(dexFile),
+                                    methodID.getFullExternalMethodSignature(dexFile),
                                     exception.message))
                     } else {
                         throw exception

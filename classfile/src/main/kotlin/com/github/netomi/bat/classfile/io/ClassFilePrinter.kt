@@ -31,6 +31,7 @@ import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
+import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.io.Writer
@@ -200,8 +201,7 @@ class ClassFilePrinter :
         printer.println()
 
         val externalModifiers = method.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
-        val descriptor = method.getDescriptor(classFile)
-        printer.println("%s %s%s;".format(externalModifiers, method.getName(classFile), descriptor))
+        printer.println("%s %s;".format(externalModifiers, method.getExternalMethodSignature(classFile)))
 
         printer.levelUp()
         printer.println("descriptor: %s".format(method.getDescriptor(classFile)))
@@ -295,5 +295,16 @@ class ClassFilePrinter :
         printer.print("[")
         elementValue.acceptElementValues(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
         printer.print("]")
+    }
+}
+
+private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
+    return buildString {
+        val (parameterTypes, returnType) = parseDescriptorToJvmTypes(getDescriptor(classFile))
+
+        append(returnType.toExternalType())
+        append(' ')
+        append(getName(classFile))
+        append(parameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
     }
 }

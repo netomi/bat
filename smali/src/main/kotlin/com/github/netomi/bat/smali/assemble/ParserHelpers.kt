@@ -22,6 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.smali.SmaliParseException
 import com.github.netomi.bat.smali.parser.SmaliParser
 import com.github.netomi.bat.smali.parser.SmaliParser.SParameterContext
+import com.github.netomi.bat.util.parseDescriptorParameters
 import com.github.netomi.bat.util.unescapeJavaString
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.tree.ParseTree
@@ -134,51 +135,10 @@ internal fun parseMethodObject(text: String): MethodInfo {
 
     val name = text.substring(startNameIndex, parameterStartIndex)
 
-    val parameters = text.substring(parameterStartIndex + 1, parameterEndIndex)
-    val parameterTypes = if (parameters.isEmpty()) emptyList() else parseParameters(parameters)
-    val returnType = text.substring(parameterEndIndex + 1)
+    val parameters     = text.substring(parameterStartIndex + 1, parameterEndIndex)
+    val parameterTypes = parseDescriptorParameters(parameters)
+    val returnType     = text.substring(parameterEndIndex + 1)
     return MethodInfo(classType, name, parameterTypes, returnType)
-}
-
-private fun parseParameters(parameters: String): List<String> {
-    val result = mutableListOf<String>()
-
-    var index = 0
-    while (index < parameters.length) {
-        val char = parameters[index]
-
-        when (char) {
-            'L' -> {
-                val colon = parameters.indexOf(';', index)
-                result.add(parameters.substring(index, colon + 1))
-                index = colon + 1
-            }
-
-            '[' -> {
-                var j = index + 1
-                while (parameters[j] == '[') j++
-                index = when (parameters[j]) {
-                    'L' -> {
-                        val colon = parameters.indexOf(';', j)
-                        result.add(parameters.substring(index, colon + 1))
-                        colon + 1
-                    }
-
-                    else -> {
-                        result.add(parameters.substring(index, j + 1))
-                        j + 1
-                    }
-                }
-            }
-
-            else -> {
-                result.add(char.toString())
-                index++
-            }
-        }
-    }
-
-    return result
 }
 
 internal fun parseAccessFlags(sAccListContext: SmaliParser.SAccListContext): Int {

@@ -73,7 +73,7 @@ class FieldID private constructor(classIndex: Int = NO_INDEX,
         return dexFile.getStringID(nameIndex).stringValue
     }
 
-    fun getFullExternalFieldDescriptor(dexFile: DexFile): String {
+    fun getFullExternalFieldSignature(dexFile: DexFile): String {
         return buildString {
             append(getClassDexType(dexFile).toExternalClassName())
             append('.')

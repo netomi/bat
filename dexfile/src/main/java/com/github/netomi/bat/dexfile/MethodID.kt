@@ -84,14 +84,14 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
         return getProtoID(dexFile).getShorty(dexFile)
     }
 
-    fun getFullExternalMethodDescriptor(dexFile: DexFile): String {
+    fun getFullExternalMethodSignature(dexFile: DexFile): String {
         return buildString {
             append(getReturnDexType(dexFile).toExternalType())
             append(' ')
             append(getClassDexType(dexFile).toExternalClassName())
             append('.')
             append(getName(dexFile))
-            append(getParameterDexTypes(dexFile).joinToString(separator = ",", prefix = "(", postfix = ")") { it.toExternalType() })
+            append(getParameterDexTypes(dexFile).joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
         }
     }
 

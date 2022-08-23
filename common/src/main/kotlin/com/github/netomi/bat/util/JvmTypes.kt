@@ -174,3 +174,57 @@ class JvmClassName private constructor(val className: String, val internal: Bool
         }
     }
 }
+
+fun parseDescriptorToJvmTypes(descriptor: String): Pair<List<JvmType>, JvmType> {
+    val parameterStartIndex = descriptor.indexOf('(')
+    val parameterEndIndex   = descriptor.indexOf(')')
+
+    val parameters     = descriptor.substring(parameterStartIndex + 1, parameterEndIndex)
+    val parameterTypes = parseDescriptorParameters(parameters)
+    val returnType     = descriptor.substring(parameterEndIndex + 1)
+
+    return Pair(parameterTypes.map { it.asJvmType() }, returnType.asJvmType())
+}
+
+fun parseDescriptorParameters(parameters: String): List<String> {
+    if (parameters.isEmpty()) return emptyList()
+
+    val result = mutableListOf<String>()
+
+    var index = 0
+    while (index < parameters.length) {
+        val char = parameters[index]
+
+        when (char) {
+            'L' -> {
+                val colon = parameters.indexOf(';', index)
+                result.add(parameters.substring(index, colon + 1))
+                index = colon + 1
+            }
+
+            '[' -> {
+                var j = index + 1
+                while (parameters[j] == '[') j++
+                index = when (parameters[j]) {
+                    'L' -> {
+                        val colon = parameters.indexOf(';', j)
+                        result.add(parameters.substring(index, colon + 1))
+                        colon + 1
+                    }
+
+                    else -> {
+                        result.add(parameters.substring(index, j + 1))
+                        j + 1
+                    }
+                }
+            }
+
+            else -> {
+                result.add(char.toString())
+                index++
+            }
+        }
+    }
+
+    return result
+}

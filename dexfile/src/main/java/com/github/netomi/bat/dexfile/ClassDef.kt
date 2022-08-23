@@ -149,7 +149,7 @@ class ClassDef private constructor(            classIndex:           Int        
             require(fieldClass == getType(dexFile)) { "field class does not match this class" }
             classData.fields.forEach {
                 require(field.fieldIndex != it.fieldIndex)
-                    { "field '${fieldID.getFullExternalFieldDescriptor(dexFile)}' already exists in this class" }
+                    { "field '${fieldID.getFullExternalFieldSignature(dexFile)}' already exists in this class" }
             }
         }
         classData.addField(field)
@@ -162,7 +162,7 @@ class ClassDef private constructor(            classIndex:           Int        
             require(methodClass == getType(dexFile)) { "method class does not match this class" }
             classData.methods.forEach {
                 require(method.methodIndex != it.methodIndex)
-                    { "method '${methodID.getFullExternalMethodDescriptor(dexFile)}' already exists in this class" }
+                    { "method '${methodID.getFullExternalMethodSignature(dexFile)}' already exists in this class" }
             }
         }
         classData.addMethod(method)
