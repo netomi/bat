@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.*
+import com.github.netomi.bat.classfile.attribute.annotations.Annotation
 import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.constant.*
@@ -234,15 +235,17 @@ class ClassFilePrinter :
 
     override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
         printer.println("RuntimeInvisibleAnnotations:")
-
         printer.levelUp()
 
-        attribute.annotations.forEachIndexed {
-            index, annotation ->
-                printer.println("%2d: #%d()".format(index, annotation.typeIndex))
-                printer.levelUp()
-                printer.println(annotation.getJvmType(classFile).toExternalType())
-                printer.levelDown()
+        val referencedIndexPrinter = ReferencedIndexPrinter(printer)
+
+        attribute.annotations.forEachIndexed { index, annotation ->
+            printer.print("${index}: ")
+            referencedIndexPrinter.visitAnnotation(classFile, annotation)
+            printer.println()
+            printer.levelUp()
+            printer.println(annotation.getJvmType(classFile).toExternalType())
+            printer.levelDown()
         }
 
         printer.levelDown()
@@ -250,17 +253,20 @@ class ClassFilePrinter :
 
     override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         printer.println("RuntimeVisibleAnnotations:")
-
         printer.levelUp()
 
+        val referencedIndexPrinter = ReferencedIndexPrinter(printer)
+
         attribute.annotations.forEachIndexed { index, annotation ->
-            printer.println("%2d: #%d()".format(index, annotation.typeIndex))
+            printer.print("${index}: ")
+            referencedIndexPrinter.visitAnnotation(classFile, annotation)
+            printer.println()
             printer.levelUp()
-            printer.println(annotation.getType(classFile).asJvmType().toExternalType())
+            printer.println(annotation.getJvmType(classFile).toExternalType())
 
             printer.levelUp()
             annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
-                printer.print("%s=".format(classFile.getString(elementNameIndex)))
+                printer.print("${classFile.getString(elementNameIndex)}=")
                 elementValue.accept(classFile, this)
                 printer.println()
             }
@@ -271,9 +277,7 @@ class ClassFilePrinter :
         printer.levelDown()
     }
 
-    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {
-        // TODO("Not yet implemented")
-    }
+    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
 
     override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
         printer.print("%s".format(classFile.getInteger(elementValue.constValueIndex)))
@@ -306,5 +310,76 @@ private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
         append(' ')
         append(getName(classFile))
         append(parameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
+    }
+}
+
+private class ReferencedIndexPrinter constructor(val printer: IndentingPrinter): ElementValueVisitor {
+
+    fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
+        printer.print("#${annotation.typeIndex}(")
+        annotation.elementValues.forEachIndexed { index, (elementNameIndex, elementValue) ->
+            printer.print("#${elementNameIndex}=")
+            elementValue.accept(classFile, this)
+            if (index < annotation.elementValues.lastIndex) {
+                printer.print(",")
+            }
+        }
+        printer.print(")")
+    }
+
+    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
+
+    override fun visitClassElementValue(classFile: ClassFile, elementValue: ClassElementValue) {
+        TODO("implement")
+    }
+
+    override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
+        TODO("implement")
+    }
+
+    override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
+        printer.print("[")
+        elementValue.acceptElementValues(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
+        printer.print("]")
+    }
+
+    override fun visitAnnotationElementValue(classFile: ClassFile, elementValue: AnnotationElementValue) {
+        visitAnnotation(classFile, elementValue.annotation)
+    }
+
+    override fun visitByteElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("B#${elementValue.constValueIndex}")
+    }
+
+    override fun visitCharElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("C#${elementValue.constValueIndex}")
+    }
+
+    override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("I#${elementValue.constValueIndex}")
+    }
+
+    override fun visitLongElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("J#${elementValue.constValueIndex}")
+    }
+
+    override fun visitShortElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("S#${elementValue.constValueIndex}")
+    }
+
+    override fun visitFloatElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("F#${elementValue.constValueIndex}")
+    }
+
+    override fun visitDoubleElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("D#${elementValue.constValueIndex}")
+    }
+
+    override fun visitBooleanElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("Z#${elementValue.constValueIndex}")
+    }
+
+    override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("s#${elementValue.constValueIndex}")
     }
 }
