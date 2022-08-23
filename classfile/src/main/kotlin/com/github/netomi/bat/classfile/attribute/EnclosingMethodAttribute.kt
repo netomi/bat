@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.util.JvmClassName
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -39,7 +40,7 @@ data class EnclosingMethodAttribute internal constructor(override val attributeN
     val methodIndex: Int
         get() = _methodIndex
 
-    fun getClassName(classFile: ClassFile): String {
+    fun getClassName(classFile: ClassFile): JvmClassName {
         return classFile.getClassName(classIndex)
     }
 

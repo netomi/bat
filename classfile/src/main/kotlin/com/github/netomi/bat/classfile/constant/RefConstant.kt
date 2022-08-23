@@ -16,6 +16,7 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.util.JvmClassName
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -33,7 +34,7 @@ abstract class RefConstant(protected open var _classIndex:       Int = -1,
     val nameAndTypeIndex: Int
         get() = _nameAndTypeIndex
 
-    fun getClassName(classFile: ClassFile): String {
+    fun getClassName(classFile: ClassFile): JvmClassName {
         return classFile.getClassName(classIndex)
     }
 

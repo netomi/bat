@@ -18,7 +18,6 @@ package com.github.netomi.bat.classfile.attribute.annotations
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
 import com.github.netomi.bat.util.JvmType
-import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
@@ -33,12 +32,8 @@ data class Annotation private constructor(private var _typeIndex:     Int       
     val elementValues: List<Pair<Int, ElementValue>>
         get() = _elementValues
 
-    fun getType(classFile: ClassFile): String {
-        return classFile.getString(typeIndex)
-    }
-
-    fun getJvmType(classFile: ClassFile): JvmType {
-        return getType(classFile).asJvmType()
+    fun getType(classFile: ClassFile): JvmType {
+        return classFile.getType(typeIndex)
     }
 
     @Throws(IOException::class)

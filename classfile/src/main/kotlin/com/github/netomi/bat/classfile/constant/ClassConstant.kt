@@ -18,6 +18,8 @@ package com.github.netomi.bat.classfile.constant
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.util.JvmClassName
+import com.github.netomi.bat.util.asInternalClassName
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -35,8 +37,8 @@ data class ClassConstant private constructor(private var _nameIndex: Int = -1) :
     val nameIndex: Int
         get() = _nameIndex
 
-    fun getClassName(classFile: ClassFile): String {
-        return classFile.getString(nameIndex)
+    fun getClassName(classFile: ClassFile): JvmClassName {
+        return classFile.getString(nameIndex).asInternalClassName()
     }
 
     @Throws(IOException::class)

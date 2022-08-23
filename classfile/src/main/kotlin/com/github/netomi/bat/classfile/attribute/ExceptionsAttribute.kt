@@ -39,7 +39,7 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
         get() = _exceptions
 
     fun getExceptionClassNames(classFile: ClassFile): List<JvmClassName> {
-        return exceptions.map { classFile.getClassName(it).asInternalClassName() }
+        return exceptions.map { classFile.getClassName(it) }
     }
 
     @Throws(IOException::class)

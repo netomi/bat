@@ -24,7 +24,10 @@ import com.github.netomi.bat.classfile.attribute.visitor.classAttributes
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
-import com.github.netomi.bat.util.asInternalClassName
+import com.github.netomi.bat.util.JvmClassName
+import com.github.netomi.bat.util.JvmType
+import com.github.netomi.bat.util.asJvmType
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.IOException
 import java.util.*
@@ -56,39 +59,34 @@ class ClassFile private constructor() {
 
     private val constantPool: ConstantPool = ConstantPool.empty()
 
-    private val interfaces = mutableListOf<Int>()
-    private val fields     = mutableListOf<Field>()
-    private val methods    = mutableListOf<Method>()
-    private val attributes = mutableListOf<Attribute>()
+    private var _interfaces = mutableListOfCapacity<Int>(0)
+    private var _fields     = mutableListOfCapacity<Field>(0)
+    private var _methods    = mutableListOfCapacity<Method>(0)
+    private var _attributes = mutableListOfCapacity<Attribute>(0)
 
-    val className: String
+    val className: JvmClassName
         get() = getClassName(thisClassIndex)
 
-    val externalClassName: String
-        get() = className.asInternalClassName().toExternalClassName()
-
-    val superClassName: String
+    val superClassName: JvmClassName
         get() = getClassName(superClassIndex)
 
-    fun interfaces(): Collection<String> {
-        return if (interfaces.isEmpty()) {
-            emptyList()
-        } else {
-            interfaces.map { getClassName(it) }
+    val interfaces: List<JvmClassName>
+        get() {
+            return if (_interfaces.isEmpty()) {
+                emptyList()
+            } else {
+                _interfaces.map { getClassName(it) }
+            }
         }
-    }
 
-    fun fields(): Collection<Field> {
-        return fields
-    }
+    val fields: List<Field>
+        get() = _fields
 
-    fun methods(): Collection<Method> {
-        return methods
-    }
+    val methods: List<Method>
+        get() = _methods
 
-    fun attributes(): Collection<Attribute> {
-        return attributes
-    }
+    val attributes: List<Attribute>
+        get() = _attributes
 
     // helper methods to access constant pool entries
 
@@ -104,8 +102,12 @@ class ClassFile private constructor() {
         return (constantPool[constantIndex] as Utf8Constant).value
     }
 
-    fun getClassName(classIndex: Int): String {
+    fun getClassName(classIndex: Int): JvmClassName {
         return (constantPool[classIndex] as ClassConstant).getClassName(this)
+    }
+
+    fun getType(typeIndex: Int): JvmType {
+        return getString(typeIndex).asJvmType()
     }
 
     fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
@@ -125,24 +127,28 @@ class ClassFile private constructor() {
         superClassIndex = input.readUnsignedShort()
 
         val interfacesCount = input.readUnsignedShort()
+        _interfaces = mutableListOfCapacity(interfacesCount)
         for (i in 0 until interfacesCount) {
             val idx = input.readUnsignedShort()
-            interfaces.add(idx)
+            _interfaces.add(idx)
         }
 
         val fieldCount = input.readUnsignedShort()
+        _fields = mutableListOfCapacity(fieldCount)
         for (i in 0 until fieldCount) {
-            fields.add(Field.readField(input, this))
+            _fields.add(Field.readField(input, this))
         }
 
         val methodCount = input.readUnsignedShort()
+        _methods = mutableListOfCapacity(methodCount)
         for (i in 0 until methodCount) {
-            methods.add(Method.readMethod(input, this))
+            _methods.add(Method.readMethod(input, this))
         }
 
         val attributeCount = input.readUnsignedShort()
+        _attributes = mutableListOfCapacity(attributeCount)
         for (i in 0 until attributeCount) {
-            attributes.add(Attribute.readAttribute(input, this))
+            _attributes.add(Attribute.readAttribute(input, this))
         }
     }
 
@@ -175,7 +181,7 @@ class ClassFile private constructor() {
     }
 
     companion object {
-        fun empty(): ClassFile {
+        internal fun empty(): ClassFile {
             return ClassFile()
         }
 

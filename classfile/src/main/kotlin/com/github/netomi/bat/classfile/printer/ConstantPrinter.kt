@@ -67,16 +67,14 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
         val str = "$className.$memberName:$descriptor"
         var type = "Unknown"
         when (refConstant.type) {
-            ConstantType.FIELD_REF -> type = "Fieldref"
-            ConstantType.METHOD_REF -> type = "Methodref"
+            ConstantType.FIELD_REF            -> type = "Fieldref"
+            ConstantType.METHOD_REF           -> type = "Methodref"
             ConstantType.INTERFACE_METHOD_REF -> type = "InterfaceMethodref"
             else -> {
                 // do nothing
             }
         }
-        printer.print("%-19s %-15s // %s".format(type,
-            "#" + refConstant.classIndex + ".#" + refConstant.nameAndTypeIndex,
-            str))
+        printer.print("%-19s %-15s // %s".format(type, "#${refConstant.classIndex}.#${refConstant.nameAndTypeIndex}", str))
     }
 
     override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {

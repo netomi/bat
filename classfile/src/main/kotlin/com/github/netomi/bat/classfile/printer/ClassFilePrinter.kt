@@ -52,7 +52,7 @@ class ClassFilePrinter :
         val externalModifiers = classFile.modifiers.filter { it != AccessFlag.SUPER }
                                                    .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
 
-        printer.println("%s class %s".format(externalModifiers, classFile.externalClassName))
+        printer.println("%s class %s".format(externalModifiers, classFile.className.toExternalClassName()))
         printer.levelUp()
         printer.println("minor version: " + classFile.minorVersion)
         printer.println("major version: " + classFile.majorVersion)
@@ -64,10 +64,10 @@ class ClassFilePrinter :
         printer.println("super_class: #%-28d // %s".format(classFile.superClassIndex, classFile.superClassName))
 
         printer.println("interfaces: %d, fields: %d, methods: %d, attributes: %d"
-            .format(classFile.interfaces().count(),
-                    classFile.fields().count(),
-                    classFile.methods().count(),
-                    classFile.attributes().count()))
+            .format(classFile.interfaces.count(),
+                    classFile.fields.count(),
+                    classFile.methods.count(),
+                    classFile.attributes.count()))
 
         printer.levelDown()
 
@@ -156,7 +156,7 @@ class ClassFilePrinter :
             referencedIndexPrinter.visitAnnotation(classFile, annotation)
             printer.println()
             printer.levelUp()
-            printer.println(annotation.getJvmType(classFile).toExternalType())
+            printer.println(annotation.getType(classFile).toExternalType())
 
             printer.levelUp()
             annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
@@ -215,7 +215,7 @@ private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
 
         val methodName = getName(classFile)
         if (methodName == "<init>") {
-            append(classFile.externalClassName)
+            append(classFile.className.toExternalClassName())
         } else {
             append(getName(classFile))
         }
