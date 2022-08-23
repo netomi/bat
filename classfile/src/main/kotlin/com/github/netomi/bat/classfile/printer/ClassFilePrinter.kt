@@ -83,7 +83,7 @@ class ClassFilePrinter :
 
         printer.levelDown()
 
-        printer.println("{")
+        printer.print("{")
 
         printer.levelUp()
         classFile.fieldsAccept(this)
@@ -113,6 +113,7 @@ class ClassFilePrinter :
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
+        printer.println()
         val externalModifiers = field.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
         val externalType = field.getDescriptor(classFile).asJvmType().toExternalType()
         printer.println("%s %s %s;".format(externalModifiers, externalType, field.getName(classFile)))
@@ -121,7 +122,6 @@ class ClassFilePrinter :
 
     override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
         printer.println()
-
         val externalModifiers = method.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
         printer.println("%s %s;".format(externalModifiers, method.getExternalMethodSignature(classFile)))
         visitAnyMember(classFile, index, method)
@@ -221,7 +221,14 @@ private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
 
         append(returnType.toExternalType())
         append(' ')
-        append(getName(classFile))
+
+        val methodName = getName(classFile)
+        if (methodName == "<init>") {
+            append(classFile.externalClassName)
+        } else {
+            append(getName(classFile))
+        }
+
         append(parameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
     }
 }
