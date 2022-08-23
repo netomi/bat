@@ -16,6 +16,8 @@
 
 package com.github.netomi.bat.util
 
+import java.util.*
+
 // common class type constants
 const val JAVA_LANG_OBJECT_TYPE = "Ljava/lang/Object;"
 const val JAVA_LANG_STRING_TYPE = "Ljava/lang/String;"
@@ -130,9 +132,7 @@ open class JvmType protected constructor(val type: String) {
         if (this === other) return true
         if (other !is JvmType) return false
 
-        if (type != other.type) return false
-
-        return true
+        return type == other.type
     }
 
     override fun hashCode(): Int {
@@ -162,6 +162,18 @@ class JvmClassName private constructor(val className: String, val internal: Bool
 
     fun toInternalType(): String {
         return "L${toInternalClassName()};"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is JvmClassName) return false
+
+        return className == other.className &&
+               internal  == other.internal
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(className, internal)
     }
 
     override fun toString(): String {
