@@ -31,11 +31,11 @@ data class DynamicConstant internal constructor(
     var bootstrapMethodAttrIndex: Int = -1,
     var nameAndTypeIndex:         Int = -1) : Constant() {
 
-    override val type: Type
-        get() = Type.DYNAMIC
+    override val type: ConstantType
+        get() = ConstantType.DYNAMIC
 
-    fun getNameAndType(cp: ConstantPool): NameAndTypeConstant {
-        return cp.getNameAndType(nameAndTypeIndex)
+    fun getNameAndType(classFile: ClassFile): NameAndTypeConstant {
+        return classFile.getNameAndType(nameAndTypeIndex)
     }
 
     @Throws(IOException::class)
@@ -64,6 +64,8 @@ data class DynamicConstant internal constructor(
         }
 
         fun of(bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): DynamicConstant {
+            require(bootstrapMethodAttrIndex >= 1) { "bootstrapMethodAttrIndex must be a positive number" }
+            require(nameAndTypeIndex >= 1) { "nameAndTypeIndex must be a positive number" }
             return DynamicConstant(bootstrapMethodAttrIndex, nameAndTypeIndex)
         }
     }

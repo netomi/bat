@@ -28,8 +28,8 @@ data class MethodrefConstant private constructor(
     override var classIndex:       Int = -1,
     override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
 
-    override val type: Type
-        get() = Type.METHOD_REF
+    override val type: ConstantType
+        get() = ConstantType.METHOD_REF
 
     override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitMethodRefConstant(classFile, this)
@@ -45,6 +45,8 @@ data class MethodrefConstant private constructor(
         }
 
         fun of(classIndex: Int, nameAndTypeIndex: Int): MethodrefConstant {
+            require(classIndex >= 1) { "classIndex must be a positive number" }
+            require(nameAndTypeIndex >= 1) { "nameAndTypeIndex must be a positive number" }
             return MethodrefConstant(classIndex, nameAndTypeIndex)
         }
     }

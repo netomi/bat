@@ -15,13 +15,10 @@
  */
 package com.github.netomi.bat.dexfile.annotation.visitor
 
-import com.github.netomi.bat.dexfile.ClassDef
-import com.github.netomi.bat.dexfile.DataItem
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.annotation.Annotation
-import com.github.netomi.bat.dexfile.annotation.AnnotationSet
-import com.github.netomi.bat.dexfile.visitor.AbstractCollector
-import com.github.netomi.bat.dexfile.visitor.AbstractMultiVisitor
+import com.github.netomi.bat.visitor.AbstractCollector
+import com.github.netomi.bat.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
 
 fun annotationCollector(): AnnotationCollector {

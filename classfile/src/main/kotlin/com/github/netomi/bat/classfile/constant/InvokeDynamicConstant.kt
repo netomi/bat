@@ -31,8 +31,8 @@ data class InvokeDynamicConstant private constructor(
     var bootstrapMethodAttrIndex: Int = -1,
     var nameAndTypeIndex:         Int = -1) : Constant() {
 
-    override val type: Type
-        get() = Type.INVOKE_DYNAMIC
+    override val type: ConstantType
+        get() = ConstantType.INVOKE_DYNAMIC
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -60,6 +60,8 @@ data class InvokeDynamicConstant private constructor(
         }
 
         fun of(bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): InvokeDynamicConstant {
+            require(bootstrapMethodAttrIndex >= 1) { "bootstrapMethodAttrIndex must be a positive number" }
+            require(nameAndTypeIndex >= 1) { "nameAndTypeIndex must be a positive number" }
             return InvokeDynamicConstant(bootstrapMethodAttrIndex, nameAndTypeIndex)
         }
     }

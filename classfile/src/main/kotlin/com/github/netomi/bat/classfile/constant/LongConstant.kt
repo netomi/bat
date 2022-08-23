@@ -29,8 +29,8 @@ import java.io.IOException
  */
 data class LongConstant private constructor(var value: Long = 0) : Constant() {
 
-    override val type: Type
-        get() = Type.LONG
+    override val type: ConstantType
+        get() = ConstantType.LONG
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {

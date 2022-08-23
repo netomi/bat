@@ -1,7 +1,7 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -10,8 +10,8 @@ data class EnumElementValue internal constructor(
     var typeNameIndex:  Int = -1,
     var constNameIndex: Int = -1) : ElementValue() {
 
-    override val type: Type
-        get() = Type.ENUM
+    override val type: ElementValueType
+        get() = ElementValueType.ENUM
 
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
@@ -25,13 +25,12 @@ data class EnumElementValue internal constructor(
         output.writeShort(constNameIndex)
     }
 
-    override fun accept(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, visitor: ElementValueVisitor) {
-        visitor.visitEnumElementValue(classFile, annotation, index, elementName, this)
+    override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {
+        visitor.visitEnumElementValue(classFile, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(): EnumElementValue {
+        internal fun empty(): EnumElementValue {
             return EnumElementValue()
         }
     }

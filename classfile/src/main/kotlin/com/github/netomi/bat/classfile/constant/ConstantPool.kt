@@ -18,44 +18,39 @@ package com.github.netomi.bat.classfile.constant
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-class ConstantPool {
-    private val constants = mutableListOf<Constant?>()
+internal class ConstantPool private constructor(private var constants: MutableList<Constant?> = mutableListOfCapacity(1)) {
 
-    fun addConstant(constant: Constant) {
+    init {
+        if (constants.isEmpty()) {
+            constants.add(null)
+        }
+    }
+
+    operator fun get(index: Int): Constant {
+        require(constants[index] != null) { "trying to retrieve a null constant at index $index" }
+        return constants[index]!!
+    }
+
+    internal fun addConstant(constant: Constant): Int {
         constants.add(constant)
-    }
-
-    fun getInteger(constantIndex: Int): Int {
-        return (constants[constantIndex] as IntegerConstant).value
-    }
-
-    fun getString(constantIndex: Int): String {
-        return (constants[constantIndex] as Utf8Constant).value
-    }
-
-    fun getClassName(classIndex: Int): String {
-        return (constants[classIndex] as ClassConstant).getClassName(this)
-    }
-
-    fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
-        return (constants[nameAndTypeIndex] as NameAndTypeConstant)
+        return constants.lastIndex
     }
 
     @Throws(IOException::class)
     fun read(input: DataInput) {
-        check(constants.isEmpty()) { "trying to populate a non-empty ConstantPool" }
-
         val entries = input.readUnsignedShort()
+        constants = mutableListOfCapacity(entries)
         constants.add(null)
         var i = 1
         while (i < entries) {
             val constant = Constant.read(input)
             constants.add(constant)
-            if (constant.type.constantPoolSize > 1) {
+            if (constant.constantPoolSize > 1) {
                 constants.add(null)
                 i += 2
             } else {
@@ -79,13 +74,19 @@ class ConstantPool {
     }
 
     fun accept(classFile: ClassFile, visitor: ConstantPoolVisitor) {
-        visitor.visitConstantPoolStart(classFile, this)
+        visitor.visitConstantPoolStart(classFile)
         constants.forEachIndexed { index, constant -> constant?.accept(classFile, index, visitor) }
-        visitor.visitConstantPoolEnd(classFile, this)
+        visitor.visitConstantPoolEnd(classFile)
     }
 
     fun constantAccept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
         require(constants[index] != null) { "trying to accept a null constant at index $index" }
         constants[index]?.accept(classFile, visitor)
+    }
+
+    companion object {
+        fun empty(): ConstantPool {
+            return ConstantPool()
+        }
     }
 }

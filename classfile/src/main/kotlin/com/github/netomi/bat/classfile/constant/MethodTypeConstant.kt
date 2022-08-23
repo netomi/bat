@@ -29,11 +29,11 @@ import java.io.IOException
  */
 data class MethodTypeConstant private constructor(var descriptorIndex: Int = -1) : Constant() {
 
-    override val type: Type
-        get() = Type.METHOD_TYPE
+    override val type: ConstantType
+        get() = ConstantType.METHOD_TYPE
 
-    fun getDescriptor(cp: ConstantPool): String {
-        return cp.getString(descriptorIndex)
+    fun getDescriptor(classFile: ClassFile): String {
+        return classFile.getString(descriptorIndex)
     }
 
     @Throws(IOException::class)
@@ -60,6 +60,7 @@ data class MethodTypeConstant private constructor(var descriptorIndex: Int = -1)
         }
 
         fun of(descriptorIndex: Int): MethodTypeConstant {
+            require(descriptorIndex >= 1) { "descriptorIndex must be a positive number" }
             return MethodTypeConstant(descriptorIndex)
         }
     }

@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.util.StringMatcher
 import com.github.netomi.bat.util.asInternalJavaClassName
 import com.github.netomi.bat.util.classNameMatcher
+import com.github.netomi.bat.visitor.AbstractMultiVisitor
 
 fun multiClassDefVisitorOf(visitor: ClassDefVisitor, vararg visitors: ClassDefVisitor): ClassDefVisitor {
     return MultiClassDefVisitor(visitor, *visitors)

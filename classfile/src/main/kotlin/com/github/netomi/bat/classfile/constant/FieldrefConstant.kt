@@ -29,8 +29,8 @@ data class FieldrefConstant private constructor(
     override var classIndex:       Int = -1,
     override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
 
-    override val type: Type
-        get() = Type.FIELD_REF
+    override val type: ConstantType
+        get() = ConstantType.FIELD_REF
 
     override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitFieldRefConstant(classFile, this)
@@ -46,6 +46,8 @@ data class FieldrefConstant private constructor(
         }
 
         fun of(classIndex: Int, nameAndTypeIndex: Int): FieldrefConstant {
+            require(classIndex >= 1) { "classIndex must be a positive number" }
+            require(nameAndTypeIndex >= 1) { "nameAndTypeIndex must be a positive number" }
             return FieldrefConstant(classIndex, nameAndTypeIndex)
         }
     }

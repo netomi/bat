@@ -17,6 +17,6 @@ package com.github.netomi.bat.classfile.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
 
-interface ClassFileVisitor {
+fun interface ClassFileVisitor {
     fun visitClassFile(classFile: ClassFile)
 }

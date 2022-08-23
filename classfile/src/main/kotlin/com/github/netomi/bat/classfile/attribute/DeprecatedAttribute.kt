@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -30,8 +30,8 @@ import java.io.IOException
  */
 data class DeprecatedAttribute internal constructor(override var attributeNameIndex: Int) : Attribute(attributeNameIndex) {
 
-    override val type: Type
-        get() = Type.DEPRECATED
+    override val type: AnnotationType
+        get() = AnnotationType.DEPRECATED
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
@@ -49,8 +49,7 @@ data class DeprecatedAttribute internal constructor(override var attributeNameIn
     }
 
     companion object {
-        @JvmStatic
-        fun create(attributeNameIndex: Int): DeprecatedAttribute {
+        internal fun of(attributeNameIndex: Int): DeprecatedAttribute {
             return DeprecatedAttribute(attributeNameIndex)
         }
     }

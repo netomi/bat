@@ -15,23 +15,22 @@
  */
 package com.github.netomi.bat.classfile
 
-import com.github.netomi.bat.classfile.constant.ConstantPool
 import java.io.DataInput
 import java.io.IOException
 
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.6
  */
-class Method internal constructor(): Member() {
+class Method private constructor(): Member() {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.METHOD
 
     companion object {
         @Throws(IOException::class)
-        fun readMethod(input: DataInput, constantPool: ConstantPool): Method {
+        internal fun readMethod(input: DataInput, classFile: ClassFile): Method {
             val method = Method()
-            method.read(input, constantPool)
+            method.read(input, classFile)
             return method
         }
     }

@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -31,11 +31,11 @@ import java.io.IOException
 data class SourceFileAttribute internal constructor(override var attributeNameIndex: Int,
                                                              var sourceFileIndex:    Int = -1) : Attribute(attributeNameIndex) {
 
-    override val type: Type
-        get() = Type.SOURCE_FILE
+    override val type: AnnotationType
+        get() = AnnotationType.SOURCE_FILE
 
-    fun sourceFile(classFile: ClassFile): String {
-        return classFile.cp.getString(sourceFileIndex)
+    fun getSourceFile(classFile: ClassFile): String {
+        return classFile.getString(sourceFileIndex)
     }
 
     @Throws(IOException::class)
@@ -56,8 +56,7 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
     }
 
     companion object {
-        @JvmStatic
-        fun create(attributeNameIndex: Int): SourceFileAttribute {
+        internal fun of(attributeNameIndex: Int): SourceFileAttribute {
             return SourceFileAttribute(attributeNameIndex)
         }
     }

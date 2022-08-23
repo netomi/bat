@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -31,11 +31,11 @@ import java.io.IOException
 data class SignatureAttribute internal constructor(override var attributeNameIndex: Int,
                                                             var signatureIndex:     Int = -1) : Attribute(attributeNameIndex) {
 
-    override val type: Type
-        get() = Type.SIGNATURE
+    override val type: AnnotationType
+        get() = AnnotationType.SIGNATURE
 
-    fun signature(classFile: ClassFile): String {
-        return classFile.cp.getString(signatureIndex)
+    fun getSignature(classFile: ClassFile): String {
+        return classFile.getString(signatureIndex)
     }
 
     @Throws(IOException::class)
@@ -56,8 +56,7 @@ data class SignatureAttribute internal constructor(override var attributeNameInd
     }
 
     companion object {
-        @JvmStatic
-        fun create(attributeNameIndex: Int): SignatureAttribute {
+        internal fun of(attributeNameIndex: Int): SignatureAttribute {
             return SignatureAttribute(attributeNameIndex)
         }
     }

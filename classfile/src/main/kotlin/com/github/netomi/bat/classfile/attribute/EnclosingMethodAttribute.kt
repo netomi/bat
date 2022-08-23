@@ -16,8 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.ConstantPool
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -31,19 +30,19 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
                                                                   var classIndex:         Int = -1,
                                                                   var methodIndex:        Int = -1) : Attribute(attributeNameIndex) {
 
-    override val type: Type
-        get() = Type.ENCLOSING_METHOD
+    override val type: AnnotationType
+        get() = AnnotationType.ENCLOSING_METHOD
 
-    fun getClassName(constantPool: ConstantPool): String {
-        return constantPool.getClassName(classIndex)
+    fun getClassName(classFile: ClassFile): String {
+        return classFile.getClassName(classIndex)
     }
 
-    fun getMethodName(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(methodIndex).getMemberName(constantPool);
+    fun getMethodName(classFile: ClassFile): String {
+        return classFile.getNameAndType(methodIndex).getMemberName(classFile);
     }
 
-    fun getMethodType(constantPool: ConstantPool): String {
-        return constantPool.getNameAndType(methodIndex).getDescriptor(constantPool)
+    fun getMethodType(classFile: ClassFile): String {
+        return classFile.getNameAndType(methodIndex).getDescriptor(classFile)
     }
 
     @Throws(IOException::class)
@@ -68,8 +67,7 @@ data class EnclosingMethodAttribute internal constructor(override var attributeN
     companion object {
         private const val ATTRIBUTE_LENGTH = 4
 
-        @JvmStatic
-        fun create(attributeNameIndex: Int): EnclosingMethodAttribute {
+        internal fun of(attributeNameIndex: Int): EnclosingMethodAttribute {
             return EnclosingMethodAttribute(attributeNameIndex)
         }
     }

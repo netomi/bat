@@ -24,36 +24,40 @@ import java.util.*
 abstract class Member {
     var accessFlags: Int = 0
         private set
+
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
+
     val modifiers: EnumSet<AccessFlag>
         get() = accessFlagModifiers(accessFlags, accessFlagTarget)
+
     var nameIndex: Int = 0
         private set
+
     var descriptorIndex: Int = 0
         private set
 
     protected val attributes = mutableListOf<Attribute>()
 
-    abstract val accessFlagTarget: AccessFlagTarget
+    protected abstract val accessFlagTarget: AccessFlagTarget
 
     fun name(classFile: ClassFile): String {
-        return classFile.cp.getString(nameIndex)
+        return classFile.getString(nameIndex)
     }
 
     fun descriptor(classFile: ClassFile): String {
-        return classFile.cp.getString(descriptorIndex)
+        return classFile.getString(descriptorIndex)
     }
 
     @Throws(IOException::class)
-    protected fun read(input: DataInput, constantPool: ConstantPool) {
+    protected fun read(input: DataInput, classFile: ClassFile) {
         accessFlags     = input.readUnsignedShort()
         nameIndex       = input.readUnsignedShort()
         descriptorIndex = input.readUnsignedShort()
 
         val attributeCount = input.readUnsignedShort()
         for (i in 0 until attributeCount) {
-            attributes.add(Attribute.readAttribute(input, constantPool))
+            attributes.add(Attribute.readAttribute(input, classFile))
         }
     }
 }

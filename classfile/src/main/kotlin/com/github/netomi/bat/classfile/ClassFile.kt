@@ -16,8 +16,9 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.ConstantPool
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -29,23 +30,29 @@ import java.util.*
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
  */
-class ClassFile internal constructor() {
+class ClassFile private constructor() {
     var minorVersion = 0
         private set
+
     var majorVersion = 0
         private set
+
     var accessFlags: Int = 0
         private set
+
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
+
     val modifiers: EnumSet<AccessFlag>
         get() = accessFlagModifiers(accessFlags, AccessFlagTarget.CLASS)
+
     var thisClassIndex = -1
         private set
+
     var superClassIndex = -1
         private set
 
-    internal val cp: ConstantPool = ConstantPool()
+    private val constantPool: ConstantPool = ConstantPool.empty()
 
     private val interfaces = mutableListOf<Int>()
     private val fields     = mutableListOf<Field>()
@@ -53,19 +60,19 @@ class ClassFile internal constructor() {
     private val attributes = mutableListOf<Attribute>()
 
     val className: String
-        get() = cp.getClassName(thisClassIndex)
+        get() = getClassName(thisClassIndex)
 
     val externalClassName: String
         get() = className.asInternalJavaClassName().toExternalClassName()
 
     val superClassName: String
-        get() = cp.getClassName(superClassIndex)
+        get() = getClassName(superClassIndex)
 
     fun interfaces(): Collection<String> {
         return if (interfaces.isEmpty()) {
             emptyList()
         } else {
-            interfaces.map { cp.getClassName(it) }
+            interfaces.map { getClassName(it) }
         }
     }
 
@@ -81,6 +88,22 @@ class ClassFile internal constructor() {
         return attributes
     }
 
+    fun getInteger(constantIndex: Int): Int {
+        return (constantPool[constantIndex] as IntegerConstant).value
+    }
+
+    fun getString(constantIndex: Int): String {
+        return (constantPool[constantIndex] as Utf8Constant).value
+    }
+
+    fun getClassName(classIndex: Int): String {
+        return (constantPool[classIndex] as ClassConstant).getClassName(this)
+    }
+
+    fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
+        return (constantPool[nameAndTypeIndex] as NameAndTypeConstant)
+    }
+
     @Throws(IOException::class)
     private fun read(input: DataInput) {
         val magic = input.readInt()
@@ -88,7 +111,7 @@ class ClassFile internal constructor() {
 
         minorVersion = input.readUnsignedShort()
         majorVersion = input.readUnsignedShort()
-        cp.read(input)
+        constantPool.read(input)
         accessFlags     = input.readUnsignedShort()
         thisClassIndex  = input.readUnsignedShort()
         superClassIndex = input.readUnsignedShort()
@@ -101,17 +124,17 @@ class ClassFile internal constructor() {
 
         val fieldCount = input.readUnsignedShort()
         for (i in 0 until fieldCount) {
-            fields.add(Field.readField(input, cp))
+            fields.add(Field.readField(input, this))
         }
 
         val methodCount = input.readUnsignedShort()
         for (i in 0 until methodCount) {
-            methods.add(Method.readMethod(input, cp))
+            methods.add(Method.readMethod(input, this))
         }
 
         val attributeCount = input.readUnsignedShort()
         for (i in 0 until attributeCount) {
-            attributes.add(Attribute.readAttribute(input, cp))
+            attributes.add(Attribute.readAttribute(input, this))
         }
     }
 
@@ -120,7 +143,7 @@ class ClassFile internal constructor() {
     }
 
     fun constantPoolAccept(visitor: ConstantPoolVisitor) {
-        cp.accept(this, visitor)
+        constantPool.accept(this, visitor)
     }
 
     fun membersAccept(visitor: MemberVisitor) {
@@ -141,6 +164,10 @@ class ClassFile internal constructor() {
     }
 
     companion object {
+        fun empty(): ClassFile {
+            return ClassFile()
+        }
+
         @Throws(IOException::class)
         fun readClassFile(input: DataInput): ClassFile {
             val classFile = ClassFile()

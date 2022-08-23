@@ -1,7 +1,7 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -9,14 +9,14 @@ import java.io.IOException
 data class ArrayElementValue
     internal constructor(var elementValues: MutableList<ElementValue> = mutableListOf()) : ElementValue() {
 
-    override val type: Type
-        get() = Type.ARRAY
+    override val type: ElementValueType
+        get() = ElementValueType.ARRAY
 
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
         val elementValueCount = input.readUnsignedShort()
         for (i in 0 until elementValueCount) {
-            elementValues.add(ElementValue.read(input))
+            elementValues.add(read(input))
         }
     }
 
@@ -26,19 +26,16 @@ data class ArrayElementValue
         elementValues.forEach { it.write(output) }
     }
 
-    override fun accept(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, visitor: ElementValueVisitor) {
-        return visitor.visitArrayElementValue(classFile, annotation, index, elementName, this)
+    override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {
+        return visitor.visitArrayElementValue(classFile, this)
     }
 
-    fun acceptElementValues(classFile: ClassFile, annotation: Annotation, visitor: ElementValueVisitor) {
-        elementValues.forEachIndexed { index, elementValue ->
-            elementValue.accept(classFile, annotation, index, null, visitor)
-        }
+    fun acceptElementValues(classFile: ClassFile, visitor: ElementValueVisitor) {
+        elementValues.forEach { elementValue -> elementValue.accept(classFile, visitor) }
     }
 
     companion object {
-        @JvmStatic
-        fun create(): ArrayElementValue {
+        internal fun empty(): ArrayElementValue {
             return ArrayElementValue()
         }
     }

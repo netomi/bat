@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.classfile.constant
 
+import com.github.netomi.bat.classfile.ClassFile
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -26,20 +27,20 @@ import java.io.IOException
 abstract class RefConstant(open var classIndex:       Int = -1,
                            open var nameAndTypeIndex: Int = -1): Constant() {
 
-    fun getClassName(cp: ConstantPool): String {
-        return cp.getClassName(classIndex)
+    fun getClassName(classFile: ClassFile): String {
+        return classFile.getClassName(classIndex)
     }
 
-    private fun getNameAndTypeConstant(cp: ConstantPool): NameAndTypeConstant {
-        return cp.getNameAndType(nameAndTypeIndex)
+    private fun getNameAndTypeConstant(classFile: ClassFile): NameAndTypeConstant {
+        return classFile.getNameAndType(nameAndTypeIndex)
     }
 
-    fun getMemberName(cp: ConstantPool): String {
-        return getNameAndTypeConstant(cp).getMemberName(cp)
+    fun getMemberName(classFile: ClassFile): String {
+        return getNameAndTypeConstant(classFile).getMemberName(classFile)
     }
 
-    fun getDescriptor(cp: ConstantPool): String {
-        return getNameAndTypeConstant(cp).getDescriptor(cp)
+    fun getDescriptor(classFile: ClassFile): String {
+        return getNameAndTypeConstant(classFile).getDescriptor(classFile)
     }
 
     @Throws(IOException::class)

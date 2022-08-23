@@ -16,13 +16,12 @@
 package com.github.netomi.bat.classfile.constant.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.constant.*
 
 fun interface ConstantPoolVisitor {
-    fun visitConstantPoolStart(classFile: ClassFile, constantPool: ConstantPool) {}
+    fun visitConstantPoolStart(classFile: ClassFile) {}
 
-    fun visitConstantPoolEnd(classFile: ClassFile, constantPool: ConstantPool) {}
+    fun visitConstantPoolEnd(classFile: ClassFile) {}
 
     fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant)
 

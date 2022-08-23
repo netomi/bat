@@ -16,22 +16,19 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
 /**
  * Base class for attributes as contained in a class file.
- *
- * @author Thomas Neidhart
  */
 abstract class Attribute protected constructor(open val attributeNameIndex: Int) {
 
-    abstract val type: Type
+    internal abstract val type: AnnotationType
 
     @Throws(IOException::class)
     protected abstract fun readAttributeData(input: DataInput)
@@ -48,69 +45,67 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
     abstract fun accept(classFile: ClassFile, visitor: AttributeVisitor)
 
     companion object {
-        @JvmStatic
-        fun readAttribute(input : DataInput, constantPool: ConstantPool): Attribute {
+        internal fun readAttribute(input : DataInput, classFile: ClassFile): Attribute {
             val attributeNameIndex = input.readUnsignedShort()
-            val attributeName      = constantPool.getString(attributeNameIndex)
+            val attributeName      = classFile.getString(attributeNameIndex)
 
-            val attribute = Type.of(attributeName).createAttribute(attributeNameIndex)
+            val attribute = AnnotationType.of(attributeName).createAttribute(attributeNameIndex)
             attribute.readAttributeData(input)
 
             return attribute
         }
     }
+}
 
-    /**
-     * Known constant types as contained in a java class file.
-     */
-    enum class Type constructor(val attributeName: String, val supplier: ((Int) -> Attribute)?) {
+/**
+ * Known constant types as contained in a java class file.
+ */
+internal enum class AnnotationType constructor(val attributeName: String, private val supplier: ((Int) -> Attribute)?) {
 
-        // Predefined attributes:
-        // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7-300
+    // Predefined attributes:
+    // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7-300
 
-        CONSTANT_VALUE("ConstantValue", ConstantValueAttribute.Companion::create),
-        CODE("Code", null),
-        STACK_MAP_TABLE("StackMapTable", null),
-        EXCEPTIONS("Exceptions", null),
-        INNER_CLASSES("InnerClasses", null),
-        ENCLOSING_METHOD("EnclosingMethod", EnclosingMethodAttribute.Companion::create),
-        SYNTHETIC("Synthetic", SyntheticAttribute.Companion::create),
-        SIGNATURE("Signature", SignatureAttribute.Companion::create),
-        SOURCE_FILE("SourceFile", SourceFileAttribute.Companion::create),
-        SOURCE_DEBUG_EXTENSION("SourceDebugExtension", null),
-        LINE_NUMBER_TABLE("LineNumberTable", null),
-        LOCAL_VARIABLE_TABLE("LocalVariableTable", null),
-        LOCAL_VARIABLE_TYPE_TABLE("LocalVariableTypeTable", null),
-        DEPRECATED("Deprecated", DeprecatedAttribute.Companion::create),
-        RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::create),
-        RUNTIME_INVISIBLE_ANNOTATIONS("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::create),
-        RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS("RuntimeVisibleParameterAnnotations", null),
-        RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", null),
-        RUNTIME_VISIBLE_TYPE_ANNOTATIONS("RuntimeVisibleTypeAnnotations", null),
-        RUNTIME_INVISIBLE_TYPE_ANNOTATIONS("RuntimeInvisibleTypeAnnotations", null),
-        ANNOTATION_DEFAULT("AnnotationDefault", null),
-        BOOTSTRAP_METHOD("BootstrapMethod", null),
-        METHOD_PARAMETERS("MethodParameters", null),
-        MODULE("Module", null),
-        MODULE_PACKAGES("ModulePackages", null),
-        MODULE_MAIN_CLASS("ModuleMainClass", null),
-        NEST_HOST("NestHost", null),
-        NEST_MEMBERS("NestMembers", null),
-        UNKNOWN("Unknown", UnknownAttribute.Companion::create);
+    CONSTANT_VALUE("ConstantValue", ConstantValueAttribute.Companion::of),
+    CODE("Code", null),
+    STACK_MAP_TABLE("StackMapTable", null),
+    EXCEPTIONS("Exceptions", null),
+    INNER_CLASSES("InnerClasses", null),
+    ENCLOSING_METHOD("EnclosingMethod", EnclosingMethodAttribute.Companion::of),
+    SYNTHETIC("Synthetic", SyntheticAttribute.Companion::of),
+    SIGNATURE("Signature", SignatureAttribute.Companion::of),
+    SOURCE_FILE("SourceFile", SourceFileAttribute.Companion::of),
+    SOURCE_DEBUG_EXTENSION("SourceDebugExtension", null),
+    LINE_NUMBER_TABLE("LineNumberTable", null),
+    LOCAL_VARIABLE_TABLE("LocalVariableTable", null),
+    LOCAL_VARIABLE_TYPE_TABLE("LocalVariableTypeTable", null),
+    DEPRECATED("Deprecated", DeprecatedAttribute.Companion::of),
+    RUNTIME_VISIBLE_ANNOTATIONS("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::of),
+    RUNTIME_INVISIBLE_ANNOTATIONS("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::of),
+    RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS("RuntimeVisibleParameterAnnotations", null),
+    RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", null),
+    RUNTIME_VISIBLE_TYPE_ANNOTATIONS("RuntimeVisibleTypeAnnotations", null),
+    RUNTIME_INVISIBLE_TYPE_ANNOTATIONS("RuntimeInvisibleTypeAnnotations", null),
+    ANNOTATION_DEFAULT("AnnotationDefault", null),
+    BOOTSTRAP_METHOD("BootstrapMethod", null),
+    METHOD_PARAMETERS("MethodParameters", null),
+    MODULE("Module", null),
+    MODULE_PACKAGES("ModulePackages", null),
+    MODULE_MAIN_CLASS("ModuleMainClass", null),
+    NEST_HOST("NestHost", null),
+    NEST_MEMBERS("NestMembers", null),
+    UNKNOWN("Unknown", UnknownAttribute.Companion::of);
 
-        companion object {
-            private val nameToAttributeMap: Map<String, Type> by lazy {
-                values().associateBy { it.attributeName }
-            }
-
-            fun of(name: String) : Type {
-                return nameToAttributeMap[name] ?: UNKNOWN
-            }
+    companion object {
+        private val nameToAttributeMap: Map<String, AnnotationType> by lazy {
+            values().associateBy { it.attributeName }
         }
 
-        fun createAttribute(attributeNameIndex: Int): Attribute {
-            return supplier?.invoke(attributeNameIndex) ?: UNKNOWN.supplier!!.invoke(attributeNameIndex)
+        fun of(name: String) : AnnotationType {
+            return nameToAttributeMap[name] ?: UNKNOWN
         }
     }
 
+    fun createAttribute(attributeNameIndex: Int): Attribute {
+        return supplier?.invoke(attributeNameIndex) ?: UNKNOWN.supplier!!.invoke(attributeNameIndex)
+    }
 }

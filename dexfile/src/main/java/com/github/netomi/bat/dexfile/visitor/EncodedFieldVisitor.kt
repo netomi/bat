@@ -18,6 +18,8 @@ package com.github.netomi.bat.dexfile.visitor
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.util.StringMatcher
 import com.github.netomi.bat.util.simpleNameMatcher
+import com.github.netomi.bat.visitor.AbstractCollector
+import com.github.netomi.bat.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
 
 fun multiFieldVisitorOf(visitor: EncodedFieldVisitor, vararg visitors: EncodedFieldVisitor): EncodedFieldVisitor {

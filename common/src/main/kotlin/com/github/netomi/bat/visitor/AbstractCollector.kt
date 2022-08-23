@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.dexfile.visitor
+package com.github.netomi.bat.visitor
 
 abstract class AbstractCollector<T> {
 

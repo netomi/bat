@@ -31,8 +31,8 @@ data class MethodHandleConstant private constructor(
     var referenceKind:  Int =  0,
     var referenceIndex: Int = -1) : Constant() {
 
-    override val type: Type
-        get() = Type.METHOD_HANDLE
+    override val type: ConstantType
+        get() = ConstantType.METHOD_HANDLE
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
@@ -60,6 +60,7 @@ data class MethodHandleConstant private constructor(
         }
 
         fun of(referenceKind: Int, referenceIndex: Int): MethodHandleConstant {
+            require(referenceIndex >= 1) { "referenceIndex must be a positive number" }
             return MethodHandleConstant(referenceKind, referenceIndex)
         }
     }

@@ -28,8 +28,8 @@ data class InterfaceMethodrefConstant private constructor(
     override var classIndex:       Int = -1,
     override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
 
-    override val type: Type
-        get() = Type.INTERFACE_METHOD_REF
+    override val type: ConstantType
+        get() = ConstantType.INTERFACE_METHOD_REF
 
     override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
         visitor.visitInterfaceMethodRefConstant(classFile, this)
@@ -45,6 +45,8 @@ data class InterfaceMethodrefConstant private constructor(
         }
 
         fun of(classIndex: Int, nameAndTypeIndex: Int): InterfaceMethodrefConstant {
+            require(classIndex >= 1) { "classIndex must be a positive number" }
+            require(nameAndTypeIndex >= 1) { "nameAndTypeIndex must be a positive number" }
             return InterfaceMethodrefConstant(classIndex, nameAndTypeIndex)
         }
     }

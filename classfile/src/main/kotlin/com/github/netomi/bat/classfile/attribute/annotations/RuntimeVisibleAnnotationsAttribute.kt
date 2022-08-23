@@ -16,8 +16,9 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.AnnotationType
 import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -26,15 +27,13 @@ import java.io.IOException
  * A class representing a RuntimeVisibleAnnotations attribute in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.16">RuntimeVisibleAnnotations Attribute</a>
- *
- * @author Thomas Neidhart
  */
 data class RuntimeVisibleAnnotationsAttribute internal constructor(
     override var attributeNameIndex: Int,
              var annotations: MutableList<Annotation> = mutableListOf()) : Attribute(attributeNameIndex) {
 
-    override val type: Type
-        get() = Type.RUNTIME_VISIBLE_ANNOTATIONS
+    override val type: AnnotationType
+        get() = AnnotationType.RUNTIME_VISIBLE_ANNOTATIONS
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
@@ -56,8 +55,7 @@ data class RuntimeVisibleAnnotationsAttribute internal constructor(
     }
 
     companion object {
-        @JvmStatic
-        fun create(attributeNameIndex: Int): RuntimeVisibleAnnotationsAttribute {
+        internal fun of(attributeNameIndex: Int): RuntimeVisibleAnnotationsAttribute {
             return RuntimeVisibleAnnotationsAttribute(attributeNameIndex)
         }
     }

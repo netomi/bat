@@ -29,11 +29,11 @@ import java.io.IOException
  */
 data class PackageConstant private constructor(var nameIndex: Int = -1): Constant() {
 
-    override val type: Type
-        get() = Type.PACKAGE
+    override val type: ConstantType
+        get() = ConstantType.PACKAGE
 
-    fun getPackageName(cp: ConstantPool): String {
-        return cp.getString(nameIndex)
+    fun getPackageName(classFile: ClassFile): String {
+        return classFile.getString(nameIndex)
     }
 
     @Throws(IOException::class)
@@ -60,6 +60,7 @@ data class PackageConstant private constructor(var nameIndex: Int = -1): Constan
         }
 
         fun of(nameIndex: Int): PackageConstant {
+            require(nameIndex >= 1) { "nameIndex must be a positive number" }
             return PackageConstant(nameIndex)
         }
     }

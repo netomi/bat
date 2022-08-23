@@ -47,7 +47,7 @@ class FloatConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile(), object : ConstantVisitor {
+        constant.accept(ClassFile.empty(), object : ConstantVisitor {
             override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {
                 wrongMethod++
             }
@@ -68,7 +68,7 @@ class FloatConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile(), 0, object : ConstantPoolVisitor {
+        constant.accept(ClassFile.empty(), 0, object : ConstantPoolVisitor {
             override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }

@@ -29,11 +29,11 @@ import java.io.IOException
  */
 data class StringConstant private constructor(var stringIndex: Int = -1): Constant() {
 
-    override val type: Type
-        get() = Type.STRING
+    override val type: ConstantType
+        get() = ConstantType.STRING
 
-    fun getString(cp: ConstantPool): String {
-        return cp.getString(stringIndex)
+    fun getString(classFile: ClassFile): String {
+        return classFile.getString(stringIndex)
     }
 
     @Throws(IOException::class)
@@ -60,6 +60,7 @@ data class StringConstant private constructor(var stringIndex: Int = -1): Consta
         }
 
         fun of(stringIndex: Int): StringConstant {
+            require(stringIndex >= 1) { "stringIndex must be a positive number" }
             return StringConstant(stringIndex)
         }
     }

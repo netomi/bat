@@ -27,7 +27,10 @@ import java.io.IOException
  */
 abstract class Constant {
 
-    abstract val type: Type
+    internal abstract val type: ConstantType
+
+    internal val constantPoolSize: Int
+        get() = type.constantPoolSize
 
     @Throws(IOException::class)
     abstract fun readConstantInfo(input: DataInput)
@@ -48,52 +51,51 @@ abstract class Constant {
     companion object {
         fun read(input: DataInput): Constant {
             val tag      = input.readUnsignedByte()
-            val constant = Type.of(tag).createConstant()
+            val constant = ConstantType.of(tag).createConstant()
             constant.readConstantInfo(input)
 
             return constant
         }
     }
-
-    /**
-     * Known constant types as contained in a java class file.
-     */
-    enum class Type constructor(val tag: Int, val constantPoolSize: Int, val supplier: () -> Constant) {
-
-        // Valid constants and their corresponding tags:
-        // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4-210
-
-        UTF8                ( 1, 1, Utf8Constant.Companion::empty),
-        INTEGER             ( 3, 1, IntegerConstant.Companion::empty),
-        FLOAT               ( 4, 1, FloatConstant.Companion::empty),
-        LONG                ( 5, 2, LongConstant.Companion::empty),
-        DOUBLE              ( 6, 2, DoubleConstant.Companion::empty),
-        CLASS               ( 7, 1, ClassConstant.Companion::empty),
-        STRING              ( 8, 1, StringConstant.Companion::empty),
-        FIELD_REF           ( 9, 1, FieldrefConstant.Companion::empty),
-        METHOD_REF          (10, 1, MethodrefConstant.Companion::empty),
-        INTERFACE_METHOD_REF(11, 1, InterfaceMethodrefConstant.Companion::empty),
-        NAME_AND_TYPE       (12, 1, NameAndTypeConstant.Companion::empty),
-        METHOD_HANDLE       (15, 1, MethodHandleConstant.Companion::empty),
-        METHOD_TYPE         (16, 1, MethodTypeConstant.Companion::empty),
-        DYNAMIC             (17, 1, DynamicConstant.Companion::empty),
-        INVOKE_DYNAMIC      (18, 1, InvokeDynamicConstant.Companion::empty),
-        MODULE              (19, 1, ModuleConstant.Companion::empty),
-        PACKAGE             (20, 1, PackageConstant.Companion::empty);
-
-        companion object {
-            private val tagToConstantMap: Map<Int, Type> by lazy {
-                values().associateBy { it.tag }
-            }
-
-            fun of(tag: Int) : Type {
-                return tagToConstantMap[tag] ?: throw IllegalArgumentException("Unknown constant tag '$tag'")
-            }
-        }
-
-        fun createConstant(): Constant {
-            return supplier.invoke()
-        }
-    }
 }
 
+/**
+ * Known constant types as contained in a java class file.
+ */
+internal enum class ConstantType constructor(val tag: Int, val constantPoolSize: Int, private val supplier: () -> Constant) {
+
+    // Valid constants and their corresponding tags:
+    // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4-210
+
+    UTF8                ( 1, 1, Utf8Constant.Companion::empty),
+    INTEGER             ( 3, 1, IntegerConstant.Companion::empty),
+    FLOAT               ( 4, 1, FloatConstant.Companion::empty),
+    LONG                ( 5, 2, LongConstant.Companion::empty),
+    DOUBLE              ( 6, 2, DoubleConstant.Companion::empty),
+    CLASS               ( 7, 1, ClassConstant.Companion::empty),
+    STRING              ( 8, 1, StringConstant.Companion::empty),
+    FIELD_REF           ( 9, 1, FieldrefConstant.Companion::empty),
+    METHOD_REF          (10, 1, MethodrefConstant.Companion::empty),
+    INTERFACE_METHOD_REF(11, 1, InterfaceMethodrefConstant.Companion::empty),
+    NAME_AND_TYPE       (12, 1, NameAndTypeConstant.Companion::empty),
+    METHOD_HANDLE       (15, 1, MethodHandleConstant.Companion::empty),
+    METHOD_TYPE         (16, 1, MethodTypeConstant.Companion::empty),
+    DYNAMIC             (17, 1, DynamicConstant.Companion::empty),
+    INVOKE_DYNAMIC      (18, 1, InvokeDynamicConstant.Companion::empty),
+    MODULE              (19, 1, ModuleConstant.Companion::empty),
+    PACKAGE             (20, 1, PackageConstant.Companion::empty);
+
+    companion object {
+        private val tagToConstantMap: Map<Int, ConstantType> by lazy {
+            values().associateBy { it.tag }
+        }
+
+        fun of(tag: Int) : ConstantType {
+            return tagToConstantMap[tag] ?: throw IllegalArgumentException("unknown constant tag '$tag'")
+        }
+    }
+
+    fun createConstant(): Constant {
+        return supplier.invoke()
+    }
+}

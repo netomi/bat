@@ -5,8 +5,8 @@ import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Member
 import com.github.netomi.bat.classfile.Method
 
-interface MemberVisitor {
-    fun visitAnyMember(classFile: ClassFile, index: Int, member: Member) {}
+fun interface MemberVisitor {
+    fun visitAnyMember(classFile: ClassFile, index: Int, member: Member)
 
     fun visitField(classFile: ClassFile, index: Int, field: Field) {
         visitAnyMember(classFile, index, field)

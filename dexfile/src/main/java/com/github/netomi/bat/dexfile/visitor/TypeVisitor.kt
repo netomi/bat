@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile.visitor
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.TypeList
+import com.github.netomi.bat.visitor.AbstractCollector
 
 fun typeCollector(): TypeCollector {
     return TypeCollector()

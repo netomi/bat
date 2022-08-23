@@ -18,10 +18,13 @@ package com.github.netomi.bat.classfile.io
 import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Member
+import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.*
-import com.github.netomi.bat.classfile.attribute.annotations.Annotation
+import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
@@ -94,6 +97,8 @@ class ClassFilePrinter :
         printer.println()
     }
 
+    override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {}
+
     override fun visitIntegerConstant(classFile: ClassFile, constant: IntegerConstant) {
         printer.print("%-19s %d".format("Integer", constant.value))
     }
@@ -121,21 +126,21 @@ class ClassFilePrinter :
     }
 
     override fun visitStringConstant(classFile: ClassFile, constant: StringConstant) {
-        val str = classFile.cp.getString(constant.stringIndex)
+        val str = classFile.getString(constant.stringIndex)
         printer.print("%-19s %-15s // %s".format("String", "#" + constant.stringIndex, str))
     }
 
     override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
-        val className  = refConstant.getClassName(classFile.cp)
-        val memberName = refConstant.getMemberName(classFile.cp)
-        val descriptor = refConstant.getDescriptor(classFile.cp)
+        val className  = refConstant.getClassName(classFile)
+        val memberName = refConstant.getMemberName(classFile)
+        val descriptor = refConstant.getDescriptor(classFile)
 
         val str = "$className.$memberName:$descriptor"
         var type = "Unknown"
         when (refConstant.type) {
-            Constant.Type.FIELD_REF -> type = "Fieldref"
-            Constant.Type.METHOD_REF -> type = "Methodref"
-            Constant.Type.INTERFACE_METHOD_REF -> type = "InterfaceMethodref"
+            ConstantType.FIELD_REF            -> type = "Fieldref"
+            ConstantType.METHOD_REF           -> type = "Methodref"
+            ConstantType.INTERFACE_METHOD_REF -> type = "InterfaceMethodref"
             else -> {
                 // do nothing
             }
@@ -146,14 +151,13 @@ class ClassFilePrinter :
     }
 
     override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {
-        val str = classFile.cp.getString(constant.nameIndex)
+        val str = classFile.getString(constant.nameIndex)
         printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, str))
     }
 
     override fun visitNameAndTypeConstant(classFile: ClassFile, constant: NameAndTypeConstant) {
-        val cp = classFile.cp
-        val memberName = cp.getString(constant.nameIndex)
-        val descriptor = cp.getString(constant.descriptorIndex)
+        val memberName = classFile.getString(constant.nameIndex)
+        val descriptor = classFile.getString(constant.descriptorIndex)
         val str = "$memberName:$descriptor"
         printer.print("%-19s %-15s // %s".format("NameAndType",
                                                  "#" + constant.nameIndex + ".#" + constant.descriptorIndex,
@@ -161,13 +165,17 @@ class ClassFilePrinter :
     }
 
     override fun visitModuleConstant(classFile: ClassFile, constant: ModuleConstant) {
-        val str = constant.getName(classFile.cp)
+        val str = constant.getModuleName(classFile)
         printer.print(String.format("%-19s %-15s // %s", "Module", "#" + constant.nameIndex, str))
     }
 
     override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
-        val str = constant.getPackageName(classFile.cp)
+        val str = constant.getPackageName(classFile)
         printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, str))
+    }
+
+    override fun visitAnyMember(classFile: ClassFile, index: Int, member: Member) {
+        // TODO("Not yet implemented")
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
@@ -186,12 +194,16 @@ class ClassFilePrinter :
         printer.levelDown()
    }
 
+    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
+        // TODO("Not yet implemented")
+    }
+
     override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
-        printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.signature(classFile)))
+        printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.getSignature(classFile)))
     }
 
     override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
-        printer.println("SourceFile: \"%s\"".format(attribute.sourceFile(classFile)))
+        printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
     }
 
     override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
@@ -203,7 +215,7 @@ class ClassFilePrinter :
             index, annotation ->
                 printer.println("%2d: #%d()".format(index, annotation.typeIndex))
                 printer.levelUp()
-                printer.println(annotation.type(classFile.cp).asJvmType().toExternalType())
+                printer.println(annotation.getJvmType(classFile).toExternalType())
                 printer.levelDown()
         }
 
@@ -213,19 +225,17 @@ class ClassFilePrinter :
     override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         printer.println("RuntimeVisibleAnnotations:")
 
-        val cp = classFile.cp
-
         printer.levelUp()
 
         attribute.annotations.forEachIndexed { index, annotation ->
             printer.println("%2d: #%d()".format(index, annotation.typeIndex))
             printer.levelUp()
-            printer.println(annotation.type(cp).asJvmType().toExternalType())
+            printer.println(annotation.getType(classFile).asJvmType().toExternalType())
 
             printer.levelUp()
-            annotation.elementValues.forEachIndexed { _, (elementName, elementValue) ->
-                printer.print("%s=".format(cp.getString(elementName)))
-                elementValue.accept(classFile, annotation, 0, null, this)
+            annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
+                printer.print("%s=".format(classFile.getString(elementNameIndex)))
+                elementValue.accept(classFile, this)
                 printer.println()
             }
             printer.levelDown()
@@ -235,12 +245,16 @@ class ClassFilePrinter :
         printer.levelDown()
     }
 
-    override fun visitIntElementValue(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, elementValue: ConstElementValue) {
-        printer.print("%s".format(classFile.cp.getInteger(elementValue.constValueIndex)))
+    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {
+        // TODO("Not yet implemented")
     }
 
-    override fun visitStringElementValue(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, elementValue: ConstElementValue) {
-        val value = classFile.cp.getString(elementValue.constValueIndex)
+    override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print("%s".format(classFile.getInteger(elementValue.constValueIndex)))
+    }
+
+    override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        val value = classFile.getString(elementValue.constValueIndex)
 
         val output = if (!value.isAsciiPrintable()) {
             value.escapeAsJavaString()
@@ -251,12 +265,9 @@ class ClassFilePrinter :
         printer.print("\"%s\"".format(output))
     }
 
-    override fun visitArrayElementValue(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, elementValue: ArrayElementValue) {
+    override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
         printer.print("[")
-        elementValue.elementValues.forEachIndexed { idx, ev ->
-            ev.accept(classFile, annotation, index, null, this)
-            if (idx < elementValue.elementValues.size - 1) printer.print(",")
-        }
+        elementValue.acceptElementValues(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
         printer.print("]")
     }
 }

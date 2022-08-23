@@ -31,15 +31,15 @@ data class NameAndTypeConstant internal constructor(
     var nameIndex:       Int = -1,
     var descriptorIndex: Int = -1) : Constant() {
 
-    override val type: Type
-        get() = Type.NAME_AND_TYPE
+    override val type: ConstantType
+        get() = ConstantType.NAME_AND_TYPE
 
-    fun getMemberName(cp: ConstantPool): String {
-        return cp.getString(nameIndex)
+    fun getMemberName(classFile: ClassFile): String {
+        return classFile.getString(nameIndex)
     }
 
-    fun getDescriptor(cp: ConstantPool): String {
-        return cp.getString(descriptorIndex)
+    fun getDescriptor(classFile: ClassFile): String {
+        return classFile.getString(descriptorIndex)
     }
 
     @Throws(IOException::class)
@@ -68,6 +68,8 @@ data class NameAndTypeConstant internal constructor(
         }
 
         fun of(nameIndex: Int, descriptorIndex: Int): NameAndTypeConstant {
+            require(nameIndex >= 1) { "nameIndex must be a positive number" }
+            require(descriptorIndex >= 1) { "descriptorIndex must be a positive number" }
             return NameAndTypeConstant(nameIndex, descriptorIndex)
         }
     }

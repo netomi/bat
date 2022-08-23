@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -29,8 +29,8 @@ import java.io.IOException
 data class UnknownAttribute internal constructor(override val attributeNameIndex: Int = -1,
                                                           var info:               ByteArray = ByteArray(0)) : Attribute(attributeNameIndex) {
 
-    override val type: Type
-        get() = Type.UNKNOWN
+    override val type: AnnotationType
+        get() = AnnotationType.UNKNOWN
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
@@ -70,8 +70,7 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
     }
 
     companion object {
-        @JvmStatic
-        fun create(attributeNameIndex: Int): UnknownAttribute {
+        internal fun of(attributeNameIndex: Int): UnknownAttribute {
             return UnknownAttribute(attributeNameIndex)
         }
     }

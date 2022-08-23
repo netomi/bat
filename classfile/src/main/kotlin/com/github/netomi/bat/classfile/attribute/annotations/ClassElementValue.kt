@@ -1,15 +1,15 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
 data class ClassElementValue internal constructor(var classInfoIndex: Int = -1) : ElementValue() {
 
-    override val type: Type
-        get() = Type.CLASS
+    override val type: ElementValueType
+        get() = ElementValueType.CLASS
 
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
@@ -21,13 +21,12 @@ data class ClassElementValue internal constructor(var classInfoIndex: Int = -1) 
         output.writeShort(classInfoIndex)
     }
 
-    override fun accept(classFile: ClassFile, annotation: Annotation, index: Int, elementName: String?, visitor: ElementValueVisitor) {
-        visitor.visitClassElementValue(classFile, annotation, index, elementName, this)
+    override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {
+        visitor.visitClassElementValue(classFile, this)
     }
 
     companion object {
-        @JvmStatic
-        fun create(): ClassElementValue {
+        internal fun empty(): ClassElementValue {
             return ClassElementValue()
         }
     }

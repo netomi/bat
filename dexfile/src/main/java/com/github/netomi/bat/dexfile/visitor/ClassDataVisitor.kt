@@ -18,8 +18,7 @@ package com.github.netomi.bat.dexfile.visitor
 import com.github.netomi.bat.dexfile.ClassData
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
-import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
-import com.github.netomi.bat.dexfile.value.visitor.multiValueVisitorOf
+import com.github.netomi.bat.visitor.AbstractMultiVisitor
 
 internal fun multiClassDataVisitorOf(visitor: ClassDataVisitor, vararg visitors: ClassDataVisitor): ClassDataVisitor {
     return MultiClassDataVisitor(visitor, *visitors)

@@ -29,8 +29,8 @@ import java.io.IOException
  */
 data class Utf8Constant private constructor(var value: String = ""): Constant() {
 
-    override val type: Type
-        get() = Type.UTF8
+    override val type: ConstantType
+        get() = ConstantType.UTF8
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {

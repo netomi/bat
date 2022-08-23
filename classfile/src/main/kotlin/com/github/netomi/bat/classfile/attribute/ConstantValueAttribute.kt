@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -31,8 +31,8 @@ import java.io.IOException
 data class ConstantValueAttribute internal constructor(override val attributeNameIndex: Int,
                                                                 var constantValueIndex: Int = -1) : Attribute(attributeNameIndex) {
 
-    override val type: Type
-        get() = Type.CONSTANT_VALUE
+    override val type: AnnotationType
+        get() = AnnotationType.CONSTANT_VALUE
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
@@ -52,8 +52,7 @@ data class ConstantValueAttribute internal constructor(override val attributeNam
     }
 
     companion object {
-        @JvmStatic
-        fun create(attributeNameIndex: Int): ConstantValueAttribute {
+        internal fun of(attributeNameIndex: Int): ConstantValueAttribute {
             return ConstantValueAttribute(attributeNameIndex)
         }
     }

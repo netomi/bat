@@ -29,11 +29,11 @@ import java.io.IOException
  */
 data class ModuleConstant private constructor(var nameIndex: Int = -1): Constant() {
 
-    override val type: Type
-        get() = Type.MODULE
+    override val type: ConstantType
+        get() = ConstantType.MODULE
 
-    fun getName(cp: ConstantPool): String {
-        return cp.getString(nameIndex)
+    fun getModuleName(classFile: ClassFile): String {
+        return classFile.getString(nameIndex)
     }
 
     @Throws(IOException::class)
@@ -60,6 +60,7 @@ data class ModuleConstant private constructor(var nameIndex: Int = -1): Constant
         }
 
         fun of(nameIndex: Int): ModuleConstant {
+            require(nameIndex >= 1) { "nameIndex must be a positive number" }
             return ModuleConstant(nameIndex)
         }
     }

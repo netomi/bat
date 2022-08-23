@@ -29,8 +29,8 @@ import java.io.IOException
  */
 data class FloatConstant private constructor(var value: Float = 0.0f) : Constant() {
 
-    override val type: Type
-        get() = Type.FLOAT
+    override val type: ConstantType
+        get() = ConstantType.FLOAT
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {

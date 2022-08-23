@@ -17,8 +17,8 @@ package com.github.netomi.bat.dexfile.value.visitor
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.*
-import com.github.netomi.bat.dexfile.visitor.AbstractCollector
-import com.github.netomi.bat.dexfile.visitor.AbstractMultiVisitor
+import com.github.netomi.bat.visitor.AbstractCollector
+import com.github.netomi.bat.visitor.AbstractMultiVisitor
 import java.util.*
 import java.util.function.BiConsumer
 

@@ -29,8 +29,8 @@ import java.io.IOException
  */
 data class IntegerConstant private constructor(var value: Int = 0) : Constant() {
 
-    override val type: Type
-        get() = Type.INTEGER
+    override val type: ConstantType
+        get() = ConstantType.INTEGER
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
