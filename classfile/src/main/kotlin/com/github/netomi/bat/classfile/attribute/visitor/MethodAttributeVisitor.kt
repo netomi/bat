@@ -31,6 +31,10 @@ fun interface MethodAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitExceptionsAttributes(classFile: ClassFile, attribute: ExceptionsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }

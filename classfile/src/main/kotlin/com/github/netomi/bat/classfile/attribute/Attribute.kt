@@ -72,7 +72,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     CONSTANT_VALUE("ConstantValue", ConstantValueAttribute.Companion::empty),
     CODE("Code", null),
     STACK_MAP_TABLE("StackMapTable", null),
-    EXCEPTIONS("Exceptions", null),
+    EXCEPTIONS("Exceptions", ExceptionsAttribute.Companion::empty),
     INNER_CLASSES("InnerClasses", null),
     ENCLOSING_METHOD("EnclosingMethod", EnclosingMethodAttribute.Companion::empty),
     SYNTHETIC("Synthetic", SyntheticAttribute.Companion::empty),

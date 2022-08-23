@@ -17,7 +17,6 @@ package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.classAttributes
 import com.github.netomi.bat.classfile.attribute.visitor.fieldAttributes
 import com.github.netomi.bat.util.toHexString
 import java.io.DataInput

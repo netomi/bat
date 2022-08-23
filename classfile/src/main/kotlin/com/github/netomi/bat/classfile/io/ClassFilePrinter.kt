@@ -15,11 +15,9 @@
  */
 package com.github.netomi.bat.classfile.io
 
-import com.github.netomi.bat.classfile.AccessFlag
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.Field
-import com.github.netomi.bat.classfile.Member
+import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.*
@@ -82,6 +80,10 @@ class ClassFilePrinter :
 
         printer.levelUp()
         classFile.fieldsAccept(this)
+        printer.levelDown()
+
+        printer.levelUp()
+        classFile.methodsAccept(this)
         printer.levelDown()
 
         printer.println("}")
@@ -194,6 +196,23 @@ class ClassFilePrinter :
         printer.levelDown()
    }
 
+    override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
+        printer.println()
+
+        val externalModifiers = method.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
+        val descriptor = method.getDescriptor(classFile)
+        printer.println("%s %s%s;".format(externalModifiers, method.getName(classFile), descriptor))
+
+        printer.levelUp()
+        printer.println("descriptor: %s".format(method.getDescriptor(classFile)))
+
+        val modifiers = method.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
+        printer.println("flags: (0x%04x) %s".format(method.accessFlags, modifiers))
+
+        method.attributesAccept(classFile, this)
+        printer.levelDown()
+    }
+
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
         // TODO("Not yet implemented")
     }
@@ -204,6 +223,13 @@ class ClassFilePrinter :
 
     override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
         printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
+    }
+
+    override fun visitExceptionsAttributes(classFile: ClassFile, attribute: ExceptionsAttribute) {
+        printer.println("Exceptions:")
+        printer.levelUp()
+        attribute.getExceptionClassNames(classFile).forEach { printer.println("throws ${it.toExternalClassName()}") }
+        printer.levelDown()
     }
 
     override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
