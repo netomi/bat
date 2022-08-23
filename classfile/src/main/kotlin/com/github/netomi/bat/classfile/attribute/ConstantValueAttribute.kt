@@ -17,6 +17,8 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.constant.Constant
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -26,7 +28,7 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2">ConstantValue Attribute</a>
  */
-data class ConstantValueAttribute internal constructor(override val attributeNameIndex: Int,
+data class ConstantValueAttribute internal constructor(override val attributeNameIndex:  Int,
                                                         private var _constantValueIndex: Int = -1) : Attribute(attributeNameIndex) {
 
     override val type: AttributeType
@@ -34,6 +36,10 @@ data class ConstantValueAttribute internal constructor(override val attributeNam
 
     val constantValueIndex: Int
         get() = _constantValueIndex
+
+    fun getConstantValue(classFile: ClassFile): Constant {
+        return classFile.getConstant(constantValueIndex)
+    }
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput) {
@@ -50,6 +56,10 @@ data class ConstantValueAttribute internal constructor(override val attributeNam
 
     override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
         visitor.visitConstantValueAttribute(classFile, this)
+    }
+
+    fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.getConstant(constantValueIndex).accept(classFile, visitor)
     }
 
     companion object {

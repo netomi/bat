@@ -92,6 +92,10 @@ class ClassFile private constructor() {
 
     // helper methods to access constant pool entries
 
+    internal fun getConstant(constantIndex: Int): Constant {
+        return constantPool[constantIndex]
+    }
+
     fun getInteger(constantIndex: Int): Int {
         return (constantPool[constantIndex] as IntegerConstant).value
     }

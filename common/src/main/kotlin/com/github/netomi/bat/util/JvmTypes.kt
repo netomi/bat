@@ -164,6 +164,10 @@ class JvmClassName private constructor(val className: String, val internal: Bool
         return "L${toInternalClassName()};"
     }
 
+    override fun toString(): String {
+        return toInternalClassName()
+    }
+
     companion object {
         fun ofInternal(className: String): JvmClassName {
             return JvmClassName(className, true)
