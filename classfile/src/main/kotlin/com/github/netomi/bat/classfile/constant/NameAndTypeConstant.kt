@@ -27,12 +27,17 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.6">CONSTANT_NameAndType_info Structure</a>
  */
-data class NameAndTypeConstant internal constructor(
-    var nameIndex:       Int = -1,
-    var descriptorIndex: Int = -1) : Constant() {
+data class NameAndTypeConstant private constructor(private var _nameIndex:       Int = -1,
+                                                   private var _descriptorIndex: Int = -1) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.NAME_AND_TYPE
+
+    val nameIndex: Int
+        get() = _nameIndex
+
+    val descriptorIndex: Int
+        get() = _descriptorIndex
 
     fun getMemberName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
@@ -44,8 +49,8 @@ data class NameAndTypeConstant internal constructor(
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        nameIndex = input.readUnsignedShort()
-        descriptorIndex = input.readUnsignedShort()
+        _nameIndex       = input.readUnsignedShort()
+        _descriptorIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

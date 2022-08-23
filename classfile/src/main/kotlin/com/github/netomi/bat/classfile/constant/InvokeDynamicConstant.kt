@@ -27,17 +27,22 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.10">CONSTANT_InvokeDynamic_info Structure</a>
  */
-data class InvokeDynamicConstant private constructor(
-    var bootstrapMethodAttrIndex: Int = -1,
-    var nameAndTypeIndex:         Int = -1) : Constant() {
+data class InvokeDynamicConstant private constructor(private var _bootstrapMethodAttrIndex: Int = -1,
+                                                     private var _nameAndTypeIndex:         Int = -1) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.INVOKE_DYNAMIC
 
+    val bootstrapMethodAttrIndex: Int
+        get() = _bootstrapMethodAttrIndex
+
+    val nameAndTypeIndex: Int
+        get() = _nameAndTypeIndex
+
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        bootstrapMethodAttrIndex = input.readUnsignedShort()
-        nameAndTypeIndex = input.readUnsignedShort()
+        _bootstrapMethodAttrIndex = input.readUnsignedShort()
+        _nameAndTypeIndex         = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

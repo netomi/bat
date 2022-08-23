@@ -27,17 +27,22 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.8">CONSTANT_MethodHandle_info Structure</a>
  */
-data class MethodHandleConstant private constructor(
-    var referenceKind:  Int =  0,
-    var referenceIndex: Int = -1) : Constant() {
+data class MethodHandleConstant private constructor(private var _referenceKind:  Int =  0,
+                                                    private var _referenceIndex: Int = -1) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.METHOD_HANDLE
 
+    val referenceKind: Int
+        get() = _referenceKind
+
+    val referenceIndex: Int
+        get() = _referenceIndex
+
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        referenceKind = input.readUnsignedByte()
-        referenceIndex = input.readUnsignedShort()
+        _referenceKind  = input.readUnsignedByte()
+        _referenceIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

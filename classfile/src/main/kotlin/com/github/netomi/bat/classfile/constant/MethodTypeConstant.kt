@@ -27,10 +27,13 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.9">CONSTANT_MethodType_info Structure</a>
  */
-data class MethodTypeConstant private constructor(var descriptorIndex: Int = -1) : Constant() {
+data class MethodTypeConstant private constructor(private var _descriptorIndex: Int = -1) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.METHOD_TYPE
+
+    val descriptorIndex: Int
+        get() = _descriptorIndex
 
     fun getDescriptor(classFile: ClassFile): String {
         return classFile.getString(descriptorIndex)
@@ -38,7 +41,7 @@ data class MethodTypeConstant private constructor(var descriptorIndex: Int = -1)
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        descriptorIndex = input.readUnsignedShort()
+        _descriptorIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

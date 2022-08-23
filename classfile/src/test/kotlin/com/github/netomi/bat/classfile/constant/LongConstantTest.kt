@@ -34,9 +34,6 @@ class LongConstantTest : ConstantBaseTest() {
     fun accessors() {
         val constant = createConstants()[0]
         assertEquals(0, constant.value)
-
-        constant.value = Long.MAX_VALUE
-        assertEquals(Long.MAX_VALUE, constant.value)
     }
 
     @Test

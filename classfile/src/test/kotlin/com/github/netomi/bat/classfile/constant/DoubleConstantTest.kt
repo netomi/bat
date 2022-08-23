@@ -35,9 +35,6 @@ class DoubleConstantTest : ConstantBaseTest() {
     fun accessors() {
         val constant = createConstants()[0]
         assertEquals(0.0, constant.value)
-
-        constant.value = Double.MAX_VALUE
-        assertEquals(Double.MAX_VALUE, constant.value)
     }
 
     @Test

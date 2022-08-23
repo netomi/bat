@@ -35,9 +35,6 @@ class FloatConstantTest : ConstantBaseTest() {
     fun accessors() {
         val constant = createConstants()[0]
         assertEquals(0.0f, constant.value)
-
-        constant.value = -10.12345f
-        assertEquals(-10.12345f, constant.value)
     }
 
     @Test

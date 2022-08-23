@@ -34,9 +34,6 @@ class Utf8ConstantTest : ConstantBaseTest() {
     fun accessors() {
         val constant = createConstants()[0]
         assertEquals("some content", constant.value)
-
-        constant.value = "other"
-        assertEquals("other", constant.value)
     }
 
     @Test

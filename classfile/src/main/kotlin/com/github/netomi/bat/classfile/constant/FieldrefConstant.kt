@@ -19,15 +19,13 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 
-
 /**
  * A constant representing a CONSTANT_Fieldref_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2">CONSTANT_Fieldref_info Structure</a>
  */
-data class FieldrefConstant private constructor(
-    override var classIndex:       Int = -1,
-    override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
+data class FieldrefConstant private constructor(override var _classIndex:       Int = -1,
+                                                override var _nameAndTypeIndex: Int = -1) : RefConstant(_classIndex, _nameAndTypeIndex) {
 
     override val type: ConstantType
         get() = ConstantType.FIELD_REF

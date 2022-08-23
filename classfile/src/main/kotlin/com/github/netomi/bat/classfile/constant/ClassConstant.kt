@@ -27,10 +27,13 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.1">CONSTANT_Class_info Structure</a>
  */
-data class ClassConstant private constructor(var nameIndex: Int = -1) : Constant() {
+data class ClassConstant private constructor(private var _nameIndex: Int = -1) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.CLASS
+
+    val nameIndex: Int
+        get() = _nameIndex
 
     fun getClassName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
@@ -38,7 +41,7 @@ data class ClassConstant private constructor(var nameIndex: Int = -1) : Constant
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        nameIndex = input.readUnsignedShort()
+        _nameIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

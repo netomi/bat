@@ -27,10 +27,13 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.12">CONSTANT_Package_info Structure</a>
  */
-data class PackageConstant private constructor(var nameIndex: Int = -1): Constant() {
+data class PackageConstant private constructor(private var _nameIndex: Int = -1): Constant() {
 
     override val type: ConstantType
         get() = ConstantType.PACKAGE
+
+    val nameIndex: Int
+        get() = _nameIndex
 
     fun getPackageName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
@@ -38,7 +41,7 @@ data class PackageConstant private constructor(var nameIndex: Int = -1): Constan
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        nameIndex = input.readUnsignedShort()
+        _nameIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

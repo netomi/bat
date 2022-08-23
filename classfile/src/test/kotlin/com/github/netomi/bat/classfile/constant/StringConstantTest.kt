@@ -34,9 +34,6 @@ class StringConstantTest : ConstantBaseTest() {
     fun accessors() {
         val constant = createConstants()[0]
         assertEquals(10, constant.stringIndex)
-
-        constant.stringIndex = 20
-        assertEquals(20, constant.stringIndex)
     }
 
     @Test

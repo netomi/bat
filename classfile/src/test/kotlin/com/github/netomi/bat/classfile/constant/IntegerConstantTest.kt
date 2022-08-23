@@ -34,9 +34,6 @@ class IntegerConstantTest : ConstantBaseTest() {
     fun accessors() {
         val constant = createConstants()[0]
         assertEquals(0, constant.value)
-
-        constant.value = Integer.MAX_VALUE
-        assertEquals(Integer.MAX_VALUE, constant.value)
     }
 
     @Test

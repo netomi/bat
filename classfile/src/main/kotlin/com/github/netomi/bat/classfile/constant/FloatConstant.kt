@@ -27,14 +27,17 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4">CONSTANT_Float_info Structure</a>
  */
-data class FloatConstant private constructor(var value: Float = 0.0f) : Constant() {
+data class FloatConstant private constructor(private var _value: Float = 0.0f) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.FLOAT
 
+    val value: Float
+        get() = _value
+
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        value = Float.fromBits(input.readInt())
+        _value = Float.fromBits(input.readInt())
     }
 
     @Throws(IOException::class)

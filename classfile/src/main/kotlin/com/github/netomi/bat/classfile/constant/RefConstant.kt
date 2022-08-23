@@ -24,8 +24,14 @@ import java.io.IOException
  * An abstract base class for constants representing a member reference,
  * i.e. Fieldref, Methodref or InterfaceMethodref.
  */
-abstract class RefConstant(open var classIndex:       Int = -1,
-                           open var nameAndTypeIndex: Int = -1): Constant() {
+abstract class RefConstant(protected open var _classIndex:       Int = -1,
+                           protected open var _nameAndTypeIndex: Int = -1): Constant() {
+
+    val classIndex: Int
+        get() = _classIndex
+
+    val nameAndTypeIndex: Int
+        get() = _nameAndTypeIndex
 
     fun getClassName(classFile: ClassFile): String {
         return classFile.getClassName(classIndex)
@@ -45,8 +51,8 @@ abstract class RefConstant(open var classIndex:       Int = -1,
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        classIndex = input.readUnsignedShort()
-        nameAndTypeIndex = input.readUnsignedShort()
+        _classIndex       = input.readUnsignedShort()
+        _nameAndTypeIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)

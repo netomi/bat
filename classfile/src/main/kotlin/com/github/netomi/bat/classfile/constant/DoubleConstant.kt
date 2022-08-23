@@ -27,17 +27,20 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.5">CONSTANT_Double_info Structure</a>
  */
-data class DoubleConstant private constructor(var value: Double = 0.0) : Constant() {
+data class DoubleConstant private constructor(var _value: Double = 0.0) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.DOUBLE
+
+    val value: Double
+        get() = _value
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
         val highBytes = input.readInt()
         val lowBytes  = input.readInt()
         val bits = (highBytes.toLong() shl 32) + lowBytes
-        value = Double.fromBits(bits)
+        _value = Double.fromBits(bits)
     }
 
     @Throws(IOException::class)

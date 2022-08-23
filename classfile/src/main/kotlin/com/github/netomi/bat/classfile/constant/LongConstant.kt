@@ -27,16 +27,19 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.5">CONSTANT_Long_info Structure</a>
  */
-data class LongConstant private constructor(var value: Long = 0) : Constant() {
+data class LongConstant private constructor(private var _value: Long = 0) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.LONG
+
+    val value: Long
+        get() = _value
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
         val highBytes = input.readInt()
         val lowBytes  = input.readInt()
-        value = (highBytes.toLong() shl 32) + lowBytes
+        _value = (highBytes.toLong() shl 32) + lowBytes
     }
 
     @Throws(IOException::class)

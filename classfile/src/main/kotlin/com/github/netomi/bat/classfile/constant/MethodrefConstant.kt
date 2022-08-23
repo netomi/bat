@@ -24,9 +24,8 @@ import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2">CONSTANT_MethodRef_info Structure</a>
  */
-data class MethodrefConstant private constructor(
-    override var classIndex:       Int = -1,
-    override var nameAndTypeIndex: Int = -1) : RefConstant(classIndex, nameAndTypeIndex) {
+data class MethodrefConstant private constructor(override var _classIndex:       Int = -1,
+                                                 override var _nameAndTypeIndex: Int = -1) : RefConstant(_classIndex, _nameAndTypeIndex) {
 
     override val type: ConstantType
         get() = ConstantType.METHOD_REF

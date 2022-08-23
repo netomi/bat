@@ -27,14 +27,17 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4">CONSTANT_Integer_info Structure</a>
  */
-data class IntegerConstant private constructor(var value: Int = 0) : Constant() {
+data class IntegerConstant private constructor(private var _value: Int = 0) : Constant() {
 
     override val type: ConstantType
         get() = ConstantType.INTEGER
 
+    val value: Int
+        get() = _value
+
     @Throws(IOException::class)
     override fun readConstantInfo(input: DataInput) {
-        value = input.readInt()
+        _value = input.readInt()
     }
 
     @Throws(IOException::class)
