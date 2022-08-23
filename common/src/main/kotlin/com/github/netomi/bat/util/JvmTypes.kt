@@ -165,7 +165,7 @@ class JvmClassName private constructor(val className: String, val internal: Bool
     }
 
     override fun toString(): String {
-        return toInternalClassName()
+        return if (internal) toInternalClassName() else toExternalClassName()
     }
 
     companion object {
