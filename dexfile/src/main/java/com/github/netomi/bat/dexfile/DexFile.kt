@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.instruction.DexOpCode
 import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.*
-import com.github.netomi.bat.util.asInternalJavaClassName
+import com.github.netomi.bat.util.asInternalClassName
 import com.github.netomi.bat.util.parallelForEachIndexed
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -236,7 +236,7 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     }
 
     fun getClassDefByClassName(internalClassName: String): ClassDef? {
-        val classType = internalClassName.asInternalJavaClassName().toInternalType()
+        val classType = internalClassName.asInternalClassName().toInternalType()
         val index = classDefMap[classType]
         return if (index == null) null else classDefs[index]
     }

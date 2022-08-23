@@ -18,7 +18,7 @@ package com.github.netomi.bat.dexfile.util
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.visitor.ClassDefVisitor
-import com.github.netomi.bat.util.asInternalJavaClassName
+import com.github.netomi.bat.util.asInternalClassName
 import java.util.*
 
 fun classDefPoolFiller(pool: ClassDefPool): ClassDefVisitor {
@@ -41,7 +41,7 @@ class ClassDefPool private constructor() {
     }
 
     fun getClassDefByClassName(internalClassName: String): ClassDefData? {
-        val internalType = internalClassName.asInternalJavaClassName().toInternalType()
+        val internalType = internalClassName.asInternalClassName().toInternalType()
         return classDefMap[internalType]
     }
 

@@ -24,10 +24,10 @@ import com.github.netomi.bat.util.*
 class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClass() {
 
     override val type: String
-        get() = clazz.name.asExternalJavaClassName().toInternalType()
+        get() = clazz.name.asExternalClassName().toInternalType()
 
     override val className: String
-        get() = clazz.name.asExternalJavaClassName().toInternalClassName()
+        get() = clazz.name.asExternalClassName().toInternalClassName()
 
     private val fieldCache = mutableMapOf<String, DvmNativeField?>()
 

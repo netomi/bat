@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.editor.FieldEditor
 import com.github.netomi.bat.dexfile.editor.MethodEditor
 import com.github.netomi.bat.smali.parser.SmaliBaseVisitor
 import com.github.netomi.bat.smali.parser.SmaliParser.*
-import com.github.netomi.bat.util.asInternalJavaClassName
+import com.github.netomi.bat.util.asInternalClassName
 import java.io.PrintWriter
 
 internal class ClassDefAssembler(private val dexEditor:      DexEditor,
@@ -63,7 +63,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
             } catch (exception: RuntimeException) {
                 if (lenientMode) {
                     val externalClassName =
-                        classDefEditor.classDef.getClassName(dexFile).asInternalJavaClassName().toExternalClassName()
+                        classDefEditor.classDef.getClassName(dexFile).asInternalClassName().toExternalClassName()
                     warningPrinter?.println(
                         "warning: class '%s': %s, skipping annotation"
                             .format(externalClassName, exception.message))

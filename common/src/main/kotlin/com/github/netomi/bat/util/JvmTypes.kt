@@ -37,12 +37,12 @@ fun String.asJvmType(): JvmType {
     return JvmType.of(this)
 }
 
-fun String.asInternalJavaClassName(): JavaClassName {
-    return JavaClassName.ofInternal(this)
+fun String.asInternalClassName(): JvmClassName {
+    return JvmClassName.ofInternal(this)
 }
 
-fun String.asExternalJavaClassName(): JavaClassName {
-    return JavaClassName.ofExternal(this)
+fun String.asExternalClassName(): JvmClassName {
+    return JvmClassName.ofExternal(this)
 }
 
 open class JvmType protected constructor(val type: String) {
@@ -150,7 +150,7 @@ open class JvmType protected constructor(val type: String) {
     }
 }
 
-class JavaClassName private constructor(val className: String, val internal: Boolean) {
+class JvmClassName private constructor(val className: String, val internal: Boolean) {
 
     fun toExternalClassName(): String {
         return if (internal) className.replace('/', '.') else className
@@ -165,12 +165,12 @@ class JavaClassName private constructor(val className: String, val internal: Boo
     }
 
     companion object {
-        fun ofInternal(className: String): JavaClassName {
-            return JavaClassName(className, true)
+        fun ofInternal(className: String): JvmClassName {
+            return JvmClassName(className, true)
         }
 
-        fun ofExternal(className: String): JavaClassName {
-            return JavaClassName(className, false)
+        fun ofExternal(className: String): JvmClassName {
+            return JvmClassName(className, false)
         }
     }
 }

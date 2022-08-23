@@ -25,7 +25,7 @@ import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
-import com.github.netomi.bat.util.asInternalJavaClassName
+import com.github.netomi.bat.util.asInternalClassName
 import com.github.netomi.bat.util.toHexString
 import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.github.netomi.bat.util.toPrintableAsciiString
@@ -292,7 +292,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         }
 
         private fun fullExternalMethodSignature(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod): String {
-            return "%s.%s:%s".format(classDef.getClassName(dexFile).asInternalJavaClassName().toExternalClassName(),
+            return "%s.%s:%s".format(classDef.getClassName(dexFile).asInternalClassName().toExternalClassName(),
                                      method.getName(dexFile),
                                      method.getDescriptor(dexFile)
             )
