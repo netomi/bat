@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile.visitor
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.TypeList
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.visitor.AbstractCollector
 
 fun typeCollector(): TypeCollector {
@@ -24,11 +25,11 @@ fun typeCollector(): TypeCollector {
 }
 
 fun interface TypeVisitor {
-    fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: String)
+    fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: DexType)
 }
 
-class TypeCollector: AbstractCollector<String>(), TypeVisitor {
-    override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: String) {
+class TypeCollector: AbstractCollector<DexType>(), TypeVisitor {
+    override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: DexType) {
         addItem(type)
     }
 }

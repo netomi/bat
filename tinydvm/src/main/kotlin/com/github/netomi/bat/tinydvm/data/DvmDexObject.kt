@@ -17,12 +17,18 @@
 package com.github.netomi.bat.tinydvm.data
 
 import com.github.netomi.bat.dexfile.EncodedField
+import javassist.util.proxy.MethodHandler
+
+import javassist.util.proxy.ProxyFactory
+
+
+
 
 class DvmDexObject constructor(private val clazz:  DvmDexClass,
                                private var status: ObjectInitializationStatus = ObjectInitializationStatus.UNINITIALIZED): DvmObject() {
 
     override val obj: Any
-        get() = this
+        get() = createProxy()
 
     override val type: String
         get() = clazz.type
@@ -38,6 +44,18 @@ class DvmDexObject constructor(private val clazz:  DvmDexClass,
 
     fun getClass(): DvmDexClass {
         return clazz
+    }
+
+    fun createProxy(): Object {
+        val factory = ProxyFactory()
+        factory.superclass = Object::class.java
+
+        val handler = MethodHandler { self, thisMethod, proceed, args ->
+            println("Handling $thisMethod via the method handler")
+            "nothing"
+        }
+
+        return factory.create(arrayOfNulls(0), arrayOfNulls(0), handler) as Object
     }
 
     fun getValue(field: EncodedField): DvmValue {

@@ -39,7 +39,7 @@ class MethodEditor private constructor(val dexEditor: DexEditor, private val cla
         insSize += argumentSize
 
         val code = Code.of(registersSize = 0, insSize = insSize, outsSize = 0)
-        code.debugInfo = DebugInfo.empty(protoID.parameters.typeCount)
+        code.debugInfo = DebugInfo.empty(protoID.parameters.size)
 
         method.code = code
         return CodeEditor.of(dexEditor, classDef, method, code)

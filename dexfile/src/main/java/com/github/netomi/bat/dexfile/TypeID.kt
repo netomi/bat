@@ -36,12 +36,8 @@ class TypeID private constructor(descriptorIndex: Int = NO_INDEX) : DataItem() {
     var descriptorIndex: Int = descriptorIndex
         private set
 
-    fun getType(dexFile: DexFile): String {
-        return dexFile.getStringID(descriptorIndex).stringValue
-    }
-
-    fun getDexType(dexFile: DexFile): DexType {
-        return getType(dexFile).asDexType()
+    fun getType(dexFile: DexFile): DexType {
+        return dexFile.getStringID(descriptorIndex).stringValue.asDexType()
     }
 
     override val isEmpty: Boolean

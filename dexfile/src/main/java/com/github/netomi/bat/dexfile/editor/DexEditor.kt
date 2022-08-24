@@ -17,6 +17,8 @@
 package com.github.netomi.bat.dexfile.editor
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.util.toShortyFormat
 import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
 import java.util.*
@@ -29,6 +31,10 @@ class DexEditor private constructor(val dexFile: DexFile) {
             index = dexFile.addStringID(StringID.of(string))
         }
         return index
+    }
+
+    fun addOrGetTypeIDIndex(type: DexType): Int {
+        return addOrGetTypeIDIndex(type.type)
     }
 
     fun addOrGetTypeIDIndex(type: String): Int {
@@ -44,6 +50,10 @@ class DexEditor private constructor(val dexFile: DexFile) {
         val returnType     = protoID.getReturnType(dexFile)
 
         return addOrGetProtoIDIndex(parameterTypes, returnType)
+    }
+
+    fun addOrGetProtoIDIndex(parameterTypes: List<DexType>, returnType: DexType): Int {
+        return addOrGetProtoIDIndex(parameterTypes.map { it.type }, returnType.type)
     }
 
     fun addOrGetProtoIDIndex(parameterTypes: List<String>, returnType: String): Int {
@@ -69,6 +79,10 @@ class DexEditor private constructor(val dexFile: DexFile) {
         return addOrGetFieldIDIndex(classType, name, type)
     }
 
+    fun addOrGetFieldIDIndex(classType: DexType, name: String, type: DexType): Int {
+        return addOrGetFieldIDIndex(classType.type, name, type.type)
+    }
+
     fun addOrGetFieldIDIndex(classType: String, name: String, type: String): Int {
         val fieldID =
             FieldID.of(
@@ -90,7 +104,11 @@ class DexEditor private constructor(val dexFile: DexFile) {
         val parameterTypes = methodID.getParameterTypes(dexFile)
         val returnType     = methodID.getReturnType(dexFile)
 
-        return addOrGetMethodIDIndex(classType, name, parameterTypes, returnType)
+        return addOrGetMethodIDIndex(classType.type, name, parameterTypes, returnType)
+    }
+
+    fun addOrGetMethodIDIndex(classType: String, name: String, parameterTypes: List<DexType>, returnType: DexType): Int {
+        return addOrGetMethodIDIndex(classType, name, parameterTypes.map { it.type }, returnType.type)
     }
 
     fun addOrGetMethodIDIndex(classType: String, name: String, parameterTypes: List<String>, returnType: String): Int {
@@ -114,6 +132,10 @@ class DexEditor private constructor(val dexFile: DexFile) {
                     superType:  String? = JAVA_LANG_OBJECT_TYPE,
                     sourceFile: String? = null): ClassDefEditor {
         return addClassDef(classType, accessFlagsOf(visibility, modifiers), superType, sourceFile)
+    }
+
+    fun addClassDef(classType: DexType, accessFlags: Int, superType: DexType? = JAVA_LANG_OBJECT_TYPE.asDexType(), sourceFile: String? = null): ClassDefEditor {
+        return addClassDef(classType.type, accessFlags, superType?.type, sourceFile)
     }
 
     fun addClassDef(classType: String, accessFlags: Int, superType: String? = JAVA_LANG_OBJECT_TYPE, sourceFile: String? = null): ClassDefEditor {

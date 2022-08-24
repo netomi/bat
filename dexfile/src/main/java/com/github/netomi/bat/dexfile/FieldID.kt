@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexType
-import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
@@ -49,24 +48,16 @@ class FieldID private constructor(classIndex: Int = NO_INDEX,
         return dexFile.getTypeID(classIndex)
     }
 
-    fun getClassType(dexFile: DexFile): String {
+    fun getClassType(dexFile: DexFile): DexType {
         return getClassTypeID(dexFile).getType(dexFile)
-    }
-
-    fun getClassDexType(dexFile: DexFile): DexType {
-        return getClassTypeID(dexFile).getDexType(dexFile)
     }
 
     fun getTypeID(dexFile: DexFile): TypeID {
         return dexFile.getTypeID(typeIndex)
     }
 
-    fun getType(dexFile: DexFile): String {
+    fun getType(dexFile: DexFile): DexType {
         return getTypeID(dexFile).getType(dexFile)
-    }
-
-    fun getDexType(dexFile: DexFile): DexType {
-        return getTypeID(dexFile).getDexType(dexFile)
     }
 
     fun getName(dexFile: DexFile): String {
@@ -75,11 +66,11 @@ class FieldID private constructor(classIndex: Int = NO_INDEX,
 
     fun getFullExternalFieldSignature(dexFile: DexFile): String {
         return buildString {
-            append(getClassDexType(dexFile).toExternalClassName())
+            append(getClassType(dexFile).toExternalClassName())
             append('.')
             append(getName(dexFile))
             append(':')
-            append(getDexType(dexFile).toExternalType())
+            append(getType(dexFile).toExternalType())
         }
     }
 

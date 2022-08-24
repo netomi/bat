@@ -20,7 +20,6 @@ import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexType
-import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
@@ -77,7 +76,7 @@ class ClassDef private constructor(            classIndex:           Int        
     var interfaces: TypeList = interfaces
         private set
 
-    fun interfaces(dexFile: DexFile): List<String> {
+    fun interfaces(dexFile: DexFile): List<DexType> {
         val collector = typeCollector()
         interfacesAccept(dexFile, collector)
         return collector.items()
@@ -111,27 +110,19 @@ class ClassDef private constructor(            classIndex:           Int        
         get() = classData.methods
 
     fun getClassName(dexFile: DexFile): String {
-        return getDexType(dexFile).toInternalClassName()
+        return getType(dexFile).toInternalClassName()
     }
 
-    fun getType(dexFile: DexFile): String {
+    fun getType(dexFile: DexFile): DexType {
         return dexFile.getTypeID(classIndex).getType(dexFile)
     }
 
-    fun getDexType(dexFile: DexFile): DexType {
-        return getType(dexFile).asDexType()
-    }
-
     fun getSuperClassName(dexFile: DexFile): String? {
-        return getSuperClassDexType(dexFile)?.toInternalClassName()
+        return getSuperClassType(dexFile)?.toInternalClassName()
     }
 
-    fun getSuperClassType(dexFile: DexFile): String? {
-        return dexFile.getTypeNullable(superClassIndex)
-    }
-
-    fun getSuperClassDexType(dexFile: DexFile): DexType? {
-        return getSuperClassType(dexFile)?.asDexType()
+    fun getSuperClassType(dexFile: DexFile): DexType? {
+        return dexFile.getTypeOrNull(superClassIndex)
     }
 
     fun getSourceFile(dexFile: DexFile): String? {
@@ -144,9 +135,9 @@ class ClassDef private constructor(            classIndex:           Int        
 
     internal fun addField(dexFile: DexFile, field: EncodedField, validate: Boolean = true) {
         if (validate) {
-            val fieldID    = field.getFieldID(dexFile)
-            val fieldClass = fieldID.getClassType(dexFile)
-            require(fieldClass == getType(dexFile)) { "field class does not match this class" }
+            val fieldID        = field.getFieldID(dexFile)
+            val fieldClassType = fieldID.getClassType(dexFile)
+            require(fieldClassType == getType(dexFile)) { "field class does not match this class" }
             classData.fields.forEach {
                 require(field.fieldIndex != it.fieldIndex)
                     { "field '${fieldID.getFullExternalFieldSignature(dexFile)}' already exists in this class" }
@@ -157,9 +148,9 @@ class ClassDef private constructor(            classIndex:           Int        
 
     internal fun addMethod(dexFile: DexFile, method: EncodedMethod, validate: Boolean = true) {
         if (validate) {
-            val methodID    = method.getMethodID(dexFile)
-            val methodClass = methodID.getClassType(dexFile)
-            require(methodClass == getType(dexFile)) { "method class does not match this class" }
+            val methodID        = method.getMethodID(dexFile)
+            val methodClassType = methodID.getClassType(dexFile)
+            require(methodClassType == getType(dexFile)) { "method class does not match this class" }
             classData.methods.forEach {
                 require(method.methodIndex != it.methodIndex)
                     { "method '${methodID.getFullExternalMethodSignature(dexFile)}' already exists in this class" }
@@ -176,8 +167,8 @@ class ClassDef private constructor(            classIndex:           Int        
     }
 
     internal fun setStaticValue(dexFile: DexFile, field: EncodedField, value: EncodedValue) {
-        val fieldClass = field.getFieldID(dexFile).getClassType(dexFile)
-        require(fieldClass == getType(dexFile)) { "field class does not match this class" }
+        val fieldClassType = field.getFieldID(dexFile).getClassType(dexFile)
+        require(fieldClassType == getType(dexFile)) { "field class does not match this class" }
 
         val staticFieldIndex = getStaticFieldIndex(field)
         require(staticFieldIndex != NO_INDEX)
@@ -188,7 +179,7 @@ class ClassDef private constructor(            classIndex:           Int        
             for (i in currentStaticValueCount until staticFieldIndex) {
                 val currentField = staticFields[i]
                 val type = currentField.getFieldID(dexFile).getType(dexFile)
-                val encodedValue = type.asDexType().getDefaultEncodedValueForType()
+                val encodedValue = type.getDefaultEncodedValueForType()
                 staticValues.array.add(encodedValue)
             }
             staticValues.array.add(value)

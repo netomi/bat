@@ -87,11 +87,11 @@ internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer
     }
 
     override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {
-        printer.print(value.getType(dexFile))
+        printer.print(value.getType(dexFile).toString())
     }
 
     override fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {
-        printer.print(value.getType(dexFile))
+        printer.print(value.getType(dexFile).toString())
         for (annotationElement in value) {
             printer.print(" " + annotationElement.getName(dexFile) + "=")
             annotationElement.value.accept(dexFile, this)

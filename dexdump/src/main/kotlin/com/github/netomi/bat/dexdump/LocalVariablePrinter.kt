@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.debug.*
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.util.toHexStringWithPrefix
 
 internal class LocalVariablePrinter constructor(
@@ -41,7 +42,7 @@ internal class LocalVariablePrinter constructor(
         var register = code.registersSize - code.insSize
         if (!method.isStatic) {
             val classType = method.getClassType(dexFile)
-            variableInfos[register++] = LocalVariableInfo("this", classType, null)
+            variableInfos[register++] = LocalVariableInfo("this", classType.type, null)
         }
 
         val debugInfo  = code.debugInfo
@@ -50,9 +51,9 @@ internal class LocalVariablePrinter constructor(
 
         debugInfo.apply {
             var i = 0
-            while (i < parameterCount && i < parameters.typeCount && register < code.registersSize) {
+            while (i < parameterCount && i < parameters.size && register < code.registersSize) {
                 val parameterName = getParameterName(dexFile, i)
-                val parameterType = parameters.getDexType(dexFile, i)
+                val parameterType = parameters.getType(dexFile, i)
                 variableInfos[register] = LocalVariableInfo(parameterName, parameterType.type, null)
 
                 i++
@@ -96,7 +97,7 @@ internal class LocalVariablePrinter constructor(
         handleStartLocalInstructions(instruction.registerNum, name, type, sig)
     }
 
-    private fun handleStartLocalInstructions(registerNum: Int, name: String?, type: String?, sig: String?) {
+    private fun handleStartLocalInstructions(registerNum: Int, name: String?, type: DexType?, sig: String?) {
         var variableInfo = variableInfos[registerNum]
 
         // only for compatibility with dexdump:
@@ -106,7 +107,7 @@ internal class LocalVariablePrinter constructor(
             printLocal(registerNum, variableInfo)
         }
 
-        variableInfo = LocalVariableInfo(name, type, sig)
+        variableInfo = LocalVariableInfo(name, type?.type, sig)
         variableInfo.startAddr = codeOffset
         variableInfos[registerNum] = variableInfo
     }

@@ -23,6 +23,7 @@ import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.asInternalClassName
@@ -224,7 +225,7 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
         }
     }
 
-    override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: String) {
+    override fun visitType(dexFile: DexFile, typeList: TypeList, index: Int, typeIndex: Int, type: DexType) {
         printer.println("#%-14d : '%s'".format(index, type))
     }
 

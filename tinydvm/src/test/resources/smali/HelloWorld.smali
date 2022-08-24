@@ -16,8 +16,8 @@
 
     new-instance v1, LHelloWorld;
     invoke-direct {v1}, LHelloWorld;-><init>()V
-    invoke-virtual {v1}, LHelloWorld;->virtualMethod()Ljava/lang/String;
-    move-result-object v1
+    #invoke-virtual {v1}, LHelloWorld;->virtualMethod()Ljava/lang/String;
+    #move-result-object v1
 
     invoke-virtual {v0, v1}, Ljava/io/PrintStream;->println(Ljava/lang/Object;)V
 

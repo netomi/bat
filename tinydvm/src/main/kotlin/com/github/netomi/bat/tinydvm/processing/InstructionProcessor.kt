@@ -40,7 +40,7 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
     override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
         when (instruction.opCode) {
             NEW_INSTANCE -> {
-                val dvmClazz = dvm.getClass(instruction.getType(dexFile))
+                val dvmClazz = dvm.getClass(instruction.getType(dexFile).type)
                 val r = instruction.registers[0]
                 state.registers[r] = DvmReferenceValue.of(DvmObject.newInstanceOf(dvmClazz))
             }
@@ -175,11 +175,11 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
         val classType  = methodID.getClassType(dexFile)
         val methodName = methodID.getName(dexFile)
         val proto      = methodID.getProtoID(dexFile)
-        val parameterTypes = proto.getParameterDexTypes(dexFile)
+        val parameterTypes = proto.getParameterTypes(dexFile)
 
         when (instruction.opCode) {
             INVOKE_DIRECT  -> {
-                val dvmClazz     = dvm.getClass(classType)
+                val dvmClazz     = dvm.getClass(classType.type)
                 val dvmMethod = dvmClazz.getDirectMethod(dexFile, methodName, proto)
 
                 val parameters = Array(instruction.registers.size) { index -> state.registers[instruction.registers[index]]!! }
@@ -188,7 +188,7 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
 
             INVOKE_VIRTUAL -> {
                 val parameterTypeClasses = parameterTypes.map { it.toJvmClass() }
-                val externalClassName = classType.asJvmType().toExternalClassName()
+                val externalClassName = classType.toExternalClassName()
                 val clazz = Class.forName(externalClassName)
 
                 val m = clazz.getMethod(methodName, *parameterTypeClasses.toTypedArray())

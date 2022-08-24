@@ -45,7 +45,7 @@ class ProtoIDTest : DexContentTest<ProtoID>() {
         assertEquals(1, data[0].shortyIndex)
         assertEquals(2, data[0].returnTypeIndex)
         val parameters = data[0].parameters
-        assertEquals(3, parameters.typeCount)
+        assertEquals(3, parameters.size)
         assertEquals(3, parameters.getTypeIndex(0))
         assertEquals(4, parameters.getTypeIndex(1))
         assertEquals(5, parameters.getTypeIndex(2))

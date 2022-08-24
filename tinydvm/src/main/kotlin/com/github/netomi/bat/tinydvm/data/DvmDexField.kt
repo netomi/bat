@@ -25,7 +25,7 @@ class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
     private val dexFile = dvmDexClass.dexFile
 
     override val name = field.getName(dexFile)
-    override val type = field.getType(dexFile)
+    override val type = field.getType(dexFile).type
 
     override fun get(dvm: Dvm, obj: Any?): DvmValue {
         return if (field.isStatic) {

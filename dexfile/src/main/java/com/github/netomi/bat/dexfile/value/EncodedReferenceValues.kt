@@ -19,6 +19,7 @@ package com.github.netomi.bat.dexfile.value
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
@@ -187,7 +188,7 @@ data class EncodedTypeValue private constructor(private var _typeIndex: Int = NO
     override val valueType: EncodedValueType
         get() = EncodedValueType.TYPE
 
-    fun getType(dexFile: DexFile): String {
+    fun getType(dexFile: DexFile): DexType {
         return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 

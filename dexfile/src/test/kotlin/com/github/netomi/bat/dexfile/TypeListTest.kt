@@ -38,9 +38,9 @@ class TypeListTest : DexContentTest<TypeList>() {
     @Test
     fun getter() {
         val data = testInstances
-        assertEquals(0, data[0].typeCount)
-        assertEquals(3, data[1].typeCount)
-        assertEquals(6, data[2].typeCount)
+        assertEquals(0, data[0].size)
+        assertEquals(3, data[1].size)
+        assertEquals(6, data[2].size)
     }
 
     @Test

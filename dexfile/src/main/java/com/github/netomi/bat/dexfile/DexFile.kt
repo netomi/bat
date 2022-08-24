@@ -16,6 +16,7 @@
 package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.instruction.DexOpCode
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.asInternalClassName
@@ -136,18 +137,18 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
         return typeMap[type] ?: NO_INDEX
     }
 
-    fun getType(index: Int): String {
+    fun getType(index: Int): DexType {
         return getTypeID(index).getType(this)
     }
 
-    fun getTypeNullable(index: Int): String? {
+    fun getTypeOrNull(index: Int): DexType? {
         return if (index == NO_INDEX) null else getType(index)
     }
 
     internal fun addTypeID(typeID: TypeID): Int {
         typeIDs.add(typeID)
         val index = typeIDs.lastIndex
-        typeMap[typeID.getType(this)] = index
+        typeMap[typeID.getType(this).type] = index
         return index
     }
 
@@ -230,6 +231,10 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
         return classDefs
     }
 
+    fun getClassDefByType(classType: DexType): ClassDef? {
+        return getClassDefByType(classType.type)
+    }
+
     fun getClassDefByType(classType: String): ClassDef? {
         val index = classDefMap[classType]
         return if (index == null) null else classDefs[index]
@@ -247,14 +252,14 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
 
     internal fun addClassDef(classDef: ClassDef): Int {
         val classType = classDef.getType(this)
-        if (getClassDefByType(classType) != null) {
-            val className = classType.asDexType().toInternalClassName()
+        if (getClassDefByType(classType.type) != null) {
+            val className = classType.toInternalClassName()
             throw IllegalArgumentException("class with name '$className' already exists")
         }
 
         classDefs.add(classDef)
         val index = classDefs.lastIndex
-        classDefMap[classType] = index
+        classDefMap[classType.type] = index
         return index
     }
 
@@ -334,6 +339,10 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
             val visitor = threadLocal.get()
             visitor.visitClassDef(this, classDef)
         }
+    }
+
+    fun classDefAcceptByType(classType: DexType, visitor: ClassDefVisitor) {
+        getClassDefByType(classType)?.accept(this, visitor)
     }
 
     fun classDefAcceptByType(classType: String, visitor: ClassDefVisitor) {
@@ -416,7 +425,7 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
 
     internal fun refreshCaches() {
         classDefMap.clear()
-        classDefs.forEachIndexed  { index, classDef  -> classDefMap[classDef.getType(this)] = index }
+        classDefs.forEachIndexed  { index, classDef  -> classDefMap[classDef.getType(this).type] = index }
     }
 
     override fun toString(): String {

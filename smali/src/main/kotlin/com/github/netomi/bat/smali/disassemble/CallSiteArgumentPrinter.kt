@@ -28,21 +28,21 @@ internal class CallSiteArgumentPrinter(private val printer: IndentingPrinter) : 
     }
 
     override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {
-        printer.print(value.getType(dexFile))
+        printer.print(value.getType(dexFile).toString())
     }
 
     override fun visitFieldValue(dexFile: DexFile, value: EncodedFieldValue) {
         val fieldID = value.getFieldID(dexFile)
-        printer.print(fieldID.getClassType(dexFile) + "->" + fieldID.getName(dexFile) + ":" + fieldID.getType(dexFile))
+        printer.print("${fieldID.getClassType(dexFile)}->${fieldID.getName(dexFile)}:${fieldID.getType(dexFile)}")
     }
 
     override fun visitMethodValue(dexFile: DexFile, value: EncodedMethodValue) {
         val methodID = value.getMethodID(dexFile)
-        printer.print(methodID.getClassTypeID(dexFile).getType(dexFile) + "->" + methodID.getName(dexFile) + methodID.getProtoID(dexFile).getDescriptor(dexFile))
+        printer.print("${methodID.getClassTypeID(dexFile).getType(dexFile)}->${methodID.getName(dexFile)}${methodID.getProtoID(dexFile).getDescriptor(dexFile)}")
     }
 
     override fun visitMethodHandleValue(dexFile: DexFile, value: EncodedMethodHandleValue) {
-        printer.print(value.getMethodHandle(dexFile).getTargetClassType(dexFile))
+        printer.print(value.getMethodHandle(dexFile).getTargetClassType(dexFile).toString())
     }
 
     override fun visitMethodTypeValue(dexFile: DexFile, value: EncodedMethodTypeValue) {

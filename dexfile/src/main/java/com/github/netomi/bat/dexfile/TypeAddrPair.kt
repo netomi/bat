@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.util.Copyable
@@ -38,7 +39,7 @@ class TypeAddrPair private constructor(            typeIndex: Int     = NO_INDEX
     var address: Int = address
         private set
 
-    fun getType(dexFile: DexFile): String {
+    fun getType(dexFile: DexFile): DexType {
         return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 

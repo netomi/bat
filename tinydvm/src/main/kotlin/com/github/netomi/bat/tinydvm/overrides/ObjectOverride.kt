@@ -22,8 +22,9 @@ import com.github.netomi.bat.tinydvm.data.DvmDexObject
 class ObjectOverride {
     companion object {
         @JvmStatic
-        fun dvm_init(obj: DvmDexObject) {
-            obj.setInitialized()
+        fun dvm_init(obj: Object) {
+            //obj.setInitialized()
+            println(obj)
         }
     }
 }

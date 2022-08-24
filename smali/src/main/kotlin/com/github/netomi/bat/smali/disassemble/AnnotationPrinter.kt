@@ -73,7 +73,7 @@ internal class AnnotationPrinter(private val printer:      IndentingPrinter,
     override fun visitAnnotation(dexFile: DexFile, annotation: Annotation) {
         printer.print(".annotation " + annotation.visibility.simpleName + " ")
         val annotationValue = annotation.annotationValue
-        printer.println(annotationValue.getType(dexFile))
+        printer.println(annotationValue.getType(dexFile).toString())
         printer.levelUp()
         annotationValue.annotationElementsAccept(dexFile, this)
         printer.levelDown()

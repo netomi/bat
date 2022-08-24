@@ -53,11 +53,11 @@ internal class InstructionPrinter(private val printer: IndentingPrinter): Instru
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
         val fieldID = instruction.getField(dexFile)
-        printer.print(fieldID.getClassType(dexFile))
+        printer.print(fieldID.getClassType(dexFile).toString())
         printer.print("->")
         printer.print(fieldID.getName(dexFile))
         printer.print(":")
-        printer.println(fieldID.getType(dexFile))
+        printer.println(fieldID.getType(dexFile).toString())
     }
 
     override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
@@ -83,7 +83,7 @@ internal class InstructionPrinter(private val printer: IndentingPrinter): Instru
         printCommon(code, offset, instruction, useBrackets = true, appendNewLine = false)
 
         printer.print(", ")
-        printer.print(methodID.getClassType(dexFile))
+        printer.print(methodID.getClassType(dexFile).toString())
         printer.print("->")
         printer.print(methodID.getName(dexFile))
         printer.print(methodID.getProtoID(dexFile).getDescriptor(dexFile))
@@ -116,14 +116,14 @@ internal class InstructionPrinter(private val printer: IndentingPrinter): Instru
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
-        printer.println(typeID.getType(dexFile))
+        printer.println(typeID.getType(dexFile).toString())
     }
 
     override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
         printCommon(code, offset, instruction, useBrackets = true, appendNewLine = false)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
-        printer.println(typeID.getType(dexFile))
+        printer.println(typeID.getType(dexFile).toString())
     }
 
     override fun visitFillArrayPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: FillArrayPayload) {

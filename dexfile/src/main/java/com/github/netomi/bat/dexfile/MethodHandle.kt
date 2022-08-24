@@ -17,6 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
@@ -50,7 +51,7 @@ class MethodHandle private constructor(methodHandleTypeValue: Int = -1,
         return if (methodHandleType.targetsField) null else dexFile.getMethodID(fieldOrMethodId)
     }
 
-    fun getTargetClassType(dexFile: DexFile): String {
+    fun getTargetClassType(dexFile: DexFile): DexType {
         return if (methodHandleType.targetsField) {
             val fieldID = getFieldID(dexFile)
             fieldID!!.getClassType(dexFile)
@@ -73,7 +74,7 @@ class MethodHandle private constructor(methodHandleTypeValue: Int = -1,
     fun getTargetMemberDescriptor(dexFile: DexFile): String {
         return if (methodHandleType.targetsField) {
             val fieldID = getFieldID(dexFile)
-            fieldID!!.getType(dexFile)
+            fieldID!!.getType(dexFile).type
         } else {
             val methodID = getMethodID(dexFile)
             methodID!!.getProtoID(dexFile).getDescriptor(dexFile)

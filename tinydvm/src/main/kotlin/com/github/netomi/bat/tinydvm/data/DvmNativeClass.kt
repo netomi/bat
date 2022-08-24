@@ -42,7 +42,7 @@ class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClas
     }
 
     override fun getDirectMethod(dexFile: DexFile, name: String, protoID: ProtoID): DvmMethod? {
-        val parameterClasses = protoID.getParameterDexTypes(dexFile).map { it.toJvmClass() }.toMutableList()
+        val parameterClasses = protoID.getParameterTypes(dexFile).map { it.toJvmClass() }.toMutableList()
 
         return try {
             var methodName = name

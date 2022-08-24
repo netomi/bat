@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.debug.visitor.DebugSequenceVisitor
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import java.util.*
@@ -460,8 +461,8 @@ open class DebugStartLocal : DebugInstruction {
         return dexFile.getStringNullable(nameIndex)
     }
 
-    fun getType(dexFile: DexFile): String? {
-        return dexFile.getTypeNullable(typeIndex)
+    fun getType(dexFile: DexFile): DexType? {
+        return dexFile.getTypeOrNull(typeIndex)
     }
 
     override fun read(input: DexDataInput) {

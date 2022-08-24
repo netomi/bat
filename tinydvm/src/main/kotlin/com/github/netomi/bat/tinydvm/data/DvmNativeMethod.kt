@@ -30,7 +30,8 @@ class DvmNativeMethod private constructor(private val  method:  Method,
     override fun invoke(dvm: Dvm, vararg parameters: DvmValue): DvmValue {
         val obj = parameters[0]
         // FIXME: just a hack to override testing
-        method.invoke(null, obj.value)
+        val value = obj.value
+        method.invoke(null, value)
         return DvmValue.ofUnitValue()
     }
 

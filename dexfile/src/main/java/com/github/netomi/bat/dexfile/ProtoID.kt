@@ -66,28 +66,20 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
         }
     }
 
-    fun getParameterTypes(dexFile: DexFile): List<String> {
+    fun getParameterTypes(dexFile: DexFile): List<DexType> {
         return parameters.getTypes(dexFile)
     }
 
-    fun getParameterDexTypes(dexFile: DexFile): List<DexType> {
-        return getParameterTypes(dexFile).map { it.asDexType() }
-    }
-
     fun getParametersArgumentSize(dexFile: DexFile): Int {
-        return getParameterDexTypes(dexFile).getArgumentSize()
+        return getParameterTypes(dexFile).getArgumentSize()
     }
 
     fun getReturnTypeTypeID(dexFile: DexFile): TypeID {
         return dexFile.getTypeID(returnTypeIndex)
     }
 
-    fun getReturnType(dexFile: DexFile): String {
+    fun getReturnType(dexFile: DexFile): DexType {
         return getReturnTypeTypeID(dexFile).getType(dexFile)
-    }
-
-    fun getReturnDexType(dexFile: DexFile): DexType {
-        return getReturnTypeTypeID(dexFile).getDexType(dexFile)
     }
 
     override val isEmpty: Boolean
@@ -117,7 +109,7 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
     }
 
     fun parameterTypesAccept(dexFile: DexFile, visitor: TypeVisitor) {
-        for (i in 0 until parameters.typeCount) {
+        for (i in 0 until parameters.size) {
             visitor.visitType(dexFile, parameters, i, parameters.getTypeIndex(i), parameters.getType(dexFile, i))
         }
     }

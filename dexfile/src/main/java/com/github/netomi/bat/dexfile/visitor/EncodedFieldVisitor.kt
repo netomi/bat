@@ -16,6 +16,8 @@
 package com.github.netomi.bat.dexfile.visitor
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.util.StringMatcher
 import com.github.netomi.bat.util.simpleNameMatcher
 import com.github.netomi.bat.visitor.AbstractCollector
@@ -76,11 +78,12 @@ class EncodedFieldCollector: AbstractCollector<EncodedField>(), EncodedFieldVisi
     }
 }
 
-private class FieldNameAndTypeFilter(nameExpression:      String?,
-                                     private val type:    String?,
+private class FieldNameAndTypeFilter(            nameExpression:      String?,
+                                                 type:    String?,
                                      private val visitor: EncodedFieldVisitor) : EncodedFieldVisitor {
 
     private val nameMatcher: StringMatcher?
+    private val type:        DexType? = type?.asDexType()
 
     init {
         nameMatcher = if (nameExpression != null) {
@@ -109,7 +112,7 @@ private class FieldNameAndTypeFilter(nameExpression:      String?,
     }
 
     // Private utility methods.
-    private fun accepted(name: String, type: String): Boolean {
+    private fun accepted(name: String, type: DexType): Boolean {
         return (this.nameMatcher == null || this.nameMatcher.matches(name)) &&
                 (this.type       == null || this.type == type)
     }

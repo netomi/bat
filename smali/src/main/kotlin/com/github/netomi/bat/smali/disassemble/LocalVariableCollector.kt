@@ -67,7 +67,7 @@ internal class LocalVariableCollector(private val debugState:         MutableMap
     private fun handleStartLocal(dexFile: DexFile, registerNum: Int, nameIndex: Int, typeIndex: Int, sigIndex: Int) {
         localVariableInfos[registerNum] = LocalVariableInfo(
             dexFile.getStringNullable(nameIndex),
-            dexFile.getTypeNullable(typeIndex),
+            dexFile.getTypeOrNull(typeIndex)?.type,
             dexFile.getStringNullable(sigIndex)
         )
 

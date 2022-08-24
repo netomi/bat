@@ -22,8 +22,9 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.DexInstruction
 import com.github.netomi.bat.dexfile.instruction.FieldInstruction
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.util.DexType
 
-internal class InitializationDetector(private val name: String, private val type: String) : InstructionVisitor {
+internal class InitializationDetector(private val name: String, private val type: DexType) : InstructionVisitor {
     var fieldIsSetInStaticInitializer = false
         private set
 

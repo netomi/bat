@@ -17,6 +17,8 @@ dependencies {
     implementation(project(":dexfile"))
     implementation(project(":smali"))
 
+    implementation("javassist:javassist:3.12.1.GA")
+
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiterVersion}")
 }

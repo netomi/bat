@@ -16,6 +16,7 @@
 package com.github.netomi.bat.smali.disassemble
 
 import com.github.netomi.bat.dexfile.*
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.io.IndentingPrinter
 import java.io.OutputStreamWriter
@@ -52,7 +53,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
         if (!classDef.interfaces.isEmpty) {
             printer.println()
             printer.println("# interfaces")
-            classDef.interfacesAccept(dexFile) { _, _, _, _, type: String -> printer.println(".implements $type") }
+            classDef.interfacesAccept(dexFile) { _, _, _, _, type: DexType -> printer.println(".implements $type") }
         }
 
         classDef.classAnnotationSetAccept(dexFile, classDef, annotationPrinter)
@@ -140,7 +141,7 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
     private fun printParameterAnnotations(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod) {
         var registerIndex = if (method.isStatic) 0 else 1
 
-        for ((parameterIndex, parameterType) in method.getParameterDexTypes(dexFile).withIndex()) {
+        for ((parameterIndex, parameterType) in method.getParameterTypes(dexFile).withIndex()) {
             annotationPrinter.apply {
                 printParameterInfo   = true
                 currentParameterType = parameterType.type
@@ -164,10 +165,10 @@ class SmaliPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) 
 
             if (!method.isStatic) {
                 val classType = method.getClassType(dexFile)
-                localVariableInfos[localVariables] = LocalVariableInfo("this", classType, null)
+                localVariableInfos[localVariables] = LocalVariableInfo("this", classType.type, null)
             }
 
-            for ((parameterIndex, parameterType) in method.getParameterDexTypes(dexFile).withIndex()) {
+            for ((parameterIndex, parameterType) in method.getParameterTypes(dexFile).withIndex()) {
                 val parameterName = code.debugInfo.getParameterName(dexFile, parameterIndex)
                 if (parameterName != null) {
                     printer.println(".param p%d, \"%s\"    # %s".format(registerIndex, parameterName, parameterType))

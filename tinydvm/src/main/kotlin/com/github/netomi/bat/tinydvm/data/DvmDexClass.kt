@@ -30,7 +30,7 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
                                       private var status:   ClassInitializationStatus = ClassInitializationStatus.UNINITIALIZED): DvmClass() {
 
     override val type: String
-        get() = classDef.getType(dexFile)
+        get() = classDef.getType(dexFile).type
 
     override val className: String
         get() = classDef.getClassName(dexFile)
@@ -76,12 +76,12 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
 
         val superType = classDef.getSuperClassType(dexFile)
         if (superType != null) {
-            dvm.getClass(superType)
+            dvm.getClass(superType.type)
         }
 
         classDef.staticFields.forEach { field ->
-            val initialValue = field.staticValue(dexFile) ?: field.getDexType(dexFile).getDefaultEncodedValueForType()
-            staticFields[field] = initialValue.toDVMValue(dvm, dexFile, field.getType(dexFile))
+            val initialValue = field.staticValue(dexFile) ?: field.getType(dexFile).getDefaultEncodedValueForType()
+            staticFields[field] = initialValue.toDVMValue(dvm, dexFile, field.getType(dexFile).type)
         }
 
 

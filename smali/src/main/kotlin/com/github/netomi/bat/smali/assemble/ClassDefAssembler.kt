@@ -86,7 +86,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         val fieldEditor: FieldEditor
 
         try {
-            val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classDefEditor.classType, name, type)
+            val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classDefEditor.classType.type, name, type)
             val fieldID      = dexFile.getFieldID(fieldIDIndex)
             if (addedFields.contains(fieldID)) {
                 throw RuntimeException("field '${fieldID.getFullExternalFieldSignature(dexFile)}' already exists in this class")
@@ -134,7 +134,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         val methodEditor: MethodEditor
 
         try {
-            val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classDefEditor.classType, name, parameterTypes, returnType)
+            val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classDefEditor.classType.type, name, parameterTypes, returnType)
             val methodID      = dexFile.getMethodID(methodIDIndex)
             if (addedMethods.contains(methodID)) {
                 throw RuntimeException("method '${methodID.getFullExternalMethodSignature(dexFile)}' already exists in this class")

@@ -50,7 +50,7 @@ class Dvm constructor(private val classDefPool: ClassDefPool) {
         val type      = fieldID.getType(dexFile)
         val classType = fieldID.getClassType(dexFile)
 
-        val dvmClazz = getClass(classType)
-        return dvmClazz.getField(name, type)
+        val dvmClazz = getClass(classType.type)
+        return dvmClazz.getField(name, type.type)
     }
 }

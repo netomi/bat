@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.dexfile.util.DexType
 
 class ArrayTypeInstruction: ArrayInstruction {
 
@@ -35,7 +36,7 @@ class ArrayTypeInstruction: ArrayInstruction {
         return dexFile.getTypeID(typeIndex)
     }
 
-    fun getType(dexFile: DexFile): String {
+    fun getType(dexFile: DexFile): DexType {
         return getTypeID(dexFile).getType(dexFile)
     }
 

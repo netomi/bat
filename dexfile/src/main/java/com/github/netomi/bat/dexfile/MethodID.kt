@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexType
-import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.*
 import java.util.*
 
@@ -48,12 +47,8 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
         return dexFile.getTypeID(classIndex)
     }
 
-    fun getClassType(dexFile: DexFile): String {
+    fun getClassType(dexFile: DexFile): DexType {
         return getClassTypeID(dexFile).getType(dexFile)
-    }
-
-    fun getClassDexType(dexFile: DexFile): DexType {
-        return getClassTypeID(dexFile).getDexType(dexFile)
     }
 
     fun getProtoID(dexFile: DexFile): ProtoID {
@@ -64,20 +59,12 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
         return dexFile.getStringID(nameIndex).stringValue
     }
 
-    fun getParameterTypes(dexFile: DexFile): List<String> {
+    fun getParameterTypes(dexFile: DexFile): List<DexType> {
         return getProtoID(dexFile).getParameterTypes(dexFile)
     }
 
-    fun getParameterDexTypes(dexFile: DexFile): List<DexType> {
-        return getProtoID(dexFile).getParameterDexTypes(dexFile)
-    }
-
-    fun getReturnType(dexFile: DexFile): String {
+    fun getReturnType(dexFile: DexFile): DexType {
         return getProtoID(dexFile).getReturnType(dexFile)
-    }
-
-    fun getReturnDexType(dexFile: DexFile): DexType {
-        return getProtoID(dexFile).getReturnDexType(dexFile)
     }
 
     fun getShortyType(dexFile: DexFile): String {
@@ -86,12 +73,12 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
 
     fun getFullExternalMethodSignature(dexFile: DexFile): String {
         return buildString {
-            append(getReturnDexType(dexFile).toExternalType())
+            append(getReturnType(dexFile).toExternalType())
             append(' ')
-            append(getClassDexType(dexFile).toExternalClassName())
+            append(getClassType(dexFile).toExternalClassName())
             append('.')
             append(getName(dexFile))
-            append(getParameterDexTypes(dexFile).joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
+            append(getParameterTypes(dexFile).joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
         }
     }
 
@@ -112,7 +99,7 @@ class MethodID private constructor(classIndex: Int = NO_INDEX,
 
     fun accept(dexFile: DexFile, visitor: EncodedMethodVisitor) {
         val classType = getClassType(dexFile)
-        val classDef  = dexFile.getClassDefByType(classType)
+        val classDef  = dexFile.getClassDefByType(classType.type)
 
         classDef?.methodsAccept(dexFile, filterMethodsByNameAndProtoID(getName(dexFile), getProtoID(dexFile), visitor))
     }

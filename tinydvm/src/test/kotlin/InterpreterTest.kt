@@ -35,7 +35,7 @@ class InterpreterTest {
 
             val dvm = Dvm(classDefPool)
 
-            classDef.methodsAccept(dexFile, "main") { _, _, method ->
+            classDef.methodsAccept(dexFile, "main2") { _, _, method ->
                 val interpreter = Interpreter.of(dvm, dexFile, classDef, method)
                 interpreter.invoke()
             }

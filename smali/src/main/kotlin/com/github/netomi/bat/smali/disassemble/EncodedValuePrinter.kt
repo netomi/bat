@@ -69,17 +69,17 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
     }
 
     override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {
-        appendWithPrefix(value.getType(dexFile))
+        appendWithPrefix(value.getType(dexFile).toString())
     }
 
     override fun visitFieldValue(dexFile: DexFile, value: EncodedFieldValue) {
         val fieldID = value.getFieldID(dexFile)
-        appendWithPrefix(fieldID.getClassType(dexFile) + "->" + fieldID.getName(dexFile) + ":" + fieldID.getType(dexFile))
+        appendWithPrefix("${fieldID.getClassType(dexFile)}->${fieldID.getName(dexFile)}:${fieldID.getType(dexFile)}")
     }
 
     override fun visitMethodValue(dexFile: DexFile, value: EncodedMethodValue) {
         val methodID = value.getMethodID(dexFile)
-        appendWithPrefix(methodID.getClassTypeID(dexFile).getType(dexFile) + "->" + methodID.getName(dexFile) + methodID.getProtoID(dexFile).getDescriptor(dexFile))
+        appendWithPrefix("${methodID.getClassTypeID(dexFile).getType(dexFile)}->${methodID.getName(dexFile)}${methodID.getProtoID(dexFile).getDescriptor(dexFile)}")
     }
 
     override fun visitBooleanValue(dexFile: DexFile, value: EncodedBooleanValue) {

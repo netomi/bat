@@ -19,6 +19,7 @@ package com.github.netomi.bat.dexfile.editor
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.annotation.*
 import com.github.netomi.bat.dexfile.annotation.Annotation
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.util.VOID_TYPE
 import java.util.*
@@ -28,8 +29,12 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
     val dexFile: DexFile
         get() = dexEditor.dexFile
 
-    val classType: String
+    val classType: DexType
         get() = classDef.getType(dexFile)
+
+    fun addInterface(type: DexType) {
+        addInterface(type.type)
+    }
 
     fun addInterface(type: String) {
         val typeIndex = dexEditor.addOrGetTypeIDIndex(type)
@@ -61,8 +66,12 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
         return addField(fieldName, accessFlagsOf(visibility, modifiers), type)
     }
 
+    fun addField(fieldName: String, accessFlags: Int, type: DexType, validate: Boolean = true): FieldEditor {
+        return addField(fieldName, accessFlags, type.type, validate)
+    }
+
     fun addField(fieldName: String, accessFlags: Int, type: String, validate: Boolean = true): FieldEditor {
-        val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType, fieldName, type)
+        val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType.type, fieldName, type)
         val field = EncodedField.of(fieldIDIndex, accessFlags)
         classDef.addField(dexFile, field, validate)
         return FieldEditor.of(dexEditor, this, field)
@@ -76,8 +85,12 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
         return addMethod(methodName, accessFlagsOf(visibility, modifiers), parameterTypes, returnType)
     }
 
+    fun addMethod(methodName: String, accessFlags: Int, parameterTypes: List<DexType>, returnType: DexType, validate: Boolean = true): MethodEditor {
+        return addMethod(methodName, accessFlags, parameterTypes.map { it.type }, returnType.type, validate)
+    }
+
     fun addMethod(methodName: String, accessFlags: Int, parameterTypes: List<String>, returnType: String, validate: Boolean = true): MethodEditor {
-        val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classType, methodName, parameterTypes, returnType)
+        val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classType.type, methodName, parameterTypes, returnType)
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
         classDef.addMethod(dexFile, method, validate)
         return MethodEditor.of(dexEditor, this, method)

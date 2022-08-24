@@ -179,7 +179,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printGeneric(instruction)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
-        printer.print(typeID.getType(dexFile))
+        printer.print(typeID.getType(dexFile).toString())
         printer.print(" // type@")
         printer.print(toHexString(instruction.typeIndex, 4))
     }
@@ -189,7 +189,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printRegisters(instruction, true)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
-        printer.print(typeID.getType(dexFile))
+        printer.print(typeID.getType(dexFile).toString())
         printer.print(" // type@")
         printer.print(toHexString(instruction.typeIndex, 4))
     }

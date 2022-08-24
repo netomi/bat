@@ -22,7 +22,6 @@ import com.github.netomi.bat.dexfile.annotation.visitor.annotationCollector
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexType
-import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.CodeVisitor
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
@@ -60,7 +59,7 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
         return getMethodID(dexFile).getProtoID(dexFile)
     }
 
-    fun getClassType(dexFile: DexFile): String {
+    fun getClassType(dexFile: DexFile): DexType {
         return dexFile.getMethodID(methodIndex).getClassTypeID(dexFile).getType(dexFile)
     }
 
@@ -72,15 +71,11 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
         return getMethodID(dexFile).getProtoID(dexFile).getShorty(dexFile)
     }
 
-    fun getParameterTypes(dexFile: DexFile): List<String> {
+    fun getParameterTypes(dexFile: DexFile): List<DexType> {
         return getProtoID(dexFile).getParameterTypes(dexFile)
     }
 
-    fun getParameterDexTypes(dexFile: DexFile): List<DexType> {
-        return getProtoID(dexFile).getParameterDexTypes(dexFile)
-    }
-
-    fun getReturnType(dexFile: DexFile): String {
+    fun getReturnType(dexFile: DexFile): DexType {
         return getProtoID(dexFile).getReturnType(dexFile)
     }
 

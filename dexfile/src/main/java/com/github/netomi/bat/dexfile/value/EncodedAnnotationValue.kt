@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.NO_INDEX
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.value.visitor.AnnotationElementVisitor
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
@@ -39,7 +40,7 @@ data class EncodedAnnotationValue
     override val valueType: EncodedValueType
         get() = EncodedValueType.ANNOTATION
 
-    fun getType(dexFile: DexFile): String {
+    fun getType(dexFile: DexFile): DexType {
         return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 

@@ -32,8 +32,12 @@ class ClassDefPool private constructor() {
         get() = classDefMap.size
 
     fun addClassDef(dexFile: DexFile, classDef: ClassDef) {
-        val className = classDef.getType(dexFile)
-        classDefMap.computeIfAbsent(className) { ClassDefData(dexFile, classDef) }
+        val classType = classDef.getType(dexFile)
+        classDefMap.computeIfAbsent(classType.type) { ClassDefData(dexFile, classDef) }
+    }
+
+    fun getClassDefByType(type: DexType): ClassDefData? {
+        return getClassDefByType(type.type)
     }
 
     fun getClassDefByType(type: String): ClassDefData? {
