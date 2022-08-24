@@ -29,7 +29,7 @@ class DvmDexObject constructor(private val clazz:  DvmDexClass,
                                private var status: ObjectInitializationStatus = ObjectInitializationStatus.UNINITIALIZED): DvmObject() {
 
     override val obj: Any
-        get() = createProxy()
+        get() = this
 
     override val type: DexType
         get() = clazz.type
