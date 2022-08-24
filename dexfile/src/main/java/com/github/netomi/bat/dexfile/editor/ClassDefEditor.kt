@@ -32,6 +32,9 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
     val classType: DexType
         get() = classDef.getType(dexFile)
 
+    val classTypeString: String
+        get() = classType.type
+
     fun addInterface(type: DexType) {
         addInterface(type.type)
     }
@@ -71,7 +74,7 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
     }
 
     fun addField(fieldName: String, accessFlags: Int, type: String, validate: Boolean = true): FieldEditor {
-        val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classType.type, fieldName, type)
+        val fieldIDIndex = dexEditor.addOrGetFieldIDIndex(classTypeString, fieldName, type)
         val field = EncodedField.of(fieldIDIndex, accessFlags)
         classDef.addField(dexFile, field, validate)
         return FieldEditor.of(dexEditor, this, field)
@@ -90,7 +93,7 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
     }
 
     fun addMethod(methodName: String, accessFlags: Int, parameterTypes: List<String>, returnType: String, validate: Boolean = true): MethodEditor {
-        val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classType.type, methodName, parameterTypes, returnType)
+        val methodIDIndex = dexEditor.addOrGetMethodIDIndex(classTypeString, methodName, parameterTypes, returnType)
         val method = EncodedMethod.of(methodIDIndex, accessFlags)
         classDef.addMethod(dexFile, method, validate)
         return MethodEditor.of(dexEditor, this, method)
