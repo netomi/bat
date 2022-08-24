@@ -23,6 +23,7 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.*
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.data.*
+import com.github.netomi.bat.tinydvm.data.jvm.DvmNativeObject
 
 class InstructionProcessor constructor(private val dvm:   Dvm,
                                        private val state: InterpreterState) : InstructionVisitor {
@@ -40,7 +41,7 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
     override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
         when (instruction.opCode) {
             NEW_INSTANCE -> {
-                val dvmClazz = dvm.getClass(instruction.getType(dexFile).type)
+                val dvmClazz = dvm.getClass(instruction.getType(dexFile))
                 val r = instruction.registers[0]
                 state.registers[r] = DvmReferenceValue.of(DvmObject.newInstanceOf(dvmClazz))
             }
@@ -58,10 +59,12 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
                                                                                                       fieldID.getName(dexFile),
                                                                                                       fieldID.getType(dexFile)))
 
-        val javaFieldType = field.type.asJvmType()
+        val javaFieldType = field.type
 
         val getStaticField = { supportedTypes: Array<String> ->
-            if (!supportedTypes.contains(field.type)) {
+            val supportedJvmTypes = supportedTypes.map { it.asJvmType() }
+
+            if (!supportedJvmTypes.contains(field.type)) {
                 throw VerifyException("[0x%x] get insn has type '%s' but expected type '%d'"
                         .format(offset, supportedTypes.joinToString(separator = "|"), field.type))
             }
@@ -76,7 +79,9 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
         }
 
         val setPrimitiveStaticField = { supportedTypes: Array<String> ->
-            if (!supportedTypes.contains(field.type)) {
+            val supportedJvmTypes = supportedTypes.map { it.asJvmType() }
+
+            if (!supportedJvmTypes.contains(field.type)) {
                 throw VerifyException("[0x%x] get insn has type '%s' but expected type '%d'"
                         .format(offset, supportedTypes.joinToString(separator = "|"), field.type))
             }
@@ -100,7 +105,7 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
             }
 
             dvmValue = dvmValue.withType(field.type)
-            if (!supportedTypes.contains(dvmValue.type)) {
+            if (!supportedJvmTypes.contains(dvmValue.type)) {
                 throw VerifyException("[0x%x] unexpected value in v%d of type '%s' but expected '%s' for put"
                         .format(offset, r, dvmValue.type, supportedTypes.joinToString(separator = "|")))
             }
@@ -179,7 +184,7 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
 
         when (instruction.opCode) {
             INVOKE_DIRECT  -> {
-                val dvmClazz     = dvm.getClass(classType.type)
+                val dvmClazz  = dvm.getClass(classType)
                 val dvmMethod = dvmClazz.getDirectMethod(dexFile, methodName, proto)
 
                 val parameters = Array(instruction.registers.size) { index -> state.registers[instruction.registers[index]]!! }
@@ -203,7 +208,7 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
                         null
                     } else {
                         when (dvmValue) {
-                            is DvmPrimitiveValue -> dvmValue.valueOfType(parameterTypes[index].type)
+                            is DvmPrimitiveValue -> dvmValue.valueOfType(parameterTypes[index])
                             is DvmReferenceValue -> dvmValue.value
                             else -> {}
                         }

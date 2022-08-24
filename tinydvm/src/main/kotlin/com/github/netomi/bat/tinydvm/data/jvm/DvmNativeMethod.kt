@@ -14,11 +14,13 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.jvm
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.ProtoID
 import com.github.netomi.bat.tinydvm.Dvm
+import com.github.netomi.bat.tinydvm.data.DvmMethod
+import com.github.netomi.bat.tinydvm.data.DvmValue
 import java.lang.reflect.Method
 
 class DvmNativeMethod private constructor(private val  method:  Method,

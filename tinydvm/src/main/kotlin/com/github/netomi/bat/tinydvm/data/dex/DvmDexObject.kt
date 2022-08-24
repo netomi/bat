@@ -14,15 +14,16 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.dex
 
 import com.github.netomi.bat.dexfile.EncodedField
+import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.tinydvm.data.DvmObject
+import com.github.netomi.bat.tinydvm.data.DvmValue
+import com.github.netomi.bat.tinydvm.data.ObjectInitializationStatus
 import javassist.util.proxy.MethodHandler
 
 import javassist.util.proxy.ProxyFactory
-
-
-
 
 class DvmDexObject constructor(private val clazz:  DvmDexClass,
                                private var status: ObjectInitializationStatus = ObjectInitializationStatus.UNINITIALIZED): DvmObject() {
@@ -30,7 +31,7 @@ class DvmDexObject constructor(private val clazz:  DvmDexClass,
     override val obj: Any
         get() = createProxy()
 
-    override val type: String
+    override val type: DexType
         get() = clazz.type
 
     private val instanceFields = mutableMapOf<EncodedField, DvmValue?>()

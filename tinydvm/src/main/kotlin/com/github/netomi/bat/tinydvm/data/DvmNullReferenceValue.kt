@@ -16,7 +16,9 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-class DvmNullReferenceValue private constructor(override val type: String): DvmValue() {
+import com.github.netomi.bat.util.JvmType
+
+class DvmNullReferenceValue private constructor(override val type: JvmType): DvmValue() {
     override val value: Any?
         get() = null
 
@@ -28,7 +30,7 @@ class DvmNullReferenceValue private constructor(override val type: String): DvmV
     }
 
     companion object {
-        fun of(type: String): DvmValue {
+        fun of(type: JvmType): DvmValue {
             return DvmNullReferenceValue(type)
         }
     }

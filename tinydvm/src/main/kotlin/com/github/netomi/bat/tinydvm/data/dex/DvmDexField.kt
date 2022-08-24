@@ -14,10 +14,12 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.dex
 
 import com.github.netomi.bat.dexfile.EncodedField
 import com.github.netomi.bat.tinydvm.Dvm
+import com.github.netomi.bat.tinydvm.data.DvmField
+import com.github.netomi.bat.tinydvm.data.DvmValue
 
 class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
                                       private val field:       EncodedField): DvmField() {
@@ -25,7 +27,7 @@ class DVMDexField private constructor(private val dvmDexClass: DvmDexClass,
     private val dexFile = dvmDexClass.dexFile
 
     override val name = field.getName(dexFile)
-    override val type = field.getType(dexFile).type
+    override val type = field.getType(dexFile)
 
     override fun get(dvm: Dvm, obj: Any?): DvmValue {
         return if (field.isStatic) {

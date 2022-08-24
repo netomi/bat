@@ -20,12 +20,13 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.value.*
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.tinydvm.Dvm
+import com.github.netomi.bat.tinydvm.data.jvm.DvmNativeObject
 import com.github.netomi.bat.util.*
 import com.google.common.base.Objects
 
 sealed class DvmValue {
     abstract val value: Any?
-    abstract val type:  String
+    abstract val type:  JvmType
 
     abstract val isNullReference: Boolean
 
@@ -48,7 +49,7 @@ sealed class DvmValue {
             return DvmUnitValue
         }
 
-        fun ofNativeValue(dvm: Dvm, obj: Any?, type: String): DvmValue {
+        fun ofNativeValue(dvm: Dvm, obj: Any?, type: JvmType): DvmValue {
             if (obj == null) {
                 return DvmNullReferenceValue.of(type)
             }
@@ -71,13 +72,13 @@ sealed class DvmValue {
     }
 }
 
-internal fun EncodedValue.toDVMValue(dvm: Dvm, dexFile: DexFile, type: String): DvmValue {
+internal fun EncodedValue.toDVMValue(dvm: Dvm, dexFile: DexFile, type: JvmType): DvmValue {
     val converter = EncodedValueConverter(dvm, type)
     accept(dexFile, converter)
     return converter.dvmValue
 }
 
-private class EncodedValueConverter constructor(private val dvm: Dvm, private val type: String): EncodedValueVisitor {
+private class EncodedValueConverter constructor(private val dvm: Dvm, private val type: JvmType): EncodedValueVisitor {
 
     lateinit var dvmValue: DvmValue
 

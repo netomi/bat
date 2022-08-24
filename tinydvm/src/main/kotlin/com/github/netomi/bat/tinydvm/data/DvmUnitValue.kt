@@ -16,15 +16,17 @@
 
 package com.github.netomi.bat.tinydvm.data
 
+import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.VOID_TYPE
+import com.github.netomi.bat.util.asJvmType
 
 object DvmUnitValue: DvmValue() {
 
     override val value: Any
         get() = this
 
-    override val type: String
-        get() = VOID_TYPE
+    override val type: JvmType
+        get() = VOID_TYPE.asJvmType()
 
     override val isNullReference: Boolean
         get() = false

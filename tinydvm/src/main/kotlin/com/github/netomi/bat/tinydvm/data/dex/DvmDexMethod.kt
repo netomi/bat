@@ -14,12 +14,14 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.dex
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.Interpreter
+import com.github.netomi.bat.tinydvm.data.DvmMethod
+import com.github.netomi.bat.tinydvm.data.DvmValue
 
 class DvmDexMethod private constructor(private val dvmDexClazz: DvmDexClass,
                                        private val classDef:    ClassDef,

@@ -14,7 +14,11 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.jvm
+
+import com.github.netomi.bat.tinydvm.data.DvmClass
+import com.github.netomi.bat.tinydvm.data.DvmObject
+import com.github.netomi.bat.util.JvmType
 
 class DvmNativeObject private constructor(private var _obj:  Any? = null,
                                           private val clazz: DvmNativeClass): DvmObject() {
@@ -22,11 +26,11 @@ class DvmNativeObject private constructor(private var _obj:  Any? = null,
     override val obj: Any
         get() = _obj!!
 
-    override val type: String
+    override val type: JvmType
         get() = clazz.type
 
     override val isInitialized: Boolean
-        get() = obj != null
+        get() = _obj != null
 
     override fun toString(): String {
         return "NativeObject[obj=${obj}, type=${type}]"

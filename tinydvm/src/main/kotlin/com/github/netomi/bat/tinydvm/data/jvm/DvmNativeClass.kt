@@ -14,24 +14,27 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.jvm
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.ProtoID
+import com.github.netomi.bat.tinydvm.data.DvmClass
+import com.github.netomi.bat.tinydvm.data.DvmField
+import com.github.netomi.bat.tinydvm.data.DvmMethod
 import com.github.netomi.bat.tinydvm.overrides.Override
 import com.github.netomi.bat.util.*
 
 class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClass() {
 
-    override val type: String
-        get() = clazz.name.asExternalClassName().toInternalType()
+    override val type: JvmType
+        get() = clazz.name.asExternalClassName().toInternalType().asJvmType()
 
     override val className: String
         get() = clazz.name.asExternalClassName().toInternalClassName()
 
     private val fieldCache = mutableMapOf<String, DvmNativeField?>()
 
-    override fun getField(name: String, type: String): DvmField? {
+    override fun getField(name: String, type: JvmType): DvmField? {
         return fieldCache.computeIfAbsent(name) { fieldName ->
             try {
                 DvmNativeField.of(clazz.getField(fieldName), type)
@@ -74,8 +77,8 @@ class DvmNativeClass private constructor(private val clazz: Class<Any>): DvmClas
             return DvmNativeClass(clazz as Class<Any>)
         }
 
-        fun of(type: String): DvmNativeClass {
-            val externalClassName = type.asJvmType().toExternalClassName()
+        fun of(type: JvmType): DvmNativeClass {
+            val externalClassName = type.toExternalClassName()
             return DvmNativeClass(Class.forName(externalClassName) as Class<Any>)
         }
     }

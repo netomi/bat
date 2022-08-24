@@ -18,11 +18,12 @@ package com.github.netomi.bat.tinydvm.data
 
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.ProtoID
+import com.github.netomi.bat.util.JvmType
 
-sealed class DvmClass {
-    abstract val type:      String
+abstract class DvmClass {
+    abstract val type:      JvmType
     abstract val className: String
 
-    abstract fun getField(name: String, type: String): DvmField?
+    abstract fun getField(name: String, type: JvmType): DvmField?
     abstract fun getDirectMethod(dexFile: DexFile, name: String, protoID: ProtoID): DvmMethod?
 }

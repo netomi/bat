@@ -29,22 +29,6 @@ class DexType private constructor(type: String): JvmType(type) {
         return if (isClassType || isArrayType) "L" else type
     }
 
-    fun getArgumentSize(): Int {
-        return when (type) {
-            BYTE_TYPE,
-            SHORT_TYPE,
-            CHAR_TYPE,
-            INT_TYPE,
-            BOOLEAN_TYPE,
-            FLOAT_TYPE  -> 1
-
-            LONG_TYPE,
-            DOUBLE_TYPE -> 2
-
-            else -> 1
-        }
-    }
-
     fun getDefaultEncodedValueForType(): EncodedValue {
         return if (isClassType) {
             EncodedNullValue

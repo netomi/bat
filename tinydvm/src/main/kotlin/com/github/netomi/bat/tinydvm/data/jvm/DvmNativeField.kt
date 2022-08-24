@@ -14,13 +14,16 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.jvm
 
 import com.github.netomi.bat.tinydvm.Dvm
+import com.github.netomi.bat.tinydvm.data.DvmField
+import com.github.netomi.bat.tinydvm.data.DvmValue
+import com.github.netomi.bat.util.JvmType
 import java.lang.reflect.Field
 
 class DvmNativeField private constructor(private val  field: Field,
-                                         override val type:  String): DvmField() {
+                                         override val type:  JvmType): DvmField() {
 
     override val name: String = field.name
 
@@ -33,7 +36,7 @@ class DvmNativeField private constructor(private val  field: Field,
     }
 
     companion object {
-        internal fun of(field: Field, type: String): DvmNativeField {
+        internal fun of(field: Field, type: JvmType): DvmNativeField {
             return DvmNativeField(field, type)
         }
     }

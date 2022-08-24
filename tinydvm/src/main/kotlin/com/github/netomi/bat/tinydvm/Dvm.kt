@@ -20,8 +20,12 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.FieldID
 import com.github.netomi.bat.dexfile.util.ClassDefPool
 import com.github.netomi.bat.tinydvm.data.*
+import com.github.netomi.bat.tinydvm.data.dex.DvmDexClass
+import com.github.netomi.bat.tinydvm.data.jvm.DvmNativeClass
 import com.github.netomi.bat.tinydvm.overrides.ObjectOverride
 import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
+import com.github.netomi.bat.util.JvmType
+import com.github.netomi.bat.util.asJvmType
 
 class Dvm constructor(private val classDefPool: ClassDefPool) {
 
@@ -33,15 +37,21 @@ class Dvm constructor(private val classDefPool: ClassDefPool) {
     }
 
     fun getClass(type: String): DvmClass {
-        val classDefData = classDefPool.getClassDefByType(type)
+        return getClass(type.asJvmType())
+    }
+
+    fun getClass(type: JvmType): DvmClass {
+        val typeString = type.type
+
+        val classDefData = classDefPool.getClassDefByType(typeString)
         return if (classDefData != null) {
-            val clazz = dvmDexClassMap.computeIfAbsent(type) { DvmDexClass.of(classDefData.dexFile, classDefData.classDef) }
+            val clazz = dvmDexClassMap.computeIfAbsent(typeString) { DvmDexClass.of(classDefData.dexFile, classDefData.classDef) }
             if (!clazz.isInitialized) {
                 clazz.initialize(this)
             }
             clazz
         } else {
-            dvmNativeClassMap.computeIfAbsent(type) { DvmNativeClass.of(type) }
+            dvmNativeClassMap.computeIfAbsent(typeString) { DvmNativeClass.of(type) }
         }
     }
 
@@ -51,6 +61,6 @@ class Dvm constructor(private val classDefPool: ClassDefPool) {
         val classType = fieldID.getClassType(dexFile)
 
         val dvmClazz = getClass(classType.type)
-        return dvmClazz.getField(name, type.type)
+        return dvmClazz.getField(name, type)
     }
 }

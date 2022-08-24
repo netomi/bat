@@ -16,16 +16,22 @@
 
 package com.github.netomi.bat.tinydvm.data
 
-sealed class DvmObject {
+import com.github.netomi.bat.tinydvm.data.dex.DvmDexClass
+import com.github.netomi.bat.tinydvm.data.dex.DvmDexObject
+import com.github.netomi.bat.tinydvm.data.jvm.DvmNativeClass
+import com.github.netomi.bat.tinydvm.data.jvm.DvmNativeObject
+import com.github.netomi.bat.util.JvmType
+
+abstract class DvmObject {
     abstract val obj:  Any
-    abstract val type: String
+    abstract val type: JvmType
 
     abstract val isInitialized: Boolean
 
     companion object {
         fun newInstanceOf(clazz: DvmClass): DvmObject {
             return when (clazz) {
-                is DvmDexClass    -> DvmDexObject.newInstanceOf(clazz)
+                is DvmDexClass -> DvmDexObject.newInstanceOf(clazz)
                 is DvmNativeClass -> DvmNativeObject.newInstanceOf(clazz)
                 else -> error("unexpected DvmClass $clazz")
             }

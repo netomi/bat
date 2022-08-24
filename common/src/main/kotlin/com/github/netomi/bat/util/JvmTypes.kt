@@ -128,6 +128,22 @@ open class JvmType protected constructor(val type: String) {
 
     }
 
+    fun getArgumentSize(): Int {
+        return when (type) {
+            BYTE_TYPE,
+            SHORT_TYPE,
+            CHAR_TYPE,
+            INT_TYPE,
+            BOOLEAN_TYPE,
+            FLOAT_TYPE  -> 1
+
+            LONG_TYPE,
+            DOUBLE_TYPE -> 2
+
+            else -> 1
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is JvmType) return false

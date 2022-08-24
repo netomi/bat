@@ -24,28 +24,28 @@ class DvmPrimitiveValue private constructor(private val _value: Long, private va
     override val value: Any
         get() = valueOfType(type)
 
-    override val type: String
-        get() = primitiveType.typeString
+    override val type: JvmType
+        get() = primitiveType.type
 
     override val isNullReference: Boolean
         get() = false
 
-    fun valueOfType(type: String): Any {
-        return when (type) {
-            INT_TYPE           -> _value.toInt()
-            LONG_TYPE          -> _value
-            SHORT_TYPE         -> _value.toShort()
-            BYTE_TYPE          -> _value.toByte()
-            CHAR_TYPE          -> _value.toInt().toChar()
-            BOOLEAN_TYPE       -> _value.toInt() != 0
-            FLOAT_TYPE         -> Float.fromBits(_value.toInt())
-            DOUBLE_TYPE        -> Double.fromBits(_value)
-            UNKNOWN.typeString -> _value
+    fun valueOfType(type: JvmType): Any {
+        return when (type.type) {
+            INT_TYPE                -> _value.toInt()
+            LONG_TYPE               -> _value
+            SHORT_TYPE              -> _value.toShort()
+            BYTE_TYPE               -> _value.toByte()
+            CHAR_TYPE               -> _value.toInt().toChar()
+            BOOLEAN_TYPE            -> _value.toInt() != 0
+            FLOAT_TYPE              -> Float.fromBits(_value.toInt())
+            DOUBLE_TYPE             -> Double.fromBits(_value)
+            UNKNOWN.type.toString() -> _value
             else -> throw IllegalArgumentException("unexpected primitive type $type")
         }
     }
 
-    fun withType(newType: String): DvmValue {
+    fun withType(newType: JvmType): DvmValue {
         return if (newType != type) {
             DvmPrimitiveValue(_value, PrimitiveType.of(newType))
         } else {
@@ -96,7 +96,7 @@ class DvmPrimitiveValue private constructor(private val _value: Long, private va
     }
 }
 
-enum class PrimitiveType constructor(val typeString: String) {
+enum class PrimitiveType constructor(typeString: String) {
     INT    (INT_TYPE),
     LONG   (LONG_TYPE),
     SHORT  (SHORT_TYPE),
@@ -109,10 +109,12 @@ enum class PrimitiveType constructor(val typeString: String) {
     //       we need to distinguish between wide values and normal ones.
     UNKNOWN("?");
 
+    val type: JvmType = typeString.asJvmType()
+
     companion object {
-        fun of(type: String): PrimitiveType {
+        fun of(type: JvmType): PrimitiveType {
             for (item in values()) {
-                if (type == item.typeString) {
+                if (type == item.type) {
                     return item
                 }
             }

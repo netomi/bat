@@ -16,12 +16,14 @@
 
 package com.github.netomi.bat.tinydvm.data
 
+import com.github.netomi.bat.util.JvmType
+
 class DvmReferenceValue private constructor(private val reference: DvmObject): DvmValue() {
 
     override val value: Any
         get() = reference.obj
 
-    override val type: String
+    override val type: JvmType
         get() = reference.type
 
     override val isNullReference: Boolean

@@ -16,9 +16,7 @@
 
 package com.github.netomi.bat.tinydvm.overrides
 
-import com.github.netomi.bat.tinydvm.data.DvmDexObject
-
-@Override(names = [MethodMapping(name = "<init>", overrideName = "dvm_init", overrideDescriptor = "Lcom/github/netomi/bat/tinydvm/data/DvmDexObject;")])
+@Override(names = [MethodMapping(name = "<init>", overrideName = "dvm_init", overrideDescriptor = "Lcom/github/netomi/bat/tinydvm/data/dex/DvmDexObject;")])
 class ObjectOverride {
     companion object {
         @JvmStatic

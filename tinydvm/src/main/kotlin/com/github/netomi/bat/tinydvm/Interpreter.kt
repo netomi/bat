@@ -54,7 +54,7 @@ class Interpreter private constructor(private val dvm:      Dvm,
         var paramRegister = localRegisters
         for (parameter in parameters) {
             state.registers[paramRegister] = parameter
-            paramRegister += parameter.type.asDexType().getArgumentSize()
+            paramRegister += parameter.type.getArgumentSize()
         }
     }
 

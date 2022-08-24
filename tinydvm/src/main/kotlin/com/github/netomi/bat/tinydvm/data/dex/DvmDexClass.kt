@@ -14,23 +14,26 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.tinydvm.data
+package com.github.netomi.bat.tinydvm.data.dex
 
 import com.github.netomi.bat.dexfile.ClassDef
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedField
 import com.github.netomi.bat.dexfile.ProtoID
+import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.visitor.fieldCollector
 import com.github.netomi.bat.dexfile.visitor.filterMethodsByNameAndProtoID
 import com.github.netomi.bat.dexfile.visitor.methodCollector
 import com.github.netomi.bat.tinydvm.Dvm
+import com.github.netomi.bat.tinydvm.data.*
+import com.github.netomi.bat.util.JvmType
 
 class DvmDexClass private constructor(        val dexFile:  DexFile,
                                       private val classDef: ClassDef,
                                       private var status:   ClassInitializationStatus = ClassInitializationStatus.UNINITIALIZED): DvmClass() {
 
-    override val type: String
-        get() = classDef.getType(dexFile).type
+    override val type: DexType
+        get() = classDef.getType(dexFile)
 
     override val className: String
         get() = classDef.getClassName(dexFile)
@@ -41,10 +44,10 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
 
     private val fieldCache = mutableMapOf<Pair<String, String>, DVMDexField?>()
 
-    override fun getField(name: String, type: String): DvmField? {
-        return fieldCache.computeIfAbsent(Pair(name, type)) {
+    override fun getField(name: String, type: JvmType): DvmField? {
+        return fieldCache.computeIfAbsent(Pair(name, type.type)) {
             val fieldCollector = fieldCollector()
-            classDef.fieldsAccept(dexFile, name, type, fieldCollector)
+            classDef.fieldsAccept(dexFile, name, type.type, fieldCollector)
             val field = fieldCollector.items().singleOrNull()
             if (field != null) DVMDexField.of(this, field) else null
         }
@@ -76,12 +79,12 @@ class DvmDexClass private constructor(        val dexFile:  DexFile,
 
         val superType = classDef.getSuperClassType(dexFile)
         if (superType != null) {
-            dvm.getClass(superType.type)
+            dvm.getClass(superType)
         }
 
         classDef.staticFields.forEach { field ->
             val initialValue = field.staticValue(dexFile) ?: field.getType(dexFile).getDefaultEncodedValueForType()
-            staticFields[field] = initialValue.toDVMValue(dvm, dexFile, field.getType(dexFile).type)
+            staticFields[field] = initialValue.toDVMValue(dvm, dexFile, field.getType(dexFile))
         }
 
 
