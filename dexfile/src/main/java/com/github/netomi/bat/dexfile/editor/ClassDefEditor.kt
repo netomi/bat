@@ -125,11 +125,11 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
         }
 
         val annotationSetRefList = parameterAnnotation.annotationSetRefList
-        while (annotationSetRefList.annotationSetRefCount <= parameterIndex) {
+        while (annotationSetRefList.size <= parameterIndex) {
             annotationSetRefList.addAnnotationSetRef(AnnotationSetRef.of(AnnotationSet.empty()))
         }
 
-        return annotationSetRefList.getAnnotationSetRef(parameterIndex).annotationSet
+        return annotationSetRefList[parameterIndex].annotationSet
     }
 
     companion object {

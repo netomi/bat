@@ -71,8 +71,8 @@ class ParameterAnnotation private constructor(methodIndex:          Int         
     }
 
     fun accept(dexFile: DexFile, classDef: ClassDef, parameterIndex: Int, visitor: AnnotationSetVisitor) {
-        if (parameterIndex in 0 until annotationSetRefList.annotationSetRefCount) {
-            val annotationSetRef = annotationSetRefList.getAnnotationSetRef(parameterIndex)
+        if (parameterIndex in 0 until annotationSetRefList.size) {
+            val annotationSetRef = annotationSetRefList[parameterIndex]
             visitor.visitParameterAnnotationSet(dexFile, classDef, this, parameterIndex, annotationSetRef.annotationSet)
         }
     }
@@ -88,7 +88,7 @@ class ParameterAnnotation private constructor(methodIndex:          Int         
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
-        for (annotationSetRef in annotationSetRefList.annotationSetRefs) {
+        for (annotationSetRef in annotationSetRefList) {
             annotationSetRef.referencedIDsAccept(dexFile, visitor)
         }
     }
@@ -108,7 +108,7 @@ class ParameterAnnotation private constructor(methodIndex:          Int         
     }
 
     override fun toString(): String {
-        return "ParameterAnnotation[methodIndex=${methodIndex},annotationSetRefList=${annotationSetRefList.annotationSetRefCount} items]"
+        return "ParameterAnnotation[methodIndex=${methodIndex},annotationSetRefList=${annotationSetRefList.size} items]"
     }
 
     companion object {

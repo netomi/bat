@@ -190,7 +190,7 @@ internal class AnnotationsDirectory
 
     override fun toString(): String {
         return ("AnnotationsDirectory[classAnnotationCount=%d,fieldAnnotationCount=%d," +
-                                     "methodAnnotationCount=%d,parameterAnnotationCount=%d]").format(classAnnotations.annotationCount,
+                                     "methodAnnotationCount=%d,parameterAnnotationCount=%d]").format(classAnnotations.size,
                                                                                                      fieldAnnotations.size,
                                                                                                      methodAnnotations.size,
                                                                                                      parameterAnnotations.size)

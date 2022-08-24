@@ -93,7 +93,7 @@ class MethodAnnotation private constructor(methodIndex:   Int           = NO_IND
     }
 
     override fun toString(): String {
-        return "MethodAnnotation[methodIdx=${methodIndex},annotationSet=${annotationSet.annotationCount} items]"
+        return "MethodAnnotation[methodIdx=${methodIndex},annotationSet=${annotationSet.size} items]"
     }
 
     companion object {

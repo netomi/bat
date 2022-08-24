@@ -37,25 +37,25 @@ class AnnotationSet
 
     private var annotationOffsetEntries: IntArray = intArrayOf()
 
-    val annotationCount: Int
+    val size: Int
         get() = annotations.size
 
-    fun getAnnotation(index: Int): Annotation {
-        return annotations[index]
-    }
+    override val isEmpty: Boolean
+        get() = annotations.isEmpty()
 
-    internal fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
-        require(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
-            { "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet" }
-        annotations.add(annotation)
+    operator fun get(index: Int): Annotation {
+        return annotations[index]
     }
 
     override fun iterator(): Iterator<Annotation> {
         return annotations.iterator()
     }
 
-    override val isEmpty: Boolean
-        get() = annotations.isEmpty()
+    internal fun addAnnotation(dexFile: DexFile, annotation: Annotation) {
+        require(!annotations.any { it.annotationValue.typeIndex == annotation.annotationValue.typeIndex })
+        { "annotation with type '${dexFile.getType(annotation.annotationValue.typeIndex)}' already exists in this AnnotationSet" }
+        annotations.add(annotation)
+    }
 
     internal fun sort() {
         annotations.sortWith(compareBy { it.annotationValue.typeIndex })

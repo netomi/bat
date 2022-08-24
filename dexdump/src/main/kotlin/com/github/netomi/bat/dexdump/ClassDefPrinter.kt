@@ -252,11 +252,11 @@ internal class ClassDefPrinter constructor(private val printer: Mutf8Printer, pr
     override fun visitParameterAnnotationSetRefList(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
         val methodID = parameterAnnotation.getMethodID(dexFile)
         printer.println("Annotations on method #" + parameterAnnotation.methodIndex + " '" + methodID.getName(dexFile) + "' parameters")
-        for (i in 0 until annotationSetRefList.annotationSetRefCount) {
+        for (i in 0 until annotationSetRefList.size) {
             printer.println("#$i")
-            val annotationSetRef = annotationSetRefList.getAnnotationSetRef(i)
+            val annotationSetRef = annotationSetRefList[i]
             annotationSetRef.accept(dexFile, this)
-            if (annotationSetRef.annotationSet.annotationCount == 0) {
+            if (annotationSetRef.annotationSet.isEmpty) {
                 printer.println("   empty-annotation-set")
             }
         }

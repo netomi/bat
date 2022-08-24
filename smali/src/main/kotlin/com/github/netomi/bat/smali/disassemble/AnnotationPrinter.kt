@@ -37,8 +37,7 @@ internal class AnnotationPrinter(private val printer:      IndentingPrinter,
     override fun visitAnyAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {}
 
     override fun visitClassAnnotationSet(dexFile: DexFile, classDef: ClassDef, annotationSet: AnnotationSet) {
-        val annotationCount = annotationSet.annotationCount
-        if (annotationCount > 0) {
+        if (!annotationSet.isEmpty) {
             printer.println()
             printer.println()
             printer.println("# annotations")
@@ -47,8 +46,7 @@ internal class AnnotationPrinter(private val printer:      IndentingPrinter,
     }
 
     override fun visitFieldAnnotationSet(dexFile: DexFile, classDef: ClassDef, fieldAnnotation: FieldAnnotation, annotationSet: AnnotationSet) {
-        val annotationCount = annotationSet.annotationCount
-        if (annotationCount > 0) {
+        if (!annotationSet.isEmpty) {
             printer.levelUp()
             annotationSet.accept(dexFile, this.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printer.levelDown()

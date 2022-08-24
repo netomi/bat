@@ -93,7 +93,7 @@ class FieldAnnotation private constructor(fieldIndex:    Int           = NO_INDE
     }
 
     override fun toString(): String {
-        return "FieldAnnotation[fieldIdx=${fieldIndex},annotationSet=${annotationSet.annotationCount} items]"
+        return "FieldAnnotation[fieldIdx=${fieldIndex},annotationSet=${annotationSet.size} items]"
     }
 
     companion object {

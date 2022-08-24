@@ -43,8 +43,8 @@ fun interface AnnotationSetVisitor {
     }
 
     fun visitParameterAnnotationSetRefList(dexFile: DexFile, classDef: ClassDef, parameterAnnotation: ParameterAnnotation, annotationSetRefList: AnnotationSetRefList) {
-        for (index in 0 until annotationSetRefList.annotationSetRefCount) {
-            visitParameterAnnotationSet(dexFile, classDef, parameterAnnotation, index, annotationSetRefList.getAnnotationSetRef(index).annotationSet)
+        for (index in 0 until annotationSetRefList.size) {
+            visitParameterAnnotationSet(dexFile, classDef, parameterAnnotation, index, annotationSetRefList[index].annotationSet)
         }
     }
 }

@@ -87,7 +87,7 @@ class AnnotationSetRef private constructor(annotationSet: AnnotationSet = Annota
     }
 
     override fun toString(): String {
-        return "AnnotationSetRef[annotationSet=${annotationSet.annotationCount} items]"
+        return "AnnotationSetRef[annotationSet=${annotationSet.size} items]"
     }
 
     companion object {

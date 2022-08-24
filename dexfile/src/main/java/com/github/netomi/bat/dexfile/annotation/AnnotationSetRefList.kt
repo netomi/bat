@@ -33,24 +33,25 @@ import com.github.netomi.bat.util.mutableListOfCapacity
     dataAlignment = 4,
     dataSection   = true)
 class AnnotationSetRefList
-    private constructor(private var _annotationSetRefs: MutableList<AnnotationSetRef> = mutableListOfCapacity(0)) : DataItem() {
+    private constructor(private var _annotationSetRefs: MutableList<AnnotationSetRef> = mutableListOfCapacity(0)) : DataItem(), Sequence<AnnotationSetRef> {
 
-    val annotationSetRefs: List<AnnotationSetRef>
-        get() = _annotationSetRefs
-
-    val annotationSetRefCount: Int
+    val size: Int
         get() = _annotationSetRefs.size
 
-    fun getAnnotationSetRef(index: Int): AnnotationSetRef {
+    override val isEmpty: Boolean
+        get() = !_annotationSetRefs.any { !it.isEmpty }
+
+    operator fun get(index: Int): AnnotationSetRef {
         return _annotationSetRefs[index]
+    }
+
+    override fun iterator(): Iterator<AnnotationSetRef> {
+        return _annotationSetRefs.iterator()
     }
 
     internal fun addAnnotationSetRef(annotationSetRef: AnnotationSetRef) {
         _annotationSetRefs.add(annotationSetRef)
     }
-
-    override val isEmpty: Boolean
-        get() = !_annotationSetRefs.any { !it.isEmpty }
 
     override fun read(input: DexDataInput) {
         val size = input.readInt()
