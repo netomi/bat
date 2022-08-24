@@ -44,10 +44,10 @@ data class EncodedAnnotationValue
         return dexFile.getTypeID(typeIndex).getType(dexFile)
     }
 
-    val annotationElementCount: Int
+    val size: Int
         get() = elements.size
 
-    fun getAnnotationElement(index: Int): AnnotationElement {
+    operator fun get(index: Int): AnnotationElement {
         return elements[index]
     }
 

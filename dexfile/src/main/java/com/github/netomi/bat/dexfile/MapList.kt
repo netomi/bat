@@ -31,10 +31,10 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 class MapList
     private constructor(private var mapItems: MutableList<MapItem> = mutableListOfCapacity(0)) : DataItem(), Sequence<MapItem> {
 
-    val mapItemCount: Int
+    val size: Int
         get() = mapItems.size
 
-    fun getMapItem(index: Int): MapItem {
+    operator fun get(index: Int): MapItem {
         return mapItems[index]
     }
 

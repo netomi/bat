@@ -36,7 +36,7 @@ data class EncodedArrayValue
     val isEmpty: Boolean
         get() = values.isEmpty()
 
-    val valueCount: Int
+    val size: Int
         get() = values.size
 
     operator fun get(index: Int): EncodedValue {

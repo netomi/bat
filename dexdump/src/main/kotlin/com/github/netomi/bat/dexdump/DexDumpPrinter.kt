@@ -107,7 +107,7 @@ class DexDumpPrinter constructor(
         printer.levelUp()
         val callSite = callSiteID.callSite
         val arrayValue = callSite.array
-        for (i in 0 until arrayValue.valueCount) {
+        for (i in 0 until arrayValue.size) {
             printer.print("link_argument[$i] : ")
             arrayValue.valueAccept(dexFile, i, callSiteArgumentPrinter)
             printer.println()

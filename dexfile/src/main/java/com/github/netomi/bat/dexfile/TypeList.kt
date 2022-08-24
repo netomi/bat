@@ -47,7 +47,7 @@ class TypeList private constructor(private var typeList: IntArray = intArrayOf()
         return dexFile.getTypeID(typeList[index]).getType(dexFile)
     }
 
-    fun getTypeIndex(index: Int): Int {
+    operator fun get(index: Int): Int {
         return typeList[index]
     }
 

@@ -110,7 +110,7 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
 
     fun parameterTypesAccept(dexFile: DexFile, visitor: TypeVisitor) {
         for (i in 0 until parameters.size) {
-            visitor.visitType(dexFile, parameters, i, parameters.getTypeIndex(i), parameters.getType(dexFile, i))
+            visitor.visitType(dexFile, parameters, i, parameters[i], parameters.getType(dexFile, i))
         }
     }
 
