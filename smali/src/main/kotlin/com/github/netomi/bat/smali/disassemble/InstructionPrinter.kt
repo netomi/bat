@@ -83,7 +83,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
     override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
-        printer.print(toSignedHexStringWithPrefix(instruction.value))
+        printer.print(toSignedHexStringWithPrefix(instruction.literal))
         val opCode = instruction.opCode
         val instructionFormat = opCode.format
 
@@ -94,9 +94,9 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         }
 
         if (instruction.opCode.targetsWideRegister) {
-            printCommentIfLikelyDouble(printer, instruction.value)
+            printCommentIfLikelyDouble(printer, instruction.literal)
         } else {
-            printCommentIfLikelyFloat(printer, instruction.value.toInt())
+            printCommentIfLikelyFloat(printer, instruction.literal.toInt())
         }
 
         printer.println()

@@ -114,7 +114,7 @@ class LiteralInstructionTest: DexInstructionTest<LiteralInstruction>() {
         )
 
     override fun equals(instructionA: LiteralInstruction, instructionB: LiteralInstruction): Boolean {
-        return instructionA.opCode == instructionB.opCode &&
-               instructionA.value  == instructionB.value
+        return instructionA.opCode  == instructionB.opCode &&
+               instructionA.literal == instructionB.literal
     }
 }

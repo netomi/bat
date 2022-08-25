@@ -63,7 +63,7 @@ internal class InstructionPrinter(private val printer: IndentingPrinter): Instru
     override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
-        printer.print(toSignedHexStringWithPrefix(instruction.value))
+        printer.print(toSignedHexStringWithPrefix(instruction.literal))
         val opCode = instruction.opCode
         val instructionFormat = opCode.format
 

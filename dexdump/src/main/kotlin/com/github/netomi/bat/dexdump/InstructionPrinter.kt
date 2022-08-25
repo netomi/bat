@@ -86,7 +86,7 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printGeneric(instruction)
         printer.print(", ")
 
-        val value = instruction.value
+        val value = instruction.literal
         when (instruction.opCode.format) {
             InstructionFormat.FORMAT_11n,
             InstructionFormat.FORMAT_22b -> printer.print("#int %d // #%x".format(value, value.toByte()))

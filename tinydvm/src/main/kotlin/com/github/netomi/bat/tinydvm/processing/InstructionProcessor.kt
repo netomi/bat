@@ -32,7 +32,7 @@ class InstructionProcessor constructor(private val dvm:   Dvm,
 
     override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         val rA = instruction.registers[0]
-        state.registers[rA] = DvmPrimitiveValue.ofUnknownType(instruction.value)
+        state.registers[rA] = DvmPrimitiveValue.ofUnknownType(instruction.literal)
         if (instruction.opCode.targetsWideRegister) {
             state.registers[rA + 1] = state.registers[rA]
         }
