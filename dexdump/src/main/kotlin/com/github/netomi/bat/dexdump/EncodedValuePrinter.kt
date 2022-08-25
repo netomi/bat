@@ -23,7 +23,7 @@ import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer): EncodedValueVisitor {
 
     override fun visitAnyValue(dexFile: DexFile, value: EncodedValue) {
-        printer.print(value.toString())
+        printer.print(value)
     }
 
     override fun visitArrayValue(dexFile: DexFile, value: EncodedArrayValue) {
@@ -55,15 +55,15 @@ internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer
     }
 
     override fun visitCharValue(dexFile: DexFile, value: EncodedCharValue) {
-        printer.print(value.value.code.toString())
+        printer.print(value.value.code)
     }
 
     override fun visitByteValue(dexFile: DexFile, value: EncodedByteValue) {
-        printer.print(value.value.toInt().toString())
+        printer.print(value.value.toInt())
     }
 
     override fun visitShortValue(dexFile: DexFile, value: EncodedShortValue) {
-        printer.print(value.value.toString())
+        printer.print(value.value)
     }
 
     override fun visitBooleanValue(dexFile: DexFile, value: EncodedBooleanValue) {
@@ -71,11 +71,11 @@ internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer
     }
 
     override fun visitIntValue(dexFile: DexFile, value: EncodedIntValue) {
-        printer.print(value.value.toString())
+        printer.print(value.value)
     }
 
     override fun visitLongValue(dexFile: DexFile, value: EncodedLongValue) {
-        printer.print(value.value.toString())
+        printer.print(value.value)
     }
 
     override fun visitDoubleValue(dexFile: DexFile, value: EncodedDoubleValue) {
@@ -87,11 +87,11 @@ internal class EncodedValuePrinter constructor(private val printer: Mutf8Printer
     }
 
     override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {
-        printer.print(value.getType(dexFile).toString())
+        printer.print(value.getType(dexFile))
     }
 
     override fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {
-        printer.print(value.getType(dexFile).toString())
+        printer.print(value.getType(dexFile))
         for (annotationElement in value) {
             printer.print(" " + annotationElement.getName(dexFile) + "=")
             annotationElement.value.accept(dexFile, this)

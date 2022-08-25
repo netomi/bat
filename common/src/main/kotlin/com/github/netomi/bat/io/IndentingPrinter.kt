@@ -49,10 +49,18 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
         updateCurrentIndentation()
     }
 
-    fun print(text: CharSequence) {
+    fun print(obj: Any?) {
+        print(java.lang.String.valueOf(obj))
+    }
+
+    fun print(text: String) {
         printIndentation()
-        delegateWriter.write(text.toString())
+        delegateWriter.write(text)
         currentPosition += text.length
+    }
+
+    fun println(obj: Any?) {
+        println(java.lang.String.valueOf(obj))
     }
 
     fun println(text: CharSequence) {

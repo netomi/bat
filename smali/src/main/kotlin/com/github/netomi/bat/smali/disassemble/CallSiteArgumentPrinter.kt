@@ -28,7 +28,7 @@ internal class CallSiteArgumentPrinter(private val printer: IndentingPrinter) : 
     }
 
     override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {
-        printer.print(value.getType(dexFile).toString())
+        printer.print(value.getType(dexFile))
     }
 
     override fun visitFieldValue(dexFile: DexFile, value: EncodedFieldValue) {
@@ -42,7 +42,7 @@ internal class CallSiteArgumentPrinter(private val printer: IndentingPrinter) : 
     }
 
     override fun visitMethodHandleValue(dexFile: DexFile, value: EncodedMethodHandleValue) {
-        printer.print(value.getMethodHandle(dexFile).getTargetClassType(dexFile).toString())
+        printer.print(value.getMethodHandle(dexFile).getTargetClassType(dexFile))
     }
 
     override fun visitMethodTypeValue(dexFile: DexFile, value: EncodedMethodTypeValue) {

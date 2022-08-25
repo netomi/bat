@@ -62,7 +62,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         callSite.accept(dexFile, filterByStartIndex(1, CallSiteArgumentPrinter(printer).joinedByValueConsumer { _, _ -> printer.print(", ") } ))
         printer.print(")@")
         val methodHandle = callSite.getMethodHandle(dexFile)
-        printer.print(methodHandle.getTargetClassType(dexFile).toString())
+        printer.print(methodHandle.getTargetClassType(dexFile))
         printer.print("->")
         printer.print(methodHandle.getTargetMemberName(dexFile))
         printer.println(methodHandle.getTargetDescriptor(dexFile))
@@ -72,11 +72,11 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
         val fieldID = instruction.getField(dexFile)
-        printer.print(fieldID.getClassType(dexFile).toString())
+        printer.print(fieldID.getClassType(dexFile))
         printer.print("->")
         printer.print(fieldID.getName(dexFile))
         printer.print(":")
-        printer.println(fieldID.getType(dexFile).toString())
+        printer.println(fieldID.getType(dexFile))
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 
@@ -118,7 +118,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printCommon(code, offset, instruction, methodFollowerExplanation, useBrackets = true, appendNewLine = false)
 
         printer.print(", ")
-        printer.print(methodID.getClassType(dexFile).toString())
+        printer.print(methodID.getClassType(dexFile))
         printer.print("->")
         printer.print(methodID.getName(dexFile))
         printer.print(methodID.getProtoID(dexFile).getDescriptor(dexFile))
@@ -138,7 +138,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         val methodHandle = instruction.getMethodHandle(dexFile)
         printer.print(methodHandle.methodHandleType.simpleName)
         printer.print("@")
-        printer.print(methodHandle.getTargetClassType(dexFile).toString())
+        printer.print(methodHandle.getTargetClassType(dexFile))
         printer.print("->")
         printer.print(methodHandle.getTargetMemberName(dexFile))
         printer.println(methodHandle.getTargetMemberDescriptor(dexFile))
@@ -176,7 +176,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
-        printer.println(typeID.getType(dexFile).toString())
+        printer.println(typeID.getType(dexFile))
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 
@@ -184,7 +184,7 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printCommon(code, offset, instruction, useBrackets = true, appendNewLine = false)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
-        printer.println(typeID.getType(dexFile).toString())
+        printer.println(typeID.getType(dexFile))
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 

@@ -69,7 +69,7 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
     }
 
     override fun visitTypeValue(dexFile: DexFile, value: EncodedTypeValue) {
-        appendWithPrefix(value.getType(dexFile).toString())
+        appendWithPrefix(value.getType(dexFile))
     }
 
     override fun visitFieldValue(dexFile: DexFile, value: EncodedFieldValue) {
@@ -148,6 +148,10 @@ internal class EncodedValuePrinter @JvmOverloads constructor(
     }
 
     // private utility methods.
+
+    private fun appendWithPrefix(obj: Any?) {
+        appendWithPrefix(java.lang.String.valueOf(obj))
+    }
 
     private fun appendWithPrefix(text: String) {
         if (prefix != null) {
