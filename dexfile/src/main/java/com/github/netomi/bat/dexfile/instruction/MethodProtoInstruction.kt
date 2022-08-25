@@ -18,6 +18,7 @@ package com.github.netomi.bat.dexfile.instruction
 import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.toHexString
 
 class MethodProtoInstruction: MethodInstruction {
 
@@ -60,6 +61,10 @@ class MethodProtoInstruction: MethodInstruction {
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitMethodProtoInstruction(dexFile, classDef, method, code, offset, this)
+    }
+
+    override fun toString(): String {
+        return super.toString() + ", proto@${toHexString(protoIndex, 4)}"
     }
 
     companion object {

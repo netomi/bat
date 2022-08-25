@@ -21,18 +21,19 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.toSignedHexString
 import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
 class LiteralInstruction: DexInstruction {
 
-    var value: Long = 0
+    var literal: Long = 0
         private set
 
-    val valueAsFloat: Float
-        get() = java.lang.Float.intBitsToFloat(value.toInt())
+    val literalAsFloat: Float
+        get() = Float.fromBits(literal.toInt())
 
-    val valueAsDouble: Double
-        get() = java.lang.Double.longBitsToDouble(value)
+    val literalAsDouble: Double
+        get() = Double.fromBits(literal)
 
     private constructor(opCode: DexOpCode): super(opCode)
 
@@ -46,13 +47,13 @@ class LiteralInstruction: DexInstruction {
             else -> {}
         }
 
-        this.value = literal
+        this.literal = literal
     }
 
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        value = when (opCode.format) {
+        literal = when (opCode.format) {
             FORMAT_11n -> (instructions[offset].toInt() shr 12).toLong()
 
             FORMAT_21s -> instructions[offset + 1].toLong()
@@ -85,28 +86,28 @@ class LiteralInstruction: DexInstruction {
         val data = super.writeData()
 
         when (opCode.format) {
-            FORMAT_11n -> data[0] = (data[0].toInt() or (value shl 12).toInt()).toShort()
+            FORMAT_11n -> data[0] = (data[0].toInt() or (literal shl 12).toInt()).toShort()
 
-            FORMAT_21s -> data[1] = value.toShort()
+            FORMAT_21s -> data[1] = literal.toShort()
 
             FORMAT_31i -> {
-                data[1] = value.toShort()
-                data[2] = (value shr 16).toShort()
+                data[1] = literal.toShort()
+                data[2] = (literal shr 16).toShort()
             }
 
             FORMAT_21h -> {
                 if (opCode.targetsWideRegister) {
-                    data[1] = (value shr 48).toShort()
+                    data[1] = (literal shr 48).toShort()
                 } else {
-                    data[1] = (value shr 16).toShort()
+                    data[1] = (literal shr 16).toShort()
                 }
             }
 
             FORMAT_51l -> {
-                data[1] = value.toShort()
-                data[2] = (value shr 16).toShort()
-                data[3] = (value shr 32).toShort()
-                data[4] = (value shr 48).toShort()
+                data[1] = literal.toShort()
+                data[2] = (literal shr 16).toShort()
+                data[3] = (literal shr 32).toShort()
+                data[4] = (literal shr 48).toShort()
             }
 
             else -> throw IllegalStateException("unexpected format for opcode " + opCode.mnemonic)
@@ -120,7 +121,7 @@ class LiteralInstruction: DexInstruction {
     }
 
     override fun toString(): String {
-        return super.toString() + ", ${toSignedHexStringWithPrefix(value)}"
+        return super.toString() + " #${toSignedHexString(literal)}"
     }
 
     companion object {

@@ -19,6 +19,7 @@ import com.github.netomi.bat.dexfile.*
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexType
+import com.github.netomi.bat.util.toHexString
 
 class ArrayTypeInstruction: ArrayInstruction {
 
@@ -65,6 +66,10 @@ class ArrayTypeInstruction: ArrayInstruction {
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitArrayTypeInstruction(dexFile, classDef, method, code, offset, this)
+    }
+
+    override fun toString(): String {
+        return super.toString() + ", type@${toHexString(typeIndex, 4)}"
     }
 
     companion object {

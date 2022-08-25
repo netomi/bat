@@ -50,6 +50,30 @@ fun toSignedHexString(value: Int, digits: Int): String {
     }
 }
 
+fun toSignedHexString(value: Int): String {
+    return buildString {
+        val hexValue: String = if (value < 0) {
+            Integer.toHexString(-value)
+        } else {
+            Integer.toHexString(value)
+        }
+        append(if (value < 0) "-" else "+")
+        append(hexValue)
+    }
+}
+
+fun toSignedHexString(value: Long): String {
+    return buildString {
+        val hexValue: String = if (value < 0) {
+            java.lang.Long.toHexString(-value)
+        } else {
+            java.lang.Long.toHexString(value)
+        }
+        append(if (value < 0) "-" else "+")
+        append(hexValue)
+    }
+}
+
 fun toHexString(value: Int, digits: Int): String {
     return buildString {
         val hexValue     = Integer.toHexString(value)
