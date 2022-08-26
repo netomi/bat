@@ -32,7 +32,7 @@ class ClassDefAdder constructor(private val targetDexEditor: DexEditor): ClassDe
                                         classDef.getSuperClassType(dexFile),
                                         classDef.getSourceFile(dexFile))
 
-        classDef.interfaces(dexFile).forEach { targetClassDefEditor.addInterface(it) }
+        classDef.getInterfaces(dexFile).forEach { targetClassDefEditor.addInterface(it) }
 
         val classAnnotations = classDef.annotationsDirectory.classAnnotations
         if (!classAnnotations.isEmpty) {

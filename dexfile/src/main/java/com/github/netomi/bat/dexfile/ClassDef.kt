@@ -76,7 +76,7 @@ class ClassDef private constructor(            classIndex:           Int        
     var interfaces: TypeList = interfaces
         private set
 
-    fun interfaces(dexFile: DexFile): List<DexType> {
+    fun getInterfaces(dexFile: DexFile): List<DexType> {
         val collector = typeCollector()
         interfacesAccept(dexFile, collector)
         return collector.items()
