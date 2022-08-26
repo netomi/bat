@@ -16,8 +16,16 @@
 package com.github.netomi.bat.classfile.attribute.annotations
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.AttachedToClass
+import com.github.netomi.bat.classfile.attribute.AttachedToField
+import com.github.netomi.bat.classfile.attribute.AttachedToMethod
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -28,13 +36,21 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 data class RuntimeVisibleAnnotationsAttribute
     private constructor(override val attributeNameIndex: Int,
                         override var _annotations:       MutableList<Annotation> = mutableListOfCapacity(0))
-    : RuntimeAnnotationsAttribute(attributeNameIndex, _annotations) {
+    : RuntimeAnnotationsAttribute(attributeNameIndex, _annotations), AttachedToClass, AttachedToField, AttachedToMethod {
 
     override val type: AttributeType
         get() = AttributeType.RUNTIME_VISIBLE_ANNOTATIONS
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, this)
+    }
+
+    override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
+        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, field, this)
+    }
+
+    override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
+        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, method, this)
     }
 
     companion object {

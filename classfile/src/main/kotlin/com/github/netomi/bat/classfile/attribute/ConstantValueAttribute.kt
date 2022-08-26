@@ -16,7 +16,8 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
@@ -29,7 +30,7 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2">ConstantValue Attribute</a>
  */
 data class ConstantValueAttribute internal constructor(override val attributeNameIndex:  Int,
-                                                        private var _constantValueIndex: Int = -1) : Attribute(attributeNameIndex) {
+                                                        private var _constantValueIndex: Int = -1) : Attribute(attributeNameIndex), AttachedToField {
 
     override val type: AttributeType
         get() = AttributeType.CONSTANT_VALUE
@@ -42,7 +43,7 @@ data class ConstantValueAttribute internal constructor(override val attributeNam
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _constantValueIndex = input.readUnsignedShort()
@@ -54,8 +55,8 @@ data class ConstantValueAttribute internal constructor(override val attributeNam
         output.writeShort(constantValueIndex)
     }
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
-        visitor.visitConstantValueAttribute(classFile, this)
+    override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
+        visitor.visitConstantValueAttribute(classFile, field, this)
     }
 
     fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {

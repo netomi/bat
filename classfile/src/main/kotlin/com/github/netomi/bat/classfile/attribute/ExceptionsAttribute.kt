@@ -16,9 +16,9 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.util.JvmClassName
-import com.github.netomi.bat.util.asInternalClassName
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -30,7 +30,7 @@ import java.util.*
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.5">Exceptions Attribute</a>
  */
 data class ExceptionsAttribute internal constructor(override val attributeNameIndex: Int,
-                                                     private var _exceptions:        IntArray = IntArray(0)) : Attribute(attributeNameIndex) {
+                                                     private var _exceptions:        IntArray = IntArray(0)) : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType
         get() = AttributeType.EXCEPTIONS
@@ -43,7 +43,7 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
         val numberOfExceptions = input.readUnsignedShort()
         _exceptions = IntArray(numberOfExceptions)
@@ -62,8 +62,8 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
         }
     }
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
-        visitor.visitExceptionsAttributes(classFile, this)
+    override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
+        visitor.visitExceptionsAttributes(classFile, method, this)
     }
 
     override fun equals(other: Any?): Boolean {

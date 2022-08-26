@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.classfile.attribute.annotations
 
+import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
@@ -32,7 +33,7 @@ abstract class RuntimeAnnotationsAttribute
         get() = _annotations
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
 
         val annotationCount = input.readUnsignedShort()

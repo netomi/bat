@@ -15,10 +15,10 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.attribute.AttachedToField
 import com.github.netomi.bat.classfile.attribute.ConstantValueAttribute
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.fieldAttributes
+import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.util.toHexString
 import java.io.DataInput
@@ -34,18 +34,14 @@ class Field private constructor(): Member() {
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.FIELD
 
-    val isStatic: Boolean
-        get() = modifiers.contains(AccessFlag.STATIC)
-
     fun getConstantValue(classFile: ClassFile): Constant? {
         return attributes.filterIsInstance<ConstantValueAttribute>()
                          .singleOrNull()?.getConstantValue(classFile)
     }
 
-    fun attributesAccept(classFile: ClassFile, visitor: FieldAttributeVisitor) {
-        val adapter = if (visitor is AttributeVisitor) visitor else fieldAttributes(visitor)
-        for (attribute in attributes) {
-            attribute.accept(classFile, adapter)
+    override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
+        for (attribute in attributes.filterIsInstance(AttachedToField::class.java)) {
+            attribute.accept(classFile, this, visitor)
         }
     }
 

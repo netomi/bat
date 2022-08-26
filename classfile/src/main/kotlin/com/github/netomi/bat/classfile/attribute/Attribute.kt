@@ -16,9 +16,13 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -35,7 +39,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
     }
 
     @Throws(IOException::class)
-    protected abstract fun readAttributeData(input: DataInput)
+    protected abstract fun readAttributeData(input: DataInput, classFile: ClassFile)
 
     @Throws(IOException::class)
     protected abstract fun writeAttributeData(output: DataOutput)
@@ -46,19 +50,29 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
         writeAttributeData(output)
     }
 
-    abstract fun accept(classFile: ClassFile, visitor: AttributeVisitor)
-
     companion object {
         internal fun readAttribute(input : DataInput, classFile: ClassFile): Attribute {
             val attributeNameIndex = input.readUnsignedShort()
             val attributeName      = classFile.getString(attributeNameIndex)
 
             val attribute = AttributeType.of(attributeName).createAttribute(attributeNameIndex)
-            attribute.readAttributeData(input)
+            attribute.readAttributeData(input, classFile)
 
             return attribute
         }
     }
+}
+
+interface AttachedToClass {
+    fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor)
+}
+
+interface AttachedToField {
+    fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor)
+}
+
+interface AttachedToMethod {
+    fun accept(classFile: ClassFile, method:  Method, visitor: MethodAttributeVisitor)
 }
 
 /**
@@ -70,7 +84,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7-300
 
     CONSTANT_VALUE("ConstantValue", ConstantValueAttribute.Companion::empty),
-    CODE("Code", null),
+    CODE("Code", CodeAttribute.Companion::empty),
     STACK_MAP_TABLE("StackMapTable", null),
     EXCEPTIONS("Exceptions", ExceptionsAttribute.Companion::empty),
     INNER_CLASSES("InnerClasses", null),

@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.util.JvmClassName
 import java.io.DataInput
 import java.io.DataOutput
@@ -29,7 +29,7 @@ import java.io.IOException
  */
 data class EnclosingMethodAttribute internal constructor(override val attributeNameIndex: Int,
                                                           private var _classIndex:        Int = -1,
-                                                          private var _methodIndex:       Int = -1) : Attribute(attributeNameIndex) {
+                                                          private var _methodIndex:       Int = -1) : Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
         get() = AttributeType.ENCLOSING_METHOD
@@ -53,7 +53,7 @@ data class EnclosingMethodAttribute internal constructor(override val attributeN
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _classIndex  = input.readUnsignedShort()
@@ -67,7 +67,7 @@ data class EnclosingMethodAttribute internal constructor(override val attributeN
         output.writeShort(methodIndex)
     }
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitEnclosingMethodAttribute(classFile, this)
     }
 

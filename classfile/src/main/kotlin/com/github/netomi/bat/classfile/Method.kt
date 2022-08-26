@@ -15,6 +15,7 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.attribute.AttachedToMethod
 import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.util.toHexString
 import java.io.DataInput
@@ -30,10 +31,9 @@ class Method private constructor(): Member() {
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.METHOD
 
-    fun methodAttributesAccept(classFile: ClassFile, visitor: MethodAttributeVisitor) {
-        val adapter = if (visitor is AttributeVisitor) visitor else methodAttributes(visitor)
-        for (attribute in attributes) {
-            attribute.accept(classFile, adapter)
+    override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
+        for (attribute in attributes.filterIsInstance(AttachedToMethod::class.java)) {
+            attribute.accept(classFile, this, visitor)
         }
     }
 

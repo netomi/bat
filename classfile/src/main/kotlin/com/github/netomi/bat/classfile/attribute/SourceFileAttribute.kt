@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,7 +27,7 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.10">SourceFile Attribute</a>
  */
 data class SourceFileAttribute internal constructor(override val attributeNameIndex: Int,
-                                                     private var _sourceFileIndex:   Int = -1) : Attribute(attributeNameIndex) {
+                                                     private var _sourceFileIndex:   Int = -1) : Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
         get() = AttributeType.SOURCE_FILE
@@ -40,7 +40,7 @@ data class SourceFileAttribute internal constructor(override val attributeNameIn
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _sourceFileIndex = input.readUnsignedShort()
@@ -52,7 +52,7 @@ data class SourceFileAttribute internal constructor(override val attributeNameIn
         output.writeShort(sourceFileIndex)
     }
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitSourceFileAttribute(classFile, this)
     }
 

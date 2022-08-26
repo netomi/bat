@@ -16,7 +16,11 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -26,13 +30,14 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.15">Deprecated Attribute</a>
  */
-data class DeprecatedAttribute private constructor(override val attributeNameIndex: Int) : Attribute(attributeNameIndex) {
+data class DeprecatedAttribute private constructor(override val attributeNameIndex: Int)
+    : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod {
 
     override val type: AttributeType
         get() = AttributeType.DEPRECATED
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
     }
@@ -42,8 +47,16 @@ data class DeprecatedAttribute private constructor(override val attributeNameInd
         output.writeInt(ATTRIBUTE_LENGTH)
     }
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitDeprecatedAttribute(classFile, this)
+    }
+
+    override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
+        visitor.visitDeprecatedAttribute(classFile, field, this)
+    }
+
+    override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
+        visitor.visitDeprecatedAttribute(classFile, method, this)
     }
 
     companion object {

@@ -17,84 +17,39 @@
 package com.github.netomi.bat.classfile.attribute.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 
-fun fieldAttributes(visitor: FieldAttributeVisitor): AttributeVisitor {
-    return FieldAttributeAdapter.of(visitor)
-}
-
 fun interface FieldAttributeVisitor: AnyAttributeVisitor {
 
-    fun visitConstantValueAttribute(classFile: ClassFile, attribute: ConstantValueAttribute) {
+    fun visitConstantValueAttribute(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+    fun visitDeprecatedAttribute(classFile: ClassFile, field: Field, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
+    fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitRuntimeAnnotationsAttribute(classFile, field, attribute)
     }
 
-    fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitRuntimeAnnotationsAttribute(classFile, field, attribute)
     }
 
-    fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+    fun visitSignatureAttribute(classFile: ClassFile, field: Field, attribute: SignatureAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+    fun visitSyntheticAttribute(classFile: ClassFile, field: Field, attribute: SyntheticAttribute) {
         visitAnyAttribute(classFile, attribute)
-    }
-}
-
-private class FieldAttributeAdapter private constructor(val visitor: FieldAttributeVisitor): AttributeVisitor {
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
-
-    override fun visitConstantValueAttribute(classFile: ClassFile, attribute: ConstantValueAttribute) {
-        visitor.visitConstantValueAttribute(classFile, attribute)
-    }
-
-    override fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
-        visitor.visitDeprecatedAttribute(classFile, attribute)
-    }
-
-    override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
-        visitor.visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
-        visitor.visitSignatureAttribute(classFile, attribute)
-    }
-
-    override fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
-        visitor.visitSyntheticAttribute(classFile, attribute)
-    }
-
-    override fun visitUnknownAttribute(classFile: ClassFile, attribute: UnknownAttribute) {
-        visitor.visitUnknownAttribute(classFile, attribute)
-    }
-
-    companion object {
-        fun of(visitor: FieldAttributeVisitor): FieldAttributeAdapter {
-            return FieldAttributeAdapter(visitor)
-        }
     }
 }

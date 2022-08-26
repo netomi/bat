@@ -16,7 +16,7 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.IOException
@@ -47,6 +47,9 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
 
     protected abstract val accessFlagTarget: AccessFlagTarget
 
+    val isStatic: Boolean
+        get() = modifiers.contains(AccessFlag.STATIC)
+
     fun getName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
     }
@@ -54,6 +57,8 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
     fun getDescriptor(classFile: ClassFile): String {
         return classFile.getString(descriptorIndex)
     }
+
+    abstract fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor)
 
     @Throws(IOException::class)
     protected fun read(input: DataInput, classFile: ClassFile) {
@@ -65,12 +70,6 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
         _attributes = mutableListOfCapacity(attributeCount)
         for (i in 0 until attributeCount) {
             _attributes.add(Attribute.readAttribute(input, classFile))
-        }
-    }
-
-    fun attributesAccept(classFile: ClassFile, visitor: AttributeVisitor) {
-        for (attribute in attributes) {
-            attribute.accept(classFile, visitor)
         }
     }
 

@@ -17,19 +17,10 @@
 package com.github.netomi.bat.classfile.printer
 
 import com.github.netomi.bat.classfile.*
-import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
-import com.github.netomi.bat.classfile.attribute.SignatureAttribute
-import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.*
-import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.asJvmType
-import com.github.netomi.bat.util.escapeAsJavaString
-import com.github.netomi.bat.util.isAsciiPrintable
 import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import java.io.OutputStream
 import java.io.OutputStreamWriter
@@ -37,14 +28,16 @@ import java.io.Writer
 import java.util.*
 
 class ClassFilePrinter :
-    ClassFileVisitor, MemberVisitor, AttributeVisitor, ElementValueVisitor
+    ClassFileVisitor, MemberVisitor
 {
-    private val printer: IndentingPrinter
+    private val printer:          IndentingPrinter
+    private val attributePrinter: AttributePrinter
 
     constructor(os: OutputStream = System.out) : this(OutputStreamWriter(os))
 
     constructor(writer: Writer) {
-        this.printer = IndentingPrinter(writer, 2)
+        this.printer          = IndentingPrinter(writer, 2)
+        this.attributePrinter = AttributePrinter(printer)
     }
 
     override fun visitClassFile(classFile: ClassFile) {
@@ -95,7 +88,7 @@ class ClassFilePrinter :
 
         printer.println("}")
 
-        classFile.attributesAccept(this)
+        classFile.attributesAccept(attributePrinter)
 
         printer.flush()
     }
@@ -108,7 +101,7 @@ class ClassFilePrinter :
         val modifiers = member.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
         printer.println("flags: (0x%04x) %s".format(member.accessFlags, modifiers))
 
-        member.attributesAccept(classFile, this)
+        member.attributesAccept(classFile, attributePrinter)
         printer.levelDown()
     }
 
@@ -125,84 +118,6 @@ class ClassFilePrinter :
         val externalModifiers = method.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
         printer.println("%s %s;".format(externalModifiers, method.getExternalMethodSignature(classFile)))
         visitAnyMember(classFile, index, method)
-    }
-
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
-        // TODO("Not yet implemented")
-    }
-
-    override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
-        printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.getSignature(classFile)))
-    }
-
-    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
-        printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
-    }
-
-    override fun visitExceptionsAttributes(classFile: ClassFile, attribute: ExceptionsAttribute) {
-        printer.println("Exceptions:")
-        printer.levelUp()
-        attribute.getExceptionClassNames(classFile).forEach { printer.println("throws ${it.toExternalClassName()}") }
-        printer.levelDown()
-    }
-
-    override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
-        printer.levelUp()
-
-        val referencedIndexPrinter = ReferencedIndexPrinter(printer)
-
-        attribute.annotations.forEachIndexed { index, annotation ->
-            printer.print("${index}: ")
-            referencedIndexPrinter.visitAnnotation(classFile, annotation)
-            printer.println()
-            printer.levelUp()
-            printer.println(annotation.getType(classFile).toExternalType())
-
-            printer.levelUp()
-            annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
-                printer.print("${classFile.getString(elementNameIndex)}=")
-                elementValue.accept(classFile, this)
-                printer.println()
-            }
-            printer.levelDown()
-            printer.levelDown()
-        }
-
-        printer.levelDown()
-    }
-
-    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        printer.println("RuntimeInvisibleAnnotations:")
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        printer.println("RuntimeVisibleAnnotations:")
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
-
-    override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        printer.print("%s".format(classFile.getInteger(elementValue.constValueIndex)))
-    }
-
-    override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        val value = classFile.getString(elementValue.constValueIndex)
-
-        val output = if (!value.isAsciiPrintable()) {
-            value.escapeAsJavaString()
-        } else {
-            value
-        }
-
-        printer.print("\"%s\"".format(output))
-    }
-
-    override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
-        printer.print("[")
-        elementValue.elementValuesAccept(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
-        printer.print("]")
     }
 }
 

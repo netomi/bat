@@ -16,7 +16,11 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,7 +31,8 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.9">Signature Attribute</a>
  */
 data class SignatureAttribute internal constructor(override val attributeNameIndex: Int,
-                                                    private var _signatureIndex:    Int = -1) : Attribute(attributeNameIndex) {
+                                                    private var _signatureIndex:    Int = -1)
+    : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod {
 
     override val type: AttributeType
         get() = AttributeType.SIGNATURE
@@ -40,7 +45,7 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _signatureIndex = input.readUnsignedShort()
@@ -52,8 +57,16 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
         output.writeShort(signatureIndex)
     }
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitSignatureAttribute(classFile, this)
+    }
+
+    override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
+        visitor.visitSignatureAttribute(classFile, field, this)
+    }
+
+    override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
+        visitor.visitSignatureAttribute(classFile, method, this)
     }
 
     companion object {

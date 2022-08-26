@@ -22,10 +22,6 @@ import com.github.netomi.bat.classfile.attribute.annotations.RuntimeAnnotationsA
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 
-fun classAttributes(visitor: ClassAttributeVisitor): AttributeVisitor {
-    return ClassAttributeAdapter.of(visitor)
-}
-
 fun interface ClassAttributeVisitor: AnyAttributeVisitor {
     fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
@@ -35,16 +31,16 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
+    fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
     fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+        visitRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
     fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+        visitRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
     fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
@@ -57,51 +53,5 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
 
     fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
         visitAnyAttribute(classFile, attribute)
-    }
-}
-
-private class ClassAttributeAdapter private constructor(val visitor: ClassAttributeVisitor): AttributeVisitor {
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
-
-    override fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
-        visitor.visitDeprecatedAttribute(classFile, attribute)
-    }
-
-    override fun visitEnclosingMethodAttribute(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
-        visitor.visitEnclosingMethodAttribute(classFile, attribute)
-    }
-
-    override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
-        visitor.visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, attribute)
-    }
-
-    override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
-        visitor.visitSignatureAttribute(classFile, attribute)
-    }
-
-    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
-        visitor.visitSourceFileAttribute(classFile, attribute)
-    }
-
-    override fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
-        visitor.visitSyntheticAttribute(classFile, attribute)
-    }
-
-    override fun visitUnknownAttribute(classFile: ClassFile, attribute: UnknownAttribute) {
-        visitor.visitUnknownAttribute(classFile, attribute)
-    }
-
-    companion object {
-        fun of(visitor: ClassAttributeVisitor): AttributeVisitor {
-            return ClassAttributeAdapter(visitor)
-        }
     }
 }

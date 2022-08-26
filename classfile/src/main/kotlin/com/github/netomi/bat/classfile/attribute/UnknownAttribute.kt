@@ -16,7 +16,11 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -26,7 +30,8 @@ import java.util.*
  * A class representing an unknown attribute in a class file.
  */
 data class UnknownAttribute internal constructor(override val attributeNameIndex: Int,
-                                                  private var _data:              ByteArray = ByteArray(0)) : Attribute(attributeNameIndex) {
+                                                  private var _data:              ByteArray = ByteArray(0))
+    : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod {
 
     override val type: AttributeType
         get() = AttributeType.UNKNOWN
@@ -35,7 +40,7 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
         get() = _data
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput) {
+    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
         _data = ByteArray(length)
         input.readFully(_data)
@@ -47,7 +52,15 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
         output.write(data)
     }
 
-    override fun accept(classFile: ClassFile, visitor: AttributeVisitor) {
+    override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
+        visitor.visitUnknownAttribute(classFile, this)
+    }
+
+    override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
+        visitor.visitUnknownAttribute(classFile, this)
+    }
+
+    override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
         visitor.visitUnknownAttribute(classFile, this)
     }
 

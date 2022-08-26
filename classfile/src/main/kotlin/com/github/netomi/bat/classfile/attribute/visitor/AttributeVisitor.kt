@@ -17,35 +17,71 @@
 package com.github.netomi.bat.classfile.attribute.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.Member
+import com.github.netomi.bat.classfile.attribute.DeprecatedAttribute
+import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 
-fun interface AttributeVisitor: ClassAttributeVisitor, FieldAttributeVisitor, MethodAttributeVisitor {
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute)
-
-    override fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor {
+    fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
+    override fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+        visitAnyDeprecatedAttribute(classFile, attribute)
+    }
+
+    override fun visitDeprecatedAttribute(classFile: ClassFile, member: Member, attribute: DeprecatedAttribute) {
+        visitAnyDeprecatedAttribute(classFile, attribute)
+    }
+
+    fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeAnnotationsAttribute) {
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
+    fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
     override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitAnyRuntimeVisibleAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitAnyRuntimeVisibleAnnotationsAttribute(classFile, attribute)
+    }
+
+    fun visitAnyRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
         visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
     override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+        visitAnyRuntimeInvisibleAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitAnyRuntimeInvisibleAnnotationsAttribute(classFile, attribute)
+    }
+
+    fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+        visitAnyAttribute(classFile, attribute)
     }
 
     override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
-        visitAnyAttribute(classFile, attribute)
+        visitAnySignatureAttribute(classFile, attribute)
     }
 
-    override fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
-        visitAnyAttribute(classFile, attribute)
+    override fun visitSignatureAttribute(classFile: ClassFile, member: Member, attribute: SignatureAttribute) {
+        visitAnySignatureAttribute(classFile, attribute)
     }
 }

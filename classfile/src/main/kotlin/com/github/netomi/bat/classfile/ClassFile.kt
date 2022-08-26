@@ -15,12 +15,11 @@
  */
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.attribute.AttachedToClass
 import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.classAttributes
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -174,9 +173,8 @@ class ClassFile private constructor() {
     }
 
     fun attributesAccept(visitor: ClassAttributeVisitor) {
-        val adapter = if (visitor is AttributeVisitor) visitor else classAttributes(visitor)
-        for (attribute in attributes) {
-            attribute.accept(this, adapter)
+        for (attribute in attributes.filterIsInstance(AttachedToClass::class.java)) {
+            attribute.accept(this, visitor)
         }
     }
 
