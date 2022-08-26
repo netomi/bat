@@ -17,6 +17,8 @@ package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.AttachedToMethod
 import com.github.netomi.bat.classfile.attribute.visitor.*
+import com.github.netomi.bat.util.getArgumentSize
+import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import com.github.netomi.bat.util.toHexString
 import java.io.DataInput
 import java.io.IOException
@@ -30,6 +32,13 @@ class Method private constructor(): Member() {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.METHOD
+
+    fun getArgumentSize(classFile: ClassFile): Int {
+        var argumentSize = if (isStatic) 0 else 1
+        val (parameters, _) = parseDescriptorToJvmTypes(getDescriptor(classFile))
+        argumentSize += parameters.getArgumentSize()
+        return argumentSize
+    }
 
     override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
         for (attribute in attributes.filterIsInstance(AttachedToMethod::class.java)) {

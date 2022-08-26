@@ -260,3 +260,7 @@ fun parseDescriptorParameters(parameters: String): List<String> {
 
     return result
 }
+
+fun Iterable<JvmType>.getArgumentSize(): Int {
+    return fold(0) { size, type -> size + type.getArgumentSize() }
+}

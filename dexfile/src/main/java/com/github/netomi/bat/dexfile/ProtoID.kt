@@ -18,12 +18,11 @@ package com.github.netomi.bat.dexfile
 import com.github.netomi.bat.dexfile.io.DexDataInput
 import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.util.DexType
-import com.github.netomi.bat.dexfile.util.asDexType
-import com.github.netomi.bat.dexfile.util.getArgumentSize
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.PropertyAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
+import com.github.netomi.bat.util.getArgumentSize
 import java.util.*
 
 /**

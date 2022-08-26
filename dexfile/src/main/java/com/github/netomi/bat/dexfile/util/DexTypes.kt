@@ -63,7 +63,3 @@ internal fun toShortyFormat(parameterTypes: List<String>, returnType: String): S
 
     return result
 }
-
-fun Iterable<DexType>.getArgumentSize(): Int {
-    return fold(0) { size, type -> size + type.getArgumentSize() }
-}

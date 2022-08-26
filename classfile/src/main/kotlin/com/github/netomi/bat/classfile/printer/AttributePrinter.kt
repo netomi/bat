@@ -40,10 +40,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     }
 
     override fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
-        var argsSize =
         printer.println("Code:")
         printer.levelUp()
-        printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=")
+        printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentSize(classFile)}")
         printer.levelDown()
     }
 
