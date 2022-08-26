@@ -18,10 +18,10 @@ package com.github.netomi.bat.classfile.attribute
 
 import java.io.DataInput
 
-class ExceptionEntry private constructor(startPC:   Int = -1,
-                                         endPC:     Int = -1,
-                                         handlerPC: Int = -1,
-                                         catchType: Int = -1) {
+class ExceptionElement private constructor(startPC:   Int = -1,
+                                           endPC:     Int = -1,
+                                           handlerPC: Int = -1,
+                                           catchType: Int = -1) {
 
     var startPC: Int = startPC
         private set
@@ -43,8 +43,8 @@ class ExceptionEntry private constructor(startPC:   Int = -1,
     }
 
     companion object {
-        internal fun read(input: DataInput): ExceptionEntry {
-            val entry = ExceptionEntry()
+        internal fun read(input: DataInput): ExceptionElement {
+            val entry = ExceptionElement()
             entry.read(input)
             return entry
         }

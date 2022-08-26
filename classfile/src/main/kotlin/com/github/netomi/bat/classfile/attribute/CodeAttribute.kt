@@ -24,12 +24,17 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
+/**
+ * A class representing a Code attribute in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.3">Code Attribute</a>
+ */
 class CodeAttribute
     private constructor(override val attributeNameIndex: Int,
                         maxStack:           Int                         = 0,
                         maxLocals:          Int                         = 0,
                         code:               ByteArray                   = ByteArray(0),
-                        private var  _exceptionTable:    MutableList<ExceptionEntry> = mutableListOfCapacity(0),
+                        private var  _exceptionTable:    MutableList<ExceptionElement> = mutableListOfCapacity(0),
                         private var  _attributes:        MutableList<Attribute>      = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToMethod {
 
@@ -48,7 +53,7 @@ class CodeAttribute
     var code: ByteArray = code
         private set
 
-    val exceptionTable: List<ExceptionEntry>
+    val exceptionTable: List<ExceptionElement>
         get() = _exceptionTable
 
     val attributes: List<Attribute>
@@ -67,7 +72,7 @@ class CodeAttribute
         val exceptionTableLength = input.readUnsignedShort()
         _exceptionTable = mutableListOfCapacity(exceptionTableLength)
         for (i in 0 until exceptionTableLength) {
-            _exceptionTable.add(ExceptionEntry.read(input))
+            _exceptionTable.add(ExceptionElement.read(input))
         }
 
         val attributesCount = input.readUnsignedShort()
