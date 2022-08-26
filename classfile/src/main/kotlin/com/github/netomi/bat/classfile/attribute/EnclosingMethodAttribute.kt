@@ -52,6 +52,9 @@ data class EnclosingMethodAttribute internal constructor(override val attributeN
         return classFile.getNameAndType(methodIndex).getDescriptor(classFile)
     }
 
+    override val dataSize: Int
+        get() = ATTRIBUTE_LENGTH
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
@@ -62,7 +65,7 @@ data class EnclosingMethodAttribute internal constructor(override val attributeN
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(ATTRIBUTE_LENGTH)
+        output.writeInt(dataSize)
         output.writeShort(classIndex)
         output.writeShort(methodIndex)
     }

@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import java.io.DataInput
@@ -37,6 +38,8 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
     fun getAttributeName(classFile: ClassFile): String {
         return classFile.getString(attributeNameIndex)
     }
+
+    protected abstract val dataSize: Int
 
     @Throws(IOException::class)
     protected abstract fun readAttributeData(input: DataInput, classFile: ClassFile)
@@ -72,7 +75,11 @@ interface AttachedToField {
 }
 
 interface AttachedToMethod {
-    fun accept(classFile: ClassFile, method:  Method, visitor: MethodAttributeVisitor)
+    fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor)
+}
+
+interface AttachedToCodeAttribute {
+    fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor)
 }
 
 /**
@@ -93,7 +100,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     SIGNATURE("Signature", SignatureAttribute.Companion::empty),
     SOURCE_FILE("SourceFile", SourceFileAttribute.Companion::empty),
     SOURCE_DEBUG_EXTENSION("SourceDebugExtension", null),
-    LINE_NUMBER_TABLE("LineNumberTable", null),
+    LINE_NUMBER_TABLE("LineNumberTable", LineNumberTableAttribute.Companion::empty),
     LOCAL_VARIABLE_TABLE("LocalVariableTable", null),
     LOCAL_VARIABLE_TYPE_TABLE("LocalVariableTypeTable", null),
     DEPRECATED("Deprecated", DeprecatedAttribute.Companion::empty),

@@ -32,6 +32,9 @@ abstract class RuntimeAnnotationsAttribute
     val annotations: List<Annotation>
         get() = _annotations
 
+    override val dataSize: Int
+        get() = TODO("implement")
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
@@ -45,6 +48,11 @@ abstract class RuntimeAnnotationsAttribute
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        TODO("implement")
+        output.writeInt(dataSize)
+
+        output.writeShort(annotations.size)
+        for (annotation in annotations) {
+            annotation.write(output)
+        }
     }
 }

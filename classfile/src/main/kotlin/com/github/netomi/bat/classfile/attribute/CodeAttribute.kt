@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
@@ -31,11 +32,11 @@ import java.io.IOException
  */
 class CodeAttribute
     private constructor(override val attributeNameIndex: Int,
-                        maxStack:           Int                         = 0,
-                        maxLocals:          Int                         = 0,
-                        code:               ByteArray                   = ByteArray(0),
+                                     maxStack:           Int                           = 0,
+                                     maxLocals:          Int                           = 0,
+                                     code:               ByteArray                     = ByteArray(0),
                         private var  _exceptionTable:    MutableList<ExceptionElement> = mutableListOfCapacity(0),
-                        private var  _attributes:        MutableList<Attribute>      = mutableListOfCapacity(0))
+                        private var  _attributes:        MutableList<Attribute>        = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType
@@ -58,6 +59,9 @@ class CodeAttribute
 
     val attributes: List<Attribute>
         get() = _attributes
+
+    override val dataSize: Int
+        get() = TODO("Not yet implemented")
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
@@ -84,11 +88,33 @@ class CodeAttribute
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        TODO("implement")
+        output.writeInt(dataSize)
+
+        output.writeShort(maxStack)
+        output.writeShort(maxLocals)
+
+        output.writeInt(codeLength)
+        output.write(code)
+
+        output.writeShort(exceptionTable.size)
+        for (exceptionElement in exceptionTable) {
+            exceptionElement.write(output)
+        }
+
+        output.writeShort(attributes.size)
+        for (attribute in attributes) {
+            attribute.writeAttribute(output)
+        }
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
         visitor.visitCodeAttribute(classFile, method, this)
+    }
+
+    fun attributesAccept(classFile: ClassFile, method: Method, visitor: CodeAttributeVisitor) {
+        for (attribute in attributes.filterIsInstance(AttachedToCodeAttribute::class.java)) {
+            attribute.accept(classFile, method, this, visitor)
+        }
     }
 
     companion object {

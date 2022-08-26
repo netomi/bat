@@ -42,6 +42,9 @@ data class ConstantValueAttribute internal constructor(override val attributeNam
         return classFile.getConstant(constantValueIndex)
     }
 
+    override val dataSize: Int
+        get() = ATTRIBUTE_LENGTH
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
@@ -51,7 +54,7 @@ data class ConstantValueAttribute internal constructor(override val attributeNam
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.write(ATTRIBUTE_LENGTH)
+        output.write(dataSize)
         output.writeShort(constantValueIndex)
     }
 

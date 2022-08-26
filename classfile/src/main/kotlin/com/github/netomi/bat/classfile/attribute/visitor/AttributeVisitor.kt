@@ -24,7 +24,7 @@ import com.github.netomi.bat.classfile.attribute.annotations.RuntimeAnnotationsA
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 
-fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor {
+fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, CodeAttributeVisitor {
     fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }

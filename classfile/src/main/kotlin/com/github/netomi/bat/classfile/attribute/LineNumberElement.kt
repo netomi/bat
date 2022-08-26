@@ -19,42 +19,30 @@ package com.github.netomi.bat.classfile.attribute
 import java.io.DataInput
 import java.io.DataOutput
 
-class ExceptionElement private constructor(startPC:   Int = -1,
-                                           endPC:     Int = -1,
-                                           handlerPC: Int = -1,
-                                           catchType: Int = -1) {
+class LineNumberElement private constructor(startPC:    Int = -1,
+                                            lineNumber: Int = -1) {
 
-    var startPC: Int = startPC
+    var startPC = startPC
         private set
 
-    var endPC: Int = endPC
-        private set
-
-    var handlerPC: Int = handlerPC
-        private set
-
-    var catchType: Int = catchType
+    var lineNumber = lineNumber
         private set
 
     private fun read(input: DataInput) {
-        startPC   = input.readUnsignedShort()
-        endPC     = input.readUnsignedShort()
-        handlerPC = input.readUnsignedShort()
-        catchType = input.readUnsignedShort()
+        startPC    = input.readUnsignedShort()
+        lineNumber = input.readUnsignedShort()
     }
 
     internal fun write(output: DataOutput) {
         output.writeShort(startPC)
-        output.writeShort(endPC)
-        output.writeShort(handlerPC)
-        output.writeShort(catchType)
+        output.writeShort(lineNumber)
     }
 
     companion object {
-        internal const val SIZE = 8
+        internal const val DATA_SIZE = 4
 
-        internal fun read(input: DataInput): ExceptionElement {
-            val element = ExceptionElement()
+        internal fun read(input: DataInput): LineNumberElement {
+            val element = LineNumberElement()
             element.read(input)
             return element
         }

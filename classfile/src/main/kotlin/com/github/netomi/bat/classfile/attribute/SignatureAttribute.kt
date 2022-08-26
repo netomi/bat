@@ -44,6 +44,9 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
         return classFile.getString(signatureIndex)
     }
 
+    override val dataSize: Int
+        get() = ATTRIBUTE_LENGTH
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
@@ -53,7 +56,7 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(ATTRIBUTE_LENGTH)
+        output.writeInt(dataSize)
         output.writeShort(signatureIndex)
     }
 

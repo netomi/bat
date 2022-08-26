@@ -36,6 +36,9 @@ data class SyntheticAttribute internal constructor(override val attributeNameInd
     override val type: AttributeType
         get() = AttributeType.SYNTHETIC
 
+    override val dataSize: Int
+        get() = ATTRIBUTE_LENGTH
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
@@ -44,7 +47,7 @@ data class SyntheticAttribute internal constructor(override val attributeNameInd
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        output.writeInt(ATTRIBUTE_LENGTH)
+        output.writeInt(dataSize)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {

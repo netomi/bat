@@ -43,6 +43,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.println("Code:")
         printer.levelUp()
         printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentSize(classFile)}")
+
+        attribute.attributesAccept(classFile, method, this)
+
         printer.levelDown()
     }
 
@@ -86,6 +89,17 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         printer.println("RuntimeVisibleAnnotations:")
         visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
+    // Implementations for CodeAttributeVisitor
+
+    override fun visitLineNumberTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
+        printer.println("LineNumberTable:")
+        printer.levelUp()
+        for (element in attribute.lineNumberTable) {
+            printer.println("line ${element.lineNumber}: ${element.startPC}")
+        }
+        printer.levelDown()
     }
 
     // Implementations for ElementValueVisitor

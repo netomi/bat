@@ -42,6 +42,9 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
         return exceptions.map { classFile.getClassName(it) }
     }
 
+    override val dataSize: Int
+        get() = 2 + exceptions.size * 2
+
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
@@ -54,8 +57,7 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
-        val length = 2 + exceptions.size * 2
-        output.write(length)
+        output.write(dataSize)
         output.writeShort(exceptions.size)
         for (index in exceptions.indices) {
             output.writeShort(exceptions[index])
