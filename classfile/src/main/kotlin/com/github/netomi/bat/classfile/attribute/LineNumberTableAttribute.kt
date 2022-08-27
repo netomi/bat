@@ -25,7 +25,7 @@ import java.io.DataOutput
 
 data class LineNumberTableAttribute
     private constructor(override val attributeNameIndex: Int,
-                        private var _lineNumberTable:    MutableList<LineNumberElement> = mutableListOfCapacity(0))
+                         private var _lineNumberTable:   MutableList<LineNumberElement> = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToCodeAttribute {
 
     override val type: AttributeType
@@ -61,6 +61,36 @@ data class LineNumberTableAttribute
     companion object {
         internal fun empty(attributeNameIndex: Int): LineNumberTableAttribute {
             return LineNumberTableAttribute(attributeNameIndex)
+        }
+    }
+}
+
+data class LineNumberElement private constructor(private var _startPC:    Int = -1,
+                                                 private var _lineNumber: Int = -1) {
+
+    val startPC
+        get() = _startPC
+
+    val lineNumber
+        get() = _lineNumber
+
+    private fun read(input: DataInput) {
+        _startPC    = input.readUnsignedShort()
+        _lineNumber = input.readUnsignedShort()
+    }
+
+    internal fun write(output: DataOutput) {
+        output.writeShort(startPC)
+        output.writeShort(lineNumber)
+    }
+
+    companion object {
+        internal const val DATA_SIZE = 4
+
+        internal fun read(input: DataInput): LineNumberElement {
+            val element = LineNumberElement()
+            element.read(input)
+            return element
         }
     }
 }
