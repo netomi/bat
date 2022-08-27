@@ -37,6 +37,7 @@ abstract class RuntimeAnnotationsAttribute
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+        @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
 
         val annotationCount = input.readUnsignedShort()

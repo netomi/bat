@@ -49,7 +49,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitExceptionsAttributes(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+    override fun visitExceptionsAttribute(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
         printer.println("Exceptions:")
         printer.levelUp()
         attribute.getExceptionClassNames(classFile).forEach { printer.println("throws ${it.toExternalClassName()}") }

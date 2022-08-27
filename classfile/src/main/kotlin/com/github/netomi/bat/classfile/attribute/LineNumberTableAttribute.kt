@@ -23,6 +23,11 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
 
+/**
+ * A class representing a LineNumberTable attribute in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.12">LineNumberTable Attribute</a>
+ */
 data class LineNumberTableAttribute
     private constructor(override val attributeNameIndex: Int,
                          private var _lineNumberTable:   MutableList<LineNumberElement> = mutableListOfCapacity(0))
@@ -38,6 +43,7 @@ data class LineNumberTableAttribute
         get() = 2 + lineNumberTable.size * LineNumberElement.DATA_SIZE
 
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+        @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val lineNumberTableLength = input.readUnsignedShort()
         _lineNumberTable = mutableListOfCapacity(lineNumberTableLength)

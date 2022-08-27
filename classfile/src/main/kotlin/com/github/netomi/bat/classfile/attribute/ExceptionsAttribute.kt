@@ -47,6 +47,7 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+        @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfExceptions = input.readUnsignedShort()
         _exceptions = IntArray(numberOfExceptions)
@@ -65,7 +66,7 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitExceptionsAttributes(classFile, method, this)
+        visitor.visitExceptionsAttribute(classFile, method, this)
     }
 
     override fun equals(other: Any?): Boolean {

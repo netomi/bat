@@ -33,7 +33,11 @@ fun interface MethodAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitExceptionsAttributes(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+    fun visitExceptionsAttribute(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitMethodParametersAttribute(classFile: ClassFile, method: Method, attribute: MethodParametersAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 

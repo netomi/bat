@@ -66,6 +66,7 @@ data class CodeAttribute
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+        @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         _maxStack  = input.readUnsignedShort()
         _maxLocals = input.readUnsignedShort()

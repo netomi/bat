@@ -23,6 +23,11 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
 
+/**
+ * A class representing a LocalVariableTable attribute in a class file.
+ *
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.13">LocalVariableTable Attribute</a>
+ */
 data class LocalVariableTableAttribute
     private constructor(override val attributeNameIndex: Int,
                          private var _localVariableTable:   MutableList<LocalVariableElement> = mutableListOfCapacity(0))
@@ -38,10 +43,11 @@ data class LocalVariableTableAttribute
         get() = _localVariableTable
 
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+        @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val localVariavbleTableLength = input.readUnsignedShort()
-        _localVariableTable = mutableListOfCapacity(localVariavbleTableLength)
-        for (i in 0 until localVariavbleTableLength) {
+        val localVariableTableLength = input.readUnsignedShort()
+        _localVariableTable = mutableListOfCapacity(localVariableTableLength)
+        for (i in 0 until localVariableTableLength) {
             _localVariableTable.add(LocalVariableElement.read(input))
         }
     }
