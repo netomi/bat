@@ -96,7 +96,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitLineNumberTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
         printer.println("LineNumberTable:")
         printer.levelUp()
-        for (element in attribute.lineNumberTable) {
+        for (element in attribute) {
             printer.println("line ${element.lineNumber}: ${element.startPC}")
         }
         printer.levelDown()
@@ -105,10 +105,10 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitLocalVariableTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
         printer.println("LocalVariableTable:")
         printer.levelUp()
-        if (attribute.localVariableTable.isNotEmpty()) {
+        if (attribute.size > 0) {
             // TODO: better align name / signature to make output more readable
             printer.println("Start  Length  Slot  Name   Signature")
-            for (element in attribute.localVariableTable) {
+            for (element in attribute) {
                 printer.println("%5d  %6d  %4d %5s   %s"
                     .format(element.startPC,
                             element.length,

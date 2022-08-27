@@ -30,25 +30,33 @@ import java.io.DataOutput
  */
 data class LocalVariableTableAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var _localVariableTable:   MutableList<LocalVariableElement> = mutableListOfCapacity(0))
-    : Attribute(attributeNameIndex), AttachedToCodeAttribute {
+                         private var localVariableTable: MutableList<LocalVariableElement> = mutableListOfCapacity(0))
+    : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LocalVariableElement> {
 
     override val type: AttributeType
         get() = AttributeType.LOCAL_VARIABLE_TABLE
 
     override val dataSize: Int
-        get() = 2 + localVariableTable.size * LocalVariableElement.DATA_SIZE
+        get() = 2 + size * LocalVariableElement.DATA_SIZE
 
-    val localVariableTable: List<LocalVariableElement>
-        get() = _localVariableTable
+    val size: Int
+        get() = localVariableTable.size
+
+    operator fun get(index: Int): LocalVariableElement {
+        return localVariableTable[index]
+    }
+
+    override fun iterator(): Iterator<LocalVariableElement> {
+        return localVariableTable.iterator()
+    }
 
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val localVariableTableLength = input.readUnsignedShort()
-        _localVariableTable = mutableListOfCapacity(localVariableTableLength)
+        localVariableTable = mutableListOfCapacity(localVariableTableLength)
         for (i in 0 until localVariableTableLength) {
-            _localVariableTable.add(LocalVariableElement.read(input))
+            localVariableTable.add(LocalVariableElement.read(input))
         }
     }
 

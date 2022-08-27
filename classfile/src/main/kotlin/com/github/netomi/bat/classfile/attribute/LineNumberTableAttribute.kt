@@ -30,25 +30,33 @@ import java.io.DataOutput
  */
 data class LineNumberTableAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var _lineNumberTable:   MutableList<LineNumberElement> = mutableListOfCapacity(0))
-    : Attribute(attributeNameIndex), AttachedToCodeAttribute {
+                         private var lineNumberTable:    MutableList<LineNumberElement> = mutableListOfCapacity(0))
+    : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LineNumberElement> {
 
     override val type: AttributeType
         get() = AttributeType.LINE_NUMBER_TABLE
 
-    val lineNumberTable: List<LineNumberElement>
-        get() = _lineNumberTable
-
     override val dataSize: Int
-        get() = 2 + lineNumberTable.size * LineNumberElement.DATA_SIZE
+        get() = 2 + size * LineNumberElement.DATA_SIZE
+
+    val size: Int
+        get() = lineNumberTable.size
+
+    operator fun get(index: Int): LineNumberElement {
+        return lineNumberTable[index]
+    }
+
+    override fun iterator(): Iterator<LineNumberElement> {
+        return lineNumberTable.iterator()
+    }
 
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val lineNumberTableLength = input.readUnsignedShort()
-        _lineNumberTable = mutableListOfCapacity(lineNumberTableLength)
+        lineNumberTable = mutableListOfCapacity(lineNumberTableLength)
         for (i in 0 until lineNumberTableLength) {
-            _lineNumberTable.add(LineNumberElement.read(input))
+            lineNumberTable.add(LineNumberElement.read(input))
         }
     }
 

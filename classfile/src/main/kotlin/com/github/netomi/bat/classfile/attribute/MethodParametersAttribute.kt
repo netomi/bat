@@ -30,24 +30,33 @@ import java.io.DataOutput
  */
 data class MethodParametersAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var _parameters:        MutableList<ParameterElement> = mutableListOfCapacity(0)
-    ): Attribute(attributeNameIndex), AttachedToMethod {
+                         private var parameters:         MutableList<ParameterElement> = mutableListOfCapacity(0)
+    ): Attribute(attributeNameIndex), AttachedToMethod, Sequence<ParameterElement> {
 
     override val type: AttributeType
         get() = AttributeType.METHOD_PARAMETERS
 
     override val dataSize: Int
-        get() = 1 + parameters.size * ParameterElement.DATA_SIZE
+        get() = 1 + size * ParameterElement.DATA_SIZE
 
-    val parameters: List<ParameterElement>
-        get() = _parameters
+    val size: Int
+        get() = parameters.size
+
+    operator fun get(index: Int): ParameterElement {
+        return parameters[index]
+    }
+
+    override fun iterator(): Iterator<ParameterElement> {
+        return parameters.iterator()
+    }
 
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+        @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val parametersCount = input.readByte().toInt()
-        _parameters = mutableListOfCapacity(parametersCount)
+        parameters = mutableListOfCapacity(parametersCount)
         for (i in 0 until parametersCount) {
-            _parameters.add(ParameterElement.read(input))
+            parameters.add(ParameterElement.read(input))
         }
     }
 
