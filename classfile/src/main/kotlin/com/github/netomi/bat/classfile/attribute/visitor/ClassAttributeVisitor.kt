@@ -47,6 +47,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitSourceDebugExtensionAttribute(classFile: ClassFile, attribute: SourceDebugExtensionAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
         visitAnyAttribute(classFile, attribute)
     }

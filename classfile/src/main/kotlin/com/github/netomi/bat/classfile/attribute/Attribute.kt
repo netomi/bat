@@ -99,7 +99,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     SYNTHETIC("Synthetic", SyntheticAttribute.Companion::empty),
     SIGNATURE("Signature", SignatureAttribute.Companion::empty),
     SOURCE_FILE("SourceFile", SourceFileAttribute.Companion::empty),
-    SOURCE_DEBUG_EXTENSION("SourceDebugExtension", null),
+    SOURCE_DEBUG_EXTENSION("SourceDebugExtension", SourceDebugExtensionAttribute.Companion::empty),
     LINE_NUMBER_TABLE("LineNumberTable", LineNumberTableAttribute.Companion::empty),
     LOCAL_VARIABLE_TABLE("LocalVariableTable", null),
     LOCAL_VARIABLE_TYPE_TABLE("LocalVariableTypeTable", null),
