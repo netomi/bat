@@ -88,7 +88,7 @@ interface AttachedToCodeAttribute {
 internal enum class AttributeType constructor(val attributeName: String, private val supplier: ((Int) -> Attribute)?) {
 
     // Predefined attributes:
-    // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7-300
+    // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7-300
 
     CONSTANT_VALUE                         ("ConstantValue", ConstantValueAttribute.Companion::empty),
     CODE                                   ("Code", CodeAttribute.Companion::empty),
@@ -118,6 +118,8 @@ internal enum class AttributeType constructor(val attributeName: String, private
     MODULE_MAIN_CLASS                      ("ModuleMainClass", null),
     NEST_HOST                              ("NestHost", null),
     NEST_MEMBERS                           ("NestMembers", null),
+    RECORD                                 ("Record", null),
+    PERMITTED_SUBCLASSES                   ("PermittedSubclasses", null),
     UNKNOWN                                ("Unknown", UnknownAttribute.Companion::empty);
 
     companion object {
