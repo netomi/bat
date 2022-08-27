@@ -18,8 +18,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeInvisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeVisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor

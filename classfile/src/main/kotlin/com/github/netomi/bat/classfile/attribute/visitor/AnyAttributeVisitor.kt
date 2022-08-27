@@ -18,8 +18,6 @@ package com.github.netomi.bat.classfile.attribute.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.*
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
 
 fun interface AnyAttributeVisitor {
     fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute)

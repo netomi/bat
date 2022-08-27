@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2020 Thomas Neidhart.
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.attribute.annotations
+package com.github.netomi.bat.classfile.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.Attribute

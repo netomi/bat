@@ -23,9 +23,9 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.DeprecatedAttribute
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.SyntheticAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeInvisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeVisibleAnnotationsAttribute
 
 fun interface MemberAttributeVisitor: FieldAttributeVisitor, MethodAttributeVisitor {
     fun visitDeprecatedAttribute(classFile: ClassFile, member: Member, attribute: DeprecatedAttribute) {

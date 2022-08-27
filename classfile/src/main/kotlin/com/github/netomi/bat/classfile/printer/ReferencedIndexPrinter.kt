@@ -17,9 +17,9 @@
 package com.github.netomi.bat.classfile.printer
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.annotations.*
-import com.github.netomi.bat.classfile.attribute.annotations.Annotation
-import com.github.netomi.bat.classfile.attribute.annotations.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.annotation.*
+import com.github.netomi.bat.classfile.annotation.Annotation
+import com.github.netomi.bat.classfile.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 
 internal class ReferencedIndexPrinter constructor(private val printer: IndentingPrinter): ElementValueVisitor {

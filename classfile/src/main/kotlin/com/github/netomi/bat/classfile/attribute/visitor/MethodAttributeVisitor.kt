@@ -19,9 +19,9 @@ package com.github.netomi.bat.classfile.attribute.visitor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.*
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotations.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeInvisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.annotation.RuntimeVisibleAnnotationsAttribute
 
 fun interface MethodAttributeVisitor: AnyAttributeVisitor {
 

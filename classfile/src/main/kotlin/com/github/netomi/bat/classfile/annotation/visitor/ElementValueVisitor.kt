@@ -14,10 +14,10 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.attribute.annotations.visitor
+package com.github.netomi.bat.classfile.annotation.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.annotations.*
+import com.github.netomi.bat.classfile.annotation.*
 import com.github.netomi.bat.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
 
@@ -100,8 +100,9 @@ fun interface ElementValueVisitor {
     }
 }
 
-private class MultiElementValueVisitor constructor(       visitor:       ElementValueVisitor,
-                                                   vararg otherVisitors: ElementValueVisitor)
+private class MultiElementValueVisitor constructor(visitor: ElementValueVisitor,
+                                                   vararg otherVisitors: ElementValueVisitor
+)
     : AbstractMultiVisitor<ElementValueVisitor>(visitor, *otherVisitors), ElementValueVisitor {
 
     override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {
