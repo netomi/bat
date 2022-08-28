@@ -23,6 +23,10 @@ import com.github.netomi.bat.classfile.annotation.RuntimeInvisibleAnnotationsAtt
 import com.github.netomi.bat.classfile.annotation.RuntimeVisibleAnnotationsAttribute
 
 fun interface ClassAttributeVisitor: AnyAttributeVisitor {
+    fun visitBootstrapMethodsAttribute(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
