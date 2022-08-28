@@ -102,7 +102,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     SOURCE_DEBUG_EXTENSION                 ("SourceDebugExtension", SourceDebugExtensionAttribute.Companion::empty),
     LINE_NUMBER_TABLE                      ("LineNumberTable", LineNumberTableAttribute.Companion::empty),
     LOCAL_VARIABLE_TABLE                   ("LocalVariableTable", LocalVariableTableAttribute.Companion::empty),
-    LOCAL_VARIABLE_TYPE_TABLE              ("LocalVariableTypeTable", null),
+    LOCAL_VARIABLE_TYPE_TABLE              ("LocalVariableTypeTable", LocalVariableTypeTableAttribute.Companion::empty),
     DEPRECATED                             ("Deprecated", DeprecatedAttribute.Companion::empty),
     RUNTIME_VISIBLE_ANNOTATIONS            ("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::empty),
     RUNTIME_INVISIBLE_ANNOTATIONS          ("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::empty),

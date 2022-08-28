@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.attribute.LineNumberTableAttribute
 import com.github.netomi.bat.classfile.attribute.LocalVariableTableAttribute
+import com.github.netomi.bat.classfile.attribute.LocalVariableTypeTableAttribute
 
 fun interface CodeAttributeVisitor: AnyAttributeVisitor {
     fun visitLineNumberTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
@@ -28,6 +29,10 @@ fun interface CodeAttributeVisitor: AnyAttributeVisitor {
     }
 
     fun visitLocalVariableTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitLocalVariableTypeTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 }
