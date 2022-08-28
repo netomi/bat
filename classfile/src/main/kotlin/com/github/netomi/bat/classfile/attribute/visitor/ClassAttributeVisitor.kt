@@ -31,6 +31,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitModuleMainClassAttribute(classFile: ClassFile, attribute: ModuleMainClassAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
