@@ -43,6 +43,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitPermittedSubclassesAttribute(classFile: ClassFile, attribute: PermittedSubclassesAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }

@@ -119,7 +119,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     NEST_HOST                              ("NestHost", NestHostAttribute.Companion::empty),
     NEST_MEMBERS                           ("NestMembers", NestMembersAttribute.Companion::empty),
     RECORD                                 ("Record", null),
-    PERMITTED_SUBCLASSES                   ("PermittedSubclasses", null),
+    PERMITTED_SUBCLASSES                   ("PermittedSubclasses", PermittedSubclassesAttribute.Companion::empty),
     UNKNOWN                                ("Unknown", UnknownAttribute.Companion::empty);
 
     companion object {
