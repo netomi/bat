@@ -116,7 +116,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     MODULE                                 ("Module", null),
     MODULE_PACKAGES                        ("ModulePackages", null),
     MODULE_MAIN_CLASS                      ("ModuleMainClass", ModuleMainClassAttribute.Companion::empty),
-    NEST_HOST                              ("NestHost", null),
+    NEST_HOST                              ("NestHost", NestHostAttribute.Companion::empty),
     NEST_MEMBERS                           ("NestMembers", null),
     RECORD                                 ("Record", null),
     PERMITTED_SUBCLASSES                   ("PermittedSubclasses", null),
