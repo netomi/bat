@@ -39,6 +39,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitNestMembersAttribute(classFile: ClassFile, attribute: NestMembersAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
