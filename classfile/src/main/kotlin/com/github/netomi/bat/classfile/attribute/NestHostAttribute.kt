@@ -32,7 +32,7 @@ data class NestHostAttribute
                          private var _hostClassIndex:    Int = -1): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
-        get() = AttributeType.MODULE_MAIN_CLASS
+        get() = AttributeType.NEST_HOST
 
     override val dataSize: Int
         get() = 2

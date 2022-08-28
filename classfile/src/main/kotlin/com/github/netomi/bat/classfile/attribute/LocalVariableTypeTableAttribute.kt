@@ -34,7 +34,7 @@ data class LocalVariableTypeTableAttribute
     : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LocalVariableTypeElement> {
 
     override val type: AttributeType
-        get() = AttributeType.LOCAL_VARIABLE_TABLE
+        get() = AttributeType.LOCAL_VARIABLE_TYPE_TABLE
 
     override val dataSize: Int
         get() = 2 + size * LocalVariableTypeElement.DATA_SIZE

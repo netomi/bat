@@ -28,13 +28,13 @@ import java.util.*
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.31">PermittedSubclasses Attribute</a>
  */
-data class PermittedSubclassesAttribute
+data class BootstrapMethodsAttribute
     private constructor(override val attributeNameIndex: Int,
                          private var _permittedClasses:  IntArray = IntArray(0)
     ): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
-        get() = AttributeType.PERMITTED_SUBCLASSES
+        get() = AttributeType.MODULE_MAIN_CLASS
 
     override val dataSize: Int
         get() = 2 + permittedClasses.size * 2
@@ -70,7 +70,7 @@ data class PermittedSubclassesAttribute
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is PermittedSubclassesAttribute) return false
+        if (other !is BootstrapMethodsAttribute) return false
 
         return attributeNameIndex == other.attributeNameIndex &&
                _permittedClasses.contentEquals(other._permittedClasses)
@@ -81,8 +81,8 @@ data class PermittedSubclassesAttribute
     }
 
     companion object {
-        internal fun empty(attributeNameIndex: Int): PermittedSubclassesAttribute {
-            return PermittedSubclassesAttribute(attributeNameIndex)
+        internal fun empty(attributeNameIndex: Int): BootstrapMethodsAttribute {
+            return BootstrapMethodsAttribute(attributeNameIndex)
         }
     }
 }

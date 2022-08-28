@@ -34,7 +34,7 @@ data class NestMembersAttribute
     ): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
-        get() = AttributeType.MODULE_MAIN_CLASS
+        get() = AttributeType.NEST_MEMBERS
 
     override val dataSize: Int
         get() = 2 + nestMemberClasses.size * 2
