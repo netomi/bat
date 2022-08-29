@@ -29,30 +29,36 @@ import java.util.*
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.5">Exceptions Attribute</a>
  */
-data class ExceptionsAttribute internal constructor(override val attributeNameIndex: Int,
-                                                     private var _exceptions:        IntArray = IntArray(0)) : Attribute(attributeNameIndex), AttachedToMethod {
+data class ExceptionsAttribute
+    private constructor(override val attributeNameIndex: Int,
+                         private var exceptions:         IntArray = IntArray(0))
+    : Attribute(attributeNameIndex), AttachedToMethod, Sequence<Int> {
 
     override val type: AttributeType
         get() = AttributeType.EXCEPTIONS
 
-    val exceptions: IntArray
-        get() = _exceptions
+    override val dataSize: Int
+        get() = 2 + exceptions.size * 2
+
+    val size: Int
+        get() = exceptions.size
+
+    override fun iterator(): Iterator<Int> {
+        return exceptions.iterator()
+    }
 
     fun getExceptionClassNames(classFile: ClassFile): List<JvmClassName> {
         return exceptions.map { classFile.getClassName(it) }
     }
-
-    override val dataSize: Int
-        get() = 2 + exceptions.size * 2
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfExceptions = input.readUnsignedShort()
-        _exceptions = IntArray(numberOfExceptions)
+        exceptions = IntArray(numberOfExceptions)
         for (index in 0 until numberOfExceptions) {
-            _exceptions[index] = input.readUnsignedShort()
+            exceptions[index] = input.readUnsignedShort()
         }
     }
 
@@ -74,11 +80,11 @@ data class ExceptionsAttribute internal constructor(override val attributeNameIn
         if (other !is ExceptionsAttribute) return false
 
         return attributeNameIndex == other.attributeNameIndex &&
-               _exceptions.contentEquals(other._exceptions)
+               exceptions.contentEquals(other.exceptions)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(attributeNameIndex, _exceptions.contentHashCode())
+        return Objects.hash(attributeNameIndex, exceptions.contentHashCode())
     }
 
     companion object {

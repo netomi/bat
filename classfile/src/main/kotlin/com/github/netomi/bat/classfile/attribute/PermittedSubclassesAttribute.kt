@@ -30,8 +30,8 @@ import java.util.*
  */
 data class PermittedSubclassesAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var _permittedClasses:  IntArray = IntArray(0)
-    ): Attribute(attributeNameIndex), AttachedToClass {
+                         private var permittedClasses:   IntArray = IntArray(0)
+    ): Attribute(attributeNameIndex), AttachedToClass, Sequence<Int> {
 
     override val type: AttributeType
         get() = AttributeType.PERMITTED_SUBCLASSES
@@ -39,8 +39,16 @@ data class PermittedSubclassesAttribute
     override val dataSize: Int
         get() = 2 + permittedClasses.size * 2
 
-    val permittedClasses: IntArray
-        get() = _permittedClasses
+    val size: Int
+        get() = permittedClasses.size
+
+    operator fun get(index: Int): Int {
+        return permittedClasses[index]
+    }
+
+    override fun iterator(): Iterator<Int> {
+        return permittedClasses.iterator()
+    }
 
     fun getPermittedClassNames(classFile: ClassFile): List<JvmClassName> {
         return permittedClasses.map { classFile.getClassName(it) }
@@ -50,9 +58,9 @@ data class PermittedSubclassesAttribute
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfClasses = input.readUnsignedShort()
-        _permittedClasses = IntArray(numberOfClasses)
+        permittedClasses = IntArray(numberOfClasses)
         for (i in 0 until numberOfClasses) {
-            _permittedClasses[i] = input.readUnsignedShort()
+            permittedClasses[i] = input.readUnsignedShort()
         }
     }
 
@@ -73,11 +81,11 @@ data class PermittedSubclassesAttribute
         if (other !is PermittedSubclassesAttribute) return false
 
         return attributeNameIndex == other.attributeNameIndex &&
-               _permittedClasses.contentEquals(other._permittedClasses)
+               permittedClasses.contentEquals(other.permittedClasses)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(attributeNameIndex, _permittedClasses.contentHashCode())
+        return Objects.hash(attributeNameIndex, permittedClasses.contentHashCode())
     }
 
     companion object {

@@ -32,15 +32,15 @@ data class SourceFileAttribute internal constructor(override val attributeNameIn
     override val type: AttributeType
         get() = AttributeType.SOURCE_FILE
 
+    override val dataSize: Int
+        get() = ATTRIBUTE_LENGTH
+
     val sourceFileIndex: Int
         get() = _sourceFileIndex
 
     fun getSourceFile(classFile: ClassFile): String {
         return classFile.getString(sourceFileIndex)
     }
-
-    override val dataSize: Int
-        get() = ATTRIBUTE_LENGTH
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {

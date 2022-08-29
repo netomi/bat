@@ -30,8 +30,8 @@ import java.util.*
  */
 data class ModulePackagesAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var _packages:          IntArray = IntArray(0)
-    ): Attribute(attributeNameIndex), AttachedToClass {
+                         private var packages:           IntArray = IntArray(0)
+    ): Attribute(attributeNameIndex), AttachedToClass, Sequence<Int> {
 
     override val type: AttributeType
         get() = AttributeType.MODULE_PACKAGES
@@ -39,8 +39,16 @@ data class ModulePackagesAttribute
     override val dataSize: Int
         get() = 2 + packages.size * 2
 
-    val packages: IntArray
-        get() = _packages
+    val size: Int
+        get() = packages.size
+
+    operator fun get(index: Int): Int {
+        return packages[index]
+    }
+
+    override fun iterator(): Iterator<Int> {
+        return packages.iterator()
+    }
 
     fun getPackageNames(classFile: ClassFile): List<String> {
         return packages.map { (classFile.getConstant(it) as PackageConstant).getPackageName(classFile) }
@@ -50,9 +58,9 @@ data class ModulePackagesAttribute
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfClasses = input.readUnsignedShort()
-        _packages = IntArray(numberOfClasses)
+        packages = IntArray(numberOfClasses)
         for (i in 0 until numberOfClasses) {
-            _packages[i] = input.readUnsignedShort()
+            packages[i] = input.readUnsignedShort()
         }
     }
 
@@ -73,11 +81,11 @@ data class ModulePackagesAttribute
         if (other !is ModulePackagesAttribute) return false
 
         return attributeNameIndex == other.attributeNameIndex &&
-               _packages.contentEquals(other._packages)
+               packages.contentEquals(other.packages)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(attributeNameIndex, _packages.contentHashCode())
+        return Objects.hash(attributeNameIndex, packages.contentHashCode())
     }
 
     companion object {

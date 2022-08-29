@@ -30,8 +30,8 @@ import java.util.*
  */
 data class NestMembersAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var _nestMemberClasses: IntArray = IntArray(0)
-    ): Attribute(attributeNameIndex), AttachedToClass {
+                         private var nestMemberClasses:  IntArray = IntArray(0)
+    ): Attribute(attributeNameIndex), AttachedToClass, Sequence<Int> {
 
     override val type: AttributeType
         get() = AttributeType.NEST_MEMBERS
@@ -39,8 +39,16 @@ data class NestMembersAttribute
     override val dataSize: Int
         get() = 2 + nestMemberClasses.size * 2
 
-    val nestMemberClasses: IntArray
-        get() = _nestMemberClasses
+    val size: Int
+        get() = nestMemberClasses.size
+
+    operator fun get(index: Int): Int {
+        return nestMemberClasses[index]
+    }
+
+    override fun iterator(): Iterator<Int> {
+        return nestMemberClasses.iterator()
+    }
 
     fun getNestMemberClassNames(classFile: ClassFile): List<JvmClassName> {
         return nestMemberClasses.map { classFile.getClassName(it) }
@@ -50,9 +58,9 @@ data class NestMembersAttribute
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfClasses = input.readUnsignedShort()
-        _nestMemberClasses = IntArray(numberOfClasses)
+        nestMemberClasses = IntArray(numberOfClasses)
         for (i in 0 until numberOfClasses) {
-            _nestMemberClasses[i] = input.readUnsignedShort()
+            nestMemberClasses[i] = input.readUnsignedShort()
         }
     }
 
@@ -73,11 +81,11 @@ data class NestMembersAttribute
         if (other !is NestMembersAttribute) return false
 
         return attributeNameIndex == other.attributeNameIndex &&
-               _nestMemberClasses.contentEquals(other._nestMemberClasses)
+               nestMemberClasses.contentEquals(other.nestMemberClasses)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(attributeNameIndex, _nestMemberClasses.contentHashCode())
+        return Objects.hash(attributeNameIndex, nestMemberClasses.contentHashCode())
     }
 
     companion object {

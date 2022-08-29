@@ -37,15 +37,15 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
     override val type: AttributeType
         get() = AttributeType.SIGNATURE
 
+    override val dataSize: Int
+        get() = ATTRIBUTE_LENGTH
+
     val signatureIndex: Int
         get() = _signatureIndex
 
     fun getSignature(classFile: ClassFile): String {
         return classFile.getString(signatureIndex)
     }
-
-    override val dataSize: Int
-        get() = ATTRIBUTE_LENGTH
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {

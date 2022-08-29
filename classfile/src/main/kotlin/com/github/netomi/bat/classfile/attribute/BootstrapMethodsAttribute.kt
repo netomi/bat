@@ -44,6 +44,10 @@ data class BootstrapMethodsAttribute
     val size: Int
         get() = bootstrapMethods.size
 
+    operator fun get(index: Int): BootstrapMethodElement {
+        return bootstrapMethods[index]
+    }
+
     override fun iterator(): Iterator<BootstrapMethodElement> {
         return bootstrapMethods.iterator()
     }
