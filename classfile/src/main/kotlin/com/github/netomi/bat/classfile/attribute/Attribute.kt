@@ -94,7 +94,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     CODE                                   ("Code", CodeAttribute.Companion::empty),
     STACK_MAP_TABLE                        ("StackMapTable", null),
     EXCEPTIONS                             ("Exceptions", ExceptionsAttribute.Companion::empty),
-    INNER_CLASSES                          ("InnerClasses", null),
+    INNER_CLASSES                          ("InnerClasses", InnerClassesAttribute.Companion::empty),
     ENCLOSING_METHOD                       ("EnclosingMethod", EnclosingMethodAttribute.Companion::empty),
     SYNTHETIC                              ("Synthetic", SyntheticAttribute.Companion::empty),
     SIGNATURE                              ("Signature", SignatureAttribute.Companion::empty),
