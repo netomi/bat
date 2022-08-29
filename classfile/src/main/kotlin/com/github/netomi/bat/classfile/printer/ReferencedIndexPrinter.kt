@@ -19,12 +19,13 @@ package com.github.netomi.bat.classfile.printer
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.annotation.*
 import com.github.netomi.bat.classfile.annotation.Annotation
+import com.github.netomi.bat.classfile.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 
-internal class ReferencedIndexPrinter constructor(private val printer: IndentingPrinter): ElementValueVisitor {
+internal class ReferencedIndexPrinter constructor(private val printer: IndentingPrinter): ElementValueVisitor, AnnotationVisitor {
 
-    fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
+    override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
         printer.print("#${annotation.typeIndex}(")
         annotation.elementValues.forEachIndexed { index, (elementNameIndex, elementValue) ->
             printer.print("#${elementNameIndex}=")

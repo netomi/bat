@@ -13,27 +13,37 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.annotation
+package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.annotation.Annotation
+import com.github.netomi.bat.classfile.annotation.visitor.AnnotationVisitor
+import com.github.netomi.bat.classfile.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
 /**
- * A base class representing a Runtime*Annotations attributes in a class file.
+ * A base class representing a Runtime*Annotations attribute in a class file.
  */
 abstract class RuntimeAnnotationsAttribute
     protected constructor(      override val attributeNameIndex: Int,
-                          protected open var _annotations:       MutableList<Annotation>) : Attribute(attributeNameIndex) {
-
-    val annotations: List<Annotation>
-        get() = _annotations
+                          protected open var annotations:        MutableList<Annotation>) : Attribute(attributeNameIndex), Sequence<Annotation> {
 
     override val dataSize: Int
         get() = TODO("implement")
+
+    val size: Int
+        get() = annotations.size
+
+    operator fun get(index: Int): Annotation {
+        return annotations[index]
+    }
+
+    override fun iterator(): Iterator<Annotation> {
+        return annotations.iterator()
+    }
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
@@ -41,9 +51,9 @@ abstract class RuntimeAnnotationsAttribute
         val length = input.readInt()
 
         val annotationCount = input.readUnsignedShort()
-        _annotations = mutableListOfCapacity(annotationCount)
+        annotations = mutableListOfCapacity(annotationCount)
         for (i in 0 until annotationCount) {
-            _annotations.add(Annotation.readAnnotation(input))
+            annotations.add(Annotation.readAnnotation(input))
         }
     }
 
@@ -55,5 +65,15 @@ abstract class RuntimeAnnotationsAttribute
         for (annotation in annotations) {
             annotation.write(output)
         }
+    }
+
+    fun annotationsAccept(classFile: ClassFile, visitor: AnnotationVisitor) {
+        for (annotation in annotations) {
+            visitor.visitAnnotation(classFile, annotation)
+        }
+    }
+
+    fun annotationAcceptIndexed(classFile: ClassFile, visitor: AnnotationVisitorIndexed) {
+        annotations.forEachIndexed { index, annotation -> visitor.visitAnnotation(classFile, index, annotation) }
     }
 }

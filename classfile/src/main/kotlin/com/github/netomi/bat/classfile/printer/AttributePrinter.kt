@@ -19,6 +19,8 @@ package com.github.netomi.bat.classfile.printer
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.annotation.*
+import com.github.netomi.bat.classfile.annotation.Annotation
+import com.github.netomi.bat.classfile.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
@@ -26,7 +28,10 @@ import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
 
-internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor, ElementValueVisitor {
+internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor, ElementValueVisitor, AnnotationVisitorIndexed {
+
+    private val referencedIndexPrinter = ReferencedIndexPrinter(printer)
+
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
         // TODO("Not yet implemented")
     }
@@ -56,28 +61,26 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
+    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
+        printer.print("${index}: ")
+        referencedIndexPrinter.visitAnnotation(classFile, annotation)
+        printer.println()
+        printer.levelUp()
+        printer.println(annotation.getType(classFile).toExternalType())
+
+        printer.levelUp()
+        annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
+            printer.print("${classFile.getString(elementNameIndex)}=")
+            elementValue.accept(classFile, this)
+            printer.println()
+        }
+        printer.levelDown()
+        printer.levelDown()
+    }
+
     override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         printer.levelUp()
-
-        val referencedIndexPrinter = ReferencedIndexPrinter(printer)
-
-        attribute.annotations.forEachIndexed { index, annotation ->
-            printer.print("${index}: ")
-            referencedIndexPrinter.visitAnnotation(classFile, annotation)
-            printer.println()
-            printer.levelUp()
-            printer.println(annotation.getType(classFile).toExternalType())
-
-            printer.levelUp()
-            annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
-                printer.print("${classFile.getString(elementNameIndex)}=")
-                elementValue.accept(classFile, this)
-                printer.println()
-            }
-            printer.levelDown()
-            printer.levelDown()
-        }
-
+        attribute.annotationAcceptIndexed(classFile, this)
         printer.levelDown()
     }
 
@@ -89,6 +92,29 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         printer.println("RuntimeVisibleAnnotations:")
         visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
+        printer.levelUp()
+
+        for (parameterIndex in 0 until attribute.size) {
+            printer.println("parameter $parameterIndex:")
+            printer.levelUp()
+            attribute.parameterAnnotationsAcceptIndexed(classFile, parameterIndex, this)
+            printer.levelDown()
+        }
+
+        printer.levelDown()
+    }
+
+    override fun visitRuntimeInvisibleParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleParameterAnnotationsAttribute) {
+        printer.println("RuntimeInvisibleParameterAnnotations:")
+        visitRuntimeParameterAnnotationsAttribute(classFile, method, attribute)
+    }
+
+    override fun visitRuntimeVisibleParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleParameterAnnotationsAttribute) {
+        printer.println("RuntimeVisibleParameterAnnotations:")
+        visitRuntimeParameterAnnotationsAttribute(classFile, method, attribute)
     }
 
     // Implementations for CodeAttributeVisitor

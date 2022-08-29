@@ -18,8 +18,6 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.annotation.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.annotation.RuntimeVisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
@@ -106,8 +104,8 @@ internal enum class AttributeType constructor(val attributeName: String, private
     DEPRECATED                             ("Deprecated", DeprecatedAttribute.Companion::empty),
     RUNTIME_VISIBLE_ANNOTATIONS            ("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::empty),
     RUNTIME_INVISIBLE_ANNOTATIONS          ("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::empty),
-    RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS  ("RuntimeVisibleParameterAnnotations", null),
-    RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", null),
+    RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS  ("RuntimeVisibleParameterAnnotations", RuntimeVisibleParameterAnnotationsAttribute.Companion::empty),
+    RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", RuntimeInvisibleParameterAnnotationsAttribute.Companion::empty),
     RUNTIME_VISIBLE_TYPE_ANNOTATIONS       ("RuntimeVisibleTypeAnnotations", null),
     RUNTIME_INVISIBLE_TYPE_ANNOTATIONS     ("RuntimeInvisibleTypeAnnotations", null),
     ANNOTATION_DEFAULT                     ("AnnotationDefault", AnnotationDefaultAttribute.Companion::empty),
