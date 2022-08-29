@@ -114,7 +114,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     BOOTSTRAP_METHOD                       ("BootstrapMethod", BootstrapMethodsAttribute.Companion::empty),
     METHOD_PARAMETERS                      ("MethodParameters", MethodParametersAttribute.Companion::empty),
     MODULE                                 ("Module", null),
-    MODULE_PACKAGES                        ("ModulePackages", null),
+    MODULE_PACKAGES                        ("ModulePackages", ModulePackagesAttribute.Companion::empty),
     MODULE_MAIN_CLASS                      ("ModuleMainClass", ModuleMainClassAttribute.Companion::empty),
     NEST_HOST                              ("NestHost", NestHostAttribute.Companion::empty),
     NEST_MEMBERS                           ("NestMembers", NestMembersAttribute.Companion::empty),

@@ -39,6 +39,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitModulePackages(classFile: ClassFile, attribute: ModulePackagesAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitNestHostAttribute(classFile: ClassFile, attribute: NestHostAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
