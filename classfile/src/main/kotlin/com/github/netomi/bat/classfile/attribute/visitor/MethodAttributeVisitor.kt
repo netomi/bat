@@ -25,6 +25,10 @@ import com.github.netomi.bat.classfile.annotation.RuntimeVisibleAnnotationsAttri
 
 fun interface MethodAttributeVisitor: AnyAttributeVisitor {
 
+    fun visitAnnotationDefaultAttribute(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
         visitAnyAttribute(classFile, attribute)
     }

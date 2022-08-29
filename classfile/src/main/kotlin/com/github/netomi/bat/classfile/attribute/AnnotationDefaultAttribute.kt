@@ -17,7 +17,12 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.annotation.ClassElementValue
+import com.github.netomi.bat.classfile.annotation.ElementValue
+import com.github.netomi.bat.classfile.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
@@ -25,54 +30,48 @@ import java.io.DataOutput
 import java.io.IOException
 
 /**
- * A class representing a ConstantValue attribute in a class file.
+ * A class representing an AnnotationDefault attribute in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2">ConstantValue Attribute</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.22">AnnotationDefault Attribute</a>
  */
-data class ConstantValueAttribute
+data class AnnotationDefaultAttribute
     private constructor(override val attributeNameIndex:  Int,
-                         private var _constantValueIndex: Int = -1)
-    : Attribute(attributeNameIndex), AttachedToField {
+                         // Pick an arbitrary empty element value as default, will be modified during read
+                         private var _elementValue:       ElementValue = ClassElementValue.empty())
+    : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType
-        get() = AttributeType.CONSTANT_VALUE
+        get() = AttributeType.ANNOTATION_DEFAULT
 
-    val constantValueIndex: Int
-        get() = _constantValueIndex
-
-    fun getConstantValue(classFile: ClassFile): Constant {
-        return classFile.getConstant(constantValueIndex)
-    }
+    val elementValue: ElementValue
+        get() = _elementValue
 
     override val dataSize: Int
-        get() = ATTRIBUTE_LENGTH
+        get() = TODO("implement")
 
     @Throws(IOException::class)
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
         val length = input.readInt()
-        assert(length == ATTRIBUTE_LENGTH)
-        _constantValueIndex = input.readUnsignedShort()
+        _elementValue = ElementValue.read(input)
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: DataOutput) {
         output.write(dataSize)
-        output.writeShort(constantValueIndex)
+        elementValue.write(output)
     }
 
-    override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitConstantValueAttribute(classFile, field, this)
+    override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
+        visitor.visitAnnotationDefaultAttribute(classFile, method, this)
     }
 
-    fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.getConstant(constantValueIndex).accept(classFile, visitor)
+    fun elementValueAccept(classFile: ClassFile, visitor: ElementValueVisitor) {
+        elementValue.accept(classFile, visitor)
     }
 
     companion object {
-        private const val ATTRIBUTE_LENGTH = 2
-
-        internal fun empty(attributeNameIndex: Int): ConstantValueAttribute {
-            return ConstantValueAttribute(attributeNameIndex)
+        internal fun empty(attributeNameIndex: Int): AnnotationDefaultAttribute {
+            return AnnotationDefaultAttribute(attributeNameIndex)
         }
     }
 }
