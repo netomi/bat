@@ -14,10 +14,10 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.annotation
+package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException

@@ -14,10 +14,11 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.annotation.visitor
+package com.github.netomi.bat.classfile.attribute.annotation.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.annotation.*
+import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
 

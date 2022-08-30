@@ -14,9 +14,12 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.attribute
+package com.github.netomi.bat.classfile.attribute.module
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.AttachedToClass
+import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.PackageConstant
 import java.io.DataInput

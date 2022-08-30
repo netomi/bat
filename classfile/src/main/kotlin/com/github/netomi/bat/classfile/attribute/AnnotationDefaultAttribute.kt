@@ -16,15 +16,11 @@
 package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.annotation.ClassElementValue
-import com.github.netomi.bat.classfile.annotation.ElementValue
-import com.github.netomi.bat.classfile.annotation.visitor.ElementValueVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.annotation.ClassElementValue
+import com.github.netomi.bat.classfile.attribute.annotation.ElementValue
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
-import com.github.netomi.bat.classfile.constant.Constant
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -37,7 +33,7 @@ import java.io.IOException
 data class AnnotationDefaultAttribute
     private constructor(override val attributeNameIndex:  Int,
                          // Pick an arbitrary empty element value as default, will be modified during read
-                         private var _elementValue:       ElementValue = ClassElementValue.empty())
+                         private var _elementValue: ElementValue = ClassElementValue.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType

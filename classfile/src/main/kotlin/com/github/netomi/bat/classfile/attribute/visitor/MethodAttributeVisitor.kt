@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.attribute.visitor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface MethodAttributeVisitor: AnyAttributeVisitor {
 

@@ -13,11 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.attribute
+package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.annotation.Annotation
+import com.github.netomi.bat.classfile.attribute.AttachedToMethod
+import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
@@ -26,21 +27,21 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.18">RuntimeVisibleParameterAnnotations Attribute</a>
  */
-data class RuntimeVisibleParameterAnnotationsAttribute
+data class RuntimeInvisibleParameterAnnotationsAttribute
     private constructor(override val attributeNameIndex:   Int,
                         override var parameterAnnotations: MutableList<MutableList<Annotation>> = mutableListOfCapacity(0))
     : RuntimeParameterAnnotationsAttribute(attributeNameIndex, parameterAnnotations), AttachedToMethod {
 
     override val type: AttributeType
-        get() = AttributeType.RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS
+        get() = AttributeType.RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitRuntimeVisibleParameterAnnotationsAttribute(classFile, method, this)
+        visitor.visitRuntimeInvisibleParameterAnnotationsAttribute(classFile, method, this)
     }
 
     companion object {
-        internal fun empty(attributeNameIndex: Int): RuntimeVisibleParameterAnnotationsAttribute {
-            return RuntimeVisibleParameterAnnotationsAttribute(attributeNameIndex)
+        internal fun empty(attributeNameIndex: Int): RuntimeInvisibleParameterAnnotationsAttribute {
+            return RuntimeInvisibleParameterAnnotationsAttribute(attributeNameIndex)
         }
     }
 }

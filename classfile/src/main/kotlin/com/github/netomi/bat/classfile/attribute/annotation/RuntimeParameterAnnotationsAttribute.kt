@@ -13,12 +13,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.attribute
+package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.annotation.Annotation
-import com.github.netomi.bat.classfile.annotation.visitor.AnnotationVisitor
-import com.github.netomi.bat.classfile.annotation.visitor.AnnotationVisitorIndexed
+import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput

@@ -13,10 +13,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.annotation.visitor
+package com.github.netomi.bat.classfile.attribute.annotation.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.annotation.Annotation
+import com.github.netomi.bat.classfile.attribute.annotation.Annotation
 import com.github.netomi.bat.visitor.AbstractCollector
 import com.github.netomi.bat.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
@@ -61,8 +61,9 @@ class AnnotationCollector: AbstractCollector<Annotation>(), AnnotationVisitor {
     }
 }
 
-private class MultiAnnotationVisitor constructor(       visitor:       AnnotationVisitor,
-                                                 vararg otherVisitors: AnnotationVisitor)
+private class MultiAnnotationVisitor constructor(visitor: AnnotationVisitor,
+                                                 vararg otherVisitors: AnnotationVisitor
+)
     : AbstractMultiVisitor<AnnotationVisitor>(visitor, *otherVisitors), AnnotationVisitor {
 
     override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {

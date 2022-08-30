@@ -13,45 +13,48 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.attribute
+package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.annotation.Annotation
+import com.github.netomi.bat.classfile.attribute.AttachedToClass
+import com.github.netomi.bat.classfile.attribute.AttachedToField
+import com.github.netomi.bat.classfile.attribute.AttachedToMethod
+import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
- * A class representing a RuntimeVisibleAnnotations attribute in a class file.
+ * A class representing a RuntimeInvisibleAnnotations attribute in a class file.
  *
- * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.16">RuntimeVisibleAnnotations Attribute</a>
+ * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.17">RuntimeInvisibleAnnotations Attribute</a>
  */
-data class RuntimeVisibleAnnotationsAttribute
+data class RuntimeInvisibleAnnotationsAttribute
     private constructor(override val attributeNameIndex: Int,
                         override var annotations:        MutableList<Annotation> = mutableListOfCapacity(0))
     : RuntimeAnnotationsAttribute(attributeNameIndex, annotations), AttachedToClass, AttachedToField, AttachedToMethod {
 
     override val type: AttributeType
-        get() = AttributeType.RUNTIME_VISIBLE_ANNOTATIONS
+        get() = AttributeType.RUNTIME_INVISIBLE_ANNOTATIONS
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, this)
+        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, this)
     }
 
     override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, field, this)
+        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, field, this)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitRuntimeVisibleAnnotationsAttribute(classFile, method, this)
+        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, method, this)
     }
 
     companion object {
-        internal fun empty(attributeNameIndex: Int): RuntimeVisibleAnnotationsAttribute {
-            return RuntimeVisibleAnnotationsAttribute(attributeNameIndex)
+        internal fun empty(attributeNameIndex: Int): RuntimeInvisibleAnnotationsAttribute {
+            return RuntimeInvisibleAnnotationsAttribute(attributeNameIndex)
         }
     }
 }

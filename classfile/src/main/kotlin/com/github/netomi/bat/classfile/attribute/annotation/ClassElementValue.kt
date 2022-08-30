@@ -13,39 +13,40 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.classfile.annotation
+
+package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-data class AnnotationElementValue private constructor(private var _annotation: Annotation = Annotation.empty()) : ElementValue() {
+data class ClassElementValue private constructor(private var _classIndex: Int = -1) : ElementValue() {
 
     override val type: ElementValueType
-        get() = ElementValueType.ANNOTATION
+        get() = ElementValueType.CLASS
 
-    val annotation: Annotation
-        get() = _annotation
+    val classIndex: Int
+        get() = _classIndex
 
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
-        _annotation = Annotation.readAnnotation(input)
+        _classIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeElementValue(output: DataOutput) {
-        annotation.write(output)
+        output.writeShort(classIndex)
     }
 
     override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {
-        visitor.visitAnnotationElementValue(classFile, this)
+        visitor.visitClassElementValue(classFile, this)
     }
 
     companion object {
-        internal fun empty(): AnnotationElementValue {
-            return AnnotationElementValue()
+        internal fun empty(): ClassElementValue {
+            return ClassElementValue()
         }
     }
 }
