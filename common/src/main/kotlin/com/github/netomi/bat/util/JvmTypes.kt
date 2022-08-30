@@ -19,8 +19,8 @@ package com.github.netomi.bat.util
 import java.util.*
 
 // common class type constants
-const val JAVA_LANG_OBJECT_TYPE = "Ljava/lang/Object;"
-const val JAVA_LANG_STRING_TYPE = "Ljava/lang/String;"
+val JAVA_LANG_OBJECT_TYPE = "Ljava/lang/Object;".asJvmType()
+val JAVA_LANG_STRING_TYPE = "Ljava/lang/String;".asJvmType()
 
 // primitive types
 const val INT_TYPE     = "I"

@@ -33,7 +33,7 @@ class Dvm constructor(private val classDefPool: ClassDefPool) {
     private val dvmNativeClassMap = mutableMapOf<String, DvmNativeClass>()
 
     init {
-        dvmNativeClassMap[JAVA_LANG_OBJECT_TYPE] = DvmNativeClass.of(ObjectOverride::class.java)
+        dvmNativeClassMap[JAVA_LANG_OBJECT_TYPE.type] = DvmNativeClass.of(ObjectOverride::class.java)
     }
 
     fun getClass(type: String): DvmClass {

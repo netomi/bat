@@ -21,6 +21,7 @@ import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.util.toShortyFormat
 import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
+import com.github.netomi.bat.util.JvmType
 import java.util.*
 
 class DexEditor private constructor(val dexFile: DexFile) {
@@ -129,16 +130,16 @@ class DexEditor private constructor(val dexFile: DexFile) {
     fun addClassDef(classType:  String,
                     visibility: Visibility,
                     modifiers:  EnumSet<ClassModifier> = EnumSet.noneOf(ClassModifier::class.java),
-                    superType:  String? = JAVA_LANG_OBJECT_TYPE,
+                    superType:  String? = JAVA_LANG_OBJECT_TYPE.type,
                     sourceFile: String? = null): ClassDefEditor {
         return addClassDef(classType, accessFlagsOf(visibility, modifiers), superType, sourceFile)
     }
 
-    fun addClassDef(classType: DexType, accessFlags: Int, superType: DexType? = JAVA_LANG_OBJECT_TYPE.asDexType(), sourceFile: String? = null): ClassDefEditor {
+    fun addClassDef(classType: DexType, accessFlags: Int, superType: JvmType? = JAVA_LANG_OBJECT_TYPE, sourceFile: String? = null): ClassDefEditor {
         return addClassDef(classType.type, accessFlags, superType?.type, sourceFile)
     }
 
-    fun addClassDef(classType: String, accessFlags: Int, superType: String? = JAVA_LANG_OBJECT_TYPE, sourceFile: String? = null): ClassDefEditor {
+    fun addClassDef(classType: String, accessFlags: Int, superType: String? = JAVA_LANG_OBJECT_TYPE.type, sourceFile: String? = null): ClassDefEditor {
         val classTypeIndex  = addOrGetTypeIDIndex(classType)
         val superTypeIndex  = if (superType != null) addOrGetTypeIDIndex(superType) else NO_INDEX
         val sourceFileIndex = if (sourceFile != null) addOrGetStringIDIndex(sourceFile) else NO_INDEX
