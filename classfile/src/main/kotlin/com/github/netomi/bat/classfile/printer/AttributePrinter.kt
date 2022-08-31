@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.escapeAsJavaString
@@ -31,6 +32,7 @@ import com.github.netomi.bat.util.isAsciiPrintable
 internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor, ElementValueVisitor, AnnotationVisitorIndexed {
 
     private val referencedIndexPrinter = ReferencedIndexPrinter(printer)
+    private val stackMapFramePrinter   = StackMapFramePrinter(printer)
 
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
         // TODO("Not yet implemented")
@@ -143,6 +145,13 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                             element.getDescriptor(classFile)))
             }
         }
+        printer.levelDown()
+    }
+
+    override fun visitStackMapTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {
+        printer.println("StackMapTable: number_of_entries = ${attribute.size}")
+        printer.levelUp()
+        attribute.stackMapFramesAccept(classFile, stackMapFramePrinter)
         printer.levelDown()
     }
 

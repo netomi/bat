@@ -16,15 +16,19 @@
 
 package com.github.netomi.bat.classfile.attribute.preverification
 
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 
-abstract class StackMapFrame protected constructor(protected val frameType: Int) {
+abstract class StackMapFrame protected constructor(val frameType: Int) {
     internal abstract val type: StackMapFrameType
 
     abstract val offsetDelta: Int
 
     protected open fun readData(input: DataInput) {}
+
+    abstract fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor)
 
     companion object {
         internal fun read(input: DataInput): StackMapFrame {
@@ -43,6 +47,10 @@ class SameFrame private constructor(frameType: Int): StackMapFrame(frameType) {
 
     override val offsetDelta: Int
         get() = frameType
+
+    override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
+        visitor.visitSameFrame(classFile, this)
+    }
 
     companion object {
         internal fun of(frameType: Int): SameFrame {
@@ -67,6 +75,10 @@ class ChopFrame private constructor(            frameType:    Int,
         _offsetDelta = input.readUnsignedShort()
     }
 
+    override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
+        visitor.visitChopFrame(classFile, this)
+    }
+
     companion object {
         internal fun of(frameType: Int): ChopFrame {
             require(frameType in 248 .. 250)
@@ -85,6 +97,10 @@ class SameFrameExtended private constructor(            frameType:    Int,
 
     override fun readData(input: DataInput) {
         _offsetDelta = input.readUnsignedShort()
+    }
+
+    override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
+        visitor.visitSameFrameExtended(classFile, this)
     }
 
     companion object {
@@ -119,12 +135,17 @@ class AppendFrame private constructor(            frameType:    Int,
     override fun iterator(): Iterator<VerificationType> {
         return locals.iterator()
     }
+
     override fun readData(input: DataInput) {
         _offsetDelta = input.readUnsignedShort()
         locals = mutableListOfCapacity(appendedVariables)
         for (i in 0 until appendedVariables) {
             locals.add(VerificationType.read(input))
         }
+    }
+
+    override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
+        visitor.visitAppendFrame(classFile, this)
     }
 
     companion object {
@@ -150,6 +171,10 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
 
     override fun readData(input: DataInput) {
         _stack = VerificationType.read(input)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
+        visitor.visitSameLocalsOneStackItemFrame(classFile, this)
     }
 
     companion object {
@@ -179,6 +204,10 @@ class SameLocalsOneStackItemFrameExtended private constructor(            frameT
         _stack = VerificationType.read(input)
     }
 
+    override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
+        visitor.visitSameLocalsOneStackItemFrameExtended(classFile, this)
+    }
+
     companion object {
         internal fun of(frameType: Int): SameLocalsOneStackItemFrameExtended {
             require(frameType == 247)
@@ -204,7 +233,7 @@ class FullFrame private constructor(            frameType:    Int,
 
     val stack: List<VerificationType>
         get() = _stack
-    
+
     override fun readData(input: DataInput) {
         _offsetDelta = input.readUnsignedShort()
         val numberOfLocals = input.readUnsignedShort()
@@ -217,6 +246,10 @@ class FullFrame private constructor(            frameType:    Int,
         for (i in 0 until numberOfStackItems) {
             _stack.add(VerificationType.read(input))
         }
+    }
+
+    override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
+        visitor.visitFullFrame(classFile, this)
     }
 
     companion object {

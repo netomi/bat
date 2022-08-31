@@ -24,6 +24,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnota
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleParameterAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
+import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
@@ -96,7 +97,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
 
     CONSTANT_VALUE                         ("ConstantValue", ConstantValueAttribute.Companion::empty),
     CODE                                   ("Code", CodeAttribute.Companion::empty),
-    STACK_MAP_TABLE                        ("StackMapTable", null),
+    STACK_MAP_TABLE                        ("StackMapTable", StackMapTableAttribute.Companion::empty),
     EXCEPTIONS                             ("Exceptions", ExceptionsAttribute.Companion::empty),
     INNER_CLASSES                          ("InnerClasses", InnerClassesAttribute.Companion::empty),
     ENCLOSING_METHOD                       ("EnclosingMethod", EnclosingMethodAttribute.Companion::empty),
