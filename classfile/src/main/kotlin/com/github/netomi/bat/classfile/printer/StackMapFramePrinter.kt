@@ -32,7 +32,7 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
         printer.println("frame_type = ${frame.frameType} /* append */")
         printer.levelUp()
         printer.println("offset_delta = ${frame.offsetDelta}")
-        val locals = frame.map { it.toHumanReadableString() }.joinToString(separator = ", ", prefix = "[ ", postfix = " ]")
+        val locals = frame.map { it.toHumanReadableString(classFile) }.joinToString(separator = ", ", prefix = "[ ", postfix = " ]")
         printer.println("locals = $locals")
         printer.levelDown()
     }
@@ -40,11 +40,19 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
     override fun visitSameFrame(classFile: ClassFile, frame: SameFrame) {
         printer.println("frame_type = ${frame.frameType} /* same */")
     }
+
+    override fun visitChopFrame(classFile: ClassFile, frame: ChopFrame) {
+        printer.println("frame_type = ${frame.frameType} /* chop */")
+        printer.levelUp()
+        printer.println("offset_delta = ${frame.offsetDelta}")
+        printer.levelDown()
+    }
 }
 
-internal fun VerificationType.toHumanReadableString(): String {
+internal fun VerificationType.toHumanReadableString(classFile: ClassFile): String {
     return when (this.type) {
         ItemType.INTEGER -> "int"
+        ItemType.OBJECT  -> "class ${(this as ObjectVariable).getClassName(classFile)}"
         else             -> "unknown"
     }
 }
