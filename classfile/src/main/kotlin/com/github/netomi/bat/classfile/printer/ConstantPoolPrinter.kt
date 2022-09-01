@@ -21,8 +21,6 @@ import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.ConstantType
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.escapeAsJavaString
-import com.github.netomi.bat.util.isAsciiPrintable
 
 internal class ConstantPoolPrinter constructor(private val printer: IndentingPrinter): ConstantVisitor {
 
