@@ -83,7 +83,7 @@ data class BootstrapMethodsAttribute
 
 data class BootstrapMethodElement
     private constructor(private var _bootstrapMethodRefIndex: Int      = -1,
-                        private var _bootstrapArguments:      IntArray = IntArray(0)) {
+                        private var bootstrapArguments:       IntArray = IntArray(0)): Sequence<Int> {
 
     val bootstrapMethodRefIndex: Int
         get() = _bootstrapMethodRefIndex
@@ -92,8 +92,16 @@ data class BootstrapMethodElement
         return classFile.getConstant(bootstrapMethodRefIndex) as MethodHandleConstant
     }
 
-    val bootstrapArguments: IntArray
-        get() = _bootstrapArguments
+    val size: Int
+        get() = bootstrapArguments.size
+
+    operator fun get(index: Int): Int {
+        return bootstrapArguments[index]
+    }
+
+    override fun iterator(): Iterator<Int> {
+        return bootstrapArguments.iterator()
+    }
 
     fun getBootstrapArguments(classFile: ClassFile): List<Constant> {
         return bootstrapArguments.map { classFile.getConstant(it) }
@@ -105,9 +113,9 @@ data class BootstrapMethodElement
     private fun read(input: DataInput) {
         _bootstrapMethodRefIndex = input.readUnsignedShort()
         val numBootstrapArguments = input.readUnsignedShort()
-        _bootstrapArguments = IntArray(numBootstrapArguments)
+        bootstrapArguments = IntArray(numBootstrapArguments)
         for (i in 0 until numBootstrapArguments) {
-            _bootstrapArguments[i] = input.readUnsignedShort()
+            bootstrapArguments[i] = input.readUnsignedShort()
         }
     }
 
@@ -117,6 +125,10 @@ data class BootstrapMethodElement
         for (index in bootstrapArguments) {
             output.writeShort(index)
         }
+    }
+
+    fun bootstrapMethodRefAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.getConstant(_bootstrapMethodRefIndex).accept(classFile, visitor)
     }
 
     fun bootstrapArgumentsAccept(classFile: ClassFile, visitor: ConstantVisitor) {

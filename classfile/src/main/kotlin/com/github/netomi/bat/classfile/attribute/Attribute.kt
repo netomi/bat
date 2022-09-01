@@ -116,7 +116,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     RUNTIME_VISIBLE_TYPE_ANNOTATIONS       ("RuntimeVisibleTypeAnnotations", null),
     RUNTIME_INVISIBLE_TYPE_ANNOTATIONS     ("RuntimeInvisibleTypeAnnotations", null),
     ANNOTATION_DEFAULT                     ("AnnotationDefault", AnnotationDefaultAttribute.Companion::empty),
-    BOOTSTRAP_METHOD                       ("BootstrapMethod", BootstrapMethodsAttribute.Companion::empty),
+    BOOTSTRAP_METHOD                       ("BootstrapMethods", BootstrapMethodsAttribute.Companion::empty),
     METHOD_PARAMETERS                      ("MethodParameters", MethodParametersAttribute.Companion::empty),
     MODULE                                 ("Module", null),
     MODULE_PACKAGES                        ("ModulePackages", ModulePackagesAttribute.Companion::empty),

@@ -26,22 +26,24 @@ import com.github.netomi.bat.util.isAsciiPrintable
 
 internal class ConstantPrinter constructor(private val printer: IndentingPrinter): ConstantVisitor {
 
-    override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {}
+    override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {
+        printer.print(constant)
+    }
 
     override fun visitIntegerConstant(classFile: ClassFile, constant: IntegerConstant) {
-        printer.print("%-19s %d".format("Integer", constant.value))
+        printer.print(constant.value)
     }
 
     override fun visitLongConstant(classFile: ClassFile, constant: LongConstant) {
-        printer.print("%-19s %d".format("Long", constant.value))
+        printer.print(constant.value)
     }
 
     override fun visitFloatConstant(classFile: ClassFile, constant: FloatConstant) {
-        printer.print("%-19s %f".format("Float", constant.value))
+        printer.print("%f".format(constant.value))
     }
 
     override fun visitDoubleConstant(classFile: ClassFile, constant: DoubleConstant) {
-        printer.print("%-19s %f".format("Double", constant.value))
+        printer.print("%f".format(constant.value))
     }
 
     override fun visitUtf8Constant(classFile: ClassFile, constant: Utf8Constant) {
@@ -51,49 +53,44 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
             constant.value
         }
 
-        printer.print("%-19s %s".format("Utf8", output))
+        printer.print(output)
     }
 
     override fun visitStringConstant(classFile: ClassFile, constant: StringConstant) {
-        printer.print("%-19s %-15s // %s".format("String", "#" + constant.stringIndex, constant.getString(classFile)))
+        visitUtf8Constant(classFile, classFile.getConstant(constant.stringIndex) as Utf8Constant)
     }
 
     override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
         val className  = refConstant.getClassName(classFile)
         val memberName = refConstant.getMemberName(classFile)
         val descriptor = refConstant.getDescriptor(classFile)
-
-        val str = "$className.$memberName:$descriptor"
-        var type = "Unknown"
-        when (refConstant.type) {
-            ConstantType.FIELD_REF            -> type = "Fieldref"
-            ConstantType.METHOD_REF           -> type = "Methodref"
-            ConstantType.INTERFACE_METHOD_REF -> type = "InterfaceMethodref"
-            else -> {
-                // do nothing
-            }
-        }
-        printer.print("%-19s %-15s // %s".format(type, "#${refConstant.classIndex}.#${refConstant.nameAndTypeIndex}", str))
+        printer.print("$className.$memberName:$descriptor")
     }
 
     override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {
-        printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, constant.getClassName(classFile)))
+        printer.print(constant.getClassName(classFile))
     }
 
     override fun visitNameAndTypeConstant(classFile: ClassFile, constant: NameAndTypeConstant) {
         val memberName = classFile.getString(constant.nameIndex)
         val descriptor = classFile.getString(constant.descriptorIndex)
-        val str = "$memberName:$descriptor"
-        printer.print("%-19s %-15s // %s".format("NameAndType",
-            "#" + constant.nameIndex + ".#" + constant.descriptorIndex,
-            str))
+        printer.print("$memberName:$descriptor")
+    }
+
+    override fun visitMethodTypeConstant(classFile: ClassFile, constant: MethodTypeConstant) {
+        visitUtf8Constant(classFile, classFile.getConstant(constant.descriptorIndex) as Utf8Constant)
+    }
+
+    override fun visitMethodHandleConstant(classFile: ClassFile, constant: MethodHandleConstant) {
+        printer.print("${constant.referenceKind.simpleName} ")
+        constant.referenceAccept(classFile, this)
     }
 
     override fun visitModuleConstant(classFile: ClassFile, constant: ModuleConstant) {
-        printer.print(String.format("%-19s %-15s // %s", "Module", "#" + constant.nameIndex, constant.getModuleName(classFile)))
+        printer.print(constant.getModuleName(classFile))
     }
 
     override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
-        printer.print("%-19s %-15s // %s".format("Class", "#" + constant.nameIndex, constant.getPackageName(classFile)))
+        printer.print(constant.getPackageName(classFile))
     }
 }

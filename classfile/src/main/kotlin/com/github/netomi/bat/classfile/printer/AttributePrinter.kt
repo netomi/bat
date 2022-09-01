@@ -33,6 +33,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     private val referencedIndexPrinter = ReferencedIndexPrinter(printer)
     private val stackMapFramePrinter   = StackMapFramePrinter(printer)
+    private val constantPrinter        = ConstantPrinter(printer)
 
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
         // TODO("Not yet implemented")
@@ -152,6 +153,31 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.println("StackMapTable: number_of_entries = ${attribute.size}")
         printer.levelUp()
         attribute.stackMapFramesAccept(classFile, stackMapFramePrinter)
+        printer.levelDown()
+    }
+
+    override fun visitBootstrapMethodsAttribute(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
+        printer.println("BootstrapMethods:")
+
+        printer.levelUp()
+
+        for (index in 0 until attribute.size) {
+            val element = attribute[index]
+            printer.print("$index: #${element.bootstrapMethodRefIndex} ")
+            element.bootstrapMethodRefAccept(classFile, constantPrinter)
+            printer.println()
+            printer.levelUp()
+            printer.println("Method arguments:")
+            printer.levelUp()
+            for (argumentIndex in element) {
+                printer.print("#${argumentIndex} ")
+                classFile.getConstant(argumentIndex).accept(classFile, constantPrinter)
+                printer.println()
+            }
+            printer.levelDown()
+            printer.levelDown()
+        }
+
         printer.levelDown()
     }
 

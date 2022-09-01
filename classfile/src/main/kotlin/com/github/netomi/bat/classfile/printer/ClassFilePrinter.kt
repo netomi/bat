@@ -27,8 +27,7 @@ import java.io.OutputStreamWriter
 import java.io.Writer
 import java.util.*
 
-class ClassFilePrinter :
-    ClassFileVisitor, MemberVisitor
+class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 {
     private val printer:          IndentingPrinter
     private val attributePrinter: AttributePrinter
@@ -67,7 +66,7 @@ class ClassFilePrinter :
         printer.println("Constant pool:")
         printer.levelUp()
 
-        val constantPrinter = ConstantPrinter(printer)
+        val constantPrinter = ConstantPoolPrinter(printer)
         classFile.constantPoolAccept { cf, index, constant ->
             printer.print(String.format("%4s = ", "#$index"))
             constant.accept(cf, constantPrinter)
