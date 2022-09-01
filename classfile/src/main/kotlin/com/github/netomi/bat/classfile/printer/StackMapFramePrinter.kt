@@ -47,6 +47,24 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
         printer.println("offset_delta = ${frame.offsetDelta}")
         printer.levelDown()
     }
+
+    override fun visitFullFrame(classFile: ClassFile, frame: FullFrame) {
+        printer.println("frame_type = ${frame.frameType} /* full_frame */")
+        printer.levelUp()
+        printer.println("offset_delta = ${frame.offsetDelta}")
+        val locals = frame.locals.joinToString(separator = ", ", prefix = "[ ", postfix = " ]") { it.toHumanReadableString(classFile) }
+        printer.println("locals = $locals")
+        val stack = if (frame.stack.isNotEmpty()) "[]" else frame.stack.joinToString(separator = ", ", prefix = "[ ", postfix = " ]") { it.toHumanReadableString(classFile) }
+        printer.println("stack = $stack")
+        printer.levelDown()
+    }
+
+    override fun visitSameLocalsOneStackItemFrame(classFile: ClassFile, frame: SameLocalsOneStackItemFrame) {
+        printer.println("frame_type = ${frame.frameType} /* same_locals_1_stack_item */")
+        printer.levelUp()
+        printer.println("stack = [ ${frame.stackItem.toHumanReadableString(classFile)} ]")
+        printer.levelDown()
+    }
 }
 
 internal fun VerificationType.toHumanReadableString(classFile: ClassFile): String {
