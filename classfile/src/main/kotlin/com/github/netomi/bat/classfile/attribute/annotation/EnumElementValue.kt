@@ -34,6 +34,14 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
     val constNameIndex: Int
         get() = _constNameIndex
 
+    fun getTypeName(classFile: ClassFile): String {
+        return classFile.getString(typeNameIndex)
+    }
+
+    fun getConstName(classFile: ClassFile): String {
+        return classFile.getString(constNameIndex)
+    }
+
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
         _typeNameIndex  = input.readUnsignedShort()

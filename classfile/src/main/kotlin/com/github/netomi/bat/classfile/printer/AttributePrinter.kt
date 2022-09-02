@@ -152,6 +152,19 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     // Implementations for MethodAttributeVisitor
 
+    override fun visitAnnotationDefaultAttribute(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
+        printer.println("AnnotationDefault:")
+        printer.levelUp()
+        printer.print("default_value: ")
+        attribute.elementValue.accept(classFile, referencedIndexPrinter)
+        printer.println()
+        printer.levelUp()
+        attribute.elementValue.accept(classFile, this)
+        printer.println()
+        printer.levelDown()
+        printer.levelDown()
+    }
+
     override fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
         printer.println("Code:")
         printer.levelUp()
@@ -258,12 +271,16 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
 
-    override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        printer.print(classFile.getInteger(elementValue.constValueIndex))
+    override fun visitAnyConstElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        elementValue.getConstant(classFile).accept(classFile, constantPrinter)
     }
 
     override fun visitBooleanElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        printer.print(classFile.getBoolean(elementValue.constValueIndex))
+        printer.print(elementValue.getBoolean(classFile))
+    }
+
+    override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
+        printer.print("${elementValue.getTypeName(classFile)}.${elementValue.getConstName(classFile)}")
     }
 
     override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
