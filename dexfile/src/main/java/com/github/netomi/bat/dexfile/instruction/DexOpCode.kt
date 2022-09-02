@@ -303,7 +303,7 @@ enum class DexOpCode constructor(
     CONST_METHOD_TYPE  (0xff, InstructionFormat.FORMAT_21c, MethodTypeRefInstruction::create, "const-method-type",     DexFormat.FORMAT_039),
 
     // for internal use only
-    INTERNAL_LABEL       (0x100, InstructionFormat.FORMAT_00x, null, "label");
+    INTERNAL_LABEL(0x100, InstructionFormat.FORMAT_00x, null, "label");
 
     val length: Int
         get() = format.instructionLength
@@ -323,16 +323,14 @@ enum class DexOpCode constructor(
     }
 
     companion object {
-        private val opcodeArray: Array<DexOpCode?> = arrayOfNulls(0x100)
+        private val opcodeArray:             Array<DexOpCode?>             = arrayOfNulls(0x100)
         private val mnemonicToOpCodeMapping: MutableMap<String, DexOpCode> = hashMapOf()
 
         init {
-            for (opCode in values()) {
-                // ignore pseudo opcodes
-                if (opCode.format != InstructionFormat.FORMAT_00x) {
-                    opcodeArray[opCode.value and 0xff]      = opCode
-                    mnemonicToOpCodeMapping[opCode.mnemonic] = opCode
-                }
+            // ignore pseudo opcodes
+            for (opCode in values().filter { it.value <= 0xff && it.format != InstructionFormat.FORMAT_00x }) {
+                opcodeArray[opCode.value]                = opCode
+                mnemonicToOpCodeMapping[opCode.mnemonic] = opCode
             }
         }
 

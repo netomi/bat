@@ -22,7 +22,7 @@ enum class JvmOpCode constructor(
 
     AALOAD         (0x32, "aaload"),
     AASTORE        (0x53, "aastore"),
-    ACONST_NULL    (0x1, "aconst_null"),
+    ACONST_NULL    (0x01, "aconst_null"),
     ALOAD          (0x19, "aload"),
     ALOAD_0        (0x2a, "aload_0"),
     ALOAD_1        (0x2b, "aload_1"),
@@ -51,8 +51,8 @@ enum class JvmOpCode constructor(
     DASTORE        (0x52, "dastore"),
     DCMPG          (0x98, "dcmpg"),
     DCMPL          (0x97, "dcmpl"),
-    DCONST_0       (0xe, "dconst_0"),
-    DCONST_1       (0xf, "dconst_1"),
+    DCONST_0       (0x0e, "dconst_0"),
+    DCONST_1       (0x0f, "dconst_1"),
     DDIV           (0x6f, "ddiv"),
     DLOAD          (0x18, "dload"),
     DLOAD_0        (0x26, "dload_0"),
@@ -83,9 +83,9 @@ enum class JvmOpCode constructor(
     FASTORE        (0x51, "fastore"),
     FCMPG          (0x96, "fcmpg"),
     FCMPL          (0x95, "fcmpl"),
-    FCONST_0       (0xb, "fconst_0"),
-    FCONST_1       (0xc, "fconst_1"),
-    FCONST_2       (0xd, "fconst_2"),
+    FCONST_0       (0x0b, "fconst_0"),
+    FCONST_1       (0x0c, "fconst_1"),
+    FCONST_2       (0x0d, "fconst_2"),
     FDIV           (0x6e, "fdiv"),
     FLOAD          (0x17, "fload"),
     FLOAD_0        (0x22, "fload_0"),
@@ -116,13 +116,13 @@ enum class JvmOpCode constructor(
     IALOAD         (0x2e, "iaload"),
     IAND           (0x7e, "iand"),
     IASTORE        (0x4f, "iastore"),
-    ICONST_M1      (0x2, "iconst_m1"),
-    ICONST_0       (0x3, "iconst_0"),
-    ICONST_1       (0x4, "iconst_1"),
-    ICONST_2       (0x5, "iconst_2"),
-    ICONST_3       (0x6, "iconst_3"),
-    ICONST_4       (0x7, "iconst_4"),
-    ICONST_5       (0x8, "iconst_5"),
+    ICONST_M1      (0x02, "iconst_m1"),
+    ICONST_0       (0x03, "iconst_0"),
+    ICONST_1       (0x04, "iconst_1"),
+    ICONST_2       (0x05, "iconst_2"),
+    ICONST_3       (0x06, "iconst_3"),
+    ICONST_4       (0x07, "iconst_4"),
+    ICONST_5       (0x08, "iconst_5"),
     IDIV           (0x6d, "idiv"),
     IF_ACMPEQ      (0xa5, "if_acmpeq"),
     IF_ACMPNE      (0xa6, "if_acmpne"),
@@ -178,7 +178,7 @@ enum class JvmOpCode constructor(
     LASTORE        (0x50, "lastore"),
     LCMP           (0x94, "lcmp"),
     LCONST_0       (0x9, "lconst_0"),
-    LCONST_1       (0xa, "lconst_1"),
+    LCONST_1       (0x0a, "lconst_1"),
     LDC            (0x12, "ldc"),
     LDC_W          (0x13, "ldc_w"),
     LDC2_W         (0x14, "ldc2_w"),
@@ -209,7 +209,7 @@ enum class JvmOpCode constructor(
     MULTINEWARRAY  (0xc5, "multinewarray"),
     NEW            (0xbb, "new"),
     NEWARRAY       (0xbc, "newarray"),
-    NOP            (0x0, "nop"),
+    NOP            (0x00, "nop"),
     POP            (0x57, "pop"),
     POP2           (0x58, "pop2"),
     PUTFIELD       (0xb5, "putfield"),
@@ -221,5 +221,17 @@ enum class JvmOpCode constructor(
     SIPUSH         (0x11, "sipush"),
     SWAP           (0x5f, "swap"),
     TABLESWITCH    (0xaa, "tableswitch"),
-    WIDE           (0xc4, "wide")
+    WIDE           (0xc4, "wide");
+
+    companion object {
+        private val opcodeArray:             Array<JvmOpCode?> = arrayOfNulls(0x100)
+        private val mnemonicToOpCodeMapping: MutableMap<String, JvmOpCode> = hashMapOf()
+
+        init {
+            for (opCode in values().filter { it.value <= 0xff }) {
+                opcodeArray[opCode.value]                = opCode
+                mnemonicToOpCodeMapping[opCode.mnemonic] = opCode
+            }
+        }
+    }
 }
