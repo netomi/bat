@@ -16,8 +16,7 @@
 
 package com.github.netomi.bat.classfile.printer
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.*
@@ -28,6 +27,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
+import java.util.*
 
 internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor, ElementValueVisitor, AnnotationVisitorIndexed {
 
@@ -88,6 +88,60 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
+    override fun visitInnerClassesAttribute(classFile: ClassFile, attribute: InnerClassesAttribute) {
+        printer.println("InnerClasses:")
+        printer.levelUp()
+        for (element in attribute) {
+            val str = buildString {
+                if (element.innerNameIndex != 0) {
+                    append("#${element.innerNameIndex}= ")
+                }
+
+                append("#${element.innerClassIndex}")
+
+                if (element.outerClassIndex != 0) {
+                    append(" of #${element.outerClassIndex}")
+                }
+
+                append(";")
+
+                val modifiers = accessFlagModifiers(element.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
+                val modifiersAsString =
+                    modifiers.filter { !EnumSet.of(AccessFlag.INTERFACE, AccessFlag.PRIVATE, AccessFlag.ENUM).contains(it) }
+                             .map { it.toString().lowercase(Locale.getDefault()) }
+
+                if (modifiersAsString.isNotEmpty()) {
+                    var remainingLength = 39 - length
+                    var addedModifiers = ""
+
+                    for (modifier in modifiersAsString) {
+                        if (modifier.length < remainingLength - 1) {
+                            addedModifiers  += "$modifier "
+                            remainingLength -= modifier.length + 1
+                        }
+                    }
+
+                    insert(0, addedModifiers)
+                }
+            }
+
+            val desc = buildString {
+                if (element.innerNameIndex != 0) {
+                    append("${classFile.getString(element.innerNameIndex)}=")
+                }
+
+                append("class ${classFile.getClassName(element.innerClassIndex)}")
+
+                if (element.outerClassIndex != 0) {
+                    append(" of class ${classFile.getClassName(element.outerClassIndex)}")
+                }
+            }
+
+            printer.println("%-39s // %s".format(str, desc))
+        }
+        printer.levelDown()
+    }
+    
     override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
         printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
     }
