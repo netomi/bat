@@ -26,7 +26,7 @@ fun interface StackMapFrameVisitor {
         visitAnyFrame(classFile, frame)
     }
 
-    fun visitSameFrameExtended(classFile: ClassFile, frame: SameFrameExtended) {
+    fun visitSameExtendedFrame(classFile: ClassFile, frame: SameExtendedFrame) {
         visitAnyFrame(classFile, frame)
     }
 
@@ -46,7 +46,7 @@ fun interface StackMapFrameVisitor {
         visitAnyFrame(classFile, frame)
     }
 
-    fun visitSameLocalsOneStackItemFrameExtended(classFile: ClassFile, frame: SameLocalsOneStackItemFrameExtended) {
+    fun visitSameLocalsOneStackItemExtendedFrame(classFile: ClassFile, frame: SameLocalsOneStackItemExtendedFrame) {
         visitAnyFrame(classFile, frame)
     }
 }

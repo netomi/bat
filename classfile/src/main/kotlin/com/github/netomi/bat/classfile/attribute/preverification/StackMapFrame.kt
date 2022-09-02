@@ -87,10 +87,10 @@ class ChopFrame private constructor(            frameType:    Int,
     }
 }
 
-class SameFrameExtended private constructor(            frameType:    Int,
+class SameExtendedFrame private constructor(            frameType:    Int,
                                             private var _offsetDelta: Int = 0): StackMapFrame(frameType) {
     override val type: StackMapFrameType
-        get() = StackMapFrameType.SAME_FRAME_EXTENDED
+        get() = StackMapFrameType.SAME_EXTENDED_FRAME
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -100,13 +100,13 @@ class SameFrameExtended private constructor(            frameType:    Int,
     }
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
-        visitor.visitSameFrameExtended(classFile, this)
+        visitor.visitSameExtendedFrame(classFile, this)
     }
 
     companion object {
-        internal fun of(frameType: Int): SameFrameExtended {
+        internal fun of(frameType: Int): SameExtendedFrame {
             require(frameType == 251)
-            return SameFrameExtended(frameType)
+            return SameExtendedFrame(frameType)
         }
     }
 }
@@ -185,13 +185,13 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
     }
 }
 
-class SameLocalsOneStackItemFrameExtended private constructor(            frameType:    Int,
+class SameLocalsOneStackItemExtendedFrame private constructor(            frameType:    Int,
                                                               private var _offsetDelta: Int = 0,
                                                               private var _stack:       VerificationType = TopVariable.empty())
     : StackMapFrame(frameType) {
 
     override val type: StackMapFrameType
-        get() = StackMapFrameType.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED
+        get() = StackMapFrameType.SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -205,13 +205,13 @@ class SameLocalsOneStackItemFrameExtended private constructor(            frameT
     }
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
-        visitor.visitSameLocalsOneStackItemFrameExtended(classFile, this)
+        visitor.visitSameLocalsOneStackItemExtendedFrame(classFile, this)
     }
 
     companion object {
-        internal fun of(frameType: Int): SameLocalsOneStackItemFrameExtended {
+        internal fun of(frameType: Int): SameLocalsOneStackItemExtendedFrame {
             require(frameType == 247)
-            return SameLocalsOneStackItemFrameExtended(frameType)
+            return SameLocalsOneStackItemExtendedFrame(frameType)
         }
     }
 }
@@ -263,9 +263,9 @@ class FullFrame private constructor(            frameType:    Int,
 internal enum class StackMapFrameType constructor(private val supplier: (Int) -> StackMapFrame) {
     SAME_FRAME                             (SameFrame.Companion::of),
     SAME_LOCALS_1_STACK_ITEM_FRAME         (SameLocalsOneStackItemFrame.Companion::of),
-    SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED(SameLocalsOneStackItemFrameExtended.Companion::of),
+    SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME(SameLocalsOneStackItemExtendedFrame.Companion::of),
     CHOP_FRAME                             (ChopFrame.Companion::of),
-    SAME_FRAME_EXTENDED                    (SameFrameExtended.Companion::of),
+    SAME_EXTENDED_FRAME                    (SameExtendedFrame.Companion::of),
     APPEND_FRAME                           (AppendFrame.Companion::of),
     FULL_FRAME                             (FullFrame.Companion::of);
 
@@ -276,9 +276,9 @@ internal enum class StackMapFrameType constructor(private val supplier: (Int) ->
             val type = when (tagAsInt) {
                 in 0 .. 63    -> SAME_FRAME
                 in 64 .. 127  -> SAME_LOCALS_1_STACK_ITEM_FRAME
-                247           -> SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED
+                247           -> SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME
                 in 248 .. 250 -> CHOP_FRAME
-                251           -> SAME_FRAME_EXTENDED
+                251           -> SAME_EXTENDED_FRAME
                 in 252 .. 254 -> APPEND_FRAME
                 255           -> FULL_FRAME
                 else -> throw IllegalStateException("unexpected frameType tag $tagAsInt")

@@ -23,9 +23,7 @@ import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMa
 import com.github.netomi.bat.io.IndentingPrinter
 
 internal class StackMapFramePrinter constructor(private val printer: IndentingPrinter): StackMapFrameVisitor {
-
-    // TODO: implement all frame types
-
+    
     override fun visitAnyFrame(classFile: ClassFile, frame: StackMapFrame) {}
 
     override fun visitAppendFrame(classFile: ClassFile, frame: AppendFrame) {
@@ -39,6 +37,13 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
 
     override fun visitSameFrame(classFile: ClassFile, frame: SameFrame) {
         printer.println("frame_type = ${frame.frameType} /* same */")
+    }
+
+    override fun visitSameExtendedFrame(classFile: ClassFile, frame: SameExtendedFrame) {
+        printer.println("frame_type = ${frame.frameType} /* same_extended */")
+        printer.levelUp()
+        printer.println("offset_delta = ${frame.offsetDelta}")
+        printer.levelDown()
     }
 
     override fun visitChopFrame(classFile: ClassFile, frame: ChopFrame) {
@@ -62,6 +67,14 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
     override fun visitSameLocalsOneStackItemFrame(classFile: ClassFile, frame: SameLocalsOneStackItemFrame) {
         printer.println("frame_type = ${frame.frameType} /* same_locals_1_stack_item */")
         printer.levelUp()
+        printer.println("stack = [ ${frame.stackItem.toHumanReadableString(classFile)} ]")
+        printer.levelDown()
+    }
+
+    override fun visitSameLocalsOneStackItemExtendedFrame(classFile: ClassFile, frame: SameLocalsOneStackItemExtendedFrame) {
+        printer.println("frame_type = ${frame.frameType} /* same_locals_1_stack_item_extended */")
+        printer.levelUp()
+        printer.println("offset_delta = ${frame.offsetDelta}")
         printer.println("stack = [ ${frame.stackItem.toHumanReadableString(classFile)} ]")
         printer.levelDown()
     }
