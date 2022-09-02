@@ -35,50 +35,14 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     private val stackMapFramePrinter   = StackMapFramePrinter(printer)
     private val constantPrinter        = ConstantPrinter(printer)
 
+    // common implementations
+
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
         // TODO("Not yet implemented")
     }
 
-    override fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+    override fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
         printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.getSignature(classFile)))
-    }
-
-    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
-        printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
-    }
-
-    override fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
-        printer.println("Code:")
-        printer.levelUp()
-        printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentSize(classFile)}")
-
-        attribute.attributesAccept(classFile, method, this)
-
-        printer.levelDown()
-    }
-
-    override fun visitExceptionsAttribute(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
-        printer.println("Exceptions:")
-        printer.levelUp()
-        attribute.getExceptionClassNames(classFile).forEach { printer.println("throws ${it.toExternalClassName()}") }
-        printer.levelDown()
-    }
-
-    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
-        printer.print("${index}: ")
-        referencedIndexPrinter.visitAnnotation(classFile, annotation)
-        printer.println()
-        printer.levelUp()
-        printer.println(annotation.getType(classFile).toExternalType())
-
-        printer.levelUp()
-        annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
-            printer.print("${classFile.getString(elementNameIndex)}=")
-            elementValue.accept(classFile, this)
-            printer.println()
-        }
-        printer.levelDown()
-        printer.levelDown()
     }
 
     override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
@@ -95,6 +59,56 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         printer.println("RuntimeVisibleAnnotations:")
         visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
+    // Implementations for ClassAttributeVisitor
+
+    override fun visitBootstrapMethodsAttribute(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
+        printer.println("BootstrapMethods:")
+
+        printer.levelUp()
+
+        for (index in 0 until attribute.size) {
+            val element = attribute[index]
+            printer.print("$index: #${element.bootstrapMethodRefIndex} ")
+            element.bootstrapMethodRefAccept(classFile, constantPrinter)
+            printer.println()
+            printer.levelUp()
+            printer.println("Method arguments:")
+            printer.levelUp()
+            for (argumentIndex in element) {
+                printer.print("#${argumentIndex} ")
+                classFile.getConstant(argumentIndex).accept(classFile, constantPrinter)
+                printer.println()
+            }
+            printer.levelDown()
+            printer.levelDown()
+        }
+
+        printer.levelDown()
+    }
+
+    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
+        printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
+    }
+
+    // Implementations for MethodAttributeVisitor
+
+    override fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
+        printer.println("Code:")
+        printer.levelUp()
+        printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentSize(classFile)}")
+
+        attribute.attributesAccept(classFile, method, this)
+
+        printer.levelDown()
+    }
+
+    override fun visitExceptionsAttribute(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+        printer.println("Exceptions:")
+        printer.levelUp()
+        attribute.getExceptionClassNames(classFile).forEach { printer.println("throws ${it.toExternalClassName()}") }
+        printer.levelDown()
     }
 
     override fun visitRuntimeParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
@@ -156,28 +170,22 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitBootstrapMethodsAttribute(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
-        printer.println("BootstrapMethods:")
+    // Implementations for AnnotationVisitor
+
+    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
+        printer.print("${index}: ")
+        referencedIndexPrinter.visitAnnotation(classFile, annotation)
+        printer.println()
+        printer.levelUp()
+        printer.println(annotation.getType(classFile).toExternalType())
 
         printer.levelUp()
-
-        for (index in 0 until attribute.size) {
-            val element = attribute[index]
-            printer.print("$index: #${element.bootstrapMethodRefIndex} ")
-            element.bootstrapMethodRefAccept(classFile, constantPrinter)
+        annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
+            printer.print("${classFile.getString(elementNameIndex)}=")
+            elementValue.accept(classFile, this)
             printer.println()
-            printer.levelUp()
-            printer.println("Method arguments:")
-            printer.levelUp()
-            for (argumentIndex in element) {
-                printer.print("#${argumentIndex} ")
-                classFile.getConstant(argumentIndex).accept(classFile, constantPrinter)
-                printer.println()
-            }
-            printer.levelDown()
-            printer.levelDown()
         }
-
+        printer.levelDown()
         printer.levelDown()
     }
 

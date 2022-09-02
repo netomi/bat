@@ -23,7 +23,7 @@ import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMa
 import com.github.netomi.bat.io.IndentingPrinter
 
 internal class StackMapFramePrinter constructor(private val printer: IndentingPrinter): StackMapFrameVisitor {
-    
+
     override fun visitAnyFrame(classFile: ClassFile, frame: StackMapFrame) {}
 
     override fun visitAppendFrame(classFile: ClassFile, frame: AppendFrame) {
