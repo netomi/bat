@@ -97,6 +97,10 @@ class ClassFile private constructor() {
         return (constantPool[constantIndex] as IntegerConstant).value
     }
 
+    fun getBoolean(constantIndex: Int): Boolean {
+        return (constantPool[constantIndex] as IntegerConstant).value == 1
+    }
+
     fun getString(constantIndex: Int): String {
         return (constantPool[constantIndex] as Utf8Constant).value
     }

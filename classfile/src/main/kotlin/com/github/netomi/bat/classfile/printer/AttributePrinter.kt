@@ -177,15 +177,22 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         referencedIndexPrinter.visitAnnotation(classFile, annotation)
         printer.println()
         printer.levelUp()
-        printer.println(annotation.getType(classFile).toExternalType())
+        printer.print(annotation.getType(classFile).toExternalType())
 
-        printer.levelUp()
-        annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
-            printer.print("${classFile.getString(elementNameIndex)}=")
-            elementValue.accept(classFile, this)
+        if (annotation.elementValues.isNotEmpty()) {
+            printer.println("(")
+            printer.levelUp()
+            annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
+                printer.print("${classFile.getString(elementNameIndex)}=")
+                elementValue.accept(classFile, this)
+                printer.println()
+            }
+            printer.levelDown()
+            printer.println(")")
+        } else {
             printer.println()
         }
-        printer.levelDown()
+
         printer.levelDown()
     }
 
@@ -194,7 +201,11 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
 
     override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        printer.print("%s".format(classFile.getInteger(elementValue.constValueIndex)))
+        printer.print(classFile.getInteger(elementValue.constValueIndex))
+    }
+
+    override fun visitBooleanElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
+        printer.print(classFile.getBoolean(elementValue.constValueIndex))
     }
 
     override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
