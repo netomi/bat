@@ -41,6 +41,10 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         // TODO("Not yet implemented")
     }
 
+    override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+        printer.println("Deprecated: true")
+    }
+
     override fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
         printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.getSignature(classFile)))
     }
@@ -141,7 +145,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         }
         printer.levelDown()
     }
-    
+
     override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
         printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
     }
