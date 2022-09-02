@@ -24,20 +24,29 @@ import java.io.DataOutput
 import java.io.IOException
 
 data class ArrayElementValue
-    private constructor(private var _elementValues: MutableList<ElementValue> = mutableListOfCapacity(0)) : ElementValue() {
+    private constructor(private var elementValues: MutableList<ElementValue> = mutableListOfCapacity(0))
+    : ElementValue(), Sequence<ElementValue> {
 
     override val type: ElementValueType
         get() = ElementValueType.ARRAY
 
-    val elementValues: List<ElementValue>
-        get() = _elementValues
+    val size: Int
+        get() = elementValues.size
+
+    operator fun get(index: Int): ElementValue {
+        return elementValues[index]
+    }
+
+    override fun iterator(): Iterator<ElementValue> {
+        return elementValues.iterator()
+    }
 
     @Throws(IOException::class)
     override fun readElementValue(input: DataInput) {
         val elementValueCount = input.readUnsignedShort()
-        _elementValues = mutableListOfCapacity(elementValueCount)
+        elementValues = mutableListOfCapacity(elementValueCount)
         for (i in 0 until elementValueCount) {
-            _elementValues.add(read(input))
+            elementValues.add(read(input))
         }
     }
 
