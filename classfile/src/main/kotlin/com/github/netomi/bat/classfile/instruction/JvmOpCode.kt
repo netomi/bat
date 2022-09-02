@@ -16,9 +16,12 @@
 
 package com.github.netomi.bat.classfile.instruction
 
+import com.github.netomi.bat.util.toHexStringWithPrefix
+
 enum class JvmOpCode constructor(
-        val value:    Int,
-        val mnemonic: String) {
+            val value:    Int,
+            val mnemonic: String,
+    private val supplier: InstructionSupplier? = null) {
 
     AALOAD         (0x32, "aaload"),
     AASTORE        (0x53, "aastore"),
@@ -223,6 +226,14 @@ enum class JvmOpCode constructor(
     TABLESWITCH    (0xaa, "tableswitch"),
     WIDE           (0xc4, "wide");
 
+    fun createInstruction(): JvmInstruction {
+        return supplier?.create(this) ?: throw RuntimeException("failed to create instruction for opcode $this")
+    }
+
+    private fun interface InstructionSupplier {
+        fun create(opCode: JvmOpCode): JvmInstruction
+    }
+
     companion object {
         private val opcodeArray:             Array<JvmOpCode?> = arrayOfNulls(0x100)
         private val mnemonicToOpCodeMapping: MutableMap<String, JvmOpCode> = hashMapOf()
@@ -232,6 +243,10 @@ enum class JvmOpCode constructor(
                 opcodeArray[opCode.value]                = opCode
                 mnemonicToOpCodeMapping[opCode.mnemonic] = opCode
             }
+        }
+
+        operator fun get(opcode: Byte): JvmOpCode {
+            return opcodeArray[opcode.toInt() and 0xff] ?: throw IllegalArgumentException("unknown opcode ${toHexStringWithPrefix(opcode)}")
         }
     }
 }
