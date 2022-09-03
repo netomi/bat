@@ -37,7 +37,7 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
 
     override fun visitFieldInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: FieldInstruction) {
         printer.print("%4d: %-13s #%-18d // Field ".format(offset, instruction.mnemonic, instruction.fieldIndex))
-        instruction.getField(classFile).accept(classFile, constantPrinter)
+        instruction.fieldAccept(classFile, constantPrinter)
         printer.println()
     }
 
