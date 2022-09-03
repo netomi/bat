@@ -40,6 +40,10 @@ fun interface InstructionVisitor {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
     }
 
+    fun visitCompareInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: CompareInstruction) {
+        visitAnySimpleInstruction(classFile, method, code, offset, instruction)
+    }
+
     fun visitFieldInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: FieldInstruction) {
         visitAnyInstruction(classFile, method, code, offset, instruction)
     }
