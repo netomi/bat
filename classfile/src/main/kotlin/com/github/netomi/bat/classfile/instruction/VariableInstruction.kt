@@ -26,10 +26,13 @@ class VariableInstruction private constructor(opCode: JvmOpCode): SimpleInstruct
     var variable: Int = 0
         private set
 
+    val variableIsImplicit: Boolean
+        get() = length == 1
+
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
 
-        variable = if (length > 1) {
+        variable = if (!variableIsImplicit) {
             instructions[offset + 1].toInt() and 0xff
         } else {
             val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured

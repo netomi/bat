@@ -63,7 +63,7 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
     }
 
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
-        if (instruction.length == 1) {
+        if (instruction.variableIsImplicit) {
             printer.println("%4d: %-14s".format(offset, instruction.mnemonic))
 
         } else {
