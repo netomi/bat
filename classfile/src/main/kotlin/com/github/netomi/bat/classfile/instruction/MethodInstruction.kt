@@ -19,17 +19,17 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.FieldrefConstant
+import com.github.netomi.bat.classfile.constant.MethodrefConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class FieldInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class MethodInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
-    var fieldIndex: Int = 0
+    var methodIndex: Int = 0
         private set
 
-    fun getField(classFile: ClassFile): FieldrefConstant {
-        return classFile.getFieldref(fieldIndex)
+    fun getMethod(classFile: ClassFile): MethodrefConstant {
+        return classFile.getMethodref(methodIndex)
     }
 
     override fun read(instructions: ByteArray, offset: Int) {
@@ -38,20 +38,20 @@ class FieldInstruction private constructor(opCode: JvmOpCode): JvmInstruction(op
         val indexByte1 = instructions[offset + 1]
         val indexByte2 = instructions[offset + 2]
 
-        fieldIndex = getIndex(indexByte1, indexByte2)
+        methodIndex = getIndex(indexByte1, indexByte2)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitFieldInstruction(classFile, method, code, offset, this)
+        visitor.visitMethodInstruction(classFile, method, code, offset, this)
     }
 
-    fun fieldAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        getField(classFile).accept(classFile, visitor)
+    fun methodAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        getMethod(classFile).accept(classFile, visitor)
     }
 
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return FieldInstruction(opCode)
+            return MethodInstruction(opCode)
         }
     }
 }

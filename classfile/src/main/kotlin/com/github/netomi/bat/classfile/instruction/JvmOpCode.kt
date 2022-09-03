@@ -169,9 +169,10 @@ enum class JvmOpCode constructor(
     INSTANCEOF     (0xc1, "instanceof", 3),
     INVOKEDYNAMIC  (0xba, "invokedynamic", 5),
     INVOKEINTERFACE(0xb9, "invokeinterface", 5),
-    INVOKESPECIAL  (0xb7, "invokespecial", 3),
-    INVOKESTATIC   (0xb8, "invokestatic", 3),
-    INVOKEVIRTUAL  (0xb6, "invokevirtual", 3),
+    INVOKESPECIAL  (0xb7, "invokespecial", 3, MethodInstruction::create),
+    INVOKESTATIC   (0xb8, "invokestatic",  3, MethodInstruction::create),
+    INVOKEVIRTUAL  (0xb6, "invokevirtual", 3, MethodInstruction::create),
+
     IOR            (0x80, "ior", 1, ArithmeticInstruction::create),
     IREM           (0x70, "irem", 1, ArithmeticInstruction::create),
     IRETURN        (0xac, "ireturn", 1, ReturnInstruction::create),

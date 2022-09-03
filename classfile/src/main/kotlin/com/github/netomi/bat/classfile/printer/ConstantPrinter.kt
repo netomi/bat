@@ -23,7 +23,8 @@ import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
 
-internal class ConstantPrinter constructor(private val printer: IndentingPrinter): ConstantVisitor {
+internal class ConstantPrinter constructor(private val printer:                IndentingPrinter,
+                                           private val alwaysIncludeClassName: Boolean = true): ConstantVisitor {
 
     override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {
         printer.print(constant)
@@ -60,10 +61,20 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
     }
 
     override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
-        val className  = refConstant.getClassName(classFile)
-        val memberName = refConstant.getMemberName(classFile)
-        val descriptor = refConstant.getDescriptor(classFile)
-        printer.print("$className.$memberName:$descriptor")
+        val str = buildString {
+            val className = refConstant.getClassName(classFile)
+            if (alwaysIncludeClassName || className != classFile.className) {
+                append(className)
+                append(".")
+            }
+            val memberName = refConstant.getMemberName(classFile)
+            append(memberName)
+            append(":")
+            val descriptor = refConstant.getDescriptor(classFile)
+            append(descriptor)
+        }
+
+        printer.print(str)
     }
 
     override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {
