@@ -33,7 +33,7 @@ fun interface InstructionVisitor {
     }
 
     fun visitArrayInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitBranchInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: BranchInstruction) {

@@ -35,9 +35,6 @@ open class ArithmeticInstruction: SimpleInstruction {
             FORMAT_12x,
             FORMAT_23x -> {}
 
-            FORMAT_22b,
-            FORMAT_22s -> {}
-
             else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
     }

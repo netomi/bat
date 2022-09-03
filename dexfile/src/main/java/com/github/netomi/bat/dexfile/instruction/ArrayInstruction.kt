@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class ArrayInstruction: DexInstruction {
+class ArrayInstruction: SimpleInstruction {
 
     private constructor(opCode: DexOpCode): super(opCode)
 
@@ -31,10 +31,8 @@ class ArrayInstruction: DexInstruction {
     override fun read(instructions: ShortArray, offset: Int) {
         super.read(instructions, offset)
 
-        if (this.javaClass == ArrayInstruction::class.java) {
-            check(opCode.format == FORMAT_23x ||
-                  opCode.format == FORMAT_12x) { "unexpected format ${opCode.format} for opcode ${opCode.mnemonic}" }
-        }
+        check(opCode.format == FORMAT_23x ||
+              opCode.format == FORMAT_12x) { "unexpected format ${opCode.format} for opcode ${opCode.mnemonic}" }
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
