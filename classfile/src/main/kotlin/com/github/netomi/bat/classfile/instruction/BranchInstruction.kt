@@ -19,39 +19,29 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.FieldrefConstant
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class FieldInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
-    var fieldIndex: Int = 0
+    var branchOffset: Int = 0
         private set
-
-    fun getField(classFile: ClassFile): FieldrefConstant {
-        return classFile.getFieldref(fieldIndex)
-    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
 
-        val indexByte1 = instructions[offset + 1]
-        val indexByte2 = instructions[offset + 2]
+        val offsetByte1 = instructions[offset + 1]
+        val offsetByte2 = instructions[offset + 2]
 
-        fieldIndex = getIndex(indexByte1, indexByte2)
+        branchOffset = getOffset(offsetByte1, offsetByte2)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitFieldInstruction(classFile, method, code, offset, this)
-    }
-
-    fun fieldAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.getFieldref(fieldIndex).accept(classFile, visitor)
+        visitor.visitBranchInstruction(classFile, method, code, offset, this)
     }
 
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return FieldInstruction(opCode)
+            return BranchInstruction(opCode)
         }
     }
 }

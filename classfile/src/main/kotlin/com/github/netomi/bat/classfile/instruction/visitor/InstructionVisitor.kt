@@ -36,6 +36,10 @@ fun interface InstructionVisitor {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
     }
 
+    fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
+        visitAnyInstruction(classFile, method, code, offset, instruction)
+    }
+
     fun visitConversionInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ConversionInstruction) {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
     }

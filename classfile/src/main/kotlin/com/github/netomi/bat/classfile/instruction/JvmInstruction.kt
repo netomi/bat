@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.JvmInstruction.Companion.getOffset
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
@@ -50,8 +51,16 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
             return instruction
         }
 
-        internal fun getIndex(indexByte1: Int, indexByte2: Int): Int {
-            return (indexByte1 shl 8) or indexByte2
+        internal fun getOffset(offsetByte1: Byte, offsetByte2: Byte): Int {
+            val a = offsetByte1.toInt()
+            val b = offsetByte2.toInt() and 0xff
+            return (a shl 8) or b
+        }
+
+        internal fun getIndex(indexByte1: Byte, indexByte2: Byte): Int {
+            val a = indexByte1.toInt() and 0xff
+            val b = indexByte2.toInt() and 0xff
+            return (a shl 8) or b
         }
     }
 }

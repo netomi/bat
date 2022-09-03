@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.printer
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.BranchInstruction
 import com.github.netomi.bat.classfile.instruction.FieldInstruction
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.VariableInstruction
@@ -33,6 +34,10 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
 
     override fun visitAnySimpleInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {
         printer.println("%4d: %s".format(offset, instruction.mnemonic))
+    }
+
+    override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
+        printer.println("%4d: %-13s %-18d".format(offset, instruction.mnemonic, offset + instruction.branchOffset))
     }
 
     override fun visitFieldInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: FieldInstruction) {
