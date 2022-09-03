@@ -50,7 +50,7 @@ enum class JvmOpCode constructor(
     BIPUSH         (0x10, "bipush", 2),
     CALOAD         (0x34, "caload", 1, ArrayInstruction::create),
     CASTORE        (0x55, "castore", 1, ArrayInstruction::create),
-    CHECKCAST      (0xc0, "checkcast", 3),
+    CHECKCAST      (0xc0, "checkcast", 3, ClassInstruction::create),
     D2F            (0x90, "d2f", 1, ConversionInstruction::create),
     D2I            (0x8e, "d2i", 1, ConversionInstruction::create),
     D2L            (0x8f, "d2l", 1, ConversionInstruction::create),
@@ -166,7 +166,7 @@ enum class JvmOpCode constructor(
 
     IMUL           (0x68, "imul", 1, ArithmeticInstruction::create),
     INEG           (0x74, "ineg", 1, ArithmeticInstruction::create),
-    INSTANCEOF     (0xc1, "instanceof", 3),
+    INSTANCEOF     (0xc1, "instanceof", 3, ClassInstruction::create),
 
     INVOKEDYNAMIC  (0xba, "invokedynamic",   5),
     INVOKEINTERFACE(0xb9, "invokeinterface", 5, InterfaceMethodInstruction::create),
@@ -233,7 +233,7 @@ enum class JvmOpCode constructor(
     MONITORENTER   (0xc2, "monitorenter", 1, MonitorInstruction::create),
     MONITOREXIT    (0xc3, "monitorexit", 1, MonitorInstruction::create),
     MULTINEWARRAY  (0xc5, "multinewarray", 4),
-    NEW            (0xbb, "new", 3),
+    NEW            (0xbb, "new", 3, ClassInstruction::create),
     NEWARRAY       (0xbc, "newarray", 2),
     NOP            (0x00, "nop", 1),
     POP            (0x57, "pop", 1, StackInstruction::create),

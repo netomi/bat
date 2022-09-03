@@ -93,6 +93,10 @@ class ClassFile private constructor() {
         return constantPool[constantIndex]
     }
 
+    fun getClass(constantIndex: Int): ClassConstant {
+        return (constantPool[constantIndex] as ClassConstant)
+    }
+
     fun getFieldref(constantIndex: Int): FieldrefConstant {
         return (constantPool[constantIndex] as FieldrefConstant)
     }

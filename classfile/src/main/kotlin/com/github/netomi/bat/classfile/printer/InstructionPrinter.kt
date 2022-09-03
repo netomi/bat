@@ -33,6 +33,12 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         printer.println("%4d: %s".format(offset, instruction.mnemonic))
     }
 
+    override fun visitClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ClassInstruction) {
+        printer.print("%4d: %-13s #%-18d // class ".format(offset, instruction.mnemonic, instruction.classIndex))
+        instruction.classAccept(classFile, constantPrinter)
+        printer.println()
+    }
+
     override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
         printer.println("%4d: %-13s %-18d".format(offset, instruction.mnemonic, offset + instruction.branchOffset))
     }
