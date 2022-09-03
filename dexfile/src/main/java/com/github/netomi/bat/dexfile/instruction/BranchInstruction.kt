@@ -24,7 +24,7 @@ import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexString
 
-open class BranchInstruction: DexInstruction {
+class BranchInstruction: DexInstruction {
 
     var branchOffset = 0
         internal set

@@ -95,7 +95,7 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
 
             for (payload in payloads) {
                 if (instructionWriter.nextWriteOffset.mod(2) == 1) {
-                    val nop = BasicInstruction.of(DexOpCode.NOP)
+                    val nop = NopInstruction.of(DexOpCode.NOP)
                     nop.write(instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
                 }
 

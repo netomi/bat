@@ -32,19 +32,6 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printGeneric(instruction)
     }
 
-    override fun visitArithmeticLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArithmeticLiteralInstruction) {
-        printGeneric(instruction)
-
-        val literal = instruction.literal
-        printer.print(", #int $literal // #")
-
-        when (instruction.opCode.format) {
-            InstructionFormat.FORMAT_22s -> printer.print(toHexString(literal.toShort()))
-            InstructionFormat.FORMAT_22b -> printer.print(toHexString(literal.toByte()))
-            else -> error("unexpected format ${instruction.opCode.format} for arithmetic literal instruction")
-        }
-    }
-
     override fun visitBranchInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: BranchInstruction) {
         printGeneric(instruction)
 
@@ -82,14 +69,24 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(" // field@${toHexString(instruction.fieldIndex, 4)}")
     }
 
-    override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
+    override fun visitAnyLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         printGeneric(instruction)
         printer.print(", ")
+
+        // only god knows why dexdump uses a different format for different literal instructions
+        val usePadding = instruction is ArithmeticLiteralInstruction
 
         val value = instruction.literal
         when (instruction.opCode.format) {
             InstructionFormat.FORMAT_11n,
-            InstructionFormat.FORMAT_22b -> printer.print("#int %d // #%x".format(value, value.toByte()))
+            InstructionFormat.FORMAT_22b -> {
+                val formatString = if (usePadding) {
+                    "#int %d // #%02x"
+                } else {
+                    "#int %d // #%x"
+                }
+                printer.print(formatString.format(value, value.toByte()))
+            }
 
             InstructionFormat.FORMAT_21h -> {
                 // The printed format varies a bit based on the actual opcode.
@@ -103,7 +100,14 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
             }
 
             InstructionFormat.FORMAT_21s,
-            InstructionFormat.FORMAT_22s -> printer.print("#int %d // #%x".format(value, value.toShort()))
+            InstructionFormat.FORMAT_22s -> {
+                val formatString = if (usePadding) {
+                    "#int %d // #%04x"
+                } else {
+                    "#int %d // #%x"
+                }
+                printer.print(formatString.format(value, value.toShort()))
+            }
 
             InstructionFormat.FORMAT_31i -> printer.print("#float %g // #%08x".format(intBitsToFloat(value.toInt()), value.toInt()))
 
@@ -175,18 +179,8 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         }
     }
 
-    override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
-        printGeneric(instruction)
-        printer.print(", ")
-        val typeID = instruction.getTypeID(dexFile)
-        printer.print(typeID.getType(dexFile).toString())
-        printer.print(" // type@")
-        printer.print(toHexString(instruction.typeIndex, 4))
-    }
-
-    override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
-        printer.print(instruction.mnemonic)
-        printRegisters(instruction, true)
+    override fun visitAnyTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+        printGeneric(instruction, instruction is ArrayTypeInstruction)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
         printer.print(typeID.getType(dexFile).toString())
@@ -198,12 +192,12 @@ internal class InstructionPrinter(private val printer: Mutf8Printer) : Instructi
         printer.print(payload.toString())
     }
 
-    private fun printGeneric(instruction: DexInstruction) {
+    private fun printGeneric(instruction: DexInstruction, useBrackets: Boolean = false) {
         printer.print(instruction.mnemonic)
         if (instruction.opCode == DexOpCode.NOP) {
             printer.print(" // spacer")
         }
-        printRegisters(instruction, false)
+        printRegisters(instruction, useBrackets)
     }
 
     private fun printRegisters(instruction: DexInstruction, useBrackets: Boolean) {

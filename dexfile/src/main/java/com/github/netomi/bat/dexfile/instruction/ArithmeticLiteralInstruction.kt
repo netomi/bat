@@ -21,55 +21,22 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.util.toSignedHexString
 import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
-class ArithmeticLiteralInstruction: ArithmeticInstruction {
-
-    var literal = 0
-        private set
+class ArithmeticLiteralInstruction: LiteralInstruction {
 
     private constructor(opCode: DexOpCode): super(opCode)
 
-    private constructor(opCode: DexOpCode, literal: Int, rA: Int, rB: Int): super(opCode, rA, rB) {
+    private constructor(opCode: DexOpCode, literal: Int, rA: Int, rB: Int): super(opCode, literal.toLong(), rA, rB) {
         when (opCode.format) {
             FORMAT_22b -> checkRange(literal, -0x80, 0x7f, opCode)
             FORMAT_22s -> checkRange(literal, -0x8000, 0x7fff, opCode)
             else -> {}
         }
-
-        this.literal = literal
-    }
-
-    override fun read(instructions: ShortArray, offset: Int) {
-        super.read(instructions, offset)
-
-        literal = when (opCode.format) {
-            FORMAT_22b -> instructions[offset + 1].toInt() shr 8
-            FORMAT_22s -> instructions[offset + 1].toInt()
-
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
-        }
-    }
-
-    override fun writeData(): ShortArray {
-        val data = super.writeData()
-
-        when (opCode.format) {
-            FORMAT_22b -> data[1] = (data[1].toInt() or (literal shl 8)).toShort()
-            FORMAT_22s -> data[1] = literal.toShort()
-
-            else -> {}
-        }
-        return data
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {
         visitor.visitArithmeticLiteralInstruction(dexFile, classDef, method, code, offset, this)
-    }
-
-    override fun toString(): String {
-        return super.toString() + " #${toSignedHexString(literal)}"
     }
 
     companion object {

@@ -38,9 +38,8 @@ class InstructionAdder constructor(private val targetCodeEditor: CodeEditor): In
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
-    override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
-        val typeIDIndex = targetDexEditor.addOrGetTypeIDIndex(instruction.getType(dexFile))
-        instruction.typeIndex = typeIDIndex
+    override fun visitAnyTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+        instruction.typeIndex = targetDexEditor.addOrGetTypeIDIndex(instruction.getType(dexFile))
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
@@ -57,11 +56,6 @@ class InstructionAdder constructor(private val targetCodeEditor: CodeEditor): In
     override fun visitMethodProtoInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodProtoInstruction) {
         instruction.methodIndex = targetDexEditor.addOrGetMethodIDIndex(dexFile, instruction.getMethodID(dexFile))
         instruction.protoIndex  = targetDexEditor.addOrGetProtoIDIndex(dexFile, instruction.getProtoID(dexFile))
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
-    }
-
-    override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
-        instruction.typeIndex = targetDexEditor.addOrGetTypeIDIndex(instruction.getType(dexFile))
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 

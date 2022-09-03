@@ -168,7 +168,7 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
-    override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+    override fun visitAnyTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
         instruction.typeIndex = typeIDMapping[instruction.typeIndex] ?: throw IllegalStateException("unable to map typeIndex ${instruction.typeIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
@@ -186,11 +186,6 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
     override fun visitMethodProtoInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodProtoInstruction) {
         instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: throw IllegalStateException("unable to map methodIndex ${instruction.methodIndex}")
         instruction.protoIndex  = protoIDMapping[instruction.protoIndex]   ?: throw IllegalStateException("unable to map protoIndex ${instruction.protoIndex}")
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
-    }
-
-    override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
-        instruction.typeIndex = typeIDMapping[instruction.typeIndex] ?: throw IllegalStateException("unable to map typeIndex ${instruction.typeIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 

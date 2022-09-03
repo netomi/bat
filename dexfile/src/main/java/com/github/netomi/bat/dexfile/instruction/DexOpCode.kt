@@ -26,8 +26,8 @@ enum class DexOpCode constructor(
             val minFormat: DexFormat = DexFormat.FORMAT_009,
     private val wide:      Boolean = false) {
 
-    // basic instructions.
-    NOP               (0x00, InstructionFormat.FORMAT_10x, BasicInstruction::create, "nop"),
+    // nop instructions.
+    NOP               (0x00, InstructionFormat.FORMAT_10x, NopInstruction::create, "nop"),
 
     // move instructions.
     MOVE              (0x01, InstructionFormat.FORMAT_12x, MoveInstruction::create, "move"),

@@ -251,7 +251,8 @@ sInstruction
 	| flocals
 	| fcatch
 	| fcatchall
-	| f10x
+	| f10x_nop
+	| f10x_return
 	| fx0t_branch
 	| f21t_branch
 	| f22t_branch
@@ -307,10 +308,9 @@ fpackedswitch  : '.packed-switch' start=INT sLabel+ '.end packed-switch';
 fsparseswitch  : '.sparse-switch' (INT '->' sLabel)* '.end sparse-switch';
 farraydata     : '.array-data' size=INT (sBaseValue)+ '.end array-data';
 
-f10x: op=
-    ( 'nop'
-	| 'return-void')
-	;
+f10x_nop: op='nop';
+
+f10x_return: op='return-void';
 
 fx0t_branch: op=
     ( 'goto'

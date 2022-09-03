@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.EncodedMethod
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 
-class ExceptionInstruction: DexInstruction {
+class ExceptionInstruction: SimpleInstruction {
 
     private constructor(opCode: DexOpCode): super(opCode)
 

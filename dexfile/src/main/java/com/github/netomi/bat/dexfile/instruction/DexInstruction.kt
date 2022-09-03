@@ -23,11 +23,7 @@ import com.github.netomi.bat.dexfile.instruction.InstructionFormat.*
 import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.dexfile.instruction.editor.OffsetMap
-import com.github.netomi.bat.util.toHexString
-import com.github.netomi.bat.util.toHexStringWithPrefix
 import com.github.netomi.bat.util.toSignedHexStringWithPrefix
-import kotlin.math.max
-import kotlin.math.min
 
 abstract class DexInstruction {
 

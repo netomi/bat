@@ -47,6 +47,20 @@ internal class InstructionAssembler internal constructor(private val registerInf
         return MoveInstruction.of(opcode, r1)
     }
 
+    fun parseNopInstructionF10x(ctx: F10x_nopContext): NopInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = DexOpCode[mnemonic]
+
+        return NopInstruction.of(opcode)
+    }
+
+    fun parseReturnInstructionF10x(ctx: F10x_returnContext): ReturnInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = DexOpCode[mnemonic]
+
+        return ReturnInstruction.of(opcode)
+    }
+
     fun parseReturnInstructionF11x(ctx: F11x_returnContext): ReturnInstruction {
         val mnemonic = ctx.op.text
         val opcode   = DexOpCode[mnemonic]
@@ -188,7 +202,7 @@ internal class InstructionAssembler internal constructor(private val registerInf
         return ArithmeticInstruction.of(opcode, r1, r2, r3)
     }
 
-    fun parseArithmeticLiteralInstructionF22sb(ctx: F22sb_arithmeticContext): ArithmeticInstruction {
+    fun parseArithmeticLiteralInstructionF22sb(ctx: F22sb_arithmeticContext): ArithmeticLiteralInstruction {
         val mnemonic = ctx.op.text
         val opcode = DexOpCode[mnemonic]
 

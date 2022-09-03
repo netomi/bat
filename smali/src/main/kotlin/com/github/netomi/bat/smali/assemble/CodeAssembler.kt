@@ -146,14 +146,8 @@ internal class CodeAssembler constructor(private val method:      EncodedMethod,
                         instructionAssembler.parsePackedSwitchPayload(t as FpackedswitchContext)
                     }
 
-                    RULE_f10x -> {
-                        val c = t as F10xContext
-
-                        val mnemonic = c.op.text
-                        val opcode = DexOpCode[mnemonic]
-                        opcode.createInstruction()
-                    }
-
+                    RULE_f10x_nop          -> instructionAssembler.parseNopInstructionF10x(t as F10x_nopContext)
+                    RULE_f10x_return       -> instructionAssembler.parseReturnInstructionF10x(t as F10x_returnContext)
                     RULE_f12x_conversion   -> instructionAssembler.parseConversionInstructionF12x(t as F12x_conversionContext)
                     RULE_f11x_move         -> instructionAssembler.parseMoveInstructionF11x(t as F11x_moveContext)
                     RULE_f11x_return       -> instructionAssembler.parseReturnInstructionF11x(t as F11x_returnContext)

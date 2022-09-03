@@ -33,8 +33,8 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
         return add(LabelInstruction.of(label))
     }
 
-    fun nop(): BasicInstruction {
-        return add(BasicInstruction.of(DexOpCode.NOP))
+    fun nop(): NopInstruction {
+        return add(NopInstruction.of(DexOpCode.NOP))
     }
 
     fun const(value: Long, destinationRegister: Int): LiteralInstruction {

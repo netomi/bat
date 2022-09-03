@@ -23,32 +23,16 @@ import com.github.netomi.bat.dexfile.instruction.*
 
 fun interface InstructionVisitor {
     fun visitAnyInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: DexInstruction)
-    
-    fun visitAnyArithmeticInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArithmeticInstruction) {
+
+    fun visitAnySimpleInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: SimpleInstruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitArithmeticInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArithmeticInstruction) {
-        visitAnyArithmeticInstruction(dexFile, classDef, method, code, offset, instruction)
-    }
-
-    fun visitArithmeticLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArithmeticLiteralInstruction) {
-        visitAnyArithmeticInstruction(dexFile, classDef, method, code, offset, instruction)
-    }
-
-    fun visitAnyArrayInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitArrayInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayInstruction) {
-        visitAnyArrayInstruction(dexFile, classDef, method, code, offset, instruction)
-    }
-
-    fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
-        visitAnyArrayInstruction(dexFile, classDef, method, code, offset, instruction)
-    }
-
-    fun visitBasicInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: BasicInstruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
@@ -61,23 +45,31 @@ fun interface InstructionVisitor {
     }
 
     fun visitCompareInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: CompareInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitConversionInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ConversionInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitExceptionInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ExceptionInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitFieldInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: FieldInstruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
-    fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
+    fun visitAnyLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitArithmeticLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArithmeticLiteralInstruction) {
+        visitAnyLiteralInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
+        visitAnyLiteralInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitAnyMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
@@ -101,11 +93,15 @@ fun interface InstructionVisitor {
     }
 
     fun visitMonitorInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MonitorInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitMoveInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MoveInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitNopInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: NopInstruction) {
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction<*>) {
@@ -129,15 +125,23 @@ fun interface InstructionVisitor {
     }
 
     fun visitReturnInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ReturnInstruction) {
-        visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+        visitAnySimpleInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitStringInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: StringInstruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
-    fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+    fun visitAnyTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
+        visitAnyTypeInstruction(dexFile, classDef, method, code, offset, instruction)
+    }
+
+    fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+        visitAnyTypeInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     fun visitAnyPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: Payload) {

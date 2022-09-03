@@ -24,10 +24,10 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexString
 import com.github.netomi.bat.util.toSignedHexStringWithPrefix
 
-class LiteralInstruction: DexInstruction {
+open class LiteralInstruction: DexInstruction {
 
     var literal: Long = 0
-        private set
+        protected set
 
     val literalAsFloat: Float
         get() = Float.fromBits(literal.toInt())
@@ -35,9 +35,9 @@ class LiteralInstruction: DexInstruction {
     val literalAsDouble: Double
         get() = Double.fromBits(literal)
 
-    private constructor(opCode: DexOpCode): super(opCode)
+    protected constructor(opCode: DexOpCode): super(opCode)
 
-    private constructor(opCode: DexOpCode, literal: Long, vararg registers: Int): super(opCode, *registers) {
+    protected constructor(opCode: DexOpCode, literal: Long, vararg registers: Int): super(opCode, *registers) {
         when (opCode.format) {
             FORMAT_11n -> checkRange(literal, -0x8, 0x7, opCode)
             FORMAT_21s -> checkRange(literal, -0x8000, 0x7fff, opCode)
@@ -58,6 +58,10 @@ class LiteralInstruction: DexInstruction {
 
             FORMAT_21s -> instructions[offset + 1].toLong()
 
+            FORMAT_22b -> instructions[offset + 1].toLong() shr 8
+
+            FORMAT_22s -> instructions[offset + 1].toLong()
+
             FORMAT_31i -> {
                 (instructions[offset + 1].toInt() and 0xffff or
                 (instructions[offset + 2].toInt() shl 16)).toLong()
@@ -67,12 +71,12 @@ class LiteralInstruction: DexInstruction {
                 if (opCode.targetsWideRegister) {
                     instructions[offset + 1].toLong() shl 48
                 } else {
-                    (instructions[offset + 1].toInt() shl 16).toLong()
+                    instructions[offset + 1].toLong() shl 16
                 }
             }
 
             FORMAT_51l -> {
-                (instructions[offset + 1].toInt() and 0xffff).toLong()          or
+                (instructions [offset + 1].toInt() and 0xffff).toLong()          or
                 ((instructions[offset + 2].toInt() and 0xffff).toLong() shl 16) or
                 ((instructions[offset + 3].toInt() and 0xffff).toLong() shl 32) or
                 ((instructions[offset + 4].toInt() and 0xffff).toLong() shl 48)
@@ -89,6 +93,10 @@ class LiteralInstruction: DexInstruction {
             FORMAT_11n -> data[0] = (data[0].toInt() or (literal shl 12).toInt()).toShort()
 
             FORMAT_21s -> data[1] = literal.toShort()
+
+            FORMAT_22b -> data[1] = (data[1].toInt() or (literal.toInt() shl 8)).toShort()
+
+            FORMAT_22s -> data[1] = literal.toShort()
 
             FORMAT_31i -> {
                 data[1] = literal.toShort()
@@ -154,8 +162,8 @@ class LiteralInstruction: DexInstruction {
             }
         }
 
-        fun of(opcode: DexOpCode, value: Long, vararg registers: Int): LiteralInstruction {
-            return LiteralInstruction(opcode, value, *registers)
+        fun of(opcode: DexOpCode, value: Long, register: Int): LiteralInstruction {
+            return LiteralInstruction(opcode, value, register)
         }
 
         internal fun create(opCode: DexOpCode): LiteralInstruction {

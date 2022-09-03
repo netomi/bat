@@ -172,16 +172,8 @@ internal class InstructionPrinter(private val printer:             IndentingPrin
         printEndLabels(dexFile, code, offset, instruction.length)
     }
 
-    override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
-        printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
-        printer.print(", ")
-        val typeID = instruction.getTypeID(dexFile)
-        printer.println(typeID.getType(dexFile))
-        printEndLabels(dexFile, code, offset, instruction.length)
-    }
-
-    override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
-        printCommon(code, offset, instruction, useBrackets = true, appendNewLine = false)
+    override fun visitAnyTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+        printCommon(code, offset, instruction, useBrackets = instruction is ArrayTypeInstruction, appendNewLine = false)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
         printer.println(typeID.getType(dexFile))

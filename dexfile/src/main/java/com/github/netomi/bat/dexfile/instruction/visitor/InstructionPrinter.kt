@@ -33,10 +33,21 @@ internal class InstructionPrinter(private val printer: IndentingPrinter): Instru
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = true)
     }
 
-    override fun visitArithmeticLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArithmeticLiteralInstruction) {
+    override fun visitAnyLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
         printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
         printer.print(", ")
         printer.println(toSignedHexStringWithPrefix(instruction.literal))
+
+        val opCode = instruction.opCode
+        val instructionFormat = opCode.format
+
+        // FIXME: this is a hack and should be made clean.
+        if (instructionFormat == InstructionFormat.FORMAT_21h && opCode.targetsWideRegister ||
+            instructionFormat == InstructionFormat.FORMAT_51l) {
+            printer.print("L")
+        }
+
+        printer.println()
     }
 
     override fun visitBranchInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: BranchInstruction) {
@@ -58,23 +69,6 @@ internal class InstructionPrinter(private val printer: IndentingPrinter): Instru
         printer.print(fieldID.getName(dexFile))
         printer.print(":")
         printer.println(fieldID.getType(dexFile).toString())
-    }
-
-    override fun visitLiteralInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: LiteralInstruction) {
-        printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
-        printer.print(", ")
-        printer.print(toSignedHexStringWithPrefix(instruction.literal))
-        val opCode = instruction.opCode
-        val instructionFormat = opCode.format
-
-        // FIXME: this is a hack and should be made clean.
-        if (instructionFormat == InstructionFormat.FORMAT_21h && opCode.targetsWideRegister ||
-            instructionFormat == InstructionFormat.FORMAT_51l
-        ) {
-            printer.print("L")
-        }
-
-        printer.println()
     }
 
     override fun visitAnyMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
@@ -112,15 +106,8 @@ internal class InstructionPrinter(private val printer: IndentingPrinter): Instru
         printer.println(", \"${str.escapeAsJavaString()}\"")
     }
 
-    override fun visitTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
-        printCommon(code, offset, instruction, useBrackets = false, appendNewLine = false)
-        printer.print(", ")
-        val typeID = instruction.getTypeID(dexFile)
-        printer.println(typeID.getType(dexFile).toString())
-    }
-
-    override fun visitArrayTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: ArrayTypeInstruction) {
-        printCommon(code, offset, instruction, useBrackets = true, appendNewLine = false)
+    override fun visitAnyTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
+        printCommon(code, offset, instruction, useBrackets = instruction is ArrayTypeInstruction, appendNewLine = false)
         printer.print(", ")
         val typeID = instruction.getTypeID(dexFile)
         printer.println(typeID.getType(dexFile).toString())

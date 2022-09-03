@@ -21,14 +21,14 @@ import com.github.netomi.bat.dexfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.util.toHexString
 
-class TypeInstruction: DexInstruction {
+open class TypeInstruction: DexInstruction {
 
     var typeIndex: Int = NO_INDEX
         internal set
 
-    private constructor(opCode: DexOpCode): super(opCode)
+    protected constructor(opCode: DexOpCode): super(opCode)
 
-    private constructor(opCode: DexOpCode, typeIndex: Int, vararg registers: Int): super(opCode, *registers) {
+    protected constructor(opCode: DexOpCode, typeIndex: Int, vararg registers: Int): super(opCode, *registers) {
         require(typeIndex >= 0) { "typeIndex must not be negative for instruction ${opCode.mnemonic}" }
         this.typeIndex = typeIndex
     }
@@ -46,7 +46,9 @@ class TypeInstruction: DexInstruction {
 
         typeIndex = when (opCode.format) {
             FORMAT_21c,
-            FORMAT_22c -> instructions[offset + 1].toInt() and 0xffff
+            FORMAT_22c,
+            FORMAT_3rc,
+            FORMAT_35c -> instructions[offset + 1].toInt() and 0xffff
 
             else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
         }
@@ -57,7 +59,9 @@ class TypeInstruction: DexInstruction {
 
         when (opCode.format) {
             FORMAT_21c,
-            FORMAT_22c -> data[1] = typeIndex.toShort()
+            FORMAT_22c,
+            FORMAT_3rc,
+            FORMAT_35c -> data[1] = typeIndex.toShort()
 
             else -> {}
         }
