@@ -21,33 +21,31 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
+class VariableInstruction private constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
 
-    val mnemonic: String
-        get() = opCode.mnemonic
+    var variable: Int = 0
+        private set
 
-    val length: Int
-        get() = opCode.length
+    override fun read(instructions: ByteArray, offset: Int) {
+        super.read(instructions, offset)
 
-    open fun read(instructions: ByteArray, offset: Int) {}
-
-    abstract fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor)
-
-    override fun toString(): String {
-        return buildString {
-            append(opCode.mnemonic)
+        variable = if (length > 1) {
+            instructions[offset + 1].toInt() and 0xff
+        } else {
+            val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured
+            variableString.toInt()
         }
     }
 
+    override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
+        visitor.visitVariableInstruction(classFile, method, code, offset, this)
+    }
+
     companion object {
-        fun create(instructions: ByteArray, offset: Int): JvmInstruction {
-            val opcode = instructions[offset]
-            val opCode = JvmOpCode[opcode]
+        private val VARIABLE_REGEX = "\\w+_(\\d)".toRegex()
 
-            val instruction = opCode.createInstruction()
-
-            instruction.read(instructions, offset)
-            return instruction
+        internal fun create(opCode: JvmOpCode): JvmInstruction {
+            return VariableInstruction(opCode)
         }
     }
 }

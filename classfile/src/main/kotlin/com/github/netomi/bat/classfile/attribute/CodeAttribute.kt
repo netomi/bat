@@ -20,6 +20,8 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.instruction.JvmInstruction
+import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
@@ -116,6 +118,15 @@ data class CodeAttribute
     fun attributesAccept(classFile: ClassFile, method: Method, visitor: CodeAttributeVisitor) {
         for (attribute in attributes.filterIsInstance(AttachedToCodeAttribute::class.java)) {
             attribute.accept(classFile, method, this, visitor)
+        }
+    }
+
+    fun instructionsAccept(classFile: ClassFile, method: Method, visitor: InstructionVisitor) {
+        var offset = 0
+        while (offset < codeLength) {
+            val instruction = JvmInstruction.create(code, offset)
+            instruction.accept(classFile, method, this, offset, visitor)
+            offset += instruction.length
         }
     }
 

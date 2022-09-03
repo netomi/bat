@@ -34,6 +34,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     private val referencedIndexPrinter = ReferencedIndexPrinter(printer)
     private val stackMapFramePrinter   = StackMapFramePrinter(printer)
     private val constantPrinter        = ConstantPrinter(printer)
+    private val instructionPrinter     = InstructionPrinter(printer)
 
     // common implementations
 
@@ -170,6 +171,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentSize(classFile)}")
 
+        attribute.instructionsAccept(classFile, method, instructionPrinter)
         attribute.attributesAccept(classFile, method, this)
 
         printer.levelDown()
