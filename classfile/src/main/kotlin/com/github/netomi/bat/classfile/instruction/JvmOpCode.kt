@@ -34,9 +34,9 @@ enum class JvmOpCode constructor(
     ALOAD_2        (0x2c, "aload_2", 1, VariableInstruction::create),
     ALOAD_3        (0x2d, "aload_3", 1, VariableInstruction::create),
 
-    ANEWARRAY      (0xbd, "anewarray", 3),
+    ANEWARRAY      (0xbd, "anewarray", 3, ClassInstruction::create),
     ARETURN        (0xb0, "areturn", 1, ReturnInstruction::create),
-    ARRAYLENGTH    (0xbe, "arraylength", 1),
+    ARRAYLENGTH    (0xbe, "arraylength", 1, ArrayInstruction::create),
 
     ASTORE         (0x3a, "astore",   2, VariableInstruction::create),
     ASTORE_0       (0x4b, "astore_0", 1, VariableInstruction::create),
