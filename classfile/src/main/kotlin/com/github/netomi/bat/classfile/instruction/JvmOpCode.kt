@@ -167,11 +167,12 @@ enum class JvmOpCode constructor(
     IMUL           (0x68, "imul", 1, ArithmeticInstruction::create),
     INEG           (0x74, "ineg", 1, ArithmeticInstruction::create),
     INSTANCEOF     (0xc1, "instanceof", 3),
-    INVOKEDYNAMIC  (0xba, "invokedynamic", 5),
-    INVOKEINTERFACE(0xb9, "invokeinterface", 5),
-    INVOKESPECIAL  (0xb7, "invokespecial", 3, MethodInstruction::create),
-    INVOKESTATIC   (0xb8, "invokestatic",  3, MethodInstruction::create),
-    INVOKEVIRTUAL  (0xb6, "invokevirtual", 3, MethodInstruction::create),
+
+    INVOKEDYNAMIC  (0xba, "invokedynamic",   5),
+    INVOKEINTERFACE(0xb9, "invokeinterface", 5, InterfaceMethodInstruction::create),
+    INVOKESPECIAL  (0xb7, "invokespecial",   3, MethodInstruction::create),
+    INVOKESTATIC   (0xb8, "invokestatic",    3, MethodInstruction::create),
+    INVOKEVIRTUAL  (0xb6, "invokevirtual",   3, MethodInstruction::create),
 
     IOR            (0x80, "ior", 1, ArithmeticInstruction::create),
     IREM           (0x70, "irem", 1, ArithmeticInstruction::create),

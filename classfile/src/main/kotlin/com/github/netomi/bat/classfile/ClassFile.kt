@@ -101,6 +101,10 @@ class ClassFile private constructor() {
         return (constantPool[constantIndex] as MethodrefConstant)
     }
 
+    fun getInterfaceMethodref(constantIndex: Int): InterfaceMethodrefConstant {
+        return (constantPool[constantIndex] as InterfaceMethodrefConstant)
+    }
+
     fun getInteger(constantIndex: Int): Int {
         return (constantPool[constantIndex] as IntegerConstant).value
     }

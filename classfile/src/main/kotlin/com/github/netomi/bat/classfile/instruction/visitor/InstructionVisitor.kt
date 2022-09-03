@@ -52,8 +52,16 @@ fun interface InstructionVisitor {
         visitAnyInstruction(classFile, method, code, offset, instruction)
     }
 
-    fun visitMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: MethodInstruction) {
+    fun visitAnyMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: AnyMethodInstruction) {
         visitAnyInstruction(classFile, method, code, offset, instruction)
+    }
+
+    fun visitInterfaceMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InterfaceMethodInstruction) {
+        visitAnyMethodInstruction(classFile, method, code, offset, instruction)
+    }
+
+    fun visitMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: MethodInstruction) {
+        visitAnyMethodInstruction(classFile, method, code, offset, instruction)
     }
 
     fun visitMonitorInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: MonitorInstruction) {

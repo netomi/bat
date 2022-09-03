@@ -49,6 +49,13 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         printer.println()
     }
 
+    override fun visitInterfaceMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InterfaceMethodInstruction) {
+        val instructionData = "%d, %2d".format(instruction.methodIndex, instruction.argumentCount)
+        printer.print("%4d: %-13s #%-16s // InterfaceMethod ".format(offset, instruction.mnemonic, instructionData))
+        instruction.methodAccept(classFile, constantPrinter)
+        printer.println()
+    }
+
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
         if (instruction.length == 1) {
             printer.println("%4d: %-14s".format(offset, instruction.mnemonic))
