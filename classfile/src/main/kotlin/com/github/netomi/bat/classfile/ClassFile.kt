@@ -89,8 +89,12 @@ class ClassFile private constructor() {
 
     // helper methods to access constant pool entries
 
-    internal fun getConstant(constantIndex: Int): Constant {
+    fun getConstant(constantIndex: Int): Constant {
         return constantPool[constantIndex]
+    }
+
+    fun getFieldref(constantIndex: Int): FieldrefConstant {
+        return (constantPool[constantIndex] as FieldrefConstant)
     }
 
     fun getInteger(constantIndex: Int): Int {
@@ -101,8 +105,8 @@ class ClassFile private constructor() {
         return (constantPool[constantIndex] as IntegerConstant).value == 1
     }
 
-    fun getString(constantIndex: Int): String {
-        return (constantPool[constantIndex] as Utf8Constant).value
+    fun getString(stringIndex: Int): String {
+        return (constantPool[stringIndex] as Utf8Constant).value
     }
 
     fun getClassName(classIndex: Int): JvmClassName {

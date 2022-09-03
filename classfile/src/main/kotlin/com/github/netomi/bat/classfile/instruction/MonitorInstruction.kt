@@ -21,37 +21,15 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
+class MonitorInstruction private constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
 
-    val mnemonic: String
-        get() = opCode.mnemonic
-
-    val length: Int
-        get() = opCode.length
-
-    open fun read(instructions: ByteArray, offset: Int) {}
-
-    abstract fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor)
-
-    override fun toString(): String {
-        return buildString {
-            append(opCode.mnemonic)
-        }
+    override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
+        visitor.visitMonitorInstruction(classFile, method, code, offset, this)
     }
 
     companion object {
-        fun create(instructions: ByteArray, offset: Int): JvmInstruction {
-            val opcode = instructions[offset]
-            val opCode = JvmOpCode[opcode]
-
-            val instruction = opCode.createInstruction()
-
-            instruction.read(instructions, offset)
-            return instruction
-        }
-
-        internal fun getIndex(indexByte1: Int, indexByte2: Int): Int {
-            return (indexByte1 shl 8) or indexByte2
+        internal fun create(opCode: JvmOpCode): JvmInstruction {
+            return MonitorInstruction(opCode)
         }
     }
 }

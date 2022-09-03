@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.printer
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.FieldInstruction
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.VariableInstruction
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
@@ -26,10 +27,18 @@ import com.github.netomi.bat.io.IndentingPrinter
 
 internal class InstructionPrinter constructor(private val printer: IndentingPrinter): InstructionVisitor {
 
+    private val constantPrinter = ConstantPrinter(printer)
+
     override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
 
     override fun visitAnySimpleInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {
         printer.println("%4d: %s".format(offset, instruction.mnemonic))
+    }
+
+    override fun visitFieldInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: FieldInstruction) {
+        printer.print("%4d: %-13s #%-18d // Field ".format(offset, instruction.mnemonic, instruction.fieldIndex))
+        instruction.getField(classFile).accept(classFile, constantPrinter)
+        printer.println()
     }
 
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
