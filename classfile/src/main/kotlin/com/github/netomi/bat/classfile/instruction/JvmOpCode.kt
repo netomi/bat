@@ -132,8 +132,8 @@ enum class JvmOpCode constructor(
     GETFIELD       (0xb4, "getfield",  3, FieldInstruction::create),
     GETSTATIC      (0xb2, "getstatic", 3, FieldInstruction::create),
 
-    GOTO           (0xa7, "goto", 3, BranchInstruction::create),
-    GOTO_W         (0xc8, "goto_w", 5),
+    GOTO           (0xa7, "goto",   3, BranchInstruction::create),
+    GOTO_W         (0xc8, "goto_w", 5, BranchInstruction::create),
 
     I2B            (0x91, "i2b", 1, ConversionInstruction::create),
     I2C            (0x92, "i2c", 1, ConversionInstruction::create),
@@ -236,9 +236,9 @@ enum class JvmOpCode constructor(
     LCONST_0       (0x09, "lconst_0", 1, LiteralInstruction::create),
     LCONST_1       (0x0a, "lconst_1", 1, LiteralInstruction::create),
 
-    LDC            (0x12, "ldc", 2),
-    LDC_W          (0x13, "ldc_w", 3),
-    LDC2_W         (0x14, "ldc2_w", 3),
+    LDC            (0x12, "ldc",    2, ConstantInstruction::create),
+    LDC_W          (0x13, "ldc_w",  3, ConstantInstruction::create),
+    LDC2_W         (0x14, "ldc2_w", 3, ConstantInstruction::create),
 
     LDIV           (0x6d, "ldiv", 1, ArithmeticInstruction::create),
 

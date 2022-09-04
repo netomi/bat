@@ -19,42 +19,44 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.constant.Constant
+import com.github.netomi.bat.classfile.constant.FieldrefConstant
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class ConstantInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
-    var branchOffset: Int = 0
+    var constantIndex: Int = 0
         private set
+
+    fun getConstant(classFile: ClassFile): Constant {
+        return classFile.getConstant(constantIndex)
+    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
 
-        branchOffset = when (opCode) {
-            JvmOpCode.GOTO_W -> {
-                val offsetByte1 = instructions[offset + 1]
-                val offsetByte2 = instructions[offset + 2]
-                val offsetByte3 = instructions[offset + 3]
-                val offsetByte4 = instructions[offset + 4]
+        constantIndex = when (opCode) {
+            LDC    -> instructions[offset + 1].toInt() and 0xff
+            LDC_W  -> getIndex(instructions[offset + 1], instructions[offset + 2])
+            LDC2_W -> getIndex(instructions[offset + 1], instructions[offset + 2])
 
-                getOffset(offsetByte1, offsetByte2, offsetByte3, offsetByte4)
-            }
-
-            else -> {
-                val offsetByte1 = instructions[offset + 1]
-                val offsetByte2 = instructions[offset + 2]
-
-                getOffset(offsetByte1, offsetByte2)
-            }
+            else -> error("unexpected opCode '${opCode.mnemonic}")
         }
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitBranchInstruction(classFile, method, code, offset, this)
+        visitor.visitConstantInstruction(classFile, method, code, offset, this)
+    }
+
+    fun constantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        getConstant(classFile).accept(classFile, visitor)
     }
 
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return BranchInstruction(opCode)
+            return ConstantInstruction(opCode)
         }
     }
 }

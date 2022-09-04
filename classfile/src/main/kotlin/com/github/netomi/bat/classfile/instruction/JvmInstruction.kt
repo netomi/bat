@@ -61,6 +61,14 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
             return (a shl 8) or b
         }
 
+        internal fun getOffset(offsetByte1: Byte, offsetByte2: Byte, offsetByte3: Byte, offsetByte4: Byte): Int {
+            val a = offsetByte1.toInt()
+            val b = offsetByte2.toInt() and 0xff
+            val c = offsetByte3.toInt() and 0xff
+            val d = offsetByte4.toInt() and 0xff
+            return (a shl 24) or (b shl 16) or (c shl 8) or d
+        }
+
         internal fun getIndex(indexByte1: Byte, indexByte2: Byte): Int {
             val a = indexByte1.toInt() and 0xff
             val b = indexByte2.toInt() and 0xff

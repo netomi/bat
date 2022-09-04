@@ -25,7 +25,7 @@ import com.github.netomi.bat.io.IndentingPrinter
 
 internal class InstructionPrinter constructor(private val printer: IndentingPrinter): InstructionVisitor {
 
-    private val constantPrinter = ConstantPrinter(printer, false)
+    private val constantPrinter = ConstantPrinter(printer, printConstantType = true, alwaysIncludeClassName = false)
 
     override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
 
@@ -42,8 +42,14 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         }
     }
 
+    override fun visitConstantInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ConstantInstruction) {
+        printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.constantIndex))
+        instruction.constantAccept(classFile, constantPrinter)
+        printer.println()
+    }
+
     override fun visitClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ClassInstruction) {
-        printer.print("%4d: %-13s #%-18d // class ".format(offset, instruction.mnemonic, instruction.classIndex))
+        printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.classIndex))
         instruction.classAccept(classFile, constantPrinter)
         printer.println()
     }
@@ -53,20 +59,20 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
     }
 
     override fun visitFieldInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: FieldInstruction) {
-        printer.print("%4d: %-13s #%-18d // Field ".format(offset, instruction.mnemonic, instruction.fieldIndex))
+        printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.fieldIndex))
         instruction.fieldAccept(classFile, constantPrinter)
         printer.println()
     }
 
     override fun visitMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: MethodInstruction) {
-        printer.print("%4d: %-13s #%-18d // Method ".format(offset, instruction.mnemonic, instruction.methodIndex))
+        printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.methodIndex))
         instruction.methodAccept(classFile, constantPrinter)
         printer.println()
     }
 
     override fun visitInterfaceMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InterfaceMethodInstruction) {
         val instructionData = "%d, %2d".format(instruction.methodIndex, instruction.argumentCount)
-        printer.print("%4d: %-13s #%-16s // InterfaceMethod ".format(offset, instruction.mnemonic, instructionData))
+        printer.print("%4d: %-13s #%-16s // ".format(offset, instruction.mnemonic, instructionData))
         instruction.methodAccept(classFile, constantPrinter)
         printer.println()
     }

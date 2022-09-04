@@ -24,6 +24,7 @@ import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
 
 internal class ConstantPrinter constructor(private val printer:                IndentingPrinter,
+                                           private val printConstantType:      Boolean = false,
                                            private val alwaysIncludeClassName: Boolean = true): ConstantVisitor {
 
     override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {
@@ -31,18 +32,30 @@ internal class ConstantPrinter constructor(private val printer:                I
     }
 
     override fun visitIntegerConstant(classFile: ClassFile, constant: IntegerConstant) {
+        if (printConstantType) {
+            printer.print("int ")
+        }
         printer.print(constant.value)
     }
 
     override fun visitLongConstant(classFile: ClassFile, constant: LongConstant) {
+        if (printConstantType) {
+            printer.print("long ")
+        }
         printer.print(constant.value)
     }
 
     override fun visitFloatConstant(classFile: ClassFile, constant: FloatConstant) {
+        if (printConstantType) {
+            printer.print("float ")
+        }
         printer.print("%f".format(constant.value))
     }
 
     override fun visitDoubleConstant(classFile: ClassFile, constant: DoubleConstant) {
+        if (printConstantType) {
+            printer.print("double ")
+        }
         printer.print("%f".format(constant.value))
     }
 
@@ -53,6 +66,9 @@ internal class ConstantPrinter constructor(private val printer:                I
             constant.value
         }
 
+        if (printConstantType) {
+            printer.print("String ")
+        }
         printer.print(output)
     }
 
@@ -74,10 +90,22 @@ internal class ConstantPrinter constructor(private val printer:                I
             append(descriptor)
         }
 
+        if (printConstantType) {
+            val type = when (refConstant) {
+                is FieldrefConstant           -> "Field"
+                is MethodrefConstant          -> "Method"
+                is InterfaceMethodrefConstant -> "InterfaceMethod"
+                else -> error("unexpected constant '$refConstant'")
+            }
+            printer.print("$type ")
+        }
         printer.print(str)
     }
 
     override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {
+        if (printConstantType) {
+            printer.print("class ")
+        }
         printer.print(constant.getClassName(classFile))
     }
 
