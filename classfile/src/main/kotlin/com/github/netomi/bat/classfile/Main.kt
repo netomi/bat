@@ -26,7 +26,7 @@ object Main {
     @Throws(IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        val input: DataInput = DataInputStream(FileInputStream("module-info.class"))
+        val input: DataInput = DataInputStream(FileInputStream("Person.class"))
         val classFile = ClassFile.readClassFile(input)
         classFile.accept(ClassFilePrinter())
     }

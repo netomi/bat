@@ -18,13 +18,12 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.attribute.AttachedToClass
-import com.github.netomi.bat.classfile.attribute.AttachedToField
-import com.github.netomi.bat.classfile.attribute.AttachedToMethod
+import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -35,7 +34,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 data class RuntimeInvisibleAnnotationsAttribute
     private constructor(override val attributeNameIndex: Int,
                         override var annotations:        MutableList<Annotation> = mutableListOfCapacity(0))
-    : RuntimeAnnotationsAttribute(attributeNameIndex, annotations), AttachedToClass, AttachedToField, AttachedToMethod {
+    : RuntimeAnnotationsAttribute(attributeNameIndex, annotations), AttachedToClass, AttachedToField, AttachedToMethod, AttachedToRecordComponent {
 
     override val type: AttributeType
         get() = AttributeType.RUNTIME_INVISIBLE_ANNOTATIONS
@@ -50,6 +49,10 @@ data class RuntimeInvisibleAnnotationsAttribute
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
         visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, method, this)
+    }
+
+    override fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor) {
+        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, record, component, this)
     }
 
     companion object {

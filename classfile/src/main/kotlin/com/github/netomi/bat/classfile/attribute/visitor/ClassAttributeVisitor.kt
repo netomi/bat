@@ -66,6 +66,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
+    fun visitRecordAttribute(classFile: ClassFile, attribute: RecordAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
     fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }

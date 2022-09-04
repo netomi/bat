@@ -26,6 +26,7 @@ import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
+import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
 import java.util.*
@@ -144,6 +145,20 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             }
 
             printer.println("%-39s // %s".format(str, desc))
+        }
+        printer.levelDown()
+    }
+
+    override fun visitRecordAttribute(classFile: ClassFile, attribute: RecordAttribute) {
+        printer.println("Record:")
+        printer.levelUp()
+        for (component in attribute) {
+            printer.println("%s %s;".format(component.getDescriptor(classFile).asJvmType().toExternalType(), component.getName(classFile)))
+            printer.levelUp()
+            printer.println("descriptor: ${component.getDescriptor(classFile)}")
+            component.attributesAccept(classFile, attribute, this)
+            printer.levelDown()
+            printer.println()
         }
         printer.levelDown()
     }

@@ -26,10 +26,7 @@ import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
-import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.*
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -45,7 +42,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
         return classFile.getString(attributeNameIndex)
     }
 
-    protected abstract val dataSize: Int
+    internal abstract val dataSize: Int
 
     @Throws(IOException::class)
     protected abstract fun readAttributeData(input: DataInput, classFile: ClassFile)
@@ -88,6 +85,10 @@ interface AttachedToCodeAttribute {
     fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor)
 }
 
+interface AttachedToRecordComponent {
+    fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor)
+}
+
 /**
  * Known constant types as contained in a java class file.
  */
@@ -124,7 +125,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     MODULE_MAIN_CLASS                      ("ModuleMainClass",                      ModuleMainClassAttribute.Companion::empty),
     NEST_HOST                              ("NestHost",                             NestHostAttribute.Companion::empty),
     NEST_MEMBERS                           ("NestMembers",                          NestMembersAttribute.Companion::empty),
-    RECORD                                 ("Record", null),
+    RECORD                                 ("Record",                               RecordAttribute.Companion::empty),
     PERMITTED_SUBCLASSES                   ("PermittedSubclasses",                  PermittedSubclassesAttribute.Companion::empty),
     UNKNOWN                                ("Unknown",                              UnknownAttribute.Companion::empty);
 

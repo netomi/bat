@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -32,7 +33,7 @@ import java.io.IOException
  */
 data class SignatureAttribute internal constructor(override val attributeNameIndex: Int,
                                                     private var _signatureIndex:    Int = -1)
-    : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod {
+    : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod, AttachedToRecordComponent {
 
     override val type: AttributeType
         get() = AttributeType.SIGNATURE
@@ -70,6 +71,10 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
         visitor.visitSignatureAttribute(classFile, method, this)
+    }
+
+    override fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor) {
+        visitor.visitSignatureAttribute(classFile, record, component, this)
     }
 
     companion object {

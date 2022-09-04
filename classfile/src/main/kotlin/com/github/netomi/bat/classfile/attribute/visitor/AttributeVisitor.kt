@@ -19,12 +19,14 @@ package com.github.netomi.bat.classfile.attribute.visitor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Member
 import com.github.netomi.bat.classfile.attribute.DeprecatedAttribute
+import com.github.netomi.bat.classfile.attribute.RecordAttribute
+import com.github.netomi.bat.classfile.attribute.RecordComponent
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
 
-fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, CodeAttributeVisitor {
+fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, CodeAttributeVisitor, RecordComponentAttributeVisitor {
     fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
@@ -49,6 +51,10 @@ fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, C
         visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
+    override fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeAnnotationsAttribute) {
+        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+    }
+
     fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
     }
@@ -58,6 +64,10 @@ fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, C
     }
 
     override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitAnyRuntimeVisibleAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeVisibleAnnotationsAttribute) {
         visitAnyRuntimeVisibleAnnotationsAttribute(classFile, attribute)
     }
 
@@ -73,6 +83,10 @@ fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, C
         visitAnyRuntimeInvisibleAnnotationsAttribute(classFile, attribute)
     }
 
+    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitAnyRuntimeInvisibleAnnotationsAttribute(classFile, attribute)
+    }
+
     fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
@@ -82,6 +96,10 @@ fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, C
     }
 
     override fun visitSignatureAttribute(classFile: ClassFile, member: Member, attribute: SignatureAttribute) {
+        visitAnySignatureAttribute(classFile, attribute)
+    }
+
+    override fun visitSignatureAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: SignatureAttribute) {
         visitAnySignatureAttribute(classFile, attribute)
     }
 }
