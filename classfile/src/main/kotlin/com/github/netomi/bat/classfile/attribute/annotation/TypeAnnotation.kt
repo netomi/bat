@@ -15,30 +15,21 @@
  */
 package com.github.netomi.bat.classfile.attribute.annotation
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.util.JvmType
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
 // TODO: finish implementation
-data class TypeAnnotation private constructor(private var _typeIndex: Int = -1) {
+class TypeAnnotation private constructor(): Annotation() {
 
-    val typeIndex: Int
-        get() = _typeIndex
-
-    fun getType(classFile: ClassFile): JvmType {
-        return classFile.getType(typeIndex)
+    @Throws(IOException::class)
+    override fun read(input: DataInput) {
+        super.read(input)
     }
 
     @Throws(IOException::class)
-    private fun read(input: DataInput) {
-        _typeIndex = input.readUnsignedShort()
-    }
-
-    @Throws(IOException::class)
-    fun write(output: DataOutput) {
-        output.writeShort(typeIndex)
+    override fun write(output: DataOutput) {
+        super.write(output)
     }
 
     companion object {
@@ -46,7 +37,7 @@ data class TypeAnnotation private constructor(private var _typeIndex: Int = -1) 
             return TypeAnnotation()
         }
 
-        internal fun readAnnotation(input: DataInput): TypeAnnotation {
+        internal fun readTypeAnnotation(input: DataInput): TypeAnnotation {
             val annotation = TypeAnnotation()
             annotation.read(input)
             return annotation

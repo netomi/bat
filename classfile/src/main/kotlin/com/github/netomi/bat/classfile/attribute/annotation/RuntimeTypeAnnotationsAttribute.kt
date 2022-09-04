@@ -17,7 +17,8 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.attribute.annotation.visitor.TypeAnnotationVisitor
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -68,9 +69,13 @@ abstract class RuntimeTypeAnnotationsAttribute
         }
     }
 
-    fun typeAnnotationsAccept(classFile: ClassFile, visitor: TypeAnnotationVisitor) {
+    fun typeAnnotationsAccept(classFile: ClassFile, visitor: AnnotationVisitor) {
         for (annotation in typeAnnotations) {
             visitor.visitTypeAnnotation(classFile, annotation)
         }
+    }
+
+    fun typeAnnotationsAcceptIndexed(classFile: ClassFile, visitor: AnnotationVisitorIndexed) {
+        typeAnnotations.forEachIndexed { index, annotation -> visitor.visitTypeAnnotation(classFile, index, annotation) }
     }
 }

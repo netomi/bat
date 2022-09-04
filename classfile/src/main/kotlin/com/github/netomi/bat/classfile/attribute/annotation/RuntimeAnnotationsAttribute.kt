@@ -73,7 +73,7 @@ abstract class RuntimeAnnotationsAttribute
         }
     }
 
-    fun annotationAcceptIndexed(classFile: ClassFile, visitor: AnnotationVisitorIndexed) {
+    fun annotationsAcceptIndexed(classFile: ClassFile, visitor: AnnotationVisitorIndexed) {
         annotations.forEachIndexed { index, annotation -> visitor.visitAnnotation(classFile, index, annotation) }
     }
 }

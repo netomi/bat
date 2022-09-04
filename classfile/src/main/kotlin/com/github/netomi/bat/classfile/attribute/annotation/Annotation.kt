@@ -22,9 +22,11 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
+import java.util.*
 
-data class Annotation private constructor(private var _typeIndex:     Int                                  = -1,
-                                          private var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)) {
+open class Annotation
+    protected constructor(protected var _typeIndex:     Int                                  = -1,
+                          protected var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)) {
 
     val typeIndex: Int
         get() = _typeIndex
@@ -37,7 +39,7 @@ data class Annotation private constructor(private var _typeIndex:     Int       
     }
 
     @Throws(IOException::class)
-    private fun read(input: DataInput) {
+    protected open fun read(input: DataInput) {
         _typeIndex = input.readUnsignedShort()
 
         val elementValuesCount = input.readUnsignedShort()
@@ -49,13 +51,25 @@ data class Annotation private constructor(private var _typeIndex:     Int       
     }
 
     @Throws(IOException::class)
-    fun write(output: DataOutput) {
+    internal open fun write(output: DataOutput) {
         output.writeShort(typeIndex)
         output.writeShort(elementValues.size)
         elementValues.forEach { (elementNameIndex, elementValue) ->
             output.writeShort(elementNameIndex)
             elementValue.write(output)
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Annotation) return false
+
+        return _typeIndex     == other._typeIndex &&
+               _elementValues == other._elementValues
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(_typeIndex, _elementValues)
     }
 
     fun elementValuesAccept(classFile: ClassFile, visitor: ElementValueVisitor) {

@@ -54,7 +54,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         printer.levelUp()
-        attribute.annotationAcceptIndexed(classFile, this)
+        attribute.annotationsAcceptIndexed(classFile, this)
         printer.levelDown()
     }
 
@@ -69,7 +69,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     }
 
     override fun visitAnyRuntimeTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
-        // TODO: implement
+        printer.levelUp()
+        attribute.typeAnnotationsAcceptIndexed(classFile, this)
+        printer.levelDown()
     }
 
     override fun visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
@@ -365,6 +367,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     // Implementations for AnnotationVisitor
 
+    override fun visitAnyAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {}
+
     override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
         printer.print("${index}: ")
         referencedIndexPrinter.visitAnnotation(classFile, annotation)
@@ -387,6 +391,10 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         }
 
         printer.levelDown()
+    }
+
+    override fun visitTypeAnnotation(classFile: ClassFile, index: Int, typeAnnotation: TypeAnnotation) {
+        printer.println("${index}: ")
     }
 
     // Implementations for ElementValueVisitor

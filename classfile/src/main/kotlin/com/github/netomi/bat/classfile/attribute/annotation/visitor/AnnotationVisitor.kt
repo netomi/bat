@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile.attribute.annotation.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
+import com.github.netomi.bat.classfile.attribute.annotation.TypeAnnotation
 import com.github.netomi.bat.visitor.AbstractCollector
 import com.github.netomi.bat.visitor.AbstractMultiVisitor
 import java.util.function.BiConsumer
@@ -30,20 +31,36 @@ fun multiAnnotationVisitorOf(visitor: AnnotationVisitor, vararg visitors: Annota
 }
 
 fun interface AnnotationVisitorIndexed {
-    fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation)
+    fun visitAnyAnnotation(classFile: ClassFile, index: Int, annotation: Annotation)
+
+    fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
+        visitAnyAnnotation(classFile, index, annotation)
+    }
+
+    fun visitTypeAnnotation(classFile: ClassFile, index: Int, typeAnnotation: TypeAnnotation) {
+        visitAnyAnnotation(classFile, index, typeAnnotation)
+    }
 }
 
 fun interface AnnotationVisitor: AnnotationVisitorIndexed {
-    fun visitAnnotation(classFile: ClassFile, annotation: Annotation)
+    fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation)
 
-    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
-        visitAnnotation(classFile, annotation)
+    override fun visitAnyAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
+        visitAnyAnnotation(classFile, annotation)
+    }
+
+    fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
+        visitAnyAnnotation(classFile, annotation)
+    }
+
+    fun visitTypeAnnotation(classFile: ClassFile, typeAnnotation: TypeAnnotation) {
+        visitAnyAnnotation(classFile, typeAnnotation)
     }
 
     fun joinedByAnnotationConsumer(consumer: BiConsumer<ClassFile, Annotation>): AnnotationVisitor {
         val joiner: AnnotationVisitor = object : AnnotationVisitor {
             private var firstVisited = false
-            override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
+            override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {
                 if (firstVisited) {
                     consumer.accept(classFile, annotation)
                 } else {
@@ -56,17 +73,17 @@ fun interface AnnotationVisitor: AnnotationVisitorIndexed {
 }
 
 class AnnotationCollector: AbstractCollector<Annotation>(), AnnotationVisitor {
-    override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
+    override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {
         addItem(annotation)
     }
 }
 
-private class MultiAnnotationVisitor constructor(visitor: AnnotationVisitor,
+private class MultiAnnotationVisitor constructor(             visitor: AnnotationVisitor,
                                                  vararg otherVisitors: AnnotationVisitor
 )
     : AbstractMultiVisitor<AnnotationVisitor>(visitor, *otherVisitors), AnnotationVisitor {
 
-    override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
+    override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {
         for (visitor in visitors) {
             visitor.visitAnnotation(classFile, annotation)
         }

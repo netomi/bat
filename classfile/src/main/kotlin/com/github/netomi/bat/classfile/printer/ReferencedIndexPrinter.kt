@@ -25,6 +25,8 @@ import com.github.netomi.bat.io.IndentingPrinter
 
 internal class ReferencedIndexPrinter constructor(private val printer: IndentingPrinter): ElementValueVisitor, AnnotationVisitor {
 
+    override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {}
+
     override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
         printer.print("#${annotation.typeIndex}(")
         annotation.elementValues.forEachIndexed { index, (elementNameIndex, elementValue) ->
