@@ -46,7 +46,14 @@ data class ModuleAttribute
         get() = AttributeType.MODULE
 
     override val dataSize: Int
-        get() = TODO("implement")
+        get() {
+            return 14 +
+                   requires.fold(0) { acc, element -> acc + element.dataSize } +
+                   exports.fold(0) { acc, element -> acc + element.dataSize } +
+                   opens.fold(0) { acc, element -> acc + element.dataSize } +
+                   provides.fold(0) { acc, element -> acc + element.dataSize } +
+                   uses.dataSize
+        }
 
     val moduleNameIndex: Int
         get() = _moduleNameIndex
@@ -120,7 +127,32 @@ data class ModuleAttribute
 
     override fun writeAttributeData(output: DataOutput) {
         output.writeInt(dataSize)
-        TODO("implement")
+
+        output.writeShort(_moduleNameIndex)
+        output.writeShort(_moduleFlags)
+        output.writeShort(_moduleVersionIndex)
+
+        output.writeShort(requires.size)
+        for (element in requires) {
+            element.write(output)
+        }
+
+        output.writeShort(exports.size)
+        for (element in exports) {
+            element.write(output)
+        }
+
+        output.writeShort(opens.size)
+        for (element in opens) {
+            element.write(output)
+        }
+
+        uses.write(output)
+
+        output.writeShort(provides.size)
+        for (element in provides) {
+            element.write(output)
+        }
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {

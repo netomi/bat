@@ -70,7 +70,11 @@ data class ProvidesElement
     }
 
     internal fun write(output: DataOutput) {
-        TODO("implement")
+        output.writeShort(_providesIndex)
+        output.writeShort(_providesWith.size)
+        for (element in _providesWith) {
+            output.writeShort(element)
+        }
     }
 
     override fun equals(other: Any?): Boolean {

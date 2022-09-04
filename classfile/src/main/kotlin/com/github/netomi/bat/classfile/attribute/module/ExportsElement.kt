@@ -75,7 +75,12 @@ data class ExportsElement
     }
 
     internal fun write(output: DataOutput) {
-        TODO("implement")
+        output.writeShort(_exportsIndex)
+        output.writeShort(_exportsFlags)
+        output.writeShort(_exportsTo.size)
+        for (element in _exportsTo) {
+            output.writeShort(element)
+        }
     }
 
     override fun equals(other: Any?): Boolean {

@@ -75,7 +75,12 @@ data class OpensElement
     }
 
     internal fun write(output: DataOutput) {
-        TODO("implement")
+        output.writeShort(_opensIndex)
+        output.writeShort(_opensFlags)
+        output.writeShort(_opensTo.size)
+        for (element in _opensTo) {
+            output.writeShort(element)
+        }
     }
 
     override fun equals(other: Any?): Boolean {

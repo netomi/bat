@@ -26,7 +26,7 @@ data class UsesElement
     private constructor(private var _uses: IntArray = IntArray(0)): Sequence<Int> {
 
     internal val dataSize: Int
-        get() = 4 + size * 2
+        get() = 2 + size * 2
 
     val size: Int
         get() = _uses.size
@@ -56,7 +56,10 @@ data class UsesElement
     }
 
     internal fun write(output: DataOutput) {
-        TODO("implement")
+        output.writeShort(_uses.size)
+        for (element in _uses) {
+            output.writeShort(element)
+        }
     }
 
     override fun equals(other: Any?): Boolean {
