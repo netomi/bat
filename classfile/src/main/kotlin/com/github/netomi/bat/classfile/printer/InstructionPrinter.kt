@@ -33,6 +33,15 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         printer.println("%4d: %s".format(offset, instruction.mnemonic))
     }
 
+    override fun visitLiteralInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralInstruction) {
+        if (instruction.valueIsImplicit) {
+            printer.println("%4d: %-14s".format(offset, instruction.mnemonic))
+
+        } else {
+            printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, instruction.value))
+        }
+    }
+
     override fun visitClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ClassInstruction) {
         printer.print("%4d: %-13s #%-18d // class ".format(offset, instruction.mnemonic, instruction.classIndex))
         instruction.classAccept(classFile, constantPrinter)
@@ -64,10 +73,10 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
 
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
         if (instruction.variableIsImplicit) {
-            printer.println("%4d: %-14s".format(offset, instruction.mnemonic))
+            printer.println("%4d: %-13s".format(offset, instruction.mnemonic))
 
         } else {
-            printer.println("%4d: %-14s %d".format(offset, instruction.mnemonic, instruction.variable))
+            printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, instruction.variable))
         }
     }
 }

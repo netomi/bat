@@ -47,7 +47,7 @@ enum class JvmOpCode constructor(
     ATHROW         (0xbf, "athrow", 1),
     BALOAD         (0x33, "baload",  1, ArrayInstruction::create),
     BASTORE        (0x54, "bastore", 1, ArrayInstruction::create),
-    BIPUSH         (0x10, "bipush", 2),
+    BIPUSH         (0x10, "bipush", 2, LiteralInstruction::create),
     CALOAD         (0x34, "caload",  1, ArrayInstruction::create),
     CASTORE        (0x55, "castore", 1, ArrayInstruction::create),
     CHECKCAST      (0xc0, "checkcast", 3, ClassInstruction::create),
@@ -83,10 +83,11 @@ enum class JvmOpCode constructor(
     DSTORE_3       (0x4a, "dstore_3", 1, VariableInstruction::create),
 
     DSUB           (0x67, "dsub", 1, ArithmeticInstruction::create),
-    DUP            (0x59, "dup", 1, StackInstruction::create),
-    DUP_X1         (0x5a, "dup_x1", 1, StackInstruction::create),
-    DUP_X2         (0x5b, "dup_x2", 1, StackInstruction::create),
-    DUP2           (0x5c, "dup2", 1, StackInstruction::create),
+
+    DUP            (0x59, "dup",     1, StackInstruction::create),
+    DUP_X1         (0x5a, "dup_x1",  1, StackInstruction::create),
+    DUP_X2         (0x5b, "dup_x2",  1, StackInstruction::create),
+    DUP2           (0x5c, "dup2",    1, StackInstruction::create),
     DUP2_X1        (0x5d, "dup2_x1", 1, StackInstruction::create),
     DUP2_X2        (0x5e, "dup2_x2", 1, StackInstruction::create),
 
@@ -95,6 +96,7 @@ enum class JvmOpCode constructor(
     F2L            (0x8c, "f2l", 1, ConversionInstruction::create),
 
     FADD           (0x62, "fadd", 1, ArithmeticInstruction::create),
+
     FALOAD         (0x30, "faload",  1, ArrayInstruction::create),
     FASTORE        (0x51, "fastore", 1, ArrayInstruction::create),
 
@@ -116,6 +118,7 @@ enum class JvmOpCode constructor(
     FMUL           (0x6a, "fmul", 1, ArithmeticInstruction::create),
     FNEG           (0x76, "fneg", 1, ArithmeticInstruction::create),
     FREM           (0x72, "frem", 1, ArithmeticInstruction::create),
+
     FRETURN        (0xae, "freturn", 1, ReturnInstruction::create),
 
     FSTORE         (0x38, "fstore",   2, VariableInstruction::create),
@@ -125,27 +128,36 @@ enum class JvmOpCode constructor(
     FSTORE_3       (0x46, "fstore_3", 1, VariableInstruction::create),
 
     FSUB           (0x66, "fsub", 1, ArithmeticInstruction::create),
-    GETFIELD       (0xb4, "getfield", 3, FieldInstruction::create),
+
+    GETFIELD       (0xb4, "getfield",  3, FieldInstruction::create),
     GETSTATIC      (0xb2, "getstatic", 3, FieldInstruction::create),
+
     GOTO           (0xa7, "goto", 3, BranchInstruction::create),
     GOTO_W         (0xc8, "goto_w", 5),
+
     I2B            (0x91, "i2b", 1, ConversionInstruction::create),
     I2C            (0x92, "i2c", 1, ConversionInstruction::create),
     I2D            (0x87, "i2d", 1, ConversionInstruction::create),
     I2F            (0x86, "i2f", 1, ConversionInstruction::create),
     I2L            (0x85, "i2l", 1, ConversionInstruction::create),
     I2S            (0x93, "i2s", 1, ConversionInstruction::create),
+
     IADD           (0x60, "iadd", 1, ArithmeticInstruction::create),
+
     IALOAD         (0x2e, "iaload", 1, ArrayInstruction::create),
+
     IAND           (0x7e, "iand", 1, ArithmeticInstruction::create),
+
     IASTORE        (0x4f, "iastore", 1, ArrayInstruction::create),
+
     ICONST_M1      (0x02, "iconst_m1", 1, LiteralInstruction::create),
-    ICONST_0       (0x03, "iconst_0", 1, LiteralInstruction::create),
-    ICONST_1       (0x04, "iconst_1", 1, LiteralInstruction::create),
-    ICONST_2       (0x05, "iconst_2", 1, LiteralInstruction::create),
-    ICONST_3       (0x06, "iconst_3", 1, LiteralInstruction::create),
-    ICONST_4       (0x07, "iconst_4", 1, LiteralInstruction::create),
-    ICONST_5       (0x08, "iconst_5", 1, LiteralInstruction::create),
+    ICONST_0       (0x03, "iconst_0",  1, LiteralInstruction::create),
+    ICONST_1       (0x04, "iconst_1",  1, LiteralInstruction::create),
+    ICONST_2       (0x05, "iconst_2",  1, LiteralInstruction::create),
+    ICONST_3       (0x06, "iconst_3",  1, LiteralInstruction::create),
+    ICONST_4       (0x07, "iconst_4",  1, LiteralInstruction::create),
+    ICONST_5       (0x08, "iconst_5",  1, LiteralInstruction::create),
+
     IDIV           (0x6d, "idiv", 1, ArithmeticInstruction::create),
 
     IF_ACMPEQ      (0xa5, "if_acmpeq", 3, BranchInstruction::create),
@@ -177,6 +189,7 @@ enum class JvmOpCode constructor(
 
     IMUL           (0x68, "imul", 1, ArithmeticInstruction::create),
     INEG           (0x74, "ineg", 1, ArithmeticInstruction::create),
+
     INSTANCEOF     (0xc1, "instanceof", 3, ClassInstruction::create),
 
     INVOKEDYNAMIC  (0xba, "invokedynamic",   5),
@@ -187,7 +200,9 @@ enum class JvmOpCode constructor(
 
     IOR            (0x80, "ior",  1, ArithmeticInstruction::create),
     IREM           (0x70, "irem", 1, ArithmeticInstruction::create),
+
     IRETURN        (0xac, "ireturn", 1, ReturnInstruction::create),
+
     ISHL           (0x78, "ishl", 1, ArithmeticInstruction::create),
     ISHR           (0x7a, "ishr", 1, ArithmeticInstruction::create),
 
@@ -197,24 +212,34 @@ enum class JvmOpCode constructor(
     ISTORE_2       (0x3d, "istore_2", 1, VariableInstruction::create),
     ISTORE_3       (0x3e, "istore_3", 1, VariableInstruction::create),
 
-    ISUB           (0x64, "isub", 1, ArithmeticInstruction::create),
+    ISUB           (0x64, "isub",  1, ArithmeticInstruction::create),
     IUSHR          (0x7c, "iushr", 1, ArithmeticInstruction::create),
-    IXOR           (0x82, "ixor", 1, ArithmeticInstruction::create),
+    IXOR           (0x82, "ixor",  1, ArithmeticInstruction::create),
+
     JSR            (0x8a, "jsr", 3),
     JSR_W          (0xc9, "jsr_w", 5),
+
     L2D            (0x8a, "l2d", 1, ConversionInstruction::create),
     L2F            (0x89, "l2f", 1, ConversionInstruction::create),
     L2I            (0x88, "l2i", 1, ConversionInstruction::create),
+
     LADD           (0x61, "ladd", 1, ArithmeticInstruction::create),
+
     LALOAD         (0x2f, "laload", 1, ArrayInstruction::create),
+
     LAND           (0x7f, "land", 1, ArithmeticInstruction::create),
+
     LASTORE        (0x50, "lastore", 1, ArrayInstruction::create),
+
     LCMP           (0x94, "lcmp", 1, CompareInstruction::create),
+
     LCONST_0       (0x09, "lconst_0", 1, LiteralInstruction::create),
     LCONST_1       (0x0a, "lconst_1", 1, LiteralInstruction::create),
+
     LDC            (0x12, "ldc", 2),
     LDC_W          (0x13, "ldc_w", 3),
     LDC2_W         (0x14, "ldc2_w", 3),
+
     LDIV           (0x6d, "ldiv", 1, ArithmeticInstruction::create),
 
     LLOAD          (0x16, "lload",   2, VariableInstruction::create),
@@ -225,10 +250,14 @@ enum class JvmOpCode constructor(
 
     LMUL           (0x69, "lmul", 1, ArithmeticInstruction::create),
     LNEG           (0x75, "lneg", 1, ArithmeticInstruction::create),
+
     LOOKUPSWITCH   (0xab, "lookupswitch", -1),
-    LOR            (0x81, "lor", 1, ArithmeticInstruction::create),
+
+    LOR            (0x81, "lor",  1, ArithmeticInstruction::create),
     LREM           (0x71, "lrem", 1, ArithmeticInstruction::create),
+
     LRETURN        (0xad, "lreturn", 1, ReturnInstruction::create),
+
     LSHL           (0x79, "lshl", 1, ArithmeticInstruction::create),
     LSHR           (0x7b, "lshr", 1, ArithmeticInstruction::create),
 
@@ -238,26 +267,40 @@ enum class JvmOpCode constructor(
     LSTORE_2       (0x41, "lstore_2", 1, VariableInstruction::create),
     LSTORE_3       (0x42, "lstore_3", 1, VariableInstruction::create),
 
-    LSUB           (0x65, "lsub", 1, ArithmeticInstruction::create),
+    LSUB           (0x65, "lsub",  1, ArithmeticInstruction::create),
     LUSHR          (0x7d, "lushr", 1, ArithmeticInstruction::create),
-    LXOR           (0x83, "lxor", 1, ArithmeticInstruction::create),
+    LXOR           (0x83, "lxor",  1, ArithmeticInstruction::create),
+
     MONITORENTER   (0xc2, "monitorenter", 1, MonitorInstruction::create),
-    MONITOREXIT    (0xc3, "monitorexit", 1, MonitorInstruction::create),
+    MONITOREXIT    (0xc3, "monitorexit",  1, MonitorInstruction::create),
+
     MULTINEWARRAY  (0xc5, "multinewarray", 4),
+
     NEW            (0xbb, "new", 3, ClassInstruction::create),
+
     NEWARRAY       (0xbc, "newarray", 2),
+
     NOP            (0x00, "nop", 1),
-    POP            (0x57, "pop", 1, StackInstruction::create),
+
+    POP            (0x57, "pop",  1, StackInstruction::create),
     POP2           (0x58, "pop2", 1, StackInstruction::create),
-    PUTFIELD       (0xb5, "putfield", 3, FieldInstruction::create),
+
+    PUTFIELD       (0xb5, "putfield",  3, FieldInstruction::create),
     PUTSTATIC      (0xb3, "putstatic", 3, FieldInstruction::create),
+
     RET            (0xa9, "ret", 2),
+
     RETURN         (0xb1, "return", 1, ReturnInstruction::create),
-    SALOAD         (0x35, "saload", 1, ArrayInstruction::create),
+
+    SALOAD         (0x35, "saload",  1, ArrayInstruction::create),
     SASTORE        (0x56, "sastore", 1, ArrayInstruction::create),
-    SIPUSH         (0x11, "sipush", 3),
+
+    SIPUSH         (0x11, "sipush", 3, LiteralInstruction::create),
+
     SWAP           (0x5f, "swap", 1, StackInstruction::create),
+
     TABLESWITCH    (0xaa, "tableswitch", -1),
+
     WIDE           (0xc4, "wide", -1);
 
     fun createInstruction(): JvmInstruction {

@@ -27,7 +27,10 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): SimpleInstructi
     var value: Long = 0
         private set
 
-    private val type: LiteralType = LiteralType.of(opCode.mnemonic.first())
+    val valueIsImplicit: Boolean
+        get() = length == 1
+
+    val type: LiteralType = LiteralType.of(opCode.mnemonic.first())
 
     val valueAsInt: Int
         get() {
@@ -46,10 +49,6 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): SimpleInstructi
             check(type == LiteralType.DOUBLE)
             return Double.fromBits(value)
         }
-
-    init {
-
-    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
@@ -73,6 +72,9 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): SimpleInstructi
             LCONST_0 -> 0
             LCONST_1 -> 1
 
+            BIPUSH -> instructions[offset + 1].toLong()
+            SIPUSH -> getLiteral(instructions[offset + 1], instructions[offset + 2]).toLong()
+
             else -> error("unexpected opCode '${opCode.mnemonic}'")
         }
     }
@@ -88,7 +90,7 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): SimpleInstructi
     }
 }
 
-internal enum class LiteralType constructor(private val tag: Char) {
+enum class LiteralType constructor(private val tag: Char) {
     INT   ('i'),
     LONG  ('l'),
     FLOAT ('f'),
@@ -98,7 +100,7 @@ internal enum class LiteralType constructor(private val tag: Char) {
         private val tagToTypeMap: Map<Char, LiteralType> = values().associateBy { it.tag  }
 
         fun of(tag: Char): LiteralType {
-            return tagToTypeMap[tag] ?: error("unexpected tag '$tag'")
+            return tagToTypeMap[tag] ?: INT
         }
     }
 }

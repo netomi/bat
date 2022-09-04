@@ -51,6 +51,10 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
             return instruction
         }
 
+        internal fun getLiteral(literalByte1: Byte, literalByte2: Byte): Int {
+            return getOffset(literalByte1, literalByte2)
+        }
+
         internal fun getOffset(offsetByte1: Byte, offsetByte2: Byte): Int {
             val a = offsetByte1.toInt()
             val b = offsetByte2.toInt() and 0xff
