@@ -18,13 +18,9 @@ package com.github.netomi.bat.classfile.attribute.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Member
-import com.github.netomi.bat.classfile.attribute.DeprecatedAttribute
-import com.github.netomi.bat.classfile.attribute.RecordAttribute
-import com.github.netomi.bat.classfile.attribute.RecordComponent
-import com.github.netomi.bat.classfile.attribute.SignatureAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, CodeAttributeVisitor, RecordComponentAttributeVisitor {
     fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
@@ -85,6 +81,66 @@ fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, C
 
     override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeInvisibleAnnotationsAttribute) {
         visitAnyRuntimeInvisibleAnnotationsAttribute(classFile, attribute)
+    }
+
+    fun visitAnyRuntimeTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    fun visitAnyRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeVisibleTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeVisibleTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeVisibleTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeVisibleTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    fun visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile, attribute)
     }
 
     fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {

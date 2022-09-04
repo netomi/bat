@@ -55,6 +55,18 @@ fun interface MethodAttributeVisitor: AnyAttributeVisitor {
         visitRuntimeAnnotationsAttribute(classFile, method, attribute)
     }
 
+    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, method, attribute)
+    }
+
+    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, method, attribute)
+    }
+
     fun visitRuntimeParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }

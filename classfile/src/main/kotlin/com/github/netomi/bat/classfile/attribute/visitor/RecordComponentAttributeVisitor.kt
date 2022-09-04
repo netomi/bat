@@ -20,9 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.RecordAttribute
 import com.github.netomi.bat.classfile.attribute.RecordComponent
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface RecordComponentAttributeVisitor: AnyAttributeVisitor {
     fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeAnnotationsAttribute) {
@@ -35,6 +33,18 @@ fun interface RecordComponentAttributeVisitor: AnyAttributeVisitor {
 
     fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeInvisibleAnnotationsAttribute) {
         visitRuntimeAnnotationsAttribute(classFile, record, component, attribute)
+    }
+
+    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, record, component, attribute)
+    }
+
+    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, record, component, attribute)
     }
 
     fun visitSignatureAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: SignatureAttribute) {

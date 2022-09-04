@@ -19,9 +19,7 @@ package com.github.netomi.bat.classfile.attribute.visitor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.*
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface FieldAttributeVisitor: AnyAttributeVisitor {
 
@@ -43,6 +41,18 @@ fun interface FieldAttributeVisitor: AnyAttributeVisitor {
 
     fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleAnnotationsAttribute) {
         visitRuntimeAnnotationsAttribute(classFile, field, attribute)
+    }
+
+    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, field, attribute)
+    }
+
+    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, field, attribute)
     }
 
     fun visitSignatureAttribute(classFile: ClassFile, field: Field, attribute: SignatureAttribute) {

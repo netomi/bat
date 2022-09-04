@@ -23,9 +23,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.DeprecatedAttribute
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.SyntheticAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface MemberAttributeVisitor: FieldAttributeVisitor, MethodAttributeVisitor {
     fun visitDeprecatedAttribute(classFile: ClassFile, member: Member, attribute: DeprecatedAttribute) {
@@ -74,6 +72,42 @@ fun interface MemberAttributeVisitor: FieldAttributeVisitor, MethodAttributeVisi
 
     override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleAnnotationsAttribute) {
         visitRuntimeInvisibleAnnotationsAttribute(classFile, method as Member, attribute)
+    }
+
+    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, field as Member, attribute)
+    }
+
+    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, method as Member, attribute)
+    }
+
+    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, member, attribute)
+    }
+
+    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeVisibleTypeAnnotationsAttribute(classFile, field as Member, attribute)
+    }
+
+    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeVisibleTypeAnnotationsAttribute(classFile, method as Member, attribute)
+    }
+
+    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, member, attribute)
+    }
+
+    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeInvisibleTypeAnnotationsAttribute(classFile, field as Member, attribute)
+    }
+
+    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeInvisibleTypeAnnotationsAttribute(classFile, method as Member, attribute)
     }
 
     fun visitSignatureAttribute(classFile: ClassFile, member: Member, attribute: SignatureAttribute) {

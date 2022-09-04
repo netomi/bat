@@ -22,6 +22,9 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.attribute.LineNumberTableAttribute
 import com.github.netomi.bat.classfile.attribute.LocalVariableTableAttribute
 import com.github.netomi.bat.classfile.attribute.LocalVariableTypeTableAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleTypeAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.RuntimeTypeAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleTypeAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 
 fun interface CodeAttributeVisitor: AnyAttributeVisitor {
@@ -35,6 +38,18 @@ fun interface CodeAttributeVisitor: AnyAttributeVisitor {
 
     fun visitLocalVariableTypeTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
         visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, method, code, attribute)
+    }
+
+    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotationsAttribute(classFile, method, code, attribute)
     }
 
     fun visitStackMapTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {

@@ -18,10 +18,7 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleParameterAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleParameterAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
@@ -115,8 +112,8 @@ internal enum class AttributeType constructor(val attributeName: String, private
     RUNTIME_INVISIBLE_ANNOTATIONS          ("RuntimeInvisibleAnnotations",          RuntimeInvisibleAnnotationsAttribute.Companion::empty),
     RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS  ("RuntimeVisibleParameterAnnotations",   RuntimeVisibleParameterAnnotationsAttribute.Companion::empty),
     RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", RuntimeInvisibleParameterAnnotationsAttribute.Companion::empty),
-    RUNTIME_VISIBLE_TYPE_ANNOTATIONS       ("RuntimeVisibleTypeAnnotations", null),
-    RUNTIME_INVISIBLE_TYPE_ANNOTATIONS     ("RuntimeInvisibleTypeAnnotations", null),
+    RUNTIME_VISIBLE_TYPE_ANNOTATIONS       ("RuntimeVisibleTypeAnnotations",        RuntimeVisibleTypeAnnotationsAttribute.Companion::empty),
+    RUNTIME_INVISIBLE_TYPE_ANNOTATIONS     ("RuntimeInvisibleTypeAnnotations",      RuntimeInvisibleTypeAnnotationsAttribute.Companion::empty),
     ANNOTATION_DEFAULT                     ("AnnotationDefault",                    AnnotationDefaultAttribute.Companion::empty),
     BOOTSTRAP_METHOD                       ("BootstrapMethods",                     BootstrapMethodsAttribute.Companion::empty),
     METHOD_PARAMETERS                      ("MethodParameters",                     MethodParametersAttribute.Companion::empty),

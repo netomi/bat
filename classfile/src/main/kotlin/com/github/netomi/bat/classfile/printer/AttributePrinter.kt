@@ -68,6 +68,20 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
     }
 
+    override fun visitAnyRuntimeTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
+        // TODO: implement
+    }
+
+    override fun visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        printer.println("RuntimeInvisibleTypeAnnotations:")
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
+    override fun visitAnyRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        printer.println("RuntimeVisibleTypeAnnotations:")
+        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    }
+
     // Implementations for ClassAttributeVisitor
 
     override fun visitBootstrapMethodsAttribute(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
@@ -256,18 +270,6 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
         printer.levelDown()
     }
-//  3                                       // opens
-//    #17,0                                   // com/github/netomi/sudoku/trainer to ... 2
-//      #9                                      // ... to "javafx.graphics"
-//      #11                                     // ... to tornadofx
-//    #18,0                                   // com/github/netomi/sudoku/trainer/view to ... 2
-//      #9                                      // ... to "javafx.graphics"
-//      #11                                     // ... to tornadofx
-//    #19,0                                   // com/github/netomi/sudoku/trainer/controller to ... 2
-//      #9                                      // ... to "javafx.graphics"
-//      #11                                     // ... to tornadofx
-//  0                                       // uses
-//  0                                       // provides
 
     // Implementations for MethodAttributeVisitor
 
