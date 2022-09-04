@@ -125,7 +125,12 @@ internal class ConstantPrinter constructor(private val printer:                I
     }
 
     override fun visitModuleConstant(classFile: ClassFile, constant: ModuleConstant) {
-        printer.print(constant.getModuleName(classFile))
+        val moduleName = constant.getModuleName(classFile)
+        if (moduleName.contains(".")) {
+            printer.print("\"${moduleName}\"")
+        } else {
+            printer.print(moduleName)
+        }
     }
 
     override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {

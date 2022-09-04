@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
@@ -150,6 +151,108 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
         printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
     }
+
+    override fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
+        printer.println("Module:")
+        printer.levelUp()
+        val moduleIndexAndFlags = "${attribute.moduleNameIndex},${attribute.moduleFlags.toHexString()}"
+        printer.print("#%-38s // ".format(moduleIndexAndFlags))
+        attribute.getModule(classFile).accept(classFile, constantPrinter)
+        // TODO: print accessflags
+        printer.println()
+        if (attribute.moduleVersionIndex > 0) {
+            printer.println("#%-38s // %s".format(attribute.moduleVersionIndex, attribute.getModuleVersion(classFile)))
+        } else {
+            printer.println("#%-38s".format(attribute.moduleVersionIndex))
+        }
+
+        // requires
+        printer.println("%-39d // requires".format(attribute.requires.size))
+        printer.levelUp()
+        for (requiresElement in attribute.requires) {
+            val requiresIndexAndFlags = "${requiresElement.requiresIndex},${requiresElement.requiresFlags.toHexString()}"
+            printer.print("#%-38s // ".format(requiresIndexAndFlags))
+            requiresElement.getRequiredModule(classFile).accept(classFile, constantPrinter)
+            // TODO: print accessflags
+            printer.println()
+            if (requiresElement.requiresVersionIndex > 0) {
+                printer.println("#%-38s // %s".format(requiresElement.requiresVersionIndex, requiresElement.getRequiredVersion(classFile)))
+            } else {
+                printer.println("#%-38s".format(requiresElement.requiresVersionIndex))
+            }
+        }
+        printer.levelDown()
+
+        // exports
+        printer.println("%-39d // exports".format(attribute.exports.size))
+        printer.levelUp()
+        for (exportsElement in attribute.exports) {
+            val exportsIndexAndFlags = "${exportsElement.exportsIndex},${exportsElement.exportsFlags.toHexString()}"
+            printer.print("#%-38s // ".format(exportsIndexAndFlags))
+            exportsElement.getExportedPackage(classFile).accept(classFile, constantPrinter)
+            // TODO: print accessflags
+            printer.println()
+        }
+        printer.levelDown()
+
+        // opens
+        printer.println("%-39d // opens".format(attribute.opens.size))
+        printer.levelUp()
+        for (opensElement in attribute.opens) {
+            val opensIndexAndFlags = "${opensElement.opensIndex},${opensElement.opensFlags.toHexString()}"
+            printer.print("#%-38s // ".format(opensIndexAndFlags))
+            opensElement.getOpenedPackage(classFile).accept(classFile, constantPrinter)
+            printer.println(" to ... ${opensElement.size}")
+            printer.levelUp()
+            for (opensToIndex in opensElement) {
+                printer.print("#%-38s // ... to ".format(opensToIndex))
+                classFile.getConstant(opensToIndex).accept(classFile, constantPrinter)
+                printer.println()
+            }
+            printer.levelDown()
+        }
+        printer.levelDown()
+
+        // uses
+        printer.println("%-39d // uses".format(attribute.uses.size))
+        printer.levelUp()
+        for (usesIndex in attribute.uses) {
+            printer.print("#%-38s // ".format(usesIndex))
+            classFile.getConstant(usesIndex).accept(classFile, constantPrinter)
+            printer.println()
+        }
+        printer.levelDown()
+
+        // provides
+        printer.println("%-39d // provides".format(attribute.provides.size))
+        printer.levelUp()
+        for (providesElement in attribute.provides) {
+            printer.print("#%-38s // ".format(providesElement.providesIndex))
+            providesElement.getProvidedClass(classFile).accept(classFile, constantPrinter)
+            printer.levelUp()
+            for (providesWithIndex in providesElement) {
+                printer.print("#%-38s // ".format(providesWithIndex))
+                classFile.getConstant(providesWithIndex).accept(classFile, constantPrinter)
+                printer.println()
+            }
+            printer.levelDown()
+        }
+        printer.levelDown()
+
+        printer.levelDown()
+    }
+//  3                                       // opens
+//    #17,0                                   // com/github/netomi/sudoku/trainer to ... 2
+//      #9                                      // ... to "javafx.graphics"
+//      #11                                     // ... to tornadofx
+//    #18,0                                   // com/github/netomi/sudoku/trainer/view to ... 2
+//      #9                                      // ... to "javafx.graphics"
+//      #11                                     // ... to tornadofx
+//    #19,0                                   // com/github/netomi/sudoku/trainer/controller to ... 2
+//      #9                                      // ... to "javafx.graphics"
+//      #11                                     // ... to tornadofx
+//  0                                       // uses
+//  0                                       // provides
 
     // Implementations for MethodAttributeVisitor
 
@@ -302,4 +405,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         elementValue.elementValuesAccept(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
         printer.print("]")
     }
+}
+
+private fun Int.toHexString(): String {
+    return Integer.toHexString(this)
 }

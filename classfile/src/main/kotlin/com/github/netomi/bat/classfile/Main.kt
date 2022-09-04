@@ -26,7 +26,7 @@ object Main {
     @Throws(IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        val input: DataInput = DataInputStream(FileInputStream("Maps.class"))
+        val input: DataInput = DataInputStream(FileInputStream("module-info.class"))
         val classFile = ClassFile.readClassFile(input)
         classFile.accept(ClassFilePrinter())
     }

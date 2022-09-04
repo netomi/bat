@@ -53,7 +53,11 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.println("flags: (0x%04x) %s".format(classFile.accessFlags, modifiers))
 
         printer.println("this_class: #%-29d // %s".format(classFile.thisClassIndex,   classFile.className))
-        printer.println("super_class: #%-28d // %s".format(classFile.superClassIndex, classFile.superClassName))
+        if (classFile.superClassIndex > 0) {
+            printer.println("super_class: #%-28d // %s".format(classFile.superClassIndex, classFile.superClassName))
+        } else {
+            printer.println("super_class: #%-28d".format(classFile.superClassIndex))
+        }
 
         printer.println("interfaces: %d, fields: %d, methods: %d, attributes: %d"
             .format(classFile.interfaces.count(),

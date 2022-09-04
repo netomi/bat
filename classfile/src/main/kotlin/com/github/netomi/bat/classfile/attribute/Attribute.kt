@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnno
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleParameterAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleParameterAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
@@ -95,37 +96,37 @@ internal enum class AttributeType constructor(val attributeName: String, private
     // Predefined attributes:
     // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7-300
 
-    CONSTANT_VALUE                         ("ConstantValue", ConstantValueAttribute.Companion::empty),
-    CODE                                   ("Code", CodeAttribute.Companion::empty),
-    STACK_MAP_TABLE                        ("StackMapTable", StackMapTableAttribute.Companion::empty),
-    EXCEPTIONS                             ("Exceptions", ExceptionsAttribute.Companion::empty),
-    INNER_CLASSES                          ("InnerClasses", InnerClassesAttribute.Companion::empty),
-    ENCLOSING_METHOD                       ("EnclosingMethod", EnclosingMethodAttribute.Companion::empty),
-    SYNTHETIC                              ("Synthetic", SyntheticAttribute.Companion::empty),
-    SIGNATURE                              ("Signature", SignatureAttribute.Companion::empty),
-    SOURCE_FILE                            ("SourceFile", SourceFileAttribute.Companion::empty),
-    SOURCE_DEBUG_EXTENSION                 ("SourceDebugExtension", SourceDebugExtensionAttribute.Companion::empty),
-    LINE_NUMBER_TABLE                      ("LineNumberTable", LineNumberTableAttribute.Companion::empty),
-    LOCAL_VARIABLE_TABLE                   ("LocalVariableTable", LocalVariableTableAttribute.Companion::empty),
-    LOCAL_VARIABLE_TYPE_TABLE              ("LocalVariableTypeTable", LocalVariableTypeTableAttribute.Companion::empty),
-    DEPRECATED                             ("Deprecated", DeprecatedAttribute.Companion::empty),
-    RUNTIME_VISIBLE_ANNOTATIONS            ("RuntimeVisibleAnnotations", RuntimeVisibleAnnotationsAttribute.Companion::empty),
-    RUNTIME_INVISIBLE_ANNOTATIONS          ("RuntimeInvisibleAnnotations", RuntimeInvisibleAnnotationsAttribute.Companion::empty),
-    RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS  ("RuntimeVisibleParameterAnnotations", RuntimeVisibleParameterAnnotationsAttribute.Companion::empty),
+    CONSTANT_VALUE                         ("ConstantValue",                        ConstantValueAttribute.Companion::empty),
+    CODE                                   ("Code",                                 CodeAttribute.Companion::empty),
+    STACK_MAP_TABLE                        ("StackMapTable",                        StackMapTableAttribute.Companion::empty),
+    EXCEPTIONS                             ("Exceptions",                           ExceptionsAttribute.Companion::empty),
+    INNER_CLASSES                          ("InnerClasses",                         InnerClassesAttribute.Companion::empty),
+    ENCLOSING_METHOD                       ("EnclosingMethod",                      EnclosingMethodAttribute.Companion::empty),
+    SYNTHETIC                              ("Synthetic",                            SyntheticAttribute.Companion::empty),
+    SIGNATURE                              ("Signature",                            SignatureAttribute.Companion::empty),
+    SOURCE_FILE                            ("SourceFile",                           SourceFileAttribute.Companion::empty),
+    SOURCE_DEBUG_EXTENSION                 ("SourceDebugExtension",                 SourceDebugExtensionAttribute.Companion::empty),
+    LINE_NUMBER_TABLE                      ("LineNumberTable",                      LineNumberTableAttribute.Companion::empty),
+    LOCAL_VARIABLE_TABLE                   ("LocalVariableTable",                   LocalVariableTableAttribute.Companion::empty),
+    LOCAL_VARIABLE_TYPE_TABLE              ("LocalVariableTypeTable",               LocalVariableTypeTableAttribute.Companion::empty),
+    DEPRECATED                             ("Deprecated",                           DeprecatedAttribute.Companion::empty),
+    RUNTIME_VISIBLE_ANNOTATIONS            ("RuntimeVisibleAnnotations",            RuntimeVisibleAnnotationsAttribute.Companion::empty),
+    RUNTIME_INVISIBLE_ANNOTATIONS          ("RuntimeInvisibleAnnotations",          RuntimeInvisibleAnnotationsAttribute.Companion::empty),
+    RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS  ("RuntimeVisibleParameterAnnotations",   RuntimeVisibleParameterAnnotationsAttribute.Companion::empty),
     RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS("RuntimeInvisibleParameterAnnotations", RuntimeInvisibleParameterAnnotationsAttribute.Companion::empty),
     RUNTIME_VISIBLE_TYPE_ANNOTATIONS       ("RuntimeVisibleTypeAnnotations", null),
     RUNTIME_INVISIBLE_TYPE_ANNOTATIONS     ("RuntimeInvisibleTypeAnnotations", null),
-    ANNOTATION_DEFAULT                     ("AnnotationDefault", AnnotationDefaultAttribute.Companion::empty),
-    BOOTSTRAP_METHOD                       ("BootstrapMethods", BootstrapMethodsAttribute.Companion::empty),
-    METHOD_PARAMETERS                      ("MethodParameters", MethodParametersAttribute.Companion::empty),
-    MODULE                                 ("Module", null),
-    MODULE_PACKAGES                        ("ModulePackages", ModulePackagesAttribute.Companion::empty),
-    MODULE_MAIN_CLASS                      ("ModuleMainClass", ModuleMainClassAttribute.Companion::empty),
-    NEST_HOST                              ("NestHost", NestHostAttribute.Companion::empty),
-    NEST_MEMBERS                           ("NestMembers", NestMembersAttribute.Companion::empty),
+    ANNOTATION_DEFAULT                     ("AnnotationDefault",                    AnnotationDefaultAttribute.Companion::empty),
+    BOOTSTRAP_METHOD                       ("BootstrapMethods",                     BootstrapMethodsAttribute.Companion::empty),
+    METHOD_PARAMETERS                      ("MethodParameters",                     MethodParametersAttribute.Companion::empty),
+    MODULE                                 ("Module",                               ModuleAttribute.Companion::empty),
+    MODULE_PACKAGES                        ("ModulePackages",                       ModulePackagesAttribute.Companion::empty),
+    MODULE_MAIN_CLASS                      ("ModuleMainClass",                      ModuleMainClassAttribute.Companion::empty),
+    NEST_HOST                              ("NestHost",                             NestHostAttribute.Companion::empty),
+    NEST_MEMBERS                           ("NestMembers",                          NestMembersAttribute.Companion::empty),
     RECORD                                 ("Record", null),
-    PERMITTED_SUBCLASSES                   ("PermittedSubclasses", PermittedSubclassesAttribute.Companion::empty),
-    UNKNOWN                                ("Unknown", UnknownAttribute.Companion::empty);
+    PERMITTED_SUBCLASSES                   ("PermittedSubclasses",                  PermittedSubclassesAttribute.Companion::empty),
+    UNKNOWN                                ("Unknown",                              UnknownAttribute.Companion::empty);
 
     companion object {
         private val nameToAttributeMap: Map<String, AttributeType> by lazy {

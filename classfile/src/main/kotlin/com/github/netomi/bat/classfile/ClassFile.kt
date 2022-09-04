@@ -66,8 +66,8 @@ class ClassFile private constructor() {
     val className: JvmClassName
         get() = getClassName(thisClassIndex)
 
-    val superClassName: JvmClassName
-        get() = getClassName(superClassIndex)
+    val superClassName: JvmClassName?
+        get() = if (superClassIndex > 0) getClassName(superClassIndex) else null
 
     val interfaces: List<JvmClassName>
         get() {
@@ -107,6 +107,14 @@ class ClassFile private constructor() {
 
     fun getInterfaceMethodref(constantIndex: Int): InterfaceMethodrefConstant {
         return (constantPool[constantIndex] as InterfaceMethodrefConstant)
+    }
+
+    fun getModule(constantIndex: Int): ModuleConstant {
+        return (constantPool[constantIndex] as ModuleConstant)
+    }
+
+    fun getPackage(constantIndex: Int): PackageConstant {
+        return (constantPool[constantIndex] as PackageConstant)
     }
 
     fun getInteger(constantIndex: Int): Int {

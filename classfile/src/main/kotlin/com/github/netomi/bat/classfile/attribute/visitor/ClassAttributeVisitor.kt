@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 
@@ -38,6 +39,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
     }
 
     fun visitInnerClassesAttribute(classFile: ClassFile, attribute: InnerClassesAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
