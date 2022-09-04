@@ -28,6 +28,9 @@ data class ClassElementValue private constructor(private var _classIndex: Int = 
     override val type: ElementValueType
         get() = ElementValueType.CLASS
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     val classIndex: Int
         get() = _classIndex
 
@@ -50,6 +53,8 @@ data class ClassElementValue private constructor(private var _classIndex: Int = 
     }
 
     companion object {
+        private const val DATA_SIZE = 2
+
         internal fun empty(): ClassElementValue {
             return ClassElementValue()
         }

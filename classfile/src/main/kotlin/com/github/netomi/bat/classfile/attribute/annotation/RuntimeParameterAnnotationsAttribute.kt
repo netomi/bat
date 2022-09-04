@@ -33,7 +33,10 @@ abstract class RuntimeParameterAnnotationsAttribute
     : Attribute(attributeNameIndex) {
 
     override val dataSize: Int
-        get() = TODO("implement")
+        get() = 1 +
+                parameterAnnotations.fold(0) { accParam, list ->
+                    accParam + 2 + list.fold(0) { acc, annotation -> acc + annotation.dataSize }
+                }
 
     val size: Int
         get() = parameterAnnotations.size

@@ -28,6 +28,9 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
     override val type: ElementValueType
         get() = ElementValueType.ENUM
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     val typeNameIndex: Int
         get() = _typeNameIndex
 
@@ -59,6 +62,8 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
     }
 
     companion object {
+        private const val DATA_SIZE = 4
+
         internal fun empty(): EnumElementValue {
             return EnumElementValue()
         }

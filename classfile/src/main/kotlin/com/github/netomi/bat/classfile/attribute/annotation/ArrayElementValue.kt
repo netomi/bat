@@ -30,6 +30,9 @@ data class ArrayElementValue
     override val type: ElementValueType
         get() = ElementValueType.ARRAY
 
+    override val dataSize: Int
+        get() = 2 + elementValues.fold(0) { acc, elementValue -> acc + elementValue.dataSize }
+
     val size: Int
         get() = elementValues.size
 

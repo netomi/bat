@@ -26,6 +26,8 @@ abstract class ElementValue {
 
     internal abstract val type: ElementValueType
 
+    internal abstract val dataSize: Int
+
     @Throws(IOException::class)
     protected abstract fun readElementValue(input: DataInput)
 

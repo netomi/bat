@@ -22,6 +22,9 @@ import java.io.IOException
 // TODO: finish implementation
 class TypeAnnotation private constructor(): Annotation() {
 
+    override val dataSize: Int
+        get() = TODO("implement")
+
     @Throws(IOException::class)
     override fun read(input: DataInput) {
         super.read(input)

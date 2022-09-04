@@ -28,6 +28,9 @@ open class Annotation
     protected constructor(protected var _typeIndex:     Int                                  = -1,
                           protected var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)) {
 
+    open val dataSize: Int
+        get() = 4 + _elementValues.fold(0) { acc, (_, value) -> acc + 2 + value.dataSize }
+
     val typeIndex: Int
         get() = _typeIndex
 

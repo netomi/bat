@@ -26,6 +26,9 @@ data class AnnotationElementValue private constructor(private var _annotation: A
     override val type: ElementValueType
         get() = ElementValueType.ANNOTATION
 
+    override val dataSize: Int
+        get() = _annotation.dataSize
+
     val annotation: Annotation
         get() = _annotation
 

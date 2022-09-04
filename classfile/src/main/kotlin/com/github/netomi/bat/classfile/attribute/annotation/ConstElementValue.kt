@@ -27,6 +27,9 @@ import java.io.IOException
 data class ConstElementValue private constructor(override val type: ElementValueType,
                                                  private var _constValueIndex: Int = -1) : ElementValue() {
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     val constValueIndex: Int
         get() = _constValueIndex
 
@@ -65,6 +68,8 @@ data class ConstElementValue private constructor(override val type: ElementValue
     }
 
     companion object {
+        private const val DATA_SIZE = 2
+
         internal fun create(type: ElementValueType): ConstElementValue {
             return ConstElementValue(type)
         }

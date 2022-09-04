@@ -32,7 +32,7 @@ abstract class RuntimeAnnotationsAttribute
                           protected open var annotations:        MutableList<Annotation>) : Attribute(attributeNameIndex), Sequence<Annotation> {
 
     override val dataSize: Int
-        get() = TODO("implement")
+        get() = 2 + annotations.fold(0) { acc, annotation -> acc + annotation.dataSize }
 
     val size: Int
         get() = annotations.size
