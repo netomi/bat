@@ -24,8 +24,9 @@ import java.io.Closeable
 import java.io.DataInputStream
 import java.io.InputStream
 
-internal class ClassDataInput private constructor(            `is`:      InputStream,
-                                                  private val classFile: ClassFile): Closeable {
+internal class ClassDataInput private constructor(            `is`:           InputStream,
+                                                  private val classFile:      ClassFile,
+                                                  private val skipAttributes: Boolean): Closeable {
 
     private val dataInput: DataInputStream = DataInputStream(`is`)
 
@@ -68,11 +69,18 @@ internal class ClassDataInput private constructor(            `is`:      InputSt
 
     fun readAttributes(): MutableList<Attribute> {
         val attributeCount = readUnsignedShort()
-        val attributes = mutableListOfCapacity<Attribute>(attributeCount)
-        for (i in 0 until attributeCount) {
-            attributes.add(Attribute.readAttribute(this, classFile))
+        return if (skipAttributes) {
+            for (i in 0 until attributeCount) {
+                Attribute.skipAttribute(this)
+            }
+            mutableListOfCapacity(0)
+        } else {
+            val attributes = mutableListOfCapacity<Attribute>(attributeCount)
+            for (i in 0 until attributeCount) {
+                attributes.add(Attribute.readAttribute(this, classFile))
+            }
+            attributes
         }
-        return attributes
     }
 
     override fun close() {
@@ -80,8 +88,8 @@ internal class ClassDataInput private constructor(            `is`:      InputSt
     }
 
     companion object {
-        fun of(`is`: InputStream, classFile: ClassFile = ClassFile.empty()): ClassDataInput {
-            return ClassDataInput(`is`, classFile)
+        fun of(`is`: InputStream, classFile: ClassFile = ClassFile.empty(), skipAttributes: Boolean = false): ClassDataInput {
+            return ClassDataInput(`is`, classFile, skipAttributes)
         }
     }
 }

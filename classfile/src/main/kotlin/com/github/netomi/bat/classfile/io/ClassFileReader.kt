@@ -24,12 +24,13 @@ import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.InputStream
 
-class ClassFileReader(private val `is`: InputStream): ClassFileVisitor {
+class ClassFileReader(private val `is`:           InputStream,
+                      private val skipAttributes: Boolean = false): ClassFileVisitor {
 
     private lateinit var input: ClassDataInput
 
     override fun visitClassFile(classFile: ClassFile) {
-        input = ClassDataInput.of(`is`, classFile)
+        input = ClassDataInput.of(`is`, classFile, skipAttributes)
         read(classFile)
     }
 
