@@ -81,7 +81,7 @@ data class ParameterElement private constructor(private var _nameIndex:   Int = 
                                                 private var _accessFlags: Int =  0): ClassFileContent() {
 
     override val dataSize: Int
-        get() = 4
+        get() = DATA_SIZE
 
     val nameIndex: Int
         get() = _nameIndex

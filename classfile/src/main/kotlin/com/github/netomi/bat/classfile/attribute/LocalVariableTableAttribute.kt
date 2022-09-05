@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -38,7 +39,7 @@ data class LocalVariableTableAttribute
         get() = AttributeType.LOCAL_VARIABLE_TABLE
 
     override val dataSize: Int
-        get() = 2 + size * LocalVariableElement.DATA_SIZE
+        get() = localVariableTable.dataSize()
 
     val size: Int
         get() = localVariableTable.size
@@ -85,7 +86,7 @@ data class LocalVariableElement
                         private var _variableIndex:   Int = -1): ClassFileContent() {
 
     override val dataSize: Int
-        get() = 10
+        get() = DATA_SIZE
 
     val startPC: Int
         get() = _startPC

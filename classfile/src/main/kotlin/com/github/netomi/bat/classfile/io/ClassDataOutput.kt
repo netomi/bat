@@ -67,6 +67,7 @@ internal class ClassDataOutput private constructor(outputStream: OutputStream): 
     }
 
     override fun close() {
+        dataOutput.flush()
         dataOutput.close()
     }
 

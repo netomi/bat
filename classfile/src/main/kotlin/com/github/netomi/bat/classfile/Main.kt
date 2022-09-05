@@ -17,10 +17,12 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.io.ClassFileReader
+import com.github.netomi.bat.classfile.io.ClassFileWriter
 import com.github.netomi.bat.classfile.printer.ClassFilePrinter
 import java.io.DataInput
 import java.io.DataInputStream
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.IOException
 
 object Main {
@@ -31,5 +33,9 @@ object Main {
         val classFile = ClassFile.empty()
         classFileReader.visitClassFile(classFile)
         classFile.accept(ClassFilePrinter())
+
+        val classFileWriter = ClassFileWriter(FileOutputStream("output.class"))
+        classFileWriter.visitClassFile(classFile)
+        classFileWriter.close()
     }
 }

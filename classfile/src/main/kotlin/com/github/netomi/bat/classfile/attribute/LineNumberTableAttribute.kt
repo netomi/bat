@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -38,7 +39,7 @@ data class LineNumberTableAttribute
         get() = AttributeType.LINE_NUMBER_TABLE
 
     override val dataSize: Int
-        get() = 2 + size * LineNumberElement.DATA_SIZE
+        get() = lineNumberTable.dataSize()
 
     val size: Int
         get() = lineNumberTable.size
@@ -81,7 +82,7 @@ data class LineNumberElement private constructor(private var _startPC:    Int = 
                                                  private var _lineNumber: Int = -1): ClassFileContent() {
 
     override val dataSize: Int
-        get() = 4
+        get() = DATA_SIZE
 
     val startPC
         get() = _startPC
