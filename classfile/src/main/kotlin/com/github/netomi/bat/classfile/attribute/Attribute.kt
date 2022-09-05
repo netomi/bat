@@ -48,7 +48,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
 
     @Throws(IOException::class)
     override fun write(output: ClassDataOutput) {
-        output.writeByte(attributeNameIndex)
+        output.writeShort(attributeNameIndex)
         writeAttributeData(output)
     }
 
