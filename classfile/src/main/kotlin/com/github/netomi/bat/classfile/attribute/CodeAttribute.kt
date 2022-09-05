@@ -22,12 +22,10 @@ import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.ClassFileContent
-import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 import java.io.IOException
 import java.util.*
 
@@ -49,7 +47,7 @@ data class CodeAttribute
         get() = AttributeType.CODE
 
     override val dataSize: Int
-        get() = 8 + codeLength + exceptionTable.dataSize() + attributes.dataSize()
+        get() = 8 + codeLength + exceptionTable.dataSize() + attributes.attributesDataSize()
 
     val maxStack: Int
         get() = _maxStack

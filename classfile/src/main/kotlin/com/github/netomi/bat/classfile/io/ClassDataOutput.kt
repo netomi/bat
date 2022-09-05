@@ -46,24 +46,28 @@ internal class ClassDataOutput private constructor(outputStream: OutputStream): 
     }
 
     fun <T: ClassFileContent> writeContentList(list: List<T>) {
-        dataOutput.writeShort(list.size)
+        writeShort(list.size)
         for (element in list) {
             element.write(this)
         }
     }
 
     fun writeShortIndexArray(array: IntArray) {
-        dataOutput.writeShort(array.size)
+        writeShort(array.size)
         for (index in array) {
             dataOutput.writeShort(index)
         }
     }
 
     fun writeAttributes(attributes: List<Attribute>) {
-        dataOutput.writeShort(attributes.size)
+        writeShort(attributes.size)
         for (element in attributes) {
             element.write(this)
         }
+    }
+
+    fun size(): Int {
+        return dataOutput.size()
     }
 
     override fun close() {

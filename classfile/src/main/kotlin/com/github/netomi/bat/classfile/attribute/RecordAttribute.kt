@@ -19,10 +19,9 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
+import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.ClassFileContent
-import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -84,7 +83,7 @@ data class RecordComponent
                         private var _attributes:      MutableList<Attribute> = mutableListOfCapacity(0)): ClassFileContent() {
 
     override val dataSize: Int
-        get() = 4 + _attributes.dataSize()
+        get() = 4 + _attributes.attributesDataSize()
 
     val nameIndex: Int
         get() = _nameIndex
