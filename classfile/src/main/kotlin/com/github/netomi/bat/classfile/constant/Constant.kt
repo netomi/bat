@@ -16,8 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -27,7 +27,7 @@ import java.io.IOException
  */
 abstract class Constant {
 
-    internal abstract val type: ConstantType
+    abstract val type: ConstantType
 
     internal val constantPoolSize: Int
         get() = type.constantPoolSize
@@ -46,7 +46,7 @@ abstract class Constant {
 
     abstract fun accept(classFile: ClassFile, visitor: ConstantVisitor)
 
-    abstract fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor)
+    abstract fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitorIndexed)
 
     companion object {
         fun read(input: DataInput): Constant {
@@ -62,7 +62,7 @@ abstract class Constant {
 /**
  * Known constant types as contained in a java class file.
  */
-internal enum class ConstantType constructor(val tag: Int, val constantPoolSize: Int, private val supplier: () -> Constant) {
+enum class ConstantType constructor(val tag: Int, val constantPoolSize: Int, private val supplier: () -> Constant) {
 
     // Valid constants and their corresponding tags:
     // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4-210

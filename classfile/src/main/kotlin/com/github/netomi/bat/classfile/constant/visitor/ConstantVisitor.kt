@@ -18,6 +18,12 @@ package com.github.netomi.bat.classfile.constant.visitor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.*
 
+fun filteredByConstantType(acceptedTypes: Set<ConstantType>, visitor: ConstantVisitor): ConstantVisitor {
+    return ConstantVisitor { classFile, constant ->
+        if (acceptedTypes.contains(constant.type)) constant.accept(classFile, visitor)
+    }
+}
+
 fun interface ConstantVisitor {
     fun visitAnyConstant(classFile: ClassFile, constant: Constant)
 
@@ -91,5 +97,11 @@ fun interface ConstantVisitor {
 
     fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
         visitAnyConstant(classFile, constant)
+    }
+
+    fun asIndexedVisitor(): ConstantVisitorIndexed {
+        return ConstantVisitorIndexed { classFile, _, constant ->
+            constant.accept(classFile, this@ConstantVisitor)
+        }
     }
 }

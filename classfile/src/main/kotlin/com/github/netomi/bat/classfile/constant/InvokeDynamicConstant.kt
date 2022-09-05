@@ -16,8 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -55,7 +55,7 @@ data class InvokeDynamicConstant private constructor(private var _bootstrapMetho
         visitor.visitInvokeDynamicConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitorIndexed) {
         visitor.visitInvokeDynamicConstant(classFile, index, this)
     }
 

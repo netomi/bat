@@ -19,8 +19,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 
 class FloatConstantTest : ConstantBaseTest() {
 
@@ -65,7 +65,7 @@ class FloatConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile.empty(), 0, object : ConstantPoolVisitor {
+        constant.accept(ClassFile.empty(), 0, object : ConstantVisitorIndexed {
             override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }

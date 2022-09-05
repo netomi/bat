@@ -18,11 +18,7 @@ package com.github.netomi.bat.classfile.constant.visitor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.*
 
-fun interface ConstantPoolVisitor {
-    fun visitConstantPoolStart(classFile: ClassFile) {}
-
-    fun visitConstantPoolEnd(classFile: ClassFile) {}
-
+fun interface ConstantVisitorIndexed {
     fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant)
 
     fun visitAnyRefConstant(classFile: ClassFile, index: Int, constant: RefConstant) {

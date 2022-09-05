@@ -29,14 +29,16 @@ import java.util.*
 
 class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 {
-    private val printer:          IndentingPrinter
-    private val attributePrinter: AttributePrinter
+    private val printer:             IndentingPrinter
+    private val attributePrinter:    AttributePrinter
+    private val constantPoolPrinter: ConstantPoolPrinter
 
     constructor(os: OutputStream = System.out) : this(OutputStreamWriter(os))
 
     constructor(writer: Writer) {
-        this.printer          = IndentingPrinter(writer, 2)
-        this.attributePrinter = AttributePrinter(printer)
+        this.printer             = IndentingPrinter(writer, 2)
+        this.attributePrinter    = AttributePrinter(printer)
+        this.constantPoolPrinter = ConstantPoolPrinter(printer)
     }
 
     override fun visitClassFile(classFile: ClassFile) {
@@ -70,10 +72,9 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.println("Constant pool:")
         printer.levelUp()
 
-        val constantPrinter = ConstantPoolPrinter(printer)
-        classFile.constantPoolAccept { cf, index, constant ->
+        classFile.constantsAccept { cf, index, constant ->
             printer.print(String.format("%4s = ", "#$index"))
-            constant.accept(cf, constantPrinter)
+            constant.accept(cf, constantPoolPrinter)
             printer.println()
         }
 

@@ -16,8 +16,8 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 
 /**
  * A constant representing a CONSTANT_Methodref_info structure in a class file.
@@ -34,7 +34,7 @@ data class MethodrefConstant private constructor(override var _classIndex:      
         visitor.visitMethodRefConstant(classFile, this)
     }
 
-    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantPoolVisitor) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitorIndexed) {
         visitor.visitMethodRefConstant(classFile, index, this)
     }
 
