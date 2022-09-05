@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -50,7 +50,7 @@ data class LineNumberTableAttribute
         return lineNumberTable.iterator()
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val lineNumberTableLength = input.readUnsignedShort()
@@ -88,7 +88,7 @@ data class LineNumberElement private constructor(private var _startPC:    Int = 
     val lineNumber
         get() = _lineNumber
 
-    private fun read(input: DataInput) {
+    private fun read(input: ClassDataInput) {
         _startPC    = input.readUnsignedShort()
         _lineNumber = input.readUnsignedShort()
     }
@@ -101,7 +101,7 @@ data class LineNumberElement private constructor(private var _startPC:    Int = 
     companion object {
         internal const val DATA_SIZE = 4
 
-        internal fun read(input: DataInput): LineNumberElement {
+        internal fun read(input: ClassDataInput): LineNumberElement {
             val element = LineNumberElement()
             element.read(input)
             return element

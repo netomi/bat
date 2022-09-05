@@ -19,8 +19,8 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -42,11 +42,11 @@ abstract class RuntimeParameterAnnotationsAttribute
         get() = parameterAnnotations.size
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
 
-        val numParameters = input.readByte().toInt()
+        val numParameters = input.readUnsignedByte()
         parameterAnnotations = mutableListOfCapacity(numParameters)
         for (i in 0 until numParameters) {
             val annotationCount = input.readUnsignedShort()

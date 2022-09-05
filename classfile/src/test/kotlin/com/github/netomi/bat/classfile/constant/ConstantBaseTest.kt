@@ -15,11 +15,11 @@
  */
 package com.github.netomi.bat.classfile.constant
 
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.DataInputStream
 import java.io.DataOutputStream
 
 abstract class ConstantBaseTest {
@@ -47,7 +47,7 @@ abstract class ConstantBaseTest {
     }
 
     private fun deserializeConstant(content: ByteArray): Constant {
-        DataInputStream(ByteArrayInputStream(content)).use {
+        ClassDataInput.of(ByteArrayInputStream(content)).use {
             return Constant.read(it)
         }
     }

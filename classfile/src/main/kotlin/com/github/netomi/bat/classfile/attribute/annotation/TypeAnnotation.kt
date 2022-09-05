@@ -17,7 +17,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -31,7 +31,7 @@ class TypeAnnotation private constructor(private var _target: TargetInfo = Targe
         get() = _target
 
     @Throws(IOException::class)
-    override fun read(input: DataInput) {
+    override fun read(input: ClassDataInput) {
         _target = TargetInfo.read(input)
         _path   = TypePath.read(input)
         super.read(input)
@@ -53,7 +53,7 @@ class TypeAnnotation private constructor(private var _target: TargetInfo = Targe
             return TypeAnnotation()
         }
 
-        internal fun readTypeAnnotation(input: DataInput): TypeAnnotation {
+        internal fun readTypeAnnotation(input: ClassDataInput): TypeAnnotation {
             val annotation = TypeAnnotation()
             annotation.read(input)
             return annotation

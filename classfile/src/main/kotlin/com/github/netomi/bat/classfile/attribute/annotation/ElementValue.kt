@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -29,7 +30,7 @@ abstract class ElementValue {
     internal abstract val dataSize: Int
 
     @Throws(IOException::class)
-    protected abstract fun readElementValue(input: DataInput)
+    internal abstract fun readElementValue(input: ClassDataInput)
 
     @Throws(IOException::class)
     protected abstract fun writeElementValue(output: DataOutput)
@@ -43,7 +44,7 @@ abstract class ElementValue {
     abstract fun accept(classFile: ClassFile, visitor: ElementValueVisitor)
 
     companion object {
-        internal fun read(input : DataInput): ElementValue {
+        internal fun read(input : ClassDataInput): ElementValue {
             val tag           = input.readUnsignedByte().toChar()
             val elementValue  = ElementValueType.of(tag).createElementValue()
             elementValue.readElementValue(input)

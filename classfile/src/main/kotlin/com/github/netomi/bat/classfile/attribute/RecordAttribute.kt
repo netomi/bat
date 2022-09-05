@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -50,13 +50,13 @@ data class RecordAttribute
         return components.iterator()
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val componentsCount = input.readUnsignedShort()
         components = mutableListOfCapacity(componentsCount)
         for (i in 0 until componentsCount) {
-            components.add(RecordComponent.read(input, classFile))
+            components.add(RecordComponent.read(input))
         }
     }
 
@@ -104,14 +104,10 @@ data class RecordComponent
         return classFile.getString(desciptorIndex)
     }
 
-    private fun read(input: DataInput, classFile: ClassFile) {
-        _nameIndex = input.readUnsignedShort()
+    private fun read(input: ClassDataInput) {
+        _nameIndex       = input.readUnsignedShort()
         _descriptorIndex = input.readUnsignedShort()
-        val attributesCount = input.readUnsignedShort()
-        _attributes = mutableListOfCapacity(attributesCount)
-        for (i in 0 until attributesCount) {
-            _attributes.add(Attribute.readAttribute(input, classFile))
-        }
+        _attributes      = input.readAttributes()
     }
 
     internal fun write(output: DataOutput) {
@@ -131,9 +127,9 @@ data class RecordComponent
     }
 
     companion object {
-        internal fun read(input: DataInput, classFile: ClassFile): RecordComponent {
+        internal fun read(input: ClassDataInput): RecordComponent {
             val element = RecordComponent()
-            element.read(input, classFile)
+            element.read(input)
             return element
         }
     }

@@ -18,7 +18,7 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.util.*
 
@@ -40,7 +40,7 @@ data class SourceDebugExtensionAttribute
     val debugExtension: ByteArray
         get() = _debugExtension
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         val length = input.readInt()
         _debugExtension = ByteArray(length)
         input.readFully(_debugExtension)

@@ -1,0 +1,87 @@
+/*
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.github.netomi.bat.classfile.io
+
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.constant.Constant
+import com.github.netomi.bat.util.mutableListOfCapacity
+import java.io.Closeable
+import java.io.DataInputStream
+import java.io.InputStream
+
+internal class ClassDataInput private constructor(            `is`:      InputStream,
+                                                  private val classFile: ClassFile): Closeable {
+
+    private val dataInput: DataInputStream = DataInputStream(`is`)
+
+    fun skipBytes(n: Int) {
+        dataInput.skipBytes(n)
+    }
+
+    fun readUnsignedByte(): Int {
+        return dataInput.readUnsignedByte()
+    }
+
+    fun readUnsignedShort(): Int {
+        return dataInput.readUnsignedShort()
+    }
+
+    fun readInt(): Int {
+        return dataInput.readInt()
+    }
+
+    fun readUTF(): String {
+        return dataInput.readUTF()
+    }
+
+    fun readFully(array: ByteArray) {
+        dataInput.readFully(array)
+    }
+
+    fun readConstant(): Constant {
+        return Constant.read(this)
+    }
+
+    fun readShortIndexArray(): IntArray {
+        val count = readUnsignedShort()
+        val array = IntArray(count)
+        for (i in 0 until count) {
+            array[i] = readUnsignedShort()
+        }
+        return array
+    }
+
+    fun readAttributes(): MutableList<Attribute> {
+        val attributeCount = readUnsignedShort()
+        val attributes = mutableListOfCapacity<Attribute>(attributeCount)
+        for (i in 0 until attributeCount) {
+            attributes.add(Attribute.readAttribute(this, classFile))
+        }
+        return attributes
+    }
+
+    override fun close() {
+        dataInput.close()
+    }
+
+    companion object {
+        fun of(`is`: InputStream, classFile: ClassFile = ClassFile.empty()): ClassDataInput {
+            return ClassDataInput(`is`, classFile)
+        }
+    }
+}

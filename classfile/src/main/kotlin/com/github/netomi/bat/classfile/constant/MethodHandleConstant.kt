@@ -17,7 +17,7 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -39,7 +39,7 @@ data class MethodHandleConstant private constructor(private var _referenceKind: 
         get() = _referenceIndex
 
     @Throws(IOException::class)
-    override fun readConstantInfo(input: DataInput) {
+    override fun readConstantInfo(input: ClassDataInput) {
         _referenceKind  = input.readUnsignedByte()
         _referenceIndex = input.readUnsignedShort()
     }

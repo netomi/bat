@@ -22,8 +22,8 @@ import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 import java.util.*
@@ -67,7 +67,7 @@ data class CodeAttribute
         get() = TODO("Not yet implemented")
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         _maxStack  = input.readUnsignedShort()
@@ -83,11 +83,7 @@ data class CodeAttribute
             _exceptionTable.add(ExceptionElement.read(input))
         }
 
-        val attributesCount = input.readUnsignedShort()
-        _attributes = mutableListOfCapacity(attributesCount)
-        for (i in 0 until attributesCount) {
-            _attributes.add(readAttribute(input, classFile))
-        }
+        _attributes = input.readAttributes()
     }
 
     @Throws(IOException::class)
@@ -170,7 +166,7 @@ data class ExceptionElement private constructor(private var _startPC:   Int = -1
     val catchType: Int
         get() = _catchType
 
-    private fun read(input: DataInput) {
+    private fun read(input: ClassDataInput) {
         _startPC   = input.readUnsignedShort()
         _endPC     = input.readUnsignedShort()
         _handlerPC = input.readUnsignedShort()
@@ -187,7 +183,7 @@ data class ExceptionElement private constructor(private var _startPC:   Int = -1
     companion object {
         internal const val SIZE = 8
 
-        internal fun read(input: DataInput): ExceptionElement {
+        internal fun read(input: ClassDataInput): ExceptionElement {
             val element = ExceptionElement()
             element.read(input)
             return element

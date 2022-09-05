@@ -16,8 +16,8 @@
 
 package com.github.netomi.bat.classfile.attribute.annotation
 
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 data class TypePath
@@ -34,8 +34,8 @@ data class TypePath
         return _path.iterator()
     }
 
-    internal fun read(input: DataInput) {
-        val pathLength = input.readByte().toInt() and 0xff
+    internal fun read(input: ClassDataInput) {
+        val pathLength = input.readUnsignedByte()
         _path = mutableListOfCapacity(pathLength)
         for (i in 0 until pathLength) {
             _path.add(PathElement.read(input))
@@ -54,7 +54,7 @@ data class TypePath
             return TypePath()
         }
 
-        internal fun read(input: DataInput): TypePath {
+        internal fun read(input: ClassDataInput): TypePath {
             val path = TypePath()
             path.read(input)
             return path
@@ -71,9 +71,9 @@ data class PathElement private constructor(private var _typePathKind:      Int =
     val typeArgumentIndex: Int
         get() = _typeArgumentIndex
 
-    internal fun readData(input: DataInput) {
-        _typePathKind      = input.readByte().toInt() and 0xff
-        _typeArgumentIndex = input.readByte().toInt() and 0xff
+    internal fun readData(input: ClassDataInput) {
+        _typePathKind      = input.readUnsignedByte()
+        _typeArgumentIndex = input.readUnsignedByte()
     }
 
     internal fun writeData(output: DataOutput) {
@@ -82,7 +82,7 @@ data class PathElement private constructor(private var _typePathKind:      Int =
     }
 
     companion object {
-        internal fun read(input: DataInput): PathElement {
+        internal fun read(input: ClassDataInput): PathElement {
             val element = PathElement()
             element.readData(input)
             return element

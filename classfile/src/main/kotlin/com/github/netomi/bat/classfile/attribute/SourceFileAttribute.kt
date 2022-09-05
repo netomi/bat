@@ -17,7 +17,7 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -43,7 +43,7 @@ data class SourceFileAttribute internal constructor(override val attributeNameIn
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _sourceFileIndex = input.readUnsignedShort()

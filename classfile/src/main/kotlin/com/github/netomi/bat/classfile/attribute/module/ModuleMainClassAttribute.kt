@@ -21,8 +21,8 @@ import com.github.netomi.bat.classfile.attribute.AttachedToClass
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -47,7 +47,7 @@ data class ModuleMainClassAttribute
         return classFile.getClassName(mainClassIndex)
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         _mainClassIndex = input.readUnsignedShort()

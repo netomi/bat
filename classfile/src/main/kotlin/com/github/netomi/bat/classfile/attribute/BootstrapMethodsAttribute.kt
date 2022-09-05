@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -50,7 +50,7 @@ data class BootstrapMethodsAttribute
         return bootstrapMethods.iterator()
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfBootstrapMethods = input.readUnsignedShort()
@@ -100,13 +100,9 @@ data class BootstrapMethodElement
     internal val dataSize: Int
         get() = 4 + bootstrapArguments.size * 2
 
-    private fun read(input: DataInput) {
+    private fun read(input: ClassDataInput) {
         _bootstrapMethodRefIndex = input.readUnsignedShort()
-        val numBootstrapArguments = input.readUnsignedShort()
-        bootstrapArguments = IntArray(numBootstrapArguments)
-        for (i in 0 until numBootstrapArguments) {
-            bootstrapArguments[i] = input.readUnsignedShort()
-        }
+        bootstrapArguments       = input.readShortIndexArray()
     }
 
     internal fun write(output: DataOutput) {
@@ -128,7 +124,7 @@ data class BootstrapMethodElement
     }
 
     companion object {
-        internal fun read(input: DataInput): BootstrapMethodElement {
+        internal fun read(input: ClassDataInput): BootstrapMethodElement {
             val element = BootstrapMethodElement()
             element.read(input)
             return element

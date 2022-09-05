@@ -16,6 +16,7 @@
 package com.github.netomi.bat
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.classfile.printer.ClassFilePrinter
 import picocli.CommandLine
 import java.io.*
@@ -49,7 +50,9 @@ class ClassDumpCommand : Runnable {
             println("Processing '${inputFile.name}'...")
 
             // TODO: currently supporting only single class files.
-            val classFile = ClassFile.readClassFile(DataInputStream(`is`))
+            val classFile = ClassFile.empty()
+            val reader    = ClassFileReader(`is`)
+            reader.visitClassFile(classFile)
             classFile.accept(ClassFilePrinter(os))
 
             if (outputFile != null) {

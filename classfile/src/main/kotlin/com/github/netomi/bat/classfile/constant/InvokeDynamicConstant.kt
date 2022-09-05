@@ -17,7 +17,7 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -39,7 +39,7 @@ data class InvokeDynamicConstant private constructor(private var _bootstrapMetho
         get() = _nameAndTypeIndex
 
     @Throws(IOException::class)
-    override fun readConstantInfo(input: DataInput) {
+    override fun readConstantInfo(input: ClassDataInput) {
         _bootstrapMethodAttrIndex = input.readUnsignedShort()
         _nameAndTypeIndex         = input.readUnsignedShort()
     }

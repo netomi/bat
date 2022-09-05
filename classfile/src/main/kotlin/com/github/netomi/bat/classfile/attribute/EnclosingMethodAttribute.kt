@@ -17,8 +17,8 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -58,7 +58,7 @@ data class EnclosingMethodAttribute
         get() = ATTRIBUTE_LENGTH
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _classIndex  = input.readUnsignedShort()

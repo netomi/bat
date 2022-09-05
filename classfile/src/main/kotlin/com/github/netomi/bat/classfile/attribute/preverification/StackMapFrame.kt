@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.preverification
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 
@@ -26,13 +27,13 @@ abstract class StackMapFrame protected constructor(val frameType: Int) {
 
     abstract val offsetDelta: Int
 
-    protected open fun readData(input: DataInput) {}
+    internal open fun readData(input: ClassDataInput) {}
 
     abstract fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor)
 
     companion object {
-        internal fun read(input: DataInput): StackMapFrame {
-            val tag = input.readByte()
+        internal fun read(input: ClassDataInput): StackMapFrame {
+            val tag = input.readUnsignedByte()
 
             val stackMapFrame = StackMapFrameType.of(tag)
             stackMapFrame.readData(input)
@@ -71,7 +72,7 @@ class ChopFrame private constructor(            frameType:    Int,
     val choppedVariables: Int
         get() = 251 - frameType
 
-    override fun readData(input: DataInput) {
+    override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
     }
 
@@ -95,7 +96,7 @@ class SameExtendedFrame private constructor(            frameType:    Int,
     override val offsetDelta: Int
         get() = _offsetDelta
 
-    override fun readData(input: DataInput) {
+    override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
     }
 
@@ -136,7 +137,7 @@ class AppendFrame private constructor(            frameType:    Int,
         return locals.iterator()
     }
 
-    override fun readData(input: DataInput) {
+    override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
         locals = mutableListOfCapacity(appendedVariables)
         for (i in 0 until appendedVariables) {
@@ -169,7 +170,7 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
     val stackItem: VerificationType
         get() = _stack
 
-    override fun readData(input: DataInput) {
+    override fun readData(input: ClassDataInput) {
         _stack = VerificationType.read(input)
     }
 
@@ -199,7 +200,7 @@ class SameLocalsOneStackItemExtendedFrame private constructor(            frameT
     val stackItem: VerificationType
         get() = _stack
 
-    override fun readData(input: DataInput) {
+    override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
         _stack = VerificationType.read(input)
     }
@@ -234,7 +235,7 @@ class FullFrame private constructor(            frameType:    Int,
     val stack: List<VerificationType>
         get() = _stack
 
-    override fun readData(input: DataInput) {
+    override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
         val numberOfLocals = input.readUnsignedShort()
         _locals = mutableListOfCapacity(numberOfLocals)
@@ -270,10 +271,8 @@ internal enum class StackMapFrameType constructor(private val supplier: (Int) ->
     FULL_FRAME                             (FullFrame.Companion::of);
 
     companion object {
-        fun of(tag: Byte) : StackMapFrame {
-            val tagAsInt = tag.toInt() and 0xff
-
-            val type = when (tagAsInt) {
+        fun of(frameType: Int) : StackMapFrame {
+            val type = when (frameType) {
                 in 0 .. 63    -> SAME_FRAME
                 in 64 .. 127  -> SAME_LOCALS_1_STACK_ITEM_FRAME
                 247           -> SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME
@@ -281,10 +280,10 @@ internal enum class StackMapFrameType constructor(private val supplier: (Int) ->
                 251           -> SAME_EXTENDED_FRAME
                 in 252 .. 254 -> APPEND_FRAME
                 255           -> FULL_FRAME
-                else -> throw IllegalStateException("unexpected frameType tag $tagAsInt")
+                else -> throw IllegalStateException("unexpected frameType '$frameType'")
             }
 
-            return type.supplier(tagAsInt)
+            return type.supplier(frameType)
         }
     }
 }

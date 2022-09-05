@@ -18,7 +18,7 @@ package com.github.netomi.bat.classfile.attribute.module
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ModuleConstant
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 
 data class RequiresElement
@@ -50,9 +50,9 @@ data class RequiresElement
         return classFile.getString(requiresVersionIndex)
     }
 
-    private fun read(input: DataInput) {
-        _requiresIndex = input.readUnsignedShort()
-        _requiresFlags = input.readUnsignedShort()
+    private fun read(input: ClassDataInput) {
+        _requiresIndex        = input.readUnsignedShort()
+        _requiresFlags        = input.readUnsignedShort()
         _requiresVersionIndex = input.readUnsignedShort()
     }
 
@@ -65,7 +65,7 @@ data class RequiresElement
     companion object {
         private const val DATA_SIZE = 6
 
-        internal fun read(input: DataInput): RequiresElement {
+        internal fun read(input: ClassDataInput): RequiresElement {
             val element = RequiresElement()
             element.read(input)
             return element

@@ -18,7 +18,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -46,7 +46,7 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
     }
 
     @Throws(IOException::class)
-    override fun readElementValue(input: DataInput) {
+    override fun readElementValue(input: ClassDataInput) {
         _typeNameIndex  = input.readUnsignedShort()
         _constNameIndex = input.readUnsignedShort()
     }

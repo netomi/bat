@@ -18,8 +18,8 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -45,7 +45,7 @@ data class ArrayElementValue
     }
 
     @Throws(IOException::class)
-    override fun readElementValue(input: DataInput) {
+    override fun readElementValue(input: ClassDataInput) {
         val elementValueCount = input.readUnsignedShort()
         elementValues = mutableListOfCapacity(elementValueCount)
         for (i in 0 until elementValueCount) {
@@ -56,7 +56,9 @@ data class ArrayElementValue
     @Throws(IOException::class)
     override fun writeElementValue(output: DataOutput) {
         output.writeShort(elementValues.size)
-        elementValues.forEach { it.write(output) }
+        for (elementValue in elementValues) {
+            elementValue.write(output)
+        }
     }
 
     override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {

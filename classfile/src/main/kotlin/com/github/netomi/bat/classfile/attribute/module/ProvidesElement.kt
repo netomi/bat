@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute.module
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ClassConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataInput
 import java.io.DataOutput
 import java.util.*
 
@@ -61,13 +61,9 @@ data class ProvidesElement
         return getProvidesWithClasses(classFile).map { it.getClassName(classFile) }
     }
 
-    private fun read(input: DataInput) {
+    private fun read(input: ClassDataInput) {
         _providesIndex = input.readUnsignedShort()
-        val providesWithCount = input.readUnsignedShort()
-        _providesWith = IntArray(providesWithCount)
-        for (i in 0 until providesWithCount) {
-            _providesWith[i] = input.readUnsignedShort()
-        }
+        _providesWith  = input.readShortIndexArray()
     }
 
     internal fun write(output: DataOutput) {
@@ -97,7 +93,7 @@ data class ProvidesElement
     }
 
     companion object {
-        internal fun read(input: DataInput): ProvidesElement {
+        internal fun read(input: ClassDataInput): ProvidesElement {
             val element = ProvidesElement()
             element.read(input)
             return element

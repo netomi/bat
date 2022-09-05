@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
 import java.io.DataInput
 import java.io.DataOutput
@@ -52,14 +53,10 @@ data class ExceptionsAttribute
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val numberOfExceptions = input.readUnsignedShort()
-        exceptions = IntArray(numberOfExceptions)
-        for (index in 0 until numberOfExceptions) {
-            exceptions[index] = input.readUnsignedShort()
-        }
+        exceptions = input.readShortIndexArray()
     }
 
     @Throws(IOException::class)

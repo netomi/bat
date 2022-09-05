@@ -17,8 +17,8 @@ package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.IOException
 import java.util.*
 
@@ -61,16 +61,11 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
     abstract fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor)
 
     @Throws(IOException::class)
-    protected fun read(input: DataInput, classFile: ClassFile) {
+    internal fun read(input: ClassDataInput) {
         accessFlags     = input.readUnsignedShort()
         nameIndex       = input.readUnsignedShort()
         descriptorIndex = input.readUnsignedShort()
-
-        val attributeCount = input.readUnsignedShort()
-        _attributes = mutableListOfCapacity(attributeCount)
-        for (i in 0 until attributeCount) {
-            _attributes.add(Attribute.readAttribute(input, classFile))
-        }
+        _attributes     = input.readAttributes()
     }
 
     override fun equals(other: Any?): Boolean {

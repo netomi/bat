@@ -22,7 +22,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -49,7 +49,7 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _signatureIndex = input.readUnsignedShort()

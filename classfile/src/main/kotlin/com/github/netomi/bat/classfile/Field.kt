@@ -19,6 +19,7 @@ import com.github.netomi.bat.classfile.attribute.AttachedToField
 import com.github.netomi.bat.classfile.attribute.ConstantValueAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.toHexString
 import java.io.DataInput
 import java.io.IOException
@@ -50,9 +51,9 @@ class Field private constructor(): Member() {
 
     companion object {
         @Throws(IOException::class)
-        internal fun readField(input: DataInput, classFile: ClassFile): Field {
+        internal fun readField(input: ClassDataInput): Field {
             val field = Field()
-            field.read(input, classFile)
+            field.read(input)
             return field
         }
     }

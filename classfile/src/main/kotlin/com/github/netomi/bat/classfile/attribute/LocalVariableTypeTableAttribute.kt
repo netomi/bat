@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -50,7 +50,7 @@ data class LocalVariableTypeTableAttribute
         return localVariableTypeTable.iterator()
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val localVariableTableLength = input.readUnsignedShort()
@@ -109,7 +109,7 @@ data class LocalVariableTypeElement
         return classFile.getString(signatureIndex)
     }
 
-    private fun read(input: DataInput) {
+    private fun read(input: ClassDataInput) {
         _startPC        = input.readUnsignedShort()
         _length         = input.readUnsignedShort()
         _nameIndex      = input.readUnsignedShort()
@@ -128,7 +128,7 @@ data class LocalVariableTypeElement
     companion object {
         internal const val DATA_SIZE = 10
 
-        internal fun read(input: DataInput): LocalVariableTypeElement {
+        internal fun read(input: ClassDataInput): LocalVariableTypeElement {
             val element = LocalVariableTypeElement()
             element.read(input)
             return element

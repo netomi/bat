@@ -16,6 +16,7 @@
 
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.classfile.printer.ClassFilePrinter
 import java.io.DataInput
 import java.io.DataInputStream
@@ -26,8 +27,9 @@ object Main {
     @Throws(IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        val input: DataInput = DataInputStream(FileInputStream("Maps.class"))
-        val classFile = ClassFile.readClassFile(input)
+        val classFileReader = ClassFileReader(FileInputStream("Maps.class"))
+        val classFile = ClassFile.empty()
+        classFileReader.visitClassFile(classFile)
         classFile.accept(ClassFilePrinter())
     }
 }

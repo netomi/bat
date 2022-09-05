@@ -27,8 +27,6 @@ import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
-import java.io.IOException
 import java.util.*
 
 /**
@@ -36,13 +34,13 @@ import java.util.*
  */
 class ClassFile private constructor() {
     var minorVersion = 0
-        private set
+        internal set
 
     var majorVersion = 0
-        private set
+        internal set
 
     var accessFlags: Int = 0
-        private set
+        internal set
 
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
@@ -51,17 +49,17 @@ class ClassFile private constructor() {
         get() = accessFlagModifiers(accessFlags, AccessFlagTarget.CLASS)
 
     var thisClassIndex = -1
-        private set
+        internal set
 
     var superClassIndex = -1
-        private set
+        internal set
 
-    private val constantPool: ConstantPool = ConstantPool.empty()
+    internal val constantPool: ConstantPool = ConstantPool.empty()
 
-    private var _interfaces = mutableListOfCapacity<Int>(0)
-    private var _fields     = mutableListOfCapacity<Field>(0)
-    private var _methods    = mutableListOfCapacity<Method>(0)
-    private var _attributes = mutableListOfCapacity<Attribute>(0)
+    internal var _interfaces = mutableListOfCapacity<Int>(0)
+    internal var _fields     = mutableListOfCapacity<Field>(0)
+    internal var _methods    = mutableListOfCapacity<Method>(0)
+    internal var _attributes = mutableListOfCapacity<Attribute>(0)
 
     val className: JvmClassName
         get() = getClassName(thisClassIndex)
@@ -145,44 +143,6 @@ class ClassFile private constructor() {
         return (constantPool[nameAndTypeIndex] as NameAndTypeConstant)
     }
 
-    @Throws(IOException::class)
-    private fun read(input: DataInput) {
-        val magic = input.readInt()
-        require(magic == MAGIC) { "invalid magic bytes when trying to read a class file." }
-
-        minorVersion = input.readUnsignedShort()
-        majorVersion = input.readUnsignedShort()
-        constantPool.read(input)
-        accessFlags     = input.readUnsignedShort()
-        thisClassIndex  = input.readUnsignedShort()
-        superClassIndex = input.readUnsignedShort()
-
-        val interfacesCount = input.readUnsignedShort()
-        _interfaces = mutableListOfCapacity(interfacesCount)
-        for (i in 0 until interfacesCount) {
-            val idx = input.readUnsignedShort()
-            _interfaces.add(idx)
-        }
-
-        val fieldCount = input.readUnsignedShort()
-        _fields = mutableListOfCapacity(fieldCount)
-        for (i in 0 until fieldCount) {
-            _fields.add(Field.readField(input, this))
-        }
-
-        val methodCount = input.readUnsignedShort()
-        _methods = mutableListOfCapacity(methodCount)
-        for (i in 0 until methodCount) {
-            _methods.add(Method.readMethod(input, this))
-        }
-
-        val attributeCount = input.readUnsignedShort()
-        _attributes = mutableListOfCapacity(attributeCount)
-        for (i in 0 until attributeCount) {
-            _attributes.add(Attribute.readAttribute(input, this))
-        }
-    }
-
     fun accept(visitor: ClassFileVisitor) {
         visitor.visitClassFile(this)
     }
@@ -215,15 +175,8 @@ class ClassFile private constructor() {
     }
 
     companion object {
-        internal fun empty(): ClassFile {
+        fun empty(): ClassFile {
             return ClassFile()
-        }
-
-        @Throws(IOException::class)
-        fun readClassFile(input: DataInput): ClassFile {
-            val classFile = ClassFile()
-            classFile.read(input)
-            return classFile
         }
     }
 }

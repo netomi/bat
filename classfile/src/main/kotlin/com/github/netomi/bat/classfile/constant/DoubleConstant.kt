@@ -17,7 +17,7 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -35,7 +35,7 @@ data class DoubleConstant private constructor(var _value: Double = 0.0) : Consta
         get() = _value
 
     @Throws(IOException::class)
-    override fun readConstantInfo(input: DataInput) {
+    override fun readConstantInfo(input: ClassDataInput) {
         val highBytes = input.readInt()
         val lowBytes  = input.readInt()
         val bits = (highBytes.toLong() shl 32) + lowBytes

@@ -19,7 +19,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -38,7 +38,7 @@ data class ConstElementValue private constructor(override val type: ElementValue
     }
 
     @Throws(IOException::class)
-    override fun readElementValue(input: DataInput) {
+    override fun readElementValue(input: ClassDataInput) {
         _constValueIndex = input.readUnsignedShort()
     }
 

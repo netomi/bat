@@ -24,7 +24,7 @@ import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.*
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -42,7 +42,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
     internal abstract val dataSize: Int
 
     @Throws(IOException::class)
-    protected abstract fun readAttributeData(input: DataInput, classFile: ClassFile)
+    internal abstract fun readAttributeData(input: ClassDataInput)
 
     @Throws(IOException::class)
     protected abstract fun writeAttributeData(output: DataOutput)
@@ -54,12 +54,19 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
     }
 
     companion object {
-        internal fun readAttribute(input : DataInput, classFile: ClassFile): Attribute {
+        internal fun skipAttribute(input: ClassDataInput) {
+            @Suppress("UNUSED_VARIABLE")
+            val attributeNameIndex = input.readUnsignedShort()
+            val attributeLength    = input.readInt()
+            input.skipBytes(attributeLength)
+        }
+
+        internal fun readAttribute(input : ClassDataInput, classFile: ClassFile): Attribute {
             val attributeNameIndex = input.readUnsignedShort()
             val attributeName      = classFile.getString(attributeNameIndex)
 
             val attribute = AttributeType.of(attributeName).createAttribute(attributeNameIndex)
-            attribute.readAttributeData(input, classFile)
+            attribute.readAttributeData(input)
 
             return attribute
         }

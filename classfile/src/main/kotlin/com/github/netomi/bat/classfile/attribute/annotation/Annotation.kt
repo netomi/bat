@@ -18,9 +18,9 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 import java.util.*
@@ -43,7 +43,7 @@ open class Annotation
     }
 
     @Throws(IOException::class)
-    protected open fun read(input: DataInput) {
+    internal open fun read(input: ClassDataInput) {
         _typeIndex = input.readUnsignedShort()
 
         val elementValuesCount = input.readUnsignedShort()
@@ -91,7 +91,7 @@ open class Annotation
             return Annotation()
         }
 
-        internal fun readAnnotation(input: DataInput): Annotation {
+        internal fun readAnnotation(input: ClassDataInput): Annotation {
             val annotation = Annotation()
             annotation.read(input)
             return annotation

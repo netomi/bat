@@ -21,7 +21,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.ClassElementValue
 import com.github.netomi.bat.classfile.attribute.annotation.ElementValue
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -46,7 +46,8 @@ data class AnnotationDefaultAttribute
         get() = TODO("implement")
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
+        @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         _elementValue = ElementValue.read(input)
     }

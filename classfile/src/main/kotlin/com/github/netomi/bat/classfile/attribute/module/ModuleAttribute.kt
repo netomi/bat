@@ -21,8 +21,8 @@ import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.ModuleConstant
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -91,7 +91,7 @@ data class ModuleAttribute
     val provides: List<ProvidesElement>
         get() = _providesList
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         _moduleNameIndex    = input.readUnsignedShort()

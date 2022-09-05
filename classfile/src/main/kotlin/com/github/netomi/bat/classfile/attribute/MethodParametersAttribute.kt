@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -50,10 +50,10 @@ data class MethodParametersAttribute
         return parameters.iterator()
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val parametersCount = input.readByte().toInt()
+        val parametersCount = input.readUnsignedByte()
         parameters = mutableListOfCapacity(parametersCount)
         for (i in 0 until parametersCount) {
             parameters.add(ParameterElement.read(input))
@@ -92,7 +92,7 @@ data class ParameterElement private constructor(private var _nameIndex:   Int = 
         return classFile.getString(nameIndex)
     }
 
-    private fun read(input: DataInput) {
+    private fun read(input: ClassDataInput) {
         _nameIndex   = input.readUnsignedShort()
         _accessFlags = input.readUnsignedShort()
     }
@@ -105,7 +105,7 @@ data class ParameterElement private constructor(private var _nameIndex:   Int = 
     companion object {
         internal const val DATA_SIZE = 4
 
-        internal fun read(input: DataInput): ParameterElement {
+        internal fun read(input: ClassDataInput): ParameterElement {
             val element = ParameterElement()
             element.read(input)
             return element

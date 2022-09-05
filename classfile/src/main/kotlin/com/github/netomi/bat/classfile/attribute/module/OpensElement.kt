@@ -20,7 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.constant.PackageConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.util.*
 
@@ -65,14 +65,10 @@ data class OpensElement
         return getOpenedToModules(classFile).map { it.getModuleName(classFile) }
     }
 
-    private fun read(input: DataInput) {
+    private fun read(input: ClassDataInput) {
         _opensIndex = input.readUnsignedShort()
         _opensFlags = input.readUnsignedShort()
-        val opensToCount = input.readUnsignedShort()
-        _opensTo = IntArray(opensToCount)
-        for (i in 0 until opensToCount) {
-            _opensTo[i] = input.readUnsignedShort()
-        }
+        _opensTo    = input.readShortIndexArray()
     }
 
     internal fun write(output: DataOutput) {
@@ -104,7 +100,7 @@ data class OpensElement
     }
 
     companion object {
-        internal fun read(input: DataInput): OpensElement {
+        internal fun read(input: ClassDataInput): OpensElement {
             val element = OpensElement()
             element.read(input)
             return element

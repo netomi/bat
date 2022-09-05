@@ -18,9 +18,9 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 /**
@@ -50,7 +50,7 @@ data class InnerClassesAttribute
         return innerClassesList.iterator()
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfClasses = input.readUnsignedShort()
@@ -109,10 +109,10 @@ data class InnerClassesElement
         return classFile.getString(innerNameIndex)
     }
 
-    private fun read(input: DataInput) {
-        _innerClassIndex         = input.readUnsignedShort()
-        _outerClassIndex          = input.readUnsignedShort()
-        _innerNameIndex       = input.readUnsignedShort()
+    private fun read(input: ClassDataInput) {
+        _innerClassIndex       = input.readUnsignedShort()
+        _outerClassIndex       = input.readUnsignedShort()
+        _innerNameIndex        = input.readUnsignedShort()
         _innerClassAccessFlags = input.readUnsignedShort()
     }
 
@@ -126,7 +126,7 @@ data class InnerClassesElement
     companion object {
         internal const val DATA_SIZE = 8
 
-        internal fun read(input: DataInput): InnerClassesElement {
+        internal fun read(input: ClassDataInput): InnerClassesElement {
             val element = InnerClassesElement()
             element.read(input)
             return element

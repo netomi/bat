@@ -19,7 +19,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -43,7 +43,7 @@ data class ConstantValueAttribute
         get() = ATTRIBUTE_LENGTH
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         val length = input.readInt()
         assert(length == ATTRIBUTE_LENGTH)
         _constantValueIndex = input.readUnsignedShort()

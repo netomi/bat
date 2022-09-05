@@ -18,17 +18,17 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.TargetInfoVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 import java.io.DataOutput
 
 abstract class TargetInfo protected constructor(open val type: TargetInfoType) {
 
-    internal abstract fun readInfo(input: DataInput)
+    internal abstract fun readInfo(input: ClassDataInput)
     internal abstract fun writeInfo(output: DataOutput)
 
     fun write(output: DataOutput) {
-        output.writeByte(type.targetType.toInt())
+        output.writeByte(type.targetType)
         writeInfo(output)
     }
 
@@ -39,8 +39,8 @@ abstract class TargetInfo protected constructor(open val type: TargetInfoType) {
             return EmptyTargetInfo.create(TargetInfoType.FIELD)
         }
 
-        internal fun read(input: DataInput): TargetInfo {
-            val targetType = input.readByte()
+        internal fun read(input: ClassDataInput): TargetInfo {
+            val targetType = input.readUnsignedByte()
 
             val targetInfo = TargetInfoType.createTargetInfo(targetType)
             targetInfo.readInfo(input)
@@ -55,8 +55,8 @@ data class TypeParameterTargetInfo private constructor(override val type:       
     val typeParameterIndex: Int
         get() = _typeParameterIndex
 
-    override fun readInfo(input: DataInput) {
-        _typeParameterIndex = input.readByte().toInt() and 0xff
+    override fun readInfo(input: ClassDataInput) {
+        _typeParameterIndex = input.readUnsignedByte()
     }
 
     override fun writeInfo(output: DataOutput) {
@@ -74,12 +74,12 @@ data class TypeParameterTargetInfo private constructor(override val type:       
     }
 }
 
-data class SuperTypeTargetInfo private constructor(override val type:           TargetInfoType,
+data class SuperTypeTargetInfo private constructor(override val type:            TargetInfoType,
                                                     private var _superTypeIndex: Int = -1): TargetInfo(type) {
     val superTypeIndex: Int
         get() = _superTypeIndex
 
-    override fun readInfo(input: DataInput) {
+    override fun readInfo(input: ClassDataInput) {
         _superTypeIndex = input.readUnsignedShort()
     }
 
@@ -109,9 +109,9 @@ data class TypeParameterBoundTargetInfo
     val boundIndex: Int
         get() = _boundIndex
 
-    override fun readInfo(input: DataInput) {
-        _typeParameterIndex = input.readByte().toInt() and 0xff
-        _boundIndex = input.readByte().toInt() and 0xff
+    override fun readInfo(input: ClassDataInput) {
+        _typeParameterIndex = input.readUnsignedByte()
+        _boundIndex         = input.readUnsignedByte()
     }
 
     override fun writeInfo(output: DataOutput) {
@@ -131,7 +131,7 @@ data class TypeParameterBoundTargetInfo
 }
 
 data class EmptyTargetInfo private constructor(override val type: TargetInfoType): TargetInfo(type) {
-    override fun readInfo(input: DataInput) {}
+    override fun readInfo(input: ClassDataInput) {}
 
     override fun writeInfo(output: DataOutput) {}
 
@@ -151,8 +151,8 @@ data class FormalParameterTargetInfo private constructor(override val type:     
     val formalParameterIndex: Int
         get() = _formalParameterIndex
 
-    override fun readInfo(input: DataInput) {
-        _formalParameterIndex = input.readByte().toInt() and 0xff
+    override fun readInfo(input: ClassDataInput) {
+        _formalParameterIndex = input.readUnsignedByte()
     }
 
     override fun writeInfo(output: DataOutput) {
@@ -175,7 +175,7 @@ data class ThrowsTargetInfo private constructor(override val type:             T
     val throwsTypeIndex: Int
         get() = _throwsTypeIndex
 
-    override fun readInfo(input: DataInput) {
+    override fun readInfo(input: ClassDataInput) {
         _throwsTypeIndex = input.readUnsignedShort()
     }
 
@@ -210,7 +210,7 @@ data class LocalVarTargetInfo
         return _table.iterator()
     }
 
-    override fun readInfo(input: DataInput) {
+    override fun readInfo(input: ClassDataInput) {
         val tableLength = input.readUnsignedShort()
         _table = mutableListOfCapacity(tableLength)
         for (i in 0 until tableLength) {
@@ -249,7 +249,7 @@ data class LocalVarElement private constructor(private var _startPC: Int = -1,
     val index: Int
         get() = _index
 
-    internal fun read(input: DataInput) {
+    internal fun read(input: ClassDataInput) {
         _startPC = input.readUnsignedShort()
         _length  = input.readUnsignedShort()
         _index   = input.readUnsignedShort()
@@ -262,7 +262,7 @@ data class LocalVarElement private constructor(private var _startPC: Int = -1,
     }
 
     companion object {
-        internal fun read(input: DataInput): LocalVarElement {
+        internal fun read(input: ClassDataInput): LocalVarElement {
             val element = LocalVarElement()
             element.read(input)
             return element
@@ -275,7 +275,7 @@ data class CatchTargetInfo private constructor(override val type:               
     val exceptionTableIndex: Int
         get() = _exceptionTableIndex
 
-    override fun readInfo(input: DataInput) {
+    override fun readInfo(input: ClassDataInput) {
         _exceptionTableIndex = input.readUnsignedShort()
     }
 
@@ -299,7 +299,7 @@ data class OffsetTargetInfo private constructor(override val type:    TargetInfo
     val offset: Int
         get() = _offset
 
-    override fun readInfo(input: DataInput) {
+    override fun readInfo(input: ClassDataInput) {
         _offset = input.readUnsignedShort()
     }
 
@@ -329,9 +329,9 @@ data class TypeArgumentTargetInfo
     val typeArgumentIndex: Int
         get() = _typeArgumentIndex
 
-    override fun readInfo(input: DataInput) {
-        _offset = input.readUnsignedShort()
-        _typeArgumentIndex = input.readByte().toInt() and 0xff
+    override fun readInfo(input: ClassDataInput) {
+        _offset            = input.readUnsignedShort()
+        _typeArgumentIndex = input.readUnsignedByte()
     }
 
     override fun writeInfo(output: DataOutput) {
@@ -350,7 +350,7 @@ data class TypeArgumentTargetInfo
     }
 }
 
-enum class TargetInfoType constructor(val targetType: Byte, private val supplier: (TargetInfoType) -> TargetInfo ) {
+enum class TargetInfoType constructor(val targetType: Int, private val supplier: (TargetInfoType) -> TargetInfo ) {
     CLASS_TYPE_PARAMETER                (0x00, TypeParameterTargetInfo.Companion::create),
     METHOD_TYPE_PARAMETER_TARGET        (0x01, TypeParameterTargetInfo.Companion::create),
     CLASS_EXTENDS                       (0x10, SuperTypeTargetInfo.Companion::create),
@@ -375,11 +375,11 @@ enum class TargetInfoType constructor(val targetType: Byte, private val supplier
     METHOD_REFERENCE_TYPE_ARGUMENT      (0x4B, TypeArgumentTargetInfo.Companion::create);
 
     companion object {
-        private val targetTypeToTypeMap: Map<Byte, TargetInfoType> by lazy {
+        private val targetTypeToTypeMap: Map<Int, TargetInfoType> by lazy {
             TargetInfoType.values().associateBy { it.targetType }
         }
 
-        fun createTargetInfo(targetType: Byte) : TargetInfo {
+        fun createTargetInfo(targetType: Int) : TargetInfo {
             val type = targetTypeToTypeMap[targetType]
             return type?.supplier?.invoke(type) ?: throw IllegalArgumentException("unknown targetType '$targetType'")
         }

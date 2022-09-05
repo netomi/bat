@@ -18,8 +18,8 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataInput
 import java.io.DataOutput
 import java.util.*
 
@@ -54,14 +54,10 @@ data class PermittedSubclassesAttribute
         return permittedClasses.map { classFile.getClassName(it) }
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val numberOfClasses = input.readUnsignedShort()
-        permittedClasses = IntArray(numberOfClasses)
-        for (i in 0 until numberOfClasses) {
-            permittedClasses[i] = input.readUnsignedShort()
-        }
+        permittedClasses = input.readShortIndexArray()
     }
 
     override fun writeAttributeData(output: DataOutput) {

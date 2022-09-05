@@ -17,7 +17,7 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -32,7 +32,7 @@ abstract class Constant {
         get() = type.constantPoolSize
 
     @Throws(IOException::class)
-    abstract fun readConstantInfo(input: DataInput)
+    internal abstract fun readConstantInfo(input: ClassDataInput)
 
     @Throws(IOException::class)
     abstract fun writeConstantInfo(output: DataOutput)
@@ -50,7 +50,7 @@ abstract class Constant {
     abstract fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitor)
 
     companion object {
-        fun read(input: DataInput): Constant {
+        internal fun read(input: ClassDataInput): Constant {
             val tag      = input.readUnsignedByte()
             val constant = ConstantType.of(tag).createConstant()
             constant.readConstantInfo(input)

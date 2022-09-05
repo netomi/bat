@@ -22,7 +22,7 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import java.io.DataInput
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import java.io.DataOutput
 import java.util.*
 
@@ -57,14 +57,10 @@ data class ModulePackagesAttribute
         return packages.map { classFile.getPackage(it).getPackageName(classFile) }
     }
 
-    override fun readAttributeData(input: DataInput, classFile: ClassFile) {
+    override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val numberOfClasses = input.readUnsignedShort()
-        packages = IntArray(numberOfClasses)
-        for (i in 0 until numberOfClasses) {
-            packages[i] = input.readUnsignedShort()
-        }
+        packages   = input.readShortIndexArray()
     }
 
     override fun writeAttributeData(output: DataOutput) {

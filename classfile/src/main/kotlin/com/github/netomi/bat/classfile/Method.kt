@@ -17,10 +17,10 @@ package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.AttachedToMethod
 import com.github.netomi.bat.classfile.attribute.visitor.*
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.getArgumentSize
 import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import com.github.netomi.bat.util.toHexString
-import java.io.DataInput
 import java.io.IOException
 
 /**
@@ -52,9 +52,9 @@ class Method private constructor(): Member() {
 
     companion object {
         @Throws(IOException::class)
-        internal fun readMethod(input: DataInput, classFile: ClassFile): Method {
+        internal fun readMethod(input: ClassDataInput): Method {
             val method = Method()
-            method.read(input, classFile)
+            method.read(input)
             return method
         }
     }

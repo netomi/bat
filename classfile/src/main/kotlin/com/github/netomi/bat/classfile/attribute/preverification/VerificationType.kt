@@ -17,14 +17,14 @@
 package com.github.netomi.bat.classfile.attribute.preverification
 
 import com.github.netomi.bat.classfile.*
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataInput
 import java.io.DataOutput
 
 abstract class VerificationType {
     internal abstract val type: ItemType
 
-    protected open fun readInfo(input: DataInput) {}
+    internal open fun readInfo(input: ClassDataInput) {}
     protected open fun writeInfo(output: DataOutput) {}
 
     internal fun write(output: DataOutput) {
@@ -33,8 +33,8 @@ abstract class VerificationType {
     }
 
     companion object {
-        fun read(input: DataInput): VerificationType {
-            val tag  = input.readByte()
+        internal fun read(input: ClassDataInput): VerificationType {
+            val tag  = input.readUnsignedByte()
             val type = ItemType.of(tag).createVerificationType()
             type.readInfo(input)
             return type
@@ -201,7 +201,7 @@ data class ObjectVariable private constructor(private var _classIndex: Int = -1)
         return classFile.getClassName(classIndex)
     }
 
-    override fun readInfo(input: DataInput) {
+    override fun readInfo(input: ClassDataInput) {
         _classIndex = input.readUnsignedShort()
     }
 
@@ -228,7 +228,7 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
     val offset: Int
         get() = _offset
 
-    override fun readInfo(input: DataInput) {
+    override fun readInfo(input: ClassDataInput) {
         _offset = input.readUnsignedShort()
     }
 
@@ -247,7 +247,7 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
     }
 }
 
-internal enum class ItemType constructor(internal val tag: Byte, private val supplier: () -> VerificationType) {
+internal enum class ItemType constructor(internal val tag: Int, private val supplier: () -> VerificationType) {
     TOP               (ITEM_Top,               TopVariable::empty),
     INTEGER           (ITEM_Integer,           IntegerVariable::empty),
     LONG              (ITEM_Long,              LongVariable::empty),
@@ -263,11 +263,11 @@ internal enum class ItemType constructor(internal val tag: Byte, private val sup
     }
 
     companion object {
-        private val tagToItemMap: Map<Byte, ItemType> by lazy {
+        private val tagToItemMap: Map<Int, ItemType> by lazy {
             ItemType.values().associateBy { it.tag }
         }
 
-        fun of(tag: Byte) : ItemType {
+        fun of(tag: Int) : ItemType {
             return tagToItemMap[tag] ?: throw IllegalArgumentException("unknown tag '$tag'")
         }
     }

@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute.module
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ClassConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataInput
 import java.io.DataOutput
 
 data class UsesElement
@@ -48,12 +48,8 @@ data class UsesElement
         return getUsedClasses(classFile).map { it.getClassName(classFile) }
     }
 
-    private fun read(input: DataInput) {
-        val usesCount = input.readUnsignedShort()
-        _uses = IntArray(usesCount)
-        for (i in 0 until usesCount) {
-            _uses[i] = input.readUnsignedShort()
-        }
+    private fun read(input: ClassDataInput) {
+        _uses = input.readShortIndexArray()
     }
 
     internal fun write(output: DataOutput) {
@@ -85,7 +81,7 @@ data class UsesElement
             return UsesElement()
         }
 
-        internal fun read(input: DataInput): UsesElement {
+        internal fun read(input: ClassDataInput): UsesElement {
             val element = UsesElement()
             element.read(input)
             return element

@@ -71,13 +71,13 @@ const val REF_invokeInterface  = 9
 
 // Item types for union verification_type_info
 // https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.4
-const val ITEM_Top               = 0.toByte()
-const val ITEM_Integer           = 1.toByte()
-const val ITEM_Float             = 2.toByte()
-const val ITEM_Double            = 3.toByte()
-const val ITEM_Long              = 4.toByte()
-const val ITEM_Null              = 5.toByte()
-const val ITEM_UninitializedThis = 6.toByte()
-const val ITEM_Object            = 7.toByte()
-const val ITEM_Uninitialized     = 8.toByte()
+const val ITEM_Top               = 0
+const val ITEM_Integer           = 1
+const val ITEM_Float             = 2
+const val ITEM_Double            = 3
+const val ITEM_Long              = 4
+const val ITEM_Null              = 5
+const val ITEM_UninitializedThis = 6
+const val ITEM_Object            = 7
+const val ITEM_Uninitialized     = 8
 
