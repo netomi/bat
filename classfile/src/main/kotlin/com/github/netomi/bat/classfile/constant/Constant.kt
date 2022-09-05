@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.constant
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.DataOutput
 import java.io.IOException
 
@@ -35,10 +36,10 @@ abstract class Constant {
     internal abstract fun readConstantInfo(input: ClassDataInput)
 
     @Throws(IOException::class)
-    abstract fun writeConstantInfo(output: DataOutput)
+    internal abstract fun writeConstantInfo(output: ClassDataOutput)
 
     @Throws(IOException::class)
-    fun write(output: DataOutput) {
+    internal fun write(output: ClassDataOutput) {
         output.writeByte(type.tag)
         writeConstantInfo(output)
     }

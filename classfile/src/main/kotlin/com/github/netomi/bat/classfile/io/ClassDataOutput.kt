@@ -41,6 +41,10 @@ internal class ClassDataOutput private constructor(outputStream: OutputStream): 
         dataOutput.write(b)
     }
 
+    fun writeUTF(str: String) {
+        dataOutput.writeUTF(str)
+    }
+
     fun <T: ClassFileContent> writeContentList(list: List<T>) {
         dataOutput.writeShort(list.size)
         for (element in list) {

@@ -16,6 +16,7 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
@@ -39,7 +40,7 @@ abstract class ConstantBaseTest {
     private fun serializeConstant(constant: Constant): ByteArray {
         val baos = ByteArrayOutputStream()
 
-        DataOutputStream(baos).use {
+        ClassDataOutput.of(baos).use {
             constant.write(it)
         }
 

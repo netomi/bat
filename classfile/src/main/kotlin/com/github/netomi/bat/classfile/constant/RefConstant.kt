@@ -17,8 +17,8 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataOutput
 import java.io.IOException
 
 /**
@@ -57,7 +57,7 @@ abstract class RefConstant(protected open var _classIndex:       Int = -1,
     }
 
     @Throws(IOException::class)
-    override fun writeConstantInfo(output: DataOutput) {
+    override fun writeConstantInfo(output: ClassDataOutput) {
         output.writeShort(classIndex)
         output.writeShort(nameAndTypeIndex)
     }

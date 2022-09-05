@@ -18,7 +18,7 @@ package com.github.netomi.bat.classfile.constant
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 /**
@@ -43,7 +43,7 @@ data class DoubleConstant private constructor(var _value: Double = 0.0) : Consta
     }
 
     @Throws(IOException::class)
-    override fun writeConstantInfo(output: DataOutput) {
+    override fun writeConstantInfo(output: ClassDataOutput) {
         val bits = value.toBits()
         val highBytes = (bits shr 32).toInt()
         val lowBytes  = bits.toInt()

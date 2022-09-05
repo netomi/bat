@@ -18,7 +18,7 @@ package com.github.netomi.bat.classfile.constant
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 /**
@@ -40,7 +40,7 @@ data class FloatConstant private constructor(private var _value: Float = 0.0f) :
     }
 
     @Throws(IOException::class)
-    override fun writeConstantInfo(output: DataOutput) {
+    override fun writeConstantInfo(output: ClassDataOutput) {
         output.writeInt(value.toBits())
     }
 

@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.constant
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
@@ -60,7 +61,7 @@ internal class ConstantPool private constructor(private var constants: MutableLi
     }
 
     @Throws(IOException::class)
-    fun write(output: DataOutput) {
+    fun write(output: ClassDataOutput) {
         val entries = constants.size
         output.writeShort(entries)
         val it: ListIterator<Constant?> = constants.listIterator(1)
