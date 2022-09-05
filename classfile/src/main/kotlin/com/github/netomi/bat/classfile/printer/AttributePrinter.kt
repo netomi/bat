@@ -37,6 +37,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     private val stackMapFramePrinter   = StackMapFramePrinter(printer)
     private val constantPrinter        = ConstantPrinter(printer)
     private val instructionPrinter     = InstructionPrinter(printer)
+    private val targetInfoPrinter      = TargetInfoPrinter(printer)
 
     // common implementations
 
@@ -396,6 +397,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.print("${index}: ")
         referencedIndexPrinter.visitAnnotation(classFile, typeAnnotation)
         printer.print(": ${typeAnnotation.target.type}")
+        typeAnnotation.target.accept(classFile, targetInfoPrinter)
         printer.println()
         visitAnyAnnotation(classFile, index, typeAnnotation)
     }
