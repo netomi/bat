@@ -152,7 +152,7 @@ class AppendFrame private constructor(            frameType:    Int,
         get() = StackMapFrameType.APPEND_FRAME
 
     override val dataSize: Int
-        get() = 3 + locals.dataSize()
+        get() = 3 + locals.fold(0) { acc, element -> acc + element.dataSize }
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -181,7 +181,9 @@ class AppendFrame private constructor(            frameType:    Int,
 
     override fun writeData(output: ClassDataOutput) {
         output.writeShort(offsetDelta)
-        output.writeContentList(locals)
+        for (element in locals) {
+            element.write(output)
+        }
     }
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
