@@ -26,41 +26,41 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
 
     private val constantPrinter = ConstantPrinter(printer)
 
-    override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {}
+    override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {}
 
-    override fun visitIntegerConstant(classFile: ClassFile, constant: IntegerConstant) {
+    override fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
         printer.print("%-19s ".format("Integer"))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitLongConstant(classFile: ClassFile, constant: LongConstant) {
+    override fun visitLongConstant(classFile: ClassFile, index: Int, constant: LongConstant) {
         printer.print("%-19s ".format("Long"))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitFloatConstant(classFile: ClassFile, constant: FloatConstant) {
+    override fun visitFloatConstant(classFile: ClassFile, index: Int, constant: FloatConstant) {
         printer.print("%-19s ".format("Float"))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitDoubleConstant(classFile: ClassFile, constant: DoubleConstant) {
+    override fun visitDoubleConstant(classFile: ClassFile, index: Int, constant: DoubleConstant) {
         printer.print("%-19s ".format("Double"))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitUtf8Constant(classFile: ClassFile, constant: Utf8Constant) {
+    override fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {
         printer.print("%-19s ".format("Utf8"))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitStringConstant(classFile: ClassFile, constant: StringConstant) {
+    override fun visitStringConstant(classFile: ClassFile, index: Int, constant: StringConstant) {
         printer.print("%-19s %-15s // ".format("String", "#" + constant.stringIndex))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
+    override fun visitAnyRefConstant(classFile: ClassFile, index: Int, constant: RefConstant) {
         var type = "Unknown"
-        when (refConstant.type) {
+        when (constant.type) {
             ConstantType.FIELD_REF            -> type = "Fieldref"
             ConstantType.METHOD_REF           -> type = "Methodref"
             ConstantType.INTERFACE_METHOD_REF -> type = "InterfaceMethodref"
@@ -68,37 +68,37 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
                 // do nothing
             }
         }
-        printer.print("%-19s %-15s // ".format(type, "#${refConstant.classIndex}.#${refConstant.nameAndTypeIndex}"))
-        refConstant.accept(classFile, constantPrinter)
+        printer.print("%-19s %-15s // ".format(type, "#${constant.classIndex}.#${constant.nameAndTypeIndex}"))
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {
+    override fun visitClassConstant(classFile: ClassFile, index: Int, constant: ClassConstant) {
         printer.print("%-19s %-15s // ".format("Class", "#" + constant.nameIndex))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitNameAndTypeConstant(classFile: ClassFile, constant: NameAndTypeConstant) {
+    override fun visitNameAndTypeConstant(classFile: ClassFile, index: Int, constant: NameAndTypeConstant) {
         printer.print("%-19s %-15s // ".format("NameAndType", "#" + constant.nameIndex + ".#" + constant.descriptorIndex))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitModuleConstant(classFile: ClassFile, constant: ModuleConstant) {
+    override fun visitModuleConstant(classFile: ClassFile, index: Int, constant: ModuleConstant) {
         printer.print(String.format("%-19s %-15s // ", "Module", "#" + constant.nameIndex))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
+    override fun visitPackageConstant(classFile: ClassFile, index: Int, constant: PackageConstant) {
         printer.print("%-19s %-15s // ".format("Class", "#" + constant.nameIndex))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitMethodTypeConstant(classFile: ClassFile, constant: MethodTypeConstant) {
+    override fun visitMethodTypeConstant(classFile: ClassFile, index: Int, constant: MethodTypeConstant) {
         printer.print("%-19s %-15s // ".format("MethodType", "#" + constant.descriptorIndex))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 
-    override fun visitMethodHandleConstant(classFile: ClassFile, constant: MethodHandleConstant) {
+    override fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
         printer.print("%-19s %-15s // ".format("MethodHandle", "${constant.referenceKind.value}.#${constant.referenceIndex}"))
-        constant.accept(classFile, constantPrinter)
+        constant.accept(classFile, index, constantPrinter)
     }
 }

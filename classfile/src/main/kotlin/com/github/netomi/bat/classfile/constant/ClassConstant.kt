@@ -17,7 +17,6 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.asInternalClassName
 import java.io.DataInput
@@ -51,11 +50,7 @@ data class ClassConstant private constructor(private var _nameIndex: Int = -1) :
         output.writeShort(nameIndex)
     }
 
-    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
-        visitor.visitClassConstant(classFile, this)
-    }
-
-    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitorIndexed) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
         visitor.visitClassConstant(classFile, index, this)
     }
 

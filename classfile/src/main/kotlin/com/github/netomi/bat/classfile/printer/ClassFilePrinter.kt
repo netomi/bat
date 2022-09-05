@@ -74,7 +74,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 
         classFile.constantsAccept { cf, index, constant ->
             printer.print(String.format("%4s = ", "#$index"))
-            constant.accept(cf, constantPoolPrinter)
+            constant.accept(cf, index, constantPoolPrinter)
             printer.println()
         }
 

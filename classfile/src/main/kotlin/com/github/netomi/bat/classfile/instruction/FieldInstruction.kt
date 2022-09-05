@@ -19,7 +19,6 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.FieldrefConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
@@ -27,10 +26,6 @@ class FieldInstruction private constructor(opCode: JvmOpCode): JvmInstruction(op
 
     var fieldIndex: Int = 0
         private set
-
-    fun getField(classFile: ClassFile): FieldrefConstant {
-        return classFile.getFieldref(fieldIndex)
-    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
@@ -46,7 +41,7 @@ class FieldInstruction private constructor(opCode: JvmOpCode): JvmInstruction(op
     }
 
     fun fieldAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        getField(classFile).accept(classFile, visitor)
+        classFile.constantAccept(fieldIndex, visitor)
     }
 
     companion object {

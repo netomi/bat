@@ -17,7 +17,6 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
@@ -74,23 +73,10 @@ internal class ConstantPool private constructor(private var constants: MutableLi
     }
 
     fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
-        for (constant in constants) {
-            constant?.accept(classFile, visitor)
-        }
-    }
-
-    fun accept(classFile: ClassFile, visitor: ConstantVisitorIndexed) {
         constants.forEachIndexed { index, constant -> constant?.accept(classFile, index, visitor) }
     }
 
     fun constantAccept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
-        if (index in 1 until constants.size) {
-            check(constants[index] != null) { "trying to accept a null constant at index $index" }
-            constants[index]?.accept(classFile, visitor)
-        }
-    }
-
-    fun constantAccept(classFile: ClassFile, index: Int, visitor: ConstantVisitorIndexed) {
         if (index in 1 until constants.size) {
             check(constants[index] != null) { "trying to accept a null constant at index $index" }
             constants[index]?.accept(classFile, index, visitor)

@@ -37,6 +37,6 @@ abstract class AnyMethodInstruction protected constructor(opCode: JvmOpCode): Jv
     }
 
     fun methodAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        getMethod(classFile).accept(classFile, visitor)
+        classFile.constantAccept(methodIndex, visitor)
     }
 }

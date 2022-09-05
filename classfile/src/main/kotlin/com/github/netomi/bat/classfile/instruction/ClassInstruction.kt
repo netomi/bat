@@ -19,7 +19,6 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.ClassConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.JvmClassName
@@ -28,10 +27,6 @@ class ClassInstruction private constructor(opCode: JvmOpCode): JvmInstruction(op
 
     var classIndex: Int = 0
         private set
-
-    fun getClass(classFile: ClassFile): ClassConstant {
-        return classFile.getClass(classIndex)
-    }
 
     fun getClassName(classFile: ClassFile): JvmClassName {
         return classFile.getClassName(classIndex)
@@ -51,7 +46,7 @@ class ClassInstruction private constructor(opCode: JvmOpCode): JvmInstruction(op
     }
 
     fun classAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        getClass(classFile).accept(classFile, visitor)
+        classFile.constantAccept(classIndex, visitor)
     }
 
     companion object {

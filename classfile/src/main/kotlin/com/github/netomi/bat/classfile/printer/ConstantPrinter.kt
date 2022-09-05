@@ -27,39 +27,39 @@ internal class ConstantPrinter constructor(private val printer:                I
                                            private val printConstantType:      Boolean = false,
                                            private val alwaysIncludeClassName: Boolean = true): ConstantVisitor {
 
-    override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {
+    override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
         printer.print(constant)
     }
 
-    override fun visitIntegerConstant(classFile: ClassFile, constant: IntegerConstant) {
+    override fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
         if (printConstantType) {
             printer.print("int ")
         }
         printer.print(constant.value)
     }
 
-    override fun visitLongConstant(classFile: ClassFile, constant: LongConstant) {
+    override fun visitLongConstant(classFile: ClassFile, index: Int, constant: LongConstant) {
         if (printConstantType) {
             printer.print("long ")
         }
         printer.print(constant.value)
     }
 
-    override fun visitFloatConstant(classFile: ClassFile, constant: FloatConstant) {
+    override fun visitFloatConstant(classFile: ClassFile, index: Int, constant: FloatConstant) {
         if (printConstantType) {
             printer.print("float ")
         }
         printer.print("%f".format(constant.value))
     }
 
-    override fun visitDoubleConstant(classFile: ClassFile, constant: DoubleConstant) {
+    override fun visitDoubleConstant(classFile: ClassFile, index: Int, constant: DoubleConstant) {
         if (printConstantType) {
             printer.print("double ")
         }
         printer.print("%f".format(constant.value))
     }
 
-    override fun visitUtf8Constant(classFile: ClassFile, constant: Utf8Constant) {
+    override fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {
         val output = if (!constant.value.isAsciiPrintable()) {
             constant.value.escapeAsJavaString()
         } else {
@@ -72,59 +72,59 @@ internal class ConstantPrinter constructor(private val printer:                I
         printer.print(output)
     }
 
-    override fun visitStringConstant(classFile: ClassFile, constant: StringConstant) {
-        visitUtf8Constant(classFile, classFile.getUtf8Constant(constant.stringIndex))
+    override fun visitStringConstant(classFile: ClassFile, index: Int, constant: StringConstant) {
+        visitUtf8Constant(classFile, index, classFile.getUtf8Constant(constant.stringIndex))
     }
 
-    override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
+    override fun visitAnyRefConstant(classFile: ClassFile, index: Int, constant: RefConstant) {
         val str = buildString {
-            val className = refConstant.getClassName(classFile)
+            val className = constant.getClassName(classFile)
             if (alwaysIncludeClassName || className != classFile.className) {
                 append(className)
                 append(".")
             }
-            val memberName = refConstant.getMemberName(classFile)
+            val memberName = constant.getMemberName(classFile)
             append(memberName)
             append(":")
-            val descriptor = refConstant.getDescriptor(classFile)
+            val descriptor = constant.getDescriptor(classFile)
             append(descriptor)
         }
 
         if (printConstantType) {
-            val type = when (refConstant) {
+            val type = when (constant) {
                 is FieldrefConstant           -> "Field"
                 is MethodrefConstant          -> "Method"
                 is InterfaceMethodrefConstant -> "InterfaceMethod"
-                else -> error("unexpected constant '$refConstant'")
+                else -> error("unexpected constant '$constant'")
             }
             printer.print("$type ")
         }
         printer.print(str)
     }
 
-    override fun visitClassConstant(classFile: ClassFile, constant: ClassConstant) {
+    override fun visitClassConstant(classFile: ClassFile, index: Int, constant: ClassConstant) {
         if (printConstantType) {
             printer.print("class ")
         }
         printer.print(constant.getClassName(classFile))
     }
 
-    override fun visitNameAndTypeConstant(classFile: ClassFile, constant: NameAndTypeConstant) {
+    override fun visitNameAndTypeConstant(classFile: ClassFile, index: Int, constant: NameAndTypeConstant) {
         val memberName = classFile.getString(constant.nameIndex)
         val descriptor = classFile.getString(constant.descriptorIndex)
         printer.print("$memberName:$descriptor")
     }
 
-    override fun visitMethodTypeConstant(classFile: ClassFile, constant: MethodTypeConstant) {
-        visitUtf8Constant(classFile, classFile.getUtf8Constant(constant.descriptorIndex))
+    override fun visitMethodTypeConstant(classFile: ClassFile, index: Int, constant: MethodTypeConstant) {
+        visitUtf8Constant(classFile, index, classFile.getUtf8Constant(constant.descriptorIndex))
     }
 
-    override fun visitMethodHandleConstant(classFile: ClassFile, constant: MethodHandleConstant) {
+    override fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
         printer.print("${constant.referenceKind.simpleName} ")
         constant.referenceAccept(classFile, this)
     }
 
-    override fun visitModuleConstant(classFile: ClassFile, constant: ModuleConstant) {
+    override fun visitModuleConstant(classFile: ClassFile, index: Int, constant: ModuleConstant) {
         val moduleName = constant.getModuleName(classFile)
         if (moduleName.contains(".")) {
             printer.print("\"${moduleName}\"")
@@ -133,7 +133,7 @@ internal class ConstantPrinter constructor(private val printer:                I
         }
     }
 
-    override fun visitPackageConstant(classFile: ClassFile, constant: PackageConstant) {
+    override fun visitPackageConstant(classFile: ClassFile, index: Int, constant: PackageConstant) {
         printer.print(constant.getPackageName(classFile))
     }
 }

@@ -22,7 +22,6 @@ import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.JvmType
@@ -192,15 +191,7 @@ class ClassFile private constructor() {
         constantPool.accept(this, visitor)
     }
 
-    fun constantsAccept(visitor: ConstantVisitorIndexed) {
-        constantPool.accept(this, visitor)
-    }
-
     fun constantAccept(constantIndex: Int, visitor: ConstantVisitor) {
-        constantPool.constantAccept(this, constantIndex, visitor)
-    }
-
-    fun constantAccept(constantIndex: Int, visitor: ConstantVisitorIndexed) {
         constantPool.constantAccept(this, constantIndex, visitor)
     }
 

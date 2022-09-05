@@ -17,7 +17,6 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 
 /**
  * A constant representing a CONSTANT_Fieldref_info structure in a class file.
@@ -30,11 +29,7 @@ data class FieldrefConstant private constructor(override var _classIndex:       
     override val type: ConstantType
         get() = ConstantType.FIELD_REF
 
-    override fun accept(classFile: ClassFile, visitor: ConstantVisitor) {
-        visitor.visitFieldRefConstant(classFile, this)
-    }
-
-    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitorIndexed) {
+    override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
         visitor.visitFieldRefConstant(classFile, index, this)
     }
 

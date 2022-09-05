@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitorIndexed
 
 class IntegerConstantTest : ConstantBaseTest() {
 
@@ -43,28 +42,7 @@ class IntegerConstantTest : ConstantBaseTest() {
         var wrongMethod   = 0
         var correctMethod = 0
 
-        constant.accept(ClassFile.empty(), object : ConstantVisitor {
-            override fun visitAnyConstant(classFile: ClassFile, constant: Constant) {
-                wrongMethod++
-            }
-
-            override fun visitIntegerConstant(classFile: ClassFile, constant: IntegerConstant) {
-                correctMethod++
-            }
-        })
-
-        assertTrue(wrongMethod == 0)
-        assertTrue(correctMethod == 1)
-    }
-
-    @Test
-    fun constantPoolVisitor() {
-        val constant = createConstants()[0]
-
-        var wrongMethod   = 0
-        var correctMethod = 0
-
-        constant.accept(ClassFile.empty(), 0, object : ConstantVisitorIndexed {
+        constant.accept(ClassFile.empty(), 0, object : ConstantVisitor {
             override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
                 wrongMethod++
             }
