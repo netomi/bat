@@ -21,19 +21,26 @@ import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
-// TODO: finish implementation
-class TypeAnnotation private constructor(): Annotation() {
+class TypeAnnotation private constructor(private var _target: TargetInfo = TargetInfo.empty(),
+                                         private var _path:   TypePath   = TypePath.empty()): Annotation() {
 
     override val dataSize: Int
         get() = TODO("implement")
 
+    val target: TargetInfo
+        get() = _target
+
     @Throws(IOException::class)
     override fun read(input: DataInput) {
+        _target = TargetInfo.read(input)
+        _path   = TypePath.read(input)
         super.read(input)
     }
 
     @Throws(IOException::class)
     override fun write(output: DataOutput) {
+        _target.write(output)
+        _path.write(output)
         super.write(output)
     }
 

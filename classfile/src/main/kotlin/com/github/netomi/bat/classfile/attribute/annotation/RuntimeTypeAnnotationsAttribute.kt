@@ -19,6 +19,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
+import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -50,13 +51,11 @@ abstract class RuntimeTypeAnnotationsAttribute
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
 
-        // TODO: implement
-        input.skipBytes(length)
-//        val annotationCount = input.readUnsignedShort()
-//        typeAnnotations = mutableListOfCapacity(annotationCount)
-//        for (i in 0 until annotationCount) {
-//            typeAnnotations.add(TypeAnnotation.readAnnotation(input))
-//        }
+        val typeAnnotationCount = input.readUnsignedShort()
+        typeAnnotations = mutableListOfCapacity(typeAnnotationCount)
+        for (i in 0 until typeAnnotationCount) {
+            typeAnnotations.add(TypeAnnotation.readTypeAnnotation(input))
+        }
     }
 
     @Throws(IOException::class)

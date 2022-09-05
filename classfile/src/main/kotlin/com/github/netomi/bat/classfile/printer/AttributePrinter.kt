@@ -364,12 +364,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     // Implementations for AnnotationVisitor
 
-    override fun visitAnyAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {}
-
-    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
-        printer.print("${index}: ")
-        referencedIndexPrinter.visitAnnotation(classFile, annotation)
-        printer.println()
+    override fun visitAnyAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
         printer.levelUp()
         printer.print(annotation.getType(classFile).toExternalType())
 
@@ -390,8 +385,19 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
+    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
+        printer.print("${index}: ")
+        referencedIndexPrinter.visitAnnotation(classFile, annotation)
+        printer.println()
+        visitAnyAnnotation(classFile, index, annotation)
+    }
+
     override fun visitTypeAnnotation(classFile: ClassFile, index: Int, typeAnnotation: TypeAnnotation) {
-        printer.println("${index}: ")
+        printer.print("${index}: ")
+        referencedIndexPrinter.visitAnnotation(classFile, typeAnnotation)
+        printer.print(": ${typeAnnotation.target.type}")
+        printer.println()
+        visitAnyAnnotation(classFile, index, typeAnnotation)
     }
 
     // Implementations for ElementValueVisitor
