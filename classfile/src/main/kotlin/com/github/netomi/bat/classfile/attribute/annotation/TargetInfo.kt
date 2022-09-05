@@ -16,6 +16,8 @@
 
 package com.github.netomi.bat.classfile.attribute.annotation
 
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.TargetInfoVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
 import java.io.DataOutput
@@ -29,6 +31,8 @@ abstract class TargetInfo protected constructor(open val type: TargetInfoType) {
         output.writeByte(type.targetType.toInt())
         writeInfo(output)
     }
+
+    abstract fun accept(classFile: ClassFile, visitor: TargetInfoVisitor)
 
     companion object {
         internal fun empty(): TargetInfo {
@@ -59,6 +63,10 @@ data class TypeParameterTargetInfo private constructor(override val type:       
         output.writeByte(typeParameterIndex)
     }
 
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitTypeParameterTargetInfo(classFile, this)
+    }
+
     companion object {
         internal fun create(type: TargetInfoType): TargetInfo {
             return TypeParameterTargetInfo(type)
@@ -77,6 +85,10 @@ data class SuperTypeTargetInfo private constructor(override val type:           
 
     override fun writeInfo(output: DataOutput) {
         output.writeShort(superTypeIndex)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitSuperTypeTargetInfo(classFile, this)
     }
 
     companion object {
@@ -107,6 +119,10 @@ data class TypeParameterBoundTargetInfo
         output.writeByte(boundIndex)
     }
 
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitTypeParameterBoundTargetInfo(classFile, this)
+    }
+
     companion object {
         internal fun create(type: TargetInfoType): TargetInfo {
             return TypeParameterBoundTargetInfo(type)
@@ -118,6 +134,10 @@ data class EmptyTargetInfo private constructor(override val type: TargetInfoType
     override fun readInfo(input: DataInput) {}
 
     override fun writeInfo(output: DataOutput) {}
+
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitEmptyTargetInfo(classFile, this)
+    }
 
     companion object {
         internal fun create(type: TargetInfoType): TargetInfo {
@@ -139,6 +159,10 @@ data class FormalParameterTargetInfo private constructor(override val type:     
         output.writeByte(formalParameterIndex)
     }
 
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitFormalParameterTargetInfo(classFile, this)
+    }
+
     companion object {
         internal fun create(type: TargetInfoType): TargetInfo {
             return FormalParameterTargetInfo(type)
@@ -157,6 +181,10 @@ data class ThrowsTargetInfo private constructor(override val type:             T
 
     override fun writeInfo(output: DataOutput) {
         output.writeShort(throwsTypeIndex)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitThrowsTargetInfo(classFile, this)
     }
 
     companion object {
@@ -195,6 +223,10 @@ data class LocalVarTargetInfo
         for (element in _table) {
             element.write(output)
         }
+    }
+
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitLocalVarTargetInfo(classFile, this)
     }
 
     companion object {
@@ -251,6 +283,10 @@ data class CatchTargetInfo private constructor(override val type:               
         output.writeShort(exceptionTableIndex)
     }
 
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitCatchTargetInfo(classFile, this)
+    }
+
     companion object {
         internal fun create(type: TargetInfoType): TargetInfo {
             return CatchTargetInfo(type)
@@ -269,6 +305,10 @@ data class OffsetTargetInfo private constructor(override val type:    TargetInfo
 
     override fun writeInfo(output: DataOutput) {
         output.writeShort(offset)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitOffsetTargetInfo(classFile, this)
     }
 
     companion object {
@@ -297,6 +337,10 @@ data class TypeArgumentTargetInfo
     override fun writeInfo(output: DataOutput) {
         output.writeShort(offset)
         output.writeByte(typeArgumentIndex)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: TargetInfoVisitor) {
+        visitor.visitTypeArgumentTargetInfo(classFile, this)
     }
 
     companion object {
