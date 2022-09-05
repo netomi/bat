@@ -20,8 +20,9 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 import java.io.IOException
 
 /**
@@ -33,7 +34,7 @@ abstract class RuntimeTypeAnnotationsAttribute
     : Attribute(attributeNameIndex), Sequence<TypeAnnotation> {
 
     override val dataSize: Int
-        get() = TODO("implement")
+        get() = typeAnnotations.dataSize()
 
     val size: Int
         get() = typeAnnotations.size
@@ -59,13 +60,9 @@ abstract class RuntimeTypeAnnotationsAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-
-        output.writeShort(typeAnnotations.size)
-        for (annotation in typeAnnotations) {
-            annotation.write(output)
-        }
+        output.writeContentList(typeAnnotations)
     }
 
     fun typeAnnotationsAccept(classFile: ClassFile, visitor: AnnotationVisitor) {

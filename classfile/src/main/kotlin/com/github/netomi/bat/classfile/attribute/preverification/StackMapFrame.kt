@@ -19,23 +19,31 @@ package com.github.netomi.bat.classfile.attribute.preverification
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
 
-abstract class StackMapFrame protected constructor(val frameType: Int) {
+abstract class StackMapFrame protected constructor(val frameType: Int): ClassFileContent() {
     internal abstract val type: StackMapFrameType
 
     abstract val offsetDelta: Int
 
     internal open fun readData(input: ClassDataInput) {}
+    internal open fun writeData(output: ClassDataOutput) {}
+
+    override fun write(output: ClassDataOutput) {
+        output.writeByte(frameType)
+        writeData(output)
+    }
 
     abstract fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor)
 
     companion object {
         internal fun read(input: ClassDataInput): StackMapFrame {
-            val tag = input.readUnsignedByte()
+            val frameType = input.readUnsignedByte()
 
-            val stackMapFrame = StackMapFrameType.of(tag)
+            val stackMapFrame = StackMapFrameType.of(frameType)
             stackMapFrame.readData(input)
             return stackMapFrame
         }
@@ -46,6 +54,9 @@ class SameFrame private constructor(frameType: Int): StackMapFrame(frameType) {
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_FRAME
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     override val offsetDelta: Int
         get() = frameType
 
@@ -54,6 +65,8 @@ class SameFrame private constructor(frameType: Int): StackMapFrame(frameType) {
     }
 
     companion object {
+        private const val DATA_SIZE = 1
+
         internal fun of(frameType: Int): SameFrame {
             require(frameType in 0 .. 63)
             return SameFrame(frameType)
@@ -66,6 +79,9 @@ class ChopFrame private constructor(            frameType:    Int,
     override val type: StackMapFrameType
         get() = StackMapFrameType.CHOP_FRAME
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     override val offsetDelta: Int
         get() = _offsetDelta
 
@@ -76,11 +92,17 @@ class ChopFrame private constructor(            frameType:    Int,
         _offsetDelta = input.readUnsignedShort()
     }
 
+    override fun writeData(output: ClassDataOutput) {
+        output.writeShort(offsetDelta)
+    }
+
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         visitor.visitChopFrame(classFile, this)
     }
 
     companion object {
+        private const val DATA_SIZE = 3
+
         internal fun of(frameType: Int): ChopFrame {
             require(frameType in 248 .. 250)
             return ChopFrame(frameType)
@@ -93,6 +115,9 @@ class SameExtendedFrame private constructor(            frameType:    Int,
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_EXTENDED_FRAME
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     override val offsetDelta: Int
         get() = _offsetDelta
 
@@ -100,11 +125,17 @@ class SameExtendedFrame private constructor(            frameType:    Int,
         _offsetDelta = input.readUnsignedShort()
     }
 
+    override fun writeData(output: ClassDataOutput) {
+        output.writeShort(offsetDelta)
+    }
+
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         visitor.visitSameExtendedFrame(classFile, this)
     }
 
     companion object {
+        private const val DATA_SIZE = 3
+
         internal fun of(frameType: Int): SameExtendedFrame {
             require(frameType == 251)
             return SameExtendedFrame(frameType)
@@ -119,6 +150,9 @@ class AppendFrame private constructor(            frameType:    Int,
 
     override val type: StackMapFrameType
         get() = StackMapFrameType.APPEND_FRAME
+
+    override val dataSize: Int
+        get() = 3 + locals.dataSize()
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -145,6 +179,11 @@ class AppendFrame private constructor(            frameType:    Int,
         }
     }
 
+    override fun writeData(output: ClassDataOutput) {
+        output.writeShort(offsetDelta)
+        output.writeContentList(locals)
+    }
+
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         visitor.visitAppendFrame(classFile, this)
     }
@@ -164,6 +203,9 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_LOCALS_1_STACK_ITEM_FRAME
 
+    override val dataSize: Int
+        get() = 1 + _stack.dataSize
+
     override val offsetDelta: Int
         get() = frameType - 64
 
@@ -172,6 +214,10 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
 
     override fun readData(input: ClassDataInput) {
         _stack = VerificationType.read(input)
+    }
+
+    override fun writeData(output: ClassDataOutput) {
+        _stack.write(output)
     }
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
@@ -194,6 +240,9 @@ class SameLocalsOneStackItemExtendedFrame private constructor(            frameT
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME
 
+    override val dataSize: Int
+        get() = 3 + _stack.dataSize
+
     override val offsetDelta: Int
         get() = _offsetDelta
 
@@ -203,6 +252,11 @@ class SameLocalsOneStackItemExtendedFrame private constructor(            frameT
     override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
         _stack = VerificationType.read(input)
+    }
+
+    override fun writeData(output: ClassDataOutput) {
+        output.writeShort(_offsetDelta)
+        _stack.write(output)
     }
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
@@ -226,6 +280,9 @@ class FullFrame private constructor(            frameType:    Int,
     override val type: StackMapFrameType
         get() = StackMapFrameType.FULL_FRAME
 
+    override val dataSize: Int
+        get() = 3 + locals.dataSize() + stack.dataSize()
+
     override val offsetDelta: Int
         get() = _offsetDelta
 
@@ -247,6 +304,12 @@ class FullFrame private constructor(            frameType:    Int,
         for (i in 0 until numberOfStackItems) {
             _stack.add(VerificationType.read(input))
         }
+    }
+
+    override fun writeData(output: ClassDataOutput) {
+        output.writeShort(_offsetDelta)
+        output.writeContentList(_locals)
+        output.writeContentList(_stack)
     }
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {

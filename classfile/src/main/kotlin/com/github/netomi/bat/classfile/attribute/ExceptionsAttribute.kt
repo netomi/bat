@@ -19,9 +19,8 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataInput
-import java.io.DataOutput
 import java.io.IOException
 import java.util.*
 
@@ -60,12 +59,9 @@ data class ExceptionsAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
-        output.write(dataSize)
-        output.writeShort(exceptions.size)
-        for (index in exceptions.indices) {
-            output.writeShort(exceptions[index])
-        }
+    override fun writeAttributeData(output: ClassDataOutput) {
+        output.writeInt(dataSize)
+        output.writeShortIndexArray(exceptions)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {

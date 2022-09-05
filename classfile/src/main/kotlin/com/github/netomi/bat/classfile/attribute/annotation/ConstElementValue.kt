@@ -20,7 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 data class ConstElementValue private constructor(override val type: ElementValueType,
@@ -43,7 +43,7 @@ data class ConstElementValue private constructor(override val type: ElementValue
     }
 
     @Throws(IOException::class)
-    override fun writeElementValue(output: DataOutput) {
+    override fun writeElementValue(output: ClassDataOutput) {
         output.writeShort(constValueIndex)
     }
 
@@ -67,7 +67,7 @@ data class ConstElementValue private constructor(override val type: ElementValue
     }
 
     companion object {
-        private const val DATA_SIZE = 2
+        private const val DATA_SIZE = 3
 
         internal fun create(type: ElementValueType): ConstElementValue {
             return ConstElementValue(type)

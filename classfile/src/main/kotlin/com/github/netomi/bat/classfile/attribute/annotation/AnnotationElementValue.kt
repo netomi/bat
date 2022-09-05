@@ -18,7 +18,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 data class AnnotationElementValue private constructor(private var _annotation: Annotation = Annotation.empty()) : ElementValue() {
@@ -27,7 +27,7 @@ data class AnnotationElementValue private constructor(private var _annotation: A
         get() = ElementValueType.ANNOTATION
 
     override val dataSize: Int
-        get() = _annotation.dataSize
+        get() = 1 + _annotation.dataSize
 
     val annotation: Annotation
         get() = _annotation
@@ -38,7 +38,7 @@ data class AnnotationElementValue private constructor(private var _annotation: A
     }
 
     @Throws(IOException::class)
-    override fun writeElementValue(output: DataOutput) {
+    override fun writeElementValue(output: ClassDataOutput) {
         annotation.write(output)
     }
 

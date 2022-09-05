@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 import java.util.*
@@ -66,6 +67,13 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
         nameIndex       = input.readUnsignedShort()
         descriptorIndex = input.readUnsignedShort()
         _attributes     = input.readAttributes()
+    }
+
+    internal fun write(output: ClassDataOutput) {
+        output.writeShort(accessFlags)
+        output.writeShort(nameIndex)
+        output.writeShort(descriptorIndex)
+        output.writeAttributes(_attributes)
     }
 
     override fun equals(other: Any?): Boolean {

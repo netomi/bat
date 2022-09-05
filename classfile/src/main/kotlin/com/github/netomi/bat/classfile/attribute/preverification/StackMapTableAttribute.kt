@@ -23,6 +23,8 @@ import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataOutput
 import java.io.IOException
@@ -41,7 +43,7 @@ data class StackMapTableAttribute
         get() = AttributeType.STACK_MAP_TABLE
 
     override val dataSize: Int
-        get() = TODO("implement")
+        get() = frameEntries.dataSize()
 
     val size: Int
         get() = frameEntries.size
@@ -66,9 +68,9 @@ data class StackMapTableAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
-        output.write(dataSize)
-        TODO("implement")
+    override fun writeAttributeData(output: ClassDataOutput) {
+        output.writeInt(dataSize)
+        output.writeContentList(frameEntries)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {

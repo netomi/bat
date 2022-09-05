@@ -19,24 +19,22 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import java.io.IOException
 
-abstract class ElementValue {
+abstract class ElementValue: ClassFileContent() {
 
     internal abstract val type: ElementValueType
-
-    internal abstract val dataSize: Int
 
     @Throws(IOException::class)
     internal abstract fun readElementValue(input: ClassDataInput)
 
     @Throws(IOException::class)
-    protected abstract fun writeElementValue(output: DataOutput)
+    internal abstract fun writeElementValue(output: ClassDataOutput)
 
     @Throws(IOException::class)
-    fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeByte(type.tag.code)
         writeElementValue(output)
     }

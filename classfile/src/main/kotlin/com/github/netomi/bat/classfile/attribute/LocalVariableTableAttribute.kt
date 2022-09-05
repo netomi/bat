@@ -20,8 +20,9 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 /**
  * A class representing a LocalVariableTable attribute in a class file.
@@ -60,12 +61,9 @@ data class LocalVariableTableAttribute
         }
     }
 
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-        output.writeShort(localVariableTable.size)
-        for (element in localVariableTable) {
-            element.write(output)
-        }
+        output.writeContentList(localVariableTable)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
@@ -84,7 +82,10 @@ data class LocalVariableElement
                         private var _length:          Int = -1,
                         private var _nameIndex:       Int = -1,
                         private var _descriptorIndex: Int = -1,
-                        private var _variableIndex:   Int = -1) {
+                        private var _variableIndex:   Int = -1): ClassFileContent() {
+
+    override val dataSize: Int
+        get() = 10
 
     val startPC: Int
         get() = _startPC
@@ -117,7 +118,7 @@ data class LocalVariableElement
         _variableIndex   = input.readUnsignedShort()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(startPC)
         output.writeShort(length)
         output.writeShort(nameIndex)

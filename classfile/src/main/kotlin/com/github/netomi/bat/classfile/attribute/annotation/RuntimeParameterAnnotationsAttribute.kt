@@ -20,8 +20,9 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 import java.io.IOException
 
 /**
@@ -33,10 +34,7 @@ abstract class RuntimeParameterAnnotationsAttribute
     : Attribute(attributeNameIndex) {
 
     override val dataSize: Int
-        get() = 1 +
-                parameterAnnotations.fold(0) { accParam, list ->
-                    accParam + 2 + list.fold(0) { acc, annotation -> acc + annotation.dataSize }
-                }
+        get() = parameterAnnotations.fold(1) { accParam, list -> accParam + list.dataSize() }
 
     val size: Int
         get() = parameterAnnotations.size
@@ -59,15 +57,11 @@ abstract class RuntimeParameterAnnotationsAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-
         output.writeByte(parameterAnnotations.size)
         for (annotations in parameterAnnotations) {
-            output.writeShort(annotations.size)
-            for (annotation in annotations) {
-                annotation.write(output)
-            }
+            output.writeContentList(annotations)
         }
     }
 

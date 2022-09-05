@@ -22,7 +22,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.ElementValue
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 /**
@@ -43,7 +43,7 @@ data class AnnotationDefaultAttribute
         get() = _elementValue
 
     override val dataSize: Int
-        get() = TODO("implement")
+        get() = elementValue.dataSize
 
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput) {
@@ -53,8 +53,8 @@ data class AnnotationDefaultAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
-        output.write(dataSize)
+    override fun writeAttributeData(output: ClassDataOutput) {
+        output.writeInt(dataSize)
         elementValue.write(output)
     }
 

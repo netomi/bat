@@ -20,8 +20,9 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 /**
  * A class representing a MethodParameters attribute in a class file.
@@ -60,12 +61,9 @@ data class MethodParametersAttribute
         }
     }
 
-    override fun writeAttributeData(output: DataOutput) {
-        output.write(dataSize)
-        output.writeByte(parameters.size)
-        for (element in parameters) {
-            element.write(output)
-        }
+    override fun writeAttributeData(output: ClassDataOutput) {
+        output.writeInt(dataSize)
+        output.writeContentList(parameters)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
@@ -80,7 +78,10 @@ data class MethodParametersAttribute
 }
 
 data class ParameterElement private constructor(private var _nameIndex:   Int = -1,
-                                                private var _accessFlags: Int =  0) {
+                                                private var _accessFlags: Int =  0): ClassFileContent() {
+
+    override val dataSize: Int
+        get() = 4
 
     val nameIndex: Int
         get() = _nameIndex
@@ -97,7 +98,7 @@ data class ParameterElement private constructor(private var _nameIndex:   Int = 
         _accessFlags = input.readUnsignedShort()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(nameIndex)
         output.writeShort(accessFlags)
     }

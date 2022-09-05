@@ -23,6 +23,9 @@ import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataOutput
 import java.io.IOException
@@ -45,6 +48,9 @@ data class CodeAttribute
     override val type: AttributeType
         get() = AttributeType.CODE
 
+    override val dataSize: Int
+        get() = 8 + codeLength + exceptionTable.dataSize() + attributes.dataSize()
+
     val maxStack: Int
         get() = _maxStack
 
@@ -62,9 +68,6 @@ data class CodeAttribute
 
     val attributes: List<Attribute>
         get() = _attributes
-
-    override val dataSize: Int
-        get() = TODO("Not yet implemented")
 
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput) {
@@ -87,7 +90,7 @@ data class CodeAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
 
         output.writeShort(maxStack)
@@ -96,15 +99,8 @@ data class CodeAttribute
         output.writeInt(codeLength)
         output.write(code)
 
-        output.writeShort(exceptionTable.size)
-        for (exceptionElement in exceptionTable) {
-            exceptionElement.write(output)
-        }
-
-        output.writeShort(attributes.size)
-        for (attribute in attributes) {
-            attribute.writeAttribute(output)
-        }
+        output.writeContentList(exceptionTable)
+        output.writeAttributes(attributes)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
@@ -152,7 +148,10 @@ data class CodeAttribute
 data class ExceptionElement private constructor(private var _startPC:   Int = -1,
                                                 private var _endPC:     Int = -1,
                                                 private var _handlerPC: Int = -1,
-                                                private var _catchType: Int = -1) {
+                                                private var _catchType: Int = -1): ClassFileContent() {
+
+    override val dataSize: Int
+        get() = DATA_SIZE
 
     val startPC: Int
         get() = _startPC
@@ -173,7 +172,7 @@ data class ExceptionElement private constructor(private var _startPC:   Int = -1
         _catchType = input.readUnsignedShort()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(startPC)
         output.writeShort(endPC)
         output.writeShort(handlerPC)
@@ -181,7 +180,7 @@ data class ExceptionElement private constructor(private var _startPC:   Int = -1
     }
 
     companion object {
-        internal const val SIZE = 8
+        internal const val DATA_SIZE = 8
 
         internal fun read(input: ClassDataInput): ExceptionElement {
             val element = ExceptionElement()

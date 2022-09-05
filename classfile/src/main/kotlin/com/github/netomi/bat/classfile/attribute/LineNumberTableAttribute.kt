@@ -20,8 +20,9 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 /**
  * A class representing a LineNumberTable attribute in a class file.
@@ -60,12 +61,9 @@ data class LineNumberTableAttribute
         }
     }
 
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-        output.writeShort(lineNumberTable.size)
-        for (element in lineNumberTable) {
-            element.write(output)
-        }
+        output.writeContentList(lineNumberTable)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
@@ -80,7 +78,10 @@ data class LineNumberTableAttribute
 }
 
 data class LineNumberElement private constructor(private var _startPC:    Int = -1,
-                                                 private var _lineNumber: Int = -1) {
+                                                 private var _lineNumber: Int = -1): ClassFileContent() {
+
+    override val dataSize: Int
+        get() = 4
 
     val startPC
         get() = _startPC
@@ -93,7 +94,7 @@ data class LineNumberElement private constructor(private var _startPC:    Int = 
         _lineNumber = input.readUnsignedShort()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(startPC)
         output.writeShort(lineNumber)
     }

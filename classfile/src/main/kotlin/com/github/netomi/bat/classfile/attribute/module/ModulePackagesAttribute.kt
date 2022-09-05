@@ -23,7 +23,7 @@ import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.util.*
 
 /**
@@ -63,12 +63,9 @@ data class ModulePackagesAttribute
         packages   = input.readShortIndexArray()
     }
 
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-        output.writeShort(packages.size)
-        for (packageIndex in packages) {
-            output.writeShort(packageIndex)
-        }
+        output.writeShortIndexArray(packages)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {

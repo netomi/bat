@@ -20,8 +20,10 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 /**
  * A class representing a BootstrapMethods attribute in a class file.
@@ -37,7 +39,7 @@ data class BootstrapMethodsAttribute
         get() = AttributeType.BOOTSTRAP_METHOD
 
     override val dataSize: Int
-        get() = 2 + bootstrapMethods.fold(0) { acc, bootstrapMethodElement -> acc + bootstrapMethodElement.dataSize }
+        get() = bootstrapMethods.dataSize()
 
     val size: Int
         get() = bootstrapMethods.size
@@ -60,12 +62,9 @@ data class BootstrapMethodsAttribute
         }
     }
 
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-        output.writeShort(bootstrapMethods.size)
-        for (element in bootstrapMethods) {
-            element.write(output)
-        }
+        output.writeContentList(bootstrapMethods)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
@@ -81,7 +80,10 @@ data class BootstrapMethodsAttribute
 
 data class BootstrapMethodElement
     private constructor(private var _bootstrapMethodRefIndex: Int      = -1,
-                        private var bootstrapArguments:       IntArray = IntArray(0)): Sequence<Int> {
+                        private var bootstrapArguments:       IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
+
+    override val dataSize: Int
+        get() = 4 + bootstrapArguments.size * 2
 
     val bootstrapMethodRefIndex: Int
         get() = _bootstrapMethodRefIndex
@@ -97,20 +99,14 @@ data class BootstrapMethodElement
         return bootstrapArguments.iterator()
     }
 
-    internal val dataSize: Int
-        get() = 4 + bootstrapArguments.size * 2
-
     private fun read(input: ClassDataInput) {
         _bootstrapMethodRefIndex = input.readUnsignedShort()
         bootstrapArguments       = input.readShortIndexArray()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(bootstrapMethodRefIndex)
-        output.writeShort(bootstrapArguments.size)
-        for (index in bootstrapArguments) {
-            output.writeShort(index)
-        }
+        output.writeShortIndexArray(bootstrapArguments)
     }
 
     fun bootstrapMethodRefAccept(classFile: ClassFile, visitor: ConstantVisitor) {

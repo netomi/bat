@@ -19,7 +19,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 data class EnumElementValue private constructor(private var _typeNameIndex:  Int = -1,
@@ -52,7 +52,7 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
     }
 
     @Throws(IOException::class)
-    override fun writeElementValue(output: DataOutput) {
+    override fun writeElementValue(output: ClassDataOutput) {
         output.writeShort(typeNameIndex)
         output.writeShort(constNameIndex)
     }
@@ -62,7 +62,7 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
     }
 
     companion object {
-        private const val DATA_SIZE = 4
+        private const val DATA_SIZE = 5
 
         internal fun empty(): EnumElementValue {
             return EnumElementValue()

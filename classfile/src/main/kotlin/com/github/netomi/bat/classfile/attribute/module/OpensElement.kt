@@ -21,13 +21,14 @@ import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.constant.PackageConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import java.util.*
 
 data class OpensElement
     private constructor(private var _opensIndex: Int = -1,
                         private var _opensFlags: Int =  0,
-                        private var _opensTo:    IntArray = IntArray(0)): Sequence<Int> {
+                        private var _opensTo:    IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
     val opensIndex: Int
         get() = _opensIndex
@@ -35,7 +36,7 @@ data class OpensElement
     val opensFlags: Int
         get() = _opensFlags
 
-    internal val dataSize: Int
+    override val dataSize: Int
         get() = 6 + size * 2
 
     val size: Int
@@ -71,13 +72,10 @@ data class OpensElement
         _opensTo    = input.readShortIndexArray()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(_opensIndex)
         output.writeShort(_opensFlags)
-        output.writeShort(_opensTo.size)
-        for (element in _opensTo) {
-            output.writeShort(element)
-        }
+        output.writeShortIndexArray(_opensTo)
     }
 
     override fun equals(other: Any?): Boolean {

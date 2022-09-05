@@ -20,8 +20,10 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 /**
  * A class representing a Record attribute in a class file.
@@ -37,7 +39,7 @@ data class RecordAttribute
         get() = AttributeType.RECORD
 
     override val dataSize: Int
-        get() = 2 + components.fold(0) { acc, component -> acc + component.dataSize }
+        get() = components.dataSize()
 
     val size: Int
         get() = components.size
@@ -60,12 +62,9 @@ data class RecordAttribute
         }
     }
 
-    override fun writeAttributeData(output: DataOutput) {
-        output.write(dataSize)
-        output.writeShort(components.size)
-        for (component in components) {
-            component.write(output)
-        }
+    override fun writeAttributeData(output: ClassDataOutput) {
+        output.writeInt(dataSize)
+        output.writeContentList(components)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
@@ -82,16 +81,16 @@ data class RecordAttribute
 data class RecordComponent
     private constructor(private var _nameIndex:       Int                    = -1,
                         private var _descriptorIndex: Int                    = -1,
-                        private var _attributes:      MutableList<Attribute> = mutableListOfCapacity(0)) {
+                        private var _attributes:      MutableList<Attribute> = mutableListOfCapacity(0)): ClassFileContent() {
+
+    override val dataSize: Int
+        get() = 4 + _attributes.dataSize()
 
     val nameIndex: Int
         get() = _nameIndex
 
     val desciptorIndex: Int
         get() = _descriptorIndex
-
-    internal val dataSize: Int
-        get() = 6 + _attributes.fold(0) { acc, attribute -> acc + attribute.dataSize }
 
     val attributes: List<Attribute>
         get() = _attributes
@@ -110,14 +109,10 @@ data class RecordComponent
         _attributes      = input.readAttributes()
     }
 
-    internal fun write(output: DataOutput) {
-        output.write(dataSize)
+    override fun write(output: ClassDataOutput) {
         output.writeShort(nameIndex)
         output.writeShort(desciptorIndex)
-        output.writeShort(_attributes.size)
-        for (attribute in _attributes) {
-            attribute.writeAttribute(output)
-        }
+        output.writeAttributes(attributes)
     }
 
     fun attributesAccept(classFile: ClassFile, record: RecordAttribute, visitor: RecordComponentAttributeVisitor) {

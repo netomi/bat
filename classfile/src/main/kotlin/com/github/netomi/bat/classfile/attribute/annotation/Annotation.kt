@@ -19,18 +19,19 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 import java.io.IOException
 import java.util.*
 
 open class Annotation
     protected constructor(protected var _typeIndex:     Int                                  = -1,
-                          protected var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)) {
+                          protected var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)): ClassFileContent() {
 
-    open val dataSize: Int
-        get() = 4 + _elementValues.fold(0) { acc, (_, value) -> acc + 2 + value.dataSize }
+    override val dataSize: Int
+        get() = 2 + _elementValues.fold(2) { acc, (_, value) -> acc + 2 + value.dataSize }
 
     val typeIndex: Int
         get() = _typeIndex
@@ -55,7 +56,7 @@ open class Annotation
     }
 
     @Throws(IOException::class)
-    internal open fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(typeIndex)
         output.writeShort(elementValues.size)
         elementValues.forEach { (elementNameIndex, elementValue) ->

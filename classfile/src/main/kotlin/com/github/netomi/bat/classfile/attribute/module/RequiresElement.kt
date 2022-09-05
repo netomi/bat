@@ -19,12 +19,13 @@ package com.github.netomi.bat.classfile.attribute.module
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 
 data class RequiresElement
     private constructor(private var _requiresIndex:        Int = -1,
                         private var _requiresFlags:        Int =  0,
-                        private var _requiresVersionIndex: Int = -1) {
+                        private var _requiresVersionIndex: Int = -1): ClassFileContent() {
 
     val requiresIndex: Int
         get() = _requiresIndex
@@ -35,7 +36,7 @@ data class RequiresElement
     val requiresVersionIndex: Int
         get() = _requiresVersionIndex
 
-    internal val dataSize: Int
+    override val dataSize: Int
         get() = DATA_SIZE
 
     fun getRequiredModule(classFile: ClassFile): ModuleConstant {
@@ -56,7 +57,7 @@ data class RequiresElement
         _requiresVersionIndex = input.readUnsignedShort()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(requiresIndex)
         output.writeShort(requiresFlags)
         output.writeShort(requiresVersionIndex)

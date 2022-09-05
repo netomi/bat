@@ -20,18 +20,19 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ClassConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataOutput
 import java.util.*
 
 data class ProvidesElement
     private constructor(private var _providesIndex: Int = -1,
-                        private var _providesWith:  IntArray = IntArray(0)): Sequence<Int> {
+                        private var _providesWith:  IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
     val providesIndex: Int
         get() = _providesIndex
 
-    internal val dataSize: Int
+    override val dataSize: Int
         get() = 4 + size * 2
 
     val size: Int
@@ -66,12 +67,9 @@ data class ProvidesElement
         _providesWith  = input.readShortIndexArray()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(_providesIndex)
-        output.writeShort(_providesWith.size)
-        for (element in _providesWith) {
-            output.writeShort(element)
-        }
+        output.writeShortIndexArray(_providesWith)
     }
 
     override fun equals(other: Any?): Boolean {

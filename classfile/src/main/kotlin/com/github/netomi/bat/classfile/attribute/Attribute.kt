@@ -25,13 +25,14 @@ import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import java.io.IOException
 
 /**
  * Base class for attributes as contained in a class file.
  */
-abstract class Attribute protected constructor(open val attributeNameIndex: Int) {
+abstract class Attribute protected constructor(open val attributeNameIndex: Int): ClassFileContent() {
 
     internal abstract val type: AttributeType
 
@@ -39,16 +40,14 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
         return classFile.getString(attributeNameIndex)
     }
 
-    internal abstract val dataSize: Int
-
     @Throws(IOException::class)
     internal abstract fun readAttributeData(input: ClassDataInput)
 
     @Throws(IOException::class)
-    protected abstract fun writeAttributeData(output: DataOutput)
+    internal abstract fun writeAttributeData(output: ClassDataOutput)
 
     @Throws(IOException::class)
-    fun writeAttribute(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeByte(attributeNameIndex)
         writeAttributeData(output)
     }

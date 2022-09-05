@@ -22,8 +22,8 @@ import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 /**
  * A class representing a Module attribute in a class file.
@@ -125,34 +125,18 @@ data class ModuleAttribute
         }
     }
 
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
 
         output.writeShort(_moduleNameIndex)
         output.writeShort(_moduleFlags)
         output.writeShort(_moduleVersionIndex)
 
-        output.writeShort(requires.size)
-        for (element in requires) {
-            element.write(output)
-        }
-
-        output.writeShort(exports.size)
-        for (element in exports) {
-            element.write(output)
-        }
-
-        output.writeShort(opens.size)
-        for (element in opens) {
-            element.write(output)
-        }
-
+        output.writeContentList(requires)
+        output.writeContentList(exports)
+        output.writeContentList(opens)
         uses.write(output)
-
-        output.writeShort(provides.size)
-        for (element in provides) {
-            element.write(output)
-        }
+        output.writeContentList(provides)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {

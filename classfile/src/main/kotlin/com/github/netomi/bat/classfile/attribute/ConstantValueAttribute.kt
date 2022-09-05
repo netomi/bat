@@ -20,7 +20,7 @@ import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 /**
@@ -50,8 +50,8 @@ data class ConstantValueAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
-        output.write(dataSize)
+    override fun writeAttributeData(output: ClassDataOutput) {
+        output.writeInt(dataSize)
         output.writeShort(constantValueIndex)
     }
 

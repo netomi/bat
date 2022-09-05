@@ -19,8 +19,9 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 import java.io.IOException
 
 data class ArrayElementValue
@@ -31,7 +32,7 @@ data class ArrayElementValue
         get() = ElementValueType.ARRAY
 
     override val dataSize: Int
-        get() = 2 + elementValues.fold(0) { acc, elementValue -> acc + elementValue.dataSize }
+        get() = 1 + elementValues.dataSize()
 
     val size: Int
         get() = elementValues.size
@@ -54,11 +55,8 @@ data class ArrayElementValue
     }
 
     @Throws(IOException::class)
-    override fun writeElementValue(output: DataOutput) {
-        output.writeShort(elementValues.size)
-        for (elementValue in elementValues) {
-            elementValue.write(output)
-        }
+    override fun writeElementValue(output: ClassDataOutput) {
+        output.writeContentList(elementValues)
     }
 
     override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {

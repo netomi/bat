@@ -22,8 +22,8 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataOutput
 
 /**
  * A class representing a ModuleMainClass attribute in a class file.
@@ -53,7 +53,7 @@ data class ModuleMainClassAttribute
         _mainClassIndex = input.readUnsignedShort()
     }
 
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
         output.writeShort(mainClassIndex)
     }

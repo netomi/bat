@@ -20,8 +20,9 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 import java.io.IOException
 
 /**
@@ -32,7 +33,7 @@ abstract class RuntimeAnnotationsAttribute
                           protected open var annotations:        MutableList<Annotation>) : Attribute(attributeNameIndex), Sequence<Annotation> {
 
     override val dataSize: Int
-        get() = 2 + annotations.fold(0) { acc, annotation -> acc + annotation.dataSize }
+        get() = annotations.dataSize()
 
     val size: Int
         get() = annotations.size
@@ -58,13 +59,9 @@ abstract class RuntimeAnnotationsAttribute
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-
-        output.writeShort(annotations.size)
-        for (annotation in annotations) {
-            annotation.write(output)
-        }
+        output.writeContentList(annotations)
     }
 
     fun annotationsAccept(classFile: ClassFile, visitor: AnnotationVisitor) {

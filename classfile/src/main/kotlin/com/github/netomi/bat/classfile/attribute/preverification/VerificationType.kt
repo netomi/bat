@@ -18,17 +18,20 @@ package com.github.netomi.bat.classfile.attribute.preverification
 
 import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataOutput
 
-abstract class VerificationType {
+abstract class VerificationType: ClassFileContent() {
     internal abstract val type: ItemType
 
-    internal open fun readInfo(input: ClassDataInput) {}
-    protected open fun writeInfo(output: DataOutput) {}
+    override val dataSize: Int = 1
 
-    internal fun write(output: DataOutput) {
-        output.writeByte(type.tag.toInt())
+    internal open fun readInfo(input: ClassDataInput) {}
+    internal open fun writeInfo(output: ClassDataOutput) {}
+
+    override fun write(output: ClassDataOutput) {
+        output.writeByte(type.tag)
         writeInfo(output)
     }
 
@@ -194,6 +197,9 @@ data class ObjectVariable private constructor(private var _classIndex: Int = -1)
     override val type: ItemType
         get() = ItemType.OBJECT
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     val classIndex: Int
         get() = _classIndex
 
@@ -205,7 +211,7 @@ data class ObjectVariable private constructor(private var _classIndex: Int = -1)
         _classIndex = input.readUnsignedShort()
     }
 
-    override fun writeInfo(output: DataOutput) {
+    override fun writeInfo(output: ClassDataOutput) {
         output.writeShort(classIndex)
     }
 
@@ -214,6 +220,8 @@ data class ObjectVariable private constructor(private var _classIndex: Int = -1)
     }
 
     companion object {
+        private const val DATA_SIZE = 3
+
         internal fun empty(): ObjectVariable {
             return ObjectVariable()
         }
@@ -225,6 +233,9 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
     override val type: ItemType
         get() = ItemType.UNINITIALIZED
 
+    override val dataSize: Int
+        get() = DATA_SIZE
+
     val offset: Int
         get() = _offset
 
@@ -232,7 +243,7 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
         _offset = input.readUnsignedShort()
     }
 
-    override fun writeInfo(output: DataOutput) {
+    override fun writeInfo(output: ClassDataOutput) {
         output.writeShort(offset)
     }
 
@@ -241,6 +252,8 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
     }
 
     companion object {
+        private const val DATA_SIZE = 3
+
         internal fun empty(): UninitializedVariable {
             return UninitializedVariable()
         }

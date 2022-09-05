@@ -19,8 +19,8 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
-import java.io.DataOutput
 import java.io.IOException
 
 data class ClassElementValue private constructor(private var _classIndex: Int = -1) : ElementValue() {
@@ -44,7 +44,7 @@ data class ClassElementValue private constructor(private var _classIndex: Int = 
     }
 
     @Throws(IOException::class)
-    override fun writeElementValue(output: DataOutput) {
+    override fun writeElementValue(output: ClassDataOutput) {
         output.writeShort(classIndex)
     }
 
@@ -53,7 +53,7 @@ data class ClassElementValue private constructor(private var _classIndex: Int = 
     }
 
     companion object {
-        private const val DATA_SIZE = 2
+        private const val DATA_SIZE = 3
 
         internal fun empty(): ClassElementValue {
             return ClassElementValue()

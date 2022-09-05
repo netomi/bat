@@ -17,11 +17,15 @@
 package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 data class TypePath
-    private constructor(private var _path: MutableList<PathElement> = mutableListOfCapacity(0)): Sequence<PathElement> {
+    private constructor(private var _path: MutableList<PathElement> = mutableListOfCapacity(0)): ClassFileContent(), Sequence<PathElement> {
+
+    override val dataSize: Int
+        get() = _path.fold(1) { acc, element -> acc + element.dataSize }
 
     val size: Int
         get() = _path.size
@@ -42,10 +46,10 @@ data class TypePath
         }
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeByte(_path.size)
         for (element in _path) {
-            element.writeData(output)
+            element.write(output)
         }
     }
 
@@ -63,7 +67,10 @@ data class TypePath
 }
 
 data class PathElement private constructor(private var _typePathKind:      Int = 0,
-                                           private var _typeArgumentIndex: Int = -1) {
+                                           private var _typeArgumentIndex: Int = -1): ClassFileContent() {
+
+    override val dataSize: Int
+        get() = 2
 
     val typePathKind: Int
         get() = _typePathKind
@@ -71,12 +78,12 @@ data class PathElement private constructor(private var _typePathKind:      Int =
     val typeArgumentIndex: Int
         get() = _typeArgumentIndex
 
-    internal fun readData(input: ClassDataInput) {
+    private fun read(input: ClassDataInput) {
         _typePathKind      = input.readUnsignedByte()
         _typeArgumentIndex = input.readUnsignedByte()
     }
 
-    internal fun writeData(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeByte(_typePathKind)
         output.writeByte(_typeArgumentIndex)
     }
@@ -84,7 +91,7 @@ data class PathElement private constructor(private var _typePathKind:      Int =
     companion object {
         internal fun read(input: ClassDataInput): PathElement {
             val element = PathElement()
-            element.readData(input)
+            element.read(input)
             return element
         }
     }

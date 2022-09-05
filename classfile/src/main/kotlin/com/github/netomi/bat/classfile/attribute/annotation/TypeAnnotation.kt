@@ -18,14 +18,14 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 
 class TypeAnnotation private constructor(private var _target: TargetInfo = TargetInfo.empty(),
                                          private var _path:   TypePath   = TypePath.empty()): Annotation() {
 
     override val dataSize: Int
-        get() = TODO("implement")
+        get() = super.dataSize + _target.dataSize + _path.dataSize
 
     val target: TargetInfo
         get() = _target
@@ -38,7 +38,7 @@ class TypeAnnotation private constructor(private var _target: TargetInfo = Targe
     }
 
     @Throws(IOException::class)
-    override fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         _target.write(output)
         _path.write(output)
         super.write(output)

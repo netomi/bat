@@ -22,7 +22,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import java.io.DataOutput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
 import java.util.*
 
@@ -50,7 +50,7 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
         output.write(data)
     }
@@ -74,7 +74,7 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
         other as UnknownAttribute
 
         return attributeNameIndex == other.attributeNameIndex &&
-                _data.contentEquals(other._data)
+               _data.contentEquals(other._data)
     }
 
     override fun hashCode(): Int {

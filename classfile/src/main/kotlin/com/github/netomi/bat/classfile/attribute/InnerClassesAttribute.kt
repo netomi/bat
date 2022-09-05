@@ -19,9 +19,10 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 
 /**
  * A class representing an InnerClasses attribute in a class file.
@@ -30,7 +31,7 @@ import java.io.DataOutput
  */
 data class InnerClassesAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var innerClassesList:   MutableList<InnerClassesElement> = mutableListOfCapacity(0))
+                         private var innerClasses:       MutableList<InnerClassesElement> = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToClass, Sequence<InnerClassesElement> {
 
     override val type: AttributeType
@@ -40,32 +41,29 @@ data class InnerClassesAttribute
         get() = 2 + size * InnerClassesElement.DATA_SIZE
 
     val size: Int
-        get() = innerClassesList.size
+        get() = innerClasses.size
 
     operator fun get(index: Int): InnerClassesElement {
-        return innerClassesList[index]
+        return innerClasses[index]
     }
 
     override fun iterator(): Iterator<InnerClassesElement> {
-        return innerClassesList.iterator()
+        return innerClasses.iterator()
     }
 
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
         val numberOfClasses = input.readUnsignedShort()
-        innerClassesList = mutableListOfCapacity(numberOfClasses)
+        innerClasses = mutableListOfCapacity(numberOfClasses)
         for (i in 0 until numberOfClasses) {
-            innerClassesList.add(InnerClassesElement.read(input))
+            innerClasses.add(InnerClassesElement.read(input))
         }
     }
 
-    override fun writeAttributeData(output: DataOutput) {
+    override fun writeAttributeData(output: ClassDataOutput) {
         output.writeInt(dataSize)
-        output.writeShort(innerClassesList.size)
-        for (element in innerClassesList) {
-            element.write(output)
-        }
+        output.writeContentList(innerClasses)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
@@ -83,7 +81,10 @@ data class InnerClassesElement
     private constructor(private var _innerClassIndex:       Int = -1,
                         private var _outerClassIndex:       Int = -1,
                         private var _innerNameIndex:        Int = -1,
-                        private var _innerClassAccessFlags: Int = -1) {
+                        private var _innerClassAccessFlags: Int = -1): ClassFileContent() {
+
+    override val dataSize: Int
+        get() = 8
 
     val innerClassIndex: Int
         get() = _innerClassIndex
@@ -116,7 +117,7 @@ data class InnerClassesElement
         _innerClassAccessFlags = input.readUnsignedShort()
     }
 
-    internal fun write(output: DataOutput) {
+    override fun write(output: ClassDataOutput) {
         output.writeShort(innerClassIndex)
         output.writeShort(outerClassIndex)
         output.writeShort(innerNameIndex)
