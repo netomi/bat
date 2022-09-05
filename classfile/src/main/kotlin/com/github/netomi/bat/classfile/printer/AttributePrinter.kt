@@ -186,7 +186,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         val moduleIndexAndFlags = "${attribute.moduleNameIndex},${attribute.moduleFlags.toHexString()}"
         printer.print("#%-38s // ".format(moduleIndexAndFlags))
-        attribute.getModule(classFile).accept(classFile, constantPrinter)
+        classFile.constantAccept(attribute.moduleNameIndex, constantPrinter)
         // TODO: print accessflags
         printer.println()
         if (attribute.moduleVersionIndex > 0) {
@@ -201,7 +201,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         for (requiresElement in attribute.requires) {
             val requiresIndexAndFlags = "${requiresElement.requiresIndex},${requiresElement.requiresFlags.toHexString()}"
             printer.print("#%-38s // ".format(requiresIndexAndFlags))
-            requiresElement.getRequiredModule(classFile).accept(classFile, constantPrinter)
+            classFile.constantAccept(requiresElement.requiresIndex, constantPrinter)
             // TODO: print accessflags
             printer.println()
             if (requiresElement.requiresVersionIndex > 0) {
@@ -218,7 +218,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         for (exportsElement in attribute.exports) {
             val exportsIndexAndFlags = "${exportsElement.exportsIndex},${exportsElement.exportsFlags.toHexString()}"
             printer.print("#%-38s // ".format(exportsIndexAndFlags))
-            exportsElement.getExportedPackage(classFile).accept(classFile, constantPrinter)
+            classFile.constantAccept(exportsElement.exportsIndex, constantPrinter)
             // TODO: print accessflags
             printer.println()
         }
@@ -230,7 +230,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         for (opensElement in attribute.opens) {
             val opensIndexAndFlags = "${opensElement.opensIndex},${opensElement.opensFlags.toHexString()}"
             printer.print("#%-38s // ".format(opensIndexAndFlags))
-            opensElement.getOpenedPackage(classFile).accept(classFile, constantPrinter)
+            classFile.constantAccept(opensElement.opensIndex, constantPrinter)
             printer.println(" to ... ${opensElement.size}")
             printer.levelUp()
             for (opensToIndex in opensElement) {
@@ -257,7 +257,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         for (providesElement in attribute.provides) {
             printer.print("#%-38s // ".format(providesElement.providesIndex))
-            providesElement.getProvidedClass(classFile).accept(classFile, constantPrinter)
+            classFile.constantAccept(providesElement.providesIndex, constantPrinter)
             printer.levelUp()
             for (providesWithIndex in providesElement) {
                 printer.print("#%-38s // ".format(providesWithIndex))
@@ -267,7 +267,6 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             printer.levelDown()
         }
         printer.levelDown()
-
         printer.levelDown()
     }
 

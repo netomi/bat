@@ -53,8 +53,16 @@ fun interface AnnotationVisitor: AnnotationVisitorIndexed {
         visitAnyAnnotation(classFile, annotation)
     }
 
+    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
+        visitAnnotation(classFile, annotation)
+    }
+
     fun visitTypeAnnotation(classFile: ClassFile, typeAnnotation: TypeAnnotation) {
         visitAnyAnnotation(classFile, typeAnnotation)
+    }
+
+    override fun visitTypeAnnotation(classFile: ClassFile, index: Int, typeAnnotation: TypeAnnotation) {
+        visitTypeAnnotation(classFile, typeAnnotation)
     }
 
     fun joinedByAnnotationConsumer(consumer: BiConsumer<ClassFile, Annotation>): AnnotationVisitor {
