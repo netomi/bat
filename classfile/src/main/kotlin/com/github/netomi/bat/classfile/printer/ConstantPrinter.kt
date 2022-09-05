@@ -73,7 +73,7 @@ internal class ConstantPrinter constructor(private val printer:                I
     }
 
     override fun visitStringConstant(classFile: ClassFile, constant: StringConstant) {
-        visitUtf8Constant(classFile, classFile.getConstant(constant.stringIndex) as Utf8Constant)
+        visitUtf8Constant(classFile, classFile.getUtf8Constant(constant.stringIndex))
     }
 
     override fun visitAnyRefConstant(classFile: ClassFile, refConstant: RefConstant) {
@@ -116,7 +116,7 @@ internal class ConstantPrinter constructor(private val printer:                I
     }
 
     override fun visitMethodTypeConstant(classFile: ClassFile, constant: MethodTypeConstant) {
-        visitUtf8Constant(classFile, classFile.getConstant(constant.descriptorIndex) as Utf8Constant)
+        visitUtf8Constant(classFile, classFile.getUtf8Constant(constant.descriptorIndex))
     }
 
     override fun visitMethodHandleConstant(classFile: ClassFile, constant: MethodHandleConstant) {

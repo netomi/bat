@@ -18,7 +18,6 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
-import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
@@ -39,10 +38,6 @@ data class ConstantValueAttribute
 
     val constantValueIndex: Int
         get() = _constantValueIndex
-
-    fun getConstantValue(classFile: ClassFile): Constant {
-        return classFile.getConstant(constantValueIndex)
-    }
 
     override val dataSize: Int
         get() = ATTRIBUTE_LENGTH
@@ -65,7 +60,7 @@ data class ConstantValueAttribute
     }
 
     fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.getConstant(constantValueIndex).accept(classFile, visitor)
+        classFile.constantAccept(constantValueIndex, visitor)
     }
 
     companion object {

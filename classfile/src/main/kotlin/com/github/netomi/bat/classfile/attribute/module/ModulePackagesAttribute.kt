@@ -21,7 +21,7 @@ import com.github.netomi.bat.classfile.attribute.AttachedToClass
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import com.github.netomi.bat.classfile.constant.PackageConstant
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.util.*
@@ -54,7 +54,7 @@ data class ModulePackagesAttribute
     }
 
     fun getPackageNames(classFile: ClassFile): List<String> {
-        return packages.map { (classFile.getConstant(it) as PackageConstant).getPackageName(classFile) }
+        return packages.map { classFile.getPackage(it).getPackageName(classFile) }
     }
 
     override fun readAttributeData(input: DataInput, classFile: ClassFile) {
@@ -77,6 +77,12 @@ data class ModulePackagesAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitModulePackages(classFile, this)
+    }
+
+    fun packagesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        for (constantIndex in packages) {
+            classFile.constantAccept(constantIndex, visitor)
+        }
     }
 
     override fun equals(other: Any?): Boolean {

@@ -19,8 +19,6 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.Constant
-import com.github.netomi.bat.classfile.constant.FieldrefConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
@@ -29,10 +27,6 @@ class ConstantInstruction private constructor(opCode: JvmOpCode): JvmInstruction
 
     var constantIndex: Int = 0
         private set
-
-    fun getConstant(classFile: ClassFile): Constant {
-        return classFile.getConstant(constantIndex)
-    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
@@ -51,7 +45,7 @@ class ConstantInstruction private constructor(opCode: JvmOpCode): JvmInstruction
     }
 
     fun constantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        getConstant(classFile).accept(classFile, visitor)
+        classFile.constantAccept(constantIndex, visitor)
     }
 
     companion object {

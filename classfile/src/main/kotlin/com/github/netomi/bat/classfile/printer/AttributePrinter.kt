@@ -40,9 +40,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     // common implementations
 
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
-        // TODO("Not yet implemented")
-    }
+    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
 
     override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         printer.println("Deprecated: true")
@@ -101,7 +99,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             printer.levelUp()
             for (argumentIndex in element) {
                 printer.print("#${argumentIndex} ")
-                classFile.getConstant(argumentIndex).accept(classFile, constantPrinter)
+                classFile.constantAccept(argumentIndex, constantPrinter)
                 printer.println()
             }
             printer.levelDown()
@@ -237,7 +235,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             printer.levelUp()
             for (opensToIndex in opensElement) {
                 printer.print("#%-38s // ... to ".format(opensToIndex))
-                classFile.getConstant(opensToIndex).accept(classFile, constantPrinter)
+                classFile.constantAccept(opensToIndex, constantPrinter)
                 printer.println()
             }
             printer.levelDown()
@@ -249,7 +247,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         for (usesIndex in attribute.uses) {
             printer.print("#%-38s // ".format(usesIndex))
-            classFile.getConstant(usesIndex).accept(classFile, constantPrinter)
+            classFile.constantAccept(usesIndex, constantPrinter)
             printer.println()
         }
         printer.levelDown()
@@ -263,7 +261,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             printer.levelUp()
             for (providesWithIndex in providesElement) {
                 printer.print("#%-38s // ".format(providesWithIndex))
-                classFile.getConstant(providesWithIndex).accept(classFile, constantPrinter)
+                classFile.constantAccept(providesWithIndex, constantPrinter)
                 printer.println()
             }
             printer.levelDown()
@@ -402,7 +400,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
 
     override fun visitAnyConstElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        elementValue.getConstant(classFile).accept(classFile, constantPrinter)
+        classFile.constantAccept(elementValue.constValueIndex, constantPrinter)
     }
 
     override fun visitBooleanElementValue(classFile: ClassFile, elementValue: ConstElementValue) {

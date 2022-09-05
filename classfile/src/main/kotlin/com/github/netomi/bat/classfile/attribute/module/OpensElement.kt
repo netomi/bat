@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.attribute.module
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.constant.PackageConstant
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.util.*
@@ -94,6 +95,12 @@ data class OpensElement
 
     override fun hashCode(): Int {
         return Objects.hash(_opensIndex, _opensFlags, _opensTo.contentHashCode())
+    }
+
+    fun openedToModulesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        for (constantIndex in _opensTo) {
+            classFile.constantAccept(constantIndex, visitor)
+        }
     }
 
     companion object {

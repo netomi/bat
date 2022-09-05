@@ -18,8 +18,6 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import com.github.netomi.bat.classfile.constant.Constant
-import com.github.netomi.bat.classfile.constant.MethodHandleConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.DataInput
@@ -88,10 +86,6 @@ data class BootstrapMethodElement
     val bootstrapMethodRefIndex: Int
         get() = _bootstrapMethodRefIndex
 
-    fun getBootstrapMethodRef(classFile: ClassFile): MethodHandleConstant {
-        return classFile.getConstant(bootstrapMethodRefIndex) as MethodHandleConstant
-    }
-
     val size: Int
         get() = bootstrapArguments.size
 
@@ -101,10 +95,6 @@ data class BootstrapMethodElement
 
     override fun iterator(): Iterator<Int> {
         return bootstrapArguments.iterator()
-    }
-
-    fun getBootstrapArguments(classFile: ClassFile): List<Constant> {
-        return bootstrapArguments.map { classFile.getConstant(it) }
     }
 
     internal val dataSize: Int
@@ -128,12 +118,12 @@ data class BootstrapMethodElement
     }
 
     fun bootstrapMethodRefAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.getConstant(_bootstrapMethodRefIndex).accept(classFile, visitor)
+        classFile.constantAccept(_bootstrapMethodRefIndex, visitor)
     }
 
     fun bootstrapArgumentsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (constantIndex in bootstrapArguments) {
-            classFile.getConstant(constantIndex).accept(classFile, visitor)
+            classFile.constantAccept(constantIndex, visitor)
         }
     }
 

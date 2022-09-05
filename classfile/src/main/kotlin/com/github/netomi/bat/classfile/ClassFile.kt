@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantPoolVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.JvmType
@@ -89,55 +90,59 @@ class ClassFile private constructor() {
 
     // helper methods to access constant pool entries
 
-    fun getConstant(constantIndex: Int): Constant {
+    internal fun getConstant(constantIndex: Int): Constant {
         return constantPool[constantIndex]
     }
 
-    fun getClass(constantIndex: Int): ClassConstant {
+    internal fun getClass(constantIndex: Int): ClassConstant {
         return (constantPool[constantIndex] as ClassConstant)
     }
 
-    fun getFieldref(constantIndex: Int): FieldrefConstant {
+    internal fun getFieldref(constantIndex: Int): FieldrefConstant {
         return (constantPool[constantIndex] as FieldrefConstant)
     }
 
-    fun getMethodref(constantIndex: Int): MethodrefConstant {
+    internal fun getMethodref(constantIndex: Int): MethodrefConstant {
         return (constantPool[constantIndex] as MethodrefConstant)
     }
 
-    fun getInterfaceMethodref(constantIndex: Int): InterfaceMethodrefConstant {
+    internal fun getInterfaceMethodref(constantIndex: Int): InterfaceMethodrefConstant {
         return (constantPool[constantIndex] as InterfaceMethodrefConstant)
     }
 
-    fun getModule(constantIndex: Int): ModuleConstant {
+    internal fun getModule(constantIndex: Int): ModuleConstant {
         return (constantPool[constantIndex] as ModuleConstant)
     }
 
-    fun getPackage(constantIndex: Int): PackageConstant {
+    internal fun getPackage(constantIndex: Int): PackageConstant {
         return (constantPool[constantIndex] as PackageConstant)
     }
 
-    fun getInteger(constantIndex: Int): Int {
+    internal fun getInteger(constantIndex: Int): Int {
         return (constantPool[constantIndex] as IntegerConstant).value
     }
 
-    fun getBoolean(constantIndex: Int): Boolean {
+    internal fun getBoolean(constantIndex: Int): Boolean {
         return (constantPool[constantIndex] as IntegerConstant).value == 1
     }
 
-    fun getString(stringIndex: Int): String {
+    internal fun getUtf8Constant(constantIndex: Int): Utf8Constant {
+        return (constantPool[constantIndex] as Utf8Constant)
+    }
+
+    internal fun getString(stringIndex: Int): String {
         return (constantPool[stringIndex] as Utf8Constant).value
     }
 
-    fun getClassName(classIndex: Int): JvmClassName {
+    internal fun getClassName(classIndex: Int): JvmClassName {
         return (constantPool[classIndex] as ClassConstant).getClassName(this)
     }
 
-    fun getType(typeIndex: Int): JvmType {
+    internal fun getType(typeIndex: Int): JvmType {
         return getString(typeIndex).asJvmType()
     }
 
-    fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
+    internal fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
         return (constantPool[nameAndTypeIndex] as NameAndTypeConstant)
     }
 
@@ -185,6 +190,10 @@ class ClassFile private constructor() {
 
     fun constantPoolAccept(visitor: ConstantPoolVisitor) {
         constantPool.accept(this, visitor)
+    }
+
+    fun constantAccept(constantIndex: Int, visitor: ConstantVisitor) {
+        constantPool.constantAccept(this, constantIndex, visitor)
     }
 
     fun membersAccept(visitor: MemberVisitor) {

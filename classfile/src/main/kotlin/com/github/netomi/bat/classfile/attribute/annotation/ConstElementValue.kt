@@ -18,14 +18,13 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
-import com.github.netomi.bat.classfile.constant.Constant
-import com.github.netomi.bat.classfile.constant.IntegerConstant
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
 
 data class ConstElementValue private constructor(override val type: ElementValueType,
-                                                 private var _constValueIndex: Int = -1) : ElementValue() {
+                                                  private var _constValueIndex: Int = -1) : ElementValue() {
 
     override val dataSize: Int
         get() = DATA_SIZE
@@ -33,13 +32,9 @@ data class ConstElementValue private constructor(override val type: ElementValue
     val constValueIndex: Int
         get() = _constValueIndex
 
-    fun getConstant(classFile: ClassFile): Constant {
-        return classFile.getConstant(constValueIndex)
-    }
-
     fun getBoolean(classFile: ClassFile): Boolean {
         check(type == ElementValueType.BOOLEAN)
-        return (getConstant(classFile) as IntegerConstant).value == 1
+        return classFile.getInteger(constValueIndex) == 1
     }
 
     @Throws(IOException::class)
@@ -65,6 +60,10 @@ data class ConstElementValue private constructor(override val type: ElementValue
             ElementValueType.STRING -> visitor.visitStringElementValue(classFile, this)
             else -> error("ConstElementValue has unexpected type $type")
         }
+    }
+
+    fun constantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(constValueIndex, visitor)
     }
 
     companion object {

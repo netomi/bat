@@ -60,7 +60,7 @@ data class MethodHandleConstant private constructor(private var _referenceKind: 
     }
 
     fun referenceAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.getConstant(referenceIndex).accept(classFile, visitor)
+        classFile.constantAccept(referenceIndex, visitor)
     }
 
     companion object {

@@ -80,8 +80,10 @@ internal class ConstantPool private constructor(private var constants: MutableLi
     }
 
     fun constantAccept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
-        require(constants[index] != null) { "trying to accept a null constant at index $index" }
-        constants[index]?.accept(classFile, visitor)
+        if (index in 1 until constants.size) {
+            require(constants[index] != null) { "trying to accept a null constant at index $index" }
+            constants[index]?.accept(classFile, visitor)
+        }
     }
 
     companion object {

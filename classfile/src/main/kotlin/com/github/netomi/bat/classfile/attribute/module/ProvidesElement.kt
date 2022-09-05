@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.module
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.ClassConstant
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.util.JvmClassName
 import java.io.DataInput
 import java.io.DataOutput
@@ -87,6 +88,12 @@ data class ProvidesElement
 
     override fun hashCode(): Int {
         return Objects.hash(_providesIndex, _providesWith.contentHashCode())
+    }
+
+    fun providesWithClassesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        for (constantIndex in _providesWith) {
+            classFile.constantAccept(constantIndex, visitor)
+        }
     }
 
     companion object {
