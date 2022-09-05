@@ -15,6 +15,8 @@
  */
 package com.github.netomi.bat.classfile.attribute.annotation
 
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import java.io.DataInput
 import java.io.DataOutput
 import java.io.IOException
@@ -33,6 +35,10 @@ class TypeAnnotation private constructor(): Annotation() {
     @Throws(IOException::class)
     override fun write(output: DataOutput) {
         super.write(output)
+    }
+
+    override fun accept(classFile: ClassFile, visitor: AnnotationVisitor) {
+        visitor.visitTypeAnnotation(classFile, this)
     }
 
     companion object {

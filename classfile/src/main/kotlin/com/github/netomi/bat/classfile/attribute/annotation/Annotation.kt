@@ -16,6 +16,7 @@
 package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
@@ -75,8 +76,14 @@ open class Annotation
         return Objects.hash(_typeIndex, _elementValues)
     }
 
+    open fun accept(classFile: ClassFile, visitor: AnnotationVisitor) {
+        visitor.visitAnnotation(classFile, this)
+    }
+
     fun elementValuesAccept(classFile: ClassFile, visitor: ElementValueVisitor) {
-        elementValues.forEach { (_, elementValue) -> elementValue.accept(classFile, visitor) }
+        for ((_, elementValue) in elementValues) {
+            elementValue.accept(classFile, visitor)
+        }
     }
 
     companion object {

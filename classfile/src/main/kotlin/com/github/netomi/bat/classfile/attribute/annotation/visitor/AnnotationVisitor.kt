@@ -30,39 +30,19 @@ fun multiAnnotationVisitorOf(visitor: AnnotationVisitor, vararg visitors: Annota
     return MultiAnnotationVisitor(visitor, *visitors)
 }
 
-fun interface AnnotationVisitorIndexed {
-    fun visitAnyAnnotation(classFile: ClassFile, index: Int, annotation: Annotation)
-
-    fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
-        visitAnyAnnotation(classFile, index, annotation)
-    }
-
-    fun visitTypeAnnotation(classFile: ClassFile, index: Int, typeAnnotation: TypeAnnotation) {
-        visitAnyAnnotation(classFile, index, typeAnnotation)
-    }
-}
-
-fun interface AnnotationVisitor: AnnotationVisitorIndexed {
+fun interface AnnotationVisitor {
     fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation)
-
-    override fun visitAnyAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
-        visitAnyAnnotation(classFile, annotation)
-    }
 
     fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
         visitAnyAnnotation(classFile, annotation)
-    }
-
-    override fun visitAnnotation(classFile: ClassFile, index: Int, annotation: Annotation) {
-        visitAnnotation(classFile, annotation)
     }
 
     fun visitTypeAnnotation(classFile: ClassFile, typeAnnotation: TypeAnnotation) {
         visitAnyAnnotation(classFile, typeAnnotation)
     }
 
-    override fun visitTypeAnnotation(classFile: ClassFile, index: Int, typeAnnotation: TypeAnnotation) {
-        visitTypeAnnotation(classFile, typeAnnotation)
+    fun asIndexedVisitor(): AnnotationVisitorIndexed {
+        return AnnotationVisitorIndexed { classFile, _, annotation -> annotation.accept(classFile, this@AnnotationVisitor) }
     }
 
     fun joinedByAnnotationConsumer(consumer: BiConsumer<ClassFile, Annotation>): AnnotationVisitor {
