@@ -17,8 +17,7 @@
 package com.github.netomi.bat.classfile.printer
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.annotation.TargetInfo
-import com.github.netomi.bat.classfile.attribute.annotation.TypeParameterBoundTargetInfo
+import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.TargetInfoVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 
@@ -27,8 +26,18 @@ internal class TargetInfoPrinter constructor(private val printer: IndentingPrint
     override fun visitAnyTargetInfo(classFile: ClassFile, targetInfo: TargetInfo) {
         TODO("implement")
     }
+    
+    override fun visitSuperTypeTargetInfo(classFile: ClassFile, targetInfo: SuperTypeTargetInfo) {
+        printer.print(", type_index=${targetInfo.superTypeIndex}")
+    }
 
     override fun visitTypeParameterBoundTargetInfo(classFile: ClassFile, targetInfo: TypeParameterBoundTargetInfo) {
         printer.print(", param_index=${targetInfo.typeParameterIndex}, bound_index=${targetInfo.boundIndex}")
     }
+
+    override fun visitFormalParameterTargetInfo(classFile: ClassFile, targetInfo: FormalParameterTargetInfo) {
+        printer.print(", param_index=${targetInfo.formalParameterIndex}")
+    }
+
+    override fun visitEmptyTargetInfo(classFile: ClassFile, targetInfo: EmptyTargetInfo) {}
 }
