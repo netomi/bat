@@ -82,12 +82,13 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
 
 internal fun VerificationType.toHumanReadableString(classFile: ClassFile): String {
     return when (this.type) {
-        ItemType.INTEGER -> "int"
-        ItemType.LONG    -> "long"
-        ItemType.FLOAT   -> "float"
-        ItemType.DOUBLE  -> "double"
-        ItemType.TOP     -> "top"
-        ItemType.OBJECT  -> {
+        ItemType.INTEGER            -> "int"
+        ItemType.LONG               -> "long"
+        ItemType.FLOAT              -> "float"
+        ItemType.DOUBLE             -> "double"
+        ItemType.TOP                -> "top"
+        ItemType.UNINITIALIZED_THIS -> "this"
+        ItemType.OBJECT             -> {
             val className = (this as ObjectVariable).getClassName(classFile)
             if (className.isArrayClass) {
                 "class \"${className}\""
