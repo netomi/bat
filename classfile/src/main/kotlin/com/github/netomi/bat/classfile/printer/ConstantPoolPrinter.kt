@@ -36,6 +36,7 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
     override fun visitLongConstant(classFile: ClassFile, index: Int, constant: LongConstant) {
         printer.print("%-19s ".format("Long"))
         constant.accept(classFile, index, constantPrinter)
+        printer.print("l")
     }
 
     override fun visitFloatConstant(classFile: ClassFile, index: Int, constant: FloatConstant) {
@@ -46,6 +47,7 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
     override fun visitDoubleConstant(classFile: ClassFile, index: Int, constant: DoubleConstant) {
         printer.print("%-19s ".format("Double"))
         constant.accept(classFile, index, constantPrinter)
+        printer.print("d")
     }
 
     override fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {

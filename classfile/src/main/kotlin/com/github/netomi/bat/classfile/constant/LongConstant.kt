@@ -36,9 +36,9 @@ data class LongConstant private constructor(private var _value: Long = 0) : Cons
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: ClassDataInput) {
-        val highBytes = input.readInt()
-        val lowBytes  = input.readInt()
-        _value = (highBytes.toLong() shl 32) + lowBytes
+        val highBytes = input.readInt().toLong() and 0xffffffff
+        val lowBytes  = input.readInt().toLong() and 0xffffffff
+        _value = (highBytes shl 32) + lowBytes
     }
 
     @Throws(IOException::class)
