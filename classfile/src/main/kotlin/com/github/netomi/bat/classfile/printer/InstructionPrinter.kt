@@ -86,18 +86,32 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         }
     }
 
-    override fun visitLookupSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LookupSwitchInstruction) {
-        printer.print("%4d: ".format(offset))
-
-        val currPos = printer.currentPosition
-
-        printer.println("%-12s { // %d".format(instruction.mnemonic, instruction.numberOfPairs))
-        printer.resetIndentation(currPos)
-        for (pair in instruction.matchOffsetPairs) {
+    override fun visitAnySwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: SwitchInstruction) {
+        for (pair in instruction) {
             printer.println("%12d: %d".format(pair.match, pair.offset + offset))
         }
         printer.println("%12s: %d".format("default", instruction.defaultOffset + offset))
         printer.levelDown()
         printer.println("      }")
+    }
+
+    override fun visitLookupSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LookupSwitchInstruction) {
+        printer.print("%4d: ".format(offset))
+
+        val currPos = printer.currentPosition
+
+        printer.println("%-13s { // %d".format(instruction.mnemonic, instruction.size))
+        printer.resetIndentation(currPos)
+        visitAnySwitchInstruction(classFile, method, code, offset, instruction)
+    }
+
+    override fun visitTableSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: TableSwitchInstruction) {
+        printer.print("%4d: ".format(offset))
+
+        val currPos = printer.currentPosition
+
+        printer.println("%-13s { // %d to %d".format(instruction.mnemonic, instruction.lowValue, instruction.highValue))
+        printer.resetIndentation(currPos)
+        visitAnySwitchInstruction(classFile, method, code, offset, instruction)
     }
 }

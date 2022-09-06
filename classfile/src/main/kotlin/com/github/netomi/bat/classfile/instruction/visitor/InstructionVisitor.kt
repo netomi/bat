@@ -36,6 +36,10 @@ fun interface InstructionVisitor {
         visitAnySwitchInstruction(classFile, method, code, offset, instruction)
     }
 
+    fun visitTableSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: TableSwitchInstruction) {
+        visitAnySwitchInstruction(classFile, method, code, offset, instruction)
+    }
+
     fun visitArithmeticInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArithmeticInstruction) {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
     }

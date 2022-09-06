@@ -33,7 +33,7 @@ import kotlin.io.path.*
 object Main {
 
     fun main2() {
-        val classFileReader = ClassFileReader(FileInputStream("AbstractIterator.class"))
+        val classFileReader = ClassFileReader(FileInputStream("CharMatcher.class"))
         val classFile = ClassFile.empty()
         classFileReader.visitClassFile(classFile)
         classFile.accept(ClassFilePrinter())
@@ -44,32 +44,33 @@ object Main {
     fun main(args: Array<String>) {
         main2()
 
+        System.exit(0)
 
-//        val input = Paths.get("tmp/in")
-//        val output = Paths.get("tmp/out")
-//
-//        val inputFiles = Files.find(input, Int.MAX_VALUE, REGULAR_FILE)
-//
-//        inputFiles.use {
-//            it.filter(CLASS_FILE)
-//                .sorted()
-//                .forEach { path ->
-//                    val inputPath = path.relativeTo(input)
-//                    println("handling file $inputPath")
-//
-//                    val classFileReader = ClassFileReader(path.inputStream())
-//                    val classFile = ClassFile.empty()
-//                    classFileReader.visitClassFile(classFile)
-//                    classFile.accept(ClassFilePrinter())
-//
-//                    val outputPath = output.resolve(inputPath)
-//                    outputPath.parent.createDirectories()
-//
-//                    val classFileWriter = ClassFileWriter(output.resolve(inputPath).outputStream())
-//                    classFileWriter.visitClassFile(classFile)
-//                    classFileWriter.close()
-//                }
-//        }
+        val input = Paths.get("tmp/in")
+        val output = Paths.get("tmp/out")
+
+        val inputFiles = Files.find(input, Int.MAX_VALUE, REGULAR_FILE)
+
+        inputFiles.use {
+            it.filter(CLASS_FILE)
+                .sorted()
+                .forEach { path ->
+                    val inputPath = path.relativeTo(input)
+                    println("handling file $inputPath")
+
+                    val classFileReader = ClassFileReader(path.inputStream())
+                    val classFile = ClassFile.empty()
+                    classFileReader.visitClassFile(classFile)
+                    classFile.accept(ClassFilePrinter())
+
+                    val outputPath = output.resolve(inputPath)
+                    outputPath.parent.createDirectories()
+
+                    val classFileWriter = ClassFileWriter(output.resolve(inputPath).outputStream())
+                    classFileWriter.visitClassFile(classFile)
+                    classFileWriter.close()
+                }
+        }
     }
 }
 

@@ -158,7 +158,7 @@ enum class JvmOpCode constructor(
     ICONST_4       (0x07, "iconst_4",  1, LiteralInstruction::create),
     ICONST_5       (0x08, "iconst_5",  1, LiteralInstruction::create),
 
-    IDIV           (0x6d, "idiv", 1, ArithmeticInstruction::create),
+    IDIV           (0x6c, "idiv", 1, ArithmeticInstruction::create),
 
     IF_ACMPEQ      (0xa5, "if_acmpeq", 3, BranchInstruction::create),
     IF_ACMPNE      (0xa6, "if_acmpne", 3, BranchInstruction::create),
@@ -299,7 +299,7 @@ enum class JvmOpCode constructor(
 
     SWAP           (0x5f, "swap", 1, StackInstruction::create),
 
-    TABLESWITCH    (0xaa, "tableswitch", -1),
+    TABLESWITCH    (0xaa, "tableswitch", 0, TableSwitchInstruction::create),
 
     WIDE           (0xc4, "wide", -1);
 

@@ -20,8 +20,31 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.mutableListOfCapacity
 
-abstract class SwitchInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+abstract class SwitchInstruction
+    protected constructor(              opCode:           JvmOpCode,
+                          protected var _defaultOffset:   Int                          = 0,
+                          protected var matchOffsetPairs: MutableList<MatchOffsetPair> = mutableListOfCapacity(0)
+    ): JvmInstruction(opCode), Sequence<MatchOffsetPair> {
+
+    val defaultOffset: Int
+        get() = _defaultOffset
+
+    val size: Int
+        get() = matchOffsetPairs.size
+
+    operator fun get(index: Int): MatchOffsetPair {
+        return matchOffsetPairs[index]
+    }
+
+    override fun iterator(): Iterator<MatchOffsetPair> {
+        return matchOffsetPairs.iterator()
+    }
+
+    protected fun getPadding(offset: Int): Int {
+        return (4 - (offset % 4)) % 4
+    }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
         visitor.visitAnySimpleInstruction(classFile, method, code, offset, this)
