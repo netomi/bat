@@ -188,7 +188,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         val moduleIndexAndFlags = "${attribute.moduleNameIndex},${attribute.moduleFlags.toHexString()}"
         printer.print("#%-38s // ".format(moduleIndexAndFlags))
         classFile.constantAccept(attribute.moduleNameIndex, constantPrinter)
-        // TODO: print accessflags
+        if (attribute.modifiers.isNotEmpty()) {
+            printer.print(" " + attribute.modifiers.toExternalString())
+        }
         printer.println()
         if (attribute.moduleVersionIndex > 0) {
             printer.println("#%-38s // %s".format(attribute.moduleVersionIndex, attribute.getModuleVersion(classFile)))
@@ -203,7 +205,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val requiresIndexAndFlags = "${requiresElement.requiresIndex},${requiresElement.requiresFlags.toHexString()}"
             printer.print("#%-38s // ".format(requiresIndexAndFlags))
             classFile.constantAccept(requiresElement.requiresIndex, constantPrinter)
-            // TODO: print accessflags
+            if (requiresElement.modifiers.isNotEmpty()) {
+                printer.print(" " + requiresElement.modifiers.toExternalString())
+            }
             printer.println()
             if (requiresElement.requiresVersionIndex > 0) {
                 printer.println("#%-38s // %s".format(requiresElement.requiresVersionIndex, requiresElement.getRequiredVersion(classFile)))
@@ -232,6 +236,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val opensIndexAndFlags = "${opensElement.opensIndex},${opensElement.opensFlags.toHexString()}"
             printer.print("#%-38s // ".format(opensIndexAndFlags))
             classFile.constantAccept(opensElement.opensIndex, constantPrinter)
+            // TODO: print accessflags
             printer.println(" to ... ${opensElement.size}")
             printer.levelUp()
             for (opensToIndex in opensElement) {
@@ -439,4 +444,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
 private fun Int.toHexString(): String {
     return Integer.toHexString(this)
+}
+
+private fun Set<AccessFlag>.toExternalString(): String {
+    return joinToString(" ") { txt -> "ACC_$txt" }
 }

@@ -26,10 +26,12 @@ fun accessFlagModifiers(accessFlags: Int, target: AccessFlagTarget): EnumSet<Acc
 }
 
 enum class AccessFlagTarget(val value: Int) {
-    CLASS      (0x01),
-    FIELD      (0x02),
-    METHOD     (0x04),
-    INNER_CLASS(0x08)
+    CLASS          (0x01),
+    FIELD          (0x02),
+    METHOD         (0x04),
+    INNER_CLASS    (0x08),
+    MODULE         (0x10),
+    REQUIRED_MODULE(0x20)
 }
 
 enum class AccessFlag(val value: Int, val target: Int) {
@@ -41,18 +43,22 @@ enum class AccessFlag(val value: Int, val target: Int) {
     FINAL(ACC_FINAL,               arrayOf(CLASS, FIELD, METHOD, INNER_CLASS)),
     SUPER(ACC_SUPER,               arrayOf(CLASS)),
     SYNCHRONIZED(ACC_SYNCHRONIZED, arrayOf(METHOD)),
+    OPEN(ACC_OPEN,                 arrayOf(AccessFlagTarget.MODULE)),
+    TRANSITIVE(ACC_TRANSITIVE,     arrayOf(REQUIRED_MODULE)),
     VOLATILE(ACC_VOLATILE,         arrayOf(FIELD)),
     BRIDGE(ACC_BRIDGE,             arrayOf(METHOD)),
+    STATIC_PHASE(ACC_STATIC_PHASE, arrayOf(REQUIRED_MODULE)),
     VARARGS(ACC_VARARGS,           arrayOf(METHOD)),
     NATIVE(ACC_NATIVE,             arrayOf(METHOD)),
     TRANSIENT(ACC_TRANSIENT,       arrayOf(FIELD)),
     INTERFACE(ACC_INTERFACE,       arrayOf(CLASS, INNER_CLASS)),
     ABSTRACT(ACC_ABSTRACT,         arrayOf(CLASS, METHOD, INNER_CLASS)),
     STRICT(ACC_STRICT,             arrayOf(METHOD)),
-    SYNTHETIC(ACC_SYNTHETIC,       arrayOf(CLASS, FIELD, METHOD, INNER_CLASS)),
+    SYNTHETIC(ACC_SYNTHETIC,       arrayOf(CLASS, FIELD, METHOD, INNER_CLASS, AccessFlagTarget.MODULE, REQUIRED_MODULE)),
     ANNOTATION(ACC_ANNOTATION,     arrayOf(CLASS, INNER_CLASS)),
     ENUM(ACC_ENUM,                 arrayOf(CLASS, FIELD, INNER_CLASS)),
-    MODULE(ACC_MODULE,             arrayOf(CLASS));
+    MODULE(ACC_MODULE,             arrayOf(CLASS)),
+    MANDATED(ACC_MANDATED,         arrayOf(AccessFlagTarget.MODULE, REQUIRED_MODULE));
 
     constructor(value: Int, targets: Array<AccessFlagTarget>): this(value, targets.fold(0) { acc, t -> acc or t.value })
 

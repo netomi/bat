@@ -44,8 +44,11 @@ const val ACC_STATIC       = 0x0008
 const val ACC_FINAL        = 0x0010
 const val ACC_SUPER        = 0x0020
 const val ACC_SYNCHRONIZED = 0x0020
+const val ACC_OPEN         = 0x0020
+const val ACC_TRANSITIVE   = 0x0020
 const val ACC_VOLATILE     = 0x0040
 const val ACC_BRIDGE       = 0x0040
+const val ACC_STATIC_PHASE = 0x0040
 const val ACC_TRANSIENT    = 0x0080
 const val ACC_VARARGS      = 0x0080
 const val ACC_NATIVE       = 0x0100
@@ -56,6 +59,7 @@ const val ACC_SYNTHETIC    = 0x1000
 const val ACC_ANNOTATION   = 0x2000
 const val ACC_ENUM         = 0x4000
 const val ACC_MODULE       = 0x8000
+const val ACC_MANDATED     = 0x8000
 
 // Reference kinds:
 // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-5.html#jvms-5.4.3.5-220

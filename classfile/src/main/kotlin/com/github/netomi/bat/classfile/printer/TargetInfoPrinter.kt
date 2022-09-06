@@ -26,7 +26,7 @@ internal class TargetInfoPrinter constructor(private val printer: IndentingPrint
     override fun visitAnyTargetInfo(classFile: ClassFile, targetInfo: TargetInfo) {
         TODO("implement")
     }
-    
+
     override fun visitSuperTypeTargetInfo(classFile: ClassFile, targetInfo: SuperTypeTargetInfo) {
         printer.print(", type_index=${targetInfo.superTypeIndex}")
     }
