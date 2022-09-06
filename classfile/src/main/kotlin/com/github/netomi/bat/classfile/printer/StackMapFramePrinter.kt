@@ -84,6 +84,6 @@ internal fun VerificationType.toHumanReadableString(classFile: ClassFile): Strin
     return when (this.type) {
         ItemType.INTEGER -> "int"
         ItemType.OBJECT  -> "class ${(this as ObjectVariable).getClassName(classFile)}"
-        else             -> "unknown"
+        else             -> TODO("implement")
     }
 }
