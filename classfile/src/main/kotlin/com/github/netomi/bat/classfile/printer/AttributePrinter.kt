@@ -403,6 +403,21 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         referencedIndexPrinter.visitAnnotation(classFile, typeAnnotation)
         printer.print(": ${typeAnnotation.target.type}")
         typeAnnotation.target.accept(classFile, targetInfoPrinter)
+
+        if (typeAnnotation.path.size > 0) {
+
+            val pathTransformer: (PathElement) -> CharSequence = { element ->
+                when (element.type) {
+                    TypePathType.WILDCARD      -> element.type.toString()
+                    TypePathType.TYPE_ARGUMENT -> "${element.type}(${element.typeArgumentIndex})"
+                    else -> TODO("implement")
+                }
+            }
+
+            val location = typeAnnotation.path.joinToString(separator = ", ", prefix = "[", postfix = "]", transform = pathTransformer)
+            printer.print(" location=${location}")
+        }
+
         printer.println()
         visitAnyAnnotation(classFile, index, typeAnnotation)
     }

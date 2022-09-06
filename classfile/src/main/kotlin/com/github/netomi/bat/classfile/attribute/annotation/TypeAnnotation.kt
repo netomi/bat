@@ -30,6 +30,9 @@ class TypeAnnotation private constructor(private var _target: TargetInfo = Targe
     val target: TargetInfo
         get() = _target
 
+    val path: TypePath
+        get() = _path
+
     @Throws(IOException::class)
     override fun read(input: ClassDataInput) {
         _target = TargetInfo.read(input)

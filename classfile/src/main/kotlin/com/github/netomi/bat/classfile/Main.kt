@@ -33,8 +33,8 @@ import kotlin.io.path.*
 object Main {
 
     fun main2() {
-//        val classFileReader = ClassFileReader(FileInputStream("Equivalence.class"))
-        val classFileReader = ClassFileReader(FileInputStream("module-info.class"))
+        val classFileReader = ClassFileReader(FileInputStream("Equivalence.class"))
+        //val classFileReader = ClassFileReader(FileInputStream("module-info.class"))
 
         val classFile = ClassFile.empty()
         classFileReader.visitClassFile(classFile)

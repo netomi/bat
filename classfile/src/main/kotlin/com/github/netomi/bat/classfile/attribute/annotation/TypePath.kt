@@ -72,8 +72,8 @@ data class PathElement private constructor(private var _typePathKind:      Int =
     override val contentSize: Int
         get() = 2
 
-    val typePathKind: Int
-        get() = _typePathKind
+    val type: TypePathType
+        get() = TypePathType.of(_typePathKind)
 
     val typeArgumentIndex: Int
         get() = _typeArgumentIndex
@@ -93,6 +93,23 @@ data class PathElement private constructor(private var _typePathKind:      Int =
             val element = PathElement()
             element.read(input)
             return element
+        }
+    }
+}
+
+enum class TypePathType constructor(val value: Int) {
+    ARRAY        (0),
+    INNER_TYPE   (1),
+    WILDCARD     (2),
+    TYPE_ARGUMENT(3);
+
+    companion object {
+        fun of(typePathKind: Int): TypePathType {
+            if (typePathKind in 0 until TypePathType.values().size) {
+                return TypePathType.values()[typePathKind]
+            }
+
+            error("unexpected typePathKind '${typePathKind}'")
         }
     }
 }
