@@ -408,10 +408,10 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
             val pathTransformer: (PathElement) -> CharSequence = { element ->
                 when (element.type) {
+                    TypePathType.INNER_TYPE    -> element.type.toString()
                     TypePathType.ARRAY         -> element.type.toString()
                     TypePathType.WILDCARD      -> element.type.toString()
                     TypePathType.TYPE_ARGUMENT -> "${element.type}(${element.typeArgumentIndex})"
-                    else -> TODO("implement")
                 }
             }
 
