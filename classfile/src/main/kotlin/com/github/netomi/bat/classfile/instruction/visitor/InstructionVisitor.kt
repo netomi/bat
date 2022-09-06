@@ -28,6 +28,14 @@ fun interface InstructionVisitor {
         visitAnyInstruction(classFile, method, code, offset, instruction)
     }
 
+    fun visitAnySwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: SwitchInstruction) {
+        visitAnyInstruction(classFile, method, code, offset, instruction)
+    }
+
+    fun visitLookupSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LookupSwitchInstruction) {
+        visitAnySwitchInstruction(classFile, method, code, offset, instruction)
+    }
+
     fun visitArithmeticInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArithmeticInstruction) {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
     }

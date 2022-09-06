@@ -27,8 +27,9 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
     val mnemonic: String
         get() = opCode.mnemonic
 
-    val length: Int
-        get() = opCode.length
+    open fun getLength(offset: Int): Int {
+        return opCode.length
+    }
 
     open fun read(instructions: ByteArray, offset: Int) {}
 
@@ -59,6 +60,10 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
             val a = offsetByte1.toInt()
             val b = offsetByte2.toInt() and 0xff
             return (a shl 8) or b
+        }
+
+        internal fun getLiteral(literalByte1: Byte, literalByte2: Byte, literalByte3: Byte, literalByte4: Byte): Int {
+            return getOffset(literalByte1, literalByte2, literalByte3, literalByte4)
         }
 
         internal fun getOffset(offsetByte1: Byte, offsetByte2: Byte, offsetByte3: Byte, offsetByte4: Byte): Int {

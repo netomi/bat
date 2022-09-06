@@ -85,4 +85,19 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
             printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, instruction.variable))
         }
     }
+
+    override fun visitLookupSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LookupSwitchInstruction) {
+        printer.print("%4d: ".format(offset))
+
+        val currPos = printer.currentPosition
+
+        printer.println("%-12s { // %d".format(instruction.mnemonic, instruction.numberOfPairs))
+        printer.resetIndentation(currPos)
+        for (pair in instruction.matchOffsetPairs) {
+            printer.println("%12d: %d".format(pair.match, pair.offset + offset))
+        }
+        printer.println("%12s: %d".format("default", instruction.defaultOffset + offset))
+        printer.levelDown()
+        printer.println("      }")
+    }
 }

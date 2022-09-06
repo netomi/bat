@@ -251,7 +251,7 @@ enum class JvmOpCode constructor(
     LMUL           (0x69, "lmul", 1, ArithmeticInstruction::create),
     LNEG           (0x75, "lneg", 1, ArithmeticInstruction::create),
 
-    LOOKUPSWITCH   (0xab, "lookupswitch", -1),
+    LOOKUPSWITCH   (0xab, "lookupswitch", 0, LookupSwitchInstruction::create),
 
     LOR            (0x81, "lor",  1, ArithmeticInstruction::create),
     LREM           (0x71, "lrem", 1, ArithmeticInstruction::create),

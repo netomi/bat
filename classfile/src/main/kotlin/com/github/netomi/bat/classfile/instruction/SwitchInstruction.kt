@@ -21,34 +21,11 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class VariableInstruction private constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
-
-    var variable: Int = 0
-        private set
-
-    val variableIsImplicit: Boolean
-        get() = opCode.length == 1
-
-    override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
-        variable = if (!variableIsImplicit) {
-            instructions[offset + 1].toInt() and 0xff
-        } else {
-            val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured
-            variableString.toInt()
-        }
-    }
+abstract class SwitchInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitVariableInstruction(classFile, method, code, offset, this)
-    }
-
-    companion object {
-        private val VARIABLE_REGEX = "\\w+_(\\d)".toRegex()
-
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return VariableInstruction(opCode)
-        }
+        visitor.visitAnySimpleInstruction(classFile, method, code, offset, this)
     }
 }
+
+data class MatchOffsetPair(val match: Int, val offset: Int)

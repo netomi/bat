@@ -19,23 +19,59 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.classfile.io.ClassFileWriter
 import com.github.netomi.bat.classfile.printer.ClassFilePrinter
-import java.io.DataInput
-import java.io.DataInputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.attribute.BasicFileAttributes
+import java.util.function.BiPredicate
+import java.util.function.Predicate
+import kotlin.io.path.*
 
 object Main {
-    @Throws(IOException::class)
-    @JvmStatic
-    fun main(args: Array<String>) {
-        val classFileReader = ClassFileReader(FileInputStream("Maps.class"))
+
+    fun main2() {
+        val classFileReader = ClassFileReader(FileInputStream("AbstractIterator.class"))
         val classFile = ClassFile.empty()
         classFileReader.visitClassFile(classFile)
         classFile.accept(ClassFilePrinter())
+    }
 
-        val classFileWriter = ClassFileWriter(FileOutputStream("output.class"))
-        classFileWriter.visitClassFile(classFile)
-        classFileWriter.close()
+    @Throws(IOException::class)
+    @JvmStatic
+    fun main(args: Array<String>) {
+        main2()
+
+
+//        val input = Paths.get("tmp/in")
+//        val output = Paths.get("tmp/out")
+//
+//        val inputFiles = Files.find(input, Int.MAX_VALUE, REGULAR_FILE)
+//
+//        inputFiles.use {
+//            it.filter(CLASS_FILE)
+//                .sorted()
+//                .forEach { path ->
+//                    val inputPath = path.relativeTo(input)
+//                    println("handling file $inputPath")
+//
+//                    val classFileReader = ClassFileReader(path.inputStream())
+//                    val classFile = ClassFile.empty()
+//                    classFileReader.visitClassFile(classFile)
+//                    classFile.accept(ClassFilePrinter())
+//
+//                    val outputPath = output.resolve(inputPath)
+//                    outputPath.parent.createDirectories()
+//
+//                    val classFileWriter = ClassFileWriter(output.resolve(inputPath).outputStream())
+//                    classFileWriter.visitClassFile(classFile)
+//                    classFileWriter.close()
+//                }
+//        }
     }
 }
+
+private val REGULAR_FILE = BiPredicate { _: Path, attr: BasicFileAttributes -> attr.isRegularFile }
+private val CLASS_FILE   = Predicate   { path: Path -> path.name.endsWith(".class") }

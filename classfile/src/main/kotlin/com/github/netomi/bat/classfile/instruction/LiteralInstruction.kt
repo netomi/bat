@@ -28,7 +28,7 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): SimpleInstructi
         private set
 
     val valueIsImplicit: Boolean
-        get() = length == 1
+        get() = opCode.length == 1
 
     val type: LiteralType = LiteralType.of(opCode.mnemonic.first())
 

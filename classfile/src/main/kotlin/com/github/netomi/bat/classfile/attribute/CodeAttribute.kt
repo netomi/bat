@@ -107,7 +107,7 @@ data class CodeAttribute
         while (offset < codeLength) {
             val instruction = JvmInstruction.create(code, offset)
             instruction.accept(classFile, method, this, offset, visitor)
-            offset += instruction.length
+            offset += instruction.getLength(offset)
         }
     }
 
