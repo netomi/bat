@@ -54,11 +54,7 @@ data class RecordAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val componentsCount = input.readUnsignedShort()
-        components = mutableListOfCapacity(componentsCount)
-        for (i in 0 until componentsCount) {
-            components.add(RecordComponent.read(input))
-        }
+        components = input.readContentList(RecordComponent.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {

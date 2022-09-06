@@ -296,16 +296,8 @@ class FullFrame private constructor(            frameType:    Int,
 
     override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
-        val numberOfLocals = input.readUnsignedShort()
-        _locals = mutableListOfCapacity(numberOfLocals)
-        for (i in 0 until numberOfLocals) {
-            _locals.add(VerificationType.read(input))
-        }
-        val numberOfStackItems = input.readUnsignedShort()
-        _stack = mutableListOfCapacity(numberOfStackItems)
-        for (i in 0 until numberOfStackItems) {
-            _stack.add(VerificationType.read(input))
-        }
+        _locals = input.readContentList(VerificationType.Companion::read)
+        _stack  = input.readContentList(VerificationType.Companion::read)
     }
 
     override fun writeData(output: ClassDataOutput) {

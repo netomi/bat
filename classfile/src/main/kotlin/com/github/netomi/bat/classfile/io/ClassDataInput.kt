@@ -67,6 +67,15 @@ internal class ClassDataInput private constructor(            `is`:           In
         return array
     }
 
+    fun <T: ClassFileContent> readContentList(supplier: (ClassDataInput) -> T): MutableList<T> {
+        val count = readUnsignedShort()
+        val list  = mutableListOfCapacity<T>(count)
+        for (i in 0 until count) {
+            list.add(supplier.invoke(this))
+        }
+        return list
+    }
+
     fun readAttributes(): MutableList<Attribute> {
         val attributeCount = readUnsignedShort()
         return if (skipAttributes) {

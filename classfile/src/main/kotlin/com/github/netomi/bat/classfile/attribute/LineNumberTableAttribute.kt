@@ -55,11 +55,7 @@ data class LineNumberTableAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val lineNumberTableLength = input.readUnsignedShort()
-        lineNumberTable = mutableListOfCapacity(lineNumberTableLength)
-        for (i in 0 until lineNumberTableLength) {
-            lineNumberTable.add(LineNumberElement.read(input))
-        }
+        lineNumberTable = input.readContentList(LineNumberElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {

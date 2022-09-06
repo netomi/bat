@@ -55,11 +55,7 @@ data class BootstrapMethodsAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val numberOfBootstrapMethods = input.readUnsignedShort()
-        bootstrapMethods = mutableListOfCapacity(numberOfBootstrapMethods)
-        for (i in 0 until numberOfBootstrapMethods) {
-            bootstrapMethods.add(BootstrapMethodElement.read(input))
-        }
+        bootstrapMethods = input.readContentList(BootstrapMethodElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {

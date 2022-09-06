@@ -78,13 +78,8 @@ data class CodeAttribute
         _code = ByteArray(codeLength)
         input.readFully(_code)
 
-        val exceptionTableLength = input.readUnsignedShort()
-        _exceptionTable = mutableListOfCapacity(exceptionTableLength)
-        for (i in 0 until exceptionTableLength) {
-            _exceptionTable.add(ExceptionElement.read(input))
-        }
-
-        _attributes = input.readAttributes()
+        _exceptionTable = input.readContentList(ExceptionElement.Companion::read)
+        _attributes     = input.readAttributes()
     }
 
     @Throws(IOException::class)

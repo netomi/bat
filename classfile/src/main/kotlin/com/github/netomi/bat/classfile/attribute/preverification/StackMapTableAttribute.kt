@@ -26,7 +26,6 @@ import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataOutput
 import java.io.IOException
 
 /**
@@ -60,11 +59,7 @@ data class StackMapTableAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val numberOfFrameEntries = input.readUnsignedShort()
-        frameEntries = mutableListOfCapacity(numberOfFrameEntries)
-        for (i in 0 until numberOfFrameEntries) {
-            frameEntries.add(StackMapFrame.read(input))
-        }
+        frameEntries = input.readContentList(StackMapFrame.Companion::read)
     }
 
     @Throws(IOException::class)

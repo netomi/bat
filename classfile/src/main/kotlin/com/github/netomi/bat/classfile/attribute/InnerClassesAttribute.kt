@@ -54,11 +54,7 @@ data class InnerClassesAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val numberOfClasses = input.readUnsignedShort()
-        innerClasses = mutableListOfCapacity(numberOfClasses)
-        for (i in 0 until numberOfClasses) {
-            innerClasses.add(InnerClassesElement.read(input))
-        }
+        innerClasses = input.readContentList(InnerClassesElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {

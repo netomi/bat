@@ -47,11 +47,7 @@ abstract class RuntimeParameterAnnotationsAttribute
         val numParameters = input.readUnsignedByte()
         parameterAnnotations = mutableListOfCapacity(numParameters)
         for (i in 0 until numParameters) {
-            val annotationCount = input.readUnsignedShort()
-            val annotations = mutableListOfCapacity<Annotation>(annotationCount)
-            for (j in 0 until annotationCount) {
-                annotations.add(Annotation.readAnnotation(input))
-            }
+            val annotations = input.readContentList(Annotation.Companion::readAnnotation)
             parameterAnnotations.add(annotations)
         }
     }

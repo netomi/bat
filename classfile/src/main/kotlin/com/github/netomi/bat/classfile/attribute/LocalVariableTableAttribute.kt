@@ -55,11 +55,7 @@ data class LocalVariableTableAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val localVariableTableLength = input.readUnsignedShort()
-        localVariableTable = mutableListOfCapacity(localVariableTableLength)
-        for (i in 0 until localVariableTableLength) {
-            localVariableTable.add(LocalVariableElement.read(input))
-        }
+        localVariableTable = input.readContentList(LocalVariableElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {

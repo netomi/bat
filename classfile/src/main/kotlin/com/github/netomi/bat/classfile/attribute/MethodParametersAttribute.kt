@@ -54,11 +54,7 @@ data class MethodParametersAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-        val parametersCount = input.readUnsignedByte()
-        parameters = mutableListOfCapacity(parametersCount)
-        for (i in 0 until parametersCount) {
-            parameters.add(ParameterElement.read(input))
-        }
+        parameters = input.readContentList(ParameterElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {

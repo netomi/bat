@@ -22,7 +22,6 @@ import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVi
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.dataSize
-import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 
 /**
@@ -50,12 +49,7 @@ abstract class RuntimeAnnotationsAttribute
     override fun readAttributeData(input: ClassDataInput) {
         @Suppress("UNUSED_VARIABLE")
         val length = input.readInt()
-
-        val annotationCount = input.readUnsignedShort()
-        annotations = mutableListOfCapacity(annotationCount)
-        for (i in 0 until annotationCount) {
-            annotations.add(Annotation.readAnnotation(input))
-        }
+        annotations = input.readContentList(Annotation.Companion::readAnnotation)
     }
 
     @Throws(IOException::class)

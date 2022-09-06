@@ -98,31 +98,11 @@ data class ModuleAttribute
         _moduleFlags        = input.readUnsignedShort()
         _moduleVersionIndex = input.readUnsignedShort()
 
-        val requiresCount = input.readUnsignedShort()
-        _requiresList = mutableListOfCapacity(requiresCount)
-        for (i in 0 until requiresCount) {
-            _requiresList.add(RequiresElement.read(input))
-        }
-
-        val exportsCount = input.readUnsignedShort()
-        _exportsList = mutableListOfCapacity(exportsCount)
-        for (i in 0 until exportsCount) {
-            _exportsList.add(ExportsElement.read(input))
-        }
-
-        val opensToCount = input.readUnsignedShort()
-        _opensList = mutableListOfCapacity(opensToCount)
-        for (i in 0 until opensToCount) {
-            _opensList.add(OpensElement.read(input))
-        }
-
-        _uses = UsesElement.read(input)
-
-        val providesWithCount = input.readUnsignedShort()
-        _providesList = mutableListOfCapacity(providesWithCount)
-        for (i in 0 until providesWithCount) {
-            _providesList.add(ProvidesElement.read(input))
-        }
+        _requiresList = input.readContentList(RequiresElement.Companion::read)
+        _exportsList  = input.readContentList(ExportsElement.Companion::read)
+        _opensList    = input.readContentList(OpensElement.Companion::read)
+        _uses         = UsesElement.read(input)
+        _providesList = input.readContentList(ProvidesElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
