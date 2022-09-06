@@ -416,7 +416,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             }
 
             val location = typeAnnotation.path.joinToString(separator = ", ", prefix = "[", postfix = "]", transform = pathTransformer)
-            printer.print(" location=${location}")
+            printer.print(", location=${location}")
         }
 
         printer.println()
