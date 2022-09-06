@@ -27,6 +27,18 @@ internal class TargetInfoPrinter constructor(private val printer: IndentingPrint
         TODO("implement")
     }
 
+    override fun visitTypeParameterTargetInfo(classFile: ClassFile, targetInfo: TypeParameterTargetInfo) {
+        printer.print(", type_index=${targetInfo.typeParameterIndex}")
+    }
+
+    override fun visitThrowsTargetInfo(classFile: ClassFile, targetInfo: ThrowsTargetInfo) {
+        printer.print(", type_index=${targetInfo.throwsTypeIndex}")
+    }
+
+    override fun visitOffsetTargetInfo(classFile: ClassFile, targetInfo: OffsetTargetInfo) {
+        printer.print(", offset=${targetInfo.offset}")
+    }
+
     override fun visitLocalVarTargetInfo(classFile: ClassFile, targetInfo: LocalVarTargetInfo) {
         val localVarInfo = targetInfo.joinToString(separator = ",", transform = {
             "{start_pc=${it.startPC},length=${it.length},index=${it.index}}"
