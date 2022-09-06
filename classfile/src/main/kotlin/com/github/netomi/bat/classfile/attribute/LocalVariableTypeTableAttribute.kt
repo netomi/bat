@@ -19,10 +19,9 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
+import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.ClassFileContent
-import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -39,7 +38,7 @@ data class LocalVariableTypeTableAttribute
         get() = AttributeType.LOCAL_VARIABLE_TYPE_TABLE
 
     override val dataSize: Int
-        get() = localVariableTypeTable.dataSize()
+        get() = localVariableTypeTable.contentSize()
 
     val size: Int
         get() = localVariableTypeTable.size
@@ -52,14 +51,11 @@ data class LocalVariableTypeTableAttribute
         return localVariableTypeTable.iterator()
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         localVariableTypeTable = input.readContentList(LocalVariableTypeElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeContentList(localVariableTypeTable)
     }
 
@@ -81,8 +77,8 @@ data class LocalVariableTypeElement
                         private var _signatureIndex: Int = -1,
                         private var _variableIndex:  Int = -1): ClassFileContent() {
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 10
 
     val startPC: Int
         get() = _startPC
@@ -124,8 +120,6 @@ data class LocalVariableTypeElement
     }
 
     companion object {
-        internal const val DATA_SIZE = 10
-
         internal fun read(input: ClassDataInput): LocalVariableTypeElement {
             val element = LocalVariableTypeElement()
             element.read(input)

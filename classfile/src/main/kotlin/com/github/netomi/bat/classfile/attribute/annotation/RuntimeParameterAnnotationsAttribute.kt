@@ -21,7 +21,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVi
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.dataSize
+import com.github.netomi.bat.classfile.io.contentSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 
@@ -34,16 +34,13 @@ abstract class RuntimeParameterAnnotationsAttribute
     : Attribute(attributeNameIndex) {
 
     override val dataSize: Int
-        get() = parameterAnnotations.fold(1) { accParam, list -> accParam + list.dataSize() }
+        get() = parameterAnnotations.fold(1) { accParam, list -> accParam + list.contentSize() }
 
     val size: Int
         get() = parameterAnnotations.size
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
-
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         val numParameters = input.readUnsignedByte()
         parameterAnnotations = mutableListOfCapacity(numParameters)
         for (i in 0 until numParameters) {
@@ -54,7 +51,6 @@ abstract class RuntimeParameterAnnotationsAttribute
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeByte(parameterAnnotations.size)
         for (annotations in parameterAnnotations) {
             output.writeContentList(annotations)

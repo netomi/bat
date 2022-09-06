@@ -39,22 +39,19 @@ data class AnnotationDefaultAttribute
     override val type: AttributeType
         get() = AttributeType.ANNOTATION_DEFAULT
 
+    override val dataSize: Int
+        get() = elementValue.contentSize
+
     val elementValue: ElementValue
         get() = _elementValue
 
-    override val dataSize: Int
-        get() = elementValue.dataSize
-
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         _elementValue = ElementValue.read(input)
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         elementValue.write(output)
     }
 

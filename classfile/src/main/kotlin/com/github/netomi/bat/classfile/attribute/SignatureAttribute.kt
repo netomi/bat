@@ -49,15 +49,13 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         assert(length == ATTRIBUTE_LENGTH)
         _signatureIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShort(signatureIndex)
     }
 

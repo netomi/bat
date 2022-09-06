@@ -30,8 +30,8 @@ open class Annotation
     protected constructor(protected var _typeIndex:     Int                                  = -1,
                           protected var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)): ClassFileContent() {
 
-    override val dataSize: Int
-        get() = 2 + _elementValues.fold(2) { acc, (_, value) -> acc + 2 + value.dataSize }
+    override val contentSize: Int
+        get() = 2 + _elementValues.fold(2) { acc, (_, value) -> acc + 2 + value.contentSize }
 
     val typeIndex: Int
         get() = _typeIndex

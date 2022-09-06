@@ -36,8 +36,8 @@ data class RequiresElement
     val requiresVersionIndex: Int
         get() = _requiresVersionIndex
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 6
 
     fun getRequiredModule(classFile: ClassFile): ModuleConstant {
         return classFile.getModule(requiresIndex)
@@ -64,8 +64,6 @@ data class RequiresElement
     }
 
     companion object {
-        private const val DATA_SIZE = 6
-
         internal fun read(input: ClassDataInput): RequiresElement {
             val element = RequiresElement()
             element.read(input)

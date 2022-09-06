@@ -54,14 +54,11 @@ data class PermittedSubclassesAttribute
         return permittedClasses.map { classFile.getClassName(it) }
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         permittedClasses = input.readShortIndexArray()
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShortIndexArray(permittedClasses)
     }
 

@@ -40,14 +40,12 @@ data class SourceDebugExtensionAttribute
     val debugExtension: ByteArray
         get() = _debugExtension
 
-    override fun readAttributeData(input: ClassDataInput) {
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         _debugExtension = ByteArray(length)
         input.readFully(_debugExtension)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.write(debugExtension)
     }
 

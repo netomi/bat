@@ -36,19 +36,30 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
 
     internal abstract val type: AttributeType
 
+    protected abstract val dataSize: Int
+
+    override val contentSize: Int
+        get() = 6 + dataSize
+
     fun getAttributeName(classFile: ClassFile): String {
         return classFile.getString(attributeNameIndex)
     }
 
     @Throws(IOException::class)
-    internal abstract fun readAttributeData(input: ClassDataInput)
+    internal abstract fun readAttributeData(input: ClassDataInput, length: Int)
 
     @Throws(IOException::class)
     internal abstract fun writeAttributeData(output: ClassDataOutput)
 
+    internal fun read(input: ClassDataInput) {
+        val length = input.readInt()
+        readAttributeData(input, length)
+    }
+
     @Throws(IOException::class)
     override fun write(output: ClassDataOutput) {
         output.writeShort(attributeNameIndex)
+        output.writeInt(dataSize)
         writeAttributeData(output)
     }
 
@@ -65,7 +76,7 @@ abstract class Attribute protected constructor(open val attributeNameIndex: Int)
             val attributeName      = classFile.getString(attributeNameIndex)
 
             val attribute = AttributeType.of(attributeName).createAttribute(attributeNameIndex)
-            attribute.readAttributeData(input)
+            attribute.read(input)
 
             return attribute
         }

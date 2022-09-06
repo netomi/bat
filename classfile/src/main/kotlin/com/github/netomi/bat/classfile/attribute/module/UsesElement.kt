@@ -27,7 +27,7 @@ import com.github.netomi.bat.util.JvmClassName
 data class UsesElement
     private constructor(private var _uses: IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 2 + size * 2
 
     val size: Int

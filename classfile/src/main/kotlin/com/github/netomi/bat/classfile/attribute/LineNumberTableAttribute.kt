@@ -22,7 +22,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
-import com.github.netomi.bat.classfile.io.dataSize
+import com.github.netomi.bat.classfile.io.contentSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -39,7 +39,7 @@ data class LineNumberTableAttribute
         get() = AttributeType.LINE_NUMBER_TABLE
 
     override val dataSize: Int
-        get() = lineNumberTable.dataSize()
+        get() = lineNumberTable.contentSize()
 
     val size: Int
         get() = lineNumberTable.size
@@ -52,14 +52,11 @@ data class LineNumberTableAttribute
         return lineNumberTable.iterator()
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         lineNumberTable = input.readContentList(LineNumberElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeContentList(lineNumberTable)
     }
 
@@ -77,8 +74,8 @@ data class LineNumberTableAttribute
 data class LineNumberElement private constructor(private var _startPC:    Int = -1,
                                                  private var _lineNumber: Int = -1): ClassFileContent() {
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 4
 
     val startPC
         get() = _startPC
@@ -97,8 +94,6 @@ data class LineNumberElement private constructor(private var _startPC:    Int = 
     }
 
     companion object {
-        internal const val DATA_SIZE = 4
-
         internal fun read(input: ClassDataInput): LineNumberElement {
             val element = LineNumberElement()
             element.read(input)

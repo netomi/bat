@@ -40,15 +40,12 @@ data class DeprecatedAttribute private constructor(override val attributeNameInd
         get() = ATTRIBUTE_LENGTH
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         assert(length == ATTRIBUTE_LENGTH)
     }
 
     @Throws(IOException::class)
-    override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
-    }
+    override fun writeAttributeData(output: ClassDataOutput) {}
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitDeprecatedAttribute(classFile, this)

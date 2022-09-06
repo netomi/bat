@@ -36,22 +36,20 @@ data class ConstantValueAttribute
     override val type: AttributeType
         get() = AttributeType.CONSTANT_VALUE
 
-    val constantValueIndex: Int
-        get() = _constantValueIndex
-
     override val dataSize: Int
         get() = ATTRIBUTE_LENGTH
 
+    val constantValueIndex: Int
+        get() = _constantValueIndex
+
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         assert(length == ATTRIBUTE_LENGTH)
         _constantValueIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShort(constantValueIndex)
     }
 

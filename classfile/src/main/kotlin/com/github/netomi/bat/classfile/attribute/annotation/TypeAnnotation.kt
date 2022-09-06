@@ -24,8 +24,8 @@ import java.io.IOException
 class TypeAnnotation private constructor(private var _target: TargetInfo = TargetInfo.empty(),
                                          private var _path:   TypePath   = TypePath.empty()): Annotation() {
 
-    override val dataSize: Int
-        get() = super.dataSize + _target.dataSize + _path.dataSize
+    override val contentSize: Int
+        get() = super.contentSize + _target.contentSize + _path.contentSize
 
     val target: TargetInfo
         get() = _target

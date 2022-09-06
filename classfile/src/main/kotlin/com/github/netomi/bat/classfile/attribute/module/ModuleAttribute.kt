@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.io.contentSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -46,14 +47,12 @@ data class ModuleAttribute
         get() = AttributeType.MODULE
 
     override val dataSize: Int
-        get() {
-            return 14 +
-                   requires.fold(0) { acc, element -> acc + element.dataSize } +
-                   exports.fold(0) { acc, element -> acc + element.dataSize } +
-                   opens.fold(0) { acc, element -> acc + element.dataSize } +
-                   provides.fold(0) { acc, element -> acc + element.dataSize } +
-                   uses.dataSize
-        }
+        get() = 6                      +
+                requires.contentSize() +
+                exports.contentSize()  +
+                opens.contentSize()    +
+                provides.contentSize() +
+                uses.contentSize
 
     val moduleNameIndex: Int
         get() = _moduleNameIndex
@@ -91,9 +90,7 @@ data class ModuleAttribute
     val provides: List<ProvidesElement>
         get() = _providesList
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         _moduleNameIndex    = input.readUnsignedShort()
         _moduleFlags        = input.readUnsignedShort()
         _moduleVersionIndex = input.readUnsignedShort()
@@ -106,8 +103,6 @@ data class ModuleAttribute
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
-
         output.writeShort(_moduleNameIndex)
         output.writeShort(_moduleFlags)
         output.writeShort(_moduleVersionIndex)

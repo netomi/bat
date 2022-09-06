@@ -47,14 +47,11 @@ data class ModuleMainClassAttribute
         return classFile.getClassName(mainClassIndex)
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         _mainClassIndex = input.readUnsignedShort()
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShort(mainClassIndex)
     }
 

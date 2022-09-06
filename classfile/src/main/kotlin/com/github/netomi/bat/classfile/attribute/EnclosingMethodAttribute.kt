@@ -36,6 +36,9 @@ data class EnclosingMethodAttribute
     override val type: AttributeType
         get() = AttributeType.ENCLOSING_METHOD
 
+    override val dataSize: Int
+        get() = ATTRIBUTE_LENGTH
+
     val classIndex: Int
         get() = _classIndex
 
@@ -54,12 +57,8 @@ data class EnclosingMethodAttribute
         return classFile.getNameAndType(methodIndex).getDescriptor(classFile)
     }
 
-    override val dataSize: Int
-        get() = ATTRIBUTE_LENGTH
-
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         assert(length == ATTRIBUTE_LENGTH)
         _classIndex  = input.readUnsignedShort()
         _methodIndex = input.readUnsignedShort()
@@ -67,7 +66,6 @@ data class EnclosingMethodAttribute
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShort(classIndex)
         output.writeShort(methodIndex)
     }

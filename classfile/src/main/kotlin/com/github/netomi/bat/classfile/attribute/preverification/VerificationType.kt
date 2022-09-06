@@ -25,7 +25,7 @@ import com.github.netomi.bat.util.JvmClassName
 abstract class VerificationType: ClassFileContent() {
     internal abstract val type: ItemType
 
-    override val dataSize: Int = 1
+    override val contentSize: Int = 1
 
     internal open fun readInfo(input: ClassDataInput) {}
     internal open fun writeInfo(output: ClassDataOutput) {}
@@ -197,8 +197,8 @@ data class ObjectVariable private constructor(private var _classIndex: Int = -1)
     override val type: ItemType
         get() = ItemType.OBJECT
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 3
 
     val classIndex: Int
         get() = _classIndex
@@ -220,8 +220,6 @@ data class ObjectVariable private constructor(private var _classIndex: Int = -1)
     }
 
     companion object {
-        private const val DATA_SIZE = 3
-
         internal fun empty(): ObjectVariable {
             return ObjectVariable()
         }
@@ -233,8 +231,8 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
     override val type: ItemType
         get() = ItemType.UNINITIALIZED
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 3
 
     val offset: Int
         get() = _offset
@@ -252,8 +250,6 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
     }
 
     companion object {
-        private const val DATA_SIZE = 3
-
         internal fun empty(): UninitializedVariable {
             return UninitializedVariable()
         }

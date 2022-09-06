@@ -43,15 +43,13 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
         get() = _data
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         _data = ByteArray(length)
         input.readFully(_data)
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.write(data)
     }
 

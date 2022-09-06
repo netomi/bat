@@ -32,7 +32,7 @@ data class ProvidesElement
     val providesIndex: Int
         get() = _providesIndex
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 4 + size * 2
 
     val size: Int

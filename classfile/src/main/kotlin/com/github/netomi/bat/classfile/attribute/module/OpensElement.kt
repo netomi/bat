@@ -36,7 +36,7 @@ data class OpensElement
     val opensFlags: Int
         get() = _opensFlags
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 6 + size * 2
 
     val size: Int

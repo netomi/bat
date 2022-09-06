@@ -18,10 +18,9 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.TargetInfoVisitor
+import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.ClassFileContent
-import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 abstract class TargetInfo protected constructor(open val type: TargetInfoType): ClassFileContent() {
@@ -54,7 +53,7 @@ abstract class TargetInfo protected constructor(open val type: TargetInfoType): 
 data class TypeParameterTargetInfo private constructor(override val type:                TargetInfoType,
                                                         private var _typeParameterIndex: Int = -1): TargetInfo(type) {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 2
 
     val typeParameterIndex: Int
@@ -81,7 +80,7 @@ data class TypeParameterTargetInfo private constructor(override val type:       
 
 data class SuperTypeTargetInfo private constructor(override val type:            TargetInfoType,
                                                     private var _superTypeIndex: Int = -1): TargetInfo(type) {
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 3
 
     val superTypeIndex: Int
@@ -111,7 +110,7 @@ data class TypeParameterBoundTargetInfo
                          private var _typeParameterIndex: Int = -1,
                          private var _boundIndex:         Int = -1): TargetInfo(type) {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 3
 
     val typeParameterIndex: Int
@@ -143,7 +142,7 @@ data class TypeParameterBoundTargetInfo
 
 data class EmptyTargetInfo private constructor(override val type: TargetInfoType): TargetInfo(type) {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 1
 
     override fun readInfo(input: ClassDataInput) {}
@@ -163,7 +162,7 @@ data class EmptyTargetInfo private constructor(override val type: TargetInfoType
 
 data class FormalParameterTargetInfo private constructor(override val type:                  TargetInfoType,
                                                           private var _formalParameterIndex: Int = -1): TargetInfo(type) {
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 2
 
     val formalParameterIndex: Int
@@ -190,7 +189,7 @@ data class FormalParameterTargetInfo private constructor(override val type:     
 
 data class ThrowsTargetInfo private constructor(override val type:             TargetInfoType,
                                                  private var _throwsTypeIndex: Int = -1): TargetInfo(type) {
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 3
 
     val throwsTypeIndex: Int
@@ -220,8 +219,8 @@ data class LocalVarTargetInfo
                          private var _table: MutableList<LocalVarElement> = mutableListOfCapacity(0))
     : TargetInfo(type), Sequence<LocalVarElement> {
 
-    override val dataSize: Int
-        get() = 1 + _table.dataSize()
+    override val contentSize: Int
+        get() = 1 + _table.contentSize()
 
     val size: Int
         get() = _table.size
@@ -261,7 +260,7 @@ data class LocalVarElement private constructor(private var _startPC: Int = -1,
                                                private var _length:  Int = -1,
                                                private var _index:   Int = -1): ClassFileContent() {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 6
 
     val startPC: Int
@@ -296,7 +295,7 @@ data class LocalVarElement private constructor(private var _startPC: Int = -1,
 
 data class CatchTargetInfo private constructor(override val type:                 TargetInfoType,
                                                 private var _exceptionTableIndex: Int = -1): TargetInfo(type) {
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 3
 
     val exceptionTableIndex: Int
@@ -323,7 +322,7 @@ data class CatchTargetInfo private constructor(override val type:               
 
 data class OffsetTargetInfo private constructor(override val type:    TargetInfoType,
                                                  private var _offset: Int = -1): TargetInfo(type) {
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 3
 
     val offset: Int
@@ -353,7 +352,7 @@ data class TypeArgumentTargetInfo
                          private var _offset:            Int = -1,
                          private var _typeArgumentIndex: Int = -1): TargetInfo(type) {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 4
 
     val offset: Int

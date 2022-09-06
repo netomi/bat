@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.contentSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -38,7 +39,7 @@ data class MethodParametersAttribute
         get() = AttributeType.METHOD_PARAMETERS
 
     override val dataSize: Int
-        get() = 1 + size * ParameterElement.DATA_SIZE
+        get() = parameters.contentSize()
 
     val size: Int
         get() = parameters.size
@@ -51,14 +52,11 @@ data class MethodParametersAttribute
         return parameters.iterator()
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         parameters = input.readContentList(ParameterElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeContentList(parameters)
     }
 
@@ -76,8 +74,8 @@ data class MethodParametersAttribute
 data class ParameterElement private constructor(private var _nameIndex:   Int = -1,
                                                 private var _accessFlags: Int =  0): ClassFileContent() {
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 4
 
     val nameIndex: Int
         get() = _nameIndex
@@ -100,8 +98,6 @@ data class ParameterElement private constructor(private var _nameIndex:   Int = 
     }
 
     companion object {
-        internal const val DATA_SIZE = 4
-
         internal fun read(input: ClassDataInput): ParameterElement {
             val element = ParameterElement()
             element.read(input)

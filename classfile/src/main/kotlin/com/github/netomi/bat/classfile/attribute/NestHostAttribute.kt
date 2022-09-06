@@ -44,14 +44,11 @@ data class NestHostAttribute
         return classFile.getClassName(hostClassIndex)
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         _hostClassIndex = input.readUnsignedShort()
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShort(hostClassIndex)
     }
 

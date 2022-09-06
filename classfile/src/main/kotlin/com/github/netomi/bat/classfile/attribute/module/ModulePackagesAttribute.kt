@@ -57,14 +57,11 @@ data class ModulePackagesAttribute
         return packages.map { classFile.getPackage(it).getPackageName(classFile) }
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
-        packages   = input.readShortIndexArray()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
+        packages = input.readShortIndexArray()
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShortIndexArray(packages)
     }
 

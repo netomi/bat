@@ -18,10 +18,9 @@ package com.github.netomi.bat.classfile.attribute.preverification
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
+import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.ClassFileContent
-import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 abstract class StackMapFrame protected constructor(val frameType: Int): ClassFileContent() {
@@ -54,8 +53,8 @@ class SameFrame private constructor(frameType: Int): StackMapFrame(frameType) {
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_FRAME
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 1
 
     override val offsetDelta: Int
         get() = frameType
@@ -65,8 +64,6 @@ class SameFrame private constructor(frameType: Int): StackMapFrame(frameType) {
     }
 
     companion object {
-        private const val DATA_SIZE = 1
-
         internal fun of(frameType: Int): SameFrame {
             require(frameType in 0 .. 63)
             return SameFrame(frameType)
@@ -79,8 +76,8 @@ class ChopFrame private constructor(            frameType:    Int,
     override val type: StackMapFrameType
         get() = StackMapFrameType.CHOP_FRAME
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 3
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -101,8 +98,6 @@ class ChopFrame private constructor(            frameType:    Int,
     }
 
     companion object {
-        private const val DATA_SIZE = 3
-
         internal fun of(frameType: Int): ChopFrame {
             require(frameType in 248 .. 250)
             return ChopFrame(frameType)
@@ -115,8 +110,8 @@ class SameExtendedFrame private constructor(            frameType:    Int,
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_EXTENDED_FRAME
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 3
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -134,8 +129,6 @@ class SameExtendedFrame private constructor(            frameType:    Int,
     }
 
     companion object {
-        private const val DATA_SIZE = 3
-
         internal fun of(frameType: Int): SameExtendedFrame {
             require(frameType == 251)
             return SameExtendedFrame(frameType)
@@ -151,8 +144,8 @@ class AppendFrame private constructor(            frameType:    Int,
     override val type: StackMapFrameType
         get() = StackMapFrameType.APPEND_FRAME
 
-    override val dataSize: Int
-        get() = 3 + locals.fold(0) { acc, element -> acc + element.dataSize }
+    override val contentSize: Int
+        get() = 3 + locals.fold(0) { acc, element -> acc + element.contentSize }
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -205,8 +198,8 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_LOCALS_1_STACK_ITEM_FRAME
 
-    override val dataSize: Int
-        get() = 1 + _stack.dataSize
+    override val contentSize: Int
+        get() = 1 + _stack.contentSize
 
     override val offsetDelta: Int
         get() = frameType - 64
@@ -242,8 +235,8 @@ class SameLocalsOneStackItemExtendedFrame private constructor(            frameT
     override val type: StackMapFrameType
         get() = StackMapFrameType.SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME
 
-    override val dataSize: Int
-        get() = 3 + _stack.dataSize
+    override val contentSize: Int
+        get() = 3 + _stack.contentSize
 
     override val offsetDelta: Int
         get() = _offsetDelta
@@ -282,8 +275,8 @@ class FullFrame private constructor(            frameType:    Int,
     override val type: StackMapFrameType
         get() = StackMapFrameType.FULL_FRAME
 
-    override val dataSize: Int
-        get() = 3 + locals.dataSize() + stack.dataSize()
+    override val contentSize: Int
+        get() = 3 + locals.contentSize() + stack.contentSize()
 
     override val offsetDelta: Int
         get() = _offsetDelta

@@ -24,8 +24,8 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 data class TypePath
     private constructor(private var _path: MutableList<PathElement> = mutableListOfCapacity(0)): ClassFileContent(), Sequence<PathElement> {
 
-    override val dataSize: Int
-        get() = _path.fold(1) { acc, element -> acc + element.dataSize }
+    override val contentSize: Int
+        get() = _path.fold(1) { acc, element -> acc + element.contentSize }
 
     val size: Int
         get() = _path.size
@@ -69,7 +69,7 @@ data class TypePath
 data class PathElement private constructor(private var _typePathKind:      Int = 0,
                                            private var _typeArgumentIndex: Int = -1): ClassFileContent() {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 2
 
     val typePathKind: Int

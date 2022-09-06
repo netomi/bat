@@ -38,7 +38,7 @@ data class RecordAttribute
         get() = AttributeType.RECORD
 
     override val dataSize: Int
-        get() = components.dataSize()
+        get() = components.contentSize()
 
     val size: Int
         get() = components.size
@@ -51,14 +51,11 @@ data class RecordAttribute
         return components.iterator()
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         components = input.readContentList(RecordComponent.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeContentList(components)
     }
 
@@ -78,8 +75,8 @@ data class RecordComponent
                         private var _descriptorIndex: Int                    = -1,
                         private var _attributes:      MutableList<Attribute> = mutableListOfCapacity(0)): ClassFileContent() {
 
-    override val dataSize: Int
-        get() = 4 + _attributes.attributesDataSize()
+    override val contentSize: Int
+        get() = 4 + _attributes.contentSize()
 
     val nameIndex: Int
         get() = _nameIndex

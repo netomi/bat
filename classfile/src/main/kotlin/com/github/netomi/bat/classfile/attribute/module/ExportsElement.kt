@@ -36,7 +36,7 @@ data class ExportsElement
     val exportsFlags: Int
         get() = _exportsFlags
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 6 + size * 2
 
     val size: Int

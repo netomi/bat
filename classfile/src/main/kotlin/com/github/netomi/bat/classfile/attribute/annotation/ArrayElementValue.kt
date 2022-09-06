@@ -20,7 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.dataSize
+import com.github.netomi.bat.classfile.io.contentSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 
@@ -31,8 +31,8 @@ data class ArrayElementValue
     override val type: ElementValueType
         get() = ElementValueType.ARRAY
 
-    override val dataSize: Int
-        get() = 1 + elementValues.dataSize()
+    override val contentSize: Int
+        get() = 1 + elementValues.contentSize()
 
     val size: Int
         get() = elementValues.size

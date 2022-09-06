@@ -16,17 +16,11 @@
 
 package com.github.netomi.bat.classfile.io
 
-import com.github.netomi.bat.classfile.attribute.Attribute
-
 abstract class ClassFileContent {
-    internal abstract val dataSize: Int
+    internal abstract val contentSize: Int
     internal abstract fun write(output: ClassDataOutput)
 }
 
-fun <T: ClassFileContent> List<T>.dataSize(): Int {
-    return this.fold(2) { acc, element -> acc + element.dataSize }
-}
-
-fun <T: Attribute> List<T>.attributesDataSize(): Int {
-    return this.fold(2) { acc, element -> acc + 6 + element.dataSize }
+fun <T: ClassFileContent> List<T>.contentSize(): Int {
+    return this.fold(2) { acc, content -> acc + content.contentSize }
 }

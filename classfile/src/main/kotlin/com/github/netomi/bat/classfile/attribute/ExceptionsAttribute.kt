@@ -52,15 +52,12 @@ data class ExceptionsAttribute
     }
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         exceptions = input.readShortIndexArray()
     }
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeShortIndexArray(exceptions)
     }
 

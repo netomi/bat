@@ -47,7 +47,7 @@ data class CodeAttribute
         get() = AttributeType.CODE
 
     override val dataSize: Int
-        get() = 8 + codeLength + exceptionTable.dataSize() + attributes.attributesDataSize()
+        get() = 8 + codeLength + exceptionTable.contentSize() + attributes.contentSize()
 
     val maxStack: Int
         get() = _maxStack
@@ -68,9 +68,7 @@ data class CodeAttribute
         get() = _attributes
 
     @Throws(IOException::class)
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         _maxStack  = input.readUnsignedShort()
         _maxLocals = input.readUnsignedShort()
 
@@ -84,8 +82,6 @@ data class CodeAttribute
 
     @Throws(IOException::class)
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
-
         output.writeShort(maxStack)
         output.writeShort(maxLocals)
 
@@ -143,8 +139,8 @@ data class ExceptionElement private constructor(private var _startPC:   Int = -1
                                                 private var _handlerPC: Int = -1,
                                                 private var _catchType: Int = -1): ClassFileContent() {
 
-    override val dataSize: Int
-        get() = DATA_SIZE
+    override val contentSize: Int
+        get() = 8
 
     val startPC: Int
         get() = _startPC
@@ -173,8 +169,6 @@ data class ExceptionElement private constructor(private var _startPC:   Int = -1
     }
 
     companion object {
-        internal const val DATA_SIZE = 8
-
         internal fun read(input: ClassDataInput): ExceptionElement {
             val element = ExceptionElement()
             element.read(input)

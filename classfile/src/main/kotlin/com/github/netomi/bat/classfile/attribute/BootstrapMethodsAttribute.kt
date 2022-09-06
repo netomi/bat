@@ -19,10 +19,9 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.classfile.io.ClassFileContent
-import com.github.netomi.bat.classfile.io.dataSize
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -39,7 +38,7 @@ data class BootstrapMethodsAttribute
         get() = AttributeType.BOOTSTRAP_METHOD
 
     override val dataSize: Int
-        get() = bootstrapMethods.dataSize()
+        get() = bootstrapMethods.contentSize()
 
     val size: Int
         get() = bootstrapMethods.size
@@ -52,14 +51,11 @@ data class BootstrapMethodsAttribute
         return bootstrapMethods.iterator()
     }
 
-    override fun readAttributeData(input: ClassDataInput) {
-        @Suppress("UNUSED_VARIABLE")
-        val length = input.readInt()
+    override fun readAttributeData(input: ClassDataInput, length: Int) {
         bootstrapMethods = input.readContentList(BootstrapMethodElement.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeInt(dataSize)
         output.writeContentList(bootstrapMethods)
     }
 
@@ -78,7 +74,7 @@ data class BootstrapMethodElement
     private constructor(private var _bootstrapMethodRefIndex: Int      = -1,
                         private var bootstrapArguments:       IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
-    override val dataSize: Int
+    override val contentSize: Int
         get() = 4 + bootstrapArguments.size * 2
 
     val bootstrapMethodRefIndex: Int
