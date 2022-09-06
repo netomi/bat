@@ -168,16 +168,35 @@ open class JvmType protected constructor(val type: String) {
 
 class JvmClassName private constructor(val className: String, val internal: Boolean) {
 
+    val isArrayClass: Boolean
+        get() = className.startsWith("[")
+
     fun toExternalClassName(): String {
-        return if (internal) className.replace('/', '.') else className
+        return if (isArrayClass) {
+            className.asJvmType().toExternalClassName()
+        } else if (internal) {
+            className.replace('/', '.')
+        } else {
+            className
+        }
     }
 
     fun toInternalClassName(): String {
-        return if (internal) className else className.replace('.', '/')
+        return if (isArrayClass) {
+            className
+        } else if (internal) {
+            className
+        } else {
+            className.replace('.', '/')
+        }
     }
 
     fun toInternalType(): String {
-        return "L${toInternalClassName()};"
+        return if (isArrayClass) {
+            className
+        } else {
+            "L${toInternalClassName()};"
+        }
     }
 
     override fun equals(other: Any?): Boolean {
