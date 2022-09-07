@@ -290,6 +290,15 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
+    // Implementations for FieldAttributeVisitor
+
+    override fun visitConstantValueAttribute(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {
+        printer.print("ConstantValue: ")
+        val constantValuePrinter = ConstantPrinter(printer, printConstantType = true, alwaysIncludeClassName = false)
+        classFile.constantAccept(attribute.constantValueIndex, constantValuePrinter)
+        printer.println()
+    }
+
     // Implementations for MethodAttributeVisitor
 
     override fun visitAnnotationDefaultAttribute(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
@@ -308,9 +317,24 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
         printer.println("Code:")
         printer.levelUp()
-        printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentSize(classFile)}")
+        printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentCount(classFile)}")
 
         attribute.instructionsAccept(classFile, method, instructionPrinter)
+
+        if (attribute.exceptionTable.isNotEmpty()) {
+            printer.println("Exception table:")
+            printer.println("   from    to  target type")
+            for (exception in attribute.exceptionTable) {
+                printer.print("  %6d %5d %5d".format(exception.startPC, exception.endPC, exception.handlerPC))
+
+                if (exception.catchType > 0) {
+                    printer.print("  Class ${classFile.getClassName(exception.catchType)}")
+                }
+
+                printer.println()
+            }
+        }
+
         attribute.attributesAccept(classFile, method, this)
 
         printer.levelDown()
@@ -319,7 +343,11 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitExceptionsAttribute(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
         printer.println("Exceptions:")
         printer.levelUp()
-        attribute.getExceptionClassNames(classFile).forEach { printer.println("throws ${it.toExternalClassName()}") }
+        val exceptions =
+            attribute.getExceptionClassNames(classFile)
+                     .joinToString(separator = ", ",
+                                   transform = { "throws ${it.toExternalClassName()}" })
+        printer.println(exceptions)
         printer.levelDown()
     }
 

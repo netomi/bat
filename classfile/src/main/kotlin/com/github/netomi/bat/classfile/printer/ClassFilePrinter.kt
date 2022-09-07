@@ -45,21 +45,42 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 
     override fun visitClassFile(classFile: ClassFile) {
 
-        val externalModifiers = classFile.modifiers.filter { it != AccessFlag.SUPER }
-                                                   .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
-        if (externalModifiers.isNotEmpty()) {
-            printer.print("$externalModifiers ")
-        }
-        printer.print("class %s".format(classFile.className.toExternalClassName()))
+        if (classFile.isInterface) {
+            val externalModifiers =
+                classFile.modifiers.filter { !EnumSet.of(AccessFlag.SUPER,
+                                                         AccessFlag.ABSTRACT,
+                                                         AccessFlag.ANNOTATION,
+                                                         AccessFlag.INTERFACE).contains(it) }
+                                   .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
+            if (externalModifiers.isNotEmpty()) {
+                printer.print("$externalModifiers ")
+            }
 
-        val superClassName = classFile.superClassName
-        if (superClassName != null) {
-            printer.print(" extends ${superClassName.toExternalClassName()}")
-        }
+            printer.print("interface %s".format(classFile.className.toExternalClassName()))
 
-        if (classFile.interfaces.isNotEmpty()) {
-            val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
-            printer.print(" implements $interfaceString")
+            if (classFile.interfaces.isNotEmpty()) {
+                val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+                printer.print(" extends $interfaceString")
+            }
+        } else {
+            val externalModifiers =
+                classFile.modifiers.filter { it != AccessFlag.SUPER }
+                                   .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
+            if (externalModifiers.isNotEmpty()) {
+                printer.print("$externalModifiers ")
+            }
+
+            printer.print("class %s".format(classFile.className.toExternalClassName()))
+
+            val superClassName = classFile.superClassName
+            if (superClassName != null) {
+                printer.print(" extends ${superClassName.toExternalClassName()}")
+            }
+
+            if (classFile.interfaces.isNotEmpty()) {
+                val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+                printer.print(" implements $interfaceString")
+            }
         }
 
         printer.println()
@@ -129,7 +150,9 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
-        val externalModifiers = field.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
+        val externalModifiers =
+            field.modifiers.filter { it != AccessFlag.SYNTHETIC }
+                           .joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
         val externalType = field.getDescriptor(classFile).asJvmType().toExternalType()
         printer.println("%s %s %s;".format(externalModifiers, externalType, field.getName(classFile)))
         visitAnyMember(classFile, index, field)

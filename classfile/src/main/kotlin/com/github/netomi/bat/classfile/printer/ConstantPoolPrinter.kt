@@ -36,7 +36,6 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
     override fun visitLongConstant(classFile: ClassFile, index: Int, constant: LongConstant) {
         printer.print("%-18s ".format("Long"))
         constant.accept(classFile, index, constantPrinter)
-        printer.print("l")
     }
 
     override fun visitFloatConstant(classFile: ClassFile, index: Int, constant: FloatConstant) {
@@ -100,7 +99,12 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
     }
 
     override fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
-        printer.print("%-18s %-14s // ".format("MethodHandle", "${constant.referenceKind.value}.#${constant.referenceIndex}"))
+        printer.print("%-18s %-14s // ".format("MethodHandle", "${constant.referenceKind.value}:#${constant.referenceIndex}"))
+        constant.accept(classFile, index, constantPrinter)
+    }
+
+    override fun visitInvokeDynamicConstant(classFile: ClassFile, index: Int, constant: InvokeDynamicConstant) {
+        printer.print("%-18s %-14s // ".format("InvokeDynamic", "#${constant.bootstrapMethodAttrIndex}:#${constant.nameAndTypeIndex}"))
         constant.accept(classFile, index, constantPrinter)
     }
 }

@@ -40,6 +40,13 @@ class Method private constructor(): Member() {
         return argumentSize
     }
 
+    fun getArgumentCount(classFile: ClassFile): Int {
+        var argumentCount = if (isStatic) 0 else 1
+        val (parameters, _) = parseDescriptorToJvmTypes(getDescriptor(classFile))
+        argumentCount += parameters.size
+        return argumentCount
+    }
+
     override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
         for (attribute in attributes.filterIsInstance(AttachedToMethod::class.java)) {
             attribute.accept(classFile, this, visitor)

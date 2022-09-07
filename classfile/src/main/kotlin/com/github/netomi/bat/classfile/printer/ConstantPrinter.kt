@@ -28,7 +28,7 @@ internal class ConstantPrinter constructor(private val printer:                I
                                            private val alwaysIncludeClassName: Boolean = true): ConstantVisitor {
 
     override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
-        printer.print(constant)
+        TODO("implement")
     }
 
     override fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
@@ -43,6 +43,7 @@ internal class ConstantPrinter constructor(private val printer:                I
             printer.print("long ")
         }
         printer.print(constant.value)
+        printer.print("l")
     }
 
     override fun visitFloatConstant(classFile: ClassFile, index: Int, constant: FloatConstant) {
@@ -110,7 +111,12 @@ internal class ConstantPrinter constructor(private val printer:                I
         if (printConstantType) {
             printer.print("class ")
         }
-        printer.print(constant.getClassName(classFile))
+        val className = constant.getClassName(classFile)
+        if (className.isArrayClass) {
+            printer.print("\"$className\"")
+        } else {
+            printer.print(className)
+        }
     }
 
     override fun visitNameAndTypeConstant(classFile: ClassFile, index: Int, constant: NameAndTypeConstant) {
@@ -131,6 +137,14 @@ internal class ConstantPrinter constructor(private val printer:                I
     override fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
         printer.print("${constant.referenceKind.simpleName} ")
         constant.referenceAccept(classFile, this)
+    }
+
+    override fun visitInvokeDynamicConstant(classFile: ClassFile, index: Int, constant: InvokeDynamicConstant) {
+        val nameAndType = classFile.getNameAndType(constant.nameAndTypeIndex)
+        val name = nameAndType.getMemberName(classFile)
+        val type = nameAndType.getDescriptor(classFile)
+
+        printer.print("#${constant.bootstrapMethodAttrIndex}:${name}:${type}")
     }
 
     override fun visitModuleConstant(classFile: ClassFile, index: Int, constant: ModuleConstant) {

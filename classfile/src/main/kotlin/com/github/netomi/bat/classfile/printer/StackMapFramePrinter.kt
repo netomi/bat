@@ -59,7 +59,7 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
         printer.println("offset_delta = ${frame.offsetDelta}")
         val locals = frame.locals.joinToString(separator = ", ", prefix = "[ ", postfix = " ]") { it.toHumanReadableString(classFile) }
         printer.println("locals = $locals")
-        val stack = if (frame.stack.isNotEmpty()) "[]" else frame.stack.joinToString(separator = ", ", prefix = "[ ", postfix = " ]") { it.toHumanReadableString(classFile) }
+        val stack = if (frame.stack.isEmpty()) "[]" else frame.stack.joinToString(separator = ", ", prefix = "[ ", postfix = " ]") { it.toHumanReadableString(classFile) }
         printer.println("stack = $stack")
         printer.levelDown()
     }
@@ -88,6 +88,10 @@ internal fun VerificationType.toHumanReadableString(classFile: ClassFile): Strin
         ItemType.DOUBLE             -> "double"
         ItemType.TOP                -> "top"
         ItemType.UNINITIALIZED_THIS -> "this"
+        ItemType.UNINITIALIZED      -> {
+            val offset = (this as UninitializedVariable).offset
+            "uninitialized $offset"
+        }
         ItemType.OBJECT             -> {
             val className = (this as ObjectVariable).getClassName(classFile)
             if (className.isArrayClass) {
