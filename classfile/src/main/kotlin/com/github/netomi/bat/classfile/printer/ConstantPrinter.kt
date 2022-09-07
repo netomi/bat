@@ -63,7 +63,7 @@ internal class ConstantPrinter constructor(private val printer:                I
         if (printConstantType) {
             printer.print("String ")
         }
-        printer.print(constant.value.escapeAsJavaString().trimEnd())
+        printer.print(constant.value.escapeAsJavaString())
     }
 
     override fun visitStringConstant(classFile: ClassFile, index: Int, constant: StringConstant) {
@@ -140,6 +140,10 @@ internal class ConstantPrinter constructor(private val printer:                I
         val nameAndType = classFile.getNameAndType(constant.nameAndTypeIndex)
         val name = nameAndType.getMemberName(classFile)
         val type = nameAndType.getDescriptor(classFile)
+
+        if (printConstantType) {
+            printer.print("InvokeDynamic ")
+        }
 
         printer.print("#${constant.bootstrapMethodAttrIndex}:${name}:${type}")
     }
