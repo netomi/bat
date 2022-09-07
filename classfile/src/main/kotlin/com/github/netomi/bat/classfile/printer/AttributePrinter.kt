@@ -115,7 +115,13 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             append("EnclosingMethod: ")
             append("#${attribute.classIndex}.#${attribute.methodIndex}")
         }
-        printer.println("%-39s // %s".format(str, attribute.getClassName(classFile).toExternalClassName()))
+        printer.print("%-39s // %s".format(str, attribute.getClassName(classFile).toExternalClassName()))
+
+        if (attribute.methodIndex > 0) {
+            printer.print(".${attribute.getMethodName(classFile)}")
+        }
+
+        printer.println()
     }
 
     override fun visitInnerClassesAttribute(classFile: ClassFile, attribute: InnerClassesAttribute) {
