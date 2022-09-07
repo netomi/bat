@@ -143,15 +143,19 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
                 val modifiers = accessFlagModifiers(element.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
                 val modifiersAsString =
-                    modifiers.filter { !EnumSet.of(AccessFlag.INTERFACE, AccessFlag.PRIVATE, AccessFlag.ENUM).contains(it) }
-                             .map { it.toString().lowercase(Locale.getDefault()) }
+                    modifiers.filter { !EnumSet.of(AccessFlag.INTERFACE,
+                                                   AccessFlag.PRIVATE,
+                                                   AccessFlag.ENUM,
+                                                   AccessFlag.ABSTRACT,
+                                                   AccessFlag.SYNTHETIC).contains(it) }
+                             .map    { it.toString().lowercase(Locale.getDefault()) }
 
                 if (modifiersAsString.isNotEmpty()) {
                     var remainingLength = 39 - length
                     var addedModifiers = ""
 
                     for (modifier in modifiersAsString) {
-                        if (modifier.length < remainingLength - 1) {
+                        if (modifier.length < remainingLength) {
                             addedModifiers  += "$modifier "
                             remainingLength -= modifier.length + 1
                         }

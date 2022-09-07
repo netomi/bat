@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.io.IndentingPrinter
+import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
 import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import java.io.OutputStream
@@ -73,7 +74,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
             printer.print("class %s".format(classFile.className.toExternalClassName()))
 
             val superClassName = classFile.superClassName
-            if (superClassName != null) {
+            if (superClassName != null && superClassName.className != JAVA_LANG_OBJECT_TYPE.toInternalClassName()) {
                 printer.print(" extends ${superClassName.toExternalClassName()}")
             }
 
@@ -150,17 +151,18 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
-        val externalModifiers =
-            field.modifiers.filter { it != AccessFlag.SYNTHETIC }
-                           .joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
+        val externalModifiers = field.getPrintableModifiers()
+        if (externalModifiers.isNotEmpty()) {
+            printer.print("$externalModifiers ")
+        }
         val externalType = field.getDescriptor(classFile).asJvmType().toExternalType()
-        printer.println("%s %s %s;".format(externalModifiers, externalType, field.getName(classFile)))
+        printer.println("%s %s;".format(externalType, field.getName(classFile)))
         visitAnyMember(classFile, index, field)
         printer.println()
     }
 
     override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
-        val externalModifiers = method.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
+        val externalModifiers = method.getPrintableModifiers()
         if (externalModifiers.isNotEmpty()) {
             printer.print("$externalModifiers ")
         }
@@ -170,6 +172,11 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
             printer.println()
         }
     }
+}
+
+private fun Member.getPrintableModifiers(): String {
+    return modifiers.filter            { !EnumSet.of(AccessFlag.SYNTHETIC, AccessFlag.BRIDGE).contains(it) }
+                    .joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
 }
 
 private fun Method.getExternalMethodSignature(classFile: ClassFile): String {

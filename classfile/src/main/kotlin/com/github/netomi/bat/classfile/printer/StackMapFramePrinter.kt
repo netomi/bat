@@ -40,7 +40,7 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
     }
 
     override fun visitSameExtendedFrame(classFile: ClassFile, frame: SameExtendedFrame) {
-        printer.println("frame_type = ${frame.frameType} /* same_extended */")
+        printer.println("frame_type = ${frame.frameType} /* same_frame_extended */")
         printer.levelUp()
         printer.println("offset_delta = ${frame.offsetDelta}")
         printer.levelDown()
