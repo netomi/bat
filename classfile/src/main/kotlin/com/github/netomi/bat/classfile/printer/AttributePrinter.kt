@@ -142,19 +142,14 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                 append(";")
 
                 val modifiers = accessFlagModifiers(element.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
-                val modifiersAsString =
-                    modifiers.filter { !EnumSet.of(AccessFlag.INTERFACE,
-                                                   AccessFlag.PRIVATE,
-                                                   AccessFlag.ENUM,
-                                                   AccessFlag.ABSTRACT,
-                                                   AccessFlag.SYNTHETIC).contains(it) }
-                             .map    { it.toString().lowercase(Locale.getDefault()) }
+                val externalModifiers =
+                    modifiers.getPrintableModifiers { !EnumSet.of(AccessFlag.INTERFACE).contains(it) }
 
-                if (modifiersAsString.isNotEmpty()) {
+                if (externalModifiers.isNotEmpty()) {
                     var remainingLength = 39 - length
                     var addedModifiers = ""
 
-                    for (modifier in modifiersAsString) {
+                    for (modifier in externalModifiers) {
                         if (modifier.length < remainingLength) {
                             addedModifiers  += "$modifier "
                             remainingLength -= modifier.length + 1
@@ -332,7 +327,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                 printer.print("  %6d %5d %5d".format(exception.startPC, exception.endPC, exception.handlerPC))
 
                 if (exception.catchType > 0) {
-                    printer.print("  Class ${classFile.getClassName(exception.catchType)}")
+                    printer.print("   Class ${classFile.getClassName(exception.catchType)}")
                 }
 
                 printer.println()
@@ -392,17 +387,15 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitLocalVariableTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
         printer.println("LocalVariableTable:")
         printer.levelUp()
-        if (attribute.size > 0) {
-            // TODO: better align name / signature to make output more readable
-            printer.println("Start  Length  Slot  Name   Signature")
-            for (element in attribute) {
-                printer.println("%5d  %6d  %4d %5s   %s"
-                    .format(element.startPC,
-                            element.length,
-                            element.variableIndex,
-                            element.getName(classFile),
-                            element.getDescriptor(classFile)))
-            }
+        // TODO: better align name / signature to make output more readable
+        printer.println("Start  Length  Slot  Name   Signature")
+        for (element in attribute) {
+            printer.println("%5d  %6d  %4d %5s   %s"
+                .format(element.startPC,
+                        element.length,
+                        element.variableIndex,
+                        element.getName(classFile),
+                        element.getDescriptor(classFile)))
         }
         printer.levelDown()
     }

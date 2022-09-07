@@ -42,17 +42,14 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         this.printer             = IndentingPrinter(writer, 2)
         this.attributePrinter    = AttributePrinter(printer)
         this.constantPoolPrinter = ConstantPoolPrinter(printer)
+
     }
 
     override fun visitClassFile(classFile: ClassFile) {
 
         if (classFile.isInterface) {
             val externalModifiers =
-                classFile.modifiers.filter { !EnumSet.of(AccessFlag.SUPER,
-                                                         AccessFlag.ABSTRACT,
-                                                         AccessFlag.ANNOTATION,
-                                                         AccessFlag.INTERFACE).contains(it) }
-                                   .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
+                classFile.modifiers.getPrintableModifiersString { !EnumSet.of(AccessFlag.INTERFACE, AccessFlag.ABSTRACT).contains(it) }
             if (externalModifiers.isNotEmpty()) {
                 printer.print("$externalModifiers ")
             }
@@ -64,9 +61,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                 printer.print(" extends $interfaceString")
             }
         } else {
-            val externalModifiers =
-                classFile.modifiers.filter { it != AccessFlag.SUPER }
-                                   .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
+            val externalModifiers = classFile.modifiers.getPrintableModifiersString()
             if (externalModifiers.isNotEmpty()) {
                 printer.print("$externalModifiers ")
             }
@@ -108,12 +103,14 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.levelDown()
 
         printer.println("Constant pool:")
-
+        printer.levelUp()
+        val indexWidth = classFile.constantPool.size.toString().length + 1
         classFile.constantsAccept { cf, index, constant ->
-            printer.print(String.format("%5s = ", "#$index"))
+            printer.print(String.format("%${indexWidth}s = ", "#$index"))
             constant.accept(cf, index, constantPoolPrinter)
             printer.println()
         }
+        printer.levelDown()
 
         printer.println("{")
 
@@ -151,7 +148,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
-        val externalModifiers = field.getPrintableModifiers()
+        val externalModifiers = field.modifiers.getPrintableModifiersString()
         if (externalModifiers.isNotEmpty()) {
             printer.print("$externalModifiers ")
         }
@@ -162,7 +159,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
-        val externalModifiers = method.getPrintableModifiers()
+        val externalModifiers = method.modifiers.getPrintableModifiersString()
         if (externalModifiers.isNotEmpty()) {
             printer.print("$externalModifiers ")
         }
@@ -174,9 +171,15 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 }
 
-private fun Member.getPrintableModifiers(): String {
-    return modifiers.filter            { !EnumSet.of(AccessFlag.SYNTHETIC, AccessFlag.BRIDGE).contains(it) }
-                    .joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
+internal fun EnumSet<AccessFlag>.getPrintableModifiers(filter: (AccessFlag) -> Boolean = { true }): List<String> {
+    return this.filter(filter)
+               .filter { !it.synthetic }
+               .map    { it.toString().lowercase(Locale.getDefault()) }
+}
+
+internal fun EnumSet<AccessFlag>.getPrintableModifiersString(filter: (AccessFlag) -> Boolean = { true }): String {
+    return this.getPrintableModifiers(filter)
+               .joinToString(separator = " ")
 }
 
 private fun Method.getExternalMethodSignature(classFile: ClassFile): String {

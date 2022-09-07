@@ -55,7 +55,9 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
     }
 
     override fun visitStringConstant(classFile: ClassFile, index: Int, constant: StringConstant) {
-        printer.print("%-18s %-14s // ".format("String", "#" + constant.stringIndex))
+        printer.print("%-18s %s".format("String", "#" + constant.stringIndex))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
@@ -69,42 +71,58 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
                 // do nothing
             }
         }
-        printer.print("%-18s %-14s // ".format(type, "#${constant.classIndex}.#${constant.nameAndTypeIndex}"))
+        printer.print("%-18s %s".format(type, "#${constant.classIndex}.#${constant.nameAndTypeIndex}"))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
     override fun visitClassConstant(classFile: ClassFile, index: Int, constant: ClassConstant) {
-        printer.print("%-18s %-14s // ".format("Class", "#" + constant.nameIndex))
+        printer.print("%-18s %s".format("Class", "#" + constant.nameIndex))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
     override fun visitNameAndTypeConstant(classFile: ClassFile, index: Int, constant: NameAndTypeConstant) {
-        printer.print("%-18s %-14s // ".format("NameAndType", "#" + constant.nameIndex + ":#" + constant.descriptorIndex))
+        printer.print("%-18s %s".format("NameAndType", "#" + constant.nameIndex + ":#" + constant.descriptorIndex))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
     override fun visitModuleConstant(classFile: ClassFile, index: Int, constant: ModuleConstant) {
-        printer.print(String.format("%-18s %-14s // ", "Module", "#" + constant.nameIndex))
+        printer.print(String.format("%-18s %s", "Module", "#" + constant.nameIndex))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
     override fun visitPackageConstant(classFile: ClassFile, index: Int, constant: PackageConstant) {
-        printer.print("%-18s %-14s // ".format("Class", "#" + constant.nameIndex))
+        printer.print("%-18s %s".format("Class", "#" + constant.nameIndex))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
     override fun visitMethodTypeConstant(classFile: ClassFile, index: Int, constant: MethodTypeConstant) {
-        printer.print("%-18s %-14s // ".format("MethodType", "#" + constant.descriptorIndex))
+        printer.print("%-18s %s".format("MethodType", "#" + constant.descriptorIndex))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
     override fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
-        printer.print("%-18s %-14s // ".format("MethodHandle", "${constant.referenceKind.value}:#${constant.referenceIndex}"))
+        printer.print("%-18s %s".format("MethodHandle", "${constant.referenceKind.value}:#${constant.referenceIndex}"))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 
     override fun visitInvokeDynamicConstant(classFile: ClassFile, index: Int, constant: InvokeDynamicConstant) {
-        printer.print("%-18s %-14s // ".format("InvokeDynamic", "#${constant.bootstrapMethodAttrIndex}:#${constant.nameAndTypeIndex}"))
+        printer.print("%-18s %s".format("InvokeDynamic", "#${constant.bootstrapMethodAttrIndex}:#${constant.nameAndTypeIndex}"))
+        printer.padToPosition(42)
+        printer.print("// ")
         constant.accept(classFile, index, constantPrinter)
     }
 }

@@ -32,6 +32,9 @@ internal class ConstantPool private constructor(private var constants: MutableLi
         }
     }
 
+    internal val size: Int
+        get() = constants.size
+
     operator fun get(index: Int): Constant {
         require(constants[index] != null) { "trying to retrieve a null constant at index $index" }
         return constants[index]!!

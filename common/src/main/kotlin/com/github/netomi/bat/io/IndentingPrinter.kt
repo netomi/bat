@@ -59,6 +59,15 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
         currentPosition += text.length
     }
 
+    fun padToPosition(position: Int) {
+        val spacesToPad = (position - currentPosition).coerceAtLeast(0)
+        val padding     = " ".repeat(spacesToPad)
+        if (padding.isNotEmpty()) {
+            delegateWriter.write(padding)
+            currentPosition += padding.length
+        }
+    }
+
     fun println(obj: Any?) {
         println(java.lang.String.valueOf(obj))
     }
