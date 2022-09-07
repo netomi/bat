@@ -19,7 +19,6 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.instruction.JvmInstruction.Companion.getOffset
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {

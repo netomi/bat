@@ -46,6 +46,10 @@ internal class ClassDataInput private constructor(            `is`:           In
         return dataInput.readInt()
     }
 
+    fun readUnsignedInt(): Long {
+        return dataInput.readInt().toLong() and 0xffffffff
+    }
+
     fun readUTF(): String {
         return dataInput.readUTF()
     }

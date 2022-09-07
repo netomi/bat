@@ -36,8 +36,8 @@ data class DoubleConstant private constructor(var _value: Double = 0.0) : Consta
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: ClassDataInput) {
-        val highBytes = input.readInt().toLong() and 0xffffffff
-        val lowBytes  = input.readInt().toLong() and 0xffffffff
+        val highBytes = input.readUnsignedInt()
+        val lowBytes  = input.readUnsignedInt()
         val bits = (highBytes shl 32) + lowBytes
         _value = Double.fromBits(bits)
     }
