@@ -154,19 +154,23 @@ private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
         val (parameterTypes, returnType) = parseDescriptorToJvmTypes(getDescriptor(classFile))
 
         val methodName = getName(classFile)
-        val isConstructor = methodName == "<init>"
+        val isStaticInitializer = methodName == "<clinit>"
+        val isConstructor       = methodName == "<init>"
 
-        if (!isConstructor) {
+        if (!isStaticInitializer && !isConstructor) {
             append(returnType.toExternalType())
             append(' ')
         }
 
-        if (isConstructor) {
-            append(classFile.className.toExternalClassName())
+        if (isStaticInitializer) {
+            append("{}")
         } else {
-            append(getName(classFile))
+            if (isConstructor) {
+                append(classFile.className.toExternalClassName())
+            } else {
+                append(getName(classFile))
+            }
+            append(parameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
         }
-
-        append(parameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
     }
 }
