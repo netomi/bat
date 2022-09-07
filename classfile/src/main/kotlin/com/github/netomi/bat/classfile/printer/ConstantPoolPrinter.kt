@@ -108,7 +108,7 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
     override fun visitMethodTypeConstant(classFile: ClassFile, index: Int, constant: MethodTypeConstant) {
         printer.print("%-18s %s".format("MethodType", "#" + constant.descriptorIndex))
         printer.padToPosition(42)
-        printer.print("// ")
+        printer.print("//  ")
         constant.accept(classFile, index, constantPrinter)
     }
 
