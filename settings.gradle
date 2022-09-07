@@ -6,6 +6,6 @@ include 'tools'
 include 'smali'
 include 'dexdump'
 include 'common'
-include 'jasmin'
+include 'jasm'
 include 'tinydvm'
 

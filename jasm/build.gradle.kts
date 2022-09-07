@@ -4,7 +4,7 @@ plugins {
 }
 
 base {
-    archivesName.set("bat-jasmin")
+    archivesName.set("bat-jasm")
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_11
