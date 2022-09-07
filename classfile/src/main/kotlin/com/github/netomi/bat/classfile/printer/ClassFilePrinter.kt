@@ -33,6 +33,8 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     private val attributePrinter:    AttributePrinter
     private val constantPoolPrinter: ConstantPoolPrinter
 
+    private var methodCount: Int = 0
+
     constructor(os: OutputStream = System.out) : this(OutputStreamWriter(os))
 
     constructor(writer: Writer) {
@@ -45,8 +47,22 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 
         val externalModifiers = classFile.modifiers.filter { it != AccessFlag.SUPER }
                                                    .joinToString(" ") { it.toString().lowercase(Locale.getDefault()) }
+        if (externalModifiers.isNotEmpty()) {
+            printer.print("$externalModifiers ")
+        }
+        printer.print("class %s".format(classFile.className.toExternalClassName()))
 
-        printer.println("%s class %s".format(externalModifiers, classFile.className.toExternalClassName()))
+        val superClassName = classFile.superClassName
+        if (superClassName != null) {
+            printer.print(" extends ${superClassName.toExternalClassName()}")
+        }
+
+        if (classFile.interfaces.isNotEmpty()) {
+            val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+            printer.print(" implements $interfaceString")
+        }
+
+        printer.println()
         printer.levelUp()
         printer.println("minor version: " + classFile.minorVersion)
         printer.println("major version: " + classFile.majorVersion)
@@ -54,11 +70,11 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         val modifiers = classFile.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
         printer.println("flags: (0x%04x) %s".format(classFile.accessFlags, modifiers))
 
-        printer.println("this_class: #%-29d // %s".format(classFile.thisClassIndex,   classFile.className))
+        printer.println("this_class: #%-26d // %s".format(classFile.thisClassIndex,   classFile.className))
         if (classFile.superClassIndex > 0) {
-            printer.println("super_class: #%-28d // %s".format(classFile.superClassIndex, classFile.superClassName))
+            printer.println("super_class: #%-25d // %s".format(classFile.superClassIndex, classFile.superClassName))
         } else {
-            printer.println("super_class: #%-28d".format(classFile.superClassIndex))
+            printer.println("super_class: #%-25d".format(classFile.superClassIndex))
         }
 
         printer.println("interfaces: %d, fields: %d, methods: %d, attributes: %d"
@@ -70,23 +86,21 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.levelDown()
 
         printer.println("Constant pool:")
-        printer.levelUp()
 
         classFile.constantsAccept { cf, index, constant ->
-            printer.print(String.format("%4s = ", "#$index"))
+            printer.print(String.format("%5s = ", "#$index"))
             constant.accept(cf, index, constantPoolPrinter)
             printer.println()
         }
 
-        printer.levelDown()
-
-        printer.print("{")
+        printer.println("{")
 
         printer.levelUp()
         classFile.fieldsAccept(this)
         printer.levelDown()
 
         printer.levelUp()
+        methodCount = classFile.methods.size
         classFile.methodsAccept(this)
         printer.levelDown()
 
@@ -101,27 +115,37 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.levelUp()
 
         printer.println("descriptor: %s".format(member.getDescriptor(classFile)))
+        printer.print("flags: (0x%04x)".format(member.accessFlags))
 
         val modifiers = member.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
-        printer.println("flags: (0x%04x) %s".format(member.accessFlags, modifiers))
+        if (modifiers.isNotEmpty()) {
+            printer.print(" $modifiers")
+        }
+
+        printer.println()
 
         member.attributesAccept(classFile, attributePrinter)
         printer.levelDown()
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
-        printer.println()
         val externalModifiers = field.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
         val externalType = field.getDescriptor(classFile).asJvmType().toExternalType()
         printer.println("%s %s %s;".format(externalModifiers, externalType, field.getName(classFile)))
         visitAnyMember(classFile, index, field)
-   }
+        printer.println()
+    }
 
     override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
-        printer.println()
         val externalModifiers = method.modifiers.joinToString(" ") { txt -> txt.toString().lowercase(Locale.getDefault()) }
-        printer.println("%s %s;".format(externalModifiers, method.getExternalMethodSignature(classFile)))
+        if (externalModifiers.isNotEmpty()) {
+            printer.print("$externalModifiers ")
+        }
+        printer.println("%s;".format(method.getExternalMethodSignature(classFile)))
         visitAnyMember(classFile, index, method)
+        if (index < methodCount - 1) {
+            printer.println()
+        }
     }
 }
 
@@ -129,11 +153,15 @@ private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
     return buildString {
         val (parameterTypes, returnType) = parseDescriptorToJvmTypes(getDescriptor(classFile))
 
-        append(returnType.toExternalType())
-        append(' ')
-
         val methodName = getName(classFile)
-        if (methodName == "<init>") {
+        val isConstructor = methodName == "<init>"
+
+        if (!isConstructor) {
+            append(returnType.toExternalType())
+            append(' ')
+        }
+
+        if (isConstructor) {
             append(classFile.className.toExternalClassName())
         } else {
             append(getName(classFile))

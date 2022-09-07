@@ -84,7 +84,11 @@ internal class ConstantPrinter constructor(private val printer:                I
                 append(".")
             }
             val memberName = constant.getMemberName(classFile)
-            append(memberName)
+            if (memberName.contains("<")) {
+                append("\"$memberName\"")
+            } else {
+                append(memberName)
+            }
             append(":")
             val descriptor = constant.getDescriptor(classFile)
             append(descriptor)
@@ -112,7 +116,12 @@ internal class ConstantPrinter constructor(private val printer:                I
     override fun visitNameAndTypeConstant(classFile: ClassFile, index: Int, constant: NameAndTypeConstant) {
         val memberName = classFile.getString(constant.nameIndex)
         val descriptor = classFile.getString(constant.descriptorIndex)
-        printer.print("$memberName:$descriptor")
+
+        if (memberName.contains("<")) {
+            printer.print("\"$memberName\":$descriptor")
+        } else {
+            printer.print("$memberName:$descriptor")
+        }
     }
 
     override fun visitMethodTypeConstant(classFile: ClassFile, index: Int, constant: MethodTypeConstant) {

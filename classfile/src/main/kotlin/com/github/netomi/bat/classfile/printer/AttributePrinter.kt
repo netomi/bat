@@ -110,6 +110,14 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
+    override fun visitEnclosingMethodAttribute(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
+        val str = buildString {
+            append("EnclosingMethod: ")
+            append("#${attribute.classIndex}.#${attribute.methodIndex}")
+        }
+        printer.println("%-39s // %s".format(str, attribute.getClassName(classFile).toExternalClassName()))
+    }
+
     override fun visitInnerClassesAttribute(classFile: ClassFile, attribute: InnerClassesAttribute) {
         printer.println("InnerClasses:")
         printer.levelUp()
@@ -356,6 +364,24 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                             element.variableIndex,
                             element.getName(classFile),
                             element.getDescriptor(classFile)))
+            }
+        }
+        printer.levelDown()
+    }
+
+    override fun visitLocalVariableTypeTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
+        printer.println("LocalVariableTypeTable:")
+        printer.levelUp()
+        if (attribute.size > 0) {
+            // TODO: better align name / signature to make output more readable
+            printer.println("Start  Length  Slot  Name   Signature")
+            for (element in attribute) {
+                printer.println("%5d  %6d  %4d %5s   %s"
+                    .format(element.startPC,
+                        element.length,
+                        element.variableIndex,
+                        element.getName(classFile),
+                        element.getSignature(classFile)))
             }
         }
         printer.levelDown()

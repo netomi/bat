@@ -54,6 +54,12 @@ class ClassFile private constructor() {
     var superClassIndex = -1
         internal set
 
+    val isInterface: Boolean
+        get() = modifiers.contains(AccessFlag.INTERFACE)
+
+    val isModule: Boolean
+        get() = modifiers.contains(AccessFlag.MODULE)
+
     internal val constantPool: ConstantPool = ConstantPool.empty()
 
     internal var _interfaces = mutableListOfCapacity<Int>(0)
