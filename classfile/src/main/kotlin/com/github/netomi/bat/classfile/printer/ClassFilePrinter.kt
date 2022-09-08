@@ -17,12 +17,12 @@
 package com.github.netomi.bat.classfile.printer
 
 import com.github.netomi.bat.classfile.*
+import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
+import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.io.IndentingPrinter
-import com.github.netomi.bat.util.JAVA_LANG_OBJECT_TYPE
-import com.github.netomi.bat.util.asJvmType
-import com.github.netomi.bat.util.parseDescriptorToJvmTypes
+import com.github.netomi.bat.util.*
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.io.Writer
@@ -54,11 +54,17 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                 printer.print("$externalModifiers ")
             }
 
-            printer.print("interface %s".format(classFile.className.toExternalClassName()))
+            val signature = classFile.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+            if (signature != null) {
+                val externalSignature = getExternalClassSignature(signature, true)
+                printer.print("interface %s%s".format(classFile.className.toExternalClassName(), externalSignature))
+            } else {
+                printer.print("interface %s".format(classFile.className.toExternalClassName()))
 
-            if (classFile.interfaces.isNotEmpty()) {
-                val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
-                printer.print(" extends $interfaceString")
+                if (classFile.interfaces.isNotEmpty()) {
+                    val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+                    printer.print(" extends $interfaceString")
+                }
             }
         } else {
             val externalModifiers = classFile.modifiers.getPrintableModifiersString()
@@ -66,16 +72,22 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                 printer.print("$externalModifiers ")
             }
 
-            printer.print("class %s".format(classFile.className.toExternalClassName()))
+            val signature = classFile.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+            if (signature != null) {
+                val externalSignature = getExternalClassSignature(signature)
+                printer.print("class %s%s".format(classFile.className.toExternalClassName(), externalSignature))
+            } else {
+                printer.print("class %s".format(classFile.className.toExternalClassName()))
 
-            val superClassName = classFile.superClassName
-            if (superClassName != null && superClassName.className != JAVA_LANG_OBJECT_TYPE.toInternalClassName()) {
-                printer.print(" extends ${superClassName.toExternalClassName()}")
-            }
+                val superClassName = classFile.superClassName
+                if (superClassName != null && superClassName.className != JAVA_LANG_OBJECT_TYPE.toInternalClassName()) {
+                    printer.print(" extends ${superClassName.toExternalClassName()}")
+                }
 
-            if (classFile.interfaces.isNotEmpty()) {
-                val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
-                printer.print(" implements $interfaceString")
+                if (classFile.interfaces.isNotEmpty()) {
+                    val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+                    printer.print(" implements $interfaceString")
+                }
             }
         }
 
@@ -152,7 +164,14 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         if (externalModifiers.isNotEmpty()) {
             printer.print("$externalModifiers ")
         }
-        val externalType = field.getDescriptor(classFile).asJvmType().toExternalType()
+
+        val signature = field.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+        val externalType = if (signature != null) {
+            getExternalFieldSignature(signature)
+        } else {
+            field.getDescriptor(classFile).asJvmType().toExternalType()
+        }
+
         printer.println("%s %s;".format(externalType, field.getName(classFile)))
         visitAnyMember(classFile, index, field)
         printer.println()
@@ -163,7 +182,60 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         if (externalModifiers.isNotEmpty()) {
             printer.print("$externalModifiers ")
         }
-        printer.println("%s;".format(method.getExternalMethodSignature(classFile)))
+
+        val hasVarArgs = method.modifiers.contains(AccessFlag.VARARGS)
+
+        var exceptionsPrinted = false
+        val signature = method.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+        if (signature != null) {
+            val methodSig = getExternalMethodSignature(signature)
+
+            if (methodSig.formalTypeParameters.isNotEmpty()) {
+                printer.print("${methodSig.formalTypeParameters} ")
+            }
+
+            val methodName = method.getName(classFile)
+
+            if (methodName != "<init>" &&
+                methodName != "<clinit>") {
+                printer.print("${methodSig.returnType} ")
+            }
+
+            if (methodName == "<init>") {
+                printer.print(classFile.className.toExternalClassName())
+            } else {
+                printer.print(methodName)
+            }
+
+            var parameters = methodSig.parameters
+
+            if (hasVarArgs) {
+                val bracketsIndex = parameters.lastIndexOf("[]")
+                if (bracketsIndex == parameters.lastIndex - 2) {
+                    parameters = parameters.replaceRange(bracketsIndex, bracketsIndex + 2, "...")
+                }
+            }
+
+            printer.print(parameters)
+
+            if (methodSig.exceptions.isNotEmpty()) {
+                printer.print(methodSig.exceptions)
+                exceptionsPrinted = true
+            }
+        } else {
+            printer.print("%s".format(method.getExternalMethodSignature(classFile, hasVarArgs)))
+        }
+
+        if (!exceptionsPrinted) {
+            val exceptions = method.attributes.filterIsInstance<ExceptionsAttribute>().singleOrNull()?.getExceptionClassNames(classFile)
+            if (!exceptions.isNullOrEmpty()) {
+                val exceptionString = " throws " + exceptions.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+                printer.print(exceptionString)
+            }
+        }
+
+        printer.println(";")
+
         visitAnyMember(classFile, index, method)
         if (index < methodCount - 1) {
             printer.println()
@@ -182,7 +254,7 @@ internal fun EnumSet<AccessFlag>.getPrintableModifiersString(filter: (AccessFlag
                .joinToString(separator = " ")
 }
 
-private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
+private fun Method.getExternalMethodSignature(classFile: ClassFile, hasVarArgs: Boolean): String {
     return buildString {
         val (parameterTypes, returnType) = parseDescriptorToJvmTypes(getDescriptor(classFile))
 
@@ -203,7 +275,18 @@ private fun Method.getExternalMethodSignature(classFile: ClassFile): String {
             } else {
                 append(getName(classFile))
             }
-            append(parameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
+
+            var externalParameterTypes = parameterTypes.map { it.toExternalType() }
+
+            if (hasVarArgs) {
+                externalParameterTypes =
+                    externalParameterTypes.updated(externalParameterTypes.lastIndex,
+                                                   externalParameterTypes.last().replace("[]", "..."))
+            }
+
+            append(externalParameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")"))
         }
     }
 }
+
+private fun <E> Iterable<E>.updated(index: Int, elem: E) = mapIndexed { i, existing ->  if (i == index) elem else existing }

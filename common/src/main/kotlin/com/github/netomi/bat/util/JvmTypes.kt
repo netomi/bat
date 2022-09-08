@@ -47,6 +47,21 @@ fun String.asExternalClassName(): JvmClassName {
     return JvmClassName.ofExternal(this)
 }
 
+internal fun isPrimitiveType(type: String): Boolean {
+    return when (type) {
+        INT_TYPE,
+        LONG_TYPE,
+        SHORT_TYPE,
+        BYTE_TYPE,
+        CHAR_TYPE,
+        FLOAT_TYPE,
+        DOUBLE_TYPE,
+        BOOLEAN_TYPE -> true
+
+        else -> false
+    }
+}
+
 open class JvmType protected constructor(val type: String) {
 
     val isClassType: Boolean
@@ -59,19 +74,14 @@ open class JvmType protected constructor(val type: String) {
         get() = isClassType || isArrayType
 
     val isPrimitiveType: Boolean
+        get() = isPrimitiveType(type)
+
+    val componentType: JvmType
         get() {
-            return when (type) {
-                INT_TYPE,
-                LONG_TYPE,
-                SHORT_TYPE,
-                BYTE_TYPE,
-                CHAR_TYPE,
-                FLOAT_TYPE,
-                DOUBLE_TYPE,
-                BOOLEAN_TYPE -> true
-                else         -> false
-            }
-        }
+            check(isArrayType)
+            val dimension = type.takeWhile { ch -> ch == '[' }.count()
+            return type.substring(dimension).asJvmType()
+    }
 
     fun toInternalClassName(): String {
         require(isClassType)

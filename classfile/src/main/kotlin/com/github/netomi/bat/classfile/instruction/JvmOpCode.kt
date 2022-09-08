@@ -192,7 +192,7 @@ enum class JvmOpCode constructor(
 
     INSTANCEOF     (0xc1, "instanceof", 3, ClassInstruction::create),
 
-    INVOKEDYNAMIC  (0xba, "invokedynamic",   5, MethodInstruction::create),
+    INVOKEDYNAMIC  (0xba, "invokedynamic",   5, MethodInstruction::create), // TODO: should be a separate instruction as it has different content as a method instruction
     INVOKEINTERFACE(0xb9, "invokeinterface", 5, InterfaceMethodInstruction::create),
     INVOKESPECIAL  (0xb7, "invokespecial",   3, MethodInstruction::create),
     INVOKESTATIC   (0xb8, "invokestatic",    3, MethodInstruction::create),

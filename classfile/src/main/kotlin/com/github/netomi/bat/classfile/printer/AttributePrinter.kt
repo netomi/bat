@@ -150,7 +150,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                     var addedModifiers = ""
 
                     for (modifier in externalModifiers) {
-                        if (modifier.length < remainingLength) {
+                        if (modifier.length <= remainingLength) {
                             addedModifiers  += "$modifier "
                             remainingLength -= modifier.length + 1
                         }
@@ -328,6 +328,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
                 if (exception.catchType > 0) {
                     printer.print("   Class ${classFile.getClassName(exception.catchType)}")
+                } else {
+                    printer.print("   any")
                 }
 
                 printer.println()
@@ -345,7 +347,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         val exceptions =
             attribute.getExceptionClassNames(classFile)
                      .joinToString(separator = ", ",
-                                   transform = { "throws ${it.toExternalClassName()}" })
+                                   prefix    = "throws ",
+                                   transform = { it.toExternalClassName() })
         printer.println(exceptions)
         printer.levelDown()
     }

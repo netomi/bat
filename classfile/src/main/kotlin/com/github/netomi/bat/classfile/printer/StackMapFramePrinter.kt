@@ -72,7 +72,7 @@ internal class StackMapFramePrinter constructor(private val printer: IndentingPr
     }
 
     override fun visitSameLocalsOneStackItemExtendedFrame(classFile: ClassFile, frame: SameLocalsOneStackItemExtendedFrame) {
-        printer.println("frame_type = ${frame.frameType} /* same_locals_1_stack_item_extended */")
+        printer.println("frame_type = ${frame.frameType} /* same_locals_1_stack_item_frame_extended */")
         printer.levelUp()
         printer.println("offset_delta = ${frame.offsetDelta}")
         printer.println("stack = [ ${frame.stackItem.toHumanReadableString(classFile)} ]")
