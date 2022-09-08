@@ -142,8 +142,14 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                 append(";")
 
                 val modifiers = accessFlagModifiers(element.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
+
+                if (modifiers.contains(AccessFlag.INTERFACE)) {
+                    modifiers.remove(AccessFlag.ABSTRACT)
+                }
+                modifiers.remove(AccessFlag.INTERFACE)
+
                 val externalModifiers =
-                    modifiers.getPrintableModifiers { !EnumSet.of(AccessFlag.INTERFACE).contains(it) }
+                    modifiers.getPrintableModifiers()
 
                 if (externalModifiers.isNotEmpty()) {
                     var remainingLength = 39 - length
