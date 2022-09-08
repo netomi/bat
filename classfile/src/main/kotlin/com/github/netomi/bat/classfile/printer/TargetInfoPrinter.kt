@@ -23,7 +23,9 @@ import com.github.netomi.bat.io.IndentingPrinter
 
 internal class TargetInfoPrinter constructor(private val printer: IndentingPrinter): TargetInfoVisitor {
 
-    override fun visitAnyTargetInfo(classFile: ClassFile, targetInfo: TargetInfo) {
+    override fun visitAnyTargetInfo(classFile: ClassFile, targetInfo: TargetInfo) {}
+
+    override fun visitCatchTargetInfo(classFile: ClassFile, targetInfo: CatchTargetInfo) {
         TODO("implement")
     }
 

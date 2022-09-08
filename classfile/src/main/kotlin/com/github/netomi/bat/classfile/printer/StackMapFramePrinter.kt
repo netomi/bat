@@ -87,6 +87,7 @@ internal fun VerificationType.toHumanReadableString(classFile: ClassFile): Strin
         ItemType.FLOAT              -> "float"
         ItemType.DOUBLE             -> "double"
         ItemType.TOP                -> "top"
+        ItemType.NULL               -> "null"
         ItemType.UNINITIALIZED_THIS -> "this"
         ItemType.UNINITIALIZED      -> {
             val offset = (this as UninitializedVariable).offset
@@ -100,6 +101,5 @@ internal fun VerificationType.toHumanReadableString(classFile: ClassFile): Strin
                 "class $className"
             }
         }
-        else             -> TODO("implement")
     }
 }

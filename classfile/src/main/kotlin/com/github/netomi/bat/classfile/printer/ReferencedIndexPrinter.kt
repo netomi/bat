@@ -40,7 +40,7 @@ internal class ReferencedIndexPrinter constructor(private val printer: Indenting
     override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
 
     override fun visitClassElementValue(classFile: ClassFile, elementValue: ClassElementValue) {
-        TODO("implement")
+        printer.print("c#${elementValue.classIndex}")
     }
 
     override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
