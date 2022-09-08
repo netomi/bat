@@ -48,6 +48,10 @@ fun interface InstructionVisitor {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
     }
 
+    fun visitArrayTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayTypeInstruction) {
+        visitAnyInstruction(classFile, method, code, offset, instruction)
+    }
+
     fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
         visitAnyInstruction(classFile, method, code, offset, instruction)
     }
@@ -100,7 +104,15 @@ fun interface InstructionVisitor {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
     }
 
-    fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
+    fun visitAnyVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
         visitAnySimpleInstruction(classFile, method, code, offset, instruction)
+    }
+
+    fun visitLiteralVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralVariableInstruction) {
+        visitAnyVariableInstruction(classFile, method, code, offset, instruction)
+    }
+
+    fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
+        visitAnyVariableInstruction(classFile, method, code, offset, instruction)
     }
 }

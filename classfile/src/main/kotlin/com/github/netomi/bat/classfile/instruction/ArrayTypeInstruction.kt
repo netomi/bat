@@ -16,39 +16,53 @@
 
 package com.github.netomi.bat.classfile.instruction
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.JvmClassName
 
-open class VariableInstruction protected constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
+class ArrayTypeInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
-    var variable: Int = 0
+    var arrayType: ArrayType = ArrayType.INT
         private set
-
-    val variableIsImplicit: Boolean
-        get() = opCode.length == 1
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
 
-        variable = if (!variableIsImplicit) {
-            instructions[offset + 1].toInt() and 0xff
-        } else {
-            val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured
-            variableString.toInt()
-        }
+        arrayType = ArrayType.of(instructions[offset + 1].toInt())
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitVariableInstruction(classFile, method, code, offset, this)
+        visitor.visitArrayTypeInstruction(classFile, method, code, offset, this)
     }
 
     companion object {
-        private val VARIABLE_REGEX = "\\w+_(\\d)".toRegex()
-
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return VariableInstruction(opCode)
+            return ArrayTypeInstruction(opCode)
+        }
+    }
+}
+
+enum class ArrayType constructor(val value: Int) {
+    BOOLEAN(T_BOOLEAN),
+    CHAR   (T_CHAR),
+    FLOAT  (T_FLOAT),
+    DOUBLE (T_DOUBLE),
+    BYTE   (T_BYTE),
+    SHORT  (T_SHORT),
+    INT    (T_INT),
+    LONG   (T_LONG);
+
+    companion object {
+        fun of(value: Int): ArrayType {
+            for (type in values()) {
+                if (type.value == value) {
+                    return type
+                }
+            }
+
+            error("unexpected array type value '$value'")
         }
     }
 }

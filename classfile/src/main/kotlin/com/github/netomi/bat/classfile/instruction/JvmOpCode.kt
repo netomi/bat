@@ -179,7 +179,7 @@ enum class JvmOpCode constructor(
     IFNONNULL      (0xc7, "ifnonnull", 3, BranchInstruction::create),
     IFNULL         (0xc6, "ifnull",    3, BranchInstruction::create),
 
-    IINC           (0x84, "iinc", 3),
+    IINC           (0x84, "iinc", 3, LiteralVariableInstruction::create),
 
     ILOAD          (0x15, "iload",   2, VariableInstruction::create),
     ILOAD_0        (0x1a, "iload_0", 1, VariableInstruction::create),
@@ -278,7 +278,7 @@ enum class JvmOpCode constructor(
 
     NEW            (0xbb, "new", 3, ClassInstruction::create),
 
-    NEWARRAY       (0xbc, "newarray", 2),
+    NEWARRAY       (0xbc, "newarray", 2, ArrayTypeInstruction::create),
 
     NOP            (0x00, "nop", 1),
 

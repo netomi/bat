@@ -85,3 +85,12 @@ const val ITEM_UninitializedThis = 6
 const val ITEM_Object            = 7
 const val ITEM_Uninitialized     = 8
 
+// Array Types
+const val T_BOOLEAN =  4
+const val T_CHAR    =  5
+const val T_FLOAT   =  6
+const val T_DOUBLE  =  7
+const val T_BYTE    =  8
+const val T_SHORT   =  9
+const val T_INT     = 10
+const val T_LONG    = 11

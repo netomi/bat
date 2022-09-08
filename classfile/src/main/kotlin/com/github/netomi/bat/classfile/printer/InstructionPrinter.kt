@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.*
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.io.IndentingPrinter
+import java.util.*
 
 internal class InstructionPrinter constructor(private val printer: IndentingPrinter): InstructionVisitor {
 
@@ -77,10 +78,17 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         printer.println()
     }
 
+    override fun visitArrayTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayTypeInstruction) {
+        printer.println("%4d: %-13s  %s".format(offset, instruction.mnemonic, instruction.arrayType.toString().lowercase(Locale.getDefault())))
+    }
+
+    override fun visitLiteralVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralVariableInstruction) {
+        printer.println("%4d: %-13s %d, %d".format(offset, instruction.mnemonic, instruction.variable, instruction.value))
+    }
+
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
         if (instruction.variableIsImplicit) {
             printer.println("%4d: %s".format(offset, instruction.mnemonic))
-
         } else {
             printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, instruction.variable))
         }
