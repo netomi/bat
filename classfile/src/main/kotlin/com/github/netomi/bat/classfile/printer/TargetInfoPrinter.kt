@@ -43,7 +43,7 @@ internal class TargetInfoPrinter constructor(private val printer: IndentingPrint
 
     override fun visitLocalVarTargetInfo(classFile: ClassFile, targetInfo: LocalVarTargetInfo) {
         val localVarInfo = targetInfo.joinToString(separator = ",", transform = {
-            "{start_pc=${it.startPC},length=${it.length},index=${it.index}}"
+            "{start_pc=${it.startPC}, length=${it.length}, index=${it.index}}"
         })
         printer.print(", $localVarInfo")
     }

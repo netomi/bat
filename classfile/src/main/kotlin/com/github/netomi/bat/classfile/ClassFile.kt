@@ -113,6 +113,10 @@ class ClassFile private constructor() {
         return (constantPool[constantIndex] as InterfaceMethodrefConstant)
     }
 
+    internal fun getDynamic(constantIndex: Int): DynamicConstant {
+        return (constantPool[constantIndex] as DynamicConstant)
+    }
+
     internal fun getModule(constantIndex: Int): ModuleConstant {
         return (constantPool[constantIndex] as ModuleConstant)
     }

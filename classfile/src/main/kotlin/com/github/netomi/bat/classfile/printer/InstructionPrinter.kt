@@ -78,6 +78,12 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         printer.println()
     }
 
+    override fun visitInvokeDynamicInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InvokeDynamicInstruction) {
+        printer.print("%4d: %-13s #%-18s // ".format(offset, instruction.mnemonic, "${instruction.callsiteIndex},  0"))
+        instruction.callsiteAccept(classFile, constantPrinter)
+        printer.println()
+    }
+
     override fun visitArrayTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayTypeInstruction) {
         printer.println("%4d: %-13s  %s".format(offset, instruction.mnemonic, instruction.arrayType.toString().lowercase(Locale.getDefault())))
     }

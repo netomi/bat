@@ -76,6 +76,10 @@ fun interface InstructionVisitor {
         visitAnyInstruction(classFile, method, code, offset, instruction)
     }
 
+    fun visitInvokeDynamicInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InvokeDynamicInstruction) {
+        visitAnyInstruction(classFile, method, code, offset, instruction)
+    }
+
     fun visitAnyMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: AnyMethodInstruction) {
         visitAnyInstruction(classFile, method, code, offset, instruction)
     }

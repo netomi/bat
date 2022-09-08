@@ -17,6 +17,7 @@
 package com.github.netomi.bat.classfile.printer
 
 import com.github.netomi.bat.classfile.*
+import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
@@ -181,6 +182,13 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         val externalModifiers = method.modifiers.getPrintableModifiersString()
         if (externalModifiers.isNotEmpty()) {
             printer.print("$externalModifiers ")
+        }
+
+        if (classFile.isInterface && !method.isStatic) {
+            val codeAttribute = method.attributes.filterIsInstance<CodeAttribute>().singleOrNull()
+            if (codeAttribute != null) {
+                printer.print("default ")
+            }
         }
 
         val hasVarArgs = method.modifiers.contains(AccessFlag.VARARGS)
