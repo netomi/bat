@@ -86,7 +86,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                 }
 
                 if (classFile.interfaces.isNotEmpty()) {
-                    val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+                    val interfaceString = classFile.interfaces.joinToString(separator = ",", transform = { it.toExternalClassName() })
                     printer.print(" implements $interfaceString")
                 }
             }
