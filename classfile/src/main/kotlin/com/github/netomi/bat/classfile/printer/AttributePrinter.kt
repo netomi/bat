@@ -29,7 +29,6 @@ import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.escapeAsJavaString
 import com.github.netomi.bat.util.isAsciiPrintable
-import java.util.*
 
 internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor, ElementValueVisitor, AnnotationVisitorIndexed {
 
