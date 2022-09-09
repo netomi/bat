@@ -257,15 +257,15 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
 }
 
 enum class ItemType constructor(internal val tag: Int, private val supplier: () -> VerificationType) {
-    TOP               (ITEM_Top,               TopVariable::empty),
-    INTEGER           (ITEM_Integer,           IntegerVariable::empty),
-    LONG              (ITEM_Long,              LongVariable::empty),
-    FLOAT             (ITEM_Float,             FloatVariable::empty),
-    DOUBLE            (ITEM_Double,            DoubleVariable::empty),
-    NULL              (ITEM_Null,              NullVariable::empty),
-    UNINITIALIZED_THIS(ITEM_UninitializedThis, UninitializedThisVariable::empty),
-    OBJECT            (ITEM_Object,            ObjectVariable.Companion::empty),
-    UNINITIALIZED     (ITEM_Uninitialized,     UninitializedVariable.Companion::empty);
+    TOP               (ITEM_Top,               { TopVariable.empty() }),
+    INTEGER           (ITEM_Integer,           { IntegerVariable.empty() }),
+    LONG              (ITEM_Long,              { LongVariable.empty() }),
+    FLOAT             (ITEM_Float,             { FloatVariable.empty() }),
+    DOUBLE            (ITEM_Double,            { DoubleVariable.empty() }),
+    NULL              (ITEM_Null,              { NullVariable.empty() }),
+    UNINITIALIZED_THIS(ITEM_UninitializedThis, { UninitializedThisVariable.empty() }),
+    OBJECT            (ITEM_Object,            { ObjectVariable.empty() }),
+    UNINITIALIZED     (ITEM_Uninitialized,     { UninitializedVariable.empty() });
 
     fun createVerificationType(): VerificationType {
         return supplier()

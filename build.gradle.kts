@@ -17,7 +17,8 @@ allprojects {
 subprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all")
+            // enable invokedynamic generation for lanbdas (-Xlambdas=indy)
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-Xjvm-default=all", "-Xlambdas=indy")
             jvmTarget = "11"
         }
     }

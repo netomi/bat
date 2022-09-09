@@ -312,13 +312,13 @@ class FullFrame private constructor(            frameType:    Int,
 }
 
 internal enum class StackMapFrameType constructor(private val supplier: (Int) -> StackMapFrame) {
-    SAME_FRAME                             (SameFrame.Companion::of),
-    SAME_LOCALS_1_STACK_ITEM_FRAME         (SameLocalsOneStackItemFrame.Companion::of),
-    SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME(SameLocalsOneStackItemExtendedFrame.Companion::of),
-    CHOP_FRAME                             (ChopFrame.Companion::of),
-    SAME_EXTENDED_FRAME                    (SameExtendedFrame.Companion::of),
-    APPEND_FRAME                           (AppendFrame.Companion::of),
-    FULL_FRAME                             (FullFrame.Companion::of);
+    SAME_FRAME                             ({ SameFrame.of(it) }),
+    SAME_LOCALS_1_STACK_ITEM_FRAME         ({ SameLocalsOneStackItemFrame.of(it) }),
+    SAME_LOCALS_1_STACK_ITEM_EXTENDED_FRAME({ SameLocalsOneStackItemExtendedFrame.of(it) }),
+    CHOP_FRAME                             ({ ChopFrame.of(it) }),
+    SAME_EXTENDED_FRAME                    ({ SameExtendedFrame.of(it) }),
+    APPEND_FRAME                           ({ AppendFrame.of(it) }),
+    FULL_FRAME                             ({ FullFrame.of(it) });
 
     companion object {
         fun of(frameType: Int) : StackMapFrame {

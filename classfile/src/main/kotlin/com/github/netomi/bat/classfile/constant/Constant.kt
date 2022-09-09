@@ -69,23 +69,25 @@ enum class ConstantType constructor(val tag: Int, val constantPoolSize: Int, pri
     // Valid constants and their corresponding tags:
     // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.4-210
 
-    UTF8                ( 1, 1, Utf8Constant.Companion::empty),
-    INTEGER             ( 3, 1, IntegerConstant.Companion::empty),
-    FLOAT               ( 4, 1, FloatConstant.Companion::empty),
-    LONG                ( 5, 2, LongConstant.Companion::empty),
-    DOUBLE              ( 6, 2, DoubleConstant.Companion::empty),
-    CLASS               ( 7, 1, ClassConstant.Companion::empty),
-    STRING              ( 8, 1, StringConstant.Companion::empty),
-    FIELD_REF           ( 9, 1, FieldrefConstant.Companion::empty),
-    METHOD_REF          (10, 1, MethodrefConstant.Companion::empty),
-    INTERFACE_METHOD_REF(11, 1, InterfaceMethodrefConstant.Companion::empty),
-    NAME_AND_TYPE       (12, 1, NameAndTypeConstant.Companion::empty),
-    METHOD_HANDLE       (15, 1, MethodHandleConstant.Companion::empty),
-    METHOD_TYPE         (16, 1, MethodTypeConstant.Companion::empty),
-    DYNAMIC             (17, 1, DynamicConstant.Companion::empty),
-    INVOKE_DYNAMIC      (18, 1, InvokeDynamicConstant.Companion::empty),
-    MODULE              (19, 1, ModuleConstant.Companion::empty),
-    PACKAGE             (20, 1, PackageConstant.Companion::empty);
+    // use lambdas instead of method reference as this would blow up the code
+    // https://youtrack.jetbrains.com/issue/KT-45658/Consider-compiling-callable-references-using-invokedynamic-on-JDK-18
+    UTF8                ( 1, 1, { Utf8Constant.empty() }),
+    INTEGER             ( 3, 1, { IntegerConstant.empty() }),
+    FLOAT               ( 4, 1, { FloatConstant.empty() }),
+    LONG                ( 5, 2, { LongConstant.empty() }),
+    DOUBLE              ( 6, 2, { DoubleConstant.empty() }),
+    CLASS               ( 7, 1, { ClassConstant.empty() }),
+    STRING              ( 8, 1, { StringConstant.empty() }),
+    FIELD_REF           ( 9, 1, { FieldrefConstant.empty() }),
+    METHOD_REF          (10, 1, { MethodrefConstant.empty() }),
+    INTERFACE_METHOD_REF(11, 1, { InterfaceMethodrefConstant.empty() }),
+    NAME_AND_TYPE       (12, 1, { NameAndTypeConstant.empty() }),
+    METHOD_HANDLE       (15, 1, { MethodHandleConstant.empty() }),
+    METHOD_TYPE         (16, 1, { MethodTypeConstant.empty() }),
+    DYNAMIC             (17, 1, { DynamicConstant.empty() }),
+    INVOKE_DYNAMIC      (18, 1, { InvokeDynamicConstant.empty() }),
+    MODULE              (19, 1, { ModuleConstant.empty() }),
+    PACKAGE             (20, 1, { PackageConstant.empty() });
 
     companion object {
         private val tagToConstantMap: Map<Int, ConstantType> by lazy {
