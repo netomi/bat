@@ -16,5 +16,17 @@
 
 package com.github.netomi.bat.jasm.disassemble
 
-class JasmPrinter {
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
+import com.github.netomi.bat.io.IndentingPrinter
+import java.io.OutputStreamWriter
+import java.io.Writer
+
+class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out)) : ClassFileVisitor {
+
+    private val printer: IndentingPrinter = IndentingPrinter(writer, 4)
+
+    override fun visitClassFile(classFile: ClassFile) {
+        TODO("Not yet implemented")
+    }
 }
