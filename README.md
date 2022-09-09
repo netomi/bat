@@ -9,7 +9,8 @@ The following modules are currently available
 
 1. classfile: reads and writes **class** files
 2. dexfile: reads and writes **dex** files
-3. dexdump: prints the contents of **dex** files in the same format as the dexdump tool
+3. dexdump: prints the contents of **dex** files in the same format as the _dexdump_ tool
+4. classdump: prints the contents of **class** files in the same format as the _javap_ tool
 4. smali: assembler/disassembler for **dex** files
 5. commands: convenient command line tools for the different modules
 
