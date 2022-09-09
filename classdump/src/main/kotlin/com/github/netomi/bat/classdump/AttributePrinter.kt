@@ -189,6 +189,18 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
     }
 
+    override fun visitSourceDebugExtensionAttribute(classFile: ClassFile, attribute: SourceDebugExtensionAttribute) {
+        printer.println("SourceDebugExtension:")
+        printer.levelUp()
+        val stringList = String(attribute.debugExtension).split('\n')
+        for (string in stringList) {
+            if (string.isNotEmpty()) {
+                printer.println(string)
+            }
+        }
+        printer.levelDown()
+    }
+
     override fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
         printer.println("Module:")
         printer.levelUp()
