@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
@@ -243,8 +244,19 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val exportsIndexAndFlags = "${exportsElement.exportsIndex},${exportsElement.exportsFlags.toHexString()}"
             printer.print("#%-38s // ".format(exportsIndexAndFlags))
             classFile.constantAccept(exportsElement.exportsIndex, constantPrinter)
+            if (exportsElement.size > 0) {
+                printer.println(" to ... ${exportsElement.size}")
+                printer.levelUp()
+                for (exportsToIndex in exportsElement) {
+                    printer.print("#%-38s // ... to ".format(exportsToIndex))
+                    classFile.constantAccept(exportsToIndex, constantPrinter)
+                    printer.println()
+                }
+                printer.levelDown()
+            } else {
+                printer.println()
+            }
             // TODO: print accessflags
-            printer.println()
         }
         printer.levelDown()
 
@@ -283,16 +295,32 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         for (providesElement in attribute.provides) {
             printer.print("#%-38s // ".format(providesElement.providesIndex))
             classFile.constantAccept(providesElement.providesIndex, constantPrinter)
-            printer.levelUp()
-            for (providesWithIndex in providesElement) {
-                printer.print("#%-38s // ".format(providesWithIndex))
-                classFile.constantAccept(providesWithIndex, constantPrinter)
+            if (providesElement.size > 0) {
+                printer.println(" with ... ${providesElement.size}")
+                printer.levelUp()
+                for (providesWithIndex in providesElement) {
+                    printer.print("#%-38s // ... with ".format(providesWithIndex))
+                    classFile.constantAccept(providesWithIndex, constantPrinter)
+                    printer.println()
+                }
+                printer.levelDown()
+            } else {
                 printer.println()
             }
-            printer.levelDown()
         }
         printer.levelDown()
         printer.levelDown()
+    }
+
+    override fun visitModulePackages(classFile: ClassFile, attribute: ModulePackagesAttribute) {
+        printer.println("ModulePackages:")
+        printer.levelUp()
+        for (packageIndex in attribute) {
+            printer.print("#%-38s // ".format(packageIndex))
+            classFile.constantAccept(packageIndex, constantPrinter)
+            printer.println()
+        }
+        printer.levelUp()
     }
 
     // Implementations for FieldAttributeVisitor

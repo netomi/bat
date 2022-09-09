@@ -97,7 +97,7 @@ internal class ConstantPoolPrinter constructor(private val printer:         Inde
     }
 
     override fun visitPackageConstant(classFile: ClassFile, index: Int, constant: PackageConstant) {
-        printer.print("%-18s %s".format("Class", "#" + constant.nameIndex))
+        printer.print("%-18s %s".format("Package", "#" + constant.nameIndex))
         printer.padToPosition(42)
         printer.print("// ")
         constant.accept(classFile, index, constantPrinter)

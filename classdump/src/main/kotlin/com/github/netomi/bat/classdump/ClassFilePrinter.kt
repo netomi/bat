@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.io.IndentingPrinter
@@ -68,6 +69,13 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                     printer.print(" extends $interfaceString")
                 }
             }
+        } else if (classFile.isModule) {
+            val module = classFile.attributes.filterIsInstance<ModuleAttribute>().single()
+
+            val moduleName    = module.getModuleName(classFile)
+            val moduleVersion = module.getModuleVersion(classFile)
+
+            printer.print("module %s@%s".format(moduleName, moduleVersion))
         } else {
             val externalModifiers = classFile.modifiers.getPrintableModifiersString()
             if (externalModifiers.isNotEmpty()) {

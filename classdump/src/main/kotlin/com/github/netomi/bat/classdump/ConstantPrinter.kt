@@ -111,7 +111,9 @@ internal class ConstantPrinter constructor(private val printer:                I
             printer.print("class ")
         }
         val className = constant.getClassName(classFile)
-        if (className.isArrayClass or className.className.contains("package-info")) {
+        if (className.isArrayClass or
+            className.className.contains("package-info") or
+            className.className.contains("module-info")) {
             printer.print("\"$className\"")
         } else {
             printer.print(className)

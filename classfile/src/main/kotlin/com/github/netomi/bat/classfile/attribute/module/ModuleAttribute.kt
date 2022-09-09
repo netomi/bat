@@ -23,7 +23,6 @@ import com.github.netomi.bat.classfile.accessFlagModifiers
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.contentSize
@@ -69,16 +68,12 @@ data class ModuleAttribute
     val moduleVersionIndex: Int
         get() = _moduleVersionIndex
 
-    fun getModule(classFile: ClassFile): ModuleConstant {
-        return classFile.getModule(moduleNameIndex)
-    }
-
     fun getModuleName(classFile: ClassFile): String {
-        return getModule(classFile).getModuleName(classFile)
+        return classFile.getModule(moduleNameIndex).getModuleName(classFile)
     }
 
-    fun getModuleVersion(classFile: ClassFile): String {
-        return classFile.getString(moduleVersionIndex)
+    fun getModuleVersion(classFile: ClassFile): String? {
+        return if (moduleVersionIndex > 0) classFile.getString(moduleVersionIndex) else null
     }
 
     val requires: List<RequiresElement>

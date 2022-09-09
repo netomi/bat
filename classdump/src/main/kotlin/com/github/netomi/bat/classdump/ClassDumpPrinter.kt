@@ -44,7 +44,7 @@ class ClassDumpPrinter constructor(private val printHeader: Boolean = true) {
             printer.println("Classfile ${inputPath.toAbsolutePath()}")
             printer.levelUp()
 
-            val formatter = DateTimeFormatter.ofPattern("LLL dd, yyyy").withZone(ZoneId.systemDefault())
+            val formatter = DateTimeFormatter.ofPattern("LLL d, yyyy").withZone(ZoneId.systemDefault())
             val lastModified = inputPath.getLastModifiedTime().toInstant()
             val fileSize = Files.size(inputPath)
             printer.println("Last modified ${formatter.format(lastModified)}; size $fileSize bytes")
