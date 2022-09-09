@@ -30,6 +30,7 @@ class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(o
         super.read(instructions, offset)
 
         branchOffset = when (opCode) {
+            JvmOpCode.JSR_W,
             JvmOpCode.GOTO_W -> {
                 val offsetByte1 = instructions[offset + 1]
                 val offsetByte2 = instructions[offset + 2]

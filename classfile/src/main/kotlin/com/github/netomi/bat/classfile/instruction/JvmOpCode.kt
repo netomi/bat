@@ -216,8 +216,8 @@ enum class JvmOpCode constructor(
     IUSHR          (0x7c, "iushr", 1, ArithmeticInstruction::create),
     IXOR           (0x82, "ixor",  1, ArithmeticInstruction::create),
 
-    JSR            (0x8a, "jsr", 3),
-    JSR_W          (0xc9, "jsr_w", 5),
+    JSR            (0x8a, "jsr", 3, BranchInstruction::create),
+    JSR_W          (0xc9, "jsr_w", 5, BranchInstruction::create),
 
     L2D            (0x8a, "l2d", 1, ConversionInstruction::create),
     L2F            (0x89, "l2f", 1, ConversionInstruction::create),
@@ -274,7 +274,7 @@ enum class JvmOpCode constructor(
     MONITORENTER   (0xc2, "monitorenter", 1, MonitorInstruction::create),
     MONITOREXIT    (0xc3, "monitorexit",  1, MonitorInstruction::create),
 
-    MULTINEWARRAY  (0xc5, "multinewarray", 4),
+    MULTIANEWARRAY (0xc5, "multianewarray", 4, ArrayClassInstruction::create),
 
     NEW            (0xbb, "new", 3, ClassInstruction::create),
 

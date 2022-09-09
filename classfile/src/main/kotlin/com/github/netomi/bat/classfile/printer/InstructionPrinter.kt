@@ -55,6 +55,12 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         printer.println()
     }
 
+    override fun visitArrayClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayClassInstruction) {
+        printer.print("%4d: %-13s #%-17s // ".format(offset, instruction.mnemonic, "${instruction.classIndex},  ${instruction.dimension}"))
+        instruction.classAccept(classFile, constantPrinter)
+        printer.println()
+    }
+
     override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
         printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, offset + instruction.branchOffset))
     }

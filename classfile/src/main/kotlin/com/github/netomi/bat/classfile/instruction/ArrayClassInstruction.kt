@@ -19,39 +19,26 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.util.JvmClassName
 
-open class ClassInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class ArrayClassInstruction private constructor(opCode: JvmOpCode): ClassInstruction(opCode) {
 
-    var classIndex: Int = 0
+    var dimension: Int = 0
         private set
-
-    fun getClassName(classFile: ClassFile): JvmClassName {
-        return classFile.getClassName(classIndex)
-    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
 
-        val indexByte1 = instructions[offset + 1]
-        val indexByte2 = instructions[offset + 2]
-
-        classIndex = getIndex(indexByte1, indexByte2)
+        dimension = instructions[offset + 3].toInt()
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitClassInstruction(classFile, method, code, offset, this)
-    }
-
-    fun classAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.constantAccept(classIndex, visitor)
+        visitor.visitArrayClassInstruction(classFile, method, code, offset, this)
     }
 
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return ClassInstruction(opCode)
+            return ArrayClassInstruction(opCode)
         }
     }
 }
