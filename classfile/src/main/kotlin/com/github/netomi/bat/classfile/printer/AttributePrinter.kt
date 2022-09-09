@@ -128,6 +128,19 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         for (element in attribute) {
             val str = buildString {
+                val modifiers = accessFlagModifiers(element.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
+
+                if (modifiers.contains(AccessFlag.INTERFACE)) {
+                    modifiers.remove(AccessFlag.ABSTRACT)
+                }
+                modifiers.remove(AccessFlag.INTERFACE)
+
+                val externalModifiers = modifiers.getPrintableModifiers().joinToString(separator = " ")
+                if (externalModifiers.isNotEmpty()) {
+                    append(externalModifiers)
+                    append(" ")
+                }
+
                 if (element.innerNameIndex != 0) {
                     append("#${element.innerNameIndex}= ")
                 }
@@ -139,30 +152,6 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                 }
 
                 append(";")
-
-                val modifiers = accessFlagModifiers(element.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
-
-                if (modifiers.contains(AccessFlag.INTERFACE)) {
-                    modifiers.remove(AccessFlag.ABSTRACT)
-                }
-                modifiers.remove(AccessFlag.INTERFACE)
-
-                val externalModifiers =
-                    modifiers.getPrintableModifiers()
-
-                if (externalModifiers.isNotEmpty()) {
-                    var remainingLength = 39 - length
-                    var addedModifiers = ""
-
-                    for (modifier in externalModifiers) {
-                        if (modifier.length <= remainingLength) {
-                            addedModifiers  += "$modifier "
-                            remainingLength -= modifier.length + 1
-                        }
-                    }
-
-                    insert(0, addedModifiers)
-                }
             }
 
             val desc = buildString {

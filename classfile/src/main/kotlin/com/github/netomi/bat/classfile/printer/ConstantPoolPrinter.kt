@@ -22,9 +22,8 @@ import com.github.netomi.bat.classfile.constant.ConstantType
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 
-internal class ConstantPoolPrinter constructor(private val printer: IndentingPrinter): ConstantVisitor {
-
-    private val constantPrinter = ConstantPrinter(printer)
+internal class ConstantPoolPrinter constructor(private val printer:         IndentingPrinter,
+                                               private val constantPrinter: ConstantPrinter): ConstantVisitor {
 
     override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {}
 
@@ -46,7 +45,6 @@ internal class ConstantPoolPrinter constructor(private val printer: IndentingPri
     override fun visitDoubleConstant(classFile: ClassFile, index: Int, constant: DoubleConstant) {
         printer.print("%-18s ".format("Double"))
         constant.accept(classFile, index, constantPrinter)
-        printer.print("d")
     }
 
     override fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {

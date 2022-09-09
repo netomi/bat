@@ -49,14 +49,16 @@ internal class ConstantPrinter constructor(private val printer:                I
         if (printConstantType) {
             printer.print("float ")
         }
-        printer.print("%f".format(constant.value))
+        // use %s to not print insignificant zeros
+        printer.print("%sf".format(constant.value))
     }
 
     override fun visitDoubleConstant(classFile: ClassFile, index: Int, constant: DoubleConstant) {
         if (printConstantType) {
             printer.print("double ")
         }
-        printer.print("%f".format(constant.value))
+        // use %s to not print insignificant zeros
+        printer.print("%sd".format(constant.value))
     }
 
     override fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {
@@ -109,7 +111,7 @@ internal class ConstantPrinter constructor(private val printer:                I
             printer.print("class ")
         }
         val className = constant.getClassName(classFile)
-        if (className.isArrayClass) {
+        if (className.isArrayClass or className.className.contains("package-info")) {
             printer.print("\"$className\"")
         } else {
             printer.print(className)

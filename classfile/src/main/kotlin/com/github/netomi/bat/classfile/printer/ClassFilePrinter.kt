@@ -33,6 +33,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 {
     private val printer:             IndentingPrinter
     private val attributePrinter:    AttributePrinter
+    private val constantPrinter:     ConstantPrinter
     private val constantPoolPrinter: ConstantPoolPrinter
 
     private var methodCount: Int = 0
@@ -42,8 +43,8 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     constructor(writer: Writer) {
         this.printer             = IndentingPrinter(writer, 2)
         this.attributePrinter    = AttributePrinter(printer)
-        this.constantPoolPrinter = ConstantPoolPrinter(printer)
-
+        this.constantPrinter     = ConstantPrinter(printer)
+        this.constantPoolPrinter = ConstantPoolPrinter(printer, constantPrinter)
     }
 
     override fun visitClassFile(classFile: ClassFile) {
@@ -63,7 +64,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                 printer.print("interface %s".format(classFile.className.toExternalClassName()))
 
                 if (classFile.interfaces.isNotEmpty()) {
-                    val interfaceString = classFile.interfaces.joinToString(separator = ", ", transform = { it.toExternalClassName() })
+                    val interfaceString = classFile.interfaces.joinToString(separator = ",", transform = { it.toExternalClassName() })
                     printer.print(" extends $interfaceString")
                 }
             }
@@ -100,9 +101,13 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         val modifiers = classFile.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
         printer.println("flags: (0x%04x) %s".format(classFile.accessFlags, modifiers))
 
-        printer.println("this_class: #%-26d // %s".format(classFile.thisClassIndex,   classFile.className))
+        printer.print("this_class: #%-26d // ".format(classFile.thisClassIndex))
+        classFile.constantAccept(classFile.thisClassIndex, constantPrinter)
+        printer.println()
         if (classFile.superClassIndex > 0) {
-            printer.println("super_class: #%-25d // %s".format(classFile.superClassIndex, classFile.superClassName))
+            printer.print("super_class: #%-25d // ".format(classFile.superClassIndex))
+            classFile.constantAccept(classFile.superClassIndex, constantPrinter)
+            printer.println()
         } else {
             printer.println("super_class: #%-25d".format(classFile.superClassIndex))
         }
@@ -287,9 +292,15 @@ private fun Method.getExternalMethodSignature(classFile: ClassFile, hasVarArgs: 
             var externalParameterTypes = parameterTypes.map { it.toExternalType() }
 
             if (hasVarArgs) {
-                externalParameterTypes =
-                    externalParameterTypes.updated(externalParameterTypes.lastIndex,
-                                                   externalParameterTypes.last().replace("[]", "..."))
+                val lastParameter = externalParameterTypes.last()
+                val bracketsIndex = lastParameter.lastIndexOf("[]")
+                if (bracketsIndex == lastParameter.lastIndex - 1) {
+                    externalParameterTypes =
+                        externalParameterTypes.updated(
+                            externalParameterTypes.lastIndex,
+                            lastParameter.replaceRange(bracketsIndex, bracketsIndex + 2, "...")
+                        )
+                }
             }
 
             append(externalParameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")"))
