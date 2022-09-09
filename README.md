@@ -12,12 +12,12 @@ The following modules are currently available
 3. dexdump: prints the contents of **dex** files in the same format as the _dexdump_ tool
 4. classdump: prints the contents of **class** files in the same format as the _javap_ tool
 4. smali: assembler/disassembler for **dex** files
-5. commands: convenient command line tools for the different modules
+5. tools: convenient command line tools for the different modules
 
 ## Usage
 
 1. In the root directory run: ./gradlew distZip
-2. cd commands/build/distributions
+2. cd tools/build/distributions
 3. Unzip the file 'bat-tools-${VERSION}.zip'
 4. Run bat-${toolname}.sh from the unzipped directory
 
