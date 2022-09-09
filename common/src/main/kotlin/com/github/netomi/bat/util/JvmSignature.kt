@@ -23,7 +23,7 @@ interface SignatureVisitor {
     fun visitFormalTypeParameterEnd() {}
     fun visitFormalTypeParameter(name: String, formalParameterIndex: Int) {}
     fun visitClassBound() {}
-    fun visitInterfaceBound() {}
+    fun visitInterfaceBound(boundIndex: Int) {}
 
     fun visitSuperclass() {}
     fun visitInterface(interfaceIndex: Int) {}
@@ -69,17 +69,19 @@ private class SignatureParser private constructor(val signature: String) {
                 visitor.visitFormalTypeParameter(signature.substring(currentPosition, endPosition), formalParameterIndex++)
                 currentPosition = endPosition + 1
 
+                var boundIndex = 0
                 c = signature[currentPosition]
                 when (c) {
                     'L', '[', 'T' -> {
                         visitor.visitClassBound()
                         parseType(visitor)
+                        boundIndex++
                         c = signature[currentPosition]
                     }
                 }
 
                 while (c == ':') {
-                    visitor.visitInterfaceBound()
+                    visitor.visitInterfaceBound(boundIndex++)
                     currentPosition++
                     parseType(visitor)
                     c = signature[currentPosition]
@@ -110,17 +112,19 @@ private class SignatureParser private constructor(val signature: String) {
                 visitor.visitFormalTypeParameter(signature.substring(currentPosition, endPosition), formalParameterIndex++)
                 currentPosition = endPosition + 1
 
+                var boundIndex = 0
                 c = signature[currentPosition]
                 when (c) {
                     'L', '[', 'T' -> {
                         visitor.visitClassBound()
                         parseType(visitor)
+                        boundIndex++
                         c = signature[currentPosition]
                     }
                 }
 
                 while (c == ':') {
-                    visitor.visitInterfaceBound()
+                    visitor.visitInterfaceBound(boundIndex++)
                     currentPosition++
                     parseType(visitor)
                     c = signature[currentPosition]
@@ -332,8 +336,12 @@ private class ExternalSignatureBuilder constructor(val isInterface: Boolean = fa
         builder.append(" extends ")
     }
 
-    override fun visitInterfaceBound() {
-        builder.append(" extends ")
+    override fun visitInterfaceBound(boundIndex: Int) {
+        if (boundIndex == 0) {
+            builder.append(" extends ")
+        } else {
+            builder.append(" & ")
+        }
     }
 
     override fun visitSuperclass() {
