@@ -39,6 +39,7 @@ dependencies {
     implementation(project(":dexfile"))
     implementation(project(":smali"))
     implementation(project(":dexdump"))
+    implementation(project(":classdump"))
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiterVersion}")

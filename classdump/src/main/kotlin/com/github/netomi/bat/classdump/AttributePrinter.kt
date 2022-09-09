@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.printer
+package com.github.netomi.bat.classdump
 
 import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed

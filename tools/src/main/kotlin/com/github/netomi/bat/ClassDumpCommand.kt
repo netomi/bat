@@ -15,11 +15,16 @@
  */
 package com.github.netomi.bat
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.io.ClassFileReader
-import com.github.netomi.bat.classfile.printer.ClassFilePrinter
+import com.github.netomi.bat.classdump.ClassDumpPrinter
 import picocli.CommandLine
 import java.io.*
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.attribute.BasicFileAttributes
+import java.util.function.BiPredicate
+import java.util.function.Predicate
+import kotlin.io.path.*
 
 /**
  * Command-line tool to dump class files.
@@ -31,38 +36,72 @@ import java.io.*
     optionListHeading    = "%nOptions:%n")
 class ClassDumpCommand : Runnable {
 
-    @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.class / *.jar)"])
+    @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file(s) to process (*.class / *.jar)"])
     private lateinit var inputFile: File
 
     @CommandLine.Option(names = ["-o"], arity = "1", description = ["output file name (defaults to stdout)"])
     private var outputFile: File? = null
 
-    @CommandLine.Option(names = ["-a"], description = ["print annotations"])
-    private var printAnnotations = false
+    @CommandLine.Option(names = ["-h"], description = ["print header"])
+    private var printHeader = false
 
-    @CommandLine.Option(names = ["-c"], description = ["class filter"])
-    private var classNameFilter: String? = null
+    @CommandLine.Option(names = ["-v"], description = ["verbose output"])
+    private var verbose: Boolean = false
 
     override fun run() {
-        FileInputStream(inputFile).use { `is` ->
-            val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
+        val printer = ClassDumpPrinter(printHeader)
 
-            println("Processing '${inputFile.name}'...")
+        val inputPath = inputFile.toPath()
+        if (inputPath.isDirectory()) {
+            val outputBasePath = if (outputFile == null) null else outputFile!!.toPath()
 
-            // TODO: currently supporting only single class files.
-            val classFile = ClassFile.empty()
-            val reader    = ClassFileReader(`is`)
-            reader.visitClassFile(classFile)
-            classFile.accept(ClassFilePrinter(os))
+            printVerbose("Dumping class files from '${inputFile}' into directory '$outputBasePath' ...")
 
-            if (outputFile != null) {
-                os.close()
+            val inputFiles = Files.find(inputPath, Int.MAX_VALUE, REGULAR_FILE)
+            inputFiles.use {
+                it.filter(CLASS_FILE)
+                  .sorted()
+                  .forEach { filePath ->
+                      printVerbose("  dumping file '${filePath}'")
+
+                      val os = if (outputBasePath != null) {
+                          val relativeFilePath = filePath.relativeTo(inputPath)
+                          val outputPath       = outputBasePath.resolve(relativeFilePath)
+                          outputPath.parent.createDirectories()
+                          Paths.get(outputBasePath.resolve(relativeFilePath).toString() + ".txt").outputStream()
+                      } else {
+                          System.out
+                      }
+
+                      filePath.inputStream().use { `is` ->
+                          printer.dumpClassFile(filePath, `is`, os)
+                      }
+                  }
+            }
+        } else {
+            FileInputStream(inputFile).use { `is` ->
+                val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
+
+                // TODO: handle jar or general archive files
+                printer.dumpClassFile(inputPath, `is`, os)
+
+                if (outputFile != null) {
+                    os.close()
+                }
             }
         }
+    }
 
+    private fun printVerbose(text: String) {
+        if (verbose) {
+            println(text)
+        }
     }
 
     companion object {
+        private val REGULAR_FILE = BiPredicate { _: Path, attr: BasicFileAttributes -> attr.isRegularFile }
+        private val CLASS_FILE   = Predicate   { path: Path -> path.name.endsWith(".class") }
+
         @JvmStatic
         fun main(args: Array<String>) {
             val cmdLine = CommandLine(ClassDumpCommand())

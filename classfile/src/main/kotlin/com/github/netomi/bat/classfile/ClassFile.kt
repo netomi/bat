@@ -62,6 +62,9 @@ class ClassFile private constructor() {
 
     internal val constantPool: ConstantPool = ConstantPool.empty()
 
+    val constantPoolSize: Int
+        get() = constantPool.size
+
     internal var _interfaces = mutableListOfCapacity<Int>(0)
     internal var _fields     = mutableListOfCapacity<Field>(0)
     internal var _methods    = mutableListOfCapacity<Method>(0)
@@ -97,59 +100,59 @@ class ClassFile private constructor() {
         return constantPool[constantIndex]
     }
 
-    internal fun getClass(constantIndex: Int): ClassConstant {
+    fun getClass(constantIndex: Int): ClassConstant {
         return (constantPool[constantIndex] as ClassConstant)
     }
 
-    internal fun getFieldref(constantIndex: Int): FieldrefConstant {
+    fun getFieldref(constantIndex: Int): FieldrefConstant {
         return (constantPool[constantIndex] as FieldrefConstant)
     }
 
-    internal fun getMethodref(constantIndex: Int): MethodrefConstant {
+    fun getMethodref(constantIndex: Int): MethodrefConstant {
         return (constantPool[constantIndex] as MethodrefConstant)
     }
 
-    internal fun getInterfaceMethodref(constantIndex: Int): InterfaceMethodrefConstant {
+    fun getInterfaceMethodref(constantIndex: Int): InterfaceMethodrefConstant {
         return (constantPool[constantIndex] as InterfaceMethodrefConstant)
     }
 
-    internal fun getDynamic(constantIndex: Int): DynamicConstant {
+    fun getDynamic(constantIndex: Int): DynamicConstant {
         return (constantPool[constantIndex] as DynamicConstant)
     }
 
-    internal fun getModule(constantIndex: Int): ModuleConstant {
+    fun getModule(constantIndex: Int): ModuleConstant {
         return (constantPool[constantIndex] as ModuleConstant)
     }
 
-    internal fun getPackage(constantIndex: Int): PackageConstant {
+    fun getPackage(constantIndex: Int): PackageConstant {
         return (constantPool[constantIndex] as PackageConstant)
     }
 
-    internal fun getInteger(constantIndex: Int): Int {
+    fun getInteger(constantIndex: Int): Int {
         return (constantPool[constantIndex] as IntegerConstant).value
     }
 
-    internal fun getBoolean(constantIndex: Int): Boolean {
+    fun getBoolean(constantIndex: Int): Boolean {
         return (constantPool[constantIndex] as IntegerConstant).value == 1
     }
 
-    internal fun getUtf8Constant(constantIndex: Int): Utf8Constant {
+    fun getUtf8Constant(constantIndex: Int): Utf8Constant {
         return (constantPool[constantIndex] as Utf8Constant)
     }
 
-    internal fun getString(stringIndex: Int): String {
+    fun getString(stringIndex: Int): String {
         return (constantPool[stringIndex] as Utf8Constant).value
     }
 
-    internal fun getClassName(classIndex: Int): JvmClassName {
+    fun getClassName(classIndex: Int): JvmClassName {
         return (constantPool[classIndex] as ClassConstant).getClassName(this)
     }
 
-    internal fun getType(typeIndex: Int): JvmType {
+    fun getType(typeIndex: Int): JvmType {
         return getString(typeIndex).asJvmType()
     }
 
-    internal fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
+    fun getNameAndType(nameAndTypeIndex: Int): NameAndTypeConstant {
         return (constantPool[nameAndTypeIndex] as NameAndTypeConstant)
     }
 

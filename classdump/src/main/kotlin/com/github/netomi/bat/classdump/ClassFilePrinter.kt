@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.printer
+package com.github.netomi.bat.classdump
 
 import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
@@ -29,7 +29,7 @@ import java.io.OutputStreamWriter
 import java.io.Writer
 import java.util.*
 
-class ClassFilePrinter : ClassFileVisitor, MemberVisitor
+internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 {
     private val printer:             IndentingPrinter
     private val attributePrinter:    AttributePrinter
@@ -122,7 +122,7 @@ class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 
         printer.println("Constant pool:")
         printer.levelUp()
-        val indexWidth = classFile.constantPool.size.toString().length + 1
+        val indexWidth = classFile.constantPoolSize.toString().length + 1
         classFile.constantsAccept { cf, index, constant ->
             printer.print(String.format("%${indexWidth}s = ", "#$index"))
             constant.accept(cf, index, constantPoolPrinter)

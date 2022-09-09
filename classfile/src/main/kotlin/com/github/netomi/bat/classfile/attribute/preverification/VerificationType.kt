@@ -23,7 +23,7 @@ import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.JvmClassName
 
 abstract class VerificationType: ClassFileContent() {
-    internal abstract val type: ItemType
+    abstract val type: ItemType
 
     override val contentSize: Int = 1
 
@@ -256,7 +256,7 @@ data class UninitializedVariable private constructor(private var _offset: Int = 
     }
 }
 
-internal enum class ItemType constructor(internal val tag: Int, private val supplier: () -> VerificationType) {
+enum class ItemType constructor(internal val tag: Int, private val supplier: () -> VerificationType) {
     TOP               (ITEM_Top,               TopVariable::empty),
     INTEGER           (ITEM_Integer,           IntegerVariable::empty),
     LONG              (ITEM_Long,              LongVariable::empty),
