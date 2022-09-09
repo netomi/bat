@@ -38,10 +38,11 @@ interface SignatureVisitor {
 
     fun visitBaseType(baseType: String) {}
 
-    fun visitArrayType() {}
+    fun visitArrayType(dimension: Int) {}
 
     fun visitClassType(className: String) {}
     fun visitInnerClassType(className: String) {}
+    fun visitClassTypeEnd(className: String) {}
 
     fun visitTypeVariable(variableName: String) {}
 
@@ -163,7 +164,12 @@ private class SignatureParser private constructor(val signature: String) {
         } else {
             when (c) {
                 '[' -> {
-                    visitor.visitArrayType()
+                    var dimension = 1
+                    while (signature[currentPosition] == '[') {
+                        dimension++
+                        currentPosition++
+                    }
+                    visitor.visitArrayType(dimension)
                     parseType(visitor)
                     return
                 }
@@ -183,23 +189,29 @@ private class SignatureParser private constructor(val signature: String) {
                     while (currentPosition < signature.length) {
                         when (signature[currentPosition++]) {
                             '.' -> {
+                                val className = signature.substring(startPosition, currentPosition - 1)
                                 if (!visited) {
-                                    val className = signature.substring(startPosition, currentPosition - 1)
-                                    visitor.visitClassType(className)
-                                }
-                                startPosition = currentPosition
-                                innerClass = true
-                                visited    = false
-                            }
-                            ';' -> {
-                                if (!visited) {
-                                    val className = signature.substring(startPosition, currentPosition - 1)
                                     if (innerClass) {
                                         visitor.visitInnerClassType(className)
                                     } else {
                                         visitor.visitClassType(className)
                                     }
                                 }
+                                visitor.visitClassTypeEnd(className)
+                                startPosition = currentPosition
+                                innerClass = true
+                                visited    = false
+                            }
+                            ';' -> {
+                                val className = signature.substring(startPosition, currentPosition - 1)
+                                if (!visited) {
+                                    if (innerClass) {
+                                        visitor.visitInnerClassType(className)
+                                    } else {
+                                        visitor.visitClassType(className)
+                                    }
+                                }
+                                visitor.visitClassTypeEnd(className)
                                 return
                             }
 
@@ -222,6 +234,7 @@ private class SignatureParser private constructor(val signature: String) {
                                         '>' -> {
                                             foundEnd = true
                                             visitor.visitTypeArgumentEnd()
+                                            visitor.visitClassTypeEnd(className)
                                             currentPosition++
                                         }
 
@@ -294,6 +307,8 @@ private class ExternalSignatureBuilder constructor(val isInterface: Boolean = fa
         get() = builder.toString()
 
     var nextTypeIsArray = false
+    var arrayDimension  = 0
+    var arrayClassName:String? = null
     var ignoreNextType  = false
 
     override fun visitFormalTypeParameterStart() {
@@ -379,15 +394,16 @@ private class ExternalSignatureBuilder constructor(val isInterface: Boolean = fa
 
     override fun visitBaseType(baseType: String) {
         if (nextTypeIsArray) {
-            builder.append("[$baseType".asJvmType().toExternalType())
+            builder.append("${"[".repeat(arrayDimension)}$baseType".asJvmType().toExternalType())
             nextTypeIsArray = false
         } else {
             builder.append(baseType.asJvmType().toExternalType())
         }
     }
 
-    override fun visitArrayType() {
+    override fun visitArrayType(dimension: Int) {
         nextTypeIsArray = true
+        arrayDimension  = dimension
     }
 
     override fun visitInnerClassType(className: String) {
@@ -396,7 +412,8 @@ private class ExternalSignatureBuilder constructor(val isInterface: Boolean = fa
 
     override fun visitClassType(className: String) {
         if (nextTypeIsArray) {
-            builder.append("[${className.asInternalClassName().toInternalType()}".asJvmType().toExternalType())
+            builder.append(className.asInternalClassName().toExternalClassName())
+            arrayClassName = className
             nextTypeIsArray = false
         } else if (ignoreNextType) {
             ignoreNextType = false
@@ -405,9 +422,16 @@ private class ExternalSignatureBuilder constructor(val isInterface: Boolean = fa
         }
     }
 
+    override fun visitClassTypeEnd(className: String) {
+        if (className == arrayClassName) {
+            builder.append("[]".repeat(arrayDimension))
+            arrayClassName = null
+        }
+    }
+
     override fun visitTypeVariable(variableName: String) {
         if (nextTypeIsArray) {
-            builder.append("${variableName}[]")
+            builder.append("${variableName}${"[]".repeat(arrayDimension)}")
             nextTypeIsArray = false
         } else {
             builder.append(variableName)
@@ -444,8 +468,8 @@ private class ExternalSignatureBuilder constructor(val isInterface: Boolean = fa
 
 fun main(args: Array<String>) {
     val classSignature = "Lcom/google/common/cache/LocalCache<TK;TV;>.AbstractCacheSet<Ljava/util/Map\$Entry<TK;TV;>;>;"
-    val fieldSignature = "Ljava/util/Map\$Entry<TK;TV;>;"
+    val fieldSignature = "[[TV;"
     val methodSignature = "<E:Ljava/lang/Object;>([TE;)[TE;"
     val signature = "<A::Ljava/lang/Appendable;>(TA;Ljava/util/Map<**>;)TA;"
-    println(getExternalMethodSignature(methodSignature))
+    println(getExternalFieldSignature(fieldSignature))
 }
