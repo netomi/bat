@@ -43,6 +43,10 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
 
+    override fun visitUnknownAttribute(classFile: ClassFile, attribute: UnknownAttribute) {
+        printer.println("UnknownAttribute: name=${attribute.getAttributeName(classFile)} size=${attribute.data.size}")
+    }
+
     override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         printer.println("Deprecated: true")
     }
@@ -244,6 +248,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val exportsIndexAndFlags = "${exportsElement.exportsIndex},${exportsElement.exportsFlags.toHexString()}"
             printer.print("#%-38s // ".format(exportsIndexAndFlags))
             classFile.constantAccept(exportsElement.exportsIndex, constantPrinter)
+            // TODO: print accessflags
             if (exportsElement.size > 0) {
                 printer.println(" to ... ${exportsElement.size}")
                 printer.levelUp()
@@ -256,7 +261,6 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             } else {
                 printer.println()
             }
-            // TODO: print accessflags
         }
         printer.levelDown()
 
@@ -320,7 +324,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             classFile.constantAccept(packageIndex, constantPrinter)
             printer.println()
         }
-        printer.levelUp()
+        printer.levelDown()
     }
 
     // Implementations for FieldAttributeVisitor
