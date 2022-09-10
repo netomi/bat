@@ -327,6 +327,22 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
+    override fun visitNestHostAttribute(classFile: ClassFile, attribute: NestHostAttribute) {
+        printer.print("NestHost: class ")
+        classFile.constantAccept(attribute.hostClassIndex, constantPrinter)
+        printer.println()
+    }
+
+    override fun visitNestMembersAttribute(classFile: ClassFile, attribute: NestMembersAttribute) {
+        printer.println("NestMembers:")
+        printer.levelUp()
+        for (memberIndex in attribute) {
+            classFile.constantAccept(memberIndex, constantPrinter)
+            printer.println()
+        }
+        printer.levelDown()
+    }
+
     // Implementations for FieldAttributeVisitor
 
     override fun visitConstantValueAttribute(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {
