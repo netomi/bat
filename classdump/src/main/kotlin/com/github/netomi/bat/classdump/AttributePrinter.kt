@@ -190,6 +190,16 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
+    override fun visitPermittedSubclassesAttribute(classFile: ClassFile, attribute: PermittedSubclassesAttribute) {
+        printer.println("PermittedSubclasses:")
+        printer.levelUp()
+        for (classIndex in attribute) {
+            classFile.constantAccept(classIndex, constantPrinter)
+            printer.println()
+        }
+        printer.levelDown()
+    }
+
     override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
         printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
     }
