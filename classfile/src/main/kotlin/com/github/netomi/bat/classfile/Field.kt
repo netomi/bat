@@ -20,6 +20,8 @@ import com.github.netomi.bat.classfile.attribute.ConstantValueAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.visitor.FieldVisitor
+import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.toHexString
 import java.io.DataInput
 import java.io.IOException
@@ -33,6 +35,14 @@ class Field private constructor(): Member() {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.FIELD
+
+    fun accept(classFile: ClassFile, index: Int, visitor: FieldVisitor) {
+        visitor.visitField(classFile, index, this)
+    }
+
+    override fun accept(classFile: ClassFile, index: Int, visitor: MemberVisitor) {
+        visitor.visitField(classFile, index, this)
+    }
 
     override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
         for (attribute in attributes.filterIsInstance(AttachedToField::class.java)) {

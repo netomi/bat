@@ -22,7 +22,9 @@ import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.visitor.FieldVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
+import com.github.netomi.bat.classfile.visitor.MethodVisitor
 import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.asJvmType
@@ -173,11 +175,11 @@ class ClassFile private constructor() {
         membersAccept(visitor)
     }
 
-    fun fieldsAccept(visitor: MemberVisitor) {
+    fun fieldsAccept(visitor: FieldVisitor) {
         fields.forEachIndexed { index, field -> visitor.visitField(this, index, field) }
     }
 
-    fun methodsAccept(visitor: MemberVisitor) {
+    fun methodsAccept(visitor: MethodVisitor) {
         methods.forEachIndexed { index, method -> visitor.visitMethod(this, index, method) }
     }
 

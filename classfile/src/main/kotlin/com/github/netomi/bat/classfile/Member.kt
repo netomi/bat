@@ -19,6 +19,7 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 import java.util.*
@@ -59,6 +60,7 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
         return classFile.getString(descriptorIndex)
     }
 
+    abstract fun accept(classFile: ClassFile, index: Int, visitor: MemberVisitor)
     abstract fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor)
 
     @Throws(IOException::class)

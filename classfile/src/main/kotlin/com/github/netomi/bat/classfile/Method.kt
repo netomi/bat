@@ -18,6 +18,8 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.attribute.AttachedToMethod
 import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.visitor.MemberVisitor
+import com.github.netomi.bat.classfile.visitor.MethodVisitor
 import com.github.netomi.bat.util.getArgumentSize
 import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import com.github.netomi.bat.util.toHexString
@@ -45,6 +47,14 @@ class Method private constructor(): Member() {
         val (parameters, _) = parseDescriptorToJvmTypes(getDescriptor(classFile))
         argumentCount += parameters.size
         return argumentCount
+    }
+
+    fun accept(classFile: ClassFile, index: Int, visitor: MethodVisitor) {
+        visitor.visitMethod(classFile, index, this)
+    }
+
+    override fun accept(classFile: ClassFile, index: Int, visitor: MemberVisitor) {
+        visitor.visitMethod(classFile, index, this)
     }
 
     override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {

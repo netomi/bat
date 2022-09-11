@@ -12,6 +12,11 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.compileTestJava {
+    sourceCompatibility = JavaVersion.VERSION_17.toString()
+    targetCompatibility = JavaVersion.VERSION_17.toString()
+}
+
 dependencies {
     implementation(project(":common"))
     testImplementation(kotlin("test"))
