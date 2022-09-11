@@ -43,6 +43,10 @@ data class ExceptionsAttribute
     val size: Int
         get() = exceptions.size
 
+    operator fun get(index: Int): Int {
+        return exceptions[index]
+    }
+
     override fun iterator(): Iterator<Int> {
         return exceptions.iterator()
     }
