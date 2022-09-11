@@ -26,7 +26,7 @@ internal class TargetInfoPrinter constructor(private val printer: IndentingPrint
     override fun visitAnyTargetInfo(classFile: ClassFile, targetInfo: TargetInfo) {}
 
     override fun visitCatchTargetInfo(classFile: ClassFile, targetInfo: CatchTargetInfo) {
-        TODO("implement")
+        printer.print(", exception_index=${targetInfo.exceptionTableIndex}")
     }
 
     override fun visitTypeParameterTargetInfo(classFile: ClassFile, targetInfo: TypeParameterTargetInfo) {

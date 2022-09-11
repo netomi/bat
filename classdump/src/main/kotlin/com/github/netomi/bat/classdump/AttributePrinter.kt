@@ -440,6 +440,21 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         visitRuntimeParameterAnnotationsAttribute(classFile, method, attribute)
     }
 
+    override fun visitMethodParametersAttribute(classFile: ClassFile, method: Method, attribute: MethodParametersAttribute) {
+        printer.println("MethodParameters:")
+        printer.levelUp()
+        printer.println("%-30s %4s".format("Name", "Flags"))
+        for (parameter in attribute) {
+            printer.print("%-30s".format(parameter.getName(classFile)))
+            if (parameter.accessFlags != 1) {
+                // TODO: print names of accessflags instead of numeric value (e.g. final)
+                printer.print(" %04x".format(parameter.accessFlags))
+            }
+            printer.println()
+        }
+        printer.levelDown()
+    }
+
     // Implementations for CodeAttributeVisitor
 
     override fun visitLineNumberTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {

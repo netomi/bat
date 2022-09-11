@@ -53,11 +53,18 @@ data class MethodParametersAttribute
     }
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        parameters = input.readContentList(ParameterElement.Companion::read)
+        val parametersCount = input.readUnsignedByte()
+        parameters = mutableListOfCapacity(parametersCount)
+        for (i in 0 until parametersCount) {
+            parameters.add(ParameterElement.read(input))
+        }
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeContentList(parameters)
+        output.writeByte(parameters.size)
+        for (element in parameters) {
+            element.write(output)
+        }
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
