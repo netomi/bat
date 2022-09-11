@@ -473,11 +473,3 @@ private class ExternalSignatureBuilder constructor(val isInterface: Boolean = fa
         }
     }
 }
-
-fun main(args: Array<String>) {
-    val classSignature = "Lcom/google/common/cache/LocalCache<TK;TV;>.AbstractCacheSet<Ljava/util/Map\$Entry<TK;TV;>;>;"
-    val fieldSignature = "[[TV;"
-    val methodSignature = "<E:Ljava/lang/Object;>([TE;)[TE;"
-    val signature = "<A::Ljava/lang/Appendable;>(TA;Ljava/util/Map<**>;)TA;"
-    println(getExternalFieldSignature(fieldSignature))
-}

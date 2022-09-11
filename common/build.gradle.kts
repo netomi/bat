@@ -17,4 +17,5 @@ dependencies {
     api("com.google.guava:guava:${Versions.guavaVersion}")
 
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${Versions.jupiterVersion}")
 }
