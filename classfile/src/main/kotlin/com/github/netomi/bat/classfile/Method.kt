@@ -57,10 +57,14 @@ class Method private constructor(): Member() {
         visitor.visitMethod(classFile, index, this)
     }
 
-    override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
+    fun attributesAccept(classFile: ClassFile, visitor: MethodAttributeVisitor) {
         for (attribute in attributes.filterIsInstance(AttachedToMethod::class.java)) {
             attribute.accept(classFile, this, visitor)
         }
+    }
+
+    override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
+        attributesAccept(classFile, visitor as MethodAttributeVisitor)
     }
 
     override fun toString(): String {

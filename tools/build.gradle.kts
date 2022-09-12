@@ -38,6 +38,7 @@ dependencies {
     implementation(project(":classfile"))
     implementation(project(":dexfile"))
     implementation(project(":smali"))
+    implementation(project(":jasm"))
     implementation(project(":dexdump"))
     implementation(project(":classdump"))
 

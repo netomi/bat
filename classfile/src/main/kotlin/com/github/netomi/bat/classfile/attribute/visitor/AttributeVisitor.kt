@@ -158,4 +158,16 @@ fun interface AttributeVisitor: ClassAttributeVisitor, MemberAttributeVisitor, C
     override fun visitSignatureAttribute(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: SignatureAttribute) {
         visitAnySignatureAttribute(classFile, attribute)
     }
+
+    fun visitAnySyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    override fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+        visitAnySyntheticAttribute(classFile, attribute)
+    }
+
+    override fun visitSyntheticAttribute(classFile: ClassFile, member: Member, attribute: SyntheticAttribute) {
+        visitAnySyntheticAttribute(classFile, attribute)
+    }
 }

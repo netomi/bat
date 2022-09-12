@@ -1,0 +1,66 @@
+/*
+ *  Copyright (c) 2020-2022 Thomas Neidhart.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.github.netomi.bat.jasm.disassemble
+
+import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
+import com.github.netomi.bat.io.IndentingPrinter
+
+internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor {
+
+    var printedAttributes: Boolean = false
+        private set
+
+    fun reset() {
+        printedAttributes = false
+    }
+
+    // Common Attributes.
+
+    override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+        printer.println(".deprecated")
+        printedAttributes = true
+    }
+
+    override fun visitAnySyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+        printer.println(".synthetic")
+        printedAttributes = true
+    }
+
+    override fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+        printer.println(".signature \"${attribute.getSignature(classFile)}\"")
+        printedAttributes = true
+    }
+
+    // ClassAttributeVisitor.
+
+    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
+
+    override fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+        printer.println(".synthetic")
+        printedAttributes = true
+    }
+
+    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
+        val sourceFile = attribute.getSourceFile(classFile)
+        printer.println(".source \"$sourceFile\"")
+        printedAttributes = true
+    }
+
+    // FieldAttributeVisitor.
+}

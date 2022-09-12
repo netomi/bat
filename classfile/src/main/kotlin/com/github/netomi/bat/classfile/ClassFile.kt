@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.AttachedToClass
 import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
@@ -95,6 +96,11 @@ class ClassFile private constructor() {
 
     val attributes: List<Attribute>
         get() = _attributes
+
+    // convenience methods to access certain attributes
+
+    val sourceFile: String?
+        get() = attributes.filterIsInstance<SourceFileAttribute>().singleOrNull()?.getSourceFile(this)
 
     // helper methods to access constant pool entries
 

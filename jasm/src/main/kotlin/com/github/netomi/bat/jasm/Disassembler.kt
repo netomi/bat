@@ -18,10 +18,8 @@ package com.github.netomi.bat.jasm
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
-import com.github.netomi.bat.io.FileOutputStreamFactory
 import com.github.netomi.bat.io.OutputStreamFactory
 import com.github.netomi.bat.jasm.disassemble.JasmPrinter
-import java.nio.file.Path
 
 class Disassembler(private val outputStreamFactory: OutputStreamFactory) : ClassFileVisitor {
     override fun visitClassFile(classFile: ClassFile) {
@@ -29,11 +27,4 @@ class Disassembler(private val outputStreamFactory: OutputStreamFactory) : Class
             JasmPrinter(writer).visitClassFile(classFile)
         }
     }
-}
-
-fun main(args: Array<String>) {
-    val factory = FileOutputStreamFactory(Path.of("tmp"), "jasm")
-    val disassembler = Disassembler(factory)
-
-
 }

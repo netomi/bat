@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.AttachedToField
 import com.github.netomi.bat.classfile.attribute.ConstantValueAttribute
+import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -44,10 +45,14 @@ class Field private constructor(): Member() {
         visitor.visitField(classFile, index, this)
     }
 
-    override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
+    fun attributesAccept(classFile: ClassFile, visitor: FieldAttributeVisitor) {
         for (attribute in attributes.filterIsInstance(AttachedToField::class.java)) {
             attribute.accept(classFile, this, visitor)
         }
+    }
+
+    override fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor) {
+        attributesAccept(classFile, visitor as FieldAttributeVisitor)
     }
 
     fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {
