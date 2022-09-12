@@ -18,10 +18,15 @@ package com.github.netomi.bat.jasm.disassemble
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 
-internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor {
+internal class AttributePrinter constructor(private val printer:         IndentingPrinter,
+                                            private val constantPrinter: ConstantPrinter): AttributeVisitor {
+
+    private val annotationPrinter = AnnotationPrinter(printer, constantPrinter)
 
     var printedAttributes: Boolean = false
         private set
@@ -31,6 +36,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     }
 
     // Common Attributes.
+
+    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
 
     override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         printer.println(".deprecated")
@@ -47,14 +54,29 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printedAttributes = true
     }
 
-    // ClassAttributeVisitor.
-
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
-
-    override fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
-        printer.println(".synthetic")
-        printedAttributes = true
+    override fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+        if (attribute.size > 0) {
+            printer.println(".annotations visible")
+            printer.levelUp()
+            attribute.annotationsAccept(classFile, annotationPrinter)
+            printer.levelDown()
+            printer.println(".end annotations")
+            printedAttributes = true
+        }
     }
+
+    override fun visitAnyRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        if (attribute.size > 0) {
+            printer.println(".annotations invisible")
+            printer.levelUp()
+            attribute.annotationsAccept(classFile, annotationPrinter)
+            printer.levelDown()
+            printer.println(".end annotations")
+            printedAttributes = true
+        }
+    }
+
+    // ClassAttributeVisitor.
 
     override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
         val sourceFile = attribute.getSourceFile(classFile)

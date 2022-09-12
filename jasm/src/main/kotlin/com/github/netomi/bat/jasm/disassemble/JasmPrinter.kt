@@ -16,10 +16,7 @@
 
 package com.github.netomi.bat.jasm.disassemble
 
-import com.github.netomi.bat.classfile.AccessFlag
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.Field
-import com.github.netomi.bat.classfile.Member
+import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -32,14 +29,14 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
     : ClassFileVisitor, MemberVisitor {
 
     private val printer          = IndentingPrinter(writer, 4)
-    private val attributePrinter = AttributePrinter(printer)
     private val constantPrinter  = ConstantPrinter(printer)
+    private val attributePrinter = AttributePrinter(printer, constantPrinter)
 
     override fun visitClassFile(classFile: ClassFile) {
         printer.print(".class")
 
         val modifiers = classFile.modifiers
-        // the super flag is implicit in Java SE8 and above, think about how to handle it
+        // TODO: the super flag is implicit in Java SE8 and above, think about how to handle it
         // it feels redundant to always print it, we should probably only do it when byte code version is below 52.0
         // modifiers.remove(AccessFlag.SUPER)
 
@@ -65,13 +62,11 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
 
         if (classFile.fields.isNotEmpty()) {
             printer.println()
-            printer.println()
             printer.println("# fields")
             classFile.fieldsAccept(this)
         }
 
         if (classFile.methods.isNotEmpty()) {
-            printer.println()
             printer.println()
             printer.println("# methods")
             classFile.methodsAccept(this)
@@ -80,11 +75,13 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
         val remainingAttributes = classFile.attributes.filter { it !is SourceFileAttribute }.size
         if (remainingAttributes > 0) {
             printer.println()
-            printer.println()
             printer.println("# attributes")
             attributePrinter.reset()
             classFile.attributesAccept(attributePrinter)
         }
+
+        printer.println()
+        printer.println(".end class")
 
         printer.flush()
     }
@@ -97,7 +94,7 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
         printer.print(".field")
 
         val modifiers =
-            field.modifiers.joinToString(separator = " ", transform = { it.toString().lowercase(Locale.getDefault())})
+            field.modifiers.joinToString(separator = " ", transform = { it.toString().lowercase(Locale.getDefault()) })
 
         if (modifiers.isNotEmpty()) {
             printer.print(" $modifiers")
@@ -122,6 +119,27 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
             printer.println(".end field")
         }
 
+        printer.println()
+    }
+
+    override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
+        printer.print(".method")
+
+        val modifiers =
+            method.modifiers.joinToString(separator = " ", transform = { it.toString().lowercase(Locale.getDefault()) })
+
+        if (modifiers.isNotEmpty()) {
+            printer.print(" $modifiers")
+        }
+
+        printer.println(" " + method.getName(classFile) + method.getDescriptor(classFile))
+
+        printer.levelUp()
+        attributePrinter.reset()
+        method.attributesAccept(classFile, attributePrinter)
+        printer.levelDown()
+
+        printer.println(".end method")
         printer.println()
     }
 }
