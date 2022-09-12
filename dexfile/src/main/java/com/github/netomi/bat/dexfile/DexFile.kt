@@ -20,6 +20,7 @@ import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.util.asDexType
 import com.github.netomi.bat.dexfile.visitor.*
 import com.github.netomi.bat.util.asInternalClassName
+import com.github.netomi.bat.util.mutableListOfCapacity
 import com.github.netomi.bat.util.parallelForEachIndexed
 import kotlinx.coroutines.Dispatchers
 import kotlin.coroutines.CoroutineContext
@@ -48,14 +49,14 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     var mapList: MapList? = null
         internal set
 
-    internal val stringIDs     = ArrayList<StringID>()
-    internal val typeIDs       = ArrayList<TypeID>()
-    internal val protoIDs      = ArrayList<ProtoID>()
-    internal val fieldIDs      = ArrayList<FieldID>()
-    internal val methodIDs     = ArrayList<MethodID>()
-    internal var classDefs     = ArrayList<ClassDef>()
-    internal val callSiteIDs   = ArrayList<CallSiteID>()
-    internal val methodHandles = ArrayList<MethodHandle>()
+    internal var stringIDs:     MutableList<StringID>     = mutableListOfCapacity(0)
+    internal var typeIDs:       MutableList<TypeID>       = mutableListOfCapacity(0)
+    internal var protoIDs:      MutableList<ProtoID>      = mutableListOfCapacity(0)
+    internal var fieldIDs:      MutableList<FieldID>      = mutableListOfCapacity(0)
+    internal var methodIDs:     MutableList<MethodID>     = mutableListOfCapacity(0)
+    internal var classDefs:     MutableList<ClassDef>     = mutableListOfCapacity(0)
+    internal var callSiteIDs:   MutableList<CallSiteID>   = mutableListOfCapacity(0)
+    internal var methodHandles: MutableList<MethodHandle> = mutableListOfCapacity(0)
 
     private val classDefMap : MutableMap<String, Int> = mutableMapOf()
 
@@ -66,26 +67,15 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
         return dexFormat >= opCode.minFormat
     }
 
-    internal fun clear() {
-        stringIDs.clear()
-        typeIDs.clear()
-        protoIDs.clear()
-        fieldIDs.clear()
-        methodIDs.clear()
-        classDefs.clear()
-        callSiteIDs.clear()
-        methodHandles.clear()
-
-        stringMap.clear()
-        typeMap.clear()
-        protoIDMap.clear()
-        fieldIDMap.clear()
-        methodIDMap.clear()
-        classDefMap.clear()
-        callSiteIDMap.clear()
-        methodHandleMap.clear()
-
-        linkData = null
+    internal fun isEmpty(): Boolean {
+        return stringIDs.isEmpty()   &&
+               typeIDs.isEmpty()     &&
+               protoIDs.isEmpty()    &&
+               fieldIDs.isEmpty()    &&
+               methodIDs.isEmpty()   &&
+               classDefs.isEmpty()   &&
+               callSiteIDs.isEmpty() &&
+               methodHandles.isEmpty()
     }
 
     val stringIDCount: Int
@@ -424,8 +414,29 @@ class DexFile private constructor(private var dexFormatInternal: DexFormat? = De
     }
 
     internal fun refreshCaches() {
+        stringMap.clear()
+        stringIDs.forEachIndexed { index, stringID -> stringMap[stringID.stringValue] = index }
+
+        typeMap.clear()
+        typeIDs.forEachIndexed { index, typeID -> typeMap[typeID.getType(this).type] = index }
+
+        protoIDMap.clear()
+        protoIDs.forEachIndexed { index, protoID -> protoIDMap[protoID] = index }
+
+        fieldIDMap.clear()
+        fieldIDs.forEachIndexed { index, fieldID -> fieldIDMap[fieldID] = index }
+
+        methodIDMap.clear()
+        methodIDs.forEachIndexed { index, methodID -> methodIDMap[methodID] = index }
+
         classDefMap.clear()
         classDefs.forEachIndexed  { index, classDef  -> classDefMap[classDef.getType(this).type] = index }
+
+        callSiteIDMap.clear()
+        callSiteIDs.forEachIndexed { index, callSiteID -> callSiteIDMap[callSiteID] = index }
+
+        methodHandleMap.clear()
+        methodHandles.forEachIndexed { index, methodHandle -> methodHandleMap[methodHandle] = index }
     }
 
     override fun toString(): String {
