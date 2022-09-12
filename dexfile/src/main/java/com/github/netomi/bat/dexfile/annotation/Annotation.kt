@@ -48,9 +48,9 @@ class Annotation private constructor(visibility:      AnnotationVisibility   = A
         get() = false
 
     override fun read(input: DexDataInput) {
-        val visibilityValue = input.readUnsignedByte().toInt()
-        visibility      = of(visibilityValue)
-        annotationValue = readAnnotationValue(input)
+        val visibilityValue = input.readUnsignedByte()
+        visibility          = of(visibilityValue)
+        annotationValue     = readAnnotationValue(input)
     }
 
     override fun write(output: DexDataOutput) {

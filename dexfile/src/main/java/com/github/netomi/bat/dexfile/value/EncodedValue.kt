@@ -58,7 +58,7 @@ abstract class EncodedValue {
 
     companion object {
         fun read(input: DexDataInput): EncodedValue {
-            val typeAndArg = input.readUnsignedByte().toInt()
+            val typeAndArg = input.readUnsignedByte()
             val valueArg   = typeAndArg ushr 5
             val valueType  = typeAndArg and 0x1f
             val encodedValue = create(valueType)
