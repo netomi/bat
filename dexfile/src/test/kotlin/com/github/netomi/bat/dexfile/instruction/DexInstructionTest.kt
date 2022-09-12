@@ -47,6 +47,7 @@ abstract class DexInstructionTest<T: DexInstruction> {
 
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun serializeAndDeserialize(value: T) {
         try {
             val writer = InstructionWriter()

@@ -18,13 +18,12 @@ package com.github.netomi.bat.dexfile.io
 import java.nio.ByteOrder
 
 class CountingDexDataOutput : DexDataOutput {
+
+    override var order: ByteOrder
+        get() = ByteOrder.LITTLE_ENDIAN
+        set(@Suppress("UNUSED_PARAMETER") value) {}
+
     override var offset = 0
-
-    override fun order(): ByteOrder {
-        return ByteOrder.LITTLE_ENDIAN
-    }
-
-    override fun order(byteOrder: ByteOrder) {}
 
     override fun writePadding(bytes: Int) {
         offset += bytes

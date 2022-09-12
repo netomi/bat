@@ -18,9 +18,9 @@ package com.github.netomi.bat.dexfile.io
 import java.nio.ByteOrder
 
 interface DexDataOutput {
-    fun order(): ByteOrder
-    fun order(byteOrder: ByteOrder)
+    var order:  ByteOrder
     var offset: Int
+
     fun writePadding(bytes: Int)
     fun writeAlignmentPadding(alignment: Int)
     fun writeBytes(bytes: ByteArray)

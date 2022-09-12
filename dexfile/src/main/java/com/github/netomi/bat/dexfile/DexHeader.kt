@@ -145,7 +145,7 @@ class DexHeader private constructor() : DataItem() {
             writeUnsignedInt(fileSize)
             writeUnsignedInt(headerSize)
 
-            if (output.order() == ByteOrder.LITTLE_ENDIAN) {
+            if (output.order == ByteOrder.LITTLE_ENDIAN) {
                 writeUnsignedInt(ENDIAN_CONSTANT)
             } else {
                 writeUnsignedInt(REVERSE_ENDIAN_CONSTANT)
