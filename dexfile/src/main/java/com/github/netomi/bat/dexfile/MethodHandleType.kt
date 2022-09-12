@@ -18,15 +18,15 @@ package com.github.netomi.bat.dexfile
 import com.google.common.base.Preconditions
 
 enum class MethodHandleType(val value: Int, val targetsField: Boolean, val targetsInstance: Boolean, val simpleName: String) {
-    STATIC_PUT(        METHOD_HANDLE_TYPE_STATIC_PUT,         true,  false, "static-put"),
-    STATIC_GET(        METHOD_HANDLE_TYPE_STATIC_GET,         true,  false, "static-get"),
-    INSTANCE_PUT(      METHOD_HANDLE_TYPE_INSTANCE_PUT,       true,  true,  "instance-put"),
-    INSTANCE_GET(      METHOD_HANDLE_TYPE_INSTANCE_GET,       true,  true,  "instance-get"),
-    INVOKE_STATIC(     METHOD_HANDLE_TYPE_INVOKE_STATIC,      false, false, "invoke-static"),
-    INVOKE_INSTANCE(   METHOD_HANDLE_TYPE_INVOKE_INSTANCE,    false, true,  "invoke-instance"),
+    STATIC_PUT        (METHOD_HANDLE_TYPE_STATIC_PUT,         true,  false, "static-put"),
+    STATIC_GET        (METHOD_HANDLE_TYPE_STATIC_GET,         true,  false, "static-get"),
+    INSTANCE_PUT      (METHOD_HANDLE_TYPE_INSTANCE_PUT,       true,  true,  "instance-put"),
+    INSTANCE_GET      (METHOD_HANDLE_TYPE_INSTANCE_GET,       true,  true,  "instance-get"),
+    INVOKE_STATIC     (METHOD_HANDLE_TYPE_INVOKE_STATIC,      false, false, "invoke-static"),
+    INVOKE_INSTANCE   (METHOD_HANDLE_TYPE_INVOKE_INSTANCE,    false, true,  "invoke-instance"),
     INVOKE_CONSTRUCTOR(METHOD_HANDLE_TYPE_INVOKE_CONSTRUCTOR, false, true,  "invoke-constructor"),
-    INVOKE_DIRECT(     METHOD_HANDLE_TYPE_INVOKE_DIRECT,      false, true,  "invoke-direct"),
-    INVOKE_INTERFACE(  METHOD_HANDLE_TYPE_INVOKE_INTERFACE,   false, true,  "invoke-interface");
+    INVOKE_DIRECT     (METHOD_HANDLE_TYPE_INVOKE_DIRECT,      false, true,  "invoke-direct"),
+    INVOKE_INTERFACE  (METHOD_HANDLE_TYPE_INVOKE_INTERFACE,   false, true,  "invoke-interface");
 
     companion object {
         fun of(simpleName: String): MethodHandleType {
