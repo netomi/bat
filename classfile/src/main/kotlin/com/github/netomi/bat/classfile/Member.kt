@@ -44,7 +44,7 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
 
-    val modifiers: EnumSet<AccessFlag>
+    val modifiers: Set<AccessFlag>
         get() = accessFlagModifiers(accessFlags, accessFlagTarget)
 
     protected abstract val accessFlagTarget: AccessFlagTarget

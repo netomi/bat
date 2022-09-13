@@ -15,7 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.FieldModifier.Companion.setOf
 import com.github.netomi.bat.dexfile.annotation.Annotation
 import com.github.netomi.bat.dexfile.annotation.visitor.AnnotationSetVisitor
 import com.github.netomi.bat.dexfile.annotation.visitor.allAnnotations
@@ -43,8 +42,12 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
     var fieldIndex: Int = fieldIndex
         private set
 
-    val modifiers: EnumSet<FieldModifier>
-        get() = setOf(accessFlags)
+    var modifiers: Set<FieldModifier> = FieldModifier.setOf(accessFlags)
+        private set
+
+    override fun updateModifiers(accessFlags: Int) {
+        modifiers = FieldModifier.setOf(accessFlags)
+    }
 
     fun getFieldID(dexFile: DexFile): FieldID {
         return dexFile.getFieldID(fieldIndex)

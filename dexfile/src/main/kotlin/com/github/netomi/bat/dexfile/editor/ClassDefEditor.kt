@@ -51,13 +51,13 @@ class ClassDefEditor private constructor(val dexEditor: DexEditor, val classDef:
     }
 
     fun addModifier(modifier: ClassModifier) {
-        val currentModifiers = classDef.modifiers
+        val currentModifiers = classDef.modifiers.toMutableSet()
         currentModifiers.add(modifier)
         classDef.accessFlags = accessFlagsOf(classDef.visibility, currentModifiers)
     }
 
     fun removeModifier(modifier: ClassModifier) {
-        val currentModifiers = classDef.modifiers
+        val currentModifiers = classDef.modifiers.toMutableSet()
         currentModifiers.remove(modifier)
         classDef.accessFlags = accessFlagsOf(classDef.visibility, currentModifiers)
     }

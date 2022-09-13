@@ -23,7 +23,6 @@ import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.value.EncodedValue
 import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.dexfile.visitor.*
-import java.util.*
 
 /**
  * A class representing a class def item inside a dex file.
@@ -47,13 +46,17 @@ class ClassDef private constructor(            classIndex:           Int        
         internal set
 
     var accessFlags: Int = accessFlags
-        internal set
+        internal set(value) {
+            field = value
+            visibility = Visibility.of(value)
+            modifiers  = ClassModifier.setOf(value)
+        }
 
-    val visibility: Visibility
-        get() = Visibility.of(accessFlags)
+    var visibility: Visibility = Visibility.of(accessFlags)
+        private set
 
-    val modifiers: EnumSet<ClassModifier>
-        get() = ClassModifier.setOf(accessFlags)
+    var modifiers: Set<ClassModifier> = ClassModifier.setOf(accessFlags)
+        private set
 
     var superClassIndex: Int = superClassIndex
         internal set

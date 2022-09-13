@@ -28,7 +28,7 @@ enum class Visibility(val flagValue: Int) {
 
     companion object {
         fun of(accessFlags: Int): Visibility {
-            val maskedValue = accessFlags and 0xf
+            val maskedValue = accessFlags and 0x7
             for (visibility in values()) {
                 if (maskedValue == visibility.flagValue) {
                     return visibility

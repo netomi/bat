@@ -42,8 +42,12 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
     var methodIndex: Int = methodIndex
         private set
 
-    val modifiers: EnumSet<MethodModifier>
-        get() = MethodModifier.setOf(accessFlags)
+    var modifiers: Set<MethodModifier> = MethodModifier.setOf(accessFlags)
+        private set
+
+    override fun updateModifiers(accessFlags: Int) {
+        modifiers = MethodModifier.setOf(accessFlags)
+    }
 
     var codeOffset = 0
         private set

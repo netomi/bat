@@ -37,7 +37,9 @@ internal class AttributePrinter constructor(private val printer:         Indenti
 
     // Common Attributes.
 
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
+    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
+        //TODO("implement")
+    }
 
     override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
         printer.println(".deprecated")

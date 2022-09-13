@@ -264,13 +264,13 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 }
 
-internal fun EnumSet<AccessFlag>.getPrintableModifiers(filter: (AccessFlag) -> Boolean = { true }): List<String> {
+internal fun Set<AccessFlag>.getPrintableModifiers(filter: (AccessFlag) -> Boolean = { true }): List<String> {
     return this.filter(filter)
                .filter { !it.synthetic }
                .map    { it.toString().lowercase(Locale.getDefault()) }
 }
 
-internal fun EnumSet<AccessFlag>.getPrintableModifiersString(filter: (AccessFlag) -> Boolean = { true }): String {
+internal fun Set<AccessFlag>.getPrintableModifiersString(filter: (AccessFlag) -> Boolean = { true }): String {
     return this.getPrintableModifiers(filter)
                .joinToString(separator = " ")
 }

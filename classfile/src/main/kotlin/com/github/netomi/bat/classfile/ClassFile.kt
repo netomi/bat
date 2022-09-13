@@ -48,7 +48,7 @@ class ClassFile private constructor() {
     val visibility: Visibility
         get() = Visibility.of(accessFlags)
 
-    val modifiers: EnumSet<AccessFlag>
+    val modifiers: Set<AccessFlag>
         get() = accessFlagModifiers(accessFlags, AccessFlagTarget.CLASS)
 
     var thisClassIndex = -1

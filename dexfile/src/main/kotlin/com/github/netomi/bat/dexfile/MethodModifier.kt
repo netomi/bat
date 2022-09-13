@@ -17,7 +17,7 @@ package com.github.netomi.bat.dexfile
 
 import java.util.*
 
-fun accessFlagsOf(visibility: Visibility, modifiers: EnumSet<MethodModifier>): Int {
+fun accessFlagsOf(visibility: Visibility, modifiers: Set<MethodModifier>): Int {
     return visibility.flagValue or modifiers.fold(0) { acc, m -> acc or m.flagValue }
 }
 

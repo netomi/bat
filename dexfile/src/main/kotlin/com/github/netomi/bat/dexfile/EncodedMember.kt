@@ -15,18 +15,22 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.github.netomi.bat.dexfile.Visibility.Companion.of
-
 /**
  * A base class for encoded fields and methods in a dex file
  */
 abstract class EncodedMember protected constructor(accessFlags: Int = 0) : DexContent() {
 
     var accessFlags: Int = accessFlags
-        protected set
+        protected set(value) {
+            field = value
+            visibility = Visibility.of(value)
+            updateModifiers(value)
+        }
 
-    val visibility: Visibility
-        get() = of(accessFlags)
+    var visibility: Visibility = Visibility.of(accessFlags)
+        private set
 
     abstract fun getName(dexFile: DexFile): String
+
+    protected abstract fun updateModifiers(accessFlags: Int)
 }
