@@ -29,7 +29,7 @@ enum class MethodModifier(val flagValue: Int) {
     VARARGS     (ACC_VARARGS),
     NATIVE      (ACC_NATIVE),
     ABSTRACT    (ACC_ABSTRACT),
-    STRICTFP    (ACC_STRICT),
+    STRICT      (ACC_STRICT),
     SYNTHETIC   (ACC_SYNTHETIC);
 
     companion object {

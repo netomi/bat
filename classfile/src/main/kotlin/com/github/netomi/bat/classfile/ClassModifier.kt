@@ -22,13 +22,14 @@ fun accessFlagsOf(visibility: Visibility, modifiers: Set<ClassModifier>): Int {
 }
 
 enum class ClassModifier(val flagValue: Int) {
-    STATIC    (ACC_STATIC),
     FINAL     (ACC_FINAL),
+    SUPER     (ACC_SUPER),
     INTERFACE (ACC_INTERFACE),
     ABSTRACT  (ACC_ABSTRACT),
     SYNTHETIC (ACC_SYNTHETIC),
     ANNOTATION(ACC_ANNOTATION),
-    ENUM      (ACC_ENUM);
+    ENUM      (ACC_ENUM),
+    MODULE    (ACC_MODULE);
 
     companion object {
         fun setOf(accessFlags: Int): EnumSet<ClassModifier> {
