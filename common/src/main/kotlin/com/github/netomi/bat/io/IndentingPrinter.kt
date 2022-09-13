@@ -17,7 +17,7 @@ package com.github.netomi.bat.io
 
 import java.io.Writer
 
-open class IndentingPrinter(private val delegateWriter: Writer, private val spacesPerLevel: Int = 4) : AutoCloseable {
+open class IndentingPrinter(private val delegateWriter: Writer, private val spacesPerLevel: Int = 4) : Appendable, AutoCloseable {
     private var indentedLine       = false
     private val indentationStack   = ArrayDeque<Int>()
     private var currentIndentation = ""
@@ -54,6 +54,28 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
     }
 
     fun print(text: String) {
+        // if there are any newline character in the string,
+        // split up the input into separate lines to make sure
+        // indentation is correctly added.
+        var newLinePos = text.indexOf('\n')
+        if (newLinePos != -1) {
+            var startPos = 0
+            while (newLinePos != -1) {
+                printInternal(text.substring(startPos, newLinePos))
+                println()
+                startPos = newLinePos + 1
+                newLinePos = text.indexOf('\n', startPos)
+            }
+            val remainder = text.substring(startPos)
+            if (remainder.isNotEmpty()) {
+                printInternal(remainder)
+            }
+        } else {
+            printInternal(text)
+        }
+    }
+
+    private fun printInternal(text: String) {
         printIndentation()
         delegateWriter.write(text)
         currentPosition += text.length
@@ -73,8 +95,7 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
     }
 
     fun println(text: CharSequence) {
-        printIndentation()
-        delegateWriter.write(text.toString())
+        print(text.toString())
         println()
     }
 
@@ -84,6 +105,20 @@ open class IndentingPrinter(private val delegateWriter: Writer, private val spac
         delegateWriter.write('\n'.code)
         indentedLine = false
         flush()
+    }
+
+    override fun append(csq: CharSequence, start: Int, end: Int): java.lang.Appendable {
+        print(csq.subSequence(start, end))
+        return this
+    }
+
+    override fun append(csq: CharSequence): java.lang.Appendable {
+        return append(csq, 0, csq.length)
+    }
+
+    override fun append(c: Char): java.lang.Appendable {
+        print(c.toString())
+        return this
     }
 
     fun flush() {
