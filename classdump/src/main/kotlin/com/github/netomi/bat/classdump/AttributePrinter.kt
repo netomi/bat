@@ -256,7 +256,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val exportsIndexAndFlags = "${exportsElement.exportsIndex},${exportsElement.exportsFlags.toHexString()}"
             printer.print("#%-38s // ".format(exportsIndexAndFlags))
             classFile.constantAccept(exportsElement.exportsIndex, constantPrinter)
-            // TODO: print accessflags
+            if (exportsElement.exportsFlagsAsSet.isNotEmpty()) {
+                printer.print(" ${exportsElement.exportsFlagsAsSet.toExternalStringWithPrefix()}")
+            }
             if (exportsElement.size > 0) {
                 printer.println(" to ... ${exportsElement.size}")
                 printer.levelUp()
@@ -279,7 +281,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val opensIndexAndFlags = "${opensElement.opensIndex},${opensElement.opensFlags.toHexString()}"
             printer.print("#%-38s // ".format(opensIndexAndFlags))
             classFile.constantAccept(opensElement.opensIndex, constantPrinter)
-            // TODO: print accessflags
+            if (opensElement.opensFlagsAsSet.isNotEmpty()) {
+                printer.print(" ${opensElement.opensFlagsAsSet.toExternalStringWithPrefix()}")
+            }
             printer.println(" to ... ${opensElement.size}")
             printer.levelUp()
             for (opensToIndex in opensElement) {
