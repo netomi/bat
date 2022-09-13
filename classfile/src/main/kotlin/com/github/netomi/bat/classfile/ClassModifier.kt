@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile
+package com.github.netomi.bat.classfile
 
 import java.util.*
 
@@ -22,7 +22,7 @@ fun accessFlagsOf(visibility: Visibility, modifiers: Set<ClassModifier>): Int {
 }
 
 enum class ClassModifier(val flagValue: Int) {
-    STATIC    (ACC_STATIC), // TODO: Only allowed for InnerClasses
+    STATIC    (ACC_STATIC),
     FINAL     (ACC_FINAL),
     INTERFACE (ACC_INTERFACE),
     ABSTRACT  (ACC_ABSTRACT),

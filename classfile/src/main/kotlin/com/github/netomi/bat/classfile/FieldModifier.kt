@@ -13,26 +13,25 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.github.netomi.bat.dexfile
+package com.github.netomi.bat.classfile
 
 import java.util.*
 
-fun accessFlagsOf(visibility: Visibility, modifiers: Set<ClassModifier>): Int {
+fun accessFlagsOf(visibility: Visibility, modifiers: Set<FieldModifier>): Int {
     return visibility.flagValue or modifiers.fold(0) { acc, m -> acc or m.flagValue }
 }
 
-enum class ClassModifier(val flagValue: Int) {
-    STATIC    (ACC_STATIC), // TODO: Only allowed for InnerClasses
-    FINAL     (ACC_FINAL),
-    INTERFACE (ACC_INTERFACE),
-    ABSTRACT  (ACC_ABSTRACT),
-    SYNTHETIC (ACC_SYNTHETIC),
-    ANNOTATION(ACC_ANNOTATION),
-    ENUM      (ACC_ENUM);
+enum class FieldModifier(val flagValue: Int) {
+    STATIC   (ACC_STATIC),
+    FINAL    (ACC_FINAL),
+    VOLATILE (ACC_VOLATILE),
+    TRANSIENT(ACC_TRANSIENT),
+    SYNTHETIC(ACC_SYNTHETIC),
+    ENUM     (ACC_ENUM);
 
     companion object {
-        fun setOf(accessFlags: Int): EnumSet<ClassModifier> {
-            val set = EnumSet.noneOf(ClassModifier::class.java)
+        fun setOf(accessFlags: Int): EnumSet<FieldModifier> {
+            val set = EnumSet.noneOf(FieldModifier::class.java)
             for (modifier in values()) {
                 if (accessFlags and modifier.flagValue != 0) {
                     set.add(modifier)

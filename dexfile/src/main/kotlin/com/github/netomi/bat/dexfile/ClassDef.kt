@@ -52,6 +52,8 @@ class ClassDef private constructor(            classIndex:           Int        
             modifiers  = ClassModifier.setOf(value)
         }
 
+    // TODO: according to https://source.android.com/docs/core/dalvik/dex-format#access-flags
+    //       only public (and maybe package-private) should be allowed for a class def.
     var visibility: Visibility = Visibility.of(accessFlags)
         private set
 
