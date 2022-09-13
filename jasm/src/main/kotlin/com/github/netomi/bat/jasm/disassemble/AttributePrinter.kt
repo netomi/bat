@@ -16,12 +16,15 @@
 
 package com.github.netomi.bat.jasm.disassemble
 
+import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
+import java.util.*
 
 internal class AttributePrinter constructor(private val printer:         IndentingPrinter,
                                             private val constantPrinter: ConstantPrinter): AttributeVisitor {
@@ -86,5 +89,47 @@ internal class AttributePrinter constructor(private val printer:         Indenti
         printedAttributes = true
     }
 
+    override fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
+        printer.print(".module ${attribute.getModuleName(classFile)}@${attribute.getModuleVersion(classFile)}")
+        if (attribute.moduleFlags != 0) {
+            printer.print(", ${attribute.moduleFlagsAsSet.toPrintableString()}")
+        }
+        printer.println()
+
+        printer.levelUp()
+
+        for (requireElement in attribute.requires) {
+            printer.print(".requires ${requireElement.getRequiredModuleName(classFile)}@${requireElement.getRequiredVersion(classFile)}")
+            if (requireElement.requiresFlags != 0) {
+                printer.print(", ${requireElement.requiresFlagsAsSet.toPrintableString()}")
+            }
+            printer.println()
+        }
+
+        for (exportElement in attribute.exports) {
+            printer.print(".exports ${exportElement.getExportedPackageName(classFile)}")
+            if (exportElement.exportsFlags != 0) {
+                printer.print(", ${exportElement.exportsFlagsAsSet.toPrintableString()}")
+            }
+            val exportedToModuleNames = exportElement.getExportedToModuleNames(classFile)
+            if (exportedToModuleNames.isNotEmpty()) {
+                printer.println(" to {")
+                printer.levelUp()
+                exportedToModuleNames.joinTo(printer, separator = ",\n", postfix = "\n")
+                printer.levelDown()
+                printer.println("}")
+            } else {
+                printer.println()
+            }
+        }
+
+        printer.levelDown()
+        printer.println(".end module")
+    }
     // FieldAttributeVisitor.
+}
+
+internal fun Set<AccessFlag>.toPrintableString(filter: (AccessFlag) -> Boolean = { true }): String {
+    return this.filter(filter)
+               .joinToString(separator = " ") { it.name.lowercase(Locale.getDefault()) }
 }
