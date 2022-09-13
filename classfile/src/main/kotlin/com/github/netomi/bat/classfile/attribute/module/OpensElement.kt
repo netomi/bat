@@ -16,7 +16,10 @@
 
 package com.github.netomi.bat.classfile.attribute.module
 
+import com.github.netomi.bat.classfile.AccessFlag
+import com.github.netomi.bat.classfile.AccessFlagTarget
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.accessFlagsToSet
 import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.constant.PackageConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
@@ -35,6 +38,9 @@ data class OpensElement
 
     val opensFlags: Int
         get() = _opensFlags
+
+    val opensFlagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(opensFlags, AccessFlagTarget.OPENED_MODULE)
 
     override val contentSize: Int
         get() = 6 + size * 2

@@ -26,12 +26,14 @@ internal fun accessFlagsToSet(accessFlags: Int, target: AccessFlagTarget): EnumS
 }
 
 enum class AccessFlagTarget(val value: Int) {
-    CLASS          (0x01),
-    FIELD          (0x02),
-    METHOD         (0x04),
-    INNER_CLASS    (0x08),
-    MODULE         (0x10),
-    REQUIRED_MODULE(0x20)
+    CLASS           (0x01),
+    FIELD           (0x02),
+    METHOD          (0x04),
+    INNER_CLASS     (0x08),
+    MODULE          (0x10),
+    REQUIRED_MODULE (0x20),
+    EXPORTED_PACKAGE(0x40),
+    OPENED_MODULE   (0x80);
 }
 
 enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target: Int) {
@@ -54,11 +56,12 @@ enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target
     INTERFACE                       (ACC_INTERFACE,    false, arrayOf(CLASS, INNER_CLASS)),
     ABSTRACT                        (ACC_ABSTRACT,     false, arrayOf(CLASS, METHOD, INNER_CLASS)),
     STRICT                          (ACC_STRICT,       false, arrayOf(METHOD)),
-    SYNTHETIC                       (ACC_SYNTHETIC,    true,  arrayOf(CLASS, FIELD, METHOD, INNER_CLASS, AccessFlagTarget.MODULE, REQUIRED_MODULE)),
+    SYNTHETIC                       (ACC_SYNTHETIC,    true,  arrayOf(CLASS, FIELD, METHOD, INNER_CLASS, AccessFlagTarget.MODULE,
+                                                                      REQUIRED_MODULE, EXPORTED_PACKAGE, OPENED_MODULE)),
     ANNOTATION                      (ACC_ANNOTATION,   true,  arrayOf(CLASS, INNER_CLASS)),
     ENUM                            (ACC_ENUM,         true,  arrayOf(CLASS, FIELD, INNER_CLASS)),
     MODULE                          (ACC_MODULE,       true,  arrayOf(CLASS)),
-    MANDATED                        (ACC_MANDATED,     false, arrayOf(AccessFlagTarget.MODULE, REQUIRED_MODULE));
+    MANDATED                        (ACC_MANDATED,     false, arrayOf(AccessFlagTarget.MODULE, REQUIRED_MODULE, EXPORTED_PACKAGE, OPENED_MODULE));
 
     fun matchesTarget(target: AccessFlagTarget): Boolean {
         return this.target and target.value != 0

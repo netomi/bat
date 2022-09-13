@@ -221,7 +221,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.print("#%-38s // ".format(moduleIndexAndFlags))
         classFile.constantAccept(attribute.moduleNameIndex, constantPrinter)
         if (attribute.moduleFlagsAsSet.isNotEmpty()) {
-            printer.print(" " + attribute.moduleFlagsAsSet.toExternalStringWithPrefix())
+            printer.print(" ${attribute.moduleFlagsAsSet.toExternalStringWithPrefix()}")
         }
         printer.println()
         if (attribute.moduleVersionIndex > 0) {
@@ -238,7 +238,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             printer.print("#%-38s // ".format(requiresIndexAndFlags))
             classFile.constantAccept(requiresElement.requiresIndex, constantPrinter)
             if (requiresElement.requiresFlagsAsSet.isNotEmpty()) {
-                printer.print(" " + requiresElement.requiresFlagsAsSet.toExternalStringWithPrefix())
+                printer.print(" ${requiresElement.requiresFlagsAsSet.toExternalStringWithPrefix()}")
             }
             printer.println()
             if (requiresElement.requiresVersionIndex > 0) {
