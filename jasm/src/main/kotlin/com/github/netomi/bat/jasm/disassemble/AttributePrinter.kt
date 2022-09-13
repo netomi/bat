@@ -90,16 +90,28 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     }
 
     override fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
-        printer.print(".module ${attribute.getModuleName(classFile)}@${attribute.getModuleVersion(classFile)}")
+        printer.print(".module ${attribute.getModuleName(classFile)}")
+
+        val moduleVersion = attribute.getModuleVersion(classFile)
+        if (moduleVersion != null) {
+            printer.print("@${moduleVersion}")
+        }
+
         if (attribute.moduleFlags != 0) {
             printer.print(", ${attribute.moduleFlagsAsSet.toPrintableString()}")
         }
-        printer.println()
 
+        printer.println()
         printer.levelUp()
 
         for (requireElement in attribute.requires) {
-            printer.print(".requires ${requireElement.getRequiredModuleName(classFile)}@${requireElement.getRequiredVersion(classFile)}")
+            printer.print(".requires ${requireElement.getRequiredModuleName(classFile)}")
+
+            val requiredVersion = requireElement.getRequiredVersion(classFile)
+            if (requiredVersion != null) {
+                printer.print("@${requiredVersion}")
+            }
+
             if (requireElement.requiresFlags != 0) {
                 printer.print(", ${requireElement.requiresFlagsAsSet.toPrintableString()}")
             }
@@ -131,5 +143,5 @@ internal class AttributePrinter constructor(private val printer:         Indenti
 
 internal fun Set<AccessFlag>.toPrintableString(filter: (AccessFlag) -> Boolean = { true }): String {
     return this.filter(filter)
-               .joinToString(separator = " ") { it.name.lowercase(Locale.getDefault()) }
+               .joinToString(separator = ", ", prefix = "[", postfix = "]") { "ACC_${it.name}" }
 }

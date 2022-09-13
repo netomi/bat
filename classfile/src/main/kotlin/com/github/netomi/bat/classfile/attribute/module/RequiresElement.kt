@@ -53,8 +53,8 @@ data class RequiresElement
         return getRequiredModule(classFile).getModuleName(classFile)
     }
 
-    fun getRequiredVersion(classFile: ClassFile): String {
-        return classFile.getString(requiresVersionIndex)
+    fun getRequiredVersion(classFile: ClassFile): String? {
+        return classFile.getStringOrNull(requiresVersionIndex)
     }
 
     private fun read(input: ClassDataInput) {

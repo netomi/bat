@@ -70,7 +70,7 @@ data class ModuleAttribute
     }
 
     fun getModuleVersion(classFile: ClassFile): String? {
-        return if (moduleVersionIndex > 0) classFile.getString(moduleVersionIndex) else null
+        return classFile.getStringOrNull(moduleVersionIndex)
     }
 
     val requires: List<RequiresElement>

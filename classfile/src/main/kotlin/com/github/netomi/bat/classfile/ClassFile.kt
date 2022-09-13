@@ -158,6 +158,10 @@ class ClassFile private constructor() {
         return (constantPool[stringIndex] as Utf8Constant).value
     }
 
+    fun getStringOrNull(stringIndex: Int): String? {
+        return if (stringIndex == 0) null else getString(stringIndex)
+    }
+
     fun getClassName(classIndex: Int): JvmClassName {
         return (constantPool[classIndex] as ClassConstant).getClassName(this)
     }
