@@ -36,6 +36,9 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
             updateModifiers(value)
         }
 
+    val accessFlagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(accessFlags, accessFlagTarget)
+
     var nameIndex: Int = nameIndex
         private set
 
@@ -49,7 +52,7 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
         private set
 
     protected abstract fun updateModifiers(accessFlags: Int)
-    abstract val accessFlagTarget: AccessFlagTarget
+    protected abstract val accessFlagTarget: AccessFlagTarget
 
     abstract val isStatic: Boolean
 

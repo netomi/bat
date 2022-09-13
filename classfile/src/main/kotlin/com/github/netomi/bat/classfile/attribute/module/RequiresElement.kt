@@ -19,7 +19,7 @@ package com.github.netomi.bat.classfile.attribute.module
 import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.classfile.AccessFlagTarget.*
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.accessFlagModifiers
+import com.github.netomi.bat.classfile.accessFlagsToSet
 import com.github.netomi.bat.classfile.constant.ModuleConstant
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -36,8 +36,8 @@ data class RequiresElement
     val requiresFlags: Int
         get() = _requiresFlags
 
-    val modifiers: Set<AccessFlag>
-        get() = accessFlagModifiers(requiresFlags, REQUIRED_MODULE)
+    val requiresFlagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(requiresFlags, REQUIRED_MODULE)
 
     val requiresVersionIndex: Int
         get() = _requiresVersionIndex

@@ -16,10 +16,7 @@
 
 package com.github.netomi.bat.classfile.attribute.module
 
-import com.github.netomi.bat.classfile.AccessFlag
-import com.github.netomi.bat.classfile.AccessFlagTarget
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.accessFlagModifiers
+import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
@@ -62,8 +59,8 @@ data class ModuleAttribute
     val moduleFlags: Int
         get() = _moduleFlags
 
-    val modifiers: Set<AccessFlag>
-        get() = accessFlagModifiers(moduleFlags, AccessFlagTarget.MODULE)
+    val moduleFlagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(moduleFlags, AccessFlagTarget.MODULE)
 
     val moduleVersionIndex: Int
         get() = _moduleVersionIndex

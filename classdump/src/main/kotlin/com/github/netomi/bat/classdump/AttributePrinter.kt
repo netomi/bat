@@ -133,14 +133,13 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         for (element in attribute) {
             val str = buildString {
-                val modifiers = accessFlagModifiers(element.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
-
-                if (modifiers.contains(AccessFlag.INTERFACE)) {
-                    modifiers.remove(AccessFlag.ABSTRACT)
+                val accessFlags = element.innerClassAccessFlagsAsSet.toMutableSet()
+                if (accessFlags.contains(AccessFlag.INTERFACE)) {
+                    accessFlags.remove(AccessFlag.ABSTRACT)
                 }
-                modifiers.remove(AccessFlag.INTERFACE)
+                accessFlags.remove(AccessFlag.INTERFACE)
 
-                val externalModifiers = modifiers.getPrintableAccessFlagsString()
+                val externalModifiers = accessFlags.toPrintableString()
                 if (externalModifiers.isNotEmpty()) {
                     append("$externalModifiers ")
                 }
@@ -221,8 +220,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         val moduleIndexAndFlags = "${attribute.moduleNameIndex},${attribute.moduleFlags.toHexString()}"
         printer.print("#%-38s // ".format(moduleIndexAndFlags))
         classFile.constantAccept(attribute.moduleNameIndex, constantPrinter)
-        if (attribute.modifiers.isNotEmpty()) {
-            printer.print(" " + attribute.modifiers.toExternalString())
+        if (attribute.moduleFlagsAsSet.isNotEmpty()) {
+            printer.print(" " + attribute.moduleFlagsAsSet.toExternalStringWithPrefix())
         }
         printer.println()
         if (attribute.moduleVersionIndex > 0) {
@@ -238,8 +237,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val requiresIndexAndFlags = "${requiresElement.requiresIndex},${requiresElement.requiresFlags.toHexString()}"
             printer.print("#%-38s // ".format(requiresIndexAndFlags))
             classFile.constantAccept(requiresElement.requiresIndex, constantPrinter)
-            if (requiresElement.modifiers.isNotEmpty()) {
-                printer.print(" " + requiresElement.modifiers.toExternalString())
+            if (requiresElement.requiresFlagsAsSet.isNotEmpty()) {
+                printer.print(" " + requiresElement.requiresFlagsAsSet.toExternalStringWithPrefix())
             }
             printer.println()
             if (requiresElement.requiresVersionIndex > 0) {
@@ -598,8 +597,4 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
 private fun Int.toHexString(): String {
     return Integer.toHexString(this)
-}
-
-private fun Set<AccessFlag>.toExternalString(): String {
-    return joinToString(" ") { txt -> "ACC_$txt" }
 }

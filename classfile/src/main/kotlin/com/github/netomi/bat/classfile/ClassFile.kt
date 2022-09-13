@@ -48,6 +48,9 @@ class ClassFile private constructor() {
             modifiers  = ClassModifier.setOf(value)
         }
 
+    val accessFlagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(accessFlags, AccessFlagTarget.CLASS)
+
     var visibility: Visibility = Visibility.of(accessFlags)
         private set
 

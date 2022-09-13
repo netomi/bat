@@ -16,7 +16,10 @@
 
 package com.github.netomi.bat.classfile.attribute
 
+import com.github.netomi.bat.classfile.AccessFlag
+import com.github.netomi.bat.classfile.AccessFlagTarget
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.accessFlagsToSet
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -91,6 +94,9 @@ data class InnerClassesElement
 
     val innerClassAccessFlags: Int
         get() = _innerClassAccessFlags
+
+    val innerClassAccessFlagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(innerClassAccessFlags, AccessFlagTarget.INNER_CLASS)
 
     fun getInnerClass(classFile: ClassFile): JvmClassName {
         return classFile.getClassName(innerClassIndex)

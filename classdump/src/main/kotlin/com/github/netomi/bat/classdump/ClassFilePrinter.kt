@@ -52,9 +52,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 
         if (classFile.isInterface) {
             val accessFlagsString =
-                getPrintableAccessFlagsString(classFile.accessFlags, AccessFlagTarget.CLASS)
-                    { !EnumSet.of(AccessFlag.INTERFACE, AccessFlag.ABSTRACT).contains(it) }
-
+                classFile.accessFlagsAsSet.toPrintableString { !EnumSet.of(AccessFlag.INTERFACE, AccessFlag.ABSTRACT).contains(it) }
             if (accessFlagsString.isNotEmpty()) {
                 printer.print("$accessFlagsString ")
             }
@@ -79,10 +77,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 
             printer.print("module %s@%s".format(moduleName, moduleVersion))
         } else {
-            val accessFlagsString =
-                getPrintableAccessFlagsString(classFile.accessFlags, AccessFlagTarget.CLASS)
-                    { !EnumSet.of(AccessFlag.SYNTHETIC).contains(it) }
-
+            val accessFlagsString = classFile.accessFlagsAsSet.toPrintableString()
             if (accessFlagsString.isNotEmpty()) {
                 printer.print("$accessFlagsString ")
             }
@@ -111,7 +106,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.println("minor version: " + classFile.minorVersion)
         printer.println("major version: " + classFile.majorVersion)
 
-        val flags = accessFlagModifiers(classFile.accessFlags, AccessFlagTarget.CLASS).joinToString(", ") { txt -> "ACC_$txt" }
+        val flags = classFile.accessFlagsAsSet.toExternalStringWithPrefix(", ")
         printer.println("flags: (0x%04x) %s".format(classFile.accessFlags, flags))
 
         printer.print("this_class: #%-26d // ".format(classFile.thisClassIndex))
@@ -167,7 +162,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.println("descriptor: %s".format(member.getDescriptor(classFile)))
         printer.print("flags: (0x%04x)".format(member.accessFlags))
 
-        val flags = accessFlagModifiers(member.accessFlags, member.accessFlagTarget).joinToString(", ") { txt -> "ACC_$txt" }
+        val flags = member.accessFlagsAsSet.toExternalStringWithPrefix(", ")
         if (flags.isNotEmpty()) {
             printer.print(" $flags")
         }
@@ -179,9 +174,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
-        val accessFlagsString =
-            getPrintableAccessFlagsString(field.accessFlags, AccessFlagTarget.FIELD)
-
+        val accessFlagsString = field.accessFlagsAsSet.toPrintableString()
         if (accessFlagsString.isNotEmpty()) {
             printer.print("$accessFlagsString ")
         }
@@ -199,9 +192,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
-        val accessFlagsString =
-            getPrintableAccessFlagsString(method.accessFlags, AccessFlagTarget.METHOD)
-
+        val accessFlagsString = method.accessFlagsAsSet.toPrintableString()
         if (accessFlagsString.isNotEmpty()) {
             printer.print("$accessFlagsString ")
         }
@@ -273,20 +264,15 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 }
 
-internal fun getPrintableAccessFlagsString(accessFlags: Int, target: AccessFlagTarget, filter: (AccessFlag) -> Boolean = { true }): String {
+internal fun Set<AccessFlag>.toPrintableString(filter: (AccessFlag) -> Boolean = { true }): String {
     val combinedFilter = { accessFlag: AccessFlag -> !accessFlag.synthetic && filter.invoke(accessFlag) }
-    return formatAccessFlagsAsHumanReadable(accessFlags, target, combinedFilter).lowercase(Locale.getDefault())
+
+    return this.filter(combinedFilter)
+               .joinToString(separator = " ") { it.name.lowercase(Locale.getDefault()) }
 }
 
-internal fun Set<AccessFlag>.getPrintableAccessFlags(filter: (AccessFlag) -> Boolean = { true }): List<String> {
-    return this.filter(filter)
-               .filter { !it.synthetic }
-               .map    { it.toString().lowercase(Locale.getDefault()) }
-}
-
-internal fun Set<AccessFlag>.getPrintableAccessFlagsString(filter: (AccessFlag) -> Boolean = { true }): String {
-    return this.getPrintableAccessFlags(filter)
-               .joinToString(separator = " ")
+internal fun Set<AccessFlag>.toExternalStringWithPrefix(separator: String = " "): String {
+    return joinToString(separator) { txt -> "ACC_$txt" }
 }
 
 private fun Method.getExternalMethodSignature(classFile: ClassFile, hasVarArgs: Boolean): String {
