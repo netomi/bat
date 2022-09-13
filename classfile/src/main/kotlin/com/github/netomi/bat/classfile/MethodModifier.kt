@@ -22,17 +22,15 @@ fun accessFlagsOf(visibility: Visibility, modifiers: Set<MethodModifier>): Int {
 }
 
 enum class MethodModifier(val flagValue: Int) {
-    STATIC               (ACC_STATIC),
-    FINAL                (ACC_FINAL),
-    SYNCHRONIZED         (ACC_SYNCHRONIZED),
-    BRIDGE               (ACC_BRIDGE),
-    VARARGS              (ACC_VARARGS),
-    NATIVE               (ACC_NATIVE),
-    ABSTRACT             (ACC_ABSTRACT),
-    STRICTFP             (ACC_STRICT),
-    SYNTHETIC            (ACC_SYNTHETIC),
-    CONSTRUCTOR          (ACC_CONSTRUCTOR),
-    DECLARED_SYNCHRONIZED(ACC_DECLARED_SYNCHRONIZED);
+    STATIC      (ACC_STATIC),
+    FINAL       (ACC_FINAL),
+    SYNCHRONIZED(ACC_SYNCHRONIZED),
+    BRIDGE      (ACC_BRIDGE),
+    VARARGS     (ACC_VARARGS),
+    NATIVE      (ACC_NATIVE),
+    ABSTRACT    (ACC_ABSTRACT),
+    STRICTFP    (ACC_STRICT),
+    SYNTHETIC   (ACC_SYNTHETIC);
 
     companion object {
         fun setOf(accessFlags: Int): EnumSet<MethodModifier> {
