@@ -35,6 +35,16 @@ class Method private constructor(): Member() {
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.METHOD
 
+    var modifiers: Set<MethodModifier> = MethodModifier.setOf(accessFlags)
+        private set
+
+    override fun updateModifiers(accessFlags: Int) {
+        modifiers = MethodModifier.setOf(accessFlags)
+    }
+
+    override val isStatic: Boolean
+        get() = modifiers.contains(MethodModifier.STATIC)
+
     fun getArgumentSize(classFile: ClassFile): Int {
         var argumentSize = if (isStatic) 0 else 1
         val (parameters, _) = parseDescriptorToJvmTypes(getDescriptor(classFile))

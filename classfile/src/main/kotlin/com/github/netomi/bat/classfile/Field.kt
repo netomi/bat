@@ -24,7 +24,6 @@ import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.visitor.FieldVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.toHexString
-import java.io.DataInput
 import java.io.IOException
 
 /**
@@ -36,6 +35,16 @@ class Field private constructor(): Member() {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.FIELD
+
+    var modifiers: Set<FieldModifier> = FieldModifier.setOf(accessFlags)
+        private set
+
+    override fun updateModifiers(accessFlags: Int) {
+        modifiers = FieldModifier.setOf(accessFlags)
+    }
+
+    override val isStatic: Boolean
+        get() = modifiers.contains(FieldModifier.STATIC)
 
     fun accept(classFile: ClassFile, index: Int, visitor: FieldVisitor) {
         visitor.visitField(classFile, index, this)

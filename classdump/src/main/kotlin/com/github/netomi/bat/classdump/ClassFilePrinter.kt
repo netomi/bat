@@ -51,10 +51,12 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     override fun visitClassFile(classFile: ClassFile) {
 
         if (classFile.isInterface) {
-            val externalModifiers =
-                classFile.modifiers.getPrintableModifiersString { !EnumSet.of(AccessFlag.INTERFACE, AccessFlag.ABSTRACT).contains(it) }
-            if (externalModifiers.isNotEmpty()) {
-                printer.print("$externalModifiers ")
+            val accessFlagsString =
+                getPrintableAccessFlagsString(classFile.accessFlags, AccessFlagTarget.CLASS)
+                    { !EnumSet.of(AccessFlag.INTERFACE, AccessFlag.ABSTRACT).contains(it) }
+
+            if (accessFlagsString.isNotEmpty()) {
+                printer.print("$accessFlagsString ")
             }
 
             val signature = classFile.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
@@ -77,9 +79,12 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
 
             printer.print("module %s@%s".format(moduleName, moduleVersion))
         } else {
-            val externalModifiers = classFile.modifiers.getPrintableModifiersString()
-            if (externalModifiers.isNotEmpty()) {
-                printer.print("$externalModifiers ")
+            val accessFlagsString =
+                getPrintableAccessFlagsString(classFile.accessFlags, AccessFlagTarget.CLASS)
+                    { !EnumSet.of(AccessFlag.SYNTHETIC).contains(it) }
+
+            if (accessFlagsString.isNotEmpty()) {
+                printer.print("$accessFlagsString ")
             }
 
             val signature = classFile.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
@@ -106,8 +111,8 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.println("minor version: " + classFile.minorVersion)
         printer.println("major version: " + classFile.majorVersion)
 
-        val modifiers = classFile.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
-        printer.println("flags: (0x%04x) %s".format(classFile.accessFlags, modifiers))
+        val flags = accessFlagModifiers(classFile.accessFlags, AccessFlagTarget.CLASS).joinToString(", ") { txt -> "ACC_$txt" }
+        printer.println("flags: (0x%04x) %s".format(classFile.accessFlags, flags))
 
         printer.print("this_class: #%-26d // ".format(classFile.thisClassIndex))
         classFile.constantAccept(classFile.thisClassIndex, constantPrinter)
@@ -162,9 +167,9 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         printer.println("descriptor: %s".format(member.getDescriptor(classFile)))
         printer.print("flags: (0x%04x)".format(member.accessFlags))
 
-        val modifiers = member.modifiers.joinToString(", ") { txt -> "ACC_$txt" }
-        if (modifiers.isNotEmpty()) {
-            printer.print(" $modifiers")
+        val flags = accessFlagModifiers(member.accessFlags, member.accessFlagTarget).joinToString(", ") { txt -> "ACC_$txt" }
+        if (flags.isNotEmpty()) {
+            printer.print(" $flags")
         }
 
         printer.println()
@@ -174,9 +179,11 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
-        val externalModifiers = field.modifiers.getPrintableModifiersString()
-        if (externalModifiers.isNotEmpty()) {
-            printer.print("$externalModifiers ")
+        val accessFlagsString =
+            getPrintableAccessFlagsString(field.accessFlags, AccessFlagTarget.FIELD)
+
+        if (accessFlagsString.isNotEmpty()) {
+            printer.print("$accessFlagsString ")
         }
 
         val signature = field.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
@@ -192,9 +199,11 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 
     override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
-        val externalModifiers = method.modifiers.getPrintableModifiersString()
-        if (externalModifiers.isNotEmpty()) {
-            printer.print("$externalModifiers ")
+        val accessFlagsString =
+            getPrintableAccessFlagsString(method.accessFlags, AccessFlagTarget.METHOD)
+
+        if (accessFlagsString.isNotEmpty()) {
+            printer.print("$accessFlagsString ")
         }
 
         if (classFile.isInterface && !method.isStatic) {
@@ -204,7 +213,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
             }
         }
 
-        val hasVarArgs = method.modifiers.contains(AccessFlag.VARARGS)
+        val hasVarArgs = method.modifiers.contains(MethodModifier.VARARGS)
 
         var exceptionsPrinted = false
         val signature = method.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
@@ -264,14 +273,19 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
     }
 }
 
-internal fun Set<AccessFlag>.getPrintableModifiers(filter: (AccessFlag) -> Boolean = { true }): List<String> {
+internal fun getPrintableAccessFlagsString(accessFlags: Int, target: AccessFlagTarget, filter: (AccessFlag) -> Boolean = { true }): String {
+    val combinedFilter = { accessFlag: AccessFlag -> !accessFlag.synthetic && filter.invoke(accessFlag) }
+    return formatAccessFlagsAsHumanReadable(accessFlags, target, combinedFilter).lowercase(Locale.getDefault())
+}
+
+internal fun Set<AccessFlag>.getPrintableAccessFlags(filter: (AccessFlag) -> Boolean = { true }): List<String> {
     return this.filter(filter)
                .filter { !it.synthetic }
                .map    { it.toString().lowercase(Locale.getDefault()) }
 }
 
-internal fun Set<AccessFlag>.getPrintableModifiersString(filter: (AccessFlag) -> Boolean = { true }): String {
-    return this.getPrintableModifiers(filter)
+internal fun Set<AccessFlag>.getPrintableAccessFlagsString(filter: (AccessFlag) -> Boolean = { true }): String {
+    return this.getPrintableAccessFlags(filter)
                .joinToString(separator = " ")
 }
 

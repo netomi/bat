@@ -140,10 +140,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                 }
                 modifiers.remove(AccessFlag.INTERFACE)
 
-                val externalModifiers = modifiers.getPrintableModifiers().joinToString(separator = " ")
+                val externalModifiers = modifiers.getPrintableAccessFlagsString()
                 if (externalModifiers.isNotEmpty()) {
-                    append(externalModifiers)
-                    append(" ")
+                    append("$externalModifiers ")
                 }
 
                 if (element.innerNameIndex != 0) {

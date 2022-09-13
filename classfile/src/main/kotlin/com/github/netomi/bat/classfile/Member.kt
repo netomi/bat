@@ -30,7 +30,11 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
                                             protected var _attributes: MutableList<Attribute> = mutableListOfCapacity(0)) {
 
     var accessFlags: Int = accessFlags
-        private set
+        private set(value) {
+            field = value
+            visibility = Visibility.of(value)
+            updateModifiers(value)
+        }
 
     var nameIndex: Int = nameIndex
         private set
@@ -41,16 +45,13 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
     val attributes: List<Attribute>
         get() = _attributes
 
-    val visibility: Visibility
-        get() = Visibility.of(accessFlags)
+    var visibility: Visibility = Visibility.of(accessFlags)
+        private set
 
-    val modifiers: Set<AccessFlag>
-        get() = accessFlagModifiers(accessFlags, accessFlagTarget)
+    protected abstract fun updateModifiers(accessFlags: Int)
+    abstract val accessFlagTarget: AccessFlagTarget
 
-    protected abstract val accessFlagTarget: AccessFlagTarget
-
-    val isStatic: Boolean
-        get() = modifiers.contains(AccessFlag.STATIC)
+    abstract val isStatic: Boolean
 
     fun getName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)

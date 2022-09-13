@@ -18,6 +18,12 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.AccessFlagTarget.*
 import java.util.*
 
+fun formatAccessFlagsAsHumanReadable(accessFlags: Int, target: AccessFlagTarget, filter: (AccessFlag) -> Boolean = { true }): String {
+    return AccessFlag.values().filter { it.target and target.value != 0 && it.value and accessFlags != 0 }
+                              .filter(filter)
+                              .joinToString(separator = " ") { it.name }
+}
+
 fun accessFlagModifiers(accessFlags: Int, target: AccessFlagTarget): EnumSet<AccessFlag> {
     val result = EnumSet.noneOf(AccessFlag::class.java)
     val flagsOfTarget = AccessFlag.flagsByTarget(target)
@@ -34,7 +40,7 @@ enum class AccessFlagTarget(val value: Int) {
     REQUIRED_MODULE(0x20)
 }
 
-enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target: Int) {
+enum class AccessFlag(val value: Int, val synthetic: Boolean, val target: Int) {
 
     PUBLIC                          (ACC_PUBLIC,       false, arrayOf(CLASS, FIELD, METHOD, INNER_CLASS)),
     PRIVATE                         (ACC_PRIVATE,      false, arrayOf(FIELD, METHOD, INNER_CLASS)),

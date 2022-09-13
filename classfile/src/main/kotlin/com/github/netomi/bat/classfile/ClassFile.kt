@@ -30,7 +30,6 @@ import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.util.*
 
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
@@ -43,13 +42,17 @@ class ClassFile private constructor() {
         internal set
 
     var accessFlags: Int = 0
-        internal set
+        internal set(value) {
+            field = value
+            visibility = Visibility.of(value)
+            modifiers  = ClassModifier.setOf(value)
+        }
 
-    val visibility: Visibility
-        get() = Visibility.of(accessFlags)
+    var visibility: Visibility = Visibility.of(accessFlags)
+        private set
 
-    val modifiers: Set<AccessFlag>
-        get() = accessFlagModifiers(accessFlags, AccessFlagTarget.CLASS)
+    var modifiers: Set<ClassModifier> = ClassModifier.setOf(accessFlags)
+        private set
 
     var thisClassIndex = -1
         internal set
@@ -58,10 +61,10 @@ class ClassFile private constructor() {
         internal set
 
     val isInterface: Boolean
-        get() = modifiers.contains(AccessFlag.INTERFACE)
+        get() = modifiers.contains(ClassModifier.INTERFACE)
 
     val isModule: Boolean
-        get() = modifiers.contains(AccessFlag.MODULE)
+        get() = modifiers.contains(ClassModifier.MODULE)
 
     internal val constantPool: ConstantPool = ConstantPool.empty()
 
