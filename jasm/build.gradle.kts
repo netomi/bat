@@ -16,8 +16,8 @@ tasks {
 
     generateGrammarSource {
         maxHeapSize = "64m"
-        arguments = arguments + listOf("-package", "com.github.netomi.bat.jasmin.parser", "-visitor")
-        outputDirectory = File("${project.buildDir}/generated-src/antlr/main/com/github/netomi/bat/jasmin/parser")
+        arguments = arguments + listOf("-package", "com.github.netomi.bat.jasm.parser", "-visitor")
+        outputDirectory = File("${project.buildDir}/generated-src/antlr/main/com/github/netomi/bat/jasm/parser")
     }
 }
 

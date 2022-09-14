@@ -138,10 +138,11 @@ internal class AttributePrinter constructor(private val printer:         Indenti
         printer.levelDown()
         printer.println(".end module")
     }
+
     // FieldAttributeVisitor.
 }
 
 internal fun Set<AccessFlag>.toPrintableString(filter: (AccessFlag) -> Boolean = { true }): String {
     return this.filter(filter)
-               .joinToString(separator = ", ", prefix = "[", postfix = "]") { "ACC_${it.name}" }
+               .joinToString(separator = " ") { it.name.lowercase(Locale.getDefault()) }
 }
