@@ -26,7 +26,7 @@ import java.util.EnumMap
 data class AttributeMap constructor(private var _attributes: MutableList<Attribute> = mutableListOfCapacity(0))
     : ClassFileContent(), Sequence<Attribute> {
 
-    private val typeToAttributeMap: MutableMap<AttributeType, Attribute> = EnumMap(AttributeType::class.java)
+    private val typeToAttributeMap: MutableMap<AttributeType, Attribute> by lazy { EnumMap(AttributeType::class.java) }
 
     init {
         for (attribute in _attributes) {
