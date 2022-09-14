@@ -15,9 +15,8 @@
  */
 package com.github.netomi.bat.classfile
 
-import com.github.netomi.bat.classfile.attribute.AttachedToClass
-import com.github.netomi.bat.classfile.attribute.Attribute
-import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
+import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
@@ -77,7 +76,7 @@ class ClassFile private constructor() {
     internal var _interfaces = mutableListOfCapacity<Int>(0)
     internal var _fields     = mutableListOfCapacity<Field>(0)
     internal var _methods    = mutableListOfCapacity<Method>(0)
-    internal var _attributes = mutableListOfCapacity<Attribute>(0)
+    internal var _attributes = AttributeMap.empty()
 
     val className: JvmClassName
         get() = getClassName(thisClassIndex)
@@ -100,13 +99,22 @@ class ClassFile private constructor() {
     val methods: List<Method>
         get() = _methods
 
-    val attributes: List<Attribute>
+    val attributes: Sequence<Attribute>
         get() = _attributes
 
     // convenience methods to access certain attributes
 
+    val isDeprecated: Boolean
+        get() = _attributes.get<DeprecatedAttribute>(AttributeType.DEPRECATED) != null
+
+    val isSynthetic: Boolean
+        get() = _attributes.get<SyntheticAttribute>(AttributeType.SYNTHETIC) != null
+
     val sourceFile: String?
-        get() = attributes.filterIsInstance<SourceFileAttribute>().singleOrNull()?.getSourceFile(this)
+        get() = _attributes.get<SourceFileAttribute>(AttributeType.SOURCE_FILE)?.getSourceFile(this)
+
+    val signature: String?
+        get() = _attributes.get<SignatureAttribute>(AttributeType.SIGNATURE)?.getSignature(this)
 
     // helper methods to access constant pool entries
 
@@ -200,7 +208,7 @@ class ClassFile private constructor() {
     }
 
     fun attributesAccept(visitor: ClassAttributeVisitor) {
-        for (attribute in attributes.filterIsInstance(AttachedToClass::class.java)) {
+        for (attribute in _attributes.filterIsInstance(AttachedToClass::class.java)) {
             attribute.accept(this, visitor)
         }
     }

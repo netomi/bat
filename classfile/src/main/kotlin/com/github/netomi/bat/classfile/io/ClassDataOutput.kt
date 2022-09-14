@@ -16,7 +16,6 @@
 
 package com.github.netomi.bat.classfile.io
 
-import com.github.netomi.bat.classfile.attribute.Attribute
 import java.io.Closeable
 import java.io.DataOutputStream
 import java.io.OutputStream
@@ -56,13 +55,6 @@ internal class ClassDataOutput private constructor(outputStream: OutputStream): 
         writeShort(array.size)
         for (index in array) {
             dataOutput.writeShort(index)
-        }
-    }
-
-    fun writeAttributes(attributes: List<Attribute>) {
-        writeShort(attributes.size)
-        for (element in attributes) {
-            element.write(this)
         }
     }
 

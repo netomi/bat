@@ -17,7 +17,6 @@
 package com.github.netomi.bat.classdump
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.io.IndentingPrinter
 import com.google.common.hash.Hashing
@@ -52,8 +51,7 @@ class ClassDumpPrinter constructor(private val printHeader: Boolean = true) {
             val checksum = Hashing.sha256().hashBytes(inputPath.readBytes()).toString()
             printer.println("SHA-256 checksum $checksum")
 
-            val sourceFile = classFile.attributes.filterIsInstance<SourceFileAttribute>()
-                                                 .singleOrNull()?.getSourceFile(classFile)
+            val sourceFile = classFile.sourceFile
             if (sourceFile != null) {
                 printer.println("Compiled from \"$sourceFile\"")
             }

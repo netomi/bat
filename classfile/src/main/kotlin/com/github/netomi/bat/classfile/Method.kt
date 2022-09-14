@@ -16,10 +16,14 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.AttachedToMethod
+import com.github.netomi.bat.classfile.attribute.AttributeType
+import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.classfile.visitor.MethodVisitor
+import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.getArgumentSize
 import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import com.github.netomi.bat.util.toHexString
@@ -45,6 +49,13 @@ class Method private constructor(): Member() {
     override val isStatic: Boolean
         get() = modifiers.contains(MethodModifier.STATIC)
 
+    val hasCode: Boolean
+        get() = _attributes.get<CodeAttribute>(AttributeType.CODE) != null
+
+    fun getExceptionClassNames(classFile: ClassFile): List<JvmClassName> {
+        return _attributes.get<ExceptionsAttribute>(AttributeType.EXCEPTIONS)?.getExceptionClassNames(classFile) ?: emptyList()
+    }
+
     fun getArgumentSize(classFile: ClassFile): Int {
         var argumentSize = if (isStatic) 0 else 1
         val (parameters, _) = parseDescriptorToJvmTypes(getDescriptor(classFile))
@@ -68,7 +79,7 @@ class Method private constructor(): Member() {
     }
 
     fun attributesAccept(classFile: ClassFile, visitor: MethodAttributeVisitor) {
-        for (attribute in attributes.filterIsInstance(AttachedToMethod::class.java)) {
+        for (attribute in _attributes.filterIsInstance(AttachedToMethod::class.java)) {
             attribute.accept(classFile, this, visitor)
         }
     }

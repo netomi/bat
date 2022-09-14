@@ -71,12 +71,12 @@ data class RecordAttribute
 }
 
 data class RecordComponent
-    private constructor(private var _nameIndex:       Int                    = -1,
-                        private var _descriptorIndex: Int                    = -1,
-                        private var _attributes:      MutableList<Attribute> = mutableListOfCapacity(0)): ClassFileContent() {
+    private constructor(private var _nameIndex:       Int          = -1,
+                        private var _descriptorIndex: Int          = -1,
+                        private var _attributes:      AttributeMap = AttributeMap.empty()): ClassFileContent() {
 
     override val contentSize: Int
-        get() = 4 + _attributes.contentSize()
+        get() = 4 + _attributes.contentSize
 
     val nameIndex: Int
         get() = _nameIndex
@@ -84,7 +84,7 @@ data class RecordComponent
     val desciptorIndex: Int
         get() = _descriptorIndex
 
-    val attributes: List<Attribute>
+    val attributes: Sequence<Attribute>
         get() = _attributes
 
     fun getName(classFile: ClassFile): String {
@@ -104,11 +104,11 @@ data class RecordComponent
     override fun write(output: ClassDataOutput) {
         output.writeShort(nameIndex)
         output.writeShort(desciptorIndex)
-        output.writeAttributes(attributes)
+        _attributes.write(output)
     }
 
     fun attributesAccept(classFile: ClassFile, record: RecordAttribute, visitor: RecordComponentAttributeVisitor) {
-        for (attribute in attributes.filterIsInstance(AttachedToRecordComponent::class.java)) {
+        for (attribute in _attributes.filterIsInstance(AttachedToRecordComponent::class.java)) {
             attribute.accept(classFile, record, this, visitor)
         }
     }

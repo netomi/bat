@@ -17,9 +17,6 @@
 package com.github.netomi.bat.classdump
 
 import com.github.netomi.bat.classfile.*
-import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
-import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -57,7 +54,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                 printer.print("$accessFlagsString ")
             }
 
-            val signature = classFile.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+            val signature = classFile.signature
             if (signature != null) {
                 val externalSignature = getExternalClassSignature(signature, true)
                 printer.print("interface %s%s".format(classFile.className.toExternalClassName(), externalSignature))
@@ -82,7 +79,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
                 printer.print("$accessFlagsString ")
             }
 
-            val signature = classFile.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+            val signature = classFile.signature
             if (signature != null) {
                 val externalSignature = getExternalClassSignature(signature)
                 printer.print("class %s%s".format(classFile.className.toExternalClassName(), externalSignature))
@@ -179,7 +176,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
             printer.print("$accessFlagsString ")
         }
 
-        val signature = field.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+        val signature = field.getSignature(classFile)
         val externalType = if (signature != null) {
             getExternalFieldSignature(signature)
         } else {
@@ -198,8 +195,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         }
 
         if (classFile.isInterface && !method.isStatic) {
-            val codeAttribute = method.attributes.filterIsInstance<CodeAttribute>().singleOrNull()
-            if (codeAttribute != null) {
+            if (method.hasCode) {
                 printer.print("default ")
             }
         }
@@ -207,7 +203,7 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         val hasVarArgs = method.modifiers.contains(MethodModifier.VARARGS)
 
         var exceptionsPrinted = false
-        val signature = method.attributes.filterIsInstance<SignatureAttribute>().singleOrNull()?.getSignature(classFile)
+        val signature = method.getSignature(classFile)
         if (signature != null) {
             val methodSig = getExternalMethodSignature(signature)
 
@@ -248,8 +244,8 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
         }
 
         if (!exceptionsPrinted) {
-            val exceptions = method.attributes.filterIsInstance<ExceptionsAttribute>().singleOrNull()?.getExceptionClassNames(classFile)
-            if (!exceptions.isNullOrEmpty()) {
+            val exceptions = method.getExceptionClassNames(classFile)
+            if (exceptions.isNotEmpty()) {
                 val exceptionString = " throws " + exceptions.joinToString(separator = ", ", transform = { it.toExternalClassName() })
                 printer.print(exceptionString)
             }

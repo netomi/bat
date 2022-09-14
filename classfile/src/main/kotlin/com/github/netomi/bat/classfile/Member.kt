@@ -15,19 +15,19 @@
  */
 package com.github.netomi.bat.classfile
 
-import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.*
+import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
-import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 import java.util.*
 
-abstract class Member protected constructor(accessFlags:               Int =  0,
-                                            nameIndex:                 Int = -1,
-                                            descriptorIndex:           Int = -1,
-                                            protected var _attributes: MutableList<Attribute> = mutableListOfCapacity(0)) {
+abstract class Member protected constructor(accessFlags:               Int         =  0,
+                                            nameIndex:                 Int         = -1,
+                                            descriptorIndex:           Int         = -1,
+                                            protected var _attributes: AttributeMap = AttributeMap.empty()) {
 
     var accessFlags: Int = accessFlags
         private set(value) {
@@ -45,16 +45,22 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
     var descriptorIndex: Int = descriptorIndex
         private set
 
-    val attributes: List<Attribute>
-        get() = _attributes
-
     var visibility: Visibility = Visibility.of(accessFlags)
         private set
+
+    val attributes: Sequence<Attribute>
+        get() = _attributes
 
     protected abstract fun updateModifiers(accessFlags: Int)
     protected abstract val accessFlagTarget: AccessFlagTarget
 
     abstract val isStatic: Boolean
+
+    val isDeprecated: Boolean
+        get() = _attributes.get<DeprecatedAttribute>(AttributeType.DEPRECATED) != null
+
+    val isSynthetic: Boolean
+        get() = _attributes.get<SyntheticAttribute>(AttributeType.SYNTHETIC) != null
 
     fun getName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
@@ -62,6 +68,10 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
 
     fun getDescriptor(classFile: ClassFile): String {
         return classFile.getString(descriptorIndex)
+    }
+
+    fun getSignature(classFile: ClassFile): String? {
+        return _attributes.get<SignatureAttribute>(AttributeType.SIGNATURE)?.getSignature(classFile)
     }
 
     abstract fun accept(classFile: ClassFile, index: Int, visitor: MemberVisitor)
@@ -79,15 +89,15 @@ abstract class Member protected constructor(accessFlags:               Int =  0,
         output.writeShort(accessFlags)
         output.writeShort(nameIndex)
         output.writeShort(descriptorIndex)
-        output.writeAttributes(_attributes)
+        _attributes.write(output)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Member) return false
 
-        return accessFlags     == other.accessFlags &&
-               nameIndex       == other.nameIndex &&
+        return accessFlags     == other.accessFlags     &&
+               nameIndex       == other.nameIndex       &&
                descriptorIndex == other.descriptorIndex &&
                _attributes     == other._attributes
     }

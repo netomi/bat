@@ -56,7 +56,7 @@ class ClassFileWriter constructor(outputStream: OutputStream): ClassFileVisitor,
                 method.write(output)
             }
 
-            output.writeAttributes(_attributes)
+            _attributes.write(output)
         }
     }
 

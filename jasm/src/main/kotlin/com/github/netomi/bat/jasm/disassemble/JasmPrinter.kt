@@ -72,7 +72,7 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
             classFile.methodsAccept(this)
         }
 
-        val remainingAttributes = classFile.attributes.filter { it !is SourceFileAttribute }.size
+        val remainingAttributes = classFile.attributes.filter { it !is SourceFileAttribute }.count()
         if (remainingAttributes > 0) {
             printer.println()
             printer.println("# attributes")

@@ -40,14 +40,14 @@ data class CodeAttribute
                          private var _maxLocals:         Int                         = 0,
                          private var _code:              ByteArray                   = ByteArray(0),
                          private var _exceptionTable:    MutableList<ExceptionEntry> = mutableListOfCapacity(0),
-                         private var _attributes:        MutableList<Attribute>      = mutableListOfCapacity(0))
+                         private var _attributes:        AttributeMap                = AttributeMap.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType
         get() = AttributeType.CODE
 
     override val dataSize: Int
-        get() = 8 + codeLength + exceptionTable.contentSize() + attributes.contentSize()
+        get() = 8 + codeLength + exceptionTable.contentSize() + _attributes.contentSize
 
     val maxStack: Int
         get() = _maxStack
@@ -64,7 +64,7 @@ data class CodeAttribute
     val exceptionTable: List<ExceptionEntry>
         get() = _exceptionTable
 
-    val attributes: List<Attribute>
+    val attributes: Sequence<Attribute>
         get() = _attributes
 
     @Throws(IOException::class)
@@ -89,7 +89,7 @@ data class CodeAttribute
         output.write(code)
 
         output.writeContentList(exceptionTable)
-        output.writeAttributes(attributes)
+        _attributes.write(output)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {

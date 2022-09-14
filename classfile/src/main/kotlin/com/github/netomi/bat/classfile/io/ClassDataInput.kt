@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.io
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.AttributeMap
 import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.Closeable
@@ -25,8 +26,8 @@ import java.io.DataInputStream
 import java.io.InputStream
 
 internal class ClassDataInput private constructor(            `is`:           InputStream,
-                                                  private val classFile:      ClassFile,
-                                                  private val skipAttributes: Boolean): Closeable {
+                                                  internal val classFile:      ClassFile,
+                                                   private val skipAttributes: Boolean): Closeable {
 
     private val dataInput: DataInputStream = DataInputStream(`is`)
 
@@ -80,19 +81,15 @@ internal class ClassDataInput private constructor(            `is`:           In
         return list
     }
 
-    fun readAttributes(): MutableList<Attribute> {
-        val attributeCount = readUnsignedShort()
+    fun readAttributes(): AttributeMap {
         return if (skipAttributes) {
+            val attributeCount = readUnsignedShort()
             for (i in 0 until attributeCount) {
                 Attribute.skipAttribute(this)
             }
-            mutableListOfCapacity(0)
+            AttributeMap.empty()
         } else {
-            val attributes = mutableListOfCapacity<Attribute>(attributeCount)
-            for (i in 0 until attributeCount) {
-                attributes.add(Attribute.readAttribute(this, classFile))
-            }
-            attributes
+            AttributeMap.read(this)
         }
     }
 

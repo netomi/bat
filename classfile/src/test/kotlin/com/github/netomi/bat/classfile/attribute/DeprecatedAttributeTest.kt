@@ -29,14 +29,14 @@ class DeprecatedAttributeTest: AbstractClassFileTest() {
         val classFile = loadClassFile("DeprecatedClass")
 
         assertEquals(getPackageName() + "/DeprecatedClass", classFile.className.toString(), "classnames do not match")
-        assertNotNull(classFile.attributes.filterIsInstance<DeprecatedAttribute>().singleOrNull())
+        assertNotNull(classFile.isDeprecated)
 
         val fieldCollector = fieldCollector()
         classFile.fieldsAccept(filterFieldsByName("field", fieldCollector))
-        assertNotNull(fieldCollector.items().singleOrNull()?.attributes?.filterIsInstance<DeprecatedAttribute>()?.singleOrNull())
+        assertNotNull(fieldCollector.items().singleOrNull()?.isDeprecated)
 
         val methodCollector = methodCollector()
         classFile.methodsAccept(filterMethodsByName("method", methodCollector))
-        assertNotNull(methodCollector.items().singleOrNull()?.attributes?.filterIsInstance<DeprecatedAttribute>()?.singleOrNull())
+        assertNotNull(methodCollector.items().singleOrNull()?.isDeprecated)
     }
 }
