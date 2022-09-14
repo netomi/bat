@@ -100,98 +100,13 @@ fun interface ElementValueVisitor {
     }
 }
 
-private class MultiElementValueVisitor constructor(visitor: ElementValueVisitor,
-                                                   vararg otherVisitors: ElementValueVisitor
-)
+private class MultiElementValueVisitor constructor(       visitor:       ElementValueVisitor,
+                                                   vararg otherVisitors: ElementValueVisitor)
     : AbstractMultiVisitor<ElementValueVisitor>(visitor, *otherVisitors), ElementValueVisitor {
 
     override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {
         for (visitor in visitors) {
-            visitor.visitAnyElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitClassElementValue(classFile: ClassFile, elementValue: ClassElementValue) {
-        for (visitor in visitors) {
-            visitor.visitClassElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
-        for (visitor in visitors) {
-            visitor.visitEnumElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
-        for (visitor in visitors) {
-            visitor.visitArrayElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitAnnotationElementValue(classFile: ClassFile, elementValue: AnnotationElementValue) {
-        for (visitor in visitors) {
-            visitor.visitAnnotationElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitAnyConstElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitAnyConstElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitByteElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitByteElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitCharElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitCharElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitIntElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitIntElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitLongElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitLongElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitShortElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitShortElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitFloatElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitFloatElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitDoubleElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitDoubleElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitBooleanElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitBooleanElementValue(classFile, elementValue)
-        }
-    }
-
-    override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        for (visitor in visitors) {
-            visitor.visitStringElementValue(classFile, elementValue)
+            elementValue.accept(classFile, visitor)
         }
     }
 }
