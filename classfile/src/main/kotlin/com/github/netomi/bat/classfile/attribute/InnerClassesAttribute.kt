@@ -35,8 +35,8 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  */
 data class InnerClassesAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var innerClasses:       MutableList<InnerClassesElement> = mutableListOfCapacity(0))
-    : Attribute(attributeNameIndex), AttachedToClass, Sequence<InnerClassesElement> {
+                         private var innerClasses:       MutableList<InnerClassEntry> = mutableListOfCapacity(0))
+    : Attribute(attributeNameIndex), AttachedToClass, Sequence<InnerClassEntry> {
 
     override val type: AttributeType
         get() = AttributeType.INNER_CLASSES
@@ -47,16 +47,16 @@ data class InnerClassesAttribute
     val size: Int
         get() = innerClasses.size
 
-    operator fun get(index: Int): InnerClassesElement {
+    operator fun get(index: Int): InnerClassEntry {
         return innerClasses[index]
     }
 
-    override fun iterator(): Iterator<InnerClassesElement> {
+    override fun iterator(): Iterator<InnerClassEntry> {
         return innerClasses.iterator()
     }
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        innerClasses = input.readContentList(InnerClassesElement.Companion::read)
+        innerClasses = input.readContentList(InnerClassEntry::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
@@ -74,7 +74,7 @@ data class InnerClassesAttribute
     }
 }
 
-data class InnerClassesElement
+data class InnerClassEntry
     private constructor(private var _innerClassIndex:       Int = -1,
                         private var _outerClassIndex:       Int = -1,
                         private var _innerNameIndex:        Int = -1,
@@ -125,8 +125,8 @@ data class InnerClassesElement
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): InnerClassesElement {
-            val element = InnerClassesElement()
+        internal fun read(input: ClassDataInput): InnerClassEntry {
+            val element = InnerClassEntry()
             element.read(input)
             return element
         }

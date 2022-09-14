@@ -32,8 +32,8 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  */
 data class LineNumberTableAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var lineNumberTable:    MutableList<LineNumberElement> = mutableListOfCapacity(0))
-    : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LineNumberElement> {
+                         private var lineNumberTable:    MutableList<LineNumberEntry> = mutableListOfCapacity(0))
+    : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LineNumberEntry> {
 
     override val type: AttributeType
         get() = AttributeType.LINE_NUMBER_TABLE
@@ -44,16 +44,16 @@ data class LineNumberTableAttribute
     val size: Int
         get() = lineNumberTable.size
 
-    operator fun get(index: Int): LineNumberElement {
+    operator fun get(index: Int): LineNumberEntry {
         return lineNumberTable[index]
     }
 
-    override fun iterator(): Iterator<LineNumberElement> {
+    override fun iterator(): Iterator<LineNumberEntry> {
         return lineNumberTable.iterator()
     }
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        lineNumberTable = input.readContentList(LineNumberElement.Companion::read)
+        lineNumberTable = input.readContentList(LineNumberEntry::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
@@ -71,8 +71,8 @@ data class LineNumberTableAttribute
     }
 }
 
-data class LineNumberElement private constructor(private var _startPC:    Int = -1,
-                                                 private var _lineNumber: Int = -1): ClassFileContent() {
+data class LineNumberEntry private constructor(private var _startPC:    Int = -1,
+                                               private var _lineNumber: Int = -1): ClassFileContent() {
 
     override val contentSize: Int
         get() = 4
@@ -94,8 +94,8 @@ data class LineNumberElement private constructor(private var _startPC:    Int = 
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): LineNumberElement {
-            val element = LineNumberElement()
+        internal fun read(input: ClassDataInput): LineNumberEntry {
+            val element = LineNumberEntry()
             element.read(input)
             return element
         }

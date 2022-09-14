@@ -31,8 +31,8 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  */
 data class LocalVariableTableAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var localVariableTable: MutableList<LocalVariableElement> = mutableListOfCapacity(0))
-    : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LocalVariableElement> {
+                         private var localVariableTable: MutableList<LocalVariableEntry> = mutableListOfCapacity(0))
+    : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LocalVariableEntry> {
 
     override val type: AttributeType
         get() = AttributeType.LOCAL_VARIABLE_TABLE
@@ -43,16 +43,16 @@ data class LocalVariableTableAttribute
     val size: Int
         get() = localVariableTable.size
 
-    operator fun get(index: Int): LocalVariableElement {
+    operator fun get(index: Int): LocalVariableEntry {
         return localVariableTable[index]
     }
 
-    override fun iterator(): Iterator<LocalVariableElement> {
+    override fun iterator(): Iterator<LocalVariableEntry> {
         return localVariableTable.iterator()
     }
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        localVariableTable = input.readContentList(LocalVariableElement.Companion::read)
+        localVariableTable = input.readContentList(LocalVariableEntry::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
@@ -70,7 +70,7 @@ data class LocalVariableTableAttribute
     }
 }
 
-data class LocalVariableElement
+data class LocalVariableEntry
     private constructor(private var _startPC:         Int = -1,
                         private var _length:          Int = -1,
                         private var _nameIndex:       Int = -1,
@@ -120,8 +120,8 @@ data class LocalVariableElement
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): LocalVariableElement {
-            val element = LocalVariableElement()
+        internal fun read(input: ClassDataInput): LocalVariableEntry {
+            val element = LocalVariableEntry()
             element.read(input)
             return element
         }

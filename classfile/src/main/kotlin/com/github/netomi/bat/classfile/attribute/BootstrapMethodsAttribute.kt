@@ -31,8 +31,8 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  */
 data class BootstrapMethodsAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var bootstrapMethods:   MutableList<BootstrapMethodElement> = mutableListOfCapacity(0)
-    ): Attribute(attributeNameIndex), AttachedToClass, Sequence<BootstrapMethodElement> {
+                         private var bootstrapMethods:   MutableList<BootstrapMethod> = mutableListOfCapacity(0)
+    ): Attribute(attributeNameIndex), AttachedToClass, Sequence<BootstrapMethod> {
 
     override val type: AttributeType
         get() = AttributeType.BOOTSTRAP_METHOD
@@ -43,16 +43,16 @@ data class BootstrapMethodsAttribute
     val size: Int
         get() = bootstrapMethods.size
 
-    operator fun get(index: Int): BootstrapMethodElement {
+    operator fun get(index: Int): BootstrapMethod {
         return bootstrapMethods[index]
     }
 
-    override fun iterator(): Iterator<BootstrapMethodElement> {
+    override fun iterator(): Iterator<BootstrapMethod> {
         return bootstrapMethods.iterator()
     }
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        bootstrapMethods = input.readContentList(BootstrapMethodElement.Companion::read)
+        bootstrapMethods = input.readContentList(BootstrapMethod::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
@@ -70,35 +70,35 @@ data class BootstrapMethodsAttribute
     }
 }
 
-data class BootstrapMethodElement
+data class BootstrapMethod
     private constructor(private var _bootstrapMethodRefIndex: Int      = -1,
-                        private var bootstrapArguments:       IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
+                        private var arguments:                IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
     override val contentSize: Int
-        get() = 4 + bootstrapArguments.size * 2
+        get() = 4 + arguments.size * 2
 
     val bootstrapMethodRefIndex: Int
         get() = _bootstrapMethodRefIndex
 
     val size: Int
-        get() = bootstrapArguments.size
+        get() = arguments.size
 
     operator fun get(index: Int): Int {
-        return bootstrapArguments[index]
+        return arguments[index]
     }
 
     override fun iterator(): Iterator<Int> {
-        return bootstrapArguments.iterator()
+        return arguments.iterator()
     }
 
     private fun read(input: ClassDataInput) {
         _bootstrapMethodRefIndex = input.readUnsignedShort()
-        bootstrapArguments       = input.readShortIndexArray()
+        arguments                = input.readShortIndexArray()
     }
 
     override fun write(output: ClassDataOutput) {
         output.writeShort(bootstrapMethodRefIndex)
-        output.writeShortIndexArray(bootstrapArguments)
+        output.writeShortIndexArray(arguments)
     }
 
     fun bootstrapMethodRefAccept(classFile: ClassFile, visitor: ConstantVisitor) {
@@ -106,14 +106,14 @@ data class BootstrapMethodElement
     }
 
     fun bootstrapArgumentsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        for (constantIndex in bootstrapArguments) {
+        for (constantIndex in arguments) {
             classFile.constantAccept(constantIndex, visitor)
         }
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): BootstrapMethodElement {
-            val element = BootstrapMethodElement()
+        internal fun read(input: ClassDataInput): BootstrapMethod {
+            val element = BootstrapMethod()
             element.read(input)
             return element
         }

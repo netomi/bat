@@ -36,11 +36,11 @@ import java.util.*
  */
 data class CodeAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var _maxStack:          Int                           = 0,
-                         private var _maxLocals:         Int                           = 0,
-                         private var _code:              ByteArray                     = ByteArray(0),
-                         private var _exceptionTable:    MutableList<ExceptionElement> = mutableListOfCapacity(0),
-                         private var _attributes:        MutableList<Attribute>        = mutableListOfCapacity(0))
+                         private var _maxStack:          Int                         = 0,
+                         private var _maxLocals:         Int                         = 0,
+                         private var _code:              ByteArray                   = ByteArray(0),
+                         private var _exceptionTable:    MutableList<ExceptionEntry> = mutableListOfCapacity(0),
+                         private var _attributes:        MutableList<Attribute>      = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType
@@ -61,7 +61,7 @@ data class CodeAttribute
     val code: ByteArray
         get() = _code
 
-    val exceptionTable: List<ExceptionElement>
+    val exceptionTable: List<ExceptionEntry>
         get() = _exceptionTable
 
     val attributes: List<Attribute>
@@ -76,7 +76,7 @@ data class CodeAttribute
         _code = ByteArray(codeLength)
         input.readFully(_code)
 
-        _exceptionTable = input.readContentList(ExceptionElement.Companion::read)
+        _exceptionTable = input.readContentList(ExceptionEntry::read)
         _attributes     = input.readAttributes()
     }
 
@@ -134,10 +134,10 @@ data class CodeAttribute
     }
 }
 
-data class ExceptionElement private constructor(private var _startPC:   Int = -1,
-                                                private var _endPC:     Int = -1,
-                                                private var _handlerPC: Int = -1,
-                                                private var _catchType: Int = -1): ClassFileContent() {
+data class ExceptionEntry private constructor(private var _startPC:   Int = -1,
+                                              private var _endPC:     Int = -1,
+                                              private var _handlerPC: Int = -1,
+                                              private var _catchType: Int = -1): ClassFileContent() {
 
     override val contentSize: Int
         get() = 8
@@ -169,8 +169,8 @@ data class ExceptionElement private constructor(private var _startPC:   Int = -1
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): ExceptionElement {
-            val element = ExceptionElement()
+        internal fun read(input: ClassDataInput): ExceptionEntry {
+            val element = ExceptionEntry()
             element.read(input)
             return element
         }

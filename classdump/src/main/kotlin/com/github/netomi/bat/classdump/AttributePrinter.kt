@@ -94,15 +94,14 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
         printer.levelUp()
 
-        for (index in 0 until attribute.size) {
-            val element = attribute[index]
-            printer.print("$index: #${element.bootstrapMethodRefIndex} ")
-            element.bootstrapMethodRefAccept(classFile, constantPrinter)
+        attribute.forEachIndexed { index, bootstrapMethod ->
+            printer.print("$index: #${bootstrapMethod.bootstrapMethodRefIndex} ")
+            bootstrapMethod.bootstrapMethodRefAccept(classFile, constantPrinter)
             printer.println()
             printer.levelUp()
             printer.println("Method arguments:")
             printer.levelUp()
-            for (argumentIndex in element) {
+            for (argumentIndex in bootstrapMethod) {
                 printer.print("#${argumentIndex} ")
                 classFile.constantAccept(argumentIndex, constantPrinter)
                 printer.println()
@@ -131,9 +130,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitInnerClasses(classFile: ClassFile, attribute: InnerClassesAttribute) {
         printer.println("InnerClasses:")
         printer.levelUp()
-        for (element in attribute) {
+        for (entry in attribute) {
             val str = buildString {
-                val accessFlags = element.innerClassAccessFlagsAsSet.toMutableSet()
+                val accessFlags = entry.innerClassAccessFlagsAsSet.toMutableSet()
                 if (accessFlags.contains(AccessFlag.INTERFACE)) {
                     accessFlags.remove(AccessFlag.ABSTRACT)
                 }
@@ -144,28 +143,28 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
                     append("$externalModifiers ")
                 }
 
-                if (element.innerNameIndex != 0) {
-                    append("#${element.innerNameIndex}= ")
+                if (entry.innerNameIndex != 0) {
+                    append("#${entry.innerNameIndex}= ")
                 }
 
-                append("#${element.innerClassIndex}")
+                append("#${entry.innerClassIndex}")
 
-                if (element.outerClassIndex != 0) {
-                    append(" of #${element.outerClassIndex}")
+                if (entry.outerClassIndex != 0) {
+                    append(" of #${entry.outerClassIndex}")
                 }
 
                 append(";")
             }
 
             val desc = buildString {
-                if (element.innerNameIndex != 0) {
-                    append("${classFile.getString(element.innerNameIndex)}=")
+                if (entry.innerNameIndex != 0) {
+                    append("${classFile.getString(entry.innerNameIndex)}=")
                 }
 
-                append("class ${classFile.getClassName(element.innerClassIndex)}")
+                append("class ${classFile.getClassName(entry.innerClassIndex)}")
 
-                if (element.outerClassIndex != 0) {
-                    append(" of class ${classFile.getClassName(element.outerClassIndex)}")
+                if (entry.outerClassIndex != 0) {
+                    append(" of class ${classFile.getClassName(entry.outerClassIndex)}")
                 }
             }
 
@@ -457,11 +456,11 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.println("MethodParameters:")
         printer.levelUp()
         printer.println("%-30s %4s".format("Name", "Flags"))
-        for (parameter in attribute) {
-            printer.print("%-30s".format(parameter.getName(classFile)))
-            if (parameter.accessFlags != 1) {
+        for (entry in attribute) {
+            printer.print("%-30s".format(entry.getName(classFile)))
+            if (entry.accessFlags != 0) {
                 // TODO: print names of accessflags instead of numeric value (e.g. final)
-                printer.print(" %04x".format(parameter.accessFlags))
+                printer.print(" %04x".format(entry.accessFlags))
             }
             printer.println()
         }
@@ -473,8 +472,8 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     override fun visitLineNumberTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
         printer.println("LineNumberTable:")
         printer.levelUp()
-        for (element in attribute) {
-            printer.println("line ${element.lineNumber}: ${element.startPC}")
+        for (entry in attribute) {
+            printer.println("line ${entry.lineNumber}: ${entry.startPC}")
         }
         printer.levelDown()
     }
@@ -484,13 +483,13 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         // TODO: better align name / signature to make output more readable
         printer.println("Start  Length  Slot  Name   Signature")
-        for (element in attribute) {
+        for (entry in attribute) {
             printer.println("%5d  %6d  %4d %5s   %s"
-                .format(element.startPC,
-                        element.length,
-                        element.variableIndex,
-                        element.getName(classFile),
-                        element.getDescriptor(classFile)))
+                .format(entry.startPC,
+                        entry.length,
+                        entry.variableIndex,
+                        entry.getName(classFile),
+                        entry.getDescriptor(classFile)))
         }
         printer.levelDown()
     }
@@ -501,13 +500,13 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         if (attribute.size > 0) {
             // TODO: better align name / signature to make output more readable
             printer.println("Start  Length  Slot  Name   Signature")
-            for (element in attribute) {
+            for (entry in attribute) {
                 printer.println("%5d  %6d  %4d %5s   %s"
-                    .format(element.startPC,
-                        element.length,
-                        element.variableIndex,
-                        element.getName(classFile),
-                        element.getSignature(classFile)))
+                    .format(entry.startPC,
+                            entry.length,
+                            entry.variableIndex,
+                            entry.getName(classFile),
+                            entry.getSignature(classFile)))
             }
         }
         printer.levelDown()

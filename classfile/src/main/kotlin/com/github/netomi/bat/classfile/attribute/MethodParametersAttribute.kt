@@ -32,8 +32,8 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  */
 data class MethodParametersAttribute
     private constructor(override val attributeNameIndex: Int,
-                         private var parameters:         MutableList<ParameterElement> = mutableListOfCapacity(0)
-    ): Attribute(attributeNameIndex), AttachedToMethod, Sequence<ParameterElement> {
+                         private var parameters:         MutableList<MethodParameterEntry> = mutableListOfCapacity(0)
+    ): Attribute(attributeNameIndex), AttachedToMethod, Sequence<MethodParameterEntry> {
 
     override val type: AttributeType
         get() = AttributeType.METHOD_PARAMETERS
@@ -44,11 +44,11 @@ data class MethodParametersAttribute
     val size: Int
         get() = parameters.size
 
-    operator fun get(index: Int): ParameterElement {
+    operator fun get(index: Int): MethodParameterEntry {
         return parameters[index]
     }
 
-    override fun iterator(): Iterator<ParameterElement> {
+    override fun iterator(): Iterator<MethodParameterEntry> {
         return parameters.iterator()
     }
 
@@ -56,7 +56,7 @@ data class MethodParametersAttribute
         val parametersCount = input.readUnsignedByte()
         parameters = mutableListOfCapacity(parametersCount)
         for (i in 0 until parametersCount) {
-            parameters.add(ParameterElement.read(input))
+            parameters.add(MethodParameterEntry.read(input))
         }
     }
 
@@ -78,8 +78,8 @@ data class MethodParametersAttribute
     }
 }
 
-data class ParameterElement private constructor(private var _nameIndex:   Int = -1,
-                                                private var _accessFlags: Int =  0): ClassFileContent() {
+data class MethodParameterEntry private constructor(private var _nameIndex:   Int = -1,
+                                                    private var _accessFlags: Int =  0): ClassFileContent() {
 
     override val contentSize: Int
         get() = 4
@@ -105,8 +105,8 @@ data class ParameterElement private constructor(private var _nameIndex:   Int = 
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): ParameterElement {
-            val element = ParameterElement()
+        internal fun read(input: ClassDataInput): MethodParameterEntry {
+            val element = MethodParameterEntry()
             element.read(input)
             return element
         }
