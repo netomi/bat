@@ -31,9 +31,9 @@ internal class AnnotationPrinter constructor(private val printer:         Indent
     override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
         printer.println(".annotation ${annotation.getType(classFile)}")
         printer.levelUp()
-        for ((nameIndex, elementValue) in annotation.elementValues) {
-            printer.print("${classFile.getString(nameIndex)} = ")
-            elementValue.accept(classFile, elementValuePrinter)
+        for (component in annotation) {
+            printer.print("${classFile.getString(component.nameIndex)} = ")
+            component.elementValue.accept(classFile, elementValuePrinter)
             printer.println()
         }
         printer.levelDown()
