@@ -20,7 +20,9 @@ import com.github.netomi.bat.classfile.constant.*
 
 fun filteredByConstantType(acceptedTypes: Set<ConstantType>, visitor: ConstantVisitor): ConstantVisitor {
     return ConstantVisitor { classFile, index, constant ->
-        if (acceptedTypes.contains(constant.type)) constant.accept(classFile, index, visitor)
+        if (acceptedTypes.contains(constant.type)) {
+            constant.accept(classFile, index, visitor)
+        }
     }
 }
 

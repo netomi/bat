@@ -20,92 +20,82 @@ import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.classfile.AccessFlagTarget
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.accessFlagsToSet
-import com.github.netomi.bat.classfile.constant.ModuleConstant
-import com.github.netomi.bat.classfile.constant.PackageConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
 import java.util.*
 
-data class ExportsElement
-    private constructor(private var _exportsIndex: Int = -1,
-                        private var _exportsFlags: Int =  0,
-                        private var _exportsTo:    IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
+data class ExportsEntry
+    private constructor(private var _exportedPackageIndex: Int = -1,
+                        private var _flags:                Int =  0,
+                        private var _exportedToModules:    IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
-    val exportsIndex: Int
-        get() = _exportsIndex
+    val exportedPackageIndex: Int
+        get() = _exportedPackageIndex
 
-    val exportsFlags: Int
-        get() = _exportsFlags
+    val flags: Int
+        get() = _flags
 
-    val exportsFlagsAsSet: Set<AccessFlag>
-        get() = accessFlagsToSet(exportsFlags, AccessFlagTarget.EXPORTED_PACKAGE)
+    val flagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(flags, AccessFlagTarget.EXPORTED_PACKAGE)
 
     override val contentSize: Int
         get() = 6 + size * 2
 
     val size: Int
-        get() = _exportsTo.size
+        get() = _exportedToModules.size
 
     operator fun get(index: Int): Int {
-        return _exportsTo[index]
+        return _exportedToModules[index]
     }
 
     override fun iterator(): Iterator<Int> {
-        return _exportsTo.iterator()
-    }
-
-    fun getExportedPackage(classFile: ClassFile): PackageConstant {
-        return classFile.getPackage(exportsIndex)
+        return _exportedToModules.iterator()
     }
 
     fun getExportedPackageName(classFile: ClassFile): String {
-        return getExportedPackage(classFile).getPackageName(classFile)
-    }
-
-    fun getExportedToModules(classFile: ClassFile): List<ModuleConstant> {
-        return _exportsTo.map { classFile.getModule(it) }
+        return classFile.getPackage(exportedPackageIndex).getPackageName(classFile)
     }
 
     fun getExportedToModuleNames(classFile: ClassFile): List<String> {
-        return getExportedToModules(classFile).map { it.getModuleName(classFile) }
+        return _exportedToModules.map { classFile.getModule(it).getModuleName(classFile) }
     }
 
     private fun read(input: ClassDataInput) {
-        _exportsIndex = input.readUnsignedShort()
-        _exportsFlags = input.readUnsignedShort()
-        _exportsTo    = input.readShortIndexArray()
+        _exportedPackageIndex = input.readUnsignedShort()
+        _flags                = input.readUnsignedShort()
+        _exportedToModules    = input.readShortIndexArray()
     }
 
     override fun write(output: ClassDataOutput) {
-        output.writeShort(_exportsIndex)
-        output.writeShort(_exportsFlags)
-        output.writeShortIndexArray(_exportsTo)
+        output.writeShort(_exportedPackageIndex)
+        output.writeShort(_flags)
+        output.writeShortIndexArray(_exportedToModules)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is ExportsElement) return false
+        if (other !is ExportsEntry) return false
 
-        return _exportsIndex == other._exportsIndex &&
-               _exportsFlags == other._exportsFlags &&
-               _exportsTo.contentEquals(other._exportsTo)
+        return _exportedPackageIndex == other._exportedPackageIndex &&
+               _flags                == other._flags &&
+               _exportedToModules.contentEquals(other._exportedToModules)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_exportsIndex, _exportsFlags, _exportsTo.contentHashCode())
+        return Objects.hash(_exportedPackageIndex, _flags, _exportedToModules.contentHashCode())
     }
 
     fun exportedToModulesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        for (constantIndex in _exportsTo) {
+        for (constantIndex in _exportedToModules) {
             classFile.constantAccept(constantIndex, visitor)
         }
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): ExportsElement {
-            val element = ExportsElement()
+        internal fun read(input: ClassDataInput): ExportsEntry {
+            val element = ExportsEntry()
             element.read(input)
             return element
         }

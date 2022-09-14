@@ -17,7 +17,6 @@
 package com.github.netomi.bat.classfile.attribute.module
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.ClassConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -25,74 +24,66 @@ import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.JvmClassName
 import java.util.*
 
-data class ProvidesElement
-    private constructor(private var _providesIndex: Int = -1,
-                        private var _providesWith:  IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
+data class ProvidesEntry
+    private constructor(private var _providedClassIndex:  Int      = -1,
+                        private var _providesWithClasses: IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
-    val providesIndex: Int
-        get() = _providesIndex
+    val providedClassIndex: Int
+        get() = _providedClassIndex
 
     override val contentSize: Int
         get() = 4 + size * 2
 
     val size: Int
-        get() = _providesWith.size
+        get() = _providesWithClasses.size
 
     operator fun get(index: Int): Int {
-        return _providesWith[index]
+        return _providesWithClasses[index]
     }
 
     override fun iterator(): Iterator<Int> {
-        return _providesWith.iterator()
-    }
-
-    fun getProvidedClass(classFile: ClassFile): ClassConstant {
-        return classFile.getClass(providesIndex)
+        return _providesWithClasses.iterator()
     }
 
     fun getProvidedClassName(classFile: ClassFile): JvmClassName {
-        return getProvidedClass(classFile).getClassName(classFile)
-    }
-
-    fun getProvidesWithClasses(classFile: ClassFile): List<ClassConstant> {
-        return _providesWith.map { classFile.getClass(it) }
+        return classFile.getClass(providedClassIndex).getClassName(classFile)
     }
 
     fun getProvidesWithClassNames(classFile: ClassFile): List<JvmClassName> {
-        return getProvidesWithClasses(classFile).map { it.getClassName(classFile) }
+        return _providesWithClasses.map { classFile.getClass(it).getClassName(classFile) }
     }
 
     private fun read(input: ClassDataInput) {
-        _providesIndex = input.readUnsignedShort()
-        _providesWith  = input.readShortIndexArray()
+        _providedClassIndex  = input.readUnsignedShort()
+        _providesWithClasses = input.readShortIndexArray()
     }
 
     override fun write(output: ClassDataOutput) {
-        output.writeShort(_providesIndex)
-        output.writeShortIndexArray(_providesWith)
+        output.writeShort(_providedClassIndex)
+        output.writeShortIndexArray(_providesWithClasses)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is ProvidesElement) return false
+        if (other !is ProvidesEntry) return false
 
-        return _providesIndex == other._providesIndex &&
-               _providesWith.contentEquals(other._providesWith)
+        return _providedClassIndex == other._providedClassIndex &&
+                _providesWithClasses.contentEquals(other._providesWithClasses)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_providesIndex, _providesWith.contentHashCode())
+        return Objects.hash(_providedClassIndex, _providesWithClasses.contentHashCode())
     }
 
     fun providesWithClassesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        for (constantIndex in _providesWith) {
-            classFile.constantAccept(constantIndex, visitor)
+        for (classIndex in _providesWithClasses) {
+            classFile.constantAccept(classIndex, visitor)
         }
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): ProvidesElement {
-            val element = ProvidesElement()
+        internal fun read(input: ClassDataInput): ProvidesEntry {
+            val element = ProvidesEntry()
             element.read(input)
             return element
         }

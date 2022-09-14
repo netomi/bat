@@ -31,15 +31,15 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.25">Module Attribute</a>
  */
 data class ModuleAttribute
-    private constructor(override val attributeNameIndex:  Int,
-                         private var _moduleNameIndex:    Int = -1,
-                         private var _moduleFlags:        Int =  0,
-                         private var _moduleVersionIndex: Int = -1,
-                         private var _requiresList:       MutableList<RequiresElement> = mutableListOfCapacity(0),
-                         private var _exportsList:        MutableList<ExportsElement>  = mutableListOfCapacity(0),
-                         private var _opensList:          MutableList<OpensElement>    = mutableListOfCapacity(0),
-                         private var _uses:               UsesElement                  = UsesElement.empty(),
-                         private var _providesList:       MutableList<ProvidesElement> = mutableListOfCapacity(0)
+    private constructor(override val attributeNameIndex: Int,
+                        private var _moduleNameIndex:    Int = -1,
+                        private var _moduleFlags:        Int =  0,
+                        private var _moduleVersionIndex: Int = -1,
+                        private var _requiresEntries:    MutableList<RequiresEntry> = mutableListOfCapacity(0),
+                        private var _exportsEntries:     MutableList<ExportsEntry>  = mutableListOfCapacity(0),
+                        private var _opensEntries:       MutableList<OpensEntry>    = mutableListOfCapacity(0),
+                        private var _uses:               UsesEntry                  = UsesEntry.empty(),
+                        private var _providesEntries:    MutableList<ProvidesEntry> = mutableListOfCapacity(0)
     ): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
@@ -73,31 +73,31 @@ data class ModuleAttribute
         return classFile.getStringOrNull(moduleVersionIndex)
     }
 
-    val requires: List<RequiresElement>
-        get() = _requiresList
+    val requires: List<RequiresEntry>
+        get() = _requiresEntries
 
-    val exports: List<ExportsElement>
-        get() = _exportsList
+    val exports: List<ExportsEntry>
+        get() = _exportsEntries
 
-    val opens: List<OpensElement>
-        get() = _opensList
+    val opens: List<OpensEntry>
+        get() = _opensEntries
 
-    val uses: UsesElement
+    val uses: UsesEntry
         get() = _uses
 
-    val provides: List<ProvidesElement>
-        get() = _providesList
+    val provides: List<ProvidesEntry>
+        get() = _providesEntries
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
         _moduleNameIndex    = input.readUnsignedShort()
         _moduleFlags        = input.readUnsignedShort()
         _moduleVersionIndex = input.readUnsignedShort()
 
-        _requiresList = input.readContentList(RequiresElement.Companion::read)
-        _exportsList  = input.readContentList(ExportsElement.Companion::read)
-        _opensList    = input.readContentList(OpensElement.Companion::read)
-        _uses         = UsesElement.read(input)
-        _providesList = input.readContentList(ProvidesElement.Companion::read)
+        _requiresEntries = input.readContentList(RequiresEntry.Companion::read)
+        _exportsEntries  = input.readContentList(ExportsEntry.Companion::read)
+        _opensEntries    = input.readContentList(OpensEntry.Companion::read)
+        _uses            = UsesEntry.read(input)
+        _providesEntries = input.readContentList(ProvidesEntry.Companion::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {

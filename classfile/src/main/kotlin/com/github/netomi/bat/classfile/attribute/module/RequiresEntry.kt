@@ -25,53 +25,49 @@ import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
 
-data class RequiresElement
-    private constructor(private var _requiresIndex:        Int = -1,
-                        private var _requiresFlags:        Int =  0,
-                        private var _requiresVersionIndex: Int = -1): ClassFileContent() {
+data class RequiresEntry
+    private constructor(private var _requiredModuleIndex:  Int = -1,
+                        private var _flags:                Int =  0,
+                        private var _requiredVersionIndex: Int = -1): ClassFileContent() {
 
-    val requiresIndex: Int
-        get() = _requiresIndex
+    val requiredModuleIndex: Int
+        get() = _requiredModuleIndex
 
-    val requiresFlags: Int
-        get() = _requiresFlags
+    val flags: Int
+        get() = _flags
 
-    val requiresFlagsAsSet: Set<AccessFlag>
-        get() = accessFlagsToSet(requiresFlags, REQUIRED_MODULE)
+    val flagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(flags, REQUIRED_MODULE)
 
-    val requiresVersionIndex: Int
-        get() = _requiresVersionIndex
+    val requiredVersionIndex: Int
+        get() = _requiredVersionIndex
 
     override val contentSize: Int
         get() = 6
 
-    fun getRequiredModule(classFile: ClassFile): ModuleConstant {
-        return classFile.getModule(requiresIndex)
-    }
-
     fun getRequiredModuleName(classFile: ClassFile): String {
-        return getRequiredModule(classFile).getModuleName(classFile)
+        return classFile.getModule(requiredModuleIndex).getModuleName(classFile)
     }
 
     fun getRequiredVersion(classFile: ClassFile): String? {
-        return classFile.getStringOrNull(requiresVersionIndex)
+        return classFile.getStringOrNull(requiredVersionIndex)
     }
 
     private fun read(input: ClassDataInput) {
-        _requiresIndex        = input.readUnsignedShort()
-        _requiresFlags        = input.readUnsignedShort()
-        _requiresVersionIndex = input.readUnsignedShort()
+        _requiredModuleIndex  = input.readUnsignedShort()
+        _flags                = input.readUnsignedShort()
+        _requiredVersionIndex = input.readUnsignedShort()
     }
 
     override fun write(output: ClassDataOutput) {
-        output.writeShort(requiresIndex)
-        output.writeShort(requiresFlags)
-        output.writeShort(requiresVersionIndex)
+        output.writeShort(_requiredModuleIndex)
+        output.writeShort(_flags)
+        output.writeShort(_requiredVersionIndex)
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): RequiresElement {
-            val element = RequiresElement()
+        internal fun read(input: ClassDataInput): RequiresEntry {
+            val element = RequiresEntry()
             element.read(input)
             return element
         }

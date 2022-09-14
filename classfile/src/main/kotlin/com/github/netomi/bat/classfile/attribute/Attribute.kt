@@ -32,7 +32,7 @@ import java.io.IOException
 /**
  * Base class for attributes as contained in a class file.
  */
-abstract class Attribute protected constructor(open val attributeNameIndex: Int): ClassFileContent() {
+abstract class Attribute protected constructor(protected open val attributeNameIndex: Int): ClassFileContent() {
 
     internal abstract val type: AttributeType
 

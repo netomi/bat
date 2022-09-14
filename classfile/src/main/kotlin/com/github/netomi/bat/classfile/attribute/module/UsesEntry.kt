@@ -17,70 +17,65 @@
 package com.github.netomi.bat.classfile.attribute.module
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.ClassConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.JvmClassName
 
-data class UsesElement
-    private constructor(private var _uses: IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
+data class UsesEntry
+    private constructor(private var _usedClasses: IntArray = IntArray(0)): ClassFileContent(), Sequence<Int> {
 
     override val contentSize: Int
         get() = 2 + size * 2
 
     val size: Int
-        get() = _uses.size
+        get() = _usedClasses.size
 
     operator fun get(index: Int): Int {
-        return _uses[index]
+        return _usedClasses[index]
     }
 
     override fun iterator(): Iterator<Int> {
-        return _uses.iterator()
-    }
-
-    fun getUsedClasses(classFile: ClassFile): List<ClassConstant> {
-        return _uses.map { classFile.getClass(it) }
+        return _usedClasses.iterator()
     }
 
     fun getUsedClassNames(classFile: ClassFile): List<JvmClassName> {
-        return getUsedClasses(classFile).map { it.getClassName(classFile) }
+        return _usedClasses.map { classFile.getClass(it).getClassName(classFile) }
     }
 
     private fun read(input: ClassDataInput) {
-        _uses = input.readShortIndexArray()
+        _usedClasses = input.readShortIndexArray()
     }
 
     override fun write(output: ClassDataOutput) {
-        output.writeShortIndexArray(_uses)
+        output.writeShortIndexArray(_usedClasses)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is UsesElement) return false
+        if (other !is UsesEntry) return false
 
-        return _uses.contentEquals(other._uses)
+        return _usedClasses.contentEquals(other._usedClasses)
     }
 
     override fun hashCode(): Int {
-        return _uses.contentHashCode()
+        return _usedClasses.contentHashCode()
     }
 
     fun usedClassesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        for (constantIndex in _uses) {
-            classFile.constantAccept(constantIndex, visitor)
+        for (classIndex in _usedClasses) {
+            classFile.constantAccept(classIndex, visitor)
         }
     }
 
     companion object {
-        internal fun empty(): UsesElement {
-            return UsesElement()
+        internal fun empty(): UsesEntry {
+            return UsesEntry()
         }
 
-        internal fun read(input: ClassDataInput): UsesElement {
-            val element = UsesElement()
+        internal fun read(input: ClassDataInput): UsesEntry {
+            val element = UsesEntry()
             element.read(input)
             return element
         }

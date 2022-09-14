@@ -104,26 +104,26 @@ internal class AttributePrinter constructor(private val printer:         Indenti
         printer.println()
         printer.levelUp()
 
-        for (requireElement in attribute.requires) {
-            printer.print(".requires ${requireElement.getRequiredModuleName(classFile)}")
+        for (requireEntry in attribute.requires) {
+            printer.print(".requires ${requireEntry.getRequiredModuleName(classFile)}")
 
-            val requiredVersion = requireElement.getRequiredVersion(classFile)
+            val requiredVersion = requireEntry.getRequiredVersion(classFile)
             if (requiredVersion != null) {
                 printer.print("@${requiredVersion}")
             }
 
-            if (requireElement.requiresFlags != 0) {
-                printer.print(", ${requireElement.requiresFlagsAsSet.toPrintableString()}")
+            if (requireEntry.flags != 0) {
+                printer.print(", ${requireEntry.flagsAsSet.toPrintableString()}")
             }
             printer.println()
         }
 
-        for (exportElement in attribute.exports) {
-            printer.print(".exports ${exportElement.getExportedPackageName(classFile)}")
-            if (exportElement.exportsFlags != 0) {
-                printer.print(", ${exportElement.exportsFlagsAsSet.toPrintableString()}")
+        for (exportEntry in attribute.exports) {
+            printer.print(".exports ${exportEntry.getExportedPackageName(classFile)}")
+            if (exportEntry.flags != 0) {
+                printer.print(", ${exportEntry.flagsAsSet.toPrintableString()}")
             }
-            val exportedToModuleNames = exportElement.getExportedToModuleNames(classFile)
+            val exportedToModuleNames = exportEntry.getExportedToModuleNames(classFile)
             if (exportedToModuleNames.isNotEmpty()) {
                 printer.println(" to {")
                 printer.levelUp()
