@@ -44,22 +44,22 @@ internal class AttributePrinter constructor(private val printer:         Indenti
         //TODO("implement")
     }
 
-    override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+    override fun visitAnyDeprecated(classFile: ClassFile, attribute: DeprecatedAttribute) {
         printer.println(".deprecated")
         printedAttributes = true
     }
 
-    override fun visitAnySyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+    override fun visitAnySynthetic(classFile: ClassFile, attribute: SyntheticAttribute) {
         printer.println(".synthetic")
         printedAttributes = true
     }
 
-    override fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+    override fun visitAnySignature(classFile: ClassFile, attribute: SignatureAttribute) {
         printer.println(".signature \"${attribute.getSignature(classFile)}\"")
         printedAttributes = true
     }
 
-    override fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+    override fun visitAnyRuntimeVisibleAnnotations(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         if (attribute.size > 0) {
             printer.println(".annotations visible")
             printer.levelUp()
@@ -70,7 +70,7 @@ internal class AttributePrinter constructor(private val printer:         Indenti
         }
     }
 
-    override fun visitAnyRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
+    override fun visitAnyRuntimeInvisibleAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
         if (attribute.size > 0) {
             printer.println(".annotations invisible")
             printer.levelUp()
@@ -83,13 +83,13 @@ internal class AttributePrinter constructor(private val printer:         Indenti
 
     // ClassAttributeVisitor.
 
-    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
+    override fun visitSourceFile(classFile: ClassFile, attribute: SourceFileAttribute) {
         val sourceFile = attribute.getSourceFile(classFile)
         printer.println(".source \"$sourceFile\"")
         printedAttributes = true
     }
 
-    override fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
+    override fun visitModule(classFile: ClassFile, attribute: ModuleAttribute) {
         printer.print(".module ${attribute.getModuleName(classFile)}")
 
         val moduleVersion = attribute.getModuleVersion(classFile)

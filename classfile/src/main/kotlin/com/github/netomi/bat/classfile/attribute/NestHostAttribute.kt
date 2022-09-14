@@ -53,7 +53,7 @@ data class NestHostAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitNestHostAttribute(classFile, this)
+        visitor.visitNestHost(classFile, this)
     }
 
     companion object {

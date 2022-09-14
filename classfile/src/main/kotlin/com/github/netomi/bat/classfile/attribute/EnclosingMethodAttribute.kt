@@ -71,7 +71,7 @@ data class EnclosingMethodAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitEnclosingMethodAttribute(classFile, this)
+        visitor.visitEnclosingMethod(classFile, this)
     }
 
     companion object {

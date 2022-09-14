@@ -113,7 +113,7 @@ data class ModuleAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitModuleAttribute(classFile, this)
+        visitor.visitModule(classFile, this)
     }
 
     companion object {

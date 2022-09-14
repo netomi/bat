@@ -38,23 +38,23 @@ data class RuntimeVisibleTypeAnnotationsAttribute
         get() = AttributeType.RUNTIME_INVISIBLE_TYPE_ANNOTATIONS
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitRuntimeVisibleTypeAnnotationsAttribute(classFile, this)
+        visitor.visitRuntimeVisibleTypeAnnotations(classFile, this)
     }
 
     override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitRuntimeVisibleTypeAnnotationsAttribute(classFile, field, this)
+        visitor.visitRuntimeVisibleTypeAnnotations(classFile, field, this)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitRuntimeVisibleTypeAnnotationsAttribute(classFile, method, this)
+        visitor.visitRuntimeVisibleTypeAnnotations(classFile, method, this)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
-        visitor.visitRuntimeVisibleTypeAnnotationsAttribute(classFile, method, code, this)
+        visitor.visitRuntimeVisibleTypeAnnotations(classFile, method, code, this)
     }
 
     override fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor) {
-        visitor.visitRuntimeVisibleTypeAnnotationsAttribute(classFile, record, component, this)
+        visitor.visitRuntimeVisibleTypeAnnotations(classFile, record, component, this)
     }
 
     companion object {

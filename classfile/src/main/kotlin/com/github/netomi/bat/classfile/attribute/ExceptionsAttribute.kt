@@ -66,7 +66,7 @@ data class ExceptionsAttribute
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitExceptionsAttribute(classFile, method, this)
+        visitor.visitExceptions(classFile, method, this)
     }
 
     override fun equals(other: Any?): Boolean {

@@ -23,67 +23,67 @@ import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface MethodAttributeVisitor: AnyAttributeVisitor {
 
-    fun visitAnnotationDefaultAttribute(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
+    fun visitAnnotationDefault(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
+    fun visitCode(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitDeprecatedAttribute(classFile: ClassFile, method: Method, attribute: DeprecatedAttribute) {
+    fun visitDeprecated(classFile: ClassFile, method: Method, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitExceptionsAttribute(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+    fun visitExceptions(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitMethodParametersAttribute(classFile: ClassFile, method: Method, attribute: MethodParametersAttribute) {
+    fun visitMethodParameters(classFile: ClassFile, method: Method, attribute: MethodParametersAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeAnnotationsAttribute) {
+    fun visitRuntimeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, method, attribute)
+    fun visitRuntimeVisibleAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, method, attribute)
     }
 
-    fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, method, attribute)
+    fun visitRuntimeInvisibleAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, method, attribute)
     }
 
-    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeTypeAnnotationsAttribute) {
+    fun visitRuntimeTypeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeTypeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, method, attribute)
+    fun visitRuntimeVisibleTypeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, method, attribute)
     }
 
-    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, method, attribute)
+    fun visitRuntimeInvisibleTypeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, method, attribute)
     }
 
-    fun visitRuntimeParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
+    fun visitRuntimeParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleParameterAnnotationsAttribute) {
-        visitRuntimeParameterAnnotationsAttribute(classFile, method, attribute)
+    fun visitRuntimeVisibleParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeVisibleParameterAnnotationsAttribute) {
+        visitRuntimeParameterAnnotations(classFile, method, attribute)
     }
 
-    fun visitRuntimeInvisibleParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleParameterAnnotationsAttribute) {
-        visitRuntimeParameterAnnotationsAttribute(classFile, method, attribute)
+    fun visitRuntimeInvisibleParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleParameterAnnotationsAttribute) {
+        visitRuntimeParameterAnnotations(classFile, method, attribute)
     }
 
-    fun visitSignatureAttribute(classFile: ClassFile, method: Method, attribute: SignatureAttribute) {
+    fun visitSignature(classFile: ClassFile, method: Method, attribute: SignatureAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitSyntheticAttribute(classFile: ClassFile, method: Method, attribute: SyntheticAttribute) {
+    fun visitSynthetic(classFile: ClassFile, method: Method, attribute: SyntheticAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 }

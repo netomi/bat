@@ -64,7 +64,7 @@ data class InnerClassesAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitInnerClassesAttribute(classFile, this)
+        visitor.visitInnerClasses(classFile, this)
     }
 
     companion object {

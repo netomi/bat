@@ -62,7 +62,7 @@ data class SourceDebugExtensionAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitSourceDebugExtensionAttribute(classFile, this)
+        visitor.visitSourceDebugExtension(classFile, this)
     }
 
     companion object {

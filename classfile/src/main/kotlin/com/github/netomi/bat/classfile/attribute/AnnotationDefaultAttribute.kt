@@ -55,7 +55,7 @@ data class AnnotationDefaultAttribute
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitAnnotationDefaultAttribute(classFile, method, this)
+        visitor.visitAnnotationDefault(classFile, method, this)
     }
 
     fun elementValueAccept(classFile: ClassFile, visitor: ElementValueVisitor) {

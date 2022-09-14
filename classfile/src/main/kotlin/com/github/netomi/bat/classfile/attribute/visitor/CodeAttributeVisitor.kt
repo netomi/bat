@@ -28,31 +28,31 @@ import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleTypeAn
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 
 fun interface CodeAttributeVisitor: AnyAttributeVisitor {
-    fun visitLineNumberTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
+    fun visitLineNumberTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitLocalVariableTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
+    fun visitLocalVariableTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitLocalVariableTypeTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
+    fun visitLocalVariableTypeTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeTypeAnnotationsAttribute) {
+    fun visitRuntimeTypeAnnotations(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeTypeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, method, code, attribute)
+    fun visitRuntimeVisibleTypeAnnotations(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, method, code, attribute)
     }
 
-    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, method, code, attribute)
+    fun visitRuntimeInvisibleTypeAnnotations(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, method, code, attribute)
     }
 
-    fun visitStackMapTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {
+    fun visitStackMapTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 }

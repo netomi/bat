@@ -24,27 +24,27 @@ import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 
 fun interface ClassAttributeVisitor: AnyAttributeVisitor {
-    fun visitBootstrapMethodsAttribute(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
+    fun visitBootstrapMethods(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+    fun visitDeprecated(classFile: ClassFile, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitEnclosingMethodAttribute(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
+    fun visitEnclosingMethod(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitInnerClassesAttribute(classFile: ClassFile, attribute: InnerClassesAttribute) {
+    fun visitInnerClasses(classFile: ClassFile, attribute: InnerClassesAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
+    fun visitModule(classFile: ClassFile, attribute: ModuleAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitModuleMainClassAttribute(classFile: ClassFile, attribute: ModuleMainClassAttribute) {
+    fun visitModuleMainClass(classFile: ClassFile, attribute: ModuleMainClassAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
@@ -52,59 +52,59 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitNestHostAttribute(classFile: ClassFile, attribute: NestHostAttribute) {
+    fun visitNestHost(classFile: ClassFile, attribute: NestHostAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitNestMembersAttribute(classFile: ClassFile, attribute: NestMembersAttribute) {
+    fun visitNestMembers(classFile: ClassFile, attribute: NestMembersAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitPermittedSubclassesAttribute(classFile: ClassFile, attribute: PermittedSubclassesAttribute) {
+    fun visitPermittedSubclasses(classFile: ClassFile, attribute: PermittedSubclassesAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRecordAttribute(classFile: ClassFile, attribute: RecordAttribute) {
+    fun visitRecord(classFile: ClassFile, attribute: RecordAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
+    fun visitRuntimeAnnotations(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, attribute)
+    fun visitRuntimeVisibleAnnotations(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, attribute)
     }
 
-    fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, attribute)
+    fun visitRuntimeInvisibleAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, attribute)
     }
 
-    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
+    fun visitRuntimeTypeAnnotations(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    fun visitRuntimeVisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, attribute)
     }
 
-    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, attribute)
+    fun visitRuntimeInvisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, attribute)
     }
 
-    fun visitSignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+    fun visitSignature(classFile: ClassFile, attribute: SignatureAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitSourceDebugExtensionAttribute(classFile: ClassFile, attribute: SourceDebugExtensionAttribute) {
+    fun visitSourceDebugExtension(classFile: ClassFile, attribute: SourceDebugExtensionAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
+    fun visitSourceFile(classFile: ClassFile, attribute: SourceFileAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitSyntheticAttribute(classFile: ClassFile, attribute: SyntheticAttribute) {
+    fun visitSynthetic(classFile: ClassFile, attribute: SyntheticAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 }

@@ -36,7 +36,7 @@ data class RuntimeVisibleParameterAnnotationsAttribute
         get() = AttributeType.RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitRuntimeVisibleParameterAnnotationsAttribute(classFile, method, this)
+        visitor.visitRuntimeVisibleParameterAnnotations(classFile, method, this)
     }
 
     companion object {

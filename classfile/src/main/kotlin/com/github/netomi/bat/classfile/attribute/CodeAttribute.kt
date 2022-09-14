@@ -93,7 +93,7 @@ data class CodeAttribute
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitCodeAttribute(classFile, method, this)
+        visitor.visitCode(classFile, method, this)
     }
 
     fun attributesAccept(classFile: ClassFile, method: Method, visitor: CodeAttributeVisitor) {

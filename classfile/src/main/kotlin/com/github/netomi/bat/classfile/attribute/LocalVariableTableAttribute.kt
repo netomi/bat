@@ -60,7 +60,7 @@ data class LocalVariableTableAttribute
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
-        visitor.visitLocalVariableTableAttribute(classFile, method, code, this)
+        visitor.visitLocalVariableTable(classFile, method, code, this)
     }
 
     companion object {

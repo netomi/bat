@@ -54,7 +54,7 @@ data class ConstantValueAttribute
     }
 
     override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitConstantValueAttribute(classFile, field, this)
+        visitor.visitConstantValue(classFile, field, this)
     }
 
     fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {

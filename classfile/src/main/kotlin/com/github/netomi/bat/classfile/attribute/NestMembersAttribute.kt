@@ -63,7 +63,7 @@ data class NestMembersAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitNestMembersAttribute(classFile, this)
+        visitor.visitNestMembers(classFile, this)
     }
 
     override fun equals(other: Any?): Boolean {

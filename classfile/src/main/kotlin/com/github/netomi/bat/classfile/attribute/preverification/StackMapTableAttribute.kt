@@ -66,7 +66,7 @@ data class StackMapTableAttribute
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
-        visitor.visitStackMapTableAttribute(classFile, method, code, this)
+        visitor.visitStackMapTable(classFile, method, code, this)
     }
 
     fun stackMapFramesAccept(classFile: ClassFile, visitor: StackMapFrameVisitor) {

@@ -60,7 +60,7 @@ data class BootstrapMethodsAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitBootstrapMethodsAttribute(classFile, this)
+        visitor.visitBootstrapMethods(classFile, this)
     }
 
     companion object {

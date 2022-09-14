@@ -48,15 +48,15 @@ data class DeprecatedAttribute private constructor(override val attributeNameInd
     override fun writeAttributeData(output: ClassDataOutput) {}
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitDeprecatedAttribute(classFile, this)
+        visitor.visitDeprecated(classFile, this)
     }
 
     override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitDeprecatedAttribute(classFile, field, this)
+        visitor.visitDeprecated(classFile, field, this)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitDeprecatedAttribute(classFile, method, this)
+        visitor.visitDeprecated(classFile, method, this)
     }
 
     companion object {

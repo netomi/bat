@@ -54,7 +54,7 @@ data class SourceFileAttribute internal constructor(override val attributeNameIn
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitSourceFileAttribute(classFile, this)
+        visitor.visitSourceFile(classFile, this)
     }
 
     companion object {

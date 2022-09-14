@@ -26,111 +26,111 @@ import com.github.netomi.bat.classfile.attribute.SyntheticAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface MemberAttributeVisitor: FieldAttributeVisitor, MethodAttributeVisitor {
-    fun visitDeprecatedAttribute(classFile: ClassFile, member: Member, attribute: DeprecatedAttribute) {
+    fun visitDeprecated(classFile: ClassFile, member: Member, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    override fun visitDeprecatedAttribute(classFile: ClassFile, field: Field, attribute: DeprecatedAttribute) {
-        visitDeprecatedAttribute(classFile, field as Member, attribute)
+    override fun visitDeprecated(classFile: ClassFile, field: Field, attribute: DeprecatedAttribute) {
+        visitDeprecated(classFile, field as Member, attribute)
     }
 
-    override fun visitDeprecatedAttribute(classFile: ClassFile, method: Method, attribute: DeprecatedAttribute) {
-        visitDeprecatedAttribute(classFile, method as Member, attribute)
+    override fun visitDeprecated(classFile: ClassFile, method: Method, attribute: DeprecatedAttribute) {
+        visitDeprecated(classFile, method as Member, attribute)
     }
 
-    fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeAnnotationsAttribute) {
+    fun visitRuntimeAnnotations(classFile: ClassFile, member: Member, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    override fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, field as Member, attribute)
+    override fun visitRuntimeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, field as Member, attribute)
     }
 
-    override fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, method as Member, attribute)
+    override fun visitRuntimeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, method as Member, attribute)
     }
 
-    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, member, attribute)
+    fun visitRuntimeVisibleAnnotations(classFile: ClassFile, member: Member, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, member, attribute)
     }
 
-    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitRuntimeVisibleAnnotationsAttribute(classFile, field as Member, attribute)
+    override fun visitRuntimeVisibleAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitRuntimeVisibleAnnotations(classFile, field as Member, attribute)
     }
 
-    override fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitRuntimeVisibleAnnotationsAttribute(classFile, method as Member, attribute)
+    override fun visitRuntimeVisibleAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitRuntimeVisibleAnnotations(classFile, method as Member, attribute)
     }
 
-    fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, member, attribute)
+    fun visitRuntimeInvisibleAnnotations(classFile: ClassFile, member: Member, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, member, attribute)
     }
 
-    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitRuntimeInvisibleAnnotationsAttribute(classFile, field as Member, attribute)
+    override fun visitRuntimeInvisibleAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitRuntimeInvisibleAnnotations(classFile, field as Member, attribute)
     }
 
-    override fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitRuntimeInvisibleAnnotationsAttribute(classFile, method as Member, attribute)
+    override fun visitRuntimeInvisibleAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitRuntimeInvisibleAnnotations(classFile, method as Member, attribute)
     }
 
-    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeTypeAnnotationsAttribute) {
+    fun visitRuntimeTypeAnnotations(classFile: ClassFile, member: Member, attribute: RuntimeTypeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, field as Member, attribute)
+    override fun visitRuntimeTypeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, field as Member, attribute)
     }
 
-    override fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, method as Member, attribute)
+    override fun visitRuntimeTypeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, method as Member, attribute)
     }
 
-    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, member, attribute)
+    fun visitRuntimeVisibleTypeAnnotations(classFile: ClassFile, member: Member, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, member, attribute)
     }
 
-    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
-        visitRuntimeVisibleTypeAnnotationsAttribute(classFile, field as Member, attribute)
+    override fun visitRuntimeVisibleTypeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeVisibleTypeAnnotations(classFile, field as Member, attribute)
     }
 
-    override fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
-        visitRuntimeVisibleTypeAnnotationsAttribute(classFile, method as Member, attribute)
+    override fun visitRuntimeVisibleTypeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeVisibleTypeAnnotations(classFile, method as Member, attribute)
     }
 
-    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, member: Member, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, member, attribute)
+    fun visitRuntimeInvisibleTypeAnnotations(classFile: ClassFile, member: Member, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, member, attribute)
     }
 
-    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
-        visitRuntimeInvisibleTypeAnnotationsAttribute(classFile, field as Member, attribute)
+    override fun visitRuntimeInvisibleTypeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeInvisibleTypeAnnotations(classFile, field as Member, attribute)
     }
 
-    override fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
-        visitRuntimeInvisibleTypeAnnotationsAttribute(classFile, method as Member, attribute)
+    override fun visitRuntimeInvisibleTypeAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeInvisibleTypeAnnotations(classFile, method as Member, attribute)
     }
 
-    fun visitSignatureAttribute(classFile: ClassFile, member: Member, attribute: SignatureAttribute) {
+    fun visitSignature(classFile: ClassFile, member: Member, attribute: SignatureAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    override fun visitSignatureAttribute(classFile: ClassFile, field: Field, attribute: SignatureAttribute) {
-        visitSignatureAttribute(classFile, field as Member, attribute)
+    override fun visitSignature(classFile: ClassFile, field: Field, attribute: SignatureAttribute) {
+        visitSignature(classFile, field as Member, attribute)
     }
 
-    override fun visitSignatureAttribute(classFile: ClassFile, method: Method, attribute: SignatureAttribute) {
-        visitSignatureAttribute(classFile, method as Member, attribute)
+    override fun visitSignature(classFile: ClassFile, method: Method, attribute: SignatureAttribute) {
+        visitSignature(classFile, method as Member, attribute)
     }
 
-    fun visitSyntheticAttribute(classFile: ClassFile, member: Member, attribute: SyntheticAttribute) {
+    fun visitSynthetic(classFile: ClassFile, member: Member, attribute: SyntheticAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    override fun visitSyntheticAttribute(classFile: ClassFile, field: Field, attribute: SyntheticAttribute) {
-        visitSyntheticAttribute(classFile, field as Member, attribute)
+    override fun visitSynthetic(classFile: ClassFile, field: Field, attribute: SyntheticAttribute) {
+        visitSynthetic(classFile, field as Member, attribute)
     }
 
-    override fun visitSyntheticAttribute(classFile: ClassFile, method: Method, attribute: SyntheticAttribute) {
-        visitSyntheticAttribute(classFile, method as Member, attribute)
+    override fun visitSynthetic(classFile: ClassFile, method: Method, attribute: SyntheticAttribute) {
+        visitSynthetic(classFile, method as Member, attribute)
     }
 }

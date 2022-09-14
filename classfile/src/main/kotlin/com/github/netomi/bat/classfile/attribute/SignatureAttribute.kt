@@ -60,19 +60,19 @@ data class SignatureAttribute internal constructor(override val attributeNameInd
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitSignatureAttribute(classFile, this)
+        visitor.visitSignature(classFile, this)
     }
 
     override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitSignatureAttribute(classFile, field, this)
+        visitor.visitSignature(classFile, field, this)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitSignatureAttribute(classFile, method, this)
+        visitor.visitSignature(classFile, method, this)
     }
 
     override fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor) {
-        visitor.visitSignatureAttribute(classFile, record, component, this)
+        visitor.visitSignature(classFile, record, component, this)
     }
 
     companion object {

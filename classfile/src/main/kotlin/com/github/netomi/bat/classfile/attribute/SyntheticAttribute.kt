@@ -48,15 +48,15 @@ data class SyntheticAttribute internal constructor(override val attributeNameInd
     override fun writeAttributeData(output: ClassDataOutput) {}
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitSyntheticAttribute(classFile, this)
+        visitor.visitSynthetic(classFile, this)
     }
 
     override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitSyntheticAttribute(classFile, field, this)
+        visitor.visitSynthetic(classFile, field, this)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitSyntheticAttribute(classFile, method, this)
+        visitor.visitSynthetic(classFile, method, this)
     }
 
     companion object {

@@ -60,7 +60,7 @@ data class RecordAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitRecordAttribute(classFile, this)
+        visitor.visitRecord(classFile, this)
     }
 
     companion object {

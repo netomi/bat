@@ -40,19 +40,19 @@ data class RuntimeInvisibleAnnotationsAttribute
         get() = AttributeType.RUNTIME_INVISIBLE_ANNOTATIONS
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, this)
+        visitor.visitRuntimeInvisibleAnnotations(classFile, this)
     }
 
     override fun accept(classFile: ClassFile, field: Field, visitor: FieldAttributeVisitor) {
-        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, field, this)
+        visitor.visitRuntimeInvisibleAnnotations(classFile, field, this)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, method, this)
+        visitor.visitRuntimeInvisibleAnnotations(classFile, method, this)
     }
 
     override fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor) {
-        visitor.visitRuntimeInvisibleAnnotationsAttribute(classFile, record, component, this)
+        visitor.visitRuntimeInvisibleAnnotations(classFile, record, component, this)
     }
 
     companion object {

@@ -63,7 +63,7 @@ data class PermittedSubclassesAttribute
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
-        visitor.visitPermittedSubclassesAttribute(classFile, this)
+        visitor.visitPermittedSubclasses(classFile, this)
     }
 
     override fun equals(other: Any?): Boolean {

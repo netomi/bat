@@ -36,7 +36,7 @@ data class RuntimeInvisibleParameterAnnotationsAttribute
         get() = AttributeType.RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitRuntimeInvisibleParameterAnnotationsAttribute(classFile, method, this)
+        visitor.visitRuntimeInvisibleParameterAnnotations(classFile, method, this)
     }
 
     companion object {

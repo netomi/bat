@@ -23,43 +23,43 @@ import com.github.netomi.bat.classfile.attribute.annotation.*
 
 fun interface FieldAttributeVisitor: AnyAttributeVisitor {
 
-    fun visitConstantValueAttribute(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {
+    fun visitConstantValue(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitDeprecatedAttribute(classFile: ClassFile, field: Field, attribute: DeprecatedAttribute) {
+    fun visitDeprecated(classFile: ClassFile, field: Field, attribute: DeprecatedAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeAnnotationsAttribute) {
+    fun visitRuntimeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeVisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, field, attribute)
+    fun visitRuntimeVisibleAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeVisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, field, attribute)
     }
 
-    fun visitRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleAnnotationsAttribute) {
-        visitRuntimeAnnotationsAttribute(classFile, field, attribute)
+    fun visitRuntimeInvisibleAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleAnnotationsAttribute) {
+        visitRuntimeAnnotations(classFile, field, attribute)
     }
 
-    fun visitRuntimeTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeTypeAnnotationsAttribute) {
+    fun visitRuntimeTypeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeTypeAnnotationsAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, field, attribute)
+    fun visitRuntimeVisibleTypeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, field, attribute)
     }
 
-    fun visitRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
-        visitRuntimeTypeAnnotationsAttribute(classFile, field, attribute)
+    fun visitRuntimeInvisibleTypeAnnotations(classFile: ClassFile, field: Field, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        visitRuntimeTypeAnnotations(classFile, field, attribute)
     }
 
-    fun visitSignatureAttribute(classFile: ClassFile, field: Field, attribute: SignatureAttribute) {
+    fun visitSignature(classFile: ClassFile, field: Field, attribute: SignatureAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
-    fun visitSyntheticAttribute(classFile: ClassFile, field: Field, attribute: SyntheticAttribute) {
+    fun visitSynthetic(classFile: ClassFile, field: Field, attribute: SyntheticAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 }

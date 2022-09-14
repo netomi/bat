@@ -68,7 +68,7 @@ data class MethodParametersAttribute
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
-        visitor.visitMethodParametersAttribute(classFile, method, this)
+        visitor.visitMethodParameters(classFile, method, this)
     }
 
     companion object {

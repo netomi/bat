@@ -47,49 +47,49 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.println("UnknownAttribute: name=${attribute.getAttributeName(classFile)} size=${attribute.data.size}")
     }
 
-    override fun visitAnyDeprecatedAttribute(classFile: ClassFile, attribute: DeprecatedAttribute) {
+    override fun visitAnyDeprecated(classFile: ClassFile, attribute: DeprecatedAttribute) {
         printer.println("Deprecated: true")
     }
 
-    override fun visitAnySignatureAttribute(classFile: ClassFile, attribute: SignatureAttribute) {
+    override fun visitAnySignature(classFile: ClassFile, attribute: SignatureAttribute) {
         printer.println("Signature: #%-27d // %s".format(attribute.signatureIndex, attribute.getSignature(classFile)))
     }
 
-    override fun visitAnyRuntimeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
+    override fun visitAnyRuntimeAnnotations(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
         printer.levelUp()
         attribute.annotationsAcceptIndexed(classFile, this)
         printer.levelDown()
     }
 
-    override fun visitAnyRuntimeInvisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
+    override fun visitAnyRuntimeInvisibleAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
         printer.println("RuntimeInvisibleAnnotations:")
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+        visitAnyRuntimeAnnotations(classFile, attribute)
     }
 
-    override fun visitAnyRuntimeVisibleAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
+    override fun visitAnyRuntimeVisibleAnnotations(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         printer.println("RuntimeVisibleAnnotations:")
-        visitAnyRuntimeAnnotationsAttribute(classFile, attribute)
+        visitAnyRuntimeAnnotations(classFile, attribute)
     }
 
-    override fun visitAnyRuntimeTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
+    override fun visitAnyRuntimeTypeAnnotations(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
         printer.levelUp()
         attribute.typeAnnotationsAcceptIndexed(classFile, this)
         printer.levelDown()
     }
 
-    override fun visitAnyRuntimeInvisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+    override fun visitAnyRuntimeInvisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
         printer.println("RuntimeInvisibleTypeAnnotations:")
-        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+        visitAnyRuntimeTypeAnnotations(classFile, attribute)
     }
 
-    override fun visitAnyRuntimeVisibleTypeAnnotationsAttribute(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+    override fun visitAnyRuntimeVisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
         printer.println("RuntimeVisibleTypeAnnotations:")
-        visitAnyRuntimeTypeAnnotationsAttribute(classFile, attribute)
+        visitAnyRuntimeTypeAnnotations(classFile, attribute)
     }
 
     // Implementations for ClassAttributeVisitor
 
-    override fun visitBootstrapMethodsAttribute(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
+    override fun visitBootstrapMethods(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
         printer.println("BootstrapMethods:")
 
         printer.levelUp()
@@ -114,7 +114,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitEnclosingMethodAttribute(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
+    override fun visitEnclosingMethod(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
         val str = buildString {
             append("EnclosingMethod: ")
             append("#${attribute.classIndex}.#${attribute.methodIndex}")
@@ -128,7 +128,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.println()
     }
 
-    override fun visitInnerClassesAttribute(classFile: ClassFile, attribute: InnerClassesAttribute) {
+    override fun visitInnerClasses(classFile: ClassFile, attribute: InnerClassesAttribute) {
         printer.println("InnerClasses:")
         printer.levelUp()
         for (element in attribute) {
@@ -174,7 +174,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitRecordAttribute(classFile: ClassFile, attribute: RecordAttribute) {
+    override fun visitRecord(classFile: ClassFile, attribute: RecordAttribute) {
         printer.println("Record:")
         printer.levelUp()
         for (component in attribute) {
@@ -188,7 +188,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitPermittedSubclassesAttribute(classFile: ClassFile, attribute: PermittedSubclassesAttribute) {
+    override fun visitPermittedSubclasses(classFile: ClassFile, attribute: PermittedSubclassesAttribute) {
         printer.println("PermittedSubclasses:")
         printer.levelUp()
         for (classIndex in attribute) {
@@ -198,11 +198,11 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitSourceFileAttribute(classFile: ClassFile, attribute: SourceFileAttribute) {
+    override fun visitSourceFile(classFile: ClassFile, attribute: SourceFileAttribute) {
         printer.println("SourceFile: \"%s\"".format(attribute.getSourceFile(classFile)))
     }
 
-    override fun visitSourceDebugExtensionAttribute(classFile: ClassFile, attribute: SourceDebugExtensionAttribute) {
+    override fun visitSourceDebugExtension(classFile: ClassFile, attribute: SourceDebugExtensionAttribute) {
         printer.println("SourceDebugExtension:")
         printer.levelUp()
         val stringList = String(attribute.debugExtension).split('\n')
@@ -214,7 +214,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitModuleAttribute(classFile: ClassFile, attribute: ModuleAttribute) {
+    override fun visitModule(classFile: ClassFile, attribute: ModuleAttribute) {
         printer.println("Module:")
         printer.levelUp()
 
@@ -350,13 +350,13 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitNestHostAttribute(classFile: ClassFile, attribute: NestHostAttribute) {
+    override fun visitNestHost(classFile: ClassFile, attribute: NestHostAttribute) {
         printer.print("NestHost: class ")
         classFile.constantAccept(attribute.hostClassIndex, constantPrinter)
         printer.println()
     }
 
-    override fun visitNestMembersAttribute(classFile: ClassFile, attribute: NestMembersAttribute) {
+    override fun visitNestMembers(classFile: ClassFile, attribute: NestMembersAttribute) {
         printer.println("NestMembers:")
         printer.levelUp()
         for (memberIndex in attribute) {
@@ -368,7 +368,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     // Implementations for FieldAttributeVisitor
 
-    override fun visitConstantValueAttribute(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {
+    override fun visitConstantValue(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {
         printer.print("ConstantValue: ")
         val constantValuePrinter = ConstantPrinter(printer, printConstantType = true, alwaysIncludeClassName = false)
         classFile.constantAccept(attribute.constantValueIndex, constantValuePrinter)
@@ -377,7 +377,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     // Implementations for MethodAttributeVisitor
 
-    override fun visitAnnotationDefaultAttribute(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
+    override fun visitAnnotationDefault(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
         printer.println("AnnotationDefault:")
         printer.levelUp()
         printer.print("default_value: ")
@@ -390,7 +390,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitCodeAttribute(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
+    override fun visitCode(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
         printer.println("Code:")
         printer.levelUp()
         printer.println("stack=${attribute.maxStack}, locals=${attribute.maxLocals}, args_size=${method.getArgumentCount(classFile)}")
@@ -418,7 +418,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitExceptionsAttribute(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+    override fun visitExceptions(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
         printer.println("Exceptions:")
         printer.levelUp()
         val exceptions =
@@ -430,7 +430,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitRuntimeParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
+    override fun visitRuntimeParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
         printer.levelUp()
 
         for (parameterIndex in 0 until attribute.size) {
@@ -443,17 +443,17 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitRuntimeInvisibleParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleParameterAnnotationsAttribute) {
+    override fun visitRuntimeInvisibleParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleParameterAnnotationsAttribute) {
         printer.println("RuntimeInvisibleParameterAnnotations:")
-        visitRuntimeParameterAnnotationsAttribute(classFile, method, attribute)
+        visitRuntimeParameterAnnotations(classFile, method, attribute)
     }
 
-    override fun visitRuntimeVisibleParameterAnnotationsAttribute(classFile: ClassFile, method: Method, attribute: RuntimeVisibleParameterAnnotationsAttribute) {
+    override fun visitRuntimeVisibleParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeVisibleParameterAnnotationsAttribute) {
         printer.println("RuntimeVisibleParameterAnnotations:")
-        visitRuntimeParameterAnnotationsAttribute(classFile, method, attribute)
+        visitRuntimeParameterAnnotations(classFile, method, attribute)
     }
 
-    override fun visitMethodParametersAttribute(classFile: ClassFile, method: Method, attribute: MethodParametersAttribute) {
+    override fun visitMethodParameters(classFile: ClassFile, method: Method, attribute: MethodParametersAttribute) {
         printer.println("MethodParameters:")
         printer.levelUp()
         printer.println("%-30s %4s".format("Name", "Flags"))
@@ -470,7 +470,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     // Implementations for CodeAttributeVisitor
 
-    override fun visitLineNumberTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
+    override fun visitLineNumberTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
         printer.println("LineNumberTable:")
         printer.levelUp()
         for (element in attribute) {
@@ -479,7 +479,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitLocalVariableTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
+    override fun visitLocalVariableTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
         printer.println("LocalVariableTable:")
         printer.levelUp()
         // TODO: better align name / signature to make output more readable
@@ -495,7 +495,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitLocalVariableTypeTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
+    override fun visitLocalVariableTypeTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
         printer.println("LocalVariableTypeTable:")
         printer.levelUp()
         if (attribute.size > 0) {
@@ -513,7 +513,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelDown()
     }
 
-    override fun visitStackMapTableAttribute(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {
+    override fun visitStackMapTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {
         printer.println("StackMapTable: number_of_entries = ${attribute.size}")
         printer.levelUp()
         attribute.stackMapFramesAccept(classFile, stackMapFramePrinter)

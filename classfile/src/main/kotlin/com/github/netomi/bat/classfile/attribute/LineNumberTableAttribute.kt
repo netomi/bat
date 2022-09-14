@@ -61,7 +61,7 @@ data class LineNumberTableAttribute
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
-        visitor.visitLineNumberTableAttribute(classFile, method, code, this)
+        visitor.visitLineNumberTable(classFile, method, code, this)
     }
 
     companion object {
