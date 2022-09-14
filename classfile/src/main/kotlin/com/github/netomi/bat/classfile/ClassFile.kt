@@ -215,6 +215,10 @@ class ClassFile private constructor() {
         }
     }
 
+    override fun toString(): String {
+        return "ClassFile(name=$className)"
+    }
+
     companion object {
         fun empty(): ClassFile {
             return ClassFile()

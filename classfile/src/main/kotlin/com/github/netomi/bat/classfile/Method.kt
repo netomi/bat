@@ -89,7 +89,7 @@ class Method private constructor(): Member() {
     }
 
     override fun toString(): String {
-        return "Method[nameIndex=%d,descriptorIndex=%d,accessFlags=%s]".format(nameIndex, descriptorIndex, toHexString(accessFlags, 4))
+        return "Method(nameIndex=%d,descriptorIndex=%d,accessFlags=%s)".format(nameIndex, descriptorIndex, toHexString(accessFlags, 4))
     }
 
     companion object {
