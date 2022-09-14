@@ -18,9 +18,7 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
-import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
@@ -31,7 +29,7 @@ import java.util.*
  */
 data class UnknownAttribute internal constructor(override val attributeNameIndex: Int,
                                                   private var _data:              ByteArray = ByteArray(0))
-    : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod {
+    : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod, AttachedToCodeAttribute, AttachedToRecordComponent {
 
     override val type: AttributeType
         get() = AttributeType.UNKNOWN
@@ -62,6 +60,14 @@ data class UnknownAttribute internal constructor(override val attributeNameIndex
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
+        visitor.visitUnknownAttribute(classFile, this)
+    }
+
+    override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
+        visitor.visitUnknownAttribute(classFile, this)
+    }
+
+    override fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor) {
         visitor.visitUnknownAttribute(classFile, this)
     }
 
