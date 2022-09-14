@@ -27,10 +27,10 @@ internal class ReferencedIndexPrinter constructor(private val printer: Indenting
 
     override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {
         printer.print("#${annotation.typeIndex}(")
-        annotation.elementValues.forEachIndexed { index, (elementNameIndex, elementValue) ->
-            printer.print("#${elementNameIndex}=")
-            elementValue.accept(classFile, this)
-            if (index < annotation.elementValues.lastIndex) {
+        annotation.forEachIndexed { index, component ->
+            printer.print("#${component.nameIndex}=")
+            component.elementValue.accept(classFile, this)
+            if (index < (annotation.size - 1)) {
                 printer.print(",")
             }
         }

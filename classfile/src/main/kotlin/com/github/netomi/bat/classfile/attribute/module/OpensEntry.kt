@@ -95,9 +95,9 @@ data class OpensEntry
 
     companion object {
         internal fun read(input: ClassDataInput): OpensEntry {
-            val element = OpensEntry()
-            element.read(input)
-            return element
+            val entry = OpensEntry()
+            entry.read(input)
+            return entry
         }
     }
 }

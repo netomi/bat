@@ -21,60 +21,60 @@ import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValue
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
+import com.github.netomi.bat.classfile.io.contentSize
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 import java.util.*
 
 open class Annotation
-    protected constructor(protected var _typeIndex:     Int                                  = -1,
-                          protected var _elementValues: MutableList<Pair<Int, ElementValue>> = mutableListOfCapacity(0)): ClassFileContent() {
+    protected constructor(protected var _typeIndex:  Int                              = -1,
+                          protected var _components: MutableList<AnnotationComponent> = mutableListOfCapacity(0))
+    : ClassFileContent(), Sequence<AnnotationComponent> {
 
     override val contentSize: Int
-        get() = 2 + _elementValues.fold(2) { acc, (_, value) -> acc + 2 + value.contentSize }
+        get() = 2 + _components.contentSize()
 
     val typeIndex: Int
         get() = _typeIndex
-
-    val elementValues: List<Pair<Int, ElementValue>>
-        get() = _elementValues
 
     fun getType(classFile: ClassFile): JvmType {
         return classFile.getType(typeIndex)
     }
 
+    val size: Int
+        get() = _components.size
+
+    operator fun get(index: Int): AnnotationComponent {
+        return _components[index]
+    }
+
+    override fun iterator(): Iterator<AnnotationComponent> {
+        return _components.iterator()
+    }
+
     @Throws(IOException::class)
     internal open fun read(input: ClassDataInput) {
-        _typeIndex = input.readUnsignedShort()
-
-        val elementValuesCount = input.readUnsignedShort()
-        _elementValues = mutableListOfCapacity(elementValuesCount)
-        for (i in 0 until elementValuesCount) {
-            val elementNameIndex = input.readUnsignedShort()
-            _elementValues.add(Pair(elementNameIndex, ElementValue.read(input)))
-        }
+        _typeIndex  = input.readUnsignedShort()
+        _components = input.readContentList(AnnotationComponent::read)
     }
 
     @Throws(IOException::class)
     override fun write(output: ClassDataOutput) {
-        output.writeShort(typeIndex)
-        output.writeShort(elementValues.size)
-        elementValues.forEach { (elementNameIndex, elementValue) ->
-            output.writeShort(elementNameIndex)
-            elementValue.write(output)
-        }
+        output.writeShort(_typeIndex)
+        output.writeContentList(_components)
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Annotation) return false
 
-        return _typeIndex     == other._typeIndex &&
-               _elementValues == other._elementValues
+        return _typeIndex  == other._typeIndex &&
+               _components == other._components
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_typeIndex, _elementValues)
+        return Objects.hash(_typeIndex, _components)
     }
 
     open fun accept(classFile: ClassFile, visitor: AnnotationVisitor) {
@@ -82,8 +82,8 @@ open class Annotation
     }
 
     fun elementValuesAccept(classFile: ClassFile, visitor: ElementValueVisitor) {
-        for ((_, elementValue) in elementValues) {
-            elementValue.accept(classFile, visitor)
+        for (component in _components) {
+            component.elementValue.accept(classFile, visitor)
         }
     }
 
@@ -96,6 +96,41 @@ open class Annotation
             val annotation = Annotation()
             annotation.read(input)
             return annotation
+        }
+    }
+}
+
+data class AnnotationComponent private constructor(private var _nameIndex:    Int = -1,
+                                                   private var _elementValue: ElementValue = ElementValue.empty()): ClassFileContent() {
+
+    override val contentSize: Int
+        get() = 2 + _elementValue.contentSize
+
+    val nameIndex: Int
+        get() = _nameIndex
+
+    fun getName(classFile: ClassFile): String {
+        return classFile.getString(nameIndex)
+    }
+
+    val elementValue: ElementValue
+        get() = _elementValue
+
+    private fun read(input: ClassDataInput) {
+        _nameIndex    = input.readUnsignedShort()
+        _elementValue = ElementValue.read(input)
+    }
+
+    override fun write(output: ClassDataOutput) {
+        output.writeShort(_nameIndex)
+        _elementValue.write(output)
+    }
+
+    companion object {
+        internal fun read(input: ClassDataInput): AnnotationComponent {
+            val entry = AnnotationComponent()
+            entry.read(input)
+            return entry
         }
     }
 }

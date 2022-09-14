@@ -32,8 +32,7 @@ import java.io.IOException
  */
 data class AnnotationDefaultAttribute
     private constructor(override val attributeNameIndex:  Int,
-                         // Pick an arbitrary empty element value as default, will be modified during read
-                         private var _elementValue: ElementValue = ClassElementValue.empty())
+                         private var _elementValue:       ElementValue = ElementValue.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType

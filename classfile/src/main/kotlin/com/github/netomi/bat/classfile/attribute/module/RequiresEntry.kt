@@ -67,9 +67,9 @@ data class RequiresEntry
 
     companion object {
         internal fun read(input: ClassDataInput): RequiresEntry {
-            val element = RequiresEntry()
-            element.read(input)
-            return element
+            val entry = RequiresEntry()
+            entry.read(input)
+            return entry
         }
     }
 }

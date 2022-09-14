@@ -75,9 +75,9 @@ data class UsesEntry
         }
 
         internal fun read(input: ClassDataInput): UsesEntry {
-            val element = UsesEntry()
-            element.read(input)
-            return element
+            val entry = UsesEntry()
+            entry.read(input)
+            return entry
         }
     }
 }

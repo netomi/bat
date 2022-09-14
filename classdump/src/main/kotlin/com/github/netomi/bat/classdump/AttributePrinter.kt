@@ -526,12 +526,12 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.levelUp()
         printer.print(annotation.getType(classFile).toExternalType())
 
-        if (annotation.elementValues.isNotEmpty()) {
+        if (annotation.size > 0) {
             printer.println("(")
             printer.levelUp()
-            annotation.elementValues.forEachIndexed { _, (elementNameIndex, elementValue) ->
-                printer.print("${classFile.getString(elementNameIndex)}=")
-                elementValue.accept(classFile, this)
+            annotation.forEachIndexed { _, component ->
+                printer.print("${classFile.getString(component.nameIndex)}=")
+                component.elementValue.accept(classFile, this)
                 printer.println()
             }
             printer.levelDown()

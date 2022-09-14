@@ -42,6 +42,12 @@ abstract class ElementValue: ClassFileContent() {
     abstract fun accept(classFile: ClassFile, visitor: ElementValueVisitor)
 
     companion object {
+        internal fun empty(): ElementValue {
+            // Pick an arbitrary empty element value as default, empty() is used to
+            // initialize data classes prior to read content from an input stream.
+            return ClassElementValue.empty()
+        }
+
         internal fun read(input : ClassDataInput): ElementValue {
             val tag           = input.readUnsignedByte().toChar()
             val elementValue  = ElementValueType.of(tag).createElementValue()

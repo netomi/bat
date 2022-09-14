@@ -95,9 +95,9 @@ data class ExportsEntry
 
     companion object {
         internal fun read(input: ClassDataInput): ExportsEntry {
-            val element = ExportsEntry()
-            element.read(input)
-            return element
+            val entry = ExportsEntry()
+            entry.read(input)
+            return entry
         }
     }
 }
