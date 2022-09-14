@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.classfile.visitor.FieldVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.classfile.visitor.MethodVisitor
@@ -29,6 +30,7 @@ import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.JvmType
 import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.mutableListOfCapacity
+import java.io.InputStream
 
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
@@ -216,6 +218,13 @@ class ClassFile private constructor() {
     companion object {
         fun empty(): ClassFile {
             return ClassFile()
+        }
+
+        fun read(`is`: InputStream, readAttributes: Boolean = true): ClassFile {
+            val classFile = empty()
+            val reader    = ClassFileReader(`is`, readAttributes)
+            reader.visitClassFile(classFile)
+            return classFile
         }
     }
 }
