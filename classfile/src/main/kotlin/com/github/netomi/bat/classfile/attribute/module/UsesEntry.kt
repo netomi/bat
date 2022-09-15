@@ -71,7 +71,7 @@ data class UsesEntry
         }
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         for (i in _usedClasses.indices) {
             visitor.visitClassConstant(classFile, this, ArrayElementAccessor(_usedClasses, i))
         }

@@ -54,7 +54,7 @@ data class PackageConstant private constructor(private var _nameIndex: Int = -1)
         visitor.visitPackageConstant(classFile, index, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
     }
 

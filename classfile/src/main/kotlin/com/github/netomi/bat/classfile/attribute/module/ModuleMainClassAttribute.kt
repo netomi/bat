@@ -61,8 +61,8 @@ data class ModuleMainClassAttribute
         visitor.visitModuleMainClass(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         visitor.visitClassConstant(classFile, this, PropertyAccessor(::_mainClassIndex))
     }
 

@@ -54,7 +54,7 @@ data class StringConstant private constructor(private var _stringIndex: Int = -1
         visitor.visitStringConstant(classFile, index, this);
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_stringIndex))
     }
 

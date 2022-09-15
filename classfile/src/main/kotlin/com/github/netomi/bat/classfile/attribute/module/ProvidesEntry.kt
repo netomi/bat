@@ -84,7 +84,7 @@ data class ProvidesEntry
         }
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitClassConstant(classFile, this, PropertyAccessor(::_providedClassIndex))
 
         for (i in _providesWithClasses.indices) {

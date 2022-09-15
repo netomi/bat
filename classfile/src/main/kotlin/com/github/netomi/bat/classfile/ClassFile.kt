@@ -218,24 +218,24 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
         }
     }
 
-    fun referencedConstantVisitor(visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(visitor: ReferencedConstantVisitor) {
         visitor.visitClassConstant(this, this, PropertyAccessor(::thisClassIndex))
         if (superClassIndex > 0) {
             visitor.visitClassConstant(this, this, PropertyAccessor(::superClassIndex))
         }
 
-        constantPool.referencedConstantVisitor(this, visitor)
+        constantPool.referencedConstantsAccept(this, visitor)
 
         for (field in fields) {
-            field.referencedConstantVisitor(this, visitor)
+            field.referencedConstantsAccept(this, visitor)
         }
 
         for (method in methods) {
-            method.referencedConstantVisitor(this, visitor)
+            method.referencedConstantsAccept(this, visitor)
         }
 
         for (attribute in attributes) {
-            attribute.referencedConstantVisitor(this, visitor)
+            attribute.referencedConstantsAccept(this, visitor)
         }
     }
 

@@ -59,7 +59,7 @@ abstract class BootstrapRefConstant(protected open var _bootstrapMethodAttrIndex
         output.writeShort(_nameAndTypeIndex)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitNameAndTypeConstant(classFile, this, PropertyAccessor(::_nameAndTypeIndex))
     }
 }

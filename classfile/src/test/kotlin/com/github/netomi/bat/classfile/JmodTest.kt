@@ -50,7 +50,7 @@ fun main(args: Array<String>) {
     val visitedIndices = TreeSet<Int>()
 
     val classfile = pool[0]
-    classfile.referencedConstantVisitor { classFile, owner, accessor ->
+    classfile.referencedConstantsAccept { classFile, owner, accessor ->
         visitedIndices.add(accessor.get())
         accessor.set(accessor.get())
     }

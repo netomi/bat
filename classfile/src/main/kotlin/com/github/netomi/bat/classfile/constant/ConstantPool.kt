@@ -21,8 +21,6 @@ import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisito
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
-import java.io.DataInput
-import java.io.DataOutput
 import java.io.IOException
 
 internal class ConstantPool private constructor(private var constants: MutableList<Constant?> = mutableListOfCapacity(1)) {
@@ -89,8 +87,8 @@ internal class ConstantPool private constructor(private var constants: MutableLi
         }
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        constants.forEach { constant -> constant?.referencedConstantVisitor(classFile, visitor) }
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        constants.forEach { constant -> constant?.referencedConstantsAccept(classFile, visitor) }
     }
 
     companion object {

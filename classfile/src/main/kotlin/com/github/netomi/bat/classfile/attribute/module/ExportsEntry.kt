@@ -96,7 +96,7 @@ data class ExportsEntry
         }
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitPackageConstant(classFile, this, PropertyAccessor(::_exportedPackageIndex))
 
         for (i in _exportedToModules.indices) {

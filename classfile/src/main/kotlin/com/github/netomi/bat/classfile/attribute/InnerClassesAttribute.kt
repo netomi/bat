@@ -69,10 +69,10 @@ data class InnerClassesAttribute
         visitor.visitInnerClasses(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         for (entry in innerClasses) {
-            entry.referencedConstantVisitor(classFile, visitor)
+            entry.referencedConstantsAccept(classFile, visitor)
         }
     }
 
@@ -133,7 +133,7 @@ data class InnerClassEntry
         output.writeShort(innerClassAccessFlags)
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitClassConstant(classFile, this, PropertyAccessor(::_innerClassIndex))
         if (_outerClassIndex > 0) {
             visitor.visitClassConstant(classFile, this, PropertyAccessor(::_outerClassIndex))

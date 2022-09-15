@@ -59,8 +59,8 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
         visitor.visitSourceFile(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_sourceFileIndex))
     }
 

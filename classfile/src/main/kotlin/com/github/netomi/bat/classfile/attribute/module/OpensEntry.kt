@@ -96,7 +96,7 @@ data class OpensEntry
         }
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitPackageConstant(classFile, this, PropertyAccessor(::_openedPackageIndex))
 
         for (i in _opensToModules.indices) {

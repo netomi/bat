@@ -66,7 +66,7 @@ data class RequiresEntry
         output.writeShort(_requiredVersionIndex)
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitModuleConstant(classFile, this, PropertyAccessor(::_requiredModuleIndex))
         if (_requiredVersionIndex > 0) {
             visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_requiredVersionIndex))

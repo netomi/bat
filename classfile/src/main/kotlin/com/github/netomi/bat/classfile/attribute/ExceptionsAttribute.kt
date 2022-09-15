@@ -71,8 +71,8 @@ data class ExceptionsAttribute
         visitor.visitExceptions(classFile, method, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
 
         for (i in exceptions.indices) {
             visitor.visitClassConstant(classFile, this, ArrayElementAccessor(exceptions, i))

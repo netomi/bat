@@ -108,12 +108,12 @@ abstract class Member protected constructor(accessFlags:               Int      
         return Objects.hash(accessFlags, nameIndex, descriptorIndex, _attributes)
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::nameIndex))
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::descriptorIndex))
 
         for (attribute in _attributes) {
-            attribute.referencedConstantVisitor(classFile, visitor)
+            attribute.referencedConstantsAccept(classFile, visitor)
         }
     }
 }

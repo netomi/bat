@@ -77,8 +77,8 @@ data class ModulePackagesAttribute
         }
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
 
         for (i in packages.indices) {
             visitor.visitPackageConstant(classFile, this, ArrayElementAccessor(packages, i))

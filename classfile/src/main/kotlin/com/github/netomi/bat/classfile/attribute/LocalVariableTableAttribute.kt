@@ -65,10 +65,10 @@ data class LocalVariableTableAttribute
         visitor.visitLocalVariableTable(classFile, method, code, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         for (entry in localVariableTable) {
-            entry.referencedConstantVisitor(classFile, visitor)
+            entry.referencedConstantsAccept(classFile, visitor)
         }
     }
 
@@ -128,7 +128,7 @@ data class LocalVariableEntry
         output.writeShort(variableIndex)
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_descriptorIndex))
     }

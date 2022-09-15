@@ -77,8 +77,8 @@ data class SignatureAttribute internal constructor(override var attributeNameInd
         visitor.visitSignature(classFile, record, component, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_signatureIndex))
     }
 

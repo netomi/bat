@@ -64,7 +64,7 @@ data class NameAndTypeConstant private constructor(private var _nameIndex:      
         visitor.visitNameAndTypeConstant(classFile, index, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_descriptorIndex))
     }

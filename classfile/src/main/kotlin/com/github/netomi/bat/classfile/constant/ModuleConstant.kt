@@ -54,7 +54,7 @@ data class ModuleConstant private constructor(private var _nameIndex: Int = -1):
         visitor.visitModuleConstant(classFile, index, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
     }
 

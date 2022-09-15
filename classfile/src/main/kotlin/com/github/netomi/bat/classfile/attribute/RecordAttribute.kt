@@ -65,10 +65,10 @@ data class RecordAttribute
         visitor.visitRecord(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         for (component in components) {
-            component.referencedConstantVisitor(classFile, visitor)
+            component.referencedConstantsAccept(classFile, visitor)
         }
     }
 
@@ -122,12 +122,12 @@ data class RecordComponent
         }
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_descriptorIndex))
 
         for (attribute in attributes) {
-            attribute.referencedConstantVisitor(classFile, visitor)
+            attribute.referencedConstantsAccept(classFile, visitor)
         }
     }
 

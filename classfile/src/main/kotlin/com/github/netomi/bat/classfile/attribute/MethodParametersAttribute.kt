@@ -73,10 +73,10 @@ data class MethodParametersAttribute
         visitor.visitMethodParameters(classFile, method, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         for (parameter in parameters) {
-            parameter.referencedConstantVisitor(classFile, visitor)
+            parameter.referencedConstantsAccept(classFile, visitor)
         }
     }
 
@@ -116,7 +116,7 @@ data class MethodParameterEntry private constructor(private var _nameIndex:   In
         output.writeShort(accessFlags)
     }
 
-    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
     }
 

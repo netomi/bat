@@ -64,7 +64,7 @@ abstract class RefConstant(protected open var _classIndex:       Int = -1,
         output.writeShort(nameAndTypeIndex)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitClassConstant(classFile, this, PropertyAccessor(::_classIndex))
         visitor.visitNameAndTypeConstant(classFile, this, PropertyAccessor(::_nameAndTypeIndex))
     }

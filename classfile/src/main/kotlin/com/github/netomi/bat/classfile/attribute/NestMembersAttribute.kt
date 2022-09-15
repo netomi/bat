@@ -68,8 +68,8 @@ data class NestMembersAttribute
         visitor.visitNestMembers(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
 
         for (i in nestMemberClasses.indices) {
             visitor.visitClassConstant(classFile, this, ArrayElementAccessor(nestMemberClasses, i))

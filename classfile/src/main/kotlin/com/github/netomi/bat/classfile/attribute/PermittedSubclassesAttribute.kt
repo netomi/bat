@@ -68,8 +68,8 @@ data class PermittedSubclassesAttribute
         visitor.visitPermittedSubclasses(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
 
         for (i in permittedClasses.indices) {
             visitor.visitClassConstant(classFile, this, ArrayElementAccessor(permittedClasses, i))

@@ -84,8 +84,8 @@ data class EnclosingMethodAttribute
         visitor.visitEnclosingMethod(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
         visitor.visitClassConstant(classFile, this, PropertyAccessor(::_classIndex))
         if (_methodIndex > 0) {
             visitor.visitNameAndTypeConstant(classFile, this, PropertyAccessor(::_methodIndex))

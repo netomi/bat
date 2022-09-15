@@ -118,8 +118,8 @@ data class ModuleAttribute
         visitor.visitModule(classFile, this)
     }
 
-    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        super.referencedConstantVisitor(classFile, visitor)
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
 
         visitor.visitModuleConstant(classFile, this, PropertyAccessor(::_moduleNameIndex))
         if (_moduleVersionIndex > 0) {
@@ -127,21 +127,21 @@ data class ModuleAttribute
         }
 
         for (requiresEntry in requires) {
-            requiresEntry.referencedConstantVisitor(classFile, visitor)
+            requiresEntry.referencedConstantsAccept(classFile, visitor)
         }
 
         for (exportsEntry in exports) {
-            exportsEntry.referencedConstantVisitor(classFile, visitor)
+            exportsEntry.referencedConstantsAccept(classFile, visitor)
         }
 
         for (opensEntry in opens) {
-            opensEntry.referencedConstantVisitor(classFile, visitor)
+            opensEntry.referencedConstantsAccept(classFile, visitor)
         }
 
-        uses.referencedConstantVisitor(classFile, visitor)
+        uses.referencedConstantsAccept(classFile, visitor)
 
         for (providesEntry in provides) {
-            providesEntry.referencedConstantVisitor(classFile, visitor)
+            providesEntry.referencedConstantsAccept(classFile, visitor)
         }
     }
 
