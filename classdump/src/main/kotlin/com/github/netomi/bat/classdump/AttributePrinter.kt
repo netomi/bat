@@ -556,7 +556,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
         if (typeAnnotation.path.size > 0) {
 
-            val pathTransformer: (PathElement) -> CharSequence = { element ->
+            val pathTransformer: (TypePathEntry) -> CharSequence = { element ->
                 when (element.type) {
                     TypePathType.INNER_TYPE    -> element.type.toString()
                     TypePathType.ARRAY         -> element.type.toString()

@@ -22,7 +22,7 @@ import com.github.netomi.bat.classfile.io.ClassFileContent
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 data class TypePath
-    private constructor(private var _path: MutableList<PathElement> = mutableListOfCapacity(0)): ClassFileContent(), Sequence<PathElement> {
+    private constructor(private var _path: MutableList<TypePathEntry> = mutableListOfCapacity(0)): ClassFileContent(), Sequence<TypePathEntry> {
 
     override val contentSize: Int
         get() = _path.fold(1) { acc, element -> acc + element.contentSize }
@@ -30,11 +30,11 @@ data class TypePath
     val size: Int
         get() = _path.size
 
-    operator fun get(index: Int): PathElement {
+    operator fun get(index: Int): TypePathEntry {
         return _path[index]
     }
 
-    override fun iterator(): Iterator<PathElement> {
+    override fun iterator(): Iterator<TypePathEntry> {
         return _path.iterator()
     }
 
@@ -42,7 +42,7 @@ data class TypePath
         val pathLength = input.readUnsignedByte()
         _path = mutableListOfCapacity(pathLength)
         for (i in 0 until pathLength) {
-            _path.add(PathElement.read(input))
+            _path.add(TypePathEntry.read(input))
         }
     }
 
@@ -66,8 +66,8 @@ data class TypePath
     }
 }
 
-data class PathElement private constructor(private var _typePathKind:      Int = 0,
-                                           private var _typeArgumentIndex: Int = -1): ClassFileContent() {
+data class TypePathEntry private constructor(private var _typePathKind:      Int =  0,
+                                             private var _typeArgumentIndex: Int = -1): ClassFileContent() {
 
     override val contentSize: Int
         get() = 2
@@ -89,8 +89,8 @@ data class PathElement private constructor(private var _typePathKind:      Int =
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): PathElement {
-            val element = PathElement()
+        internal fun read(input: ClassDataInput): TypePathEntry {
+            val element = TypePathEntry()
             element.read(input)
             return element
         }
