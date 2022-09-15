@@ -218,13 +218,15 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
         }
     }
 
-    fun referencedConstantsAccept(visitor: ReferencedConstantVisitor) {
+    fun referencedConstantsAccept(visitConstantPool: Boolean = true, visitor: ReferencedConstantVisitor) {
         visitor.visitClassConstant(this, this, PropertyAccessor(::thisClassIndex))
         if (superClassIndex > 0) {
             visitor.visitClassConstant(this, this, PropertyAccessor(::superClassIndex))
         }
 
-        constantPool.referencedConstantsAccept(this, visitor)
+        if (visitConstantPool) {
+            constantPool.referencedConstantsAccept(this, visitor)
+        }
 
         for (field in fields) {
             field.referencedConstantsAccept(this, visitor)
