@@ -37,11 +37,12 @@ import java.io.InputStream
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
  */
-class ClassFile private constructor() {
-    var minorVersion = 0
+class ClassFile private constructor(version: Version = Version.JAVA_8) {
+
+    var majorVersion = version.majorVersion
         internal set
 
-    var majorVersion = 0
+    var minorVersion = version.minorVersion
         internal set
 
     var accessFlags: Int = 0
@@ -245,6 +246,10 @@ class ClassFile private constructor() {
     companion object {
         fun empty(): ClassFile {
             return ClassFile()
+        }
+
+        fun of(version: Version): ClassFile {
+            return ClassFile(version)
         }
 
         fun read(`is`: InputStream, skipAttributes: Boolean = false): ClassFile {
