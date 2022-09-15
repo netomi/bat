@@ -57,4 +57,6 @@ fun main(args: Array<String>) {
     })
 
     visitedIndices.forEach { println(it) }
+
+    println("${visitedIndices.size} == ${pool[0].constantPool.size}")
 }

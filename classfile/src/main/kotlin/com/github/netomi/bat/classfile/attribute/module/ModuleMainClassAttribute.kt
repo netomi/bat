@@ -61,6 +61,11 @@ data class ModuleMainClassAttribute
         visitor.visitModuleMainClass(classFile, this)
     }
 
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _mainClassIndex }, { _mainClassIndex = it }))
+    }
+
     companion object {
         internal fun empty(attributeNameIndex: Int): ModuleMainClassAttribute {
             return ModuleMainClassAttribute(attributeNameIndex)

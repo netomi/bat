@@ -17,7 +17,9 @@
 package com.github.netomi.bat.classfile.attribute.module
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -66,6 +68,12 @@ data class UsesEntry
     fun usedClassesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (classIndex in _usedClasses) {
             classFile.constantAccept(classIndex, visitor)
+        }
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        for (i in _usedClasses.indices) {
+            visitor.visitClassConstant(classFile, this, ArrayElementAccessor(_usedClasses, i))
         }
     }
 

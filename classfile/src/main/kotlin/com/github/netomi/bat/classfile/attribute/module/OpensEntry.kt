@@ -20,7 +20,10 @@ import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.classfile.AccessFlagTarget
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.accessFlagsToSet
+import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -90,6 +93,14 @@ data class OpensEntry
     fun opensToModulesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (constantIndex in _opensToModules) {
             classFile.constantAccept(constantIndex, visitor)
+        }
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitPackageConstant(classFile, this, PropertyAccessor({ _openedPackageIndex }, { _openedPackageIndex = it }))
+
+        for (i in _opensToModules.indices) {
+            visitor.visitModuleConstant(classFile, this, ArrayElementAccessor(_opensToModules, i))
         }
     }
 

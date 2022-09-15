@@ -21,7 +21,9 @@ import com.github.netomi.bat.classfile.attribute.AttachedToClass
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.util.*
@@ -72,6 +74,14 @@ data class ModulePackagesAttribute
     fun packagesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (constantIndex in packages) {
             classFile.constantAccept(constantIndex, visitor)
+        }
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+
+        for (i in packages.indices) {
+            visitor.visitPackageConstant(classFile, this, ArrayElementAccessor(packages, i))
         }
     }
 

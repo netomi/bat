@@ -17,6 +17,8 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
@@ -55,6 +57,11 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitSourceFile(classFile, this)
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _sourceFileIndex }, { _sourceFileIndex = it }))
     }
 
     companion object {

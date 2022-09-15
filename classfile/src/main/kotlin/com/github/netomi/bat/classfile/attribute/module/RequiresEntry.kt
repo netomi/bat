@@ -20,7 +20,8 @@ import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.classfile.AccessFlagTarget.*
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.accessFlagsToSet
-import com.github.netomi.bat.classfile.constant.ModuleConstant
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -63,6 +64,13 @@ data class RequiresEntry
         output.writeShort(_requiredModuleIndex)
         output.writeShort(_flags)
         output.writeShort(_requiredVersionIndex)
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitModuleConstant(classFile, this, PropertyAccessor({ _requiredModuleIndex }, { _requiredModuleIndex = it }))
+        if (_requiredVersionIndex > 0) {
+            visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _requiredVersionIndex }, { _requiredVersionIndex = it }))
+        }
     }
 
     companion object {

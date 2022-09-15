@@ -20,6 +20,8 @@ import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.contentSize
@@ -114,6 +116,33 @@ data class ModuleAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitModule(classFile, this)
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+
+        visitor.visitModuleConstant(classFile, this, PropertyAccessor({ _moduleNameIndex }, { _moduleNameIndex = it }))
+        if (_moduleVersionIndex > 0) {
+            visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _moduleVersionIndex }, { _moduleVersionIndex = it }))
+        }
+
+        for (requiresEntry in requires) {
+            requiresEntry.referencedConstantVisitor(classFile, visitor)
+        }
+
+        for (exportsEntry in exports) {
+            exportsEntry.referencedConstantVisitor(classFile, visitor)
+        }
+
+        for (opensEntry in opens) {
+            opensEntry.referencedConstantVisitor(classFile, visitor)
+        }
+
+        uses.referencedConstantVisitor(classFile, visitor)
+
+        for (providesEntry in provides) {
+            providesEntry.referencedConstantVisitor(classFile, visitor)
+        }
     }
 
     companion object {
