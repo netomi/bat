@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleTargetAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
@@ -145,6 +146,7 @@ internal enum class AttributeType constructor(val attributeName: String, private
     MODULE_PACKAGES                        ("ModulePackages",                       { ModulePackagesAttribute.empty(it) }),
     MODULE_MAIN_CLASS                      ("ModuleMainClass",                      { ModuleMainClassAttribute.empty(it) }),
     MODULE_HASHES                          ("ModuleHashes",                         { ModuleHashesAttribute.empty(it) }),
+    MODULE_TARGET                          ("ModuleTarget",                         { ModuleTargetAttribute.empty(it) }),
     NEST_HOST                              ("NestHost",                             { NestHostAttribute.empty(it) }),
     NEST_MEMBERS                           ("NestMembers",                          { NestMembersAttribute.empty(it) }),
     RECORD                                 ("Record",                               { RecordAttribute.empty(it) }),

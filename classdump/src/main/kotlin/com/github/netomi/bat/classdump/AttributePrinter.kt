@@ -25,6 +25,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValue
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleTargetAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
@@ -362,6 +363,13 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             val hashString = hashEntry.hash.joinToString(separator = "", prefix = "[", postfix = "]") { b -> "%02x".format(b) }
             printer.println("hash: %s".format(hashString))
         }
+        printer.levelDown()
+    }
+
+    override fun visitModuleTarget(classFile: ClassFile, attribute: ModuleTargetAttribute) {
+        printer.println("ModuleTarget:")
+        printer.levelUp()
+        printer.println("target_platform: #%-21d // %s".format(attribute.platformIndex, attribute.getPlatform(classFile)))
         printer.levelDown()
     }
 

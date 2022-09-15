@@ -19,10 +19,7 @@ package com.github.netomi.bat.classfile.attribute.visitor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.*
-import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
-import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
-import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
-import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
+import com.github.netomi.bat.classfile.attribute.module.*
 
 fun interface ClassAttributeVisitor: AnyAttributeVisitor {
     fun visitBootstrapMethods(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
@@ -54,6 +51,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
     }
 
     fun visitModuleHashes(classFile: ClassFile, attribute: ModuleHashesAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitModuleTarget(classFile: ClassFile, attribute: ModuleTargetAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 
