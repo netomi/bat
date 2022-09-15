@@ -30,7 +30,7 @@ data class AttributeMap constructor(private var _attributes: MutableList<Attribu
 
     init {
         for (attribute in _attributes) {
-            typeToAttributeMap[attribute.type] = attribute
+            addAttributeToTypeMap(attribute)
         }
     }
 
@@ -45,12 +45,8 @@ data class AttributeMap constructor(private var _attributes: MutableList<Attribu
     }
 
     internal inline operator fun <reified T: Attribute> get(type: AttributeType): T? {
-        val attribute = typeToAttributeMap[type]
-        return if (attribute != null) {
-            attribute as T
-        } else {
-            null
-        }
+        require(type != AttributeType.UNKNOWN) { "attributeType 'UNKNOWN' not supported for retrieval" }
+        return typeToAttributeMap[type] as T?
     }
 
     override fun iterator(): Iterator<Attribute> {
@@ -59,7 +55,14 @@ data class AttributeMap constructor(private var _attributes: MutableList<Attribu
 
     private fun addAttribute(attribute: Attribute) {
         _attributes.add(attribute)
-        typeToAttributeMap[attribute.type] = attribute
+        addAttributeToTypeMap(attribute)
+    }
+
+    private fun addAttributeToTypeMap(attribute: Attribute) {
+        // UNKNOWN attributes are not supported by the type cache
+        if (attribute.type != AttributeType.UNKNOWN) {
+            typeToAttributeMap[attribute.type] = attribute
+        }
     }
 
     private fun read(input: ClassDataInput) {
