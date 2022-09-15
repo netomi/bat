@@ -28,7 +28,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.18">RuntimeVisibleParameterAnnotations Attribute</a>
  */
 data class RuntimeVisibleParameterAnnotationsAttribute
-    private constructor(override val attributeNameIndex:   Int,
+    private constructor(override var attributeNameIndex:   Int,
                         override var parameterAnnotations: MutableList<MutableList<Annotation>> = mutableListOfCapacity(0))
     : RuntimeParameterAnnotationsAttribute(attributeNameIndex, parameterAnnotations), AttachedToMethod {
 

@@ -30,7 +30,7 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.15">Deprecated Attribute</a>
  */
-data class DeprecatedAttribute private constructor(override val attributeNameIndex: Int)
+data class DeprecatedAttribute private constructor(override var attributeNameIndex: Int)
     : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod {
 
     override val type: AttributeType

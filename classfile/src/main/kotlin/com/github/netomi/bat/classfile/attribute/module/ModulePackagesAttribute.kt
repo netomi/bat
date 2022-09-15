@@ -32,7 +32,7 @@ import java.util.*
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.26">ModulePackages Attribute</a>
  */
 data class ModulePackagesAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var packages:           IntArray = IntArray(0)
     ): Attribute(attributeNameIndex), AttachedToClass, Sequence<Int> {
 

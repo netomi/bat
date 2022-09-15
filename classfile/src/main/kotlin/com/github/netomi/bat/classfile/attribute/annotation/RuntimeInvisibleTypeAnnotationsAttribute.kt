@@ -29,7 +29,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.21">RuntimeInvisibleTypeAnnotations Attribute</a>
  */
 data class RuntimeInvisibleTypeAnnotationsAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                         override var typeAnnotations:    MutableList<TypeAnnotation> = mutableListOfCapacity(0))
     : RuntimeTypeAnnotationsAttribute(attributeNameIndex, typeAnnotations),
       AttachedToClass, AttachedToField, AttachedToMethod, AttachedToCodeAttribute, AttachedToRecordComponent {

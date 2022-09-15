@@ -34,7 +34,7 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.4">StackMapTable Attribute</a>
  */
 data class StackMapTableAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var frameEntries:       MutableList<StackMapFrame> = mutableListOfCapacity(0)
     ) : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<StackMapFrame> {
 

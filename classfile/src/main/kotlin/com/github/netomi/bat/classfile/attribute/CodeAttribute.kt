@@ -35,7 +35,7 @@ import java.util.*
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.3">Code Attribute</a>
  */
 data class CodeAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var _maxStack:          Int                         = 0,
                          private var _maxLocals:         Int                         = 0,
                          private var _code:              ByteArray                   = ByteArray(0),

@@ -24,6 +24,8 @@ import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.*
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -32,7 +34,7 @@ import java.io.IOException
 /**
  * Base class for attributes as contained in a class file.
  */
-abstract class Attribute protected constructor(protected open val attributeNameIndex: Int): ClassFileContent() {
+abstract class Attribute protected constructor(protected open var attributeNameIndex: Int): ClassFileContent() {
 
     internal abstract val type: AttributeType
 
@@ -61,6 +63,10 @@ abstract class Attribute protected constructor(protected open val attributeNameI
         output.writeShort(attributeNameIndex)
         output.writeInt(dataSize)
         writeAttributeData(output)
+    }
+
+    open fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ attributeNameIndex }, { attributeNameIndex = it }))
     }
 
     companion object {

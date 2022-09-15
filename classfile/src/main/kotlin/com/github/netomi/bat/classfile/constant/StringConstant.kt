@@ -17,6 +17,8 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
@@ -50,6 +52,10 @@ data class StringConstant private constructor(private var _stringIndex: Int = -1
 
     override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
         visitor.visitStringConstant(classFile, index, this);
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _stringIndex }, { _stringIndex = it }))
     }
 
     companion object {

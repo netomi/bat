@@ -27,7 +27,7 @@ import java.util.*
 /**
  * A class representing an unknown attribute in a class file.
  */
-data class UnknownAttribute internal constructor(override val attributeNameIndex: Int,
+data class UnknownAttribute internal constructor(override var attributeNameIndex: Int,
                                                   private var _data:              ByteArray = ByteArray(0))
     : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod, AttachedToCodeAttribute, AttachedToRecordComponent {
 

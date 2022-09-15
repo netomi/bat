@@ -22,6 +22,8 @@ import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.classfile.visitor.FieldVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -169,7 +171,7 @@ class ClassFile private constructor() {
     }
 
     fun getStringOrNull(stringIndex: Int): String? {
-        return if (stringIndex == 0) null else getString(stringIndex)
+        return if (stringIndex > 0) getString(stringIndex) else null
     }
 
     fun getClassName(classIndex: Int): JvmClassName {
@@ -215,6 +217,27 @@ class ClassFile private constructor() {
         }
     }
 
+    fun referencedConstantVisitor(visitor: ReferencedConstantVisitor) {
+        visitor.visitClassConstant(this, this, PropertyAccessor({ thisClassIndex }, { thisClassIndex = it }))
+        if (superClassIndex > 0) {
+            visitor.visitClassConstant(this, this, PropertyAccessor({ superClassIndex }, { superClassIndex = it }))
+        }
+
+        constantPool.referencedConstantVisitor(this, visitor)
+
+        for (field in fields) {
+            field.referencedConstantVisitor(this, visitor)
+        }
+
+        for (method in methods) {
+            method.referencedConstantVisitor(this, visitor)
+        }
+
+        for (attribute in attributes) {
+            attribute.referencedConstantVisitor(this, visitor)
+        }
+    }
+
     override fun toString(): String {
         return "ClassFile(name=$className)"
     }
@@ -224,9 +247,9 @@ class ClassFile private constructor() {
             return ClassFile()
         }
 
-        fun read(`is`: InputStream, readAttributes: Boolean = true): ClassFile {
+        fun read(`is`: InputStream, skipAttributes: Boolean = false): ClassFile {
             val classFile = empty()
-            val reader    = ClassFileReader(`is`, readAttributes)
+            val reader    = ClassFileReader(`is`, skipAttributes)
             reader.visitClassFile(classFile)
             return classFile
         }

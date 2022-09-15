@@ -31,15 +31,15 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.25">Module Attribute</a>
  */
 data class ModuleAttribute
-    private constructor(override val attributeNameIndex: Int,
-                        private var _moduleNameIndex:    Int = -1,
-                        private var _moduleFlags:        Int =  0,
-                        private var _moduleVersionIndex: Int = -1,
-                        private var _requiresEntries:    MutableList<RequiresEntry> = mutableListOfCapacity(0),
-                        private var _exportsEntries:     MutableList<ExportsEntry>  = mutableListOfCapacity(0),
-                        private var _opensEntries:       MutableList<OpensEntry>    = mutableListOfCapacity(0),
-                        private var _uses:               UsesEntry                  = UsesEntry.empty(),
-                        private var _providesEntries:    MutableList<ProvidesEntry> = mutableListOfCapacity(0)
+    private constructor(override var attributeNameIndex:  Int,
+                         private var _moduleNameIndex:    Int = -1,
+                         private var _moduleFlags:        Int =  0,
+                         private var _moduleVersionIndex: Int = -1,
+                         private var _requiresEntries:    MutableList<RequiresEntry> = mutableListOfCapacity(0),
+                         private var _exportsEntries:     MutableList<ExportsEntry>  = mutableListOfCapacity(0),
+                         private var _opensEntries:       MutableList<OpensEntry>    = mutableListOfCapacity(0),
+                         private var _uses:               UsesEntry                  = UsesEntry.empty(),
+                         private var _providesEntries:    MutableList<ProvidesEntry> = mutableListOfCapacity(0)
     ): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType

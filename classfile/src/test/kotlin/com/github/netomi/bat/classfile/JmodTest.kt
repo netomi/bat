@@ -16,19 +16,22 @@
 
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import java.nio.file.Paths
+import java.util.TreeSet
 import java.util.zip.ZipInputStream
 import kotlin.io.path.inputStream
 
 fun main(args: Array<String>) {
-    val path = Paths.get("/home/tn/workspace/android_sdk/platforms/android-33/android.jar")
-    //val path = Paths.get("/home/tn/.sdkman/candidates/java/current/jmods/java.base.jmod")
+    //val path = Paths.get("/home/tn/workspace/android_sdk/platforms/android-33/android.jar")
+    val path = Paths.get("/home/tn/.sdkman/candidates/java/current/jmods/java.base.jmod")
 
     val `is` = path.inputStream()
-    //`is`.skip(4)
+    `is`.skip(4)
 
     val pool = mutableListOf<ClassFile>()
 
+    val start = System.nanoTime()
     ZipInputStream(`is`).use { zis ->
         generateSequence { zis.nextEntry }
             .filterNot { it.isDirectory }
@@ -39,8 +42,19 @@ fun main(args: Array<String>) {
                 val classFile = ClassFile.read(zis, false)
                 pool.add(classFile)
                 zis.closeEntry()
-            }.toList()
+            }.first()
     }
 
-    println("read ${pool.size} class files")
+    val end = System.nanoTime()
+    println("read ${pool.size} class files, took ${(end - start)/1e6} ms")
+
+    val visitedIndices = TreeSet<Int>()
+
+    pool[0].referencedConstantVisitor({ classFile, owner, accessor ->
+        visitedIndices.add(accessor.get())
+        //println("$accessor: ${accessor.get()}")
+        accessor.set(accessor.get())
+    })
+
+    visitedIndices.forEach { println(it) }
 }

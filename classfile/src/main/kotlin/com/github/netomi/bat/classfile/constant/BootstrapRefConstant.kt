@@ -20,27 +20,22 @@ import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
-import com.github.netomi.bat.util.JvmClassName
 import java.io.IOException
 
 /**
- * An abstract base class for constants representing a member reference,
- * i.e. Fieldref, Methodref or InterfaceMethodref.
+ * An abstract base class for constants referencing a bootstrap method,
+ * i.e. Dynamic or InvokeDynamic.
  */
-abstract class RefConstant(protected open var _classIndex:       Int = -1,
-                           protected open var _nameAndTypeIndex: Int = -1): Constant() {
+abstract class BootstrapRefConstant(protected open var _bootstrapMethodAttrIndex: Int = -1,
+                                    protected open var _nameAndTypeIndex:         Int = -1): Constant() {
 
-    val classIndex: Int
-        get() = _classIndex
+    val bootstrapMethodAttrIndex: Int
+        get() = _bootstrapMethodAttrIndex
 
     val nameAndTypeIndex: Int
         get() = _nameAndTypeIndex
 
-    fun getClassName(classFile: ClassFile): JvmClassName {
-        return classFile.getClassName(classIndex)
-    }
-
-    private fun getNameAndType(classFile: ClassFile): NameAndTypeConstant {
+    fun getNameAndType(classFile: ClassFile): NameAndTypeConstant {
         return classFile.getNameAndType(nameAndTypeIndex)
     }
 
@@ -54,18 +49,17 @@ abstract class RefConstant(protected open var _classIndex:       Int = -1,
 
     @Throws(IOException::class)
     override fun readConstantInfo(input: ClassDataInput) {
-        _classIndex       = input.readUnsignedShort()
-        _nameAndTypeIndex = input.readUnsignedShort()
+        _bootstrapMethodAttrIndex = input.readUnsignedShort()
+        _nameAndTypeIndex         = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
     override fun writeConstantInfo(output: ClassDataOutput) {
-        output.writeShort(classIndex)
-        output.writeShort(nameAndTypeIndex)
+        output.writeShort(_bootstrapMethodAttrIndex)
+        output.writeShort(_nameAndTypeIndex)
     }
 
     override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _classIndex }, { _classIndex = it }))
         visitor.visitNameAndTypeConstant(classFile, this, PropertyAccessor({ _nameAndTypeIndex }, { _nameAndTypeIndex = it }))
     }
 }

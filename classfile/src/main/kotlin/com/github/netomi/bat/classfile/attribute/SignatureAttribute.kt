@@ -31,7 +31,7 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.9">Signature Attribute</a>
  */
-data class SignatureAttribute internal constructor(override val attributeNameIndex: Int,
+data class SignatureAttribute internal constructor(override var attributeNameIndex: Int,
                                                     private var _signatureIndex:    Int = -1)
     : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod, AttachedToRecordComponent {
 

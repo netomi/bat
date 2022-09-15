@@ -31,7 +31,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.24">MethodParameters Attribute</a>
  */
 data class MethodParametersAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var parameters:         MutableList<MethodParameterEntry> = mutableListOfCapacity(0)
     ): Attribute(attributeNameIndex), AttachedToMethod, Sequence<MethodParameterEntry> {
 

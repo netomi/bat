@@ -21,6 +21,8 @@ import com.github.netomi.bat.classfile.attribute.AttachedToClass
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
@@ -31,7 +33,7 @@ import com.github.netomi.bat.util.JvmClassName
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.27">ModuleMainClass Attribute</a>
  */
 data class ModuleMainClassAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var _mainClassIndex:    Int = -1): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType

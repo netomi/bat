@@ -28,7 +28,7 @@ import com.github.netomi.bat.util.JvmClassName
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.28">NestHost Attribute</a>
  */
 data class NestHostAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var _hostClassIndex:    Int = -1): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType

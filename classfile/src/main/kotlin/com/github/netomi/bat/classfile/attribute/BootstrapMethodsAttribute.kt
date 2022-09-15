@@ -30,7 +30,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.23">BootstrapMethods Attribute</a>
  */
 data class BootstrapMethodsAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var bootstrapMethods:   MutableList<BootstrapMethod> = mutableListOfCapacity(0)
     ): Attribute(attributeNameIndex), AttachedToClass, Sequence<BootstrapMethod> {
 

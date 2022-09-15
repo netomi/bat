@@ -16,7 +16,10 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.*
+import com.github.netomi.bat.classfile.constant.ReferenceKind.*
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
@@ -58,6 +61,32 @@ data class MethodHandleConstant private constructor(private var _referenceKind: 
         classFile.constantAccept(referenceIndex, visitor)
     }
 
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        val propertyAccessor = PropertyAccessor({ _referenceIndex }, { _referenceIndex = it })
+
+        when (referenceKind) {
+            GET_FIELD,
+            GET_STATIC,
+            PUT_FIELD,
+            PUT_STATIC -> visitor.visitFieldRefConstant(classFile, this, propertyAccessor)
+
+            INVOKE_VIRTUAL,
+            NEW_INVOKE_SPECIAL -> visitor.visitMethodRefConstant(classFile, this, propertyAccessor)
+
+            INVOKE_STATIC,
+            INVOKE_SPECIAL -> {
+                val constant = classFile.getConstant(referenceIndex)
+                when (constant.type) {
+                    ConstantType.METHOD_REF           -> visitor.visitMethodRefConstant(classFile, this, propertyAccessor)
+                    ConstantType.INTERFACE_METHOD_REF -> visitor.visitInterfaceMethodRefConstant(classFile, this, propertyAccessor)
+                    else                              -> error("unexpected referenced constant '${constant}'")
+                }
+            }
+
+            INVOKE_INTERFACE -> visitor.visitInterfaceMethodRefConstant(classFile, this, propertyAccessor)
+        }
+    }
+
     companion object {
         internal fun empty(): MethodHandleConstant {
             return MethodHandleConstant()
@@ -83,7 +112,7 @@ enum class ReferenceKind constructor(val value: Int, val simpleName: String) {
 
     companion object {
         private val valueToReferenceKindMap: Map<Int, ReferenceKind> by lazy {
-            ReferenceKind.values().associateBy { it.value }
+            values().associateBy { it.value }
         }
 
         fun of(value: Int) : ReferenceKind {

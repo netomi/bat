@@ -28,7 +28,7 @@ import java.io.IOException
  * A base class representing a Runtime*TypeAnnotations attribute in a class file.
  */
 abstract class RuntimeTypeAnnotationsAttribute
-    protected constructor(      override val attributeNameIndex: Int,
+    protected constructor(      override var attributeNameIndex: Int,
                           protected open var typeAnnotations:    MutableList<TypeAnnotation>)
     : Attribute(attributeNameIndex), Sequence<TypeAnnotation> {
 

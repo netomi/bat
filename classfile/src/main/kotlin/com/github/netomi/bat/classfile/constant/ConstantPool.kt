@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
@@ -86,6 +87,10 @@ internal class ConstantPool private constructor(private var constants: MutableLi
             check(constants[index] != null) { "trying to accept a null constant at index $index" }
             constants[index]?.accept(classFile, index, visitor)
         }
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        constants.forEach { constant -> constant?.referencedConstantVisitor(classFile, visitor) }
     }
 
     companion object {

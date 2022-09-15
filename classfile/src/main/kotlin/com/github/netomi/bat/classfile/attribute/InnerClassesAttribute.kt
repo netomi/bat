@@ -34,7 +34,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.6">InnerClasses Attribute</a>
  */
 data class InnerClassesAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var innerClasses:       MutableList<InnerClassEntry> = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToClass, Sequence<InnerClassEntry> {
 

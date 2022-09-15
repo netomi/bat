@@ -30,7 +30,7 @@ import java.util.*
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.5">Exceptions Attribute</a>
  */
 data class ExceptionsAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var exceptions:         IntArray = IntArray(0))
     : Attribute(attributeNameIndex), AttachedToMethod, Sequence<Int> {
 

@@ -28,7 +28,7 @@ import java.io.IOException
  * A base class representing a Runtime*Annotations attribute in a class file.
  */
 abstract class RuntimeAnnotationsAttribute
-    protected constructor(      override val attributeNameIndex: Int,
+    protected constructor(      override var attributeNameIndex: Int,
                           protected open var annotations:        MutableList<Annotation>) : Attribute(attributeNameIndex), Sequence<Annotation> {
 
     override val dataSize: Int

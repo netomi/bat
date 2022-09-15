@@ -18,6 +18,8 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -40,10 +42,10 @@ abstract class Member protected constructor(accessFlags:               Int      
         get() = accessFlagsToSet(accessFlags, accessFlagTarget)
 
     var nameIndex: Int = nameIndex
-        private set
+        protected set
 
     var descriptorIndex: Int = descriptorIndex
-        private set
+        protected set
 
     var visibility: Visibility = Visibility.of(accessFlags)
         private set
@@ -79,10 +81,10 @@ abstract class Member protected constructor(accessFlags:               Int      
 
     @Throws(IOException::class)
     internal fun read(input: ClassDataInput) {
-        accessFlags     = input.readUnsignedShort()
-        nameIndex       = input.readUnsignedShort()
+        accessFlags = input.readUnsignedShort()
+        nameIndex = input.readUnsignedShort()
         descriptorIndex = input.readUnsignedShort()
-        _attributes     = input.readAttributes()
+        _attributes = input.readAttributes()
     }
 
     internal fun write(output: ClassDataOutput) {
@@ -96,13 +98,22 @@ abstract class Member protected constructor(accessFlags:               Int      
         if (this === other) return true
         if (other !is Member) return false
 
-        return accessFlags     == other.accessFlags     &&
-               nameIndex       == other.nameIndex       &&
+        return accessFlags     == other.accessFlags &&
+               nameIndex       == other.nameIndex &&
                descriptorIndex == other.descriptorIndex &&
                _attributes     == other._attributes
     }
 
     override fun hashCode(): Int {
         return Objects.hash(accessFlags, nameIndex, descriptorIndex, _attributes)
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ nameIndex }, { nameIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ descriptorIndex }, { descriptorIndex = it }))
+
+        for (attribute in _attributes) {
+            attribute.referencedConstantVisitor(classFile, visitor)
+        }
     }
 }

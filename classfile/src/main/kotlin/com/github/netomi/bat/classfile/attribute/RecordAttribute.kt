@@ -30,7 +30,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.30">Record Attribute</a>
  */
 data class RecordAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var components:         MutableList<RecordComponent> = mutableListOfCapacity(0)
     ): Attribute(attributeNameIndex), AttachedToClass, Sequence<RecordComponent> {
 

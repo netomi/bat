@@ -28,7 +28,7 @@ import java.util.*
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.11">SourceDebugExtension Attribute</a>
  */
 data class SourceDebugExtensionAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var _debugExtension:    ByteArray = ByteArray(0)): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType

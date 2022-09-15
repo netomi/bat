@@ -30,7 +30,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.13">LocalVariableTable Attribute</a>
  */
 data class LocalVariableTableAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var localVariableTable: MutableList<LocalVariableEntry> = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LocalVariableEntry> {
 

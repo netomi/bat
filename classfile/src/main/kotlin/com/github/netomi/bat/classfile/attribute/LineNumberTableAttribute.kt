@@ -31,7 +31,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.12">LineNumberTable Attribute</a>
  */
 data class LineNumberTableAttribute
-    private constructor(override val attributeNameIndex: Int,
+    private constructor(override var attributeNameIndex: Int,
                          private var lineNumberTable:    MutableList<LineNumberEntry> = mutableListOfCapacity(0))
     : Attribute(attributeNameIndex), AttachedToCodeAttribute, Sequence<LineNumberEntry> {
 

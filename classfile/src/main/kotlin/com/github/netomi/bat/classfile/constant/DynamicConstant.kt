@@ -17,42 +17,18 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
-import com.github.netomi.bat.classfile.io.ClassDataInput
-import com.github.netomi.bat.classfile.io.ClassDataOutput
-import java.io.IOException
 
 /**
  * A constant representing a CONSTANT_Dynamic_info structure in a class file.
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.10">CONSTANT_Dynamic_info Structure</a>
  */
-data class DynamicConstant private constructor(private var _bootstrapMethodAttrIndex: Int = -1,
-                                               private var _nameAndTypeIndex:         Int = -1) : Constant() {
+data class DynamicConstant private constructor(override var _bootstrapMethodAttrIndex: Int = -1,
+                                               override var _nameAndTypeIndex:         Int = -1)
+    : BootstrapRefConstant(_bootstrapMethodAttrIndex, _nameAndTypeIndex) {
 
     override val type: ConstantType
         get() = ConstantType.DYNAMIC
-
-    val bootstrapMethodAttrIndex: Int
-        get() = _bootstrapMethodAttrIndex
-
-    val nameAndTypeIndex: Int
-        get() = _nameAndTypeIndex
-
-    fun getNameAndType(classFile: ClassFile): NameAndTypeConstant {
-        return classFile.getNameAndType(nameAndTypeIndex)
-    }
-
-    @Throws(IOException::class)
-    override fun readConstantInfo(input: ClassDataInput) {
-        _bootstrapMethodAttrIndex = input.readUnsignedShort()
-        _nameAndTypeIndex         = input.readUnsignedShort()
-    }
-
-    @Throws(IOException::class)
-    override fun writeConstantInfo(output: ClassDataOutput) {
-        output.writeShort(bootstrapMethodAttrIndex)
-        output.writeShort(nameAndTypeIndex)
-    }
 
     override fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitor) {
         visitor.visitDynamicConstant(classFile, index, this)
@@ -64,7 +40,7 @@ data class DynamicConstant private constructor(private var _bootstrapMethodAttrI
         }
 
         fun of(bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): DynamicConstant {
-            require(bootstrapMethodAttrIndex >= 1) { "bootstrapMethodAttrIndex must be a positive number" }
+            require(bootstrapMethodAttrIndex >= 0) { "bootstrapMethodAttrIndex must not be negative" }
             require(nameAndTypeIndex >= 1) { "nameAndTypeIndex must be a positive number" }
             return DynamicConstant(bootstrapMethodAttrIndex, nameAndTypeIndex)
         }

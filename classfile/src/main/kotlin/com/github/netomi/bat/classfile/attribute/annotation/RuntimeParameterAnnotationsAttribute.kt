@@ -29,7 +29,7 @@ import java.io.IOException
  * A base class representing a Runtime*ParameterAnnotations attribute in a class file.
  */
 abstract class RuntimeParameterAnnotationsAttribute
-    protected constructor(      override val attributeNameIndex:   Int,
+    protected constructor(      override var attributeNameIndex:   Int,
                           protected open var parameterAnnotations: MutableList<MutableList<Annotation>>)
     : Attribute(attributeNameIndex) {
 

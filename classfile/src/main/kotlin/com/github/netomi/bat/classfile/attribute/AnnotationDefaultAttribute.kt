@@ -31,7 +31,7 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.22">AnnotationDefault Attribute</a>
  */
 data class AnnotationDefaultAttribute
-    private constructor(override val attributeNameIndex:  Int,
+    private constructor(override var attributeNameIndex:  Int,
                          private var _elementValue:       ElementValue = ElementValue.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {
 

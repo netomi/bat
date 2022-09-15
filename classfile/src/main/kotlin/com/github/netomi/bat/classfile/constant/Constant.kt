@@ -17,6 +17,8 @@ package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.DataOutput
@@ -49,6 +51,8 @@ abstract class Constant {
     }
 
     abstract fun accept(classFile: ClassFile, index: Int, visitor: ConstantVisitor)
+
+    open fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {}
 
     companion object {
         internal fun read(input: ClassDataInput): Constant {

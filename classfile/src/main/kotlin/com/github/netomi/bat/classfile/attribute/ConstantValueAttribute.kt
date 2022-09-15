@@ -29,7 +29,7 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2">ConstantValue Attribute</a>
  */
 data class ConstantValueAttribute
-    private constructor(override val attributeNameIndex:  Int,
+    private constructor(override var attributeNameIndex:  Int,
                          private var _constantValueIndex: Int = -1)
     : Attribute(attributeNameIndex), AttachedToField {
 
