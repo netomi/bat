@@ -94,9 +94,9 @@ class MethodHandle private constructor(methodHandleTypeValue: Int = -1,
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         if (methodHandleType.targetsField) {
-            visitor.visitFieldID(dexFile, PropertyAccessor({ fieldOrMethodId }, { fieldOrMethodId = it }))
+            visitor.visitFieldID(dexFile, PropertyAccessor(::fieldOrMethodId))
         } else {
-            visitor.visitMethodID(dexFile, PropertyAccessor({ fieldOrMethodId }, { fieldOrMethodId = it }))
+            visitor.visitMethodID(dexFile, PropertyAccessor(::fieldOrMethodId))
         }
     }
 

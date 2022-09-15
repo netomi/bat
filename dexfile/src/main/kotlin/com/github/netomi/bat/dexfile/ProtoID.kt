@@ -118,8 +118,8 @@ class ProtoID private constructor(shortyIndex:     Int      = NO_INDEX,
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitStringID(dexFile, PropertyAccessor({ shortyIndex }, { shortyIndex = it }))
-        visitor.visitTypeID(dexFile, PropertyAccessor({ returnTypeIndex }, { returnTypeIndex = it }))
+        visitor.visitStringID(dexFile, PropertyAccessor(::shortyIndex))
+        visitor.visitTypeID(dexFile, PropertyAccessor(::returnTypeIndex))
         parameters.referencedIDsAccept(dexFile, visitor)
     }
 

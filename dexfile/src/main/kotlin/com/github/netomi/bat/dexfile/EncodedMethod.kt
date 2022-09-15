@@ -171,7 +171,7 @@ class EncodedMethod private constructor(methodIndex: Int = NO_INDEX,
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
     {
-        visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
+        visitor.visitMethodID(dexFile, PropertyAccessor(::methodIndex))
         code.referencedIDsAccept(dexFile, visitor)
     }
 

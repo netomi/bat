@@ -124,7 +124,7 @@ class EncodedField private constructor(fieldIndex:  Int = NO_INDEX,
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor)
     {
-        visitor.visitFieldID(dexFile, PropertyAccessor({ fieldIndex }, { fieldIndex = it }))
+        visitor.visitFieldID(dexFile, PropertyAccessor(::fieldIndex))
     }
 
     override fun equals(other: Any?): Boolean {

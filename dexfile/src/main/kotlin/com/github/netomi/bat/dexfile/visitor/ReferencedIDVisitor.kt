@@ -17,6 +17,7 @@
 package com.github.netomi.bat.dexfile.visitor
 
 import com.github.netomi.bat.dexfile.DexFile
+import kotlin.reflect.KMutableProperty0
 
 internal interface ReferencedIDVisitor {
     fun visitStringID(dexFile: DexFile, accessor: IDAccessor) {}
@@ -37,14 +38,13 @@ internal interface IDAccessor {
     fun set(value: Int)
 }
 
-// do not use KMutableProperty as it would add a dependency to kotlin-reflect which we want to avoid
-internal class PropertyAccessor(private val getter: () -> Int, private val setter: (Int) -> Unit): IDAccessor {
+internal class PropertyAccessor(private val property: KMutableProperty0<Int>): IDAccessor {
     override fun get(): Int {
-        return getter.invoke()
+        return property.get()
     }
 
     override fun set(value: Int) {
-        setter.invoke(value)
+        property.set(value)
     }
 }
 

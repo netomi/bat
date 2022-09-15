@@ -62,7 +62,7 @@ class TypeAddrPair private constructor(            typeIndex: Int     = NO_INDEX
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor({ typeIndex }, { typeIndex = it }))
+        visitor.visitTypeID(dexFile, PropertyAccessor(::typeIndex))
     }
 
     override fun equals(other: Any?): Boolean {

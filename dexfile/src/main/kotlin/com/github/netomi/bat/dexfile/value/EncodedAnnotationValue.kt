@@ -82,7 +82,7 @@ data class EncodedAnnotationValue
     }
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitTypeID(dexFile, PropertyAccessor({ _typeIndex }, { _typeIndex = it }))
+        visitor.visitTypeID(dexFile, PropertyAccessor(::_typeIndex))
         elements.forEach { it.referencedIDsAccept(dexFile, visitor) }
     }
 
@@ -142,7 +142,7 @@ data class AnnotationElement private constructor(private var _nameIndex: Int    
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitStringID(dexFile, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
+        visitor.visitStringID(dexFile, PropertyAccessor(::_nameIndex))
         value.referencedIDsAccept(dexFile, visitor)
     }
 

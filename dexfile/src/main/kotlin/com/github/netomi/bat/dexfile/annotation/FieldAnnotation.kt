@@ -74,7 +74,7 @@ class FieldAnnotation private constructor(fieldIndex:    Int           = NO_INDE
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitFieldID(dexFile, PropertyAccessor({ fieldIndex }, { fieldIndex = it }))
+        visitor.visitFieldID(dexFile, PropertyAccessor(::fieldIndex))
         annotationSet.referencedIDsAccept(dexFile, visitor)
     }
 

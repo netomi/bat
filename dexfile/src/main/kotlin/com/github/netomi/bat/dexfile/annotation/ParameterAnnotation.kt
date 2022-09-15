@@ -87,7 +87,7 @@ class ParameterAnnotation private constructor(methodIndex:          Int         
     }
 
     internal fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
-        visitor.visitMethodID(dexFile, PropertyAccessor({ methodIndex }, { methodIndex = it }))
+        visitor.visitMethodID(dexFile, PropertyAccessor(::methodIndex))
         for (annotationSetRef in annotationSetRefList) {
             annotationSetRef.referencedIDsAccept(dexFile, visitor)
         }

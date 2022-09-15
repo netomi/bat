@@ -386,7 +386,7 @@ data class DebugSetFile private constructor(private var _nameIndex: Int = 0) : D
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         if (nameIndex != NO_INDEX) {
-            visitor.visitStringID(dexFile, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
+            visitor.visitStringID(dexFile, PropertyAccessor(::_nameIndex))
         }
     }
 
@@ -484,11 +484,11 @@ open class DebugStartLocal : DebugInstruction {
 
     override fun referencedIDsAccept(dexFile: DexFile, visitor: ReferencedIDVisitor) {
         if (nameIndex != NO_INDEX) {
-            visitor.visitStringID(dexFile, PropertyAccessor({ nameIndex }, { nameIndex = it }))
+            visitor.visitStringID(dexFile, PropertyAccessor(::nameIndex))
         }
 
         if (typeIndex != NO_INDEX) {
-            visitor.visitTypeID(dexFile, PropertyAccessor({ typeIndex }, { typeIndex = it }))
+            visitor.visitTypeID(dexFile, PropertyAccessor(::typeIndex))
         }
     }
 
@@ -558,7 +558,7 @@ class DebugStartLocalExtended : DebugStartLocal {
         super.referencedIDsAccept(dexFile, visitor)
 
         if (sigIndex != NO_INDEX) {
-            visitor.visitStringID(dexFile, PropertyAccessor({ sigIndex }, { sigIndex = it }))
+            visitor.visitStringID(dexFile, PropertyAccessor(::sigIndex))
         }
     }
 
