@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 
@@ -49,6 +50,10 @@ fun interface ClassAttributeVisitor: AnyAttributeVisitor {
     }
 
     fun visitModulePackages(classFile: ClassFile, attribute: ModulePackagesAttribute) {
+        visitAnyAttribute(classFile, attribute)
+    }
+
+    fun visitModuleHashes(classFile: ClassFile, attribute: ModuleHashesAttribute) {
         visitAnyAttribute(classFile, attribute)
     }
 

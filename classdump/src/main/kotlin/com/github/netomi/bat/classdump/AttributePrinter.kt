@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
@@ -347,6 +348,19 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             printer.print("#%-38s // ".format(packageIndex))
             classFile.constantAccept(packageIndex, constantPrinter)
             printer.println()
+        }
+        printer.levelDown()
+    }
+
+    override fun visitModuleHashes(classFile: ClassFile, attribute: ModuleHashesAttribute) {
+        printer.println("ModuleHashes:")
+        printer.levelUp()
+        printer.println("algorithm: #%-27d // %s".format(attribute.hashAlgorithmIndex, attribute.getHashAlgorithm(classFile)))
+        printer.println("%-39d // hashes".format(attribute.size))
+        for (hashEntry in attribute) {
+            printer.println("#%-38d // %s".format(hashEntry.moduleIndex, hashEntry.getModuleName(classFile)))
+            val hashString = hashEntry.hash.joinToString(separator = "", prefix = "[", postfix = "]") { b -> "%02x".format(b) }
+            printer.println("hash: %s".format(hashString))
         }
         printer.levelDown()
     }
