@@ -120,8 +120,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         }
         printer.print("%-39s // %s".format(str, attribute.getClassName(classFile).toExternalClassName()))
 
-        if (attribute.methodIndex > 0) {
-            printer.print(".${attribute.getMethodName(classFile)}")
+        val methodName = attribute.getMethodName(classFile)
+        if (methodName != null) {
+            printer.print(".$methodName")
         }
 
         printer.println()
@@ -158,13 +159,14 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
             val desc = buildString {
                 if (entry.innerNameIndex != 0) {
-                    append("${classFile.getString(entry.innerNameIndex)}=")
+                    append("${entry.getInnerName(classFile)}=")
                 }
 
-                append("class ${classFile.getClassName(entry.innerClassIndex)}")
+                append("class ${entry.getInnerClass(classFile)}")
 
-                if (entry.outerClassIndex != 0) {
-                    append(" of class ${classFile.getClassName(entry.outerClassIndex)}")
+                val outerClassName = entry.getOuterClass(classFile)
+                if (outerClassName != null) {
+                    append(" of class $outerClassName")
                 }
             }
 
