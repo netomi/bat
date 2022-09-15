@@ -16,7 +16,6 @@
 
 package com.github.netomi.bat.classfile
 
-import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import java.nio.file.Paths
 import java.util.TreeSet
 import java.util.zip.ZipInputStream
@@ -50,11 +49,11 @@ fun main(args: Array<String>) {
 
     val visitedIndices = TreeSet<Int>()
 
-    pool[0].referencedConstantVisitor({ classFile, owner, accessor ->
+    val classfile = pool[0]
+    classfile.referencedConstantVisitor { classFile, owner, accessor ->
         visitedIndices.add(accessor.get())
-        //println("$accessor: ${accessor.get()}")
         accessor.set(accessor.get())
-    })
+    }
 
     visitedIndices.forEach { println(it) }
 
