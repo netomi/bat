@@ -459,8 +459,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         for (entry in attribute) {
             printer.print("%-30s".format(entry.getName(classFile)))
             if (entry.accessFlags != 0) {
-                // TODO: print names of accessflags instead of numeric value (e.g. final)
-                printer.print(" %04x".format(entry.accessFlags))
+                printer.print(" %s".format(entry.accessFlagsAsSet.toPrintableString()))
             }
             printer.println()
         }

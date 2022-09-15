@@ -26,14 +26,15 @@ internal fun accessFlagsToSet(accessFlags: Int, target: AccessFlagTarget): EnumS
 }
 
 enum class AccessFlagTarget(val value: Int) {
-    CLASS           (0x01),
-    FIELD           (0x02),
-    METHOD          (0x04),
-    INNER_CLASS     (0x08),
-    MODULE          (0x10),
-    REQUIRED_MODULE (0x20),
-    EXPORTED_PACKAGE(0x40),
-    OPENED_MODULE   (0x80);
+    CLASS           (0x001),
+    FIELD           (0x002),
+    METHOD          (0x004),
+    INNER_CLASS     (0x008),
+    MODULE          (0x010),
+    REQUIRED_MODULE (0x020),
+    EXPORTED_PACKAGE(0x040),
+    OPENED_MODULE   (0x080),
+    METHOD_PARAMETER(0x100);
 }
 
 enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target: Int) {
@@ -42,7 +43,7 @@ enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target
     PRIVATE                         (ACC_PRIVATE,      false, arrayOf(FIELD, METHOD, INNER_CLASS)),
     PROTECTED                       (ACC_PROTECTED,    false, arrayOf(FIELD, METHOD, INNER_CLASS)),
     STATIC                          (ACC_STATIC,       false, arrayOf(FIELD, METHOD, INNER_CLASS)),
-    FINAL                           (ACC_FINAL,        false, arrayOf(CLASS, FIELD, METHOD, INNER_CLASS)),
+    FINAL                           (ACC_FINAL,        false, arrayOf(CLASS, FIELD, METHOD, INNER_CLASS, METHOD_PARAMETER)),
     SUPER                           (ACC_SUPER,        true,  arrayOf(CLASS)),
     SYNCHRONIZED                    (ACC_SYNCHRONIZED, false, arrayOf(METHOD)),
     OPEN                            (ACC_OPEN,         false, arrayOf(AccessFlagTarget.MODULE)),
@@ -57,11 +58,12 @@ enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target
     ABSTRACT                        (ACC_ABSTRACT,     false, arrayOf(CLASS, METHOD, INNER_CLASS)),
     STRICT                          (ACC_STRICT,       false, arrayOf(METHOD)),
     SYNTHETIC                       (ACC_SYNTHETIC,    true,  arrayOf(CLASS, FIELD, METHOD, INNER_CLASS, AccessFlagTarget.MODULE,
-                                                                      REQUIRED_MODULE, EXPORTED_PACKAGE, OPENED_MODULE)),
+                                                                      REQUIRED_MODULE, EXPORTED_PACKAGE, OPENED_MODULE, METHOD_PARAMETER)),
     ANNOTATION                      (ACC_ANNOTATION,   true,  arrayOf(CLASS, INNER_CLASS)),
     ENUM                            (ACC_ENUM,         true,  arrayOf(CLASS, FIELD, INNER_CLASS)),
     MODULE                          (ACC_MODULE,       true,  arrayOf(CLASS)),
-    MANDATED                        (ACC_MANDATED,     false, arrayOf(AccessFlagTarget.MODULE, REQUIRED_MODULE, EXPORTED_PACKAGE, OPENED_MODULE));
+    MANDATED                        (ACC_MANDATED,     false, arrayOf(AccessFlagTarget.MODULE, REQUIRED_MODULE, EXPORTED_PACKAGE,
+                                                                      OPENED_MODULE, METHOD_PARAMETER));
 
     fun matchesTarget(target: AccessFlagTarget): Boolean {
         return this.target and target.value != 0

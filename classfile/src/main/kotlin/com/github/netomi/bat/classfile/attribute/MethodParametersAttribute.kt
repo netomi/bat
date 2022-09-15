@@ -16,8 +16,8 @@
 
 package com.github.netomi.bat.classfile.attribute
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.*
+import com.github.netomi.bat.classfile.accessFlagsToSet
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -89,6 +89,9 @@ data class MethodParameterEntry private constructor(private var _nameIndex:   In
 
     val accessFlags: Int
         get() = _accessFlags
+
+    val accessFlagsAsSet: Set<AccessFlag>
+        get() = accessFlagsToSet(accessFlags, AccessFlagTarget.METHOD_PARAMETER)
 
     fun getName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
