@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -40,6 +41,8 @@ abstract class ElementValue: ClassFileContent() {
     }
 
     abstract fun accept(classFile: ClassFile, visitor: ElementValueVisitor)
+
+    open fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {}
 
     companion object {
         internal fun empty(): ElementValue {

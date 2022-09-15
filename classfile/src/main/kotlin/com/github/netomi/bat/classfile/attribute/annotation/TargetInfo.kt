@@ -216,8 +216,8 @@ data class ThrowsTargetInfo private constructor(override val type:             T
 
 data class LocalVarTargetInfo
     private constructor(override val type:   TargetInfoType,
-                         private var _table: MutableList<LocalVarElement> = mutableListOfCapacity(0))
-    : TargetInfo(type), Sequence<LocalVarElement> {
+                         private var _table: MutableList<LocalVarEntry> = mutableListOfCapacity(0))
+    : TargetInfo(type), Sequence<LocalVarEntry> {
 
     override val contentSize: Int
         get() = 1 + _table.contentSize()
@@ -225,11 +225,11 @@ data class LocalVarTargetInfo
     val size: Int
         get() = _table.size
 
-    operator fun get(index: Int): LocalVarElement {
+    operator fun get(index: Int): LocalVarEntry {
         return _table[index]
     }
 
-    override fun iterator(): Iterator<LocalVarElement> {
+    override fun iterator(): Iterator<LocalVarEntry> {
         return _table.iterator()
     }
 
@@ -237,7 +237,7 @@ data class LocalVarTargetInfo
         val tableLength = input.readUnsignedShort()
         _table = mutableListOfCapacity(tableLength)
         for (i in 0 until tableLength) {
-            _table.add(LocalVarElement.read(input))
+            _table.add(LocalVarEntry.read(input))
         }
     }
 
@@ -256,9 +256,9 @@ data class LocalVarTargetInfo
     }
 }
 
-data class LocalVarElement private constructor(private var _startPC: Int = -1,
-                                               private var _length:  Int = -1,
-                                               private var _index:   Int = -1): ClassFileContent() {
+data class LocalVarEntry private constructor(private var _startPC:       Int = -1,
+                                             private var _length:        Int = -1,
+                                             private var _variableIndex: Int = -1): ClassFileContent() {
 
     override val contentSize: Int
         get() = 6
@@ -269,24 +269,24 @@ data class LocalVarElement private constructor(private var _startPC: Int = -1,
     val length: Int
         get() = _length
 
-    val index: Int
-        get() = _index
+    val variableIndex: Int
+        get() = _variableIndex
 
     internal fun read(input: ClassDataInput) {
-        _startPC = input.readUnsignedShort()
-        _length  = input.readUnsignedShort()
-        _index   = input.readUnsignedShort()
+        _startPC       = input.readUnsignedShort()
+        _length        = input.readUnsignedShort()
+        _variableIndex = input.readUnsignedShort()
     }
 
     override fun write(output: ClassDataOutput) {
-        output.writeShort(startPC)
-        output.writeShort(length)
-        output.writeShort(index)
+        output.writeShort(_startPC)
+        output.writeShort(_length)
+        output.writeShort(_variableIndex)
     }
 
     companion object {
-        internal fun read(input: ClassDataInput): LocalVarElement {
-            val element = LocalVarElement()
+        internal fun read(input: ClassDataInput): LocalVarEntry {
+            val element = LocalVarEntry()
             element.read(input)
             return element
         }

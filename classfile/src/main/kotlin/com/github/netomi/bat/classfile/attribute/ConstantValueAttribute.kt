@@ -19,6 +19,9 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantAdapter
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
@@ -59,6 +62,12 @@ data class ConstantValueAttribute
 
     fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         classFile.constantAccept(constantValueIndex, visitor)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
+        constantValueAccept(classFile,
+                            ReferencedConstantAdapter(this, PropertyAccessor(::_constantValueIndex), visitor))
     }
 
     companion object {

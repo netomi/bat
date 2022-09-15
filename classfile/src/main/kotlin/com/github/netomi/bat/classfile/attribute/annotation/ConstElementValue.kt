@@ -19,6 +19,9 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantAdapter
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
@@ -49,21 +52,25 @@ data class ConstElementValue private constructor(override val type: ElementValue
 
     override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {
         when(type) {
-            ElementValueType.BYTE -> visitor.visitByteElementValue(classFile, this)
-            ElementValueType.CHAR -> visitor.visitCharElementValue(classFile, this)
-            ElementValueType.DOUBLE -> visitor.visitDoubleElementValue(classFile, this)
-            ElementValueType.FLOAT -> visitor.visitFloatElementValue(classFile, this)
-            ElementValueType.INT -> visitor.visitIntElementValue(classFile, this)
-            ElementValueType.LONG -> visitor.visitLongElementValue(classFile, this)
-            ElementValueType.SHORT -> visitor.visitShortElementValue(classFile, this)
+            ElementValueType.BYTE    -> visitor.visitByteElementValue(classFile, this)
+            ElementValueType.CHAR    -> visitor.visitCharElementValue(classFile, this)
+            ElementValueType.DOUBLE  -> visitor.visitDoubleElementValue(classFile, this)
+            ElementValueType.FLOAT   -> visitor.visitFloatElementValue(classFile, this)
+            ElementValueType.INT     -> visitor.visitIntElementValue(classFile, this)
+            ElementValueType.LONG    -> visitor.visitLongElementValue(classFile, this)
+            ElementValueType.SHORT   -> visitor.visitShortElementValue(classFile, this)
             ElementValueType.BOOLEAN -> visitor.visitBooleanElementValue(classFile, this)
-            ElementValueType.STRING -> visitor.visitStringElementValue(classFile, this)
+            ElementValueType.STRING  -> visitor.visitStringElementValue(classFile, this)
             else -> error("ConstElementValue has unexpected type $type")
         }
     }
 
     fun constantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         classFile.constantAccept(constValueIndex, visitor)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        constantAccept(classFile, ReferencedConstantAdapter(this, PropertyAccessor(::_constValueIndex), visitor))
     }
 
     companion object {

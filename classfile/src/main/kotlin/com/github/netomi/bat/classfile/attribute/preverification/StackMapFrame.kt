@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.preverification
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -37,6 +38,8 @@ abstract class StackMapFrame protected constructor(val frameType: Int): ClassFil
     }
 
     abstract fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor)
+
+    open fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {}
 
     companion object {
         internal fun read(input: ClassDataInput): StackMapFrame {
@@ -183,6 +186,12 @@ class AppendFrame private constructor(            frameType:    Int,
         visitor.visitAppendFrame(classFile, this)
     }
 
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        for (local in locals) {
+            local.referencedConstantsAccept(classFile, visitor)
+        }
+    }
+
     companion object {
         internal fun of(frameType: Int): AppendFrame {
             require(frameType in 252 .. 254)
@@ -217,6 +226,10 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         visitor.visitSameLocalsOneStackItemFrame(classFile, this)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        _stack.referencedConstantsAccept(classFile, visitor)
     }
 
     companion object {
@@ -256,6 +269,10 @@ class SameLocalsOneStackItemExtendedFrame private constructor(            frameT
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         visitor.visitSameLocalsOneStackItemExtendedFrame(classFile, this)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        _stack.referencedConstantsAccept(classFile, visitor)
     }
 
     companion object {
@@ -301,6 +318,16 @@ class FullFrame private constructor(            frameType:    Int,
 
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         visitor.visitFullFrame(classFile, this)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        for (local in _locals) {
+            local.referencedConstantsAccept(classFile, visitor)
+        }
+
+        for (stackEntry in _stack) {
+            stackEntry.referencedConstantsAccept(classFile, visitor)
+        }
     }
 
     companion object {

@@ -18,7 +18,10 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantAdapter
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -62,6 +65,13 @@ data class BootstrapMethodsAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitBootstrapMethods(classFile, this)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
+        for (entry in bootstrapMethods) {
+            entry.referencedConstantsAccept(classFile, visitor)
+        }
     }
 
     companion object {
@@ -109,6 +119,14 @@ data class BootstrapMethod
     fun bootstrapArgumentsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (constantIndex in arguments) {
             classFile.constantAccept(constantIndex, visitor)
+        }
+    }
+
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        for (i in arguments.indices) {
+            val constantIndex = arguments[i]
+            classFile.constantAccept(constantIndex,
+                                     ReferencedConstantAdapter(this, ArrayElementAccessor(arguments, i), visitor))
         }
     }
 

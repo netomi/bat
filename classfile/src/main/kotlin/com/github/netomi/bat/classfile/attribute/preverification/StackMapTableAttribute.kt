@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.contentSize
@@ -72,6 +73,13 @@ data class StackMapTableAttribute
     fun stackMapFramesAccept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         for (frame in frameEntries) {
             frame.accept(classFile, visitor)
+        }
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
+        for (frame in frameEntries) {
+            frame.referencedConstantsAccept(classFile, visitor)
         }
     }
 

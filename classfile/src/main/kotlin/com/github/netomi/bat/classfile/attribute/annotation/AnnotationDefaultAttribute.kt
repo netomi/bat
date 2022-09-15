@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import java.io.IOException
@@ -61,6 +62,11 @@ data class AnnotationDefaultAttribute
 
     fun elementValueAccept(classFile: ClassFile, visitor: ElementValueVisitor) {
         elementValue.accept(classFile, visitor)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
+        elementValue.referencedConstantsAccept(classFile, visitor)
     }
 
     companion object {

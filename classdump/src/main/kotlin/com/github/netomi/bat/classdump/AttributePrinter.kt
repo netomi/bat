@@ -404,8 +404,9 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             for (exception in attribute.exceptionTable) {
                 printer.print("  %6d %5d %5d".format(exception.startPC, exception.endPC, exception.handlerPC))
 
-                if (exception.catchType > 0) {
-                    printer.print("   Class ${classFile.getClassName(exception.catchType)}")
+                val exceptionClassName = exception.getCaughtExceptionClassName(classFile)
+                if (exceptionClassName != null) {
+                    printer.print("   Class $exceptionClassName")
                 } else {
                     printer.print("   any")
                 }
@@ -588,7 +589,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
     }
 
     override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
-        printer.print("${elementValue.getTypeName(classFile)}.${elementValue.getConstName(classFile)}")
+        printer.print("${elementValue.getType(classFile)}.${elementValue.getConstName(classFile)}")
     }
 
     override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {

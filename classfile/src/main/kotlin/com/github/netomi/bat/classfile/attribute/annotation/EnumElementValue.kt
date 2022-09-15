@@ -18,8 +18,12 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.util.JvmType
+import com.github.netomi.bat.util.asJvmType
 import java.io.IOException
 
 data class EnumElementValue private constructor(private var _typeNameIndex:  Int = -1,
@@ -37,8 +41,8 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
     val constNameIndex: Int
         get() = _constNameIndex
 
-    fun getTypeName(classFile: ClassFile): String {
-        return classFile.getString(typeNameIndex)
+    fun getType(classFile: ClassFile): JvmType {
+        return classFile.getString(typeNameIndex).asJvmType()
     }
 
     fun getConstName(classFile: ClassFile): String {
@@ -53,12 +57,17 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
 
     @Throws(IOException::class)
     override fun writeElementValue(output: ClassDataOutput) {
-        output.writeShort(typeNameIndex)
-        output.writeShort(constNameIndex)
+        output.writeShort(_typeNameIndex)
+        output.writeShort(_constNameIndex)
     }
 
     override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {
         visitor.visitEnumElementValue(classFile, this)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_typeNameIndex))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_constNameIndex))
     }
 
     companion object {

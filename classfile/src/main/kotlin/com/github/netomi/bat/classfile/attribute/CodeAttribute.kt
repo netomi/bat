@@ -20,11 +20,14 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
+import com.github.netomi.bat.util.JvmClassName
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 import java.util.*
@@ -111,6 +114,17 @@ data class CodeAttribute
         }
     }
 
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
+
+        for (entry in _exceptionTable) {
+            entry.referencedConstantsAccept(classFile, visitor)
+        }
+        for (attribute in _attributes) {
+            attribute.referencedConstantsAccept(classFile, visitor)
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CodeAttribute) return false
@@ -154,6 +168,10 @@ data class ExceptionEntry private constructor(private var _startPC:   Int = -1,
     val catchType: Int
         get() = _catchType
 
+    fun getCaughtExceptionClassName(classFile: ClassFile): JvmClassName? {
+        return if (catchType > 0) classFile.getClassName(catchType) else null
+    }
+
     private fun read(input: ClassDataInput) {
         _startPC   = input.readUnsignedShort()
         _endPC     = input.readUnsignedShort()
@@ -162,10 +180,16 @@ data class ExceptionEntry private constructor(private var _startPC:   Int = -1,
     }
 
     override fun write(output: ClassDataOutput) {
-        output.writeShort(startPC)
-        output.writeShort(endPC)
-        output.writeShort(handlerPC)
-        output.writeShort(catchType)
+        output.writeShort(_startPC)
+        output.writeShort(_endPC)
+        output.writeShort(_handlerPC)
+        output.writeShort(_catchType)
+    }
+
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        if (_catchType > 0) {
+            visitor.visitClassConstant(classFile, this, PropertyAccessor(::_catchType))
+        }
     }
 
     companion object {

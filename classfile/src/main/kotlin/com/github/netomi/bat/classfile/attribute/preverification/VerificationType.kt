@@ -17,6 +17,8 @@
 package com.github.netomi.bat.classfile.attribute.preverification
 
 import com.github.netomi.bat.classfile.*
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -29,6 +31,8 @@ abstract class VerificationType: ClassFileContent() {
 
     internal open fun readInfo(input: ClassDataInput) {}
     internal open fun writeInfo(output: ClassDataOutput) {}
+
+    open fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {}
 
     override fun write(output: ClassDataOutput) {
         output.writeByte(type.tag)
@@ -213,6 +217,10 @@ data class ObjectVariable private constructor(private var _classIndex: Int = -1)
 
     override fun writeInfo(output: ClassDataOutput) {
         output.writeShort(classIndex)
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitClassConstant(classFile, this, PropertyAccessor(::_classIndex))
     }
 
     override fun toString(): String {

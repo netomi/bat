@@ -18,6 +18,8 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -87,6 +89,13 @@ open class Annotation
         }
     }
 
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_typeIndex))
+        for (component in _components) {
+            component.referencedConstantsAccept(classFile, visitor)
+        }
+    }
+
     companion object {
         internal fun empty(): Annotation {
             return Annotation()
@@ -124,6 +133,11 @@ data class AnnotationComponent private constructor(private var _nameIndex:    In
     override fun write(output: ClassDataOutput) {
         output.writeShort(_nameIndex)
         _elementValue.write(output)
+    }
+
+    fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
+        elementValue.referencedConstantsAccept(classFile, visitor)
     }
 
     companion object {

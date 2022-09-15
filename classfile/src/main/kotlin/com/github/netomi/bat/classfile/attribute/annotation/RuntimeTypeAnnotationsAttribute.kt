@@ -19,6 +19,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitorIndexed
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.contentSize
@@ -64,5 +65,12 @@ abstract class RuntimeTypeAnnotationsAttribute
 
     fun typeAnnotationsAcceptIndexed(classFile: ClassFile, visitor: AnnotationVisitorIndexed) {
         typeAnnotations.forEachIndexed { index, annotation -> visitor.visitTypeAnnotation(classFile, index, annotation) }
+    }
+
+    override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantsAccept(classFile, visitor)
+        for (typeAnnotation in typeAnnotations) {
+            typeAnnotation.referencedConstantsAccept(classFile, visitor)
+        }
     }
 }
