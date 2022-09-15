@@ -62,7 +62,7 @@ data class MethodHandleConstant private constructor(private var _referenceKind: 
     }
 
     override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        val propertyAccessor = PropertyAccessor({ _referenceIndex }, { _referenceIndex = it })
+        val propertyAccessor = PropertyAccessor(::_referenceIndex)
 
         when (referenceKind) {
             GET_FIELD,

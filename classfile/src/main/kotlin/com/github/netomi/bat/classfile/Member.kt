@@ -109,8 +109,8 @@ abstract class Member protected constructor(accessFlags:               Int      
     }
 
     fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ nameIndex }, { nameIndex = it }))
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ descriptorIndex }, { descriptorIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::nameIndex))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::descriptorIndex))
 
         for (attribute in _attributes) {
             attribute.referencedConstantVisitor(classFile, visitor)

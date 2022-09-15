@@ -57,7 +57,7 @@ data class ClassConstant private constructor(private var _nameIndex: Int = -1) :
     }
 
     override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
     }
 
     companion object {

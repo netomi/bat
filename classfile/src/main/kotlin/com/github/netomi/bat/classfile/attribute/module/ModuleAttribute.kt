@@ -121,9 +121,9 @@ data class ModuleAttribute
     override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         super.referencedConstantVisitor(classFile, visitor)
 
-        visitor.visitModuleConstant(classFile, this, PropertyAccessor({ _moduleNameIndex }, { _moduleNameIndex = it }))
+        visitor.visitModuleConstant(classFile, this, PropertyAccessor(::_moduleNameIndex))
         if (_moduleVersionIndex > 0) {
-            visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _moduleVersionIndex }, { _moduleVersionIndex = it }))
+            visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_moduleVersionIndex))
         }
 
         for (requiresEntry in requires) {

@@ -60,7 +60,7 @@ data class NestHostAttribute
 
     override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         super.referencedConstantVisitor(classFile, visitor)
-        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _hostClassIndex }, { _hostClassIndex = it }))
+        visitor.visitClassConstant(classFile, this, PropertyAccessor(::_hostClassIndex))
     }
 
     companion object {

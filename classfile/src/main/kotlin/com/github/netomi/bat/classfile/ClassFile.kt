@@ -219,9 +219,9 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
     }
 
     fun referencedConstantVisitor(visitor: ReferencedConstantVisitor) {
-        visitor.visitClassConstant(this, this, PropertyAccessor({ thisClassIndex }, { thisClassIndex = it }))
+        visitor.visitClassConstant(this, this, PropertyAccessor(::thisClassIndex))
         if (superClassIndex > 0) {
-            visitor.visitClassConstant(this, this, PropertyAccessor({ superClassIndex }, { superClassIndex = it }))
+            visitor.visitClassConstant(this, this, PropertyAccessor(::superClassIndex))
         }
 
         constantPool.referencedConstantVisitor(this, visitor)

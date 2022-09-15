@@ -58,4 +58,8 @@ fun main(args: Array<String>) {
     visitedIndices.forEach { println(it) }
 
     println("${visitedIndices.size} == ${pool[0].constantPool.size}")
+
+    println(classfile::thisClassIndex.name)
+    classfile::thisClassIndex.set(11)
+    println(classfile.thisClassIndex)
 }

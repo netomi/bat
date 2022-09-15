@@ -117,7 +117,7 @@ data class MethodParameterEntry private constructor(private var _nameIndex:   In
     }
 
     fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
     }
 
     companion object {

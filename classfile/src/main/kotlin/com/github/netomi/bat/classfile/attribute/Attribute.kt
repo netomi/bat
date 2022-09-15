@@ -66,7 +66,7 @@ abstract class Attribute protected constructor(protected open var attributeNameI
     }
 
     open fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ attributeNameIndex }, { attributeNameIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::attributeNameIndex))
     }
 
     companion object {

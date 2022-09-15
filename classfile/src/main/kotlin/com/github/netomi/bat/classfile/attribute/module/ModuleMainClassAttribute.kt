@@ -63,7 +63,7 @@ data class ModuleMainClassAttribute
 
     override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         super.referencedConstantVisitor(classFile, visitor)
-        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _mainClassIndex }, { _mainClassIndex = it }))
+        visitor.visitClassConstant(classFile, this, PropertyAccessor(::_mainClassIndex))
     }
 
     companion object {

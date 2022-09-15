@@ -134,12 +134,12 @@ data class InnerClassEntry
     }
 
     fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _innerClassIndex }, { _innerClassIndex = it }))
+        visitor.visitClassConstant(classFile, this, PropertyAccessor(::_innerClassIndex))
         if (_outerClassIndex > 0) {
-            visitor.visitClassConstant(classFile, this, PropertyAccessor({ _outerClassIndex }, { _outerClassIndex = it }))
+            visitor.visitClassConstant(classFile, this, PropertyAccessor(::_outerClassIndex))
         }
         if (_innerNameIndex > 0) {
-            visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _innerNameIndex }, { _innerNameIndex = it }))
+            visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_innerNameIndex))
         }
     }
 

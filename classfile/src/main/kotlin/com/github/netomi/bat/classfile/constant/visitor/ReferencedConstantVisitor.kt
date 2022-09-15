@@ -17,6 +17,7 @@
 package com.github.netomi.bat.classfile.constant.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
+import kotlin.reflect.KMutableProperty0
 
 fun interface ReferencedConstantVisitor {
     fun visitAnyConstant(classFile: ClassFile, owner: Any, accessor: IDAccessor)
@@ -99,14 +100,13 @@ interface IDAccessor {
     fun set(value: Int)
 }
 
-// do not use KMutableProperty as it would add a dependency to kotlin-reflect which we want to avoid
-class PropertyAccessor(private val getter: () -> Int, private val setter: (Int) -> Unit): IDAccessor {
+internal class PropertyAccessor(private val property: KMutableProperty0<Int>): IDAccessor {
     override fun get(): Int {
-        return getter.invoke()
+        return property.get()
     }
 
     override fun set(value: Int) {
-        setter.invoke(value)
+        property.set(value)
     }
 }
 

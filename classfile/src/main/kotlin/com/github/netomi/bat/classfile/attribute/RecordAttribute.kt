@@ -123,8 +123,8 @@ data class RecordComponent
     }
 
     fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _descriptorIndex }, { _descriptorIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_nameIndex))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_descriptorIndex))
 
         for (attribute in attributes) {
             attribute.referencedConstantVisitor(classFile, visitor)

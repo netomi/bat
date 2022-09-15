@@ -85,7 +85,7 @@ data class ProvidesEntry
     }
 
     fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
-        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _providedClassIndex }, { _providedClassIndex = it }))
+        visitor.visitClassConstant(classFile, this, PropertyAccessor(::_providedClassIndex))
 
         for (i in _providesWithClasses.indices) {
             visitor.visitClassConstant(classFile, this, ArrayElementAccessor(_providesWithClasses, i))
