@@ -19,6 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -61,6 +63,13 @@ data class LocalVariableTypeTableAttribute
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, visitor: CodeAttributeVisitor) {
         visitor.visitLocalVariableTypeTable(classFile, method, code, this)
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+        for (entry in localVariableTypeTable) {
+            entry.referencedConstantVisitor(classFile, visitor)
+        }
     }
 
     companion object {
@@ -117,6 +126,11 @@ data class LocalVariableTypeEntry
         output.writeShort(nameIndex)
         output.writeShort(signatureIndex)
         output.writeShort(variableIndex)
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _signatureIndex }, { _signatureIndex = it }))
     }
 
     companion object {

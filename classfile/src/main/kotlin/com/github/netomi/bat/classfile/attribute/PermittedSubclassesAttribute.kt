@@ -18,6 +18,8 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
@@ -64,6 +66,14 @@ data class PermittedSubclassesAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitPermittedSubclasses(classFile, this)
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+
+        for (i in permittedClasses.indices) {
+            visitor.visitClassConstant(classFile, this, ArrayElementAccessor(permittedClasses, i))
+        }
     }
 
     override fun equals(other: Any?): Boolean {

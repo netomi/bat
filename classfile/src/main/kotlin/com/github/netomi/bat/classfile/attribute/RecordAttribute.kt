@@ -19,6 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -52,7 +54,7 @@ data class RecordAttribute
     }
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        components = input.readContentList(RecordComponent.Companion::read)
+        components = input.readContentList(RecordComponent::read)
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
@@ -61,6 +63,13 @@ data class RecordAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitRecord(classFile, this)
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+        for (component in components) {
+            component.referencedConstantVisitor(classFile, visitor)
+        }
     }
 
     companion object {
@@ -110,6 +119,15 @@ data class RecordComponent
     fun attributesAccept(classFile: ClassFile, record: RecordAttribute, visitor: RecordComponentAttributeVisitor) {
         for (attribute in _attributes.filterIsInstance(AttachedToRecordComponent::class.java)) {
             attribute.accept(classFile, record, this, visitor)
+        }
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _descriptorIndex }, { _descriptorIndex = it }))
+
+        for (attribute in attributes) {
+            attribute.referencedConstantVisitor(classFile, visitor)
         }
     }
 

@@ -21,6 +21,8 @@ import com.github.netomi.bat.classfile.AccessFlagTarget
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.accessFlagsToSet
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -67,6 +69,13 @@ data class InnerClassesAttribute
         visitor.visitInnerClasses(classFile, this)
     }
 
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+        for (entry in innerClasses) {
+            entry.referencedConstantVisitor(classFile, visitor)
+        }
+    }
+
     companion object {
         internal fun empty(attributeNameIndex: Int): InnerClassesAttribute {
             return InnerClassesAttribute(attributeNameIndex)
@@ -102,12 +111,12 @@ data class InnerClassEntry
         return classFile.getClassName(innerClassIndex)
     }
 
-    fun getOuterClass(classFile: ClassFile): JvmClassName {
-        return classFile.getClassName(outerClassIndex)
+    fun getOuterClass(classFile: ClassFile): JvmClassName? {
+        return if (outerClassIndex > 0) classFile.getClassName(outerClassIndex) else null
     }
 
-    fun getInnerName(classFile: ClassFile): String {
-        return classFile.getString(innerNameIndex)
+    fun getInnerName(classFile: ClassFile): String? {
+        return classFile.getStringOrNull(innerNameIndex)
     }
 
     private fun read(input: ClassDataInput) {
@@ -122,6 +131,16 @@ data class InnerClassEntry
         output.writeShort(outerClassIndex)
         output.writeShort(innerNameIndex)
         output.writeShort(innerClassAccessFlags)
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _innerClassIndex }, { _innerClassIndex = it }))
+        if (_outerClassIndex > 0) {
+            visitor.visitClassConstant(classFile, this, PropertyAccessor({ _outerClassIndex }, { _outerClassIndex = it }))
+        }
+        if (_innerNameIndex > 0) {
+            visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _innerNameIndex }, { _innerNameIndex = it }))
+        }
     }
 
     companion object {

@@ -17,6 +17,8 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
@@ -49,12 +51,20 @@ data class EnclosingMethodAttribute
         return classFile.getClassName(classIndex)
     }
 
-    fun getMethodName(classFile: ClassFile): String {
-        return classFile.getNameAndType(methodIndex).getMemberName(classFile);
+    fun getMethodName(classFile: ClassFile): String? {
+        return if (methodIndex > 0) {
+            classFile.getNameAndType(methodIndex).getMemberName(classFile)
+        } else {
+            null
+        }
     }
 
-    fun getMethodDescriptor(classFile: ClassFile): String {
-        return classFile.getNameAndType(methodIndex).getDescriptor(classFile)
+    fun getMethodDescriptor(classFile: ClassFile): String? {
+        return if (methodIndex > 0) {
+            classFile.getNameAndType(methodIndex).getDescriptor(classFile)
+        } else {
+            null
+        }
     }
 
     @Throws(IOException::class)
@@ -72,6 +82,14 @@ data class EnclosingMethodAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitEnclosingMethod(classFile, this)
+    }
+
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+        visitor.visitClassConstant(classFile, this, PropertyAccessor({ _classIndex }, { _classIndex = it }))
+        if (_methodIndex > 0) {
+            visitor.visitNameAndTypeConstant(classFile, this, PropertyAccessor({ _methodIndex }, { _methodIndex = it }))
+        }
     }
 
     companion object {

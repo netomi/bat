@@ -19,6 +19,8 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.accessFlagsToSet
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileContent
@@ -71,6 +73,13 @@ data class MethodParametersAttribute
         visitor.visitMethodParameters(classFile, method, this)
     }
 
+    override fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        super.referencedConstantVisitor(classFile, visitor)
+        for (parameter in parameters) {
+            parameter.referencedConstantVisitor(classFile, visitor)
+        }
+    }
+
     companion object {
         internal fun empty(attributeNameIndex: Int): MethodParametersAttribute {
             return MethodParametersAttribute(attributeNameIndex)
@@ -105,6 +114,10 @@ data class MethodParameterEntry private constructor(private var _nameIndex:   In
     override fun write(output: ClassDataOutput) {
         output.writeShort(nameIndex)
         output.writeShort(accessFlags)
+    }
+
+    fun referencedConstantVisitor(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor({ _nameIndex }, { _nameIndex = it }))
     }
 
     companion object {

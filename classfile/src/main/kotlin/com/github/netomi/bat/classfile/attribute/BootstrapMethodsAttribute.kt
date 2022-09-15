@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
+import java.util.*
 
 /**
  * A class representing a BootstrapMethods attribute in a class file.
@@ -109,6 +110,18 @@ data class BootstrapMethod
         for (constantIndex in arguments) {
             classFile.constantAccept(constantIndex, visitor)
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is BootstrapMethod) return false
+
+        return _bootstrapMethodRefIndex == other._bootstrapMethodRefIndex &&
+               arguments.contentEquals(other.arguments)
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(_bootstrapMethodRefIndex, arguments.contentHashCode())
     }
 
     companion object {
