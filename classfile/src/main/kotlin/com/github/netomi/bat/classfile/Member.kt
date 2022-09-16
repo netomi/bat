@@ -53,6 +53,9 @@ abstract class Member protected constructor(accessFlags:               Int      
     val attributes: Sequence<Attribute>
         get() = _attributes
 
+    internal val attributeMap: AttributeMap
+        get() = _attributes
+
     protected abstract fun updateModifiers(accessFlags: Int)
     protected abstract val accessFlagTarget: AccessFlagTarget
 
