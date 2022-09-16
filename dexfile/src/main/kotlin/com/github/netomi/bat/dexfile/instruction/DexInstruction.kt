@@ -192,16 +192,11 @@ abstract class DexInstruction {
     }
 
     open fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap? = null) {
-        var currOffset = offset
-
         if (offsetMap != null) {
             updateOffsets(offset, offsetMap)
         }
 
-        val instructionData = writeData()
-        for (instructionDatum in instructionData) {
-            writer.write(currOffset++, instructionDatum)
-        }
+        writer.write(offset, writeData())
     }
 
     protected open fun updateOffsets(offset: Int, offsetMap: OffsetMap) {}

@@ -31,10 +31,20 @@ class InstructionWriter constructor(size: Int = 8192) {
         lastWrittenOffset = -1
     }
 
-    fun write(offset: Int, value: Short) {
+    fun write(offset: Int, data: Short): Int {
         ensureCapacity(offset)
-        array[offset] = value
+        array[offset]     = data
         lastWrittenOffset = offset
+        return offset
+    }
+
+    fun write(offset: Int, data: ShortArray): Int {
+        require(data.isNotEmpty())
+        val lastOffsetToWrite = offset + data.size - 1
+        ensureCapacity(lastOffsetToWrite)
+        data.copyInto(array, offset)
+        lastWrittenOffset = lastOffsetToWrite
+        return lastOffsetToWrite
     }
 
     fun read(offset: Int): Short {
