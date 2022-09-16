@@ -22,18 +22,17 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.constant.InterfaceMethodrefConstant
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class InterfaceMethodInstruction private constructor(opCode: JvmOpCode): AnyMethodInstruction(opCode) {
+class InterfaceMethodInstruction private constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
 
     var argumentCount: Int = 0
         private set
 
-    override fun getMethod(classFile: ClassFile): InterfaceMethodrefConstant {
-        return classFile.getInterfaceMethodref(methodIndex)
+    override fun getConstant(classFile: ClassFile): InterfaceMethodrefConstant {
+        return classFile.getInterfaceMethodref(constantIndex)
     }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
-
         argumentCount = instructions[offset + 3].toInt()
     }
 

@@ -19,29 +19,19 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.constant.Constant
+import com.github.netomi.bat.classfile.constant.FieldrefConstant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class FieldInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class FieldInstruction private constructor(opCode: JvmOpCode): ConstantInstruction(opCode) {
 
-    var fieldIndex: Int = 0
-        private set
-
-    override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
-        val indexByte1 = instructions[offset + 1]
-        val indexByte2 = instructions[offset + 2]
-
-        fieldIndex = getIndex(indexByte1, indexByte2)
+    override fun getConstant(classFile: ClassFile): FieldrefConstant {
+        return classFile.getFieldref(constantIndex)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
         visitor.visitFieldInstruction(classFile, method, code, offset, this)
-    }
-
-    fun fieldAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.constantAccept(fieldIndex, visitor)
     }
 
     companion object {

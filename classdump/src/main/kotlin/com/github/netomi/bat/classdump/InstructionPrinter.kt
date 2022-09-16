@@ -37,27 +37,37 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
     override fun visitLiteralInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralInstruction) {
         if (instruction.valueIsImplicit) {
             printer.println("%4d: %s".format(offset, instruction.mnemonic))
-
         } else {
             printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, instruction.value))
         }
     }
 
-    override fun visitConstantInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ConstantInstruction) {
+    override fun visitAnyConstantInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ConstantInstruction) {
         printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.constantIndex))
         instruction.constantAccept(classFile, constantPrinter)
         printer.println()
     }
 
-    override fun visitClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ClassInstruction) {
-        printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.classIndex))
-        instruction.classAccept(classFile, constantPrinter)
+    override fun visitInterfaceMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InterfaceMethodInstruction) {
+        val instructionData = "%d, %2d".format(instruction.constantIndex, instruction.argumentCount)
+        printer.print("%4d: %-13s #%-16s // ".format(offset, instruction.mnemonic, instructionData))
+        instruction.constantAccept(classFile, constantPrinter)
+        printer.println()
+    }
+
+    override fun visitInvokeDynamicInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InvokeDynamicInstruction) {
+        printer.print("%4d: %-13s #%-18s // ".format(offset, instruction.mnemonic, "${instruction.constantIndex},  0"))
+        instruction.constantAccept(classFile, constantPrinter)
         printer.println()
     }
 
     override fun visitArrayClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayClassInstruction) {
-        printer.print("%4d: %-13s #%-17s // ".format(offset, instruction.mnemonic, "${instruction.classIndex},  ${instruction.dimension}"))
-        instruction.classAccept(classFile, constantPrinter)
+        if (instruction.dimensionIsImplicit) {
+            printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.constantIndex))
+        } else {
+            printer.print("%4d: %-13s #%-17s // ".format(offset, instruction.mnemonic, "${instruction.constantIndex},  ${instruction.dimension}"))
+        }
+        instruction.constantAccept(classFile, constantPrinter)
         printer.println()
     }
 
@@ -65,32 +75,7 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
         printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, offset + instruction.branchOffset))
     }
 
-    override fun visitFieldInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: FieldInstruction) {
-        printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.fieldIndex))
-        instruction.fieldAccept(classFile, constantPrinter)
-        printer.println()
-    }
-
-    override fun visitMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: MethodInstruction) {
-        printer.print("%4d: %-13s #%-18d // ".format(offset, instruction.mnemonic, instruction.methodIndex))
-        instruction.methodAccept(classFile, constantPrinter)
-        printer.println()
-    }
-
-    override fun visitInterfaceMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InterfaceMethodInstruction) {
-        val instructionData = "%d, %2d".format(instruction.methodIndex, instruction.argumentCount)
-        printer.print("%4d: %-13s #%-16s // ".format(offset, instruction.mnemonic, instructionData))
-        instruction.methodAccept(classFile, constantPrinter)
-        printer.println()
-    }
-
-    override fun visitInvokeDynamicInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InvokeDynamicInstruction) {
-        printer.print("%4d: %-13s #%-18s // ".format(offset, instruction.mnemonic, "${instruction.callsiteIndex},  0"))
-        instruction.callsiteAccept(classFile, constantPrinter)
-        printer.println()
-    }
-
-    override fun visitArrayTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayTypeInstruction) {
+    override fun visitArrayPrimitiveTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayPrimitiveTypeInstruction) {
         printer.println("%4d: %-13s  %s".format(offset, instruction.mnemonic, instruction.arrayType.toString().lowercase(Locale.getDefault())))
     }
 

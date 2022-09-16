@@ -17,26 +17,19 @@
 package com.github.netomi.bat.classfile.instruction
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.RefConstant
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-abstract class AnyMethodInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class NopInstruction private constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
 
-    var methodIndex: Int = 0
-        private set
-
-    abstract fun getMethod(classFile: ClassFile): RefConstant
-
-    override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
-        val indexByte1 = instructions[offset + 1]
-        val indexByte2 = instructions[offset + 2]
-
-        methodIndex = getIndex(indexByte1, indexByte2)
+    override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
+        visitor.visitNopInstruction(classFile, method, code, offset, this)
     }
 
-    fun methodAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        classFile.constantAccept(methodIndex, visitor)
+    companion object {
+        internal fun create(opCode: JvmOpCode): JvmInstruction {
+            return NopInstruction(opCode)
+        }
     }
 }

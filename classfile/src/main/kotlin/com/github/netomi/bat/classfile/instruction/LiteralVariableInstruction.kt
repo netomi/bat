@@ -28,7 +28,6 @@ class LiteralVariableInstruction private constructor(opCode: JvmOpCode): Variabl
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
-
         value = instructions[offset + 2].toInt()
     }
 

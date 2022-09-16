@@ -16,4 +16,4 @@
 
 package com.github.netomi.bat.classfile.instruction
 
-abstract class SimpleInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode)
+abstract class InvocationInstruction protected constructor(opCode: JvmOpCode): ConstantInstruction(opCode)

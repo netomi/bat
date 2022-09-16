@@ -22,7 +22,7 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class LiteralInstruction private constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
+class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
     var value: Long = 0
         private set

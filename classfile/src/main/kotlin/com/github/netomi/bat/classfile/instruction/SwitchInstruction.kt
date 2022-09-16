@@ -16,10 +16,6 @@
 
 package com.github.netomi.bat.classfile.instruction
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 abstract class SwitchInstruction
@@ -44,10 +40,6 @@ abstract class SwitchInstruction
 
     protected fun getPadding(offset: Int): Int {
         return (4 - (offset % 4)) % 4
-    }
-
-    override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitAnySimpleInstruction(classFile, method, code, offset, this)
     }
 }
 

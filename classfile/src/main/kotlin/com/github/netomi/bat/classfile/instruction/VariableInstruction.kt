@@ -21,7 +21,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-open class VariableInstruction protected constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
+open class VariableInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
     var variable: Int = 0
         private set

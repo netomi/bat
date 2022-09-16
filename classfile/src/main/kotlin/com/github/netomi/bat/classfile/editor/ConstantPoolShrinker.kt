@@ -17,19 +17,28 @@
 package com.github.netomi.bat.classfile.editor
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.attribute.visitor.allInstructions
 import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.constant.visitor.IDAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
+import com.github.netomi.bat.classfile.instruction.ConstantInstruction
+import com.github.netomi.bat.classfile.instruction.JvmInstruction
+import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
+import com.github.netomi.bat.classfile.visitor.allCode
+import com.github.netomi.bat.classfile.visitor.allMethods
 
 /**
- * TODO: mark and remap constants referenced from instructions.
+ * TODO: remap constants referenced from instructions.
  */
 class ConstantPoolShrinker: ClassFileVisitor {
 
     override fun visitClassFile(classFile: ClassFile) {
         val usageMarker = UsageMarker()
         classFile.referencedConstantsAccept(false, ReferencedConstantsMarker(usageMarker))
+        classFile.accept(allMethods(allCode(allInstructions(InstructionConstantMarker(usageMarker)))))
 
         val mapping = IntArray(classFile.constantPoolSize) { -1 }
         val shrunkConstantPool = ConstantPool.empty()
@@ -63,5 +72,13 @@ private class ReferencedConstantsMarker constructor(val usageMarker: UsageMarker
         usageMarker.markUsed(constant)
         // recursively mark referenced constants
         constant.referencedConstantsAccept(classFile, this)
+    }
+}
+
+private class InstructionConstantMarker constructor(val usageMarker: UsageMarker): InstructionVisitor {
+    override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
+
+    override fun visitAnyConstantInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ConstantInstruction) {
+        usageMarker.markUsed(instruction.getConstant(classFile))
     }
 }

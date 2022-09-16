@@ -19,22 +19,17 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.MethodrefConstant
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-open class MethodInstruction protected constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
-
-    override fun getConstant(classFile: ClassFile): MethodrefConstant {
-        return classFile.getMethodref(constantIndex)
-    }
+class NullReferenceInstruction private constructor(opCode: JvmOpCode): SimpleInstruction(opCode) {
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitMethodInstruction(classFile, method, code, offset, this)
+        visitor.visitNullReferenceInstruction(classFile, method, code, offset, this)
     }
 
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return MethodInstruction(opCode)
+            return NullReferenceInstruction(opCode)
         }
     }
 }

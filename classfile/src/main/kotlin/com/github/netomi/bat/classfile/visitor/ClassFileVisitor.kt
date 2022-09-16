@@ -17,6 +17,10 @@ package com.github.netomi.bat.classfile.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
 
+fun allMethods(visitor: MethodVisitor): ClassFileVisitor {
+    return ClassFileVisitor { it.methodsAccept(visitor) }
+}
+
 fun interface ClassFileVisitor {
     fun visitClassFile(classFile: ClassFile)
 }

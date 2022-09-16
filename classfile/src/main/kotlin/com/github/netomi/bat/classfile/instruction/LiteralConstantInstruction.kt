@@ -19,22 +19,28 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.MethodrefConstant
+import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-open class MethodInstruction protected constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
+class LiteralConstantInstruction private constructor(opCode: JvmOpCode): ConstantInstruction(opCode) {
 
-    override fun getConstant(classFile: ClassFile): MethodrefConstant {
-        return classFile.getMethodref(constantIndex)
+    override fun read(instructions: ByteArray, offset: Int) {
+        constantIndex = when (opCode) {
+            LDC    -> instructions[offset + 1].toInt() and 0xff
+            LDC_W  -> getIndex(instructions[offset + 1], instructions[offset + 2])
+            LDC2_W -> getIndex(instructions[offset + 1], instructions[offset + 2])
+
+            else -> error("unexpected opCode '${opCode.mnemonic}")
+        }
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitMethodInstruction(classFile, method, code, offset, this)
+        visitor.visitLiteralConstantInstruction(classFile, method, code, offset, this)
     }
 
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return MethodInstruction(opCode)
+            return LiteralConstantInstruction(opCode)
         }
     }
 }

@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class ArrayClassInstruction private constructor(opCode: JvmOpCode): ClassInstruction(opCode) {
@@ -26,10 +27,17 @@ class ArrayClassInstruction private constructor(opCode: JvmOpCode): ClassInstruc
     var dimension: Int = 0
         private set
 
+    val dimensionIsImplicit: Boolean
+        get() = opCode == ANEWARRAY
+
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
 
-        dimension = instructions[offset + 3].toInt()
+        dimension = when (opCode) {
+            MULTIANEWARRAY -> instructions[offset + 3].toInt()
+            ANEWARRAY      -> 1
+            else           -> error("unexpected opcode '$opCode'")
+        }
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {

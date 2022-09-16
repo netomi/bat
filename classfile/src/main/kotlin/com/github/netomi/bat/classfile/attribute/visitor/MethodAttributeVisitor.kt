@@ -20,6 +20,17 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.*
+import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+
+fun allInstructions(visitor: InstructionVisitor): MethodAttributeVisitor {
+    return object: MethodAttributeVisitor {
+        override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
+
+        override fun visitCode(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
+            attribute.instructionsAccept(classFile, method, visitor)
+        }
+    }
+}
 
 fun interface MethodAttributeVisitor: AnyAttributeVisitor {
 

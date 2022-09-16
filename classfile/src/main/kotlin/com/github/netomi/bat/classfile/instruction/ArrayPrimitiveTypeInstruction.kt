@@ -18,11 +18,9 @@ package com.github.netomi.bat.classfile.instruction
 
 import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
-import com.github.netomi.bat.util.JvmClassName
 
-class ArrayTypeInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class ArrayPrimitiveTypeInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
     var arrayType: ArrayType = ArrayType.INT
         private set
@@ -34,12 +32,12 @@ class ArrayTypeInstruction private constructor(opCode: JvmOpCode): JvmInstructio
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
-        visitor.visitArrayTypeInstruction(classFile, method, code, offset, this)
+        visitor.visitArrayPrimitiveTypeInstruction(classFile, method, code, offset, this)
     }
 
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return ArrayTypeInstruction(opCode)
+            return ArrayPrimitiveTypeInstruction(opCode)
         }
     }
 }
