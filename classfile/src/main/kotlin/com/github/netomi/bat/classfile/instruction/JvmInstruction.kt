@@ -42,12 +42,22 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
 
     companion object {
         fun create(instructions: ByteArray, offset: Int): JvmInstruction {
-            val opcode = instructions[offset]
-            val opCode = JvmOpCode[opcode]
+            var currOffset = offset
+            var opcode     = instructions[currOffset]
+            var opCode     = JvmOpCode[opcode]
+            var wide       = false
 
-            val instruction = opCode.createInstruction()
+            if (opCode == JvmOpCode.WIDE) {
+                wide = true
 
-            instruction.read(instructions, offset)
+                currOffset++
+                opcode = instructions[currOffset]
+                opCode = JvmOpCode[opcode]
+            }
+
+            val instruction = opCode.createInstruction(wide)
+
+            instruction.read(instructions, currOffset)
             return instruction
         }
 

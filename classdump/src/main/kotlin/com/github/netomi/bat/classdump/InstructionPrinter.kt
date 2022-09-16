@@ -80,14 +80,24 @@ internal class InstructionPrinter constructor(private val printer: IndentingPrin
     }
 
     override fun visitLiteralVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralVariableInstruction) {
-        printer.println("%4d: %-13s %d, %d".format(offset, instruction.mnemonic, instruction.variable, instruction.value))
+        var currOffset = offset
+        if (instruction.wide) {
+            printer.println("%4d: %s".format(currOffset, JvmOpCode.WIDE.mnemonic))
+            currOffset++
+        }
+        printer.println("%4d: %-13s %d, %d".format(currOffset, instruction.mnemonic, instruction.variable, instruction.value))
     }
 
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
+        var currOffset = offset
+        if (instruction.wide) {
+            printer.println("%4d: %s".format(currOffset, JvmOpCode.WIDE.mnemonic))
+            currOffset++
+        }
         if (instruction.variableIsImplicit) {
-            printer.println("%4d: %s".format(offset, instruction.mnemonic))
+            printer.println("%4d: %s".format(currOffset, instruction.mnemonic))
         } else {
-            printer.println("%4d: %-13s %d".format(offset, instruction.mnemonic, instruction.variable))
+            printer.println("%4d: %-13s %d".format(currOffset, instruction.mnemonic, instruction.variable))
         }
     }
 

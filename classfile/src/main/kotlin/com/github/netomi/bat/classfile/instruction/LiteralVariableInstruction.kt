@@ -21,14 +21,27 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class LiteralVariableInstruction private constructor(opCode: JvmOpCode): VariableInstruction(opCode) {
+class LiteralVariableInstruction private constructor(opCode: JvmOpCode, wide: Boolean): VariableInstruction(opCode, wide) {
 
     var value: Int = 0
         private set
 
+    override fun getLength(offset: Int): Int {
+        return if (wide) {
+            super.getLength(offset) + 1
+        } else {
+            super.getLength(offset)
+        }
+    }
+
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
-        value = instructions[offset + 2].toInt()
+
+        value = if (wide) {
+            getLiteral(instructions[offset + 3], instructions[offset + 4])
+        } else {
+            instructions[offset + 2].toInt()
+        }
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
@@ -36,8 +49,8 @@ class LiteralVariableInstruction private constructor(opCode: JvmOpCode): Variabl
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return LiteralVariableInstruction(opCode)
+        internal fun create(opCode: JvmOpCode, wide: Boolean): JvmInstruction {
+            return LiteralVariableInstruction(opCode, wide)
         }
     }
 }

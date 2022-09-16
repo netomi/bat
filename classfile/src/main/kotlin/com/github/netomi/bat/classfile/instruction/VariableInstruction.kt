@@ -21,7 +21,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-open class VariableInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+open class VariableInstruction protected constructor(opCode: JvmOpCode, wide: Boolean): JvmInstruction(opCode) {
 
     var variable: Int = 0
         private set
@@ -29,11 +29,26 @@ open class VariableInstruction protected constructor(opCode: JvmOpCode): JvmInst
     val variableIsImplicit: Boolean
         get() = opCode.length == 1
 
+    var wide: Boolean = wide
+        private set
+
+    override fun getLength(offset: Int): Int {
+        return if (wide) {
+            super.getLength(offset) + 2
+        } else {
+            super.getLength(offset)
+        }
+    }
+
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
 
         variable = if (!variableIsImplicit) {
-            instructions[offset + 1].toInt() and 0xff
+            if (wide) {
+                getIndex(instructions[offset + 1], instructions[offset + 2])
+            } else {
+                instructions[offset + 1].toInt() and 0xff
+            }
         } else {
             val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured
             variableString.toInt()
@@ -47,8 +62,8 @@ open class VariableInstruction protected constructor(opCode: JvmOpCode): JvmInst
     companion object {
         private val VARIABLE_REGEX = "\\w+_(\\d)".toRegex()
 
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
-            return VariableInstruction(opCode)
+        internal fun create(opCode: JvmOpCode, wide: Boolean = false): JvmInstruction {
+            return VariableInstruction(opCode, wide)
         }
     }
 }
