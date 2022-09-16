@@ -22,6 +22,9 @@ import com.github.netomi.bat.classfile.constant.visitor.IDAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 
+/**
+ * TODO: mark and remap constants referenced from instructions.
+ */
 class ConstantPoolShrinker: ClassFileVisitor {
 
     override fun visitClassFile(classFile: ClassFile) {
