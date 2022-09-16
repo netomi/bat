@@ -305,7 +305,7 @@ enum class JvmOpCode constructor(
     ARRAYLENGTH    (0xbe, "arraylength",    1, { opCode, _ -> ArrayInstruction.create(opCode) }),
     NEWARRAY       (0xbc, "newarray",       2, { opCode, _ -> ArrayPrimitiveTypeInstruction.create(opCode) }),
 
-    WIDE           (0xc4, "wide", -1, { _, _ -> error("tried to create a wide instruction")});
+    WIDE           (0xc4, "wide", -1, { _, _ -> error("tried to explicitly create a wide instruction")});
 
     fun createInstruction(wide: Boolean): JvmInstruction {
         return supplier.create(this, wide)
