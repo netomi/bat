@@ -30,7 +30,6 @@ abstract class ConstantInstruction protected constructor(opCode: JvmOpCode): Jvm
     }
 
     override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
         constantIndex = getIndex(instructions[offset + 1], instructions[offset + 2])
     }
 

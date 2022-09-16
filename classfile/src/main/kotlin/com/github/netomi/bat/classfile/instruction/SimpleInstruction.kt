@@ -16,4 +16,9 @@
 
 package com.github.netomi.bat.classfile.instruction
 
-abstract class SimpleInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode)
+abstract class SimpleInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+
+    override fun read(instructions: ByteArray, offset: Int) {}
+
+
+}

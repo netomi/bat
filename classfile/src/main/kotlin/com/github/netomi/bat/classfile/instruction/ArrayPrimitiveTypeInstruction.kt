@@ -26,8 +26,6 @@ class ArrayPrimitiveTypeInstruction private constructor(opCode: JvmOpCode): JvmI
         private set
 
     override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
         arrayType = ArrayType.of(instructions[offset + 1].toInt())
     }
 

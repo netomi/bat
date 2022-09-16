@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
@@ -30,7 +31,11 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
         return opCode.length
     }
 
-    open fun read(instructions: ByteArray, offset: Int) {}
+    abstract fun read(instructions: ByteArray, offset: Int)
+
+    open fun write(writer: InstructionWriter, offset: Int) {
+        TODO("implement")
+    }
 
     abstract fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor)
 

@@ -27,8 +27,6 @@ class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(o
         private set
 
     override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
         branchOffset = when (opCode) {
             JvmOpCode.JSR_W,
             JvmOpCode.GOTO_W -> {

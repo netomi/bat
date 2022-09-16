@@ -34,8 +34,6 @@ class LookupSwitchInstruction
     }
 
     override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
         var currOffset = offset + 1
         currOffset    += getPadding(currOffset)
 

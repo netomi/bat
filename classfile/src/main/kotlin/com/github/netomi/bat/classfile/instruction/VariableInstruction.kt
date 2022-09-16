@@ -41,8 +41,6 @@ open class VariableInstruction protected constructor(opCode: JvmOpCode, wide: Bo
     }
 
     override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
         variable = if (!variableIsImplicit) {
             if (wide) {
                 getIndex(instructions[offset + 1], instructions[offset + 2])

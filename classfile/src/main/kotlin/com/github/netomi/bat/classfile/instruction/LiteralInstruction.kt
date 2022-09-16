@@ -51,8 +51,6 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(
         }
 
     override fun read(instructions: ByteArray, offset: Int) {
-        super.read(instructions, offset)
-
         value = when (opCode) {
             DCONST_0 -> 0.0.toBits()
             DCONST_1 -> 1.0.toBits()
