@@ -23,7 +23,8 @@ import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.IOException
 
-internal class ConstantPool private constructor(private var constants: MutableList<Constant?> = mutableListOfCapacity(1)) {
+internal class ConstantPool
+    private constructor(private var constants: MutableList<Constant?> = mutableListOfCapacity(1)) {
 
     init {
         if (constants.isEmpty()) {
@@ -35,13 +36,17 @@ internal class ConstantPool private constructor(private var constants: MutableLi
         get() = constants.size
 
     operator fun get(index: Int): Constant {
-        require(constants[index] != null) { "trying to retrieve a null constant at index $index" }
+        require(constants[index] != null) { "trying to retrieve a null constant at index '$index'" }
         return constants[index]!!
     }
 
     internal fun addConstant(constant: Constant): Int {
         constants.add(constant)
-        return constants.lastIndex
+        val constantIndex = constants.lastIndex
+        if (constant.constantPoolSize > 1) {
+            constants.add(null)
+        }
+        return constantIndex
     }
 
     @Throws(IOException::class)

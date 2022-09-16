@@ -16,10 +16,18 @@
 
 package com.github.netomi.bat.classfile
 
+import com.github.netomi.bat.classfile.attribute.AttributeType
+import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
+import com.github.netomi.bat.classfile.constant.Constant
+import com.github.netomi.bat.classfile.constant.visitor.IDAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
+import com.github.netomi.bat.classfile.editor.ConstantPoolShrinker
+import com.github.netomi.bat.classfile.io.ClassFileWriter
 import java.nio.file.Paths
 import java.util.TreeSet
 import java.util.zip.ZipInputStream
 import kotlin.io.path.inputStream
+import kotlin.io.path.outputStream
 
 fun main(args: Array<String>) {
     //val path = Paths.get("/home/tn/workspace/android_sdk/platforms/android-33/android.jar")
@@ -50,16 +58,34 @@ fun main(args: Array<String>) {
     val visitedIndices = TreeSet<Int>()
 
     val classfile = pool[0]
-    classfile.referencedConstantsAccept { classFile, owner, accessor ->
-        visitedIndices.add(accessor.get())
-        accessor.set(accessor.get())
-    }
 
-    visitedIndices.forEach { println(it) }
+    val attr = classfile._attributes.get<ModuleHashesAttribute>(AttributeType.MODULE_HASHES)
+    classfile._attributes.removeAttribute(attr!!)
+
+    classfile.accept(ConstantPoolShrinker())
+
+    classfile.referencedConstantsAccept(false, MyReferencedConstantVisitor(visitedIndices))
 
     println("${visitedIndices.size} == ${pool[0].constantPool.size}")
 
-    println(classfile::thisClassIndex.name)
-    classfile::thisClassIndex.set(11)
-    println(classfile.thisClassIndex)
+    val writer = ClassFileWriter(Paths.get("shrunk.class").outputStream())
+    writer.visitClassFile(classfile)
+}
+
+class MyConstantUsageVisitor constructor(val usageMarker: MutableMap<Any, Boolean>): ReferencedConstantVisitor {
+    override fun visitAnyConstant(classFile: ClassFile, owner: Any, accessor: IDAccessor) {
+        val constantIndex = accessor.get()
+        val constant = classFile.getConstant(constantIndex)
+        usageMarker[constant] = true
+        constant.referencedConstantsAccept(classFile, this)
+    }
+}
+
+class MyReferencedConstantVisitor constructor(val visitedIndices: MutableSet<Int>): ReferencedConstantVisitor {
+    override fun visitAnyConstant(classFile: ClassFile, owner: Any, accessor: IDAccessor) {
+        val constantIndex = accessor.get()
+        visitedIndices.add(constantIndex)
+        val constant = classFile.getConstant(constantIndex)
+        constant.referencedConstantsAccept(classFile, this)
+    }
 }

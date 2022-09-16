@@ -53,6 +53,11 @@ data class AttributeMap constructor(private var _attributes: MutableList<Attribu
         return _attributes.iterator()
     }
 
+    internal fun removeAttribute(attribute: Attribute) {
+        _attributes.remove(attribute)
+        typeToAttributeMap.remove(attribute.type)
+    }
+
     private fun addAttribute(attribute: Attribute) {
         _attributes.add(attribute)
         addAttributeToTypeMap(attribute)

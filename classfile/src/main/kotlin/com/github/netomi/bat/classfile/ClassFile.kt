@@ -73,7 +73,7 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
     val isModule: Boolean
         get() = modifiers.contains(ClassModifier.MODULE)
 
-    internal val constantPool: ConstantPool = ConstantPool.empty()
+    internal var constantPool: ConstantPool = ConstantPool.empty()
 
     val constantPoolSize: Int
         get() = constantPool.size
