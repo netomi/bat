@@ -22,7 +22,7 @@ enum class JvmOpCode constructor(
             val value:    Int,
             val mnemonic: String,
             val length:   Int = 1,
-    private val supplier: InstructionSupplier? = null) {
+    private val supplier: InstructionSupplier) {
 
     // array instructions
 
@@ -308,7 +308,7 @@ enum class JvmOpCode constructor(
     WIDE           (0xc4, "wide", -1, { _, _ -> error("tried to create a wide instruction")});
 
     fun createInstruction(wide: Boolean): JvmInstruction {
-        return supplier?.create(this, wide) ?: throw RuntimeException("failed to create instruction for opcode $this")
+        return supplier.create(this, wide)
     }
 
     private fun interface InstructionSupplier {
@@ -327,7 +327,7 @@ enum class JvmOpCode constructor(
         }
 
         operator fun get(opcode: Byte): JvmOpCode {
-            return opcodeArray[opcode.toInt() and 0xff] ?: throw IllegalArgumentException("unknown opcode ${toHexStringWithPrefix(opcode)}")
+            return opcodeArray[opcode.toInt() and 0xff] ?: throw IllegalArgumentException("unknown opcode '${toHexStringWithPrefix(opcode)}'")
         }
     }
 }
