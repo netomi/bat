@@ -82,7 +82,7 @@ open class LiteralInstruction: DexInstruction {
                 ((instructions[offset + 4].toInt() and 0xffff).toLong() shl 48)
             }
 
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 
@@ -118,7 +118,7 @@ open class LiteralInstruction: DexInstruction {
                 data[4] = (literal shr 48).toShort()
             }
 
-            else -> throw IllegalStateException("unexpected format for opcode " + opCode.mnemonic)
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
 
         return data

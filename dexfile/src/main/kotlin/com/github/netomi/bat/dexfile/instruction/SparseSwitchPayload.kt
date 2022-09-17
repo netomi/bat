@@ -128,7 +128,7 @@ class SparseSwitchPayload private constructor(keys:          IntArray      = EMP
                 payload.read(instructions, offset)
                 return payload
             } else {
-                throw IllegalStateException("expected SparseSwitchPayload at offset $offset")
+                error("expected SparseSwitchPayload at offset $offset")
             }
         }
     }

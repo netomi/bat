@@ -44,7 +44,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
 
     fun getOffset(label: String): Int {
         return if (failOnMissingKey) {
-            labelOffsetMap[label] ?: throw IllegalStateException("unknown label $label")
+            labelOffsetMap[label] ?: error("unknown label '$label'")
         } else {
             labelOffsetMap[label] ?: 0
         }
@@ -56,7 +56,7 @@ class OffsetMap constructor(var failOnMissingKey: Boolean = false) {
 
     private fun getPayloadOffset(payload: Payload): Int {
         return if (failOnMissingKey) {
-            payloadOffsetMap[payload] ?: throw IllegalStateException("unknown payload $payload")
+            payloadOffsetMap[payload] ?: error("unknown payload '$payload'")
         } else {
             0
         }

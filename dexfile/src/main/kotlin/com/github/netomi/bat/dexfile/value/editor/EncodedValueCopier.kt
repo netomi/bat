@@ -26,7 +26,7 @@ import com.github.netomi.bat.dexfile.value.visitor.valueCollector
 internal fun EncodedValue.copyTo(originDexFile: DexFile, targetDexEditor: DexEditor): EncodedValue {
     val collector = valueCollector()
     accept(originDexFile, EncodedValueCopier(targetDexEditor, collector))
-    return collector.items().singleOrNull() ?: throw IllegalStateException("$this could not be copied")
+    return collector.items().singleOrNull() ?: error("$this could not be copied")
 }
 
 private class EncodedValueCopier constructor(private val targetDexEditor: DexEditor,
@@ -35,7 +35,7 @@ private class EncodedValueCopier constructor(private val targetDexEditor: DexEdi
     private val targetDexFile = targetDexEditor.dexFile
 
     override fun visitAnyValue(dexFile: DexFile, value: EncodedValue) {
-        throw IllegalStateException("unexpected visiting of visitAnyValue()")
+        error("unexpected visiting of visitAnyValue()")
     }
 
     override fun visitAnnotationValue(dexFile: DexFile, value: EncodedAnnotationValue) {

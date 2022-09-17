@@ -37,7 +37,7 @@ abstract class PayloadInstruction<T: Payload>: DexInstruction {
             FORMAT_31t -> (instructions[offset + 1].toInt() and 0xffff) or
                           (instructions[offset + 2].toInt() shl 16)
 
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 
@@ -71,7 +71,7 @@ abstract class PayloadInstruction<T: Payload>: DexInstruction {
                 FILL_ARRAY_DATA -> FillArrayDataInstruction.of(payload as FillArrayPayload, register)
                 PACKED_SWITCH   -> PackedSwitchInstruction.of(payload as PackedSwitchPayload, register)
                 SPARSE_SWITCH   -> SparseSwitchInstruction.of(payload as SparseSwitchPayload, register)
-                else            -> throw IllegalArgumentException("unexpected opcode $opCode for PayloadInstruction")
+                else            -> error("unexpected opcode '$opCode' for PayloadInstruction")
             }
         }
     }

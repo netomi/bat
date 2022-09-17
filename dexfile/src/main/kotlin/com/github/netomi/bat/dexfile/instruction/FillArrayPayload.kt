@@ -212,7 +212,7 @@ class FillArrayPayload private constructor(elementWidth: Int       = 0,
                 payload.read(instructions, offset)
                 return payload
             } else {
-                throw IllegalStateException("expected FillArrayPayload at offset $offset")
+                error("expected FillArrayPayload at offset $offset")
             }
         }
     }

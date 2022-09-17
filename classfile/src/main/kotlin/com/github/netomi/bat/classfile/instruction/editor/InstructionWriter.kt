@@ -47,7 +47,7 @@ class InstructionWriter constructor(size: Int = 8192) {
 
     fun read(offset: Int): Byte {
         if (offset > lastWrittenOffset) {
-            throw IllegalStateException("read data at offset '$offset' before it was written")
+            error("read data at offset '$offset' before it was written")
         }
         return array[offset]
     }

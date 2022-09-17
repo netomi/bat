@@ -357,7 +357,7 @@ internal enum class StackMapFrameType constructor(private val supplier: (Int) ->
                 251           -> SAME_EXTENDED_FRAME
                 in 252 .. 254 -> APPEND_FRAME
                 255           -> FULL_FRAME
-                else -> throw IllegalStateException("unexpected frameType '$frameType'")
+                else -> error("unexpected frameType '$frameType'")
             }
 
             return type.supplier(frameType)

@@ -45,7 +45,7 @@ class StringInstruction: DexInstruction {
             FORMAT_31c -> (instructions[offset + 1].toInt() and 0xffff) or
                                                (instructions[offset + 2].toInt() shl 16)
 
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 

@@ -43,7 +43,7 @@ class FieldInstruction: DexInstruction {
             FORMAT_21c,
             FORMAT_22c -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 

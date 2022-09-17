@@ -45,7 +45,7 @@ open class MethodInstruction: DexInstruction {
             FORMAT_45cc,
             FORMAT_4rcc -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 

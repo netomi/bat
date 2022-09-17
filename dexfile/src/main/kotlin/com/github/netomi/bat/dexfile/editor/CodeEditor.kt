@@ -357,7 +357,7 @@ private fun updateAndNormalizeTryElements(existingTryList: List<Try>, addedTryLi
                     }
                 } else {
                     if (nonOverlappingTries.last().endAddr != seq.addr) {
-                        throw RuntimeException("not expected")
+                        error("not expected while normalizing try/catch elements")
                     }
                 }
             }

@@ -43,7 +43,7 @@ class CallSiteInstruction: DexInstruction {
             FORMAT_3rc,
             FORMAT_35c -> instructions[offset + 1].toInt() and 0xffff
 
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 

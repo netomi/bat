@@ -138,7 +138,7 @@ abstract class DexInstruction {
                         instructions[offset + 2].toInt() ushr 12 and 0xf,
                         instructions[offset].toInt()     ushr  8 and 0xf
                     )
-                    else -> throw IllegalStateException("unexpected register count when reading instruction with opcode $opCode")
+                    else -> error("unexpected register count when reading instruction with opcode '$opCode'")
                 }
             }
 
@@ -183,11 +183,11 @@ abstract class DexInstruction {
                         instructions[offset + 2].toInt() ushr 12 and 0xf,
                         instructions[offset].toInt()     ushr  8 and 0xf
                     )
-                    else -> throw IllegalStateException("unexpected register count when reading instruction with opcode $opCode")
+                    else -> error("unexpected register count when reading instruction with opcode '$opCode'")
                 }
             }
 
-            else -> throw IllegalStateException("unsupported format ${opCode.format} for opCode $opCode encountered")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 
@@ -294,7 +294,7 @@ abstract class DexInstruction {
                         data[0] = (data[0].toInt() or (5 shl 12 or (registers[4] shl 8))).toShort()
                         data[2] = (data[2].toInt() or (registers[0] or (registers[1] shl 4) or (registers[2] shl 8) or (registers[3] shl 12))).toShort()
                     }
-                    else -> throw IllegalStateException("unsupported register count when writing instruction with opcode $opCode")
+                    else -> error("unsupported register count when writing instruction with opcode '$opCode'")
                 }
             }
 
@@ -315,7 +315,7 @@ abstract class DexInstruction {
                         data[2] = (data[2].toInt() or (registers[0] or (registers[1] shl 4) or (registers[2] shl 8) or (registers[3] shl 12))).toShort()
                         data[0] = (data[0].toInt() or (registers[4] shl 8)).toShort()
                     }
-                    else -> throw IllegalStateException("unsupported register count when writing instruction with opcode $opCode")
+                    else -> error("unsupported register count when writing instruction with opcode '$opCode'")
                 }
             }
 

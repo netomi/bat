@@ -155,7 +155,7 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
         if (newLength == code.insnsSize) {
             code.insns = modifiedInstructions
         } else {
-            throw RuntimeException("fixed instructions have different size")
+            error("fixed instructions have different size")
         }
     }
 
@@ -164,33 +164,33 @@ private class InstructionFixer constructor(val stringIDMapping: Map<Int, Int>,
     }
 
     override fun visitStringInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: StringInstruction) {
-        instruction.stringIndex = stringIDMapping[instruction.stringIndex] ?: throw IllegalStateException("unable to map stringIndex ${instruction.stringIndex}")
+        instruction.stringIndex = stringIDMapping[instruction.stringIndex] ?: error("unable to map stringIndex ${instruction.stringIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     override fun visitAnyTypeInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: TypeInstruction) {
-        instruction.typeIndex = typeIDMapping[instruction.typeIndex] ?: throw IllegalStateException("unable to map typeIndex ${instruction.typeIndex}")
+        instruction.typeIndex = typeIDMapping[instruction.typeIndex] ?: error("unable to map typeIndex ${instruction.typeIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     override fun visitFieldInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: FieldInstruction) {
-        instruction.fieldIndex = fieldIDMapping[instruction.fieldIndex] ?: throw IllegalStateException("unable to map fieldIndex ${instruction.fieldIndex}")
+        instruction.fieldIndex = fieldIDMapping[instruction.fieldIndex] ?: error("unable to map fieldIndex ${instruction.fieldIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     override fun visitMethodInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodInstruction) {
-        instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: throw IllegalStateException("unable to map methodIndex ${instruction.methodIndex}")
+        instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: error("unable to map methodIndex ${instruction.methodIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     override fun visitMethodProtoInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodProtoInstruction) {
-        instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: throw IllegalStateException("unable to map methodIndex ${instruction.methodIndex}")
-        instruction.protoIndex  = protoIDMapping[instruction.protoIndex]   ?: throw IllegalStateException("unable to map protoIndex ${instruction.protoIndex}")
+        instruction.methodIndex = methodIDMapping[instruction.methodIndex] ?: error("unable to map methodIndex ${instruction.methodIndex}")
+        instruction.protoIndex  = protoIDMapping[instruction.protoIndex]   ?: error("unable to map protoIndex ${instruction.protoIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 
     override fun visitMethodTypeRefInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: MethodTypeRefInstruction) {
-        instruction.protoIndex  = protoIDMapping[instruction.protoIndex] ?: throw IllegalStateException("unable to map protoIndex ${instruction.protoIndex}")
+        instruction.protoIndex  = protoIDMapping[instruction.protoIndex] ?: error("unable to map protoIndex ${instruction.protoIndex}")
         visitAnyInstruction(dexFile, classDef, method, code, offset, instruction)
     }
 }

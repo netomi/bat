@@ -51,7 +51,7 @@ class BranchInstruction: DexInstruction {
             FORMAT_30t,
             FORMAT_31t -> instructions[offset + 1].toInt() and 0xffff or (instructions[offset + 2].toInt() shl 16)
 
-            else -> throw IllegalStateException("unexpected format ${opCode.format} for opcode ${opCode.mnemonic}")
+            else -> error("unexpected format '${opCode.format}' for opcode '${opCode.mnemonic}'")
         }
     }
 

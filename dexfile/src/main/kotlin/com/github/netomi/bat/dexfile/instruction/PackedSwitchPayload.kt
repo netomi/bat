@@ -121,7 +121,7 @@ class PackedSwitchPayload private constructor(firstKey:      Int           = 0,
                 payload.read(instructions, offset)
                 return payload
             } else {
-                throw IllegalStateException("expected PackedSwitchPayload at offset $offset")
+                error("expected PackedSwitchPayload at offset $offset")
             }
         }
     }
