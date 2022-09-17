@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import java.util.function.Function
+import kotlin.test.assertTrue
 
 class TypeListTest : DexContentTest<TypeList>() {
     override val testInstances: Array<TypeList>
@@ -54,5 +55,19 @@ class TypeListTest : DexContentTest<TypeList>() {
         assertEquals(l1, l2)
         l1.addType(2)
         assertNotEquals(l1, l2)
+    }
+
+    @Test
+    fun compareTo() {
+        val l1 = empty()
+        val l2 = empty()
+        assertEquals(0, l1.compareTo(l2))
+        l1.addType(1)
+        assertTrue(l1 > l2)
+        l2.addType(1)
+        assertEquals(0, l1.compareTo(l2))
+        l1.addType(2)
+        l2.addType(3)
+        assertTrue(l1 < l2)
     }
 }

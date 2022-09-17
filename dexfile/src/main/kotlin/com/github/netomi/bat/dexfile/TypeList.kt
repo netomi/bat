@@ -21,7 +21,7 @@ import com.github.netomi.bat.dexfile.util.DexType
 import com.github.netomi.bat.dexfile.visitor.ArrayElementAccessor
 import com.github.netomi.bat.dexfile.visitor.ReferencedIDVisitor
 import com.github.netomi.bat.dexfile.visitor.TypeVisitor
-import com.google.common.primitives.Ints
+import com.github.netomi.bat.util.compareTo
 
 /**
  * A class representing a list of type ids inside a dex file.
@@ -97,7 +97,7 @@ class TypeList private constructor(private var typeList: IntArray = intArrayOf()
     }
 
     override fun compareTo(other: TypeList): Int {
-        return Ints.lexicographicalComparator().compare(typeList, other.typeList)
+        return typeList.compareTo(other.typeList)
     }
 
     override fun equals(other: Any?): Boolean {

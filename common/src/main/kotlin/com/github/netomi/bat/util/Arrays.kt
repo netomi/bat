@@ -21,3 +21,31 @@ fun ByteArray.toPrintableAsciiString(): String {
 }
 
 fun ByteArray.contentToHexString(): String = joinToString(separator = ",", prefix = "[", postfix = "]") { b -> "%02x".format(b) }
+
+fun IntArray.compareTo(other: IntArray): Int {
+    return LexicographicalComparator.compare(this, other)
+}
+
+/**
+ * The code below (LexicographicalComparator) is copied from the guava project (Ints.java):
+ *
+ * Copyright (C) 2008 The Guava Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ */
+private object LexicographicalComparator : Comparator<IntArray> {
+    override fun compare(left: IntArray, right: IntArray): Int {
+        val minLength = left.size.coerceAtMost(right.size)
+        for (i in 0 until minLength) {
+            val result = left[i].compareTo(right[i])
+            if (result != 0) {
+                return result
+            }
+        }
+        return left.size - right.size
+    }
+
+    override fun toString(): String {
+        return "LexicographicalComparator"
+    }
+}

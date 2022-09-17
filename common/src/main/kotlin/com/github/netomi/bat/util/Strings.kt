@@ -46,7 +46,6 @@ internal object StringEscapers {
     val javaEscaper: Escaper
 
     private fun escapeUnicode(cp: Int): CharArray {
-
         return buildString {
             append("\\u")
             append(Character.forDigit(cp shr 12, 16))
