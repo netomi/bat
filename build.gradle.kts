@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-    group = "org.github.netomi.bat"
+    group = "com.github.netomi.bat"
     version = property("version") ?: "undefined"
 
     repositories {
@@ -15,6 +15,24 @@ allprojects {
 }
 
 subprojects {
+    apply<JavaLibraryPlugin>()
+    apply<MavenPublishPlugin>()
+
+    configure<PublishingExtension> {
+        publications {
+            create<MavenPublication>(project.name) {
+                from(components["java"])
+                groupId    = project.group.toString()
+                artifactId = project.name
+                version    = project.version.toString()
+            }
+        }
+
+        repositories {
+            mavenLocal()
+        }
+    }
+
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             // enable invokedynamic generation for lanbdas (-Xlambdas=indy)
