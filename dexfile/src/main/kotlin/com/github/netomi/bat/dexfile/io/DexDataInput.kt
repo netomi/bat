@@ -15,12 +15,13 @@
  */
 package com.github.netomi.bat.dexfile.io
 
-import com.google.common.hash.Hasher
 import java.io.Closeable
 import java.io.IOException
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.security.MessageDigest
+import java.util.zip.Checksum
 
 class DexDataInput(inputStream: InputStream) : Closeable {
     private val byteBuffer: ByteBuffer
@@ -199,9 +200,12 @@ class DexDataInput(inputStream: InputStream) : Closeable {
         return buf.copyOf(readBytes)
     }
 
-    fun update(hasher: Hasher) {
-        @Suppress("UnstableApiUsage")
-        hasher.putBytes(byteBuffer)
+    fun update(hasher: Checksum) {
+        hasher.update(byteBuffer)
+    }
+
+    fun update(hasher: MessageDigest) {
+        hasher.update(byteBuffer)
     }
 
     @Throws(IOException::class)

@@ -19,12 +19,12 @@ package com.github.netomi.bat.classdump
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.io.IndentingPrinter
-import com.google.common.hash.Hashing
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import java.nio.file.Files
 import java.nio.file.Path
+import java.security.MessageDigest
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import kotlin.io.path.getLastModifiedTime
@@ -48,7 +48,8 @@ class ClassDumpPrinter constructor(private val printHeader: Boolean = true) {
             val fileSize = Files.size(inputPath)
             printer.println("Last modified ${formatter.format(lastModified)}; size $fileSize bytes")
 
-            val checksum = Hashing.sha256().hashBytes(inputPath.readBytes()).toString()
+            val sha256Checksum = MessageDigest.getInstance("SHA-256")!!
+            val checksum = sha256Checksum.digest(inputPath.readBytes()).joinToString(separator = "") { "%02x".format(it) }
             printer.println("SHA-256 checksum $checksum")
 
             val sourceFile = classFile.sourceFile

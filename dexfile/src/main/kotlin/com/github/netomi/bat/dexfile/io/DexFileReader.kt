@@ -21,8 +21,10 @@ import com.github.netomi.bat.dexfile.visitor.DexFileVisitor
 import com.github.netomi.bat.util.contentToHexString
 import com.github.netomi.bat.util.mutableListOfCapacity
 import com.github.netomi.bat.util.toHexStringWithPrefix
-import com.google.common.hash.Hashing
 import java.io.InputStream
+import java.security.MessageDigest
+import java.util.zip.Adler32
+
 
 class DexFileReader(`is`: InputStream, private val verifyChecksum: Boolean = true) : DexFileVisitor {
 
@@ -42,15 +44,14 @@ class DexFileReader(`is`: InputStream, private val verifyChecksum: Boolean = tru
         }
     }
 
-    @Suppress("UnstableApiUsage")
     private fun verifyChecksum(dexFile: DexFile) {
         assert(dexFile.header != null)
-        val adlerHasher = Hashing.adler32().newHasher()
+        val adlerHasher = Adler32()
 
         input.offset = 12
         input.update(adlerHasher)
 
-        val checksum = adlerHasher.hash().asInt()
+        val checksum = adlerHasher.value.toInt()
         if (checksum != dexFile.header!!.checksum) {
             throw DexFormatException("Calculated checksum %s does not match %s."
                     .format(toHexStringWithPrefix(checksum),
@@ -58,16 +59,15 @@ class DexFileReader(`is`: InputStream, private val verifyChecksum: Boolean = tru
         }
     }
 
-    @Suppress("UnstableApiUsage")
     private fun verifySignature(dexFile: DexFile) {
         assert(dexFile.header != null)
-        @Suppress("DEPRECATION")
-        val sha1Hasher = Hashing.sha1().newHasher()
+        // every java platform is required to have an SHA-1 digest.
+        val sha1Hasher = MessageDigest.getInstance("SHA-1")!!
 
         input.offset = 32
         input.update(sha1Hasher)
 
-        val signature = sha1Hasher.hash().asBytes()
+        val signature = sha1Hasher.digest()
 
         if (!signature.contentEquals(dexFile.header!!.signature)) {
             throw DexFormatException("Calculated signature %s does not match %s.".format(signature.contentToHexString(),

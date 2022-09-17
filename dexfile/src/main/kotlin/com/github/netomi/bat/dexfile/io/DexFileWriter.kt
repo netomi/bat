@@ -22,8 +22,9 @@ import com.github.netomi.bat.dexfile.debug.DebugInfo
 import com.github.netomi.bat.dexfile.editor.DexSorter
 import com.github.netomi.bat.dexfile.visitor.DataItemVisitor
 import com.github.netomi.bat.dexfile.visitor.DexFileVisitor
-import com.google.common.hash.Hashing
 import java.io.OutputStream
+import java.security.MessageDigest
+import java.util.zip.Adler32
 
 class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
 
@@ -64,18 +65,17 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
         // after the second pass, update the checksum and signature fields
         val byteBuffer = output.byteBuffer
 
-        @Suppress("DEPRECATION")
-        val sha1Signature = Hashing.sha1().newHasher()
+        val sha1Signature = MessageDigest.getInstance("SHA-1")!!
         byteBuffer.position(32)
-        sha1Signature.putBytes(byteBuffer)
-        header.signature = sha1Signature.hash().asBytes()
+        sha1Signature.update(byteBuffer)
+        header.signature = sha1Signature.digest()
 
-        val adlerChecksum = Hashing.adler32().newHasher()
+        val adlerChecksum = Adler32()
         byteBuffer.position(12)
         byteBuffer.put(header.signature)
         byteBuffer.position(12)
-        adlerChecksum.putBytes(byteBuffer)
-        header.checksum = adlerChecksum.hash().asInt()
+        adlerChecksum.update(byteBuffer)
+        header.checksum = adlerChecksum.value.toInt()
         byteBuffer.position(8)
         byteBuffer.putInt(header.checksum)
 
