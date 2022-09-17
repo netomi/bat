@@ -24,7 +24,7 @@ import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 abstract class ConstantInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
     var constantIndex: Int = 0
-        protected set
+        internal set
 
     open fun getConstant(classFile: ClassFile): Constant {
         return classFile.getConstant(constantIndex)

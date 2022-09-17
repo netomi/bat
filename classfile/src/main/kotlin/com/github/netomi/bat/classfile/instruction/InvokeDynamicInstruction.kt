@@ -19,13 +19,20 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.DynamicConstant
+import com.github.netomi.bat.classfile.constant.InvokeDynamicConstant
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class InvokeDynamicInstruction private constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
 
-    override fun getConstant(classFile: ClassFile): DynamicConstant {
-        return classFile.getDynamic(constantIndex)
+    override fun getConstant(classFile: ClassFile): InvokeDynamicConstant {
+        return classFile.getInvokeDynamic(constantIndex)
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        super.write(writer, offset)
+        writer.write(offset + 3, 0x0)
+        writer.write(offset + 4, 0x0)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {

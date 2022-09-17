@@ -143,8 +143,8 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
         return (constantPool[constantIndex] as InterfaceMethodrefConstant)
     }
 
-    fun getDynamic(constantIndex: Int): DynamicConstant {
-        return (constantPool[constantIndex] as DynamicConstant)
+    fun getInvokeDynamic(constantIndex: Int): InvokeDynamicConstant {
+        return (constantPool[constantIndex] as InvokeDynamicConstant)
     }
 
     fun getModule(constantIndex: Int): ModuleConstant {

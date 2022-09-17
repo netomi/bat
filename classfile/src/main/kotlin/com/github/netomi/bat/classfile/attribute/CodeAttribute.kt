@@ -41,7 +41,7 @@ data class CodeAttribute
     private constructor(override var attributeNameIndex: Int,
                          private var _maxStack:          Int                         = 0,
                          private var _maxLocals:         Int                         = 0,
-                         private var _code:              ByteArray                   = ByteArray(0),
+                        internal var _code:              ByteArray                   = ByteArray(0),
                          private var _exceptionTable:    MutableList<ExceptionEntry> = mutableListOfCapacity(0),
                          private var _attributes:        AttributeMap                = AttributeMap.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {

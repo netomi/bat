@@ -40,6 +40,7 @@ class InterfaceMethodInstruction private constructor(opCode: JvmOpCode): Invocat
     override fun write(writer: InstructionWriter, offset: Int) {
         super.write(writer, offset)
         writer.write(offset + 3, argumentCount.toByte())
+        writer.write(offset + 4, 0x0)
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {

@@ -30,42 +30,43 @@ import kotlin.io.path.outputStream
 
 fun main(args: Array<String>) {
     //val path = Paths.get("/home/tn/workspace/android_sdk/platforms/android-33/android.jar")
-    val path = Paths.get("/home/tn/.sdkman/candidates/java/current/jmods/java.base.jmod")
+//    val path = Paths.get("/home/tn/.sdkman/candidates/java/current/jmods/java.base.jmod")
+//
+//    val `is` = path.inputStream()
+//    `is`.skip(4)
+//
+//    val pool = mutableListOf<ClassFile>()
+//
+//    val start = System.nanoTime()
+//    ZipInputStream(`is`).use { zis ->
+//        generateSequence { zis.nextEntry }
+//            .filterNot { it.isDirectory }
+//            .filter { it.name.endsWith(".class") }
+//            .map {
+//                println(it.name)
+//
+//                val classFile = ClassFile.read(zis, false)
+//                pool.add(classFile)
+//                zis.closeEntry()
+//            }.first()
+//    }
+//    val end = System.nanoTime()
+//    println("read ${pool.size} class files, took ${(end - start)/1e6} ms")
+//    val classfile = pool[0]
 
-    val `is` = path.inputStream()
-    `is`.skip(4)
-
-    val pool = mutableListOf<ClassFile>()
-
-    val start = System.nanoTime()
-    ZipInputStream(`is`).use { zis ->
-        generateSequence { zis.nextEntry }
-            .filterNot { it.isDirectory }
-            .filter { it.name.endsWith(".class") }
-            .map {
-                println(it.name)
-
-                val classFile = ClassFile.read(zis, false)
-                pool.add(classFile)
-                zis.closeEntry()
-            }.first()
-    }
-
-    val end = System.nanoTime()
-    println("read ${pool.size} class files, took ${(end - start)/1e6} ms")
+    val classfile = ClassFile.read(Paths.get("ProtoID.class").inputStream())
 
     val visitedIndices = TreeSet<Int>()
 
-    val classfile = pool[0]
 
-    val attr = classfile._attributes.get<ModuleHashesAttribute>(AttributeType.MODULE_HASHES)
-    classfile._attributes.removeAttribute(attr!!)
+//    val attr = classfile._attributes.get<ModuleHashesAttribute>(AttributeType.MODULE_HASHES)
+//    classfile._attributes.removeAttribute(attr!!)
 
     classfile.accept(ConstantPoolShrinker())
 
     classfile.referencedConstantsAccept(false, MyReferencedConstantVisitor(visitedIndices))
 
-    println("${visitedIndices.size} == ${pool[0].constantPool.size}")
+    println("${visitedIndices.size} == ${classfile.constantPool.size}")
 
     val writer = ClassFileWriter(Paths.get("shrunk.class").outputStream())
     writer.visitClassFile(classfile)

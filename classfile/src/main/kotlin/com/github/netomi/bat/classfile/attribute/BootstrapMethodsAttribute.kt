@@ -18,10 +18,8 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
-import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.*
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantAdapter
-import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -123,6 +121,7 @@ data class BootstrapMethod
     }
 
     fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
+        visitor.visitMethodHandleConstant(classFile, this, PropertyAccessor(::_bootstrapMethodRefIndex))
         for (i in arguments.indices) {
             val constantIndex = arguments[i]
             classFile.constantAccept(constantIndex,
