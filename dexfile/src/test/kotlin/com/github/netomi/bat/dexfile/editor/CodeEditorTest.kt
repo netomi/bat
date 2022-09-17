@@ -50,7 +50,7 @@ class CodeEditorTest {
             returnVoid()
         }
 
-        codeEditor.prependInstruction(0, builder.getInstructionSequence())
+        codeEditor.prependInstructions(0, builder.getInstructionSequence())
         codeEditor.finishEditing(1)
 
         val code = codeEditor.code
@@ -79,7 +79,7 @@ class CodeEditorTest {
 
         codeEditor.addTryCatchElement(Try.of("try_start", "try_end", EncodedCatchHandler.of("handler")))
 
-        codeEditor.prependInstruction(0, builder.getInstructionSequence())
+        codeEditor.prependInstructions(0, builder.getInstructionSequence())
         codeEditor.finishEditing(1)
 
         // printInstructions(codeEditor)

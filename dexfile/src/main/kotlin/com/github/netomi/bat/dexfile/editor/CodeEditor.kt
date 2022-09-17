@@ -47,10 +47,10 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
     }
 
     fun prependInstruction(offset: Int, instruction: DexInstruction) {
-        prependInstruction(offset, listOf(instruction))
+        prependInstructions(offset, listOf(instruction))
     }
 
-    fun prependInstruction(offset: Int, instructions: List<DexInstruction>) {
+    fun prependInstructions(offset: Int, instructions: List<DexInstruction>) {
         instructions.forEach {
             require(dexFile.supportsOpcode(it.opCode)) { "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'" }
         }
@@ -60,10 +60,10 @@ class CodeEditor private constructor(val dexEditor: DexEditor,
     }
 
     fun appendInstruction(offset: Int, instruction: DexInstruction) {
-        appendInstruction(offset, listOf(instruction))
+        appendInstructions(offset, listOf(instruction))
     }
 
-    fun appendInstruction(offset: Int, instructions: List<DexInstruction>) {
+    fun appendInstructions(offset: Int, instructions: List<DexInstruction>) {
         instructions.forEach {
             require(dexFile.supportsOpcode(it.opCode)) { "instruction '$it' not supported by DexFile of format '${dexFile.dexFormat}'" }
         }
