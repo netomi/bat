@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
@@ -73,7 +74,19 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(
             BIPUSH -> instructions[offset + 1].toLong()
             SIPUSH -> getLiteral(instructions[offset + 1], instructions[offset + 2]).toLong()
 
-            else -> error("unexpected opCode '${opCode.mnemonic}'")
+            else   -> error("unexpected opCode '${opCode.mnemonic}'")
+        }
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        writer.write(offset, opCode.value.toByte())
+
+        if (!valueIsImplicit) {
+            when (opCode) {
+                BIPUSH -> writer.write(offset + 1, value.toByte())
+                SIPUSH -> writeLiteral(writer, offset + 1, value.toInt())
+                else   -> error("unexpected opCode '${opCode.mnemonic}'")
+            }
         }
     }
 

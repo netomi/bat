@@ -18,10 +18,9 @@ package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
-import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.visitor.IDAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
-import com.github.netomi.bat.classfile.editor.ConstantPoolShrinker
+import com.github.netomi.bat.classfile.constant.editor.ConstantPoolShrinker
 import com.github.netomi.bat.classfile.io.ClassFileWriter
 import java.nio.file.Paths
 import java.util.TreeSet

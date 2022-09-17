@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.editor
+package com.github.netomi.bat.classfile.marker
 
 class UsageMarker {
     private val usageMap: MutableMap<Any, Usage> = mutableMapOf()

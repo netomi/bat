@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.editor
+package com.github.netomi.bat.classfile.constant.editor
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.allInstructions
 import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.constant.visitor.IDAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
+import com.github.netomi.bat.classfile.marker.UsageMarker
 import com.github.netomi.bat.classfile.instruction.ConstantInstruction
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor

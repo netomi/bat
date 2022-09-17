@@ -32,9 +32,31 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
     }
 
     abstract fun read(instructions: ByteArray, offset: Int)
+    abstract fun write(writer: InstructionWriter, offset: Int)
 
-    open fun write(writer: InstructionWriter, offset: Int) {
-        TODO("implement")
+    protected fun writeLiteral(writer: InstructionWriter, offset: Int, literal: Int) {
+        writeOffset(writer, offset, literal)
+    }
+
+    protected fun writeLiteralWide(writer: InstructionWriter, offset: Int, literal: Int) {
+        writeOffsetWide(writer, offset, literal)
+    }
+
+    protected fun writeOffset(writer: InstructionWriter, offset: Int, offsetValue: Int) {
+        writer.write(offset,     ((offsetValue shr 8) and 0xff).toByte())
+        writer.write(offset + 1,  (offsetValue        and 0xff).toByte())
+    }
+
+    protected fun writeOffsetWide(writer: InstructionWriter, offset: Int, offsetValue: Int) {
+        writer.write(offset,     ((offsetValue  shr 24) and 0xff).toByte())
+        writer.write(offset + 1, ((offsetValue ushr 16) and 0xff).toByte())
+        writer.write(offset + 2, ((offsetValue ushr  8) and 0xff).toByte())
+        writer.write(offset + 1,  (offsetValue          and 0xff).toByte())
+    }
+
+    protected fun writeIndex(writer: InstructionWriter, offset: Int, index: Int) {
+        writer.write(offset,     ((index ushr 8) and 0xff).toByte())
+        writer.write(offset + 1,  (index         and 0xff).toByte())
     }
 
     abstract fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor)
@@ -47,22 +69,18 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
 
     companion object {
         fun create(instructions: ByteArray, offset: Int): JvmInstruction {
-            var currOffset = offset
-            var opcode     = instructions[currOffset]
+            var opcode     = instructions[offset]
             var opCode     = JvmOpCode[opcode]
             var wide       = false
 
             if (opCode == JvmOpCode.WIDE) {
-                wide = true
-
-                currOffset++
-                opcode = instructions[currOffset]
+                wide   = true
+                opcode = instructions[offset + 1]
                 opCode = JvmOpCode[opcode]
             }
 
             val instruction = opCode.createInstruction(wide)
-
-            instruction.read(instructions, currOffset)
+            instruction.read(instructions, offset)
             return instruction
         }
 

@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 open class VariableInstruction protected constructor(opCode: JvmOpCode, wide: Boolean): JvmInstruction(opCode) {
@@ -43,13 +44,30 @@ open class VariableInstruction protected constructor(opCode: JvmOpCode, wide: Bo
     override fun read(instructions: ByteArray, offset: Int) {
         variable = if (!variableIsImplicit) {
             if (wide) {
-                getIndex(instructions[offset + 1], instructions[offset + 2])
+                getIndex(instructions[offset + 2], instructions[offset + 3])
             } else {
                 instructions[offset + 1].toInt() and 0xff
             }
         } else {
             val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured
             variableString.toInt()
+        }
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        if (!variableIsImplicit) {
+            var currOffset = offset
+            if (wide) {
+                writer.write(currOffset++, JvmOpCode.WIDE.value.toByte())
+            }
+            writer.write(currOffset++, opCode.value.toByte())
+            if (wide) {
+                writeIndex(writer, currOffset, variable)
+            } else {
+                writer.write(currOffset, variable.toByte())
+            }
+        } else {
+            writer.write(offset, opCode.value.toByte())
         }
     }
 

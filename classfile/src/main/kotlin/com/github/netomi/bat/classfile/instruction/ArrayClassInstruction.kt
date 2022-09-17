@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class ArrayClassInstruction private constructor(opCode: JvmOpCode): ClassInstruction(opCode) {
@@ -37,6 +38,13 @@ class ArrayClassInstruction private constructor(opCode: JvmOpCode): ClassInstruc
             MULTIANEWARRAY -> instructions[offset + 3].toInt()
             ANEWARRAY      -> 1
             else           -> error("unexpected opcode '$opCode'")
+        }
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        super.write(writer, offset)
+        if (opCode == MULTIANEWARRAY) {
+            writer.write(offset + 3, dimension.toByte())
         }
     }
 

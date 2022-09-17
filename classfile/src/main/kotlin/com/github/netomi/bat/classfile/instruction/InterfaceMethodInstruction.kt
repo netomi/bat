@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.constant.InterfaceMethodrefConstant
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class InterfaceMethodInstruction private constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
@@ -34,6 +35,11 @@ class InterfaceMethodInstruction private constructor(opCode: JvmOpCode): Invocat
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
         argumentCount = instructions[offset + 3].toInt()
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        super.write(writer, offset)
+        writer.write(offset + 3, argumentCount.toByte())
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {

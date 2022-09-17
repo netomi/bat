@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 
 abstract class ConstantInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
 
@@ -31,6 +32,11 @@ abstract class ConstantInstruction protected constructor(opCode: JvmOpCode): Jvm
 
     override fun read(instructions: ByteArray, offset: Int) {
         constantIndex = getIndex(instructions[offset + 1], instructions[offset + 2])
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        writer.write(offset, opCode.value.toByte())
+        writeIndex(writer, offset + 1, constantIndex)
     }
 
     fun constantAccept(classFile: ClassFile, visitor: ConstantVisitor) {

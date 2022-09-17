@@ -19,6 +19,8 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
@@ -28,8 +30,8 @@ class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(o
 
     override fun read(instructions: ByteArray, offset: Int) {
         branchOffset = when (opCode) {
-            JvmOpCode.JSR_W,
-            JvmOpCode.GOTO_W -> {
+            JSR_W,
+            GOTO_W -> {
                 val offsetByte1 = instructions[offset + 1]
                 val offsetByte2 = instructions[offset + 2]
                 val offsetByte3 = instructions[offset + 3]
@@ -44,6 +46,17 @@ class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(o
 
                 getOffset(offsetByte1, offsetByte2)
             }
+        }
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        writer.write(offset, opCode.value.toByte())
+
+        when (opCode) {
+            JSR_W,
+            GOTO_W -> writeOffsetWide(writer, offset + 1, branchOffset)
+
+            else   -> writeOffset(writer, offset + 1, branchOffset)
         }
     }
 

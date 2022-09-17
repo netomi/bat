@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class LiteralVariableInstruction private constructor(opCode: JvmOpCode, wide: Boolean): VariableInstruction(opCode, wide) {
@@ -38,9 +39,19 @@ class LiteralVariableInstruction private constructor(opCode: JvmOpCode, wide: Bo
         super.read(instructions, offset)
 
         value = if (wide) {
-            getLiteral(instructions[offset + 3], instructions[offset + 4])
+            getLiteral(instructions[offset + 4], instructions[offset + 5])
         } else {
             instructions[offset + 2].toInt()
+        }
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        super.write(writer, offset)
+
+        if (wide) {
+            writeLiteral(writer, offset + 4, value)
+        } else {
+            writer.write(offset + 2, value.toByte())
         }
     }
 

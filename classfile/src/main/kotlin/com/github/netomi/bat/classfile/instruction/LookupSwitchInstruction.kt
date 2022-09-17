@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
@@ -65,6 +66,27 @@ class LookupSwitchInstruction
                           instructions[currOffset++])
 
             matchOffsetPairs.add(MatchOffsetPair(match, offsetOfMatch))
+        }
+    }
+
+    override fun write(writer: InstructionWriter, offset: Int) {
+        var currOffset = offset
+        writer.write(currOffset++, opCode.value.toByte())
+        val padding = getPadding(currOffset)
+        for (i in 0 until padding) {
+            writer.write(currOffset++, 0x00)
+        }
+
+        writeOffsetWide(writer, currOffset, defaultOffset)
+        currOffset += 4
+        writeLiteralWide(writer, currOffset, matchOffsetPairs.size)
+        currOffset += 4
+
+        for (pair in matchOffsetPairs) {
+            writeLiteralWide(writer, currOffset, pair.match)
+            currOffset += 4
+            writeOffsetWide(writer, currOffset, pair.offset)
+            currOffset += 4
         }
     }
 
