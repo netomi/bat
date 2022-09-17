@@ -22,7 +22,7 @@ import com.github.netomi.bat.dexfile.value.visitor.EncodedValueVisitor
 import com.github.netomi.bat.tinydvm.Dvm
 import com.github.netomi.bat.tinydvm.data.jvm.DvmNativeObject
 import com.github.netomi.bat.util.*
-import com.google.common.base.Objects
+import java.util.*
 
 sealed class DvmValue {
     abstract val value: Any?
@@ -41,7 +41,7 @@ sealed class DvmValue {
     }
 
     override fun hashCode(): Int {
-        return Objects.hashCode(value, type)
+        return Objects.hash(value, type)
     }
 
     companion object {

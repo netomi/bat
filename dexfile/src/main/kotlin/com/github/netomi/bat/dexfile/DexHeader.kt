@@ -21,7 +21,6 @@ import com.github.netomi.bat.dexfile.io.DexDataOutput
 import com.github.netomi.bat.dexfile.io.DexFormatException
 import com.github.netomi.bat.util.contentToHexString
 import com.github.netomi.bat.util.toHexStringWithPrefix
-import com.google.common.primitives.Bytes
 import java.nio.ByteOrder
 
 /**
@@ -36,7 +35,7 @@ import java.nio.ByteOrder
 class DexHeader private constructor() : DataItem() {
 
     private constructor(format: DexFormat): this() {
-        magic = Bytes.concat(DEX_FILE_MAGIC, format.pattern)
+        magic = DEX_FILE_MAGIC + format.pattern
     }
 
     var magic: ByteArray = ByteArray(8) // ubyte[8]

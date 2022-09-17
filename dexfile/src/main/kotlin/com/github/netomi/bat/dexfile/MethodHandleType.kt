@@ -15,8 +15,6 @@
  */
 package com.github.netomi.bat.dexfile
 
-import com.google.common.base.Preconditions
-
 enum class MethodHandleType(val value: Int, val targetsField: Boolean, val targetsInstance: Boolean, val simpleName: String) {
     STATIC_PUT        (METHOD_HANDLE_TYPE_STATIC_PUT,         true,  false, "static-put"),
     STATIC_GET        (METHOD_HANDLE_TYPE_STATIC_GET,         true,  false, "static-get"),
@@ -37,7 +35,7 @@ enum class MethodHandleType(val value: Int, val targetsField: Boolean, val targe
         }
 
         fun of(value: Int): MethodHandleType {
-            Preconditions.checkElementIndex(value, MethodHandleType.values().size, "unexpected MethodHandleType value $value")
+            require(value in 0 until values().size) { "unexpected MethodHandleType value '$value'" }
             return values()[value]
         }
     }

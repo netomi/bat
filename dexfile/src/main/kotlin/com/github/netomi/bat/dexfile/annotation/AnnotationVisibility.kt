@@ -18,7 +18,6 @@ package com.github.netomi.bat.dexfile.annotation
 import com.github.netomi.bat.dexfile.VISIBILITY_BUILD
 import com.github.netomi.bat.dexfile.VISIBILITY_RUNTIME
 import com.github.netomi.bat.dexfile.VISIBILITY_SYSTEM
-import com.google.common.base.Preconditions
 
 enum class AnnotationVisibility(val value: Short, val simpleName: String) {
     BUILD  (VISIBILITY_BUILD,   "build"),
@@ -34,7 +33,7 @@ enum class AnnotationVisibility(val value: Short, val simpleName: String) {
         }
 
         fun of(value: Int): AnnotationVisibility {
-            Preconditions.checkElementIndex(value, values().size, "unexpected annotation visibility value $value")
+            require(value in 0 until values().size) { "unexpected annotation visibility value '$value'" }
             // the values correspond to the enum ordinals, thus we can lookup by index.
             return values()[value]
         }
