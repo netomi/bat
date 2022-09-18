@@ -7,12 +7,13 @@ This goal of this project is to provide tools to work with various java related 
 
 The following modules are currently available
 
-1. classfile: reads and writes **class** files
-2. dexfile: reads and writes **dex** files
-3. dexdump: prints the contents of **dex** files in the same format as the _dexdump_ tool
-4. classdump: prints the contents of **class** files in the same format as the _javap_ tool
-4. smali: assembler/disassembler for **dex** files
-5. tools: convenient command line tools for the different modules
+* `classfile`: reads and writes **class** files
+* `dexfile`: reads and writes **dex** files
+* `dexdump`: prints the contents of **dex** files in the same format as the _dexdump_ tool
+* `classdump`: prints the contents of **class** files in the same format as the _javap_ tool
+* `smali`: assembler/disassembler for **dex** files
+* `jasm`: assembler/disassembler for **class** files
+* `tools`: convenient command line tools for the different modules
 
 ## Usage
 
@@ -40,5 +41,32 @@ Options:
 > bat-baksmali.sh -v -o out classes.dex
 
 The generated **smali** files will be created in the **out** directory in a directory structure resembling the package name of the disassembled classes.
+
+## Dependency
+
+To use the different modules via e.g. gradle in your own application, you can add the following to your build configuration:
+
+```
+repositories {
+    ...
+    maven("https://jitpack.io")
+}
+
+dependencies {
+    ...
+    implementation("com.github.netomi.bat:<module>:<tag>|<commit>|<release>")
+}
+```
+
+where **<module>** might be one of
+
+* `classfile` 
+* `dexfile`
+* `classdump`
+* `dexdump`
+* `smali`
+* `jasm`
+* `tinydvm`
+
 ## License
 [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)

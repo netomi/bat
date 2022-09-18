@@ -4,15 +4,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [0.2.0] - unreleased
+## [0.2.0] - 2022-09-18
 
 ### Added
 
-- java class file assembler / disassembler
-- 
+- class file assembler / disassembler, work in progress
+- added support for releases on jitpack.io
+
 ### Changed
 
-- finish class dump tool
+- completed classfile module
+- completed class dump tool
+
+### Removed
+
+- Removed guava dependency
 
 ## [0.1.0] - 2022-08-12
 
