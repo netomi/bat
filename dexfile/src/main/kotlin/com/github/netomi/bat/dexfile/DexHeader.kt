@@ -47,39 +47,39 @@ class DexHeader private constructor() : DataItem() {
     var fileSize: Long = 0 // uint
         internal set
     var headerSize: Long = 0x70 // uint
-        internal set
+        private set
     var endianTag: Long = 0 // uint
-        internal set
+        private set
     var linkSize = 0 // uint
-        internal set
+        private set
     var linkOffset = 0 // uint
-        internal set
+        private set
     var mapOffset = 0 // uint
-        internal set
+        private set
     var stringIDsSize = 0 // uint
-        internal set
+        private set
     var stringIDsOffsets = 0 // uint
-        internal set
+        private set
     var typeIDsSize = 0 // uint
-        internal set
+        private set
     var typeIDsOffset = 0 // uint
-        internal set
+        private set
     var protoIDsSize = 0 // uint
-        internal set
+        private set
     var protoIDsOffset = 0 // uint
-        internal set
+        private set
     var fieldIDsSize = 0 // uint
-        internal set
+        private set
     var fieldIDsOffset = 0 // uint
-        internal set
+        private set
     var methodIDsSize = 0 // uint
-        internal set
+        private set
     var methodIDsOffset = 0 // uint
-        internal set
+        private set
     var classDefsSize = 0 // uint
-        internal set
+        private set
     var classDefsOffset = 0 // uint
-        internal set
+        private set
     var dataSize = 0 // uint
         internal set
     var dataOffset = 0 // uint
@@ -111,29 +111,29 @@ class DexHeader private constructor() : DataItem() {
         checksum = input.readInt()
         input.readFully(signature)
 
-        fileSize = input.readUnsignedInt()
+        fileSize   = input.readUnsignedInt()
         headerSize = input.readUnsignedInt()
 
         // skip the endian tag, already read.
         input.readUnsignedInt()
 
-        linkSize = input.readInt()
-        linkOffset = input.readInt()
-        mapOffset = input.readInt()
-        stringIDsSize = input.readInt()
+        linkSize         = input.readInt()
+        linkOffset       = input.readInt()
+        mapOffset        = input.readInt()
+        stringIDsSize    = input.readInt()
         stringIDsOffsets = input.readInt()
-        typeIDsSize = input.readInt()
-        typeIDsOffset = input.readInt()
-        protoIDsSize = input.readInt()
-        protoIDsOffset = input.readInt()
-        fieldIDsSize = input.readInt()
-        fieldIDsOffset = input.readInt()
-        methodIDsSize = input.readInt()
-        methodIDsOffset = input.readInt()
-        classDefsSize = input.readInt()
-        classDefsOffset = input.readInt()
-        dataSize = input.readInt()
-        dataOffset = input.readInt()
+        typeIDsSize      = input.readInt()
+        typeIDsOffset    = input.readInt()
+        protoIDsSize     = input.readInt()
+        protoIDsOffset   = input.readInt()
+        fieldIDsSize     = input.readInt()
+        fieldIDsOffset   = input.readInt()
+        methodIDsSize    = input.readInt()
+        methodIDsOffset  = input.readInt()
+        classDefsSize    = input.readInt()
+        classDefsOffset  = input.readInt()
+        dataSize         = input.readInt()
+        dataOffset       = input.readInt()
     }
 
     override fun write(output: DexDataOutput) {

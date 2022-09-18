@@ -33,7 +33,6 @@ class DexFileWriter(private val outputStream: OutputStream) : DexFileVisitor {
     private var dataOffset = 0
     private var dataSize   = 0
 
-    @Suppress("UnstableApiUsage")
     override fun visitDexFile(dexFile: DexFile) {
         // First we need to sort the date items as required by the dex format.
         DexSorter().visitDexFile(dexFile)
