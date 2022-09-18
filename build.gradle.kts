@@ -2,7 +2,7 @@ plugins {
     id("base")
     id("idea")
     id("org.jetbrains.kotlin.jvm") version Versions.kotlinVersion apply false
-    id("net.researchgate.release") version "3.0.0"
+    id("net.researchgate.release") version "3.0.2"
 }
 
 allprojects {
