@@ -91,11 +91,11 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
     override fun visitField(classFile: ClassFile, index: Int, field: Field) {
         printer.print(".field")
 
-        val modifiers =
-            field.modifiers.joinToString(separator = " ", transform = { it.toString().lowercase(Locale.getDefault()) })
+        val accessFlags =
+            formatAccessFlagsAsHumanReadable(field.accessFlags, AccessFlagTarget.FIELD).lowercase(Locale.getDefault())
 
-        if (modifiers.isNotEmpty()) {
-            printer.print(" $modifiers")
+        if (accessFlags.isNotEmpty()) {
+            printer.print(" $accessFlags")
         }
 
         printer.print(" ${field.getName(classFile)}:${field.getDescriptor(classFile)}")
@@ -123,11 +123,11 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
     override fun visitMethod(classFile: ClassFile, index: Int, method: Method) {
         printer.print(".method")
 
-        val modifiers =
-            method.modifiers.joinToString(separator = " ", transform = { it.toString().lowercase(Locale.getDefault()) })
+        val accessFlags =
+            formatAccessFlagsAsHumanReadable(method.accessFlags, AccessFlagTarget.METHOD).lowercase(Locale.getDefault())
 
-        if (modifiers.isNotEmpty()) {
-            printer.print(" $modifiers")
+        if (accessFlags.isNotEmpty()) {
+            printer.print(" $accessFlags")
         }
 
         printer.println(" " + method.getName(classFile) + method.getDescriptor(classFile))

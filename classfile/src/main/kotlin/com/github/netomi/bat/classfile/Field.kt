@@ -32,7 +32,9 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.5">Field_info structure</a>
  */
-class Field private constructor(): Member() {
+class Field private constructor(nameIndex:       Int = -1,
+                                accessFlags:     Int =  0,
+                                descriptorIndex: Int = -1): Member(nameIndex, accessFlags, descriptorIndex) {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.FIELD
@@ -74,6 +76,13 @@ class Field private constructor(): Member() {
     }
 
     companion object {
+        fun of(nameIndex: Int, accessFlags: Int, descriptorIndex: Int): Field {
+            require(nameIndex >= 1)       { "nameIndex must be a positive number" }
+            require(accessFlags >= 0)     { "accessFlags mut not be negative" }
+            require(descriptorIndex >= 1) { "descriptorIndex must be a positive number" }
+            return Field(nameIndex, accessFlags, descriptorIndex)
+        }
+
         @Throws(IOException::class)
         internal fun readField(input: ClassDataInput): Field {
             val field = Field()

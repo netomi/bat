@@ -56,7 +56,7 @@ class ClassFileReader(private val `is`:           InputStream,
             val fieldCount = input.readUnsignedShort()
             _fields = mutableListOfCapacity(fieldCount)
             for (i in 0 until fieldCount) {
-                _fields.add(Field.readField(input))
+                addField(Field.readField(input))
             }
 
             val methodCount = input.readUnsignedShort()

@@ -38,7 +38,16 @@ import java.io.InputStream
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
  */
-class ClassFile private constructor(version: Version = Version.JAVA_8) {
+class ClassFile
+    private constructor(version:                   Version             = Version.JAVA_8,
+                        accessFlags:               Int                 = 0,
+                        thisClassIndex:            Int                 = -1,
+                        superClassIndex:           Int                 = -1,
+                        internal var constantPool: ConstantPool        = ConstantPool.empty(),
+                        internal var _interfaces:  MutableList<Int>    = mutableListOfCapacity(0),
+                        internal var _fields:      MutableList<Field>  = mutableListOfCapacity(0),
+                        internal var _methods:     MutableList<Method> = mutableListOfCapacity(0),
+                        internal var _attributes:  AttributeMap        = AttributeMap.empty()) {
 
     var majorVersion = version.majorVersion
         internal set
@@ -46,7 +55,7 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
     var minorVersion = version.minorVersion
         internal set
 
-    var accessFlags: Int = 0
+    var accessFlags: Int = accessFlags
         internal set(value) {
             field = value
             visibility = Visibility.of(value)
@@ -62,10 +71,10 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
     var modifiers: Set<ClassModifier> = ClassModifier.setOf(accessFlags)
         private set
 
-    var thisClassIndex = -1
+    var thisClassIndex = thisClassIndex
         internal set
 
-    var superClassIndex = -1
+    var superClassIndex = superClassIndex
         internal set
 
     val isInterface: Boolean
@@ -74,15 +83,8 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
     val isModule: Boolean
         get() = modifiers.contains(ClassModifier.MODULE)
 
-    internal var constantPool: ConstantPool = ConstantPool.empty()
-
     val constantPoolSize: Int
         get() = constantPool.size
-
-    internal var _interfaces = mutableListOfCapacity<Int>(0)
-    internal var _fields     = mutableListOfCapacity<Field>(0)
-    internal var _methods    = mutableListOfCapacity<Method>(0)
-    internal var _attributes = AttributeMap.empty()
 
     val className: JvmClassName
         get() = getClassName(thisClassIndex)
@@ -101,6 +103,10 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
 
     val fields: List<Field>
         get() = _fields
+
+    internal fun addField(field: Field) {
+        _fields.add(field)
+    }
 
     val methods: List<Method>
         get() = _methods

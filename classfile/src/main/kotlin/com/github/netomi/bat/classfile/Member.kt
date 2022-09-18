@@ -26,9 +26,9 @@ import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import java.io.IOException
 import java.util.*
 
-abstract class Member protected constructor(accessFlags:               Int         =  0,
-                                            nameIndex:                 Int         = -1,
-                                            descriptorIndex:           Int         = -1,
+abstract class Member protected constructor(nameIndex:                 Int          = -1,
+                                            accessFlags:               Int          =  0,
+                                            descriptorIndex:           Int          = -1,
                                             protected var _attributes: AttributeMap = AttributeMap.empty()) {
 
     var accessFlags: Int = accessFlags
