@@ -242,7 +242,11 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
     }
 
     override fun toString(): String {
-        return "ClassFile(name=$className)"
+        return if (constantPoolSize == 1) {
+            "ClassFile(empty)"
+        } else {
+            "ClassFile(name=$className)"
+        }
     }
 
     companion object {
