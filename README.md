@@ -58,7 +58,7 @@ dependencies {
 }
 ```
 
-where **<module>** might be one of
+where **module** might be one of
 
 * `classfile` 
 * `dexfile`
