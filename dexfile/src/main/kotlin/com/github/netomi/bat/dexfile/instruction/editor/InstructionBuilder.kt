@@ -61,12 +61,12 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
         return add(FillArrayDataInstruction.of(payload, register))
     }
 
-    fun arrayGetByte(destinationRegister: Int, arrayIndex: Int, index: Int): ArrayInstruction {
-        return add(ArrayInstruction.of(DexOpCode.AGET_BYTE, destinationRegister, arrayIndex, index))
+    fun arrayGetByte(destinationRegister: Int, arrayRegister: Int, indexRegister: Int): ArrayInstruction {
+        return add(ArrayInstruction.of(DexOpCode.AGET_BYTE, destinationRegister, arrayRegister, indexRegister))
     }
 
-    fun arrayPutByte(destinationRegister: Int, arrayIndex: Int, index: Int): ArrayInstruction {
-        return add(ArrayInstruction.of(DexOpCode.APUT_BYTE, destinationRegister, arrayIndex, index))
+    fun arrayPutByte(destinationRegister: Int, arrayRegister: Int, indexRegister: Int): ArrayInstruction {
+        return add(ArrayInstruction.of(DexOpCode.APUT_BYTE, destinationRegister, arrayRegister, indexRegister))
     }
 
     fun returnVoid(): ReturnInstruction {
@@ -105,20 +105,20 @@ class InstructionBuilder private constructor(private val dexEditor: DexEditor) {
         return add(FieldInstruction.of(DexOpCode.SGET_OBJECT, dexEditor.addOrGetFieldIDIndex(classType, name, type), register))
     }
 
-    fun intToChar(registerA: Int, registerB: Int): ConversionInstruction {
-        return add(ConversionInstruction.of(DexOpCode.INT_TO_CHAR, registerA, registerB))
+    fun intToChar(destinationRegister: Int, sourceRegister: Int): ConversionInstruction {
+        return add(ConversionInstruction.of(DexOpCode.INT_TO_CHAR, destinationRegister, sourceRegister))
     }
 
-    fun intToByte(registerA: Int, registerB: Int): ConversionInstruction {
-        return add(ConversionInstruction.of(DexOpCode.INT_TO_BYTE, registerA, registerB))
+    fun intToByte(destinationRegister: Int, sourceRegister: Int): ConversionInstruction {
+        return add(ConversionInstruction.of(DexOpCode.INT_TO_BYTE, destinationRegister, sourceRegister))
     }
 
     fun moveResult(register: Int): MoveInstruction {
         return add(MoveInstruction.of(DexOpCode.MOVE_RESULT, register))
     }
 
-    fun addIntLit8(literal: Int, registerA: Int, registerB: Int): ArithmeticLiteralInstruction {
-        return add(ArithmeticLiteralInstruction.of(DexOpCode.ADD_INT_LIT8, literal, registerA, registerB))
+    fun addIntLit8(literal: Int, destinationRegister: Int, sourceRegister: Int): ArithmeticLiteralInstruction {
+        return add(ArithmeticLiteralInstruction.of(DexOpCode.ADD_INT_LIT8, literal, destinationRegister, sourceRegister))
     }
 
     fun ifEqualZero(register: Int, label: String): BranchInstruction {
