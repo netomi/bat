@@ -16,6 +16,8 @@
 package com.github.netomi.bat.jasm
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.io.ClassFileWriter
+import com.github.netomi.bat.io.OutputStreamFactory
 import com.github.netomi.bat.jasm.assemble.ClassFileAssembler
 import com.github.netomi.bat.jasm.parser.JasmLexer
 import com.github.netomi.bat.jasm.parser.JasmParser
@@ -33,8 +35,9 @@ import java.util.function.Predicate
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.name
 
-class Assembler(private val lenientMode:    Boolean      = false,
-                private val warningPrinter: PrintWriter? = null) {
+class Assembler(private val outputStreamFactory: OutputStreamFactory,
+                private val lenientMode:         Boolean      = false,
+                private val warningPrinter:      PrintWriter? = null) {
 
     @Throws(IOException::class)
     fun assemble(input: Path, callback: (Path, Path) -> Unit = fun(_, _) {}): List<ClassFile> {
@@ -43,8 +46,8 @@ class Assembler(private val lenientMode:    Boolean      = false,
         val assembleFile = { path: Path ->
             Files.newInputStream(path).use { `is` ->
                 callback(input, path)
-                val classDefList = assemble(`is`, path.absolutePathString())
-                assembledClasses.addAll(classDefList)
+                val classFileList = assemble(`is`, path.absolutePathString())
+                assembledClasses.addAll(classFileList)
             }
             Unit
         }
@@ -74,7 +77,13 @@ class Assembler(private val lenientMode:    Boolean      = false,
         parser.errorHandler = ExceptionErrorStrategy()
 
         try {
-            return ClassFileAssembler(lenientMode, warningPrinter).visit(parser.cFiles())
+            val assembledClasses = ClassFileAssembler(lenientMode, warningPrinter).visit(parser.cFiles())
+            for (clazz in assembledClasses) {
+                val writer = ClassFileWriter(outputStreamFactory.createOutputStream(clazz.className.toInternalClassName()))
+                writer.visitClassFile(clazz)
+                writer.close()
+            }
+            return assembledClasses
         } catch (exception: RuntimeException) {
             if (name != null) {
                 throw JasmAssembleException("failed to assemble input from '$name': ${exception.message}", exception)
@@ -102,7 +111,8 @@ class ExceptionErrorStrategy : DefaultErrorStrategy() {
         val line = t.line
         val col  = t.charPositionInLine
 
-        val msg = "line $line:$col -> mismatched input ${getTokenErrorDisplay(e.offendingToken)} " +
+        val msg = "line $line:$col -> mismatched input ${getTokenErrorDisplay(e.offendingToken)} of " +
+                  "type ${recognizer.vocabulary.getSymbolicName(e.offendingToken.type)} " +
                   "expecting one of ${e.expectedTokens.toString(recognizer.vocabulary)}"
 
         val ex = RecognitionException(msg, recognizer, recognizer.inputStream, recognizer.context)

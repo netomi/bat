@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
@@ -256,6 +257,19 @@ class ClassFile private constructor(version: Version = Version.JAVA_8) {
 
         fun of(version: Version): ClassFile {
             return ClassFile(version)
+        }
+
+        fun of(className: String, accessFlags: Int, superClassName: String? = null, version: Version = Version.JAVA_8): ClassFile {
+            val classFile            = ClassFile(version)
+            val constantPoolEditor   = ConstantPoolEditor.of(classFile)
+            classFile.thisClassIndex = constantPoolEditor.addOrGetClassConstantIndex(className)
+            classFile.accessFlags    = accessFlags
+
+            if (superClassName != null) {
+                classFile.superClassIndex = constantPoolEditor.addOrGetClassConstantIndex(superClassName)
+            }
+
+            return classFile
         }
 
         fun read(`is`: InputStream, skipAttributes: Boolean = false): ClassFile {

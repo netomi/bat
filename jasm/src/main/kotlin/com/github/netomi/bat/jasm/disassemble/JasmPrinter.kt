@@ -35,17 +35,15 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
     override fun visitClassFile(classFile: ClassFile) {
         printer.print(".class")
 
-        val modifiers = classFile.modifiers
-        // TODO: the super flag is implicit in Java SE8 and above, think about how to handle it
-        // it feels redundant to always print it, we should probably only do it when byte code version is below 52.0
-        // modifiers.remove(AccessFlag.SUPER)
+        val accessFlags =
+            formatAccessFlagsAsHumanReadable(classFile.accessFlags, AccessFlagTarget.CLASS).lowercase(Locale.getDefault())
 
-        if (modifiers.isNotEmpty()) {
-            printer.print(" ${modifiers.joinToString(separator = " ", transform = { it.toString().lowercase(Locale.getDefault()) })}")
+        if (accessFlags.isNotEmpty()) {
+            printer.print(" $accessFlags")
         }
 
         printer.println(" ${classFile.className}")
-        printer.println(".bytecode ${classFile.majorVersion}.${classFile.minorVersion}")
+        printer.println(".bytecode \"${classFile.majorVersion}.${classFile.minorVersion}\"")
 
         val superClassName = classFile.superClassName
         if (superClassName != null) {

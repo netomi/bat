@@ -18,6 +18,11 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.AccessFlagTarget.*
 import java.util.*
 
+fun formatAccessFlagsAsHumanReadable(accessFlags: Int, target: AccessFlagTarget): String {
+    return AccessFlag.values().filter { it.target and target.value != 0 && it.value and accessFlags != 0 }
+                              .joinToString(separator = " ") { it.name }
+}
+
 internal fun accessFlagsToSet(accessFlags: Int, target: AccessFlagTarget): EnumSet<AccessFlag> {
     val result = EnumSet.noneOf(AccessFlag::class.java)
     val flagsOfTarget = AccessFlag.flagsByTarget(target)
@@ -37,7 +42,7 @@ enum class AccessFlagTarget(val value: Int) {
     METHOD_PARAMETER(0x100);
 }
 
-enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target: Int) {
+enum class AccessFlag(val value: Int, val synthetic: Boolean, val target: Int) {
 
     PUBLIC                          (ACC_PUBLIC,       false, arrayOf(CLASS, FIELD, METHOD, INNER_CLASS)),
     PRIVATE                         (ACC_PRIVATE,      false, arrayOf(FIELD, METHOD, INNER_CLASS)),
@@ -73,6 +78,11 @@ enum class AccessFlag(val value: Int, val synthetic: Boolean, private val target
             : this(value, synthetic, targets.fold(0) { acc, t -> acc or t.value })
 
     companion object {
+        fun of(input: String): AccessFlag {
+            val cleanedInput = input.replace("-".toRegex(), "_").uppercase(Locale.getDefault())
+            return valueOf(cleanedInput)
+        }
+
         fun flagsByTarget(target: AccessFlagTarget): Collection<AccessFlag> {
             return values().filter { it.matchesTarget(target) }
         }

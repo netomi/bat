@@ -26,6 +26,7 @@ import java.io.FileInputStream
 import java.lang.Runnable
 import java.nio.file.Files
 import kotlin.io.path.exists
+import kotlin.io.path.notExists
 
 /**
  * Command-line tool to disassemble class files in jasm format.
@@ -40,16 +41,16 @@ class DeJasmCommand : Runnable {
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.class)"])
     private lateinit var inputFile: File
 
-    @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out", description = ["output directory"])
-    private lateinit var outputFile: File
+    @CommandLine.Option(names = ["-o"], arity = "1", description = ["output directory"])
+    private var outputFile: File? = null
 
     @CommandLine.Option(names = ["-v"], description = ["verbose output"])
     private var verbose: Boolean = false
 
     override fun run() {
         FileInputStream(inputFile).use { `is` ->
-            val outputPath = outputFile.toPath()
-            if (!outputPath.exists()) {
+            val outputPath = outputFile?.toPath()
+            if (outputPath != null && outputPath.notExists()) {
                 Files.createDirectories(outputPath)
             }
 
@@ -61,9 +62,13 @@ class DeJasmCommand : Runnable {
 
             val startTime = System.nanoTime()
 
-            //classFile.accept(Disassembler(FileOutputStreamFactory(outputPath, "jasm")))
+            val outputStreamFactory = if (outputPath != null) {
+                FileOutputStreamFactory(outputPath, "jasm")
+            } else {
+                ConsoleOutputStreamFactory(System.out)
+            }
 
-            classFile.accept(Disassembler(ConsoleOutputStreamFactory(System.out)))
+            classFile.accept(Disassembler(outputStreamFactory))
 
             val endTime = System.nanoTime()
             printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")

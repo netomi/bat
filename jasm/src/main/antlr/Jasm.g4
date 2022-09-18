@@ -135,38 +135,24 @@ ACC
     | 'protected'
     | 'static'
     | 'final'
+    | 'super'
     | 'synchronized'
+    | 'open'
+    | 'transitive'
+    | 'volatile'
     | 'bridge'
+    | 'static_phase'
     | 'varargs'
     | 'native'
-    | 'abstract'
-    | 'strictfp'
-    | 'synthetic'
-    | 'constructor'
-    | 'interface'
-    | 'enum'
-    | 'annotation'
-    | 'volatile'
     | 'transient'
-    | 'declared-synchronized'
-    ;
-
-ANN_VISIBLE
-    : 'build'
-    | 'runtime'
-    | 'system'
-    ;
-
-METHOD_HANDLE_TYPE
-    : 'static-put'
-    | 'static-get'
-    | 'instance-put'
-    | 'instance-get'
-    | 'invoke-static'
-    | 'invoke-instance'
-    | 'invoke-constructor'
-    | 'invoke-direct'
-    | 'invoke-interface'
+    | 'interface'
+    | 'abstract'
+    | 'strict'
+    | 'synthetic'
+    | 'annotation'
+    | 'enum'
+    | 'module'
+    | 'mandated'
     ;
 
 REGISTER: ('v'|'V'|'p'|'P') '0'..'9'+;
@@ -177,35 +163,48 @@ DRESTARTLOCAL : '.restart local';
 
 ID: FRAGMENT_ID;
 
+CLASS_NAME : FRAGMENT_FULL_CLASS_NAME;
+
 cFiles : cFile+ EOF;
-cFile  : '.class' sAccList className=OBJECT_TYPE
-         (sSuper|sInterface|sSource|sMethod|sField|sAnnotation)*
+cFile  : '.class' sAccList className=CLASS_NAME
+         (sBytecode|sSuper|sInterface|sMethod|sField|sAttribute)*
          '.end class'?
        ;
+
+sAccList: ACC*;
+
+sAttribute
+    : sSource
+    | sSignature
+    | sAnnotations
+    ;
+
+sBytecode  : '.bytecode' version=STRING;
 sSource    : '.source' src=STRING;
-sSuper	   : '.super' name=OBJECT_TYPE;
-sInterface : '.implements' name=OBJECT_TYPE;
+sSuper	   : '.super' name=CLASS_NAME;
+sInterface : '.implements' name=CLASS_NAME;
 sMethod
 	: '.method' sAccList methodObj=(METHOD_FULL|METHOD_PART)
-        ( sAnnotation
-		| sParameter
-		| sInstruction )*
+        ( sAttribute )*
 	 '.end method';
 
 sField
     : '.field' sAccList fieldObj=(FIELD_FULL|FIELD_PART) ('=' sBaseValue)?
-	  (sAnnotation* '.end field')?
+	  (sAttribute* '.end field')?
 	;
-sAccList: ACC*;
+
+sSignature: '.signature' sig=STRING;
+
+sAnnotations
+    : '.annotations' runtime=('visible' | 'invisible') ( sAnnotation )* '.end annotations';
+
 sAnnotation
-	: '.annotation' visibility=ANN_VISIBLE type=OBJECT_TYPE
+	: '.annotation' type=OBJECT_TYPE
 	  (sAnnotationKeyName '=' sAnnotationValue)*
 	  '.end annotation'
 	;
 sSubannotation
 	: '.subannotation' type=OBJECT_TYPE (sAnnotationKeyName '=' sAnnotationValue )* '.end subannotation' ;
-
-sParameter: param=DPARAM (registerNumber=REGISTER | parameterIndex=INT) (',' name=STRING )? (sAnnotation* '.end param')?;
 
 sAnnotationKeyName: name=ID ;
 
@@ -239,359 +238,3 @@ sBaseValue
 	;
 
 sArrayValue: '{' sAnnotationValue? (',' sAnnotationValue)* '}';
-
-sInstruction
-    : fline
-    | fstartlocal
-    | fendlocal
-    | frestart
-    | fprologue
-    | fepilogue
-    | fregisters
-	| flocals
-	| fcatch
-	| fcatchall
-	| f10x_nop
-	| f10x_return
-	| fx0t_branch
-	| f21t_branch
-	| f22t_branch
-	| f11x_move
-    | f11x_return
-    | f11x_exception
-    | f11x_monitor
-	| fconst_int
-	| fconst_string
-	| fconst_type
-	| ft2c_type
-	| f21c_field
-	| f22c_field
-	| f12x_conversion
-	| f12x_arithmetic
-	| f23x_arithmetic
-    | f22sb_arithmetic
-	| fx2x_move
-	| f12x_array
-	| f23x_compare
-	| f23x_array
-	| f35c_method
-	| f3rc_method
-	| f35c_array
-    | f3rc_array
-	| f45cc_methodproto
-	| f4rcc_methodproto
-	| f35c_custom
-	| f3rc_custom
-	| sLabel
-	| f31t_payload
-	| f21c_const_handle
-	| f21c_const_type
-	| fpackedswitch
-	| fsparseswitch
-	| farraydata
-	;
-
-fline: '.line' line=INT;
-
-fstartlocal: '.local' r=REGISTER ',' name=STRING (':' type=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE))? (',' sig=STRING)? ;
-
-fendlocal      : '.end local' r=REGISTER;
-frestart       : '.restart local' r=REGISTER;
-fprologue      : '.prologue';
-fepilogue      : '.epilogue';
-fregisters     : '.registers' xregisters=INT;
-flocals        : '.locals' xlocals=INT;
-fcatch         : '.catch' type=OBJECT_TYPE '{' start=sLabel '..' end=sLabel  '}' handle=sLabel;
-fcatchall      : '.catchall' '{' start=sLabel '..' end=sLabel  '}' handle=sLabel;
-sLabel         : ':' label=ID;
-fpackedswitch  : '.packed-switch' start=INT sLabel+ '.end packed-switch';
-fsparseswitch  : '.sparse-switch' (INT '->' sLabel)* '.end sparse-switch';
-farraydata     : '.array-data' size=INT (sBaseValue)+ '.end array-data';
-
-f10x_nop: op='nop';
-
-f10x_return: op='return-void';
-
-fx0t_branch: op=
-    ( 'goto'
-    | 'goto/16'
-    | 'goto/32' ) target=sLabel
-	;
-
-f11x_move: op=
-    ( 'move-result'
-    | 'move-result-wide'
-    | 'move-result-object'
-	| 'move-exception' ) r1=REGISTER
-	;
-
-f11x_return: op=
-	( 'return'
-	| 'return-wide'
-	| 'return-object' ) r1=REGISTER
-    ;
-
-f11x_exception: op='throw' r1=REGISTER;
-
-f11x_monitor: op=
-	( 'monitor-enter'
-	| 'monitor-exit' ) r1=REGISTER
-	;
-
-fconst_int: op=
-    ( 'const/4'
-    | 'const/16'
-    | 'const'
-    | 'const/high16'
-    | 'const-wide/16'
-    | 'const-wide/32'
-    | 'const-wide/high16'
-    | 'const-wide') r1=REGISTER ',' cst=(INT|LONG|BYTE|SHORT|CHAR|BASE_FLOAT|BASE_DOUBLE)
-	;
-
-fconst_string: op=('const-string' | 'const-string/jumbo') r1=REGISTER ',' cst=STRING;
-
-fconst_type: op=('const-class' | 'check-cast' | 'new-instance' )  r1=REGISTER ',' cst=(OBJECT_TYPE|ARRAY_TYPE|PRIMITIVE_TYPE);
-
-f21c_field
-    : op=
-    ( 'sget'
-	| 'sget-wide'
-	| 'sget-object'
-	| 'sget-boolean'
-	| 'sget-byte'
-	| 'sget-char'
-	| 'sget-short'
-	| 'sput'
-	| 'sput-wide'
-	| 'sput-object'
-	| 'sput-boolean'
-	| 'sput-byte'
-	| 'sput-char'
-	| 'sput-short' ) r1=REGISTER ',' fld=FIELD_FULL
-	;
-
-ft2c_type:	op=
-    ( 'instance-of'
-    | 'new-array') r1=REGISTER ',' r2=REGISTER ',' type=(OBJECT_TYPE|ARRAY_TYPE)
-    ;
-
-f22c_field : op=
-    ( 'iget'
-	| 'iget-wide'
-	| 'iget-object'
-	| 'iget-boolean'
-	| 'iget-byte'
-	| 'iget-char'
-	| 'iget-short'
-	| 'iput'
-	| 'iput-wide'
-	| 'iput-object'
-	| 'iput-boolean'
-	| 'iput-byte'
-	| 'iput-char'
-	| 'iput-short' ) r1=REGISTER ',' r2=REGISTER ',' fld=FIELD_FULL
-	;
-
-f12x_conversion: op=
-    ( 'int-to-long'
-    | 'int-to-float'
-    | 'int-to-double'
-    | 'long-to-int'
-    | 'long-to-float'
-    | 'long-to-double'
-    | 'float-to-int'
-    | 'float-to-long'
-    | 'float-to-double'
-    | 'double-to-int'
-    | 'double-to-long'
-    | 'double-to-float'
-    | 'int-to-byte'
-    | 'int-to-char'
-    | 'int-to-short' ) r1=REGISTER ',' r2=REGISTER
-    ;
-
-f12x_arithmetic: op=
-	( 'neg-int'
-    | 'not-int'
-    | 'neg-long'
-    | 'not-long'
-    | 'neg-float'
-    | 'neg-double'
-    | 'add-int/2addr'
-    | 'sub-int/2addr'
-    | 'mul-int/2addr'
-    | 'div-int/2addr'
-    | 'rem-int/2addr'
-    | 'and-int/2addr'
-    | 'or-int/2addr'
-    | 'xor-int/2addr'
-    | 'shl-int/2addr'
-    | 'shr-int/2addr'
-    | 'ushr-int/2addr'
-    | 'add-long/2addr'
-    | 'sub-long/2addr'
-    | 'mul-long/2addr'
-    | 'div-long/2addr'
-    | 'rem-long/2addr'
-    | 'and-long/2addr'
-    | 'or-long/2addr'
-    | 'xor-long/2addr'
-    | 'shl-long/2addr'
-    | 'shr-long/2addr'
-    | 'ushr-long/2addr'
-    | 'add-float/2addr'
-    | 'sub-float/2addr'
-    | 'mul-float/2addr'
-    | 'div-float/2addr'
-    | 'rem-float/2addr'
-    | 'add-double/2addr'
-    | 'sub-double/2addr'
-    | 'mul-double/2addr'
-    | 'div-double/2addr'
-    | 'rem-double/2addr') r1=REGISTER ',' r2=REGISTER
-    ;
-
-fx2x_move: op=
-    ( 'move'
-    | 'move/from16'
-    | 'move/16'
-	| 'move-wide'
-	| 'move-wide/from16'
-	| 'move-wide/16'
-	| 'move-object'
-	| 'move-object/from16'
-	| 'move-object/16' ) r1=REGISTER ',' r2=REGISTER
-	;
-
-f12x_array: op='array-length' r1=REGISTER ',' r2=REGISTER;
-
-f23x_arithmetic: op=
-	( 'add-int'
-    | 'sub-int'
-    | 'mul-int'
-    | 'div-int'
-    | 'rem-int'
-    | 'and-int'
-    | 'or-int'
-    | 'xor-int'
-    | 'shl-int'
-    | 'shr-int'
-    | 'ushr-int'
-    | 'add-long'
-    | 'sub-long'
-    | 'mul-long'
-    | 'div-long'
-    | 'rem-long'
-    | 'and-long'
-    | 'or-long'
-    | 'xor-long'
-    | 'shl-long'
-    | 'shr-long'
-    | 'ushr-long'
-    | 'add-float'
-    | 'sub-float'
-    | 'mul-float'
-    | 'div-float'
-    | 'rem-float'
-    | 'add-double'
-    | 'sub-double'
-    | 'mul-double'
-    | 'div-double'
-    | 'rem-double' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
-	;
-
-f22sb_arithmetic : op=
-    ( 'add-int/lit16'
-    | 'rsub-int'
-    | 'mul-int/lit16'
-    | 'div-int/lit16'
-    | 'rem-int/lit16'
-    | 'and-int/lit16'
-    | 'or-int/lit16'
-    | 'xor-int/lit16'
-    | 'add-int/lit8'
-    | 'rsub-int/lit8'
-    | 'mul-int/lit8'
-    | 'div-int/lit8'
-    | 'rem-int/lit8'
-    | 'and-int/lit8'
-    | 'or-int/lit8'
-    | 'xor-int/lit8'
-    | 'shl-int/lit8'
-    | 'shr-int/lit8'
-    | 'ushr-int/lit8' ) r1=REGISTER ',' r2=REGISTER ',' lit=INT
-	;
-
-f21t_branch : op=
-    ( 'if-eqz'
-    | 'if-nez'
-    | 'if-ltz'
-    | 'if-gez'
-    | 'if-gtz'
-    | 'if-lez' )  r1=REGISTER ',' label=sLabel
-    ;
-
-f22t_branch: op=
-    ( 'if-eq'
-    | 'if-ne'
-    | 'if-lt'
-    | 'if-ge'
-    | 'if-gt'
-    | 'if-le' ) r1=REGISTER ',' r2=REGISTER ',' label=sLabel
-    ;
-
-f23x_compare: op=
-    ( 'cmpl-float'
-    | 'cmpg-float'
-    | 'cmpl-double'
-    | 'cmpg-double'
-    | 'cmp-long' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
-	;
-
-f23x_array: op=
-    ( 'aget'
-	| 'aget-wide'
-	| 'aget-object'
-	| 'aget-boolean'
-	| 'aget-byte'
-	| 'aget-char'
-	| 'aget-short'
-	| 'aput'
-	| 'aput-wide'
-	| 'aput-object'
-	| 'aput-boolean'
-	| 'aput-byte'
-	| 'aput-char'
-	| 'aput-short' ) r1=REGISTER ',' r2=REGISTER ',' r3=REGISTER
-	;
-
-f35c_array: op='filled-new-array' '{' (REGISTER (',' REGISTER)* )? '}' ',' type=ARRAY_TYPE;
-f3rc_array: op='filled-new-array/range' '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' type=( OBJECT_TYPE | ARRAY_TYPE );
-
-f35c_method: op=
-    ( 'invoke-virtual'
-    | 'invoke-super'
-    | 'invoke-direct'
-    | 'invoke-static'
-    | 'invoke-interface' )  '{' (REGISTER (',' REGISTER)* )? '}' ',' method=METHOD_FULL
-	;
-
-f3rc_method: op=
-    ( 'invoke-virtual/range'
-    | 'invoke-super/range'
-    | 'invoke-direct/range'
-    | 'invoke-static/range'
-    | 'invoke-interface/range' )  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL
-	;
-
-f45cc_methodproto: op='invoke-polymorphic'  '{' (REGISTER (',' REGISTER)* )? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
-f4rcc_methodproto: op='invoke-polymorphic/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' method=METHOD_FULL ',' proto=METHOD_PROTO;
-
-f35c_custom: op='invoke-custom'  '{' (REGISTER (',' REGISTER)* )? '}' ',' ID '(' sBaseValue (',' sBaseValue)+ ')' '@' method=METHOD_FULL;
-f3rc_custom: op='invoke-custom/range'  '{' (rstart=REGISTER '..' rend=REGISTER)? '}' ',' ID '(' sBaseValue (',' sBaseValue)+ ')' '@' method=METHOD_FULL;
-
-f31t_payload: op=('fill-array-data' | 'packed-switch' | 'sparse-switch') r1=REGISTER ',' label=sLabel;
-
-f21c_const_handle: op='const-method-handle' r1=REGISTER ',' methodHandleType=METHOD_HANDLE_TYPE '@' fieldOrMethod=(FIELD_FULL|METHOD_FULL) ;
-f21c_const_type: op='const-method-type' r1=REGISTER ',' proto=METHOD_PROTO ;

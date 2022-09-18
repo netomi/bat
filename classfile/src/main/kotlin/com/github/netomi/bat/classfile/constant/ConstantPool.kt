@@ -49,6 +49,24 @@ internal class ConstantPool
         return constantIndex
     }
 
+    internal fun getUtf8ConstantIndex(string: String): Int {
+        for ((index, constant) in constants.withIndex()) {
+            if (constant is Utf8Constant && constant.value == string) {
+                return index
+            }
+        }
+        return -1
+    }
+
+    internal fun getClassConstantIndex(nameIndex: Int): Int {
+        for ((index, constant) in constants.withIndex()) {
+            if (constant is ClassConstant && constant.nameIndex == nameIndex) {
+                return index
+            }
+        }
+        return -1
+    }
+
     @Throws(IOException::class)
     internal fun read(input: ClassDataInput) {
         val entries = input.readUnsignedShort()

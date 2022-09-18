@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.constant.IntegerConstant
 import com.github.netomi.bat.classfile.constant.Utf8Constant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.io.IndentingPrinter
+import com.github.netomi.bat.util.escapeAsJavaString
 
 internal class ConstantPrinter constructor(private val printer: IndentingPrinter): ConstantVisitor {
 
@@ -39,6 +40,6 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
     }
 
     override fun visitUtf8Constant(classFile: ClassFile, index: Int, constant: Utf8Constant) {
-        printer.print("\"${constant.value}\"")
+        printer.print("\"${constant.value.escapeAsJavaString()}\"")
     }
 }

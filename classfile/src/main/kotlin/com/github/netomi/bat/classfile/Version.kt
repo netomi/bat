@@ -35,4 +35,18 @@ enum class Version(val majorVersion: Int, val minorVersion: Int = 0) {
     JAVA_15 (MAJOR_VERSION_15_0),
     JAVA_16 (MAJOR_VERSION_16_0),
     JAVA_17 (MAJOR_VERSION_17_0);
+
+    companion object {
+        fun of(versionString: String): Version {
+            val separatorIndex = versionString.indexOf('.')
+            val (major, minor) = if (separatorIndex != -1) {
+                Pair(versionString.substring(0, separatorIndex).toInt(), versionString.substring(separatorIndex + 1).toInt())
+            } else {
+                Pair(versionString.toInt(), 0)
+            }
+
+            return values().firstOrNull { it.majorVersion == major &&
+                                          it.minorVersion == minor } ?: error("unknown version for string '$versionString'")
+        }
+    }
 }
