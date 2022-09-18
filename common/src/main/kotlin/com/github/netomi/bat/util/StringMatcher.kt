@@ -22,11 +22,13 @@ fun interface StringMatcher {
     fun matches(input: String): Boolean
 
     fun or(other: StringMatcher): StringMatcher {
-        return StringMatcher { input -> this@StringMatcher.matches(input) || other.matches(input) }
+        val thisStringMatcher = this
+        return StringMatcher { input -> thisStringMatcher.matches(input) || other.matches(input) }
     }
 
     fun and(other: StringMatcher): StringMatcher {
-        return StringMatcher { input -> this@StringMatcher.matches(input) && other.matches(input) }
+        val thisStringMatcher = this
+        return StringMatcher { input -> thisStringMatcher.matches(input) && other.matches(input) }
     }
 }
 

@@ -52,13 +52,13 @@ internal object StringEscapers {
     }
 
     init {
-        printableAsciiEscaper = object: ArrayBasedCharEscaper(ArrayBasedEscaperMap.create(ASCII_CTRL_CHARS_ESCAPE), 0x20.toChar(), 0x7e.toChar()) {
+        printableAsciiEscaper = object: ArrayBasedCharEscaper(ASCII_CTRL_CHARS_ESCAPE, 0x20.toChar(), 0x7e.toChar()) {
             override fun escapeUnsafe(c: Char): CharArray {
                 return escapeUnicode(c.code)
             }
         }
 
-        javaEscaper = object: ArrayBasedCharEscaper(ArrayBasedEscaperMap.create(JAVA_CTRL_CHARS_ESCAPE), 0x20.toChar(), 0x7e.toChar()) {
+        javaEscaper = object: ArrayBasedCharEscaper(JAVA_CTRL_CHARS_ESCAPE, 0x20.toChar(), 0x7e.toChar()) {
             override fun escapeUnsafe(c: Char): CharArray {
                 return escapeUnicode(c.code)
             }

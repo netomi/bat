@@ -307,14 +307,14 @@ internal abstract class ArrayBasedCharEscaper protected constructor(escaperMap: 
      * This is overridden to improve performance. Rough benchmarking shows that this almost doubles
      * the speed when processing strings that do not require any escaping.
      */
-    override fun escape(s: String): String {
-        for (i in s.indices) {
-            val c = s[i]
+    override fun escape(string: String): String {
+        for (i in string.indices) {
+            val c = string[i]
             if (c.code < replacementsLength && replacements[c.code] != null || c > safeMax || c < safeMin) {
-                return escapeSlow(s, i)
+                return escapeSlow(string, i)
             }
         }
-        return s
+        return string
     }
 
     /**
