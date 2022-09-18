@@ -15,10 +15,6 @@
  */
 package com.github.netomi.bat.util
 
-import com.google.common.escape.ArrayBasedCharEscaper
-import com.google.common.escape.ArrayBasedEscaperMap
-import com.google.common.escape.Escaper
-
 internal object StringEscapers {
 
     private val ASCII_CTRL_CHARS_ESCAPE =
@@ -42,8 +38,8 @@ internal object StringEscapers {
             Pair('\u000c', "\\u000c"),
         )
 
-    val printableAsciiEscaper: Escaper
-    val javaEscaper: Escaper
+    val printableAsciiEscaper: CharEscaper
+    val javaEscaper: CharEscaper
 
     private fun escapeUnicode(cp: Int): CharArray {
         return buildString {
