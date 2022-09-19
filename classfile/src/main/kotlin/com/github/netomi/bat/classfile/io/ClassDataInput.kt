@@ -25,7 +25,7 @@ import java.io.Closeable
 import java.io.DataInputStream
 import java.io.InputStream
 
-internal class ClassDataInput private constructor(            `is`:           InputStream,
+internal class ClassDataInput private constructor(             `is`:           InputStream,
                                                   internal val classFile:      ClassFile,
                                                    private val skipAttributes: Boolean): Closeable {
 

@@ -130,7 +130,7 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
             printer.print(" $accessFlags")
         }
 
-        printer.println(" " + method.getName(classFile) + method.getDescriptor(classFile))
+        printer.println(" ${method.getName(classFile)}${method.getDescriptor(classFile)}")
 
         printer.levelUp()
         attributePrinter.reset()

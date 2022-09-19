@@ -18,15 +18,7 @@ package com.github.netomi.bat.jasm.assemble
 
 import com.github.netomi.bat.classfile.AccessFlag
 import com.github.netomi.bat.jasm.parser.JasmParser
-
-internal fun parseAccessFlags(sAccListContext: JasmParser.SAccListContext): Int {
-    var accessFlags = 0
-    sAccListContext.ACC().forEach {
-        val flag = AccessFlag.of(it.text)
-        accessFlags = accessFlags or flag.value
-    }
-    return accessFlags
-}
+import com.github.netomi.bat.util.parseDescriptorParameters
 
 internal data class FieldInfo(val classType:String?, val name: String, val type: String)
 
@@ -46,4 +38,36 @@ internal fun parseFieldObject(text: String): FieldInfo {
     val type = text.substring(colonIndex + 1)
 
     return FieldInfo(classType, name, type)
+}
+
+internal data class MethodInfo(val classType: String?, val methodName: String, val parameterTypes: List<String>, val returnType: String)
+
+internal fun parseMethodObject(text: String): MethodInfo {
+    val arrowIndex = text.indexOf("->")
+    val classType = if (arrowIndex != -1) {
+        text.substring(0, arrowIndex)
+    } else {
+        null
+    }
+
+    val startNameIndex = if (arrowIndex != -1) { arrowIndex + 2 } else { 0 }
+
+    val parameterStartIndex = text.indexOf('(')
+    val parameterEndIndex   = text.indexOf(')')
+
+    val name = text.substring(startNameIndex, parameterStartIndex)
+
+    val parameters     = text.substring(parameterStartIndex + 1, parameterEndIndex)
+    val parameterTypes = parseDescriptorParameters(parameters)
+    val returnType     = text.substring(parameterEndIndex + 1)
+    return MethodInfo(classType, name, parameterTypes, returnType)
+}
+
+internal fun parseAccessFlags(sAccListContext: JasmParser.SAccListContext): Int {
+    var accessFlags = 0
+    sAccListContext.ACC().forEach {
+        val flag = AccessFlag.of(it.text)
+        accessFlags = accessFlags or flag.value
+    }
+    return accessFlags
 }

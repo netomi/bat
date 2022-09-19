@@ -34,7 +34,9 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.6">Method_info structure</a>
  */
-class Method private constructor(): Member() {
+class Method private constructor(nameIndex:       Int = -1,
+                                 accessFlags:     Int =  0,
+                                 descriptorIndex: Int = -1): Member(nameIndex, accessFlags, descriptorIndex) {
 
     override val accessFlagTarget: AccessFlagTarget
         get() = AccessFlagTarget.METHOD
@@ -93,6 +95,13 @@ class Method private constructor(): Member() {
     }
 
     companion object {
+        fun of(nameIndex: Int, accessFlags: Int, descriptorIndex: Int): Method {
+            require(nameIndex >= 1)       { "nameIndex must be a positive number" }
+            require(accessFlags >= 0)     { "accessFlags mut not be negative" }
+            require(descriptorIndex >= 1) { "descriptorIndex must be a positive number" }
+            return Method(nameIndex, accessFlags, descriptorIndex)
+        }
+
         @Throws(IOException::class)
         internal fun readMethod(input: ClassDataInput): Method {
             val method = Method()

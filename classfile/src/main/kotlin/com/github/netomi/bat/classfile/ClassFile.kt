@@ -111,6 +111,10 @@ class ClassFile
     val methods: List<Method>
         get() = _methods
 
+    internal fun addMethod(method: Method) {
+        _methods.add(method)
+    }
+
     val attributes: Sequence<Attribute>
         get() = _attributes
 
