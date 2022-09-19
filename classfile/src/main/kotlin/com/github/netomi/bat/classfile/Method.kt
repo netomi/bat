@@ -15,10 +15,8 @@
  */
 package com.github.netomi.bat.classfile
 
-import com.github.netomi.bat.classfile.attribute.AttachedToMethod
+import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
-import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.attribute.ExceptionsAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -48,14 +46,19 @@ class Method private constructor(nameIndex:       Int = -1,
         modifiers = MethodModifier.setOf(accessFlags)
     }
 
+    override fun addAttribute(attribute: Attribute) {
+        require(attribute is AttachedToMethod) { "trying to add an attribute of type '${attribute.type}' to a method"}
+        attributeMap.addAttribute(attribute)
+    }
+
     override val isStatic: Boolean
         get() = modifiers.contains(MethodModifier.STATIC)
 
     val hasCode: Boolean
-        get() = _attributes.get<CodeAttribute>(AttributeType.CODE) != null
+        get() = attributeMap.get<CodeAttribute>(AttributeType.CODE) != null
 
     fun getExceptionClassNames(classFile: ClassFile): List<JvmClassName> {
-        return _attributes.get<ExceptionsAttribute>(AttributeType.EXCEPTIONS)?.getExceptionClassNames(classFile) ?: emptyList()
+        return attributeMap.get<ExceptionsAttribute>(AttributeType.EXCEPTIONS)?.getExceptionClassNames(classFile) ?: emptyList()
     }
 
     fun getArgumentSize(classFile: ClassFile): Int {
@@ -81,7 +84,7 @@ class Method private constructor(nameIndex:       Int = -1,
     }
 
     fun attributesAccept(classFile: ClassFile, visitor: MethodAttributeVisitor) {
-        for (attribute in _attributes.filterIsInstance(AttachedToMethod::class.java)) {
+        for (attribute in attributeMap.filterIsInstance(AttachedToMethod::class.java)) {
             attribute.accept(classFile, this, visitor)
         }
     }

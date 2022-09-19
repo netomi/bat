@@ -26,7 +26,7 @@ import java.io.IOException
 
 abstract class ElementValue: ClassFileContent() {
 
-    internal abstract val type: ElementValueType
+    abstract val type: ElementValueType
 
     @Throws(IOException::class)
     internal abstract fun readElementValue(input: ClassDataInput)
@@ -63,7 +63,7 @@ abstract class ElementValue: ClassFileContent() {
 /**
  * Known element value elements contained in an annotation.
  */
-internal enum class ElementValueType constructor(val tag: Char, private val supplier: () -> ElementValue) {
+enum class ElementValueType constructor(val tag: Char, private val supplier: () -> ElementValue) {
 
     // Valid element values and their corresponding tags:
     // https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.7.16.1-130

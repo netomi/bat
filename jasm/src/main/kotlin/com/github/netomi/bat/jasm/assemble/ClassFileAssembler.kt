@@ -45,6 +45,9 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
         ctx.sField().forEach  { visitSField(it) }
         ctx.sMethod().forEach { visitSMethod(it) }
 
+        val attributeAssembler = AttributeAssembler(classEditor)
+        ctx.sAttribute().forEach { attributeAssembler.parseAndAddAttribute(it) }
+
         return listOf(classFile)
     }
 
@@ -53,6 +56,9 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
         val accessFlags     = parseAccessFlags(ctx.sAccList())
 
         val fieldEditor = classEditor.addField(name, accessFlags, type)
+        val attributeAssembler = AttributeAssembler(fieldEditor)
+
+        ctx.sAttribute().forEach { attributeAssembler.parseAndAddAttribute(it) }
 
         return emptyList()
     }
@@ -62,6 +68,9 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
         val methodEditor = classEditor.addMethod(name, accessFlags, parameterTypes, returnType)
+        val attributeAssembler = AttributeAssembler(methodEditor)
+
+        ctx.sAttribute().forEach { attributeAssembler.parseAndAddAttribute(it) }
 
         return emptyList()
     }

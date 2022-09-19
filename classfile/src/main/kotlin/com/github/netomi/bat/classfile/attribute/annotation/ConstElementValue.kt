@@ -74,6 +74,11 @@ data class ConstElementValue private constructor(override val type: ElementValue
     }
 
     companion object {
+        fun of(type: ElementValueType, constValueIndex: Int): ConstElementValue {
+            require(constValueIndex > 0) { "constValueIndex must be a positive number" }
+            return ConstElementValue(type, constValueIndex)
+        }
+
         internal fun create(type: ElementValueType): ConstElementValue {
             return ConstElementValue(type)
         }

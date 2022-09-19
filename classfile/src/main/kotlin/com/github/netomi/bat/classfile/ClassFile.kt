@@ -47,7 +47,7 @@ class ClassFile
                         internal var _interfaces:  MutableList<Int>    = mutableListOfCapacity(0),
                         internal var _fields:      MutableList<Field>  = mutableListOfCapacity(0),
                         internal var _methods:     MutableList<Method> = mutableListOfCapacity(0),
-                        internal var _attributes:  AttributeMap        = AttributeMap.empty()) {
+                        internal var attributeMap: AttributeMap        = AttributeMap.empty()) {
 
     var majorVersion = version.majorVersion
         internal set
@@ -116,21 +116,26 @@ class ClassFile
     }
 
     val attributes: Sequence<Attribute>
-        get() = _attributes
+        get() = attributeMap
+
+    internal fun addAttribute(attribute: Attribute) {
+        require(attribute is AttachedToClass) { "trying to add an attribute of type '${attribute.type}' to a class"}
+        attributeMap.addAttribute(attribute)
+    }
 
     // convenience methods to access certain attributes
 
     val isDeprecated: Boolean
-        get() = _attributes.get<DeprecatedAttribute>(AttributeType.DEPRECATED) != null
+        get() = attributeMap.get<DeprecatedAttribute>(AttributeType.DEPRECATED) != null
 
     val isSynthetic: Boolean
-        get() = _attributes.get<SyntheticAttribute>(AttributeType.SYNTHETIC) != null
+        get() = attributeMap.get<SyntheticAttribute>(AttributeType.SYNTHETIC) != null
 
     val sourceFile: String?
-        get() = _attributes.get<SourceFileAttribute>(AttributeType.SOURCE_FILE)?.getSourceFile(this)
+        get() = attributeMap.get<SourceFileAttribute>(AttributeType.SOURCE_FILE)?.getSourceFile(this)
 
     val signature: String?
-        get() = _attributes.get<SignatureAttribute>(AttributeType.SIGNATURE)?.getSignature(this)
+        get() = attributeMap.get<SignatureAttribute>(AttributeType.SIGNATURE)?.getSignature(this)
 
     // helper methods to access constant pool entries
 
@@ -224,7 +229,7 @@ class ClassFile
     }
 
     fun attributesAccept(visitor: ClassAttributeVisitor) {
-        for (attribute in _attributes.filterIsInstance(AttachedToClass::class.java)) {
+        for (attribute in attributeMap.filterIsInstance(AttachedToClass::class.java)) {
             attribute.accept(this, visitor)
         }
     }

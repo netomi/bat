@@ -65,7 +65,7 @@ class ClassFileReader(private val `is`:           InputStream,
                 _methods.add(Method.readMethod(input))
             }
 
-            _attributes = input.readAttributes()
+            attributeMap = input.readAttributes()
         }
     }
 }

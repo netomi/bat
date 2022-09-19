@@ -20,23 +20,37 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.io.IndentingPrinter
+import java.util.*
 
 internal class AnnotationPrinter constructor(private val printer:         IndentingPrinter,
                                              private val constantPrinter: ConstantPrinter): AnnotationVisitor {
 
     private val elementValuePrinter = ElementValuePrinter(printer, constantPrinter)
 
+    var visibility: AnnotationVisibility = AnnotationVisibility.RUNTIME
+
     override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {}
 
     override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
-        printer.println(".annotation ${annotation.getType(classFile)}")
-        printer.levelUp()
-        for (component in annotation) {
-            printer.print("${classFile.getString(component.nameIndex)} = ")
-            component.elementValue.accept(classFile, elementValuePrinter)
-            printer.println()
+        printer.println(".annotation $visibility ${annotation.getType(classFile)}")
+        if (annotation.size > 0) {
+            printer.levelUp()
+            for (component in annotation) {
+                printer.print("${classFile.getString(component.nameIndex)} = ")
+                component.elementValue.accept(classFile, elementValuePrinter)
+                printer.println()
+            }
+            printer.levelDown()
+            printer.println(".end annotation")
         }
-        printer.levelDown()
-        printer.println(".end annotation")
+    }
+}
+
+enum class AnnotationVisibility {
+    BUILD,
+    RUNTIME;
+
+    override fun toString(): String {
+        return super.toString().lowercase(Locale.getDefault())
     }
 }

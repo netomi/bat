@@ -67,6 +67,24 @@ internal class ConstantPool
         return -1
     }
 
+    internal fun getIntegerConstantIndex(value: Int): Int {
+        for ((index, constant) in constants.withIndex()) {
+            if (constant is IntegerConstant && constant.value == value) {
+                return index
+            }
+        }
+        return -1
+    }
+
+    internal fun getLongConstantIndex(value: Long): Int {
+        for ((index, constant) in constants.withIndex()) {
+            if (constant is LongConstant && constant.value == value) {
+                return index
+            }
+        }
+        return -1
+    }
+
     @Throws(IOException::class)
     internal fun read(input: ClassDataInput) {
         val entries = input.readUnsignedShort()

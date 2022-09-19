@@ -61,22 +61,16 @@ internal class AttributePrinter constructor(private val printer:         Indenti
 
     override fun visitAnyRuntimeVisibleAnnotations(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         if (attribute.size > 0) {
-            printer.println(".annotations visible")
-            printer.levelUp()
+            annotationPrinter.visibility = AnnotationVisibility.RUNTIME
             attribute.annotationsAccept(classFile, annotationPrinter)
-            printer.levelDown()
-            printer.println(".end annotations")
             printedAttributes = true
         }
     }
 
     override fun visitAnyRuntimeInvisibleAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
         if (attribute.size > 0) {
-            printer.println(".annotations invisible")
-            printer.levelUp()
+            annotationPrinter.visibility = AnnotationVisibility.BUILD
             attribute.annotationsAccept(classFile, annotationPrinter)
-            printer.levelDown()
-            printer.println(".end annotations")
             printedAttributes = true
         }
     }

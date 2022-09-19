@@ -22,6 +22,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
+import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -33,8 +34,8 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.9">Signature Attribute</a>
  */
-data class SignatureAttribute internal constructor(override var attributeNameIndex: Int,
-                                                    private var _signatureIndex:    Int = -1)
+data class SignatureAttribute private constructor(override var attributeNameIndex: Int,
+                                                           var signatureIndex:     Int = -1)
     : Attribute(attributeNameIndex), AttachedToClass, AttachedToField, AttachedToMethod, AttachedToRecordComponent {
 
     override val type: AttributeType
@@ -43,17 +44,18 @@ data class SignatureAttribute internal constructor(override var attributeNameInd
     override val dataSize: Int
         get() = ATTRIBUTE_LENGTH
 
-    val signatureIndex: Int
-        get() = _signatureIndex
-
     fun getSignature(classFile: ClassFile): String {
         return classFile.getString(signatureIndex)
+    }
+
+    fun setSignature(constantPoolEditor: ConstantPoolEditor, signature: String) {
+        signatureIndex = constantPoolEditor.addOrGetUtf8ConstantIndex(signature)
     }
 
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
         assert(length == ATTRIBUTE_LENGTH)
-        _signatureIndex = input.readUnsignedShort()
+        signatureIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
@@ -79,7 +81,7 @@ data class SignatureAttribute internal constructor(override var attributeNameInd
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         super.referencedConstantsAccept(classFile, visitor)
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_signatureIndex))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::signatureIndex))
     }
 
     companion object {

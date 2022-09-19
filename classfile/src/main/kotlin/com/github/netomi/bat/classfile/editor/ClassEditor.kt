@@ -19,11 +19,20 @@ package com.github.netomi.bat.classfile.editor
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.AttributeMap
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 
-class ClassEditor private constructor(private val classFile: ClassFile) {
+class ClassEditor private constructor(private val classFile: ClassFile): AttributeEditor() {
 
-    private val constantPoolEditor = ConstantPoolEditor.of(classFile)
+    override val constantPoolEditor = ConstantPoolEditor.of(classFile)
+
+    override val attributeMap: AttributeMap
+        get() = classFile.attributeMap
+
+    override fun addAttribute(attribute: Attribute) {
+        classFile.addAttribute(attribute)
+    }
 
     fun addField(name: String, accessFlags: Int, descriptor: String): FieldEditor {
         val nameIndex       = constantPoolEditor.addOrGetUtf8ConstantIndex(name)
@@ -32,7 +41,7 @@ class ClassEditor private constructor(private val classFile: ClassFile) {
         val field = Field.of(nameIndex, accessFlags, descriptorIndex)
         classFile.addField(field)
 
-        return FieldEditor.of(this, field)
+        return FieldEditor.of(constantPoolEditor, field)
     }
 
     fun addMethod(name: String, accessFlags: Int, parameterTypes: List<String>, returnType: String): MethodEditor {
@@ -50,7 +59,7 @@ class ClassEditor private constructor(private val classFile: ClassFile) {
         val method = Method.of(nameIndex, accessFlags, descriptorIndex)
         classFile.addMethod(method)
 
-        return MethodEditor.of(this, method)
+        return MethodEditor.of(constantPoolEditor, method)
     }
 
     companion object {

@@ -29,7 +29,7 @@ import java.util.*
 abstract class Member protected constructor(nameIndex:                 Int          = -1,
                                             accessFlags:               Int          =  0,
                                             descriptorIndex:           Int          = -1,
-                                            protected var _attributes: AttributeMap = AttributeMap.empty()) {
+                                            internal var attributeMap: AttributeMap = AttributeMap.empty()) {
 
     var accessFlags: Int = accessFlags
         private set(value) {
@@ -51,10 +51,7 @@ abstract class Member protected constructor(nameIndex:                 Int      
         private set
 
     val attributes: Sequence<Attribute>
-        get() = _attributes
-
-    internal val attributeMap: AttributeMap
-        get() = _attributes
+        get() = attributeMap
 
     protected abstract fun updateModifiers(accessFlags: Int)
     protected abstract val accessFlagTarget: AccessFlagTarget
@@ -62,10 +59,10 @@ abstract class Member protected constructor(nameIndex:                 Int      
     abstract val isStatic: Boolean
 
     val isDeprecated: Boolean
-        get() = _attributes.get<DeprecatedAttribute>(AttributeType.DEPRECATED) != null
+        get() = attributeMap.get<DeprecatedAttribute>(AttributeType.DEPRECATED) != null
 
     val isSynthetic: Boolean
-        get() = _attributes.get<SyntheticAttribute>(AttributeType.SYNTHETIC) != null
+        get() = attributeMap.get<SyntheticAttribute>(AttributeType.SYNTHETIC) != null
 
     fun getName(classFile: ClassFile): String {
         return classFile.getString(nameIndex)
@@ -76,25 +73,31 @@ abstract class Member protected constructor(nameIndex:                 Int      
     }
 
     fun getSignature(classFile: ClassFile): String? {
-        return _attributes.get<SignatureAttribute>(AttributeType.SIGNATURE)?.getSignature(classFile)
+        return attributeMap.get<SignatureAttribute>(AttributeType.SIGNATURE)?.getSignature(classFile)
     }
+
+    internal inline fun <reified T: Attribute> getAttribute(type: AttributeType): T? {
+        return attributeMap[type]
+    }
+
+    internal abstract fun addAttribute(attribute: Attribute)
 
     abstract fun accept(classFile: ClassFile, index: Int, visitor: MemberVisitor)
     abstract fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor)
 
     @Throws(IOException::class)
     internal fun read(input: ClassDataInput) {
-        accessFlags = input.readUnsignedShort()
-        nameIndex = input.readUnsignedShort()
+        accessFlags     = input.readUnsignedShort()
+        nameIndex       = input.readUnsignedShort()
         descriptorIndex = input.readUnsignedShort()
-        _attributes = input.readAttributes()
+        attributeMap    = input.readAttributes()
     }
 
     internal fun write(output: ClassDataOutput) {
         output.writeShort(accessFlags)
         output.writeShort(nameIndex)
         output.writeShort(descriptorIndex)
-        _attributes.write(output)
+        attributeMap.write(output)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -104,18 +107,18 @@ abstract class Member protected constructor(nameIndex:                 Int      
         return accessFlags     == other.accessFlags &&
                nameIndex       == other.nameIndex &&
                descriptorIndex == other.descriptorIndex &&
-               _attributes     == other._attributes
+                attributeMap   == other.attributeMap
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(accessFlags, nameIndex, descriptorIndex, _attributes)
+        return Objects.hash(accessFlags, nameIndex, descriptorIndex, attributeMap)
     }
 
     fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::nameIndex))
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::descriptorIndex))
 
-        for (attribute in _attributes) {
+        for (attribute in attributeMap) {
             attribute.referencedConstantsAccept(classFile, visitor)
         }
     }

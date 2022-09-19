@@ -155,6 +155,11 @@ ACC
     | 'mandated'
     ;
 
+ANN_VISIBLE
+    : 'build'
+    | 'runtime'
+    ;
+
 REGISTER: ('v'|'V'|'p'|'P') '0'..'9'+;
 
 DENUM         : '.enum';
@@ -176,7 +181,7 @@ sAccList: ACC*;
 sAttribute
     : sSource
     | sSignature
-    | sAnnotations
+    | sAnnotation
     ;
 
 sBytecode  : '.bytecode' version=STRING;
@@ -195,14 +200,11 @@ sField
 
 sSignature: '.signature' sig=STRING;
 
-sAnnotations
-    : '.annotations' runtime=('visible' | 'invisible') ( sAnnotation )* '.end annotations';
-
 sAnnotation
-	: '.annotation' type=OBJECT_TYPE
-	  (sAnnotationKeyName '=' sAnnotationValue)*
-	  '.end annotation'
+	: '.annotation' visibility=ANN_VISIBLE type=OBJECT_TYPE
+	  ((sAnnotationKeyName '=' sAnnotationValue)* '.end annotation')?
 	;
+
 sSubannotation
 	: '.subannotation' type=OBJECT_TYPE (sAnnotationKeyName '=' sAnnotationValue )* '.end subannotation' ;
 

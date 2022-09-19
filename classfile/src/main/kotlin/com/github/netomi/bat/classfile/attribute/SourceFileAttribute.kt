@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -29,7 +30,7 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.10">SourceFile Attribute</a>
  */
 data class SourceFileAttribute internal constructor(override var attributeNameIndex: Int,
-                                                     private var _sourceFileIndex:   Int = -1) : Attribute(attributeNameIndex), AttachedToClass {
+                                                             var sourceFileIndex:    Int = -1) : Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
         get() = AttributeType.SOURCE_FILE
@@ -37,17 +38,18 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
     override val dataSize: Int
         get() = ATTRIBUTE_LENGTH
 
-    val sourceFileIndex: Int
-        get() = _sourceFileIndex
-
     fun getSourceFile(classFile: ClassFile): String {
         return classFile.getString(sourceFileIndex)
+    }
+
+    fun setSourceFile(constantPoolEditor: ConstantPoolEditor, sourceFile: String) {
+        sourceFileIndex = constantPoolEditor.addOrGetUtf8ConstantIndex(sourceFile)
     }
 
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
         assert(length == ATTRIBUTE_LENGTH)
-        _sourceFileIndex = input.readUnsignedShort()
+        sourceFileIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
@@ -61,7 +63,7 @@ data class SourceFileAttribute internal constructor(override var attributeNameIn
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         super.referencedConstantsAccept(classFile, visitor)
-        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_sourceFileIndex))
+        visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::sourceFileIndex))
     }
 
     companion object {

@@ -16,6 +16,7 @@
 package com.github.netomi.bat.classfile
 
 import com.github.netomi.bat.classfile.attribute.AttachedToField
+import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.ConstantValueAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
@@ -46,6 +47,11 @@ class Field private constructor(nameIndex:       Int = -1,
         modifiers = FieldModifier.setOf(accessFlags)
     }
 
+    override fun addAttribute(attribute: Attribute) {
+        require(attribute is AttachedToField) { "trying to add an attribute of type '${attribute.type}' to a field"}
+        attributeMap.addAttribute(attribute)
+    }
+
     override val isStatic: Boolean
         get() = modifiers.contains(FieldModifier.STATIC)
 
@@ -58,7 +64,7 @@ class Field private constructor(nameIndex:       Int = -1,
     }
 
     fun attributesAccept(classFile: ClassFile, visitor: FieldAttributeVisitor) {
-        for (attribute in _attributes.filterIsInstance(AttachedToField::class.java)) {
+        for (attribute in attributeMap.filterIsInstance(AttachedToField::class.java)) {
             attribute.accept(classFile, this, visitor)
         }
     }
@@ -68,7 +74,7 @@ class Field private constructor(nameIndex:       Int = -1,
     }
 
     fun constantValueAccept(classFile: ClassFile, visitor: ConstantVisitor) {
-        _attributes.get<ConstantValueAttribute>(AttributeType.CONSTANT_VALUE)?.constantValueAccept(classFile, visitor)
+        attributeMap.get<ConstantValueAttribute>(AttributeType.CONSTANT_VALUE)?.constantValueAccept(classFile, visitor)
     }
 
     override fun toString(): String {

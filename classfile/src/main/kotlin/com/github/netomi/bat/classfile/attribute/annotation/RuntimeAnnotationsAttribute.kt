@@ -46,6 +46,10 @@ abstract class RuntimeAnnotationsAttribute
         return annotations.iterator()
     }
 
+    fun addAnnotation(annotation: Annotation) {
+        annotations.add(annotation)
+    }
+
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
         annotations = input.readContentList(Annotation.Companion::readAnnotation)

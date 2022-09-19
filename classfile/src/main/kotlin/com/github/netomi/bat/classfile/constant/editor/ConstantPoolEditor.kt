@@ -17,9 +17,8 @@
 package com.github.netomi.bat.classfile.constant.editor
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.constant.ClassConstant
+import com.github.netomi.bat.classfile.constant.*
 import com.github.netomi.bat.classfile.constant.ConstantPool
-import com.github.netomi.bat.classfile.constant.Utf8Constant
 
 class ConstantPoolEditor private constructor(private val constantPool: ConstantPool) {
 
@@ -27,6 +26,24 @@ class ConstantPoolEditor private constructor(private val constantPool: ConstantP
         val index = constantPool.getUtf8ConstantIndex(string)
         return if (index == -1) {
             constantPool.addConstant(Utf8Constant.of(string))
+        } else {
+            index
+        }
+    }
+
+    fun addOrGetIntegerConstantIndex(value: Int): Int {
+        val index = constantPool.getIntegerConstantIndex(value)
+        return if (index == -1) {
+            constantPool.addConstant(IntegerConstant.of(value))
+        } else {
+            index
+        }
+    }
+
+    fun addOrGetLongConstantIndex(value: Long): Int {
+        val index = constantPool.getLongConstantIndex(value)
+        return if (index == -1) {
+            constantPool.addConstant(LongConstant.of(value))
         } else {
             index
         }

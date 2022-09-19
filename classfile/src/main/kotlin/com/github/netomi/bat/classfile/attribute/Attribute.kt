@@ -26,6 +26,7 @@ import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleTargetAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.*
+import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -114,7 +115,7 @@ interface AttachedToRecordComponent {
 /**
  * Known constant types as contained in a java class file.
  */
-internal enum class AttributeType constructor(val attributeName: String, private val supplier: ((Int) -> Attribute)?) {
+enum class AttributeType constructor(val attributeName: String, private val supplier: (Int) -> Attribute) {
 
     // Predefined attributes:
     // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7-300
@@ -163,7 +164,13 @@ internal enum class AttributeType constructor(val attributeName: String, private
         }
     }
 
-    fun createAttribute(attributeNameIndex: Int): Attribute {
-        return supplier?.invoke(attributeNameIndex) ?: UNKNOWN.supplier!!.invoke(attributeNameIndex)
+    internal fun <T : Attribute> createAttribute(constantPoolEditor: ConstantPoolEditor): T {
+        val attributeNameIndex = constantPoolEditor.addOrGetUtf8ConstantIndex(attributeName)
+        @Suppress("UNCHECKED_CAST")
+        return supplier.invoke(attributeNameIndex) as T
+    }
+
+    internal fun createAttribute(attributeNameIndex: Int): Attribute {
+        return supplier.invoke(attributeNameIndex)
     }
 }

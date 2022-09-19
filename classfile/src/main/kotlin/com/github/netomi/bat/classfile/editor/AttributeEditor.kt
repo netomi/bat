@@ -16,23 +16,24 @@
 
 package com.github.netomi.bat.classfile.editor
 
-import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeMap
+import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 
-class FieldEditor private constructor(override val constantPoolEditor: ConstantPoolEditor, val field: Field): AttributeEditor() {
+abstract class AttributeEditor {
 
-    override val attributeMap: AttributeMap
-        get() = this.field.attributeMap
+    abstract val constantPoolEditor:     ConstantPoolEditor
+    protected abstract val attributeMap: AttributeMap
 
-    override fun addAttribute(attribute: Attribute) {
-        field.addAttribute(attribute)
-    }
+    abstract fun addAttribute(attribute: Attribute)
 
-    companion object {
-        fun of(constantPoolEditor: ConstantPoolEditor, field: Field): FieldEditor {
-            return FieldEditor(constantPoolEditor, field)
+    fun <T : Attribute> addOrGetAttribute(type: AttributeType): T {
+        var attribute: T? = attributeMap[type]
+        if (attribute == null) {
+            attribute = type.createAttribute(constantPoolEditor)
+            addAttribute(attribute)
         }
+        return attribute
     }
 }

@@ -77,6 +77,10 @@ data class ArrayElementValue
     }
 
     companion object {
+        fun of(values: List<ElementValue>): ArrayElementValue {
+            return ArrayElementValue(values.toMutableList())
+        }
+
         internal fun empty(): ArrayElementValue {
             return ArrayElementValue()
         }

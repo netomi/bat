@@ -44,8 +44,9 @@ data class AttributeMap constructor(private var _attributes: MutableList<Attribu
         return _attributes[index]
     }
 
-    internal inline operator fun <reified T: Attribute> get(type: AttributeType): T? {
+    internal operator fun <T : Attribute> get(type: AttributeType): T? {
         require(type != AttributeType.UNKNOWN) { "attributeType 'UNKNOWN' not supported for retrieval" }
+        @Suppress("UNCHECKED_CAST")
         return typeToAttributeMap[type] as T?
     }
 
@@ -58,7 +59,7 @@ data class AttributeMap constructor(private var _attributes: MutableList<Attribu
         typeToAttributeMap.remove(attribute.type)
     }
 
-    private fun addAttribute(attribute: Attribute) {
+    internal fun addAttribute(attribute: Attribute) {
         _attributes.add(attribute)
         addAttributeToTypeMap(attribute)
     }

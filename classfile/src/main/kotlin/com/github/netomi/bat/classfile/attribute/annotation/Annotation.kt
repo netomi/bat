@@ -101,6 +101,16 @@ open class Annotation
             return Annotation()
         }
 
+        fun of(typeIndex: Int): Annotation {
+            require(typeIndex >= 1) { "typeIndex must be a positive number" }
+            return Annotation(typeIndex)
+        }
+
+        fun of(typeIndex: Int, annotationComponents: List<AnnotationComponent>): Annotation {
+            require(typeIndex >= 1) { "typeIndex must be a positive number" }
+            return Annotation(typeIndex, annotationComponents.toMutableList())
+        }
+
         internal fun readAnnotation(input: ClassDataInput): Annotation {
             val annotation = Annotation()
             annotation.read(input)
@@ -141,6 +151,11 @@ data class AnnotationComponent private constructor(private var _nameIndex:    In
     }
 
     companion object {
+        fun of(nameIndex: Int, elementValue: ElementValue): AnnotationComponent {
+            require(nameIndex >= 1) { "nameIndex must be a positive number" }
+            return AnnotationComponent(nameIndex, elementValue)
+        }
+
         internal fun read(input: ClassDataInput): AnnotationComponent {
             val entry = AnnotationComponent()
             entry.read(input)
