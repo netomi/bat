@@ -104,10 +104,10 @@ abstract class Member protected constructor(nameIndex:                 Int      
         if (this === other) return true
         if (other !is Member) return false
 
-        return accessFlags     == other.accessFlags &&
-               nameIndex       == other.nameIndex &&
+        return accessFlags     == other.accessFlags     &&
+               nameIndex       == other.nameIndex       &&
                descriptorIndex == other.descriptorIndex &&
-                attributeMap   == other.attributeMap
+               attributeMap    == other.attributeMap
     }
 
     override fun hashCode(): Int {
