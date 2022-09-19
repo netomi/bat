@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
 import com.github.netomi.bat.classfile.editor.AttributeEditor
+import com.github.netomi.bat.jasm.disassemble.AnnotationVisibility
 import com.github.netomi.bat.jasm.parser.JasmParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -55,10 +56,9 @@ internal class AttributeAssembler constructor(private val attributeEditor: Attri
 
     private fun parseAndAddAnnotationAttribute(ctx: SAnnotationContext) {
         val attributeType =
-            when (val visibility = ctx.visibility.text) {
-                "build"   -> AttributeType.RUNTIME_INVISIBLE_ANNOTATIONS
-                "runtime" -> AttributeType.RUNTIME_VISIBLE_ANNOTATIONS
-                else      -> parserError(ctx, "unexpected visibility '$visibility'")
+            when (AnnotationVisibility.of(ctx.visibility.text)) {
+                AnnotationVisibility.BUILD   -> AttributeType.RUNTIME_INVISIBLE_ANNOTATIONS
+                AnnotationVisibility.RUNTIME -> AttributeType.RUNTIME_VISIBLE_ANNOTATIONS
             }
 
         val attribute: RuntimeAnnotationsAttribute = attributeEditor.addOrGetAttribute(attributeType)

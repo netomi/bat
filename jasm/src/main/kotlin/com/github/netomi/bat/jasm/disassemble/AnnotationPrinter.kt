@@ -32,7 +32,7 @@ internal class AnnotationPrinter constructor(private val printer:         Indent
     override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {}
 
     override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
-        printer.println(".annotation $visibility ${annotation.getType(classFile)}")
+        printer.println(".annotation ${visibility.toExternalString()} ${annotation.getType(classFile)}")
         if (annotation.size > 0) {
             printer.levelUp()
             for (component in annotation) {
@@ -50,7 +50,19 @@ enum class AnnotationVisibility {
     BUILD,
     RUNTIME;
 
-    override fun toString(): String {
-        return super.toString().lowercase(Locale.getDefault())
+    fun toExternalString(): String {
+        return name.lowercase(Locale.getDefault())
+    }
+
+    companion object {
+        fun of(text: String): AnnotationVisibility {
+            for (visibility in values()) {
+                if (visibility.name.equals(text, ignoreCase = true)) {
+                    return visibility
+                }
+            }
+
+            error("unexpected visibility '$text'")
+        }
     }
 }
