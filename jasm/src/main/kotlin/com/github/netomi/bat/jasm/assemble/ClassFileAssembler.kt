@@ -18,6 +18,8 @@ package com.github.netomi.bat.jasm.assemble
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Version
+import com.github.netomi.bat.classfile.attribute.AttributeType
+import com.github.netomi.bat.classfile.attribute.ConstantValueAttribute
 import com.github.netomi.bat.classfile.editor.ClassEditor
 import com.github.netomi.bat.jasm.parser.JasmBaseVisitor
 import com.github.netomi.bat.jasm.parser.JasmParser.*
@@ -57,6 +59,15 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
 
         val fieldEditor = classEditor.addField(name, accessFlags, type)
         val attributeAssembler = AttributeAssembler(fieldEditor)
+
+        val field = fieldEditor.field
+        if (field.isStatic && ctx.sBaseValue() != null) {
+            val constantAssembler  = ConstantAssembler(classEditor.constantPoolEditor)
+            val constantValueIndex = constantAssembler.parseBaseValue(ctx.sBaseValue())
+
+            val constantValueAttribute = fieldEditor.addOrGetAttribute<ConstantValueAttribute>(AttributeType.CONSTANT_VALUE)
+            constantValueAttribute.constantValueIndex = constantValueIndex
+        }
 
         ctx.sAttribute().forEach { attributeAssembler.parseAndAddAttribute(it) }
 

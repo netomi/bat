@@ -32,8 +32,8 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2">ConstantValue Attribute</a>
  */
 data class ConstantValueAttribute
-    private constructor(override var attributeNameIndex:  Int,
-                         private var _constantValueIndex: Int = -1)
+    private constructor(override var attributeNameIndex: Int,
+                                 var constantValueIndex: Int = -1)
     : Attribute(attributeNameIndex), AttachedToField {
 
     override val type: AttributeType
@@ -42,13 +42,10 @@ data class ConstantValueAttribute
     override val dataSize: Int
         get() = ATTRIBUTE_LENGTH
 
-    val constantValueIndex: Int
-        get() = _constantValueIndex
-
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
         assert(length == ATTRIBUTE_LENGTH)
-        _constantValueIndex = input.readUnsignedShort()
+        constantValueIndex = input.readUnsignedShort()
     }
 
     @Throws(IOException::class)
@@ -67,7 +64,7 @@ data class ConstantValueAttribute
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         super.referencedConstantsAccept(classFile, visitor)
         constantValueAccept(classFile,
-                            ReferencedConstantAdapter(this, PropertyAccessor(::_constantValueIndex), visitor))
+                            ReferencedConstantAdapter(this, PropertyAccessor(::constantValueIndex), visitor))
     }
 
     companion object {

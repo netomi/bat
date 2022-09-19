@@ -49,6 +49,24 @@ class ConstantPoolEditor private constructor(private val constantPool: ConstantP
         }
     }
 
+    fun addOrGetFloatConstantIndex(value: Float): Int {
+        val index = constantPool.getFloatConstantIndex(value)
+        return if (index == -1) {
+            constantPool.addConstant(FloatConstant.of(value))
+        } else {
+            index
+        }
+    }
+
+    fun addOrGetDoubleConstantIndex(value: Double): Int {
+        val index = constantPool.getDoubleConstantIndex(value)
+        return if (index == -1) {
+            constantPool.addConstant(DoubleConstant.of(value))
+        } else {
+            index
+        }
+    }
+
     fun addOrGetClassConstantIndex(className: String): Int {
         val nameIndex = addOrGetUtf8ConstantIndex(className)
         val index = constantPool.getClassConstantIndex(nameIndex)

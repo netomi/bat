@@ -28,7 +28,8 @@ import org.antlr.v4.runtime.ParserRuleContext
 internal class AttributeAssembler constructor(private val attributeEditor: AttributeEditor) {
 
     private val constantPoolEditor    = attributeEditor.constantPoolEditor
-    private val elementValueAssembler = ElementValueAssembler(constantPoolEditor)
+    private val constantAssembler     = ConstantAssembler(constantPoolEditor)
+    private val elementValueAssembler = ElementValueAssembler(constantPoolEditor, constantAssembler)
     private val annotationAssembler   = AnnotationAssembler(constantPoolEditor, elementValueAssembler)
 
     fun parseAndAddAttribute(ctx: SAttributeContext) {

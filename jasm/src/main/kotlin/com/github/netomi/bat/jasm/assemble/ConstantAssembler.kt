@@ -16,20 +16,15 @@
 
 package com.github.netomi.bat.jasm.assemble
 
-import com.github.netomi.bat.classfile.attribute.annotation.ConstElementValue
-import com.github.netomi.bat.classfile.attribute.annotation.ElementValue
-import com.github.netomi.bat.classfile.attribute.annotation.ElementValueType
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.jasm.parser.JasmLexer
-import com.github.netomi.bat.jasm.parser.JasmParser.*
+import com.github.netomi.bat.jasm.parser.JasmParser
+import com.github.netomi.bat.jasm.parser.JasmParser.SBaseValueContext
 import org.antlr.v4.runtime.tree.TerminalNode
 
-internal class ElementValueAssembler
-    constructor(private val constantPoolEditor: ConstantPoolEditor,
-                private val constantAssembler:  ConstantAssembler) {
+internal class ConstantAssembler constructor(private val constantPoolEditor: ConstantPoolEditor) {
 
-    fun parseBaseValue(ctx: SBaseValueContext): ElementValue {
-
+    fun parseBaseValue(ctx: SBaseValueContext): Int {
         // a base value is usually only a single token, only exception: enum fields
         val (value, isEnum) = if (ctx.childCount == 1) {
             val tn = ctx.getChild(0) as TerminalNode
@@ -43,24 +38,22 @@ internal class ElementValueAssembler
             Pair(tn.symbol, true)
         }
 
-        val constantValueIndex = constantAssembler.parseBaseValue(ctx)
-
         return when (value.type) {
-            STRING ->        ConstElementValue.of(ElementValueType.STRING,  constantValueIndex)
-            BOOLEAN ->       ConstElementValue.of(ElementValueType.BOOLEAN, constantValueIndex)
-            BYTE ->          ConstElementValue.of(ElementValueType.BYTE,    constantValueIndex)
-            SHORT ->         ConstElementValue.of(ElementValueType.SHORT,   constantValueIndex)
-            CHAR ->          ConstElementValue.of(ElementValueType.CHAR,    constantValueIndex)
-            INT ->           ConstElementValue.of(ElementValueType.INT,     constantValueIndex)
-            LONG ->          ConstElementValue.of(ElementValueType.LONG,    constantValueIndex)
+            JasmParser.STRING  -> constantPoolEditor.addOrGetUtf8ConstantIndex(parseString(value.text))
+            JasmParser.BOOLEAN -> constantPoolEditor.addOrGetIntegerConstantIndex(("true" == value.text).toInt())
+            JasmParser.BYTE    -> constantPoolEditor.addOrGetIntegerConstantIndex(parseByte(value.text).toInt())
+            JasmParser.SHORT   -> constantPoolEditor.addOrGetIntegerConstantIndex(parseShort(value.text).toInt())
+            JasmParser.CHAR    -> constantPoolEditor.addOrGetIntegerConstantIndex(parseChar(value.text).code)
+            JasmParser.INT     -> constantPoolEditor.addOrGetIntegerConstantIndex(parseInt(value.text))
+            JasmParser.LONG    -> constantPoolEditor.addOrGetLongConstantIndex(parseLong(value.text))
 
-            BASE_FLOAT,
-            FLOAT_INFINITY,
-            FLOAT_NAN ->     ConstElementValue.of(ElementValueType.FLOAT,   constantValueIndex)
+            JasmParser.BASE_FLOAT,
+            JasmParser.FLOAT_INFINITY,
+            JasmParser.FLOAT_NAN -> constantPoolEditor.addOrGetFloatConstantIndex(parseFloat(value.text))
 
-            BASE_DOUBLE,
-            DOUBLE_INFINITY,
-            DOUBLE_NAN ->    ConstElementValue.of(ElementValueType.DOUBLE,  constantValueIndex)
+            JasmParser.BASE_DOUBLE,
+            JasmParser.DOUBLE_INFINITY,
+            JasmParser.DOUBLE_NAN -> constantPoolEditor.addOrGetDoubleConstantIndex(parseDouble(value.text))
 
 //            JasmLexer.METHOD_FULL -> {
 //                val (classType, methodName, parameterTypes, returnType) = parseMethodObject(value.text)
@@ -81,7 +74,8 @@ internal class ElementValueAssembler
 //            JasmLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexEditor.addOrGetTypeIDIndex(value.text))
 //            JasmLexer.NULL ->          EncodedNullValue
             else -> null
-        } ?: parserError(ctx, "failure to parse base value")
+        } ?: error("failure to parse base value")
     }
 }
 
+private fun Boolean.toInt() = if (this) 1 else 0

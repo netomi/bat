@@ -25,7 +25,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.lang.Runnable
 import java.nio.file.Files
-import kotlin.io.path.exists
 import kotlin.io.path.notExists
 
 /**
@@ -38,7 +37,7 @@ import kotlin.io.path.notExists
     optionListHeading    = "%nOptions:%n")
 class DeJasmCommand : Runnable {
 
-    @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.class)"])
+    @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.[class|jar])"])
     private lateinit var inputFile: File
 
     @CommandLine.Option(names = ["-o"], arity = "1", description = ["output directory"])
