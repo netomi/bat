@@ -19,6 +19,9 @@ package com.github.netomi.bat.smali
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
 import com.github.netomi.bat.dexfile.io.DexFileWriter
+import com.github.netomi.bat.io.PathInputSource
+import com.github.netomi.bat.io.filterDataEntriesBy
+import com.github.netomi.bat.util.fileNameMatcher
 import org.junit.jupiter.api.Assumptions
 import java.io.File
 import java.io.IOException
@@ -37,10 +40,16 @@ class IntegrationTest {
         Assumptions.assumeTrue(androidRuntimesVariable != null)
 
         val resource = javaClass.getResource("/junit-tests/TestSuite.smali")
-        val resourcePath = File(resource.file).parentFile.toPath()
+        val resourcePath = File(resource!!.file).parentFile.toPath()
 
-        val dexFile  = DexFile.of(DexFormat.FORMAT_035)
-        Assembler(dexFile).assemble(resourcePath)
+        val dexFile   = DexFile.of(DexFormat.FORMAT_035)
+        val assembler = Assembler(dexFile)
+
+        val inputSource = PathInputSource.of(resourcePath)
+        inputSource.pumpDataEntries(
+            filterDataEntriesBy(fileNameMatcher("**.smali"),
+            { entry -> entry.getInputStream().use { assembler.assemble(it, entry.name) } }
+        ))
 
         val outputPath = Path.of(resourcePath.absolutePathString(), "tests.dex")
         outputPath.outputStream().use {
