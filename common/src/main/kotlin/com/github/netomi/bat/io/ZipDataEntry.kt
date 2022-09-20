@@ -32,17 +32,15 @@ class ZipDataEntry private constructor( private val zipInputStream: ZipInputStre
         get() = "${parent.fullName}!$name"
 
     override fun getInputStream(): InputStream {
-        return WrappedZipInputStream(zipInputStream)
+        return object: FilterInputStream(zipInputStream) {
+            override fun close() {
+                zipInputStream.closeEntry()
+            }
+        }
     }
 
     override fun toString(): String {
         return "ZipDataEntry[name=$fullName]"
-    }
-
-    private class WrappedZipInputStream constructor(private val inputStream: ZipInputStream): FilterInputStream(inputStream) {
-        override fun close() {
-            inputStream.closeEntry()
-        }
     }
 
     companion object {
