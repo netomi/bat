@@ -40,6 +40,14 @@ abstract class RuntimeParameterAnnotationsAttribute
     val size: Int
         get() = parameterAnnotations.size
 
+    fun getParameterAnnotationCount(parameterIndex: Int): Int {
+        return if (parameterIndex in 0 until parameterAnnotations.size) {
+            parameterAnnotations[parameterIndex].size
+        } else {
+            0
+        }
+    }
+
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
         val numParameters = input.readUnsignedByte()

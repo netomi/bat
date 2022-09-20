@@ -24,12 +24,15 @@ import com.github.netomi.bat.io.IndentingPrinter
 internal class ElementValuePrinter constructor(private val printer:         IndentingPrinter,
                                                private val constantPrinter: ConstantPrinter): ElementValueVisitor {
 
-    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
+    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {
+        TODO("implement")
+    }
 
     override fun visitClassElementValue(classFile: ClassFile, elementValue: ClassElementValue) {
     }
 
     override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
+        printer.print(".enum ${elementValue.getType(classFile)}->${elementValue.getConstName(classFile)}")
     }
 
     override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
@@ -39,6 +42,26 @@ internal class ElementValuePrinter constructor(private val printer:         Inde
     }
 
     override fun visitAnnotationElementValue(classFile: ClassFile, elementValue: AnnotationElementValue) {
+        val resetIndentation = if (printer.currentPosition > 0) {
+            printer.resetIndentation(printer.currentPosition)
+            true
+        } else {
+            false
+        }
+
+        printer.println(".subannotation ${elementValue.annotation.getType(classFile)}")
+        printer.levelUp()
+        for (component in elementValue.annotation) {
+            printer.print("${classFile.getString(component.nameIndex)} = ")
+            component.elementValue.accept(classFile, this)
+            printer.println()
+        }
+        printer.levelDown()
+        printer.print(".end subannotation")
+
+        if (resetIndentation) {
+            printer.levelDown()
+        }
     }
 
     override fun visitAnyConstElementValue(classFile: ClassFile, elementValue: ConstElementValue) {

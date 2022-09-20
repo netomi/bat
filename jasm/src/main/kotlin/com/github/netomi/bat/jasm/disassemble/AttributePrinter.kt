@@ -16,14 +16,13 @@
 
 package com.github.netomi.bat.jasm.disassemble
 
-import com.github.netomi.bat.classfile.AccessFlag
-import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.*
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeInvisibleAnnotationsAttribute
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeVisibleAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
+import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import java.util.*
 
 internal class AttributePrinter constructor(private val printer:         IndentingPrinter,
@@ -41,7 +40,7 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     // Common Attributes.
 
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
-        //TODO("implement")
+        TODO("implement ${attribute.type}")
     }
 
     override fun visitAnyDeprecated(classFile: ClassFile, attribute: DeprecatedAttribute) {
@@ -80,6 +79,42 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     override fun visitSourceFile(classFile: ClassFile, attribute: SourceFileAttribute) {
         val sourceFile = attribute.getSourceFile(classFile)
         printer.println(".source \"$sourceFile\"")
+        printedAttributes = true
+    }
+
+    override fun visitInnerClasses(classFile: ClassFile, attribute: InnerClassesAttribute) {
+        for (entry in attribute) {
+            printer.print(".innerclass")
+
+            val accessFlags =
+                formatAccessFlagsAsHumanReadable(entry.innerClassAccessFlags, AccessFlagTarget.INNER_CLASS).lowercase(Locale.getDefault())
+
+            if (accessFlags.isNotEmpty()) {
+                printer.print(" $accessFlags")
+            }
+
+            val innerClassName = entry.getInnerClass(classFile)
+            printer.print(" $innerClassName")
+
+            val name = entry.getInnerName(classFile)
+            if (name != null) {
+                printer.print(" as $name")
+            }
+
+            val outerClassName = entry.getOuterClass(classFile)
+            if (outerClassName != null) {
+                printer.print(" in $outerClassName")
+            }
+
+            printer.println()
+        }
+
+        printedAttributes = attribute.size > 0
+    }
+
+    override fun visitEnclosingMethod(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
+        val methodData = "${attribute.getClassName(classFile)}->${attribute.getMethodName(classFile)}${attribute.getMethodDescriptor(classFile)}"
+        printer.println(".enclosingmethod $methodData")
         printedAttributes = true
     }
 
@@ -131,9 +166,66 @@ internal class AttributePrinter constructor(private val printer:         Indenti
 
         printer.levelDown()
         printer.println(".end module")
+        printedAttributes = true
+    }
+
+    override fun visitSourceDebugExtension(classFile: ClassFile, attribute: SourceDebugExtensionAttribute) {
+        printer.println(".sourcedebugextension")
+        val stringList = String(attribute.debugExtension).split('\n')
+        printer.print("\"")
+        for (string in stringList) {
+            if (string.isNotEmpty()) {
+                printer.println(string)
+            }
+        }
+        printer.println("\"")
+        printedAttributes = true
     }
 
     // FieldAttributeVisitor.
+
+    // printed directly in JasmPrinter when visiting a field.
+    override fun visitConstantValue(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {}
+
+    // MethodAttributeVisitor.
+
+    override fun visitExceptions(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+        for (exceptionClassName in attribute.getExceptionClassNames(classFile)) {
+            printer.println(".throws $exceptionClassName")
+        }
+        printedAttributes = attribute.size > 0
+    }
+
+    override fun visitRuntimeParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
+        val parameterTypes = parseDescriptorToJvmTypes(method.getDescriptor(classFile))
+        for ((parameterIndex, parameterType) in parameterTypes.first.withIndex()) {
+            if (attribute.getParameterAnnotationCount(parameterIndex) > 0) {
+                printer.println(".param %d    # %s".format(parameterIndex, parameterType))
+                printer.levelUp()
+                attribute.parameterAnnotationsAccept(classFile, parameterIndex, annotationPrinter)
+                printer.levelDown()
+                printer.println(".end param")
+            }
+        }
+        printedAttributes = true
+    }
+
+    override fun visitRuntimeVisibleParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeVisibleParameterAnnotationsAttribute) {
+        if (attribute.size > 0) {
+            annotationPrinter.visibility = AnnotationVisibility.RUNTIME
+            visitRuntimeParameterAnnotations(classFile, method, attribute)
+        }
+    }
+
+    override fun visitRuntimeInvisibleParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeInvisibleParameterAnnotationsAttribute) {
+        if (attribute.size > 0) {
+            annotationPrinter.visibility = AnnotationVisibility.BUILD
+            visitRuntimeParameterAnnotations(classFile, method, attribute)
+        }
+    }
+
+    // print the code differently to ensure that it's the last attribute to be printed
+    override fun visitCode(classFile: ClassFile, method: Method, attribute: CodeAttribute) {}
 }
 
 internal fun Set<AccessFlag>.toPrintableString(filter: (AccessFlag) -> Boolean = { true }): String {

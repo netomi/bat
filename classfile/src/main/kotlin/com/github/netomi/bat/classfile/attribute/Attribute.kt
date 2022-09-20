@@ -39,7 +39,7 @@ import java.io.IOException
  */
 abstract class Attribute protected constructor(protected open var attributeNameIndex: Int): ClassFileContent() {
 
-    internal abstract val type: AttributeType
+    abstract val type: AttributeType
 
     protected abstract val dataSize: Int
 
