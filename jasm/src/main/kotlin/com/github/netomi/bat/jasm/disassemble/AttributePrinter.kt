@@ -28,7 +28,9 @@ import java.util.*
 internal class AttributePrinter constructor(private val printer:         IndentingPrinter,
                                             private val constantPrinter: ConstantPrinter): AttributeVisitor {
 
-    private val annotationPrinter = AnnotationPrinter(printer, constantPrinter)
+    private val elementValuePrinter = ElementValuePrinter(printer, constantPrinter)
+    private val annotationPrinter   = AnnotationPrinter(printer, elementValuePrinter)
+
 
     var printedAttributes: Boolean = false
         private set
@@ -188,6 +190,13 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     override fun visitConstantValue(classFile: ClassFile, field: Field, attribute: ConstantValueAttribute) {}
 
     // MethodAttributeVisitor.
+
+    override fun visitAnnotationDefault(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
+        printer.print(".annotationdefault ")
+        attribute.elementValue.accept(classFile, elementValuePrinter)
+        printer.println()
+        printedAttributes = true
+    }
 
     override fun visitExceptions(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
         for (exceptionClassName in attribute.getExceptionClassNames(classFile)) {

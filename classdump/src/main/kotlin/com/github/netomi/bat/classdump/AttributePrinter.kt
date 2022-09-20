@@ -610,6 +610,10 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         printer.print(elementValue.getBoolean(classFile))
     }
 
+    override fun visitClassElementValue(classFile: ClassFile, elementValue: ClassElementValue) {
+        printer.print("class ${elementValue.getType(classFile)}")
+    }
+
     override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
         printer.print("${elementValue.getType(classFile)}.${elementValue.getConstName(classFile)}")
     }

@@ -23,6 +23,8 @@ import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisito
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.util.JvmClassName
+import com.github.netomi.bat.util.JvmType
+import com.github.netomi.bat.util.asJvmType
 import java.io.IOException
 
 data class ClassElementValue private constructor(private var _classIndex: Int = -1) : ElementValue() {
@@ -36,8 +38,8 @@ data class ClassElementValue private constructor(private var _classIndex: Int = 
     val classIndex: Int
         get() = _classIndex
 
-    fun getClassName(classFile: ClassFile): JvmClassName {
-        return classFile.getClassName(classIndex)
+    fun getType(classFile: ClassFile): JvmType {
+        return classFile.getString(classIndex).asJvmType()
     }
 
     @Throws(IOException::class)

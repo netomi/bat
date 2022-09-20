@@ -22,10 +22,8 @@ import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVi
 import com.github.netomi.bat.io.IndentingPrinter
 import java.util.*
 
-internal class AnnotationPrinter constructor(private val printer:         IndentingPrinter,
-                                             private val constantPrinter: ConstantPrinter): AnnotationVisitor {
-
-    private val elementValuePrinter = ElementValuePrinter(printer, constantPrinter)
+internal class AnnotationPrinter constructor(private val printer:             IndentingPrinter,
+                                             private val elementValuePrinter: ElementValuePrinter): AnnotationVisitor {
 
     var visibility: AnnotationVisibility = AnnotationVisibility.RUNTIME
 
