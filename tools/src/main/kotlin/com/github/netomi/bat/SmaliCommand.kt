@@ -18,15 +18,16 @@ package com.github.netomi.bat
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.DexFormat
 import com.github.netomi.bat.dexfile.io.DexFileWriter
+import com.github.netomi.bat.io.DataEntry
+import com.github.netomi.bat.io.PathInputSource
+import com.github.netomi.bat.io.filterDataEntriesBy
 import com.github.netomi.bat.smali.Assembler
 import com.github.netomi.bat.smali.SmaliAssembleException
+import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
-import java.io.File
 import java.io.PrintWriter
 import java.nio.file.Path
-import kotlin.io.path.isDirectory
-import kotlin.io.path.pathString
-import kotlin.io.path.relativeTo
+import kotlin.io.path.*
 
 /**
  * Command-line tool to assemble dex files from smali input files.
@@ -39,10 +40,10 @@ import kotlin.io.path.relativeTo
 class SmaliCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1..*", paramLabel = "inputfile", description = ["input file / directory to process (*.smali)"])
-    private lateinit var inputFiles: Array<File>
+    private lateinit var inputFiles: Array<Path>
 
     @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out.dex", description = ["output file (default=out.dex)"])
-    private lateinit var outputFile: File
+    private lateinit var outputPath: Path
 
     @CommandLine.Option(names = ["-a"], defaultValue = "15", description = ["api level (default=15)"])
     private var apiLevel: Int = 0
@@ -57,26 +58,19 @@ class SmaliCommand : Runnable {
         val format = DexFormat.forApiLevel(apiLevel)
         val dexFile = DexFile.of(format)
 
-        printVerbose("Using format '${format.version}' for generated dex file '${outputFile.name}'")
+        printVerbose("using format '${format.version}' for generated dex file '${outputPath.name}'")
+
+        val warningPrinter = if (verbose) PrintWriter(System.out, true) else PrintWriter(System.err, true)
+        val assembler = Assembler(dexFile, lenientMode, warningPrinter)
 
         val startTime = System.nanoTime()
 
-        inputFiles.forEach { file ->
-            val filePath = file.toPath()
-
-            val warningPrinter = if (verbose) PrintWriter(System.out, true) else PrintWriter(System.err, true)
-
+        val processSmaliFile = { entry: DataEntry ->
             try {
-                val assembler = Assembler(dexFile, lenientMode, warningPrinter)
-
-                if (file.isDirectory) {
-                    printVerbose("Assembling directory '${file.name}' into file ${outputFile.name} ...")
-                    val assembledClasses = assembler.assemble(filePath, ::assembleFile)
-                    printVerbose("Assembled ${assembledClasses.size} class(es).")
-                } else {
-                    printVerbose("Assembling file '${file.name}' into file ${outputFile.name} ...")
-                    assembler.assemble(filePath, ::assembleFile)
-                    printVerbose("Assembled 1 class.")
+                entry.getInputStream().use {
+                    printVerbose("  assembling file '${entry.name}'")
+                    assembler.assemble(it, entry.name)
+                    Unit // needed to make kotlinc happy
                 }
             } catch (exception: SmaliAssembleException) {
                 warningPrinter.println("error: ${exception.message}")
@@ -84,20 +78,24 @@ class SmaliCommand : Runnable {
             }
         }
 
-        DexFileWriter(outputFile.outputStream()).visitDexFile(dexFile)
+        inputFiles.forEach { inputPath ->
+            printVerbose("assembling path '${inputPath.name}' into file ${outputPath.name} ...")
+
+            val inputSource = PathInputSource.of(inputPath, true)
+            inputSource.pumpDataEntries(
+                filterDataEntriesBy(
+                fileNameMatcher("**.smali"),
+                processSmaliFile))
+        }
+
+        printVerbose("assembled ${dexFile.classDefCount} class(es).")
+
+        DexFileWriter(outputPath.outputStream()).visitDexFile(dexFile)
 
         val endTime = System.nanoTime()
         printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
     }
 
-    private fun assembleFile(baseDirectory: Path, file: Path) {
-        val filePath = if (baseDirectory.isDirectory()) {
-            file.relativeTo(baseDirectory).pathString
-        } else {
-            file.pathString
-        }
-        printVerbose("  assembling file '${filePath}'")
-    }
     private fun printVerbose(text: String) {
         if (verbose) {
             println(text)

@@ -24,50 +24,14 @@ import com.github.netomi.bat.smali.parser.SmaliParser
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.InputMismatchException
 import org.antlr.v4.runtime.misc.IntervalSet
-import java.io.IOException
 import java.io.InputStream
 import java.io.PrintWriter
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.attribute.BasicFileAttributes
-import java.util.function.BiPredicate
-import java.util.function.Predicate
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.name
 
 class Assembler(            dexFile:        DexFile,
                 private val lenientMode:    Boolean      = false,
                 private val warningPrinter: PrintWriter? = null) {
 
     private val dexEditor: DexEditor = DexEditor.of(dexFile)
-
-    @Throws(IOException::class)
-    fun assemble(input: Path, callback: (Path, Path) -> Unit = fun(_, _) {}): List<ClassDef> {
-        val assembledClasses = mutableListOf<ClassDef>()
-
-        val assembleFile = { path: Path ->
-            Files.newInputStream(path).use { `is` ->
-                callback(input, path)
-                val classDefList = assemble(`is`, path.absolutePathString())
-                assembledClasses.addAll(classDefList)
-            }
-            Unit
-        }
-
-        if (Files.isDirectory(input)) {
-            val inputFiles = Files.find(input, Int.MAX_VALUE, REGULAR_FILE)
-
-            inputFiles.use {
-                it.filter(SMALI_FILE)
-                  .sorted()
-                  .forEach(assembleFile)
-            }
-        } else {
-            assembleFile(input)
-        }
-
-        return assembledClasses
-    }
 
     fun assemble(inputStream: InputStream, name: String? = null): List<ClassDef> {
         val lexer       = SmaliLexer(CharStreams.fromStream(inputStream))
@@ -87,11 +51,6 @@ class Assembler(            dexFile:        DexFile,
                 throw SmaliAssembleException("failed to assemble input: ${exception.message}", exception)
             }
         }
-    }
-
-    companion object {
-        private val REGULAR_FILE = BiPredicate { _: Path, attr: BasicFileAttributes -> attr.isRegularFile }
-        private val SMALI_FILE   = Predicate   { path: Path -> path.name.endsWith(".smali") }
     }
 }
 
