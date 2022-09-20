@@ -16,14 +16,11 @@
 package com.github.netomi.bat
 
 import com.github.netomi.bat.classdump.ClassDumpPrinter
+import com.github.netomi.bat.io.*
+import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
-import java.io.*
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.attribute.BasicFileAttributes
-import java.util.function.BiPredicate
-import java.util.function.Predicate
 import kotlin.io.path.*
 
 /**
@@ -37,10 +34,10 @@ import kotlin.io.path.*
 class ClassDumpCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file(s) to process (*.class / *.jar)"])
-    private lateinit var inputFile: File
+    private lateinit var inputPath: Path
 
     @CommandLine.Option(names = ["-o"], arity = "1", description = ["output file name (defaults to stdout)"])
-    private var outputFile: File? = null
+    private var outputPath: Path? = null
 
     @CommandLine.Option(names = ["-h"], description = ["print header"])
     private var printHeader = false
@@ -49,47 +46,50 @@ class ClassDumpCommand : Runnable {
     private var verbose: Boolean = false
 
     override fun run() {
-        val printer = ClassDumpPrinter(printHeader)
+        val printToConsole  = outputPath == null
+        val printSingleFile = inputPath.endsWith(".class")
 
-        val inputPath = inputFile.toPath()
-        if (inputPath.isDirectory()) {
-            val outputBasePath = if (outputFile == null) null else outputFile!!.toPath()
+        val classDumper = ClassDumpPrinter(printHeader)
 
-            printVerbose("Dumping class files from '${inputFile}' into directory '$outputBasePath' ...")
-
-            val inputFiles = Files.find(inputPath, Int.MAX_VALUE, REGULAR_FILE)
-            inputFiles.use {
-                it.filter(CLASS_FILE)
-                  .sorted()
-                  .forEach { filePath ->
-                      printVerbose("  dumping file '${filePath}'")
-
-                      val os = if (outputBasePath != null) {
-                          val relativeFilePath = filePath.relativeTo(inputPath)
-                          val outputPath       = outputBasePath.resolve(relativeFilePath)
-                          outputPath.parent.createDirectories()
-                          Paths.get(outputBasePath.resolve(relativeFilePath).toString() + ".txt").outputStream()
-                      } else {
-                          System.out
-                      }
-
-                      filePath.inputStream().use { `is` ->
-                          printer.dumpClassFile(filePath, `is`, os)
-                      }
-                  }
-            }
-        } else {
-            FileInputStream(inputFile).use { `is` ->
-                val os = if (outputFile == null) System.out else FileOutputStream(outputFile!!)
-
-                // TODO: handle jar or general archive files
-                printer.dumpClassFile(inputPath, `is`, os)
-
-                if (outputFile != null) {
-                    os.close()
-                }
+        if (!printToConsole) {
+            if (printSingleFile) {
+                printVerbose("dumping class file '${inputPath}' to file '$outputPath' ...")
+            } else {
+                printVerbose("dumping class file(s) from '${inputPath}' into directory '$outputPath' ...")
             }
         }
+
+        val processClassFile = { entry: DataEntry ->
+            if (!printToConsole) {
+                printVerbose("  dumping class '${entry.name}'")
+            }
+
+            val os = if (printToConsole) {
+                System.out
+            } else {
+                if (printSingleFile) {
+                    outputPath!!.outputStream()
+                } else {
+                    val outputBasePath    = outputPath!!
+                    val relativeEntryPath = entry.name
+                    val entryOutputPath   = outputBasePath.resolve(relativeEntryPath)
+                    entryOutputPath.parent?.createDirectories()
+                    Paths.get(entryOutputPath.toString().replace(".class", ".dump")).outputStream()
+                }
+            }
+
+            entry.getInputStream().use { classDumper.dumpClassFile(inputPath, it, os) }
+
+            if (!printToConsole) {
+                os.close()
+            }
+        }
+
+        val inputSource = PathInputSource.of(inputPath, true)
+        inputSource.pumpDataEntries(
+            unwrapArchives(
+            filterDataEntriesBy(fileNameMatcher("**.class"),
+            processClassFile)))
     }
 
     private fun printVerbose(text: String) {
@@ -99,9 +99,6 @@ class ClassDumpCommand : Runnable {
     }
 
     companion object {
-        private val REGULAR_FILE = BiPredicate { _: Path, attr: BasicFileAttributes -> attr.isRegularFile }
-        private val CLASS_FILE   = Predicate   { path: Path -> path.name.endsWith(".class") }
-
         @JvmStatic
         fun main(args: Array<String>) {
             val cmdLine = CommandLine(ClassDumpCommand())

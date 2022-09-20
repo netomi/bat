@@ -18,14 +18,14 @@ package com.github.netomi.bat
 import com.github.netomi.bat.dexfile.DexFile
 import com.github.netomi.bat.dexfile.io.DexFileReader
 import com.github.netomi.bat.dexfile.visitor.multiClassDefVisitorOf
-import com.github.netomi.bat.io.FileOutputStreamFactory
+import com.github.netomi.bat.io.*
 import com.github.netomi.bat.smali.Disassembler
+import com.github.netomi.bat.util.fileNameMatcher
 import kotlinx.coroutines.Dispatchers
 import picocli.CommandLine
-import java.io.File
-import java.io.FileInputStream
 import java.lang.Runnable
 import java.nio.file.Files
+import java.nio.file.Path
 import kotlin.io.path.exists
 
 /**
@@ -39,39 +39,45 @@ import kotlin.io.path.exists
 class BakSmaliCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.dex)"])
-    private lateinit var inputFile: File
+    private lateinit var inputPath: Path
 
     @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out", description = ["output directory"])
-    private lateinit var outputFile: File
+    private lateinit var outputPath: Path
 
     @CommandLine.Option(names = ["-v"], description = ["verbose output"])
     private var verbose: Boolean = false
 
     override fun run() {
-        FileInputStream(inputFile).use { `is` ->
-            val outputPath = outputFile.toPath()
+        val processDexFile = { entry: DataEntry ->
             if (!outputPath.exists()) {
                 Files.createDirectories(outputPath)
             }
 
-            val dexFile = DexFile.empty()
-            val reader = DexFileReader(`is`, false)
+            entry.getInputStream().use { `is` ->
+                val dexFile = DexFile.empty()
+                val reader  = DexFileReader(`is`, false)
 
-            printVerbose("Disassembling '${inputFile.name}' into directory $outputPath ...")
-            reader.visitDexFile(dexFile)
+                printVerbose("disassembling '${entry.fullName}' into directory '$outputPath' ...")
+                reader.visitDexFile(dexFile)
 
-            val startTime = System.nanoTime()
+                val startTime = System.nanoTime()
 
-            dexFile.parallelClassDefsAccept(Dispatchers.IO) {
-                multiClassDefVisitorOf(
-                    { df, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
-                    Disassembler(FileOutputStreamFactory(outputPath, "smali"))
-                )
+                dexFile.parallelClassDefsAccept(Dispatchers.IO) {
+                    multiClassDefVisitorOf(
+                        { df, classDef -> printVerbose("  disassembling class '${classDef.getClassName(df)}'") },
+                        Disassembler(FileOutputStreamFactory(outputPath, "smali"))
+                    )
+                }
+
+                val endTime = System.nanoTime()
+                printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
             }
-
-            val endTime = System.nanoTime()
-            printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
         }
+
+        val inputSource = PathInputSource.of(inputPath)
+        inputSource.pumpDataEntries(
+            filterDataEntriesBy(fileNameMatcher("**.dex"),
+            processDexFile))
     }
 
     private fun printVerbose(text: String) {

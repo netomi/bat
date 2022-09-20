@@ -89,6 +89,7 @@ class JasmCommand : Runnable {
         }
         printVerbose("  assembling file '${filePath}'")
     }
+
     private fun printVerbose(text: String) {
         if (verbose) {
             println(text)
