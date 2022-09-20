@@ -20,7 +20,6 @@ import com.github.netomi.bat.io.*
 import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
 import java.nio.file.Path
-import java.nio.file.Paths
 import kotlin.io.path.*
 
 /**
@@ -39,6 +38,9 @@ class ClassDumpCommand : Runnable {
     @CommandLine.Option(names = ["-o"], arity = "1", description = ["output file name (defaults to stdout)"])
     private var outputPath: Path? = null
 
+    @CommandLine.Option(names = ["-s"], arity = "1", defaultValue = "dump", description = ["file suffix (defaults to dump)"])
+    private lateinit var suffix: String
+
     @CommandLine.Option(names = ["-h"], description = ["print header"])
     private var printHeader = false
 
@@ -46,13 +48,13 @@ class ClassDumpCommand : Runnable {
     private var verbose: Boolean = false
 
     override fun run() {
-        val printToConsole  = outputPath == null
-        val printSingleFile = inputPath.endsWith(".class")
+        val dumpToConsole  = outputPath == null
+        val dumpSingleFile = inputPath.endsWith(".class")
 
         val classDumper = ClassDumpPrinter(printHeader)
 
-        if (!printToConsole) {
-            if (printSingleFile) {
+        if (!dumpToConsole) {
+            if (dumpSingleFile) {
                 printVerbose("dumping class file '${inputPath}' to file '$outputPath' ...")
             } else {
                 printVerbose("dumping class file(s) from '${inputPath}' into directory '$outputPath' ...")
@@ -60,27 +62,26 @@ class ClassDumpCommand : Runnable {
         }
 
         val processClassFile = { entry: DataEntry ->
-            if (!printToConsole) {
+            if (!dumpToConsole) {
                 printVerbose("  dumping class '${entry.name}'")
             }
 
-            val os = if (printToConsole) {
+            val os = if (dumpToConsole) {
                 System.out
             } else {
-                if (printSingleFile) {
+                if (dumpSingleFile) {
                     outputPath!!.outputStream()
                 } else {
-                    val outputBasePath    = outputPath!!
-                    val relativeEntryPath = entry.name
-                    val entryOutputPath   = outputBasePath.resolve(relativeEntryPath)
-                    entryOutputPath.parent?.createDirectories()
-                    Paths.get(entryOutputPath.toString().replace(".class", ".dump")).outputStream()
+                    val factory =
+                        FileOutputStreamFactory(outputPath!!, suffix)
+                            { name -> Path.of(name.removeSuffix(".class")) }
+                    factory.createOutputStream(entry.name)
                 }
             }
 
             entry.getInputStream().use { classDumper.dumpClassFile(inputPath, it, os) }
 
-            if (!printToConsole) {
+            if (!dumpToConsole) {
                 os.close()
             }
         }
