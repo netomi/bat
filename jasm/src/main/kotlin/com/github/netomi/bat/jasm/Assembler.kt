@@ -24,48 +24,12 @@ import com.github.netomi.bat.jasm.parser.JasmParser
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.InputMismatchException
 import org.antlr.v4.runtime.misc.IntervalSet
-import java.io.IOException
 import java.io.InputStream
 import java.io.PrintWriter
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.attribute.BasicFileAttributes
-import java.util.function.BiPredicate
-import java.util.function.Predicate
-import kotlin.io.path.absolutePathString
-import kotlin.io.path.name
 
 class Assembler(private val outputStreamFactory: OutputStreamFactory,
                 private val lenientMode:         Boolean      = false,
                 private val warningPrinter:      PrintWriter? = null) {
-
-    @Throws(IOException::class)
-    fun assemble(input: Path, callback: (Path, Path) -> Unit = fun(_, _) {}): List<ClassFile> {
-        val assembledClasses = mutableListOf<ClassFile>()
-
-        val assembleFile = { path: Path ->
-            Files.newInputStream(path).use { `is` ->
-                callback(input, path)
-                val classFileList = assemble(`is`, path.absolutePathString())
-                assembledClasses.addAll(classFileList)
-            }
-            Unit
-        }
-
-        if (Files.isDirectory(input)) {
-            val inputFiles = Files.find(input, Int.MAX_VALUE, REGULAR_FILE)
-
-            inputFiles.use {
-                it.filter(JASM_FILE)
-                  .sorted()
-                  .forEach(assembleFile)
-            }
-        } else {
-            assembleFile(input)
-        }
-
-        return assembledClasses
-    }
 
     fun assemble(inputStream: InputStream, name: String? = null): List<ClassFile> {
         val lexer       = JasmLexer(CharStreams.fromStream(inputStream))
@@ -91,11 +55,6 @@ class Assembler(private val outputStreamFactory: OutputStreamFactory,
                 throw JasmAssembleException("failed to assemble input: ${exception.message}", exception)
             }
         }
-    }
-
-    companion object {
-        private val REGULAR_FILE = BiPredicate { _: Path, attr: BasicFileAttributes -> attr.isRegularFile }
-        private val JASM_FILE    = Predicate   { path: Path -> path.name.endsWith(".jasm") }
     }
 }
 

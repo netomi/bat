@@ -15,17 +15,17 @@
  */
 package com.github.netomi.bat
 
+import com.github.netomi.bat.io.DataEntry
 import com.github.netomi.bat.io.FileOutputStreamFactory
+import com.github.netomi.bat.io.PathInputSource
+import com.github.netomi.bat.io.filterDataEntriesBy
 import com.github.netomi.bat.jasm.Assembler
-import com.github.netomi.bat.jasm.JasmAssembleException
+import com.github.netomi.bat.smali.SmaliAssembleException
+import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
-import java.io.File
 import java.io.PrintWriter
 import java.nio.file.Path
-import kotlin.io.path.isDirectory
 import kotlin.io.path.name
-import kotlin.io.path.pathString
-import kotlin.io.path.relativeTo
 
 /**
  * Command-line tool to assemble class files from jasm input files.
@@ -38,10 +38,10 @@ import kotlin.io.path.relativeTo
 class JasmCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1..*", paramLabel = "inputfile", description = ["input file / directory to process (*.jasm)"])
-    private lateinit var inputFiles: Array<File>
+    private lateinit var inputFiles: Array<Path>
 
     @CommandLine.Option(names = ["-o"], arity = "1", defaultValue = "out", description = ["output (default=out)"])
-    private lateinit var output: File
+    private lateinit var outputPath: Path
 
     @CommandLine.Option(names = ["-l", "--lenient"], description = ["enables lenient mode"])
     private var lenientMode: Boolean = false
@@ -52,42 +52,39 @@ class JasmCommand : Runnable {
     override fun run() {
         val startTime = System.nanoTime()
 
-        inputFiles.forEach { file ->
-            val filePath = file.toPath()
+        val warningPrinter = if (verbose) PrintWriter(System.out, true) else PrintWriter(System.err, true)
 
-            val warningPrinter = if (verbose) PrintWriter(System.out, true) else PrintWriter(System.err, true)
+        val outputStreamFactory = FileOutputStreamFactory(outputPath, "class")
+        val assembler = Assembler(outputStreamFactory, lenientMode, warningPrinter)
 
+        var assembledClasses = 0
+
+        val processJasmFile = { entry: DataEntry ->
             try {
-                val outputPath = output.toPath()
-                val outputStreamFactory = FileOutputStreamFactory(outputPath, "class")
-                val assembler = Assembler(outputStreamFactory, lenientMode, warningPrinter)
-
-                if (file.isDirectory) {
-                    printVerbose("Assembling directory '${file.name}' into directory ${outputPath.name} ...")
-                    val assembledClasses = assembler.assemble(filePath, ::assembleFile)
-                    printVerbose("Assembled ${assembledClasses.size} class(es).")
-                } else {
-                    printVerbose("Assembling file '${file.name}' into directory ${outputPath.name} ...")
-                    assembler.assemble(filePath, ::assembleFile)
-                    printVerbose("Assembled 1 class.")
+                entry.getInputStream().use {
+                    printVerbose("  assembling file '${entry.name}'")
+                    assembledClasses += assembler.assemble(it, entry.name).size
                 }
-            } catch (exception: JasmAssembleException) {
+            } catch (exception: SmaliAssembleException) {
                 warningPrinter.println("error: ${exception.message}")
                 warningPrinter.println("abort assembling.")
             }
         }
 
+        inputFiles.forEach { inputPath ->
+            printVerbose("assembling path '${inputPath.name}' into path '${outputPath.name}' ...")
+
+            val inputSource = PathInputSource.of(inputPath, true)
+            inputSource.pumpDataEntries(
+                filterDataEntriesBy(
+                fileNameMatcher("**.jasm"),
+                processJasmFile))
+        }
+
+        printVerbose("assembled $assembledClasses class(es).")
+
         val endTime = System.nanoTime()
         printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
-    }
-
-    private fun assembleFile(baseDirectory: Path, file: Path) {
-        val filePath = if (baseDirectory.isDirectory()) {
-            file.relativeTo(baseDirectory).pathString
-        } else {
-            file.pathString
-        }
-        printVerbose("  assembling file '${filePath}'")
     }
 
     private fun printVerbose(text: String) {
