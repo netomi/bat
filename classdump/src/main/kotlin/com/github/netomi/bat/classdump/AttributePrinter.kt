@@ -21,7 +21,6 @@ import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVi
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
-import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModuleHashesAttribute
 import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
@@ -30,20 +29,21 @@ import com.github.netomi.bat.classfile.attribute.preverification.StackMapTableAt
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import com.github.netomi.bat.util.asJvmType
-import com.github.netomi.bat.util.escapeAsJavaString
-import com.github.netomi.bat.util.isAsciiPrintable
 
-internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor, ElementValueVisitor, AnnotationVisitorIndexed {
+internal class AttributePrinter constructor(private val printer: IndentingPrinter): AttributeVisitor, AnnotationVisitorIndexed {
 
     private val referencedIndexPrinter = ReferencedIndexPrinter(printer)
     private val stackMapFramePrinter   = StackMapFramePrinter(printer)
     private val constantPrinter        = ConstantPrinter(printer)
     private val instructionPrinter     = InstructionPrinter(printer)
     private val targetInfoPrinter      = TargetInfoPrinter(printer)
+    private val elementValuePrinter    = ElementValuePrinter(printer, constantPrinter)
 
     // common implementations
 
-    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
+    override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {
+        TODO("implement printing of ${attribute.type}")
+    }
 
     override fun visitUnknownAttribute(classFile: ClassFile, attribute: UnknownAttribute) {
         printer.println("UnknownAttribute: name=${attribute.getAttributeName(classFile)} size=${attribute.data.size}")
@@ -407,7 +407,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
         attribute.elementValue.accept(classFile, referencedIndexPrinter)
         printer.println()
         printer.levelUp()
-        attribute.elementValue.accept(classFile, this)
+        attribute.elementValue.accept(classFile, elementValuePrinter)
         printer.println()
         printer.levelDown()
         printer.levelDown()
@@ -554,7 +554,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
             printer.levelUp()
             annotation.forEachIndexed { _, component ->
                 printer.print("${classFile.getString(component.nameIndex)}=")
-                component.elementValue.accept(classFile, this)
+                component.elementValue.accept(classFile, elementValuePrinter)
                 printer.println()
             }
             printer.levelDown()
@@ -596,44 +596,6 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
         printer.println()
         visitAnyAnnotation(classFile, index, typeAnnotation)
-    }
-
-    // Implementations for ElementValueVisitor
-
-    override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
-
-    override fun visitAnyConstElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        classFile.constantAccept(elementValue.constValueIndex, constantPrinter)
-    }
-
-    override fun visitBooleanElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        printer.print(elementValue.getBoolean(classFile))
-    }
-
-    override fun visitClassElementValue(classFile: ClassFile, elementValue: ClassElementValue) {
-        printer.print("class ${elementValue.getType(classFile)}")
-    }
-
-    override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
-        printer.print("${elementValue.getType(classFile)}.${elementValue.getConstName(classFile)}")
-    }
-
-    override fun visitStringElementValue(classFile: ClassFile, elementValue: ConstElementValue) {
-        val value = classFile.getString(elementValue.constValueIndex)
-
-        val output = if (!value.isAsciiPrintable()) {
-            value.escapeAsJavaString()
-        } else {
-            value
-        }
-
-        printer.print("\"%s\"".format(output))
-    }
-
-    override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
-        printer.print("[")
-        elementValue.elementValuesAccept(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") } )
-        printer.print("]")
     }
 }
 
