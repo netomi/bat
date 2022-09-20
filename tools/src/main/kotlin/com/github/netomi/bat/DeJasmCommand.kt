@@ -17,14 +17,14 @@ package com.github.netomi.bat
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.io.ClassFileReader
-import com.github.netomi.bat.io.ConsoleOutputStreamFactory
-import com.github.netomi.bat.io.FileOutputStreamFactory
+import com.github.netomi.bat.io.*
 import com.github.netomi.bat.jasm.Disassembler
+import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
-import java.io.File
-import java.io.FileInputStream
 import java.lang.Runnable
-import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.name
 import kotlin.io.path.notExists
 
 /**
@@ -38,40 +38,49 @@ import kotlin.io.path.notExists
 class DeJasmCommand : Runnable {
 
     @CommandLine.Parameters(index = "0", arity = "1", paramLabel = "inputfile", description = ["input file to process (*.[class|jar])"])
-    private lateinit var inputFile: File
+    private lateinit var inputPath: Path
 
     @CommandLine.Option(names = ["-o"], arity = "1", description = ["output directory"])
-    private var outputFile: File? = null
+    private var outputPath: Path? = null
 
     @CommandLine.Option(names = ["-v"], description = ["verbose output"])
     private var verbose: Boolean = false
 
     override fun run() {
-        FileInputStream(inputFile).use { `is` ->
-            val outputPath = outputFile?.toPath()
-            if (outputPath != null && outputPath.notExists()) {
-                Files.createDirectories(outputPath)
+        printVerbose("disassembling '${inputPath.name}' into path '$outputPath' ...")
+
+        val startTime = System.nanoTime()
+
+        val outputStreamFactory = if (outputPath != null) {
+            if (outputPath!!.notExists()) {
+                outputPath!!.createDirectories()
             }
-
-            val classFile = ClassFile.empty()
-            val reader    = ClassFileReader(`is`)
-
-            printVerbose("Disassembling '${inputFile.name}' into directory $outputPath ...")
-            reader.visitClassFile(classFile)
-
-            val startTime = System.nanoTime()
-
-            val outputStreamFactory = if (outputPath != null) {
-                FileOutputStreamFactory(outputPath, "jasm")
-            } else {
-                ConsoleOutputStreamFactory(System.out)
-            }
-
-            classFile.accept(Disassembler(outputStreamFactory))
-
-            val endTime = System.nanoTime()
-            printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
+            FileOutputStreamFactory(outputPath!!, "jasm")
+        } else {
+            ConsoleOutputStreamFactory(System.out)
         }
+
+        val processClassFile = { entry: DataEntry ->
+            entry.getInputStream().use {
+                printVerbose("  de-assembling file '${entry.name}'")
+
+                val classFile = ClassFile.empty()
+                val reader    = ClassFileReader(it)
+                reader.visitClassFile(classFile)
+
+                classFile.accept(Disassembler(outputStreamFactory))
+            }
+        }
+
+        val inputSource = PathInputSource.of(inputPath)
+        inputSource.pumpDataEntries(
+            unwrapArchives(
+            filterDataEntriesBy(
+            fileNameMatcher("**.class"),
+            processClassFile)))
+
+        val endTime = System.nanoTime()
+        printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")
     }
 
     private fun printVerbose(text: String) {
