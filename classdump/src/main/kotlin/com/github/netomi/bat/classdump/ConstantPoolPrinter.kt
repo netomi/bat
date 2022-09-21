@@ -25,7 +25,9 @@ import com.github.netomi.bat.io.IndentingPrinter
 internal class ConstantPoolPrinter constructor(private val printer:         IndentingPrinter,
                                                private val constantPrinter: ConstantPrinter): ConstantVisitor {
 
-    override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {}
+    override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
+        TODO("implement printing of ${constant.type}")
+    }
 
     override fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
         printer.print("%-18s ".format("Integer"))
