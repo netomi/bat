@@ -17,7 +17,7 @@ package com.github.netomi.bat.visitor
 
 abstract class AbstractMultiVisitor<V> @SafeVarargs protected constructor(visitor: V, vararg otherVisitors: V) {
 
-    private val _visitors: List<V>
+    val visitors: List<V>
 
     init {
         val visitorList = mutableListOf<V>()
@@ -25,11 +25,8 @@ abstract class AbstractMultiVisitor<V> @SafeVarargs protected constructor(visito
         for (nextVisitor in otherVisitors) {
             addVisitor(nextVisitor, visitorList)
         }
-        _visitors = visitorList.toMutableList()
+        visitors = visitorList
     }
-
-    val visitors: Iterable<V>
-        get() = _visitors
 
     companion object {
         private fun <V> addVisitor(visitor: V, visitorList: MutableList<V>) {
