@@ -121,31 +121,36 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     }
 
     override fun visitModule(classFile: ClassFile, attribute: ModuleAttribute) {
-        printer.print(".module ${attribute.getModuleName(classFile)}")
+        printer.print(".module")
+
+        if (attribute.moduleFlags != 0) {
+            printer.print(" ${attribute.moduleFlagsAsSet.toPrintableString()}")
+        }
+
+        printer.print(" ${attribute.getModuleName(classFile)}")
 
         val moduleVersion = attribute.getModuleVersion(classFile)
         if (moduleVersion != null) {
             printer.print("@${moduleVersion}")
         }
 
-        if (attribute.moduleFlags != 0) {
-            printer.print(", ${attribute.moduleFlagsAsSet.toPrintableString()}")
-        }
-
         printer.println()
         printer.levelUp()
 
         for (requireEntry in attribute.requires) {
-            printer.print(".requires ${requireEntry.getRequiredModuleName(classFile)}")
+            printer.print(".requires")
+
+            if (requireEntry.flags != 0) {
+                printer.print(" ${requireEntry.flagsAsSet.toPrintableString()}")
+            }
+
+            printer.print(" ${requireEntry.getRequiredModuleName(classFile)}")
 
             val requiredVersion = requireEntry.getRequiredVersion(classFile)
             if (requiredVersion != null) {
                 printer.print("@${requiredVersion}")
             }
 
-            if (requireEntry.flags != 0) {
-                printer.print(", ${requireEntry.flagsAsSet.toPrintableString()}")
-            }
             printer.println()
         }
 
