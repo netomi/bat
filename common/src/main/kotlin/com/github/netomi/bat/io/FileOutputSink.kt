@@ -16,13 +16,25 @@
 
 package com.github.netomi.bat.io
 
-fun transformInputDataEntriesWith(transform: (String) -> String, delegateReader: DataEntryReader): DataEntryReader {
-    return TransformingDataEntryReader(transform, delegateReader)
-}
+import java.io.OutputStream
+import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.exists
+import kotlin.io.path.outputStream
 
-private class TransformingDataEntryReader constructor(private val transform: (String) -> String,
-                                                      private val reader:    DataEntryReader): DataEntryReader {
-    override fun read(entry: DataEntry) {
-        reader.read(TransformedDataEntry.of(transform(entry.name), entry))
+class FileOutputSink private constructor(private val filePath: Path): OutputSink {
+    override fun createOutputStream(entry: DataEntry): OutputStream {
+        val outputParentPath = filePath.parent
+        if (outputParentPath != null && !outputParentPath.exists()) {
+            outputParentPath.createDirectories()
+        }
+
+        return filePath.outputStream()
+    }
+
+    companion object {
+        fun of(filePath: Path): FileOutputSink {
+            return FileOutputSink(filePath)
+        }
     }
 }

@@ -16,13 +16,8 @@
 
 package com.github.netomi.bat.io
 
-fun transformInputDataEntriesWith(transform: (String) -> String, delegateReader: DataEntryReader): DataEntryReader {
-    return TransformingDataEntryReader(transform, delegateReader)
-}
+import java.io.OutputStream
 
-private class TransformingDataEntryReader constructor(private val transform: (String) -> String,
-                                                      private val reader:    DataEntryReader): DataEntryReader {
-    override fun read(entry: DataEntry) {
-        reader.read(TransformedDataEntry.of(transform(entry.name), entry))
-    }
+fun interface DataEntryWriter {
+    fun createOutputStream(entry: DataEntry): OutputStream
 }

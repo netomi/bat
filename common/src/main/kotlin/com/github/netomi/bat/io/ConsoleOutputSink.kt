@@ -16,13 +16,19 @@
 
 package com.github.netomi.bat.io
 
-fun transformInputDataEntriesWith(transform: (String) -> String, delegateReader: DataEntryReader): DataEntryReader {
-    return TransformingDataEntryReader(transform, delegateReader)
-}
+import java.io.FilterOutputStream
+import java.io.OutputStream
 
-private class TransformingDataEntryReader constructor(private val transform: (String) -> String,
-                                                      private val reader:    DataEntryReader): DataEntryReader {
-    override fun read(entry: DataEntry) {
-        reader.read(TransformedDataEntry.of(transform(entry.name), entry))
+class ConsoleOutputSink private constructor(private val printStream: OutputStream): OutputSink {
+    override fun createOutputStream(entry: DataEntry): OutputStream {
+        return object: FilterOutputStream(printStream) {
+            override fun close() {}
+        }
+    }
+
+    companion object {
+        fun of(printStream: OutputStream): ConsoleOutputSink {
+            return ConsoleOutputSink(printStream)
+        }
     }
 }

@@ -26,7 +26,7 @@ fun unwrapArchives(reader: DataEntryReader): DataEntryReader {
 
 class ZipDataEntryReader constructor(private val delegateReader: DataEntryReader): DataEntryReader {
 
-    private val jmodReader = transformDataEntriesWith({ it.removePrefix("classes/") }, delegateReader)
+    private val jmodReader = transformInputDataEntriesWith({ it.removePrefix("classes/") }, delegateReader)
 
     private fun readEntry(entry: DataEntry, isJmod: Boolean) {
         if (isJmod) {

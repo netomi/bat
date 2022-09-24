@@ -20,7 +20,6 @@ import com.github.netomi.bat.io.*
 import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
 import java.nio.file.Path
-import kotlin.io.path.*
 
 /**
  * Command-line tool to dump class files.
@@ -38,7 +37,7 @@ class ClassDumpCommand : Runnable {
     @CommandLine.Option(names = ["-o"], arity = "1", description = ["output file name (defaults to stdout)"])
     private var outputPath: Path? = null
 
-    @CommandLine.Option(names = ["-s"], arity = "1", defaultValue = "dump", description = ["file suffix (defaults to dump)"])
+    @CommandLine.Option(names = ["-s"], arity = "1", defaultValue = "dump", description = ["file suffix (defaults to 'dump')"])
     private lateinit var suffix: String
 
     @CommandLine.Option(names = ["-h"], description = ["print header"])
@@ -61,28 +60,25 @@ class ClassDumpCommand : Runnable {
             }
         }
 
+        val writer =
+            if (dumpToConsole) {
+                ConsoleOutputSink.of(System.out)
+            } else if (dumpSingleFile) {
+                FileOutputSink.of(outputPath!!)
+            } else {
+                transformOutputDataEntriesWith({ name -> name.replace(".class", ".$suffix") },
+                DirectoryOutputSink.of(outputPath!!))
+            }
+
         val processClassFile = { entry: DataEntry ->
             if (!dumpToConsole) {
                 printVerbose("  dumping class '${entry.name}'")
             }
 
-            val os = if (dumpToConsole) {
-                System.out
-            } else {
-                if (dumpSingleFile) {
-                    outputPath!!.outputStream()
-                } else {
-                    val factory =
-                        FileOutputStreamFactory(outputPath!!, suffix)
-                            { name -> Path.of(name.removeSuffix(".class")) }
-                    factory.createOutputStream(entry.name)
+            entry.getInputStream().use { `is` ->
+                writer.createOutputStream(entry).use { os ->
+                    classDumper.dumpClassFile(inputPath, `is`, os)
                 }
-            }
-
-            entry.getInputStream().use { classDumper.dumpClassFile(inputPath, it, os) }
-
-            if (!dumpToConsole) {
-                os.close()
             }
         }
 
