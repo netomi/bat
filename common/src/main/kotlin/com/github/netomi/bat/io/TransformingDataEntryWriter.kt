@@ -28,4 +28,8 @@ private class TransformingDataEntryWriter constructor(private val transform: (St
     override fun createOutputStream(entry: DataEntry): OutputStream {
         return writer.createOutputStream(TransformedDataEntry.of(transform(entry.name), entry))
     }
+
+    override fun close() {
+        writer.close()
+    }
 }

@@ -26,6 +26,8 @@ class ConsoleOutputSink private constructor(private val printStream: OutputStrea
         }
     }
 
+    override fun close() {}
+
     companion object {
         fun of(printStream: OutputStream): ConsoleOutputSink {
             return ConsoleOutputSink(printStream)

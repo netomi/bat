@@ -32,6 +32,8 @@ class FileOutputSink private constructor(private val filePath: Path): OutputSink
         return filePath.outputStream()
     }
 
+    override fun close() {}
+
     companion object {
         fun of(filePath: Path): FileOutputSink {
             return FileOutputSink(filePath)

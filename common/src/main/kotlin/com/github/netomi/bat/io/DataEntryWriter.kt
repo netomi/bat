@@ -16,8 +16,14 @@
 
 package com.github.netomi.bat.io
 
+import java.io.Closeable
+import java.io.IOException
 import java.io.OutputStream
+import kotlin.jvm.Throws
 
-fun interface DataEntryWriter {
+interface DataEntryWriter: Closeable {
     fun createOutputStream(entry: DataEntry): OutputStream
+
+    @Throws(IOException::class)
+    override fun close()
 }

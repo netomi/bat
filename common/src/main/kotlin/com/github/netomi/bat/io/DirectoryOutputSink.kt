@@ -36,6 +36,8 @@ class DirectoryOutputSink private constructor(private val baseDir: Path): Output
         return outputPath.outputStream()
     }
 
+    override fun close() {}
+
     companion object {
         fun of(baseDir: Path): DirectoryOutputSink {
             return DirectoryOutputSink(baseDir)

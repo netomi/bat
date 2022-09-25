@@ -23,6 +23,7 @@ import com.github.netomi.bat.util.classNameMatcher
 import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
 import java.nio.file.Path
+import kotlin.io.path.pathString
 
 /**
  * Command-line tool to dump class files.
@@ -54,6 +55,7 @@ class ClassDumpCommand : Runnable {
 
     override fun run() {
         val dumpToConsole  = outputPath == null
+        val dumpToArchive  = outputPath != null && (outputPath!!.pathString.endsWith(".jar") || outputPath!!.pathString.endsWith(".zip"))
         val dumpSingleFile = inputPath.endsWith(".class")
 
         if (!dumpToConsole) {
@@ -70,30 +72,37 @@ class ClassDumpCommand : Runnable {
             } else if (dumpSingleFile) {
                 FileOutputSink.of(outputPath!!)
             } else {
-                transformOutputDataEntriesWith({ name -> name.replace(".class", ".$suffix") },
-                DirectoryOutputSink.of(outputPath!!))
-            }
-
-        val classDumper      = ClassDumpPrinter(writer, printHeader)
-        val classNameMatcher = if (classNameFilter != null) classNameMatcher(classNameFilter!!) else allMatcher()
-
-        val processClassFile = { entry: DataEntry ->
-            // this is a bit of a hack: we treat the entry name as internal classname
-            val className = entry.name.removeSuffix(".class").asInternalClassName().toExternalClassName()
-            if (classNameMatcher.matches(className)) {
-                if (!dumpToConsole) {
-                    printVerbose("  dumping class '${entry.name}'")
+                val sink = if (dumpToArchive) {
+                    ZipOutputSink.of(outputPath!!)
+                } else {
+                    DirectoryOutputSink.of(outputPath!!)
                 }
 
-                classDumper.read(entry)
+                transformOutputDataEntriesWith({ name -> name.replace(".class", ".$suffix") }, sink)
             }
-        }
 
-        val inputSource = PathInputSource.of(inputPath, true)
-        inputSource.pumpDataEntries(
-            unwrapArchives(
-            filterDataEntriesBy(fileNameMatcher("**.class"),
-            processClassFile)))
+        writer.use {
+            val classDumper      = ClassDumpPrinter(writer, printHeader)
+            val classNameMatcher = if (classNameFilter != null) classNameMatcher(classNameFilter!!) else allMatcher()
+
+            val processClassFile = { entry: DataEntry ->
+                // this is a bit of a hack: we treat the entry name as internal classname
+                val className = entry.name.removeSuffix(".class").asInternalClassName().toExternalClassName()
+                if (classNameMatcher.matches(className)) {
+                    if (!dumpToConsole) {
+                        printVerbose("  dumping class '${entry.name}'")
+                    }
+
+                    classDumper.read(entry)
+                }
+            }
+
+            val inputSource = PathInputSource.of(inputPath, true)
+            inputSource.pumpDataEntries(
+                unwrapArchives(
+                filterDataEntriesBy(fileNameMatcher("**.class"),
+                processClassFile)))
+        }
     }
 
     private fun printVerbose(text: String) {
