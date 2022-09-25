@@ -83,8 +83,7 @@ class SmaliCommand : Runnable {
 
             val inputSource = PathInputSource.of(inputPath, true)
             inputSource.pumpDataEntries(
-                filterDataEntriesBy(
-                fileNameMatcher("**.smali"),
+                filterDataEntriesBy(fileNameMatcher("**.smali"),
                 processSmaliFile))
         }
 

@@ -76,8 +76,7 @@ class JasmCommand : Runnable {
 
             val inputSource = PathInputSource.of(inputPath, true)
             inputSource.pumpDataEntries(
-                filterDataEntriesBy(
-                fileNameMatcher("**.jasm"),
+                filterDataEntriesBy(fileNameMatcher("**.jasm"),
                 processJasmFile))
         }
 

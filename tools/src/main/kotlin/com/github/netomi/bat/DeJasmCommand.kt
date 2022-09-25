@@ -75,8 +75,7 @@ class DeJasmCommand : Runnable {
         val inputSource = PathInputSource.of(inputPath)
         inputSource.pumpDataEntries(
             unwrapArchives(
-            filterDataEntriesBy(
-            fileNameMatcher("**.class"),
+            filterDataEntriesBy(fileNameMatcher("**.class"),
             processClassFile)))
 
         val endTime = System.nanoTime()
