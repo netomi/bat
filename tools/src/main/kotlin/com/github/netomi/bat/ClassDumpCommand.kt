@@ -17,6 +17,9 @@ package com.github.netomi.bat
 
 import com.github.netomi.bat.classdump.ClassDumpPrinter
 import com.github.netomi.bat.io.*
+import com.github.netomi.bat.util.allMatcher
+import com.github.netomi.bat.util.asInternalClassName
+import com.github.netomi.bat.util.classNameMatcher
 import com.github.netomi.bat.util.fileNameMatcher
 import picocli.CommandLine
 import java.nio.file.Path
@@ -37,6 +40,9 @@ class ClassDumpCommand : Runnable {
     @CommandLine.Option(names = ["-o"], arity = "1", description = ["output file name (defaults to stdout)"])
     private var outputPath: Path? = null
 
+    @CommandLine.Option(names = ["-c"], description = ["class filter"])
+    private var classNameFilter: String? = null
+
     @CommandLine.Option(names = ["-s"], arity = "1", defaultValue = "dump", description = ["file suffix (defaults to 'dump')"])
     private lateinit var suffix: String
 
@@ -49,8 +55,6 @@ class ClassDumpCommand : Runnable {
     override fun run() {
         val dumpToConsole  = outputPath == null
         val dumpSingleFile = inputPath.endsWith(".class")
-
-        val classDumper = ClassDumpPrinter(printHeader)
 
         if (!dumpToConsole) {
             if (dumpSingleFile) {
@@ -70,12 +74,19 @@ class ClassDumpCommand : Runnable {
                 DirectoryOutputSink.of(outputPath!!))
             }
 
-        val processClassFile = { entry: DataEntry ->
-            if (!dumpToConsole) {
-                printVerbose("  dumping class '${entry.name}'")
-            }
+        val classDumper      = ClassDumpPrinter(writer, printHeader)
+        val classNameMatcher = if (classNameFilter != null) classNameMatcher(classNameFilter!!) else allMatcher()
 
-            classDumper.dumpClassFile(entry, writer)
+        val processClassFile = { entry: DataEntry ->
+            // this is a bit of a hack: we treat the entry name as internal classname
+            val className = entry.name.removeSuffix(".class").asInternalClassName().toExternalClassName()
+            if (classNameMatcher.matches(className)) {
+                if (!dumpToConsole) {
+                    printVerbose("  dumping class '${entry.name}'")
+                }
+
+                classDumper.read(entry)
+            }
         }
 
         val inputSource = PathInputSource.of(inputPath, true)

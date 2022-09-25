@@ -19,6 +19,7 @@ package com.github.netomi.bat.classdump
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.io.DataEntry
+import com.github.netomi.bat.io.DataEntryReader
 import com.github.netomi.bat.io.DataEntryWriter
 import com.github.netomi.bat.io.IndentingPrinter
 import java.io.BufferedInputStream
@@ -27,8 +28,9 @@ import java.security.MessageDigest
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class ClassDumpPrinter constructor(private val printHeader: Boolean = true) {
-    fun dumpClassFile(entry: DataEntry, writer: DataEntryWriter) {
+class ClassDumpPrinter constructor(private val writer:      DataEntryWriter,
+                                   private val printHeader: Boolean = true): DataEntryReader {
+    override fun read(entry: DataEntry) {
         BufferedInputStream(entry.getInputStream()).use { `is` ->
             `is`.mark(entry.size.toInt())
 

@@ -32,6 +32,10 @@ fun interface StringMatcher {
     }
 }
 
+fun allMatcher(): StringMatcher {
+    return StringMatcher { true }
+}
+
 fun simpleNameMatcher(regularExpression: String): StringMatcher {
     return SimpleNameMatcher(regularExpression)
 }

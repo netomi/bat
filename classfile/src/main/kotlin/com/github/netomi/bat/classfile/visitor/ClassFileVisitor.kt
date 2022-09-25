@@ -16,6 +16,16 @@
 package com.github.netomi.bat.classfile.visitor
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.util.StringMatcher
+import com.github.netomi.bat.util.classNameMatcher
+
+fun ClassFileVisitor.filteredByExternalClassName(regularExpression: String): ClassFileVisitor {
+    return filteredByExternalClassName(regularExpression, this)
+}
+
+fun filteredByExternalClassName(regularExpression: String, visitor: ClassFileVisitor): ClassFileVisitor {
+    return ExternalClassNameFilter(regularExpression, visitor)
+}
 
 fun allMethods(visitor: MethodVisitor): ClassFileVisitor {
     return ClassFileVisitor { it.methodsAccept(visitor) }
@@ -23,4 +33,20 @@ fun allMethods(visitor: MethodVisitor): ClassFileVisitor {
 
 fun interface ClassFileVisitor {
     fun visitClassFile(classFile: ClassFile)
+}
+
+private class ExternalClassNameFilter(regularExpression: String, private val visitor: ClassFileVisitor) : ClassFileVisitor {
+
+    private val matcher: StringMatcher = classNameMatcher(regularExpression)
+
+    override fun visitClassFile(classFile: ClassFile) {
+        val externalClassName = classFile.className.toExternalClassName()
+        if (accepted(externalClassName)) {
+            classFile.accept(visitor)
+        }
+    }
+
+    private fun accepted(className: String): Boolean {
+        return matcher.matches(className)
+    }
 }
