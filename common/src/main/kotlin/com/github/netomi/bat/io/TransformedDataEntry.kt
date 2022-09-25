@@ -17,6 +17,7 @@
 package com.github.netomi.bat.io
 
 import java.io.InputStream
+import java.nio.file.attribute.FileTime
 
 class TransformedDataEntry
     private constructor(private val newName:       String,
@@ -34,6 +35,12 @@ class TransformedDataEntry
     override fun getInputStream(): InputStream {
         return originalEntry.getInputStream()
     }
+
+    override val lastModifiedTime: FileTime
+        get() = originalEntry.lastModifiedTime
+
+    override val size: Long
+        get() = originalEntry.size
 
     companion object {
         fun of(transformedName: String, originalEntry: DataEntry): TransformedDataEntry {

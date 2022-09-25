@@ -70,9 +70,12 @@ internal class ClassFilePrinter : ClassFileVisitor, MemberVisitor
             val module = classFile.attributes.filterIsInstance<ModuleAttribute>().single()
 
             val moduleName    = module.getModuleName(classFile)
-            val moduleVersion = module.getModuleVersion(classFile)
+            printer.print("module $moduleName")
 
-            printer.print("module %s@%s".format(moduleName, moduleVersion))
+            val moduleVersion = module.getModuleVersion(classFile)
+            if (moduleVersion != null) {
+                printer.print("@$moduleVersion")
+            }
         } else {
             val accessFlagsString = classFile.accessFlagsAsSet.toPrintableString()
             if (accessFlagsString.isNotEmpty()) {

@@ -75,11 +75,7 @@ class ClassDumpCommand : Runnable {
                 printVerbose("  dumping class '${entry.name}'")
             }
 
-            entry.getInputStream().use { `is` ->
-                writer.createOutputStream(entry).use { os ->
-                    classDumper.dumpClassFile(inputPath, `is`, os)
-                }
-            }
+            classDumper.dumpClassFile(entry, writer)
         }
 
         val inputSource = PathInputSource.of(inputPath, true)

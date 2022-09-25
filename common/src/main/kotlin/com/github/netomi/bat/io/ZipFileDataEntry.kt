@@ -17,6 +17,7 @@
 package com.github.netomi.bat.io
 
 import java.io.InputStream
+import java.nio.file.attribute.FileTime
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -34,6 +35,12 @@ class ZipFileDataEntry private constructor( private val zipFile:  ZipFile,
     override fun getInputStream(): InputStream {
         return zipFile.getInputStream(zipEntry)
     }
+
+    override val lastModifiedTime: FileTime
+        get() = zipEntry.lastModifiedTime
+
+    override val size: Long
+        get() = zipEntry.size
 
     override fun toString(): String {
         return "ZipFileDataEntry[name=$fullName]"

@@ -17,10 +17,14 @@
 package com.github.netomi.bat.io
 
 import java.io.InputStream
+import java.nio.file.attribute.FileTime
 
 interface DataEntry {
     val name:     String
     val fullName: String
     val parent:   DataEntry?
     fun getInputStream(): InputStream
+
+    val lastModifiedTime: FileTime
+    val size: Long
 }

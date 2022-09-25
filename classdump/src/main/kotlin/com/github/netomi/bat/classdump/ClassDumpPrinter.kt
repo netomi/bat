@@ -18,49 +18,53 @@ package com.github.netomi.bat.classdump
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.io.ClassFileReader
+import com.github.netomi.bat.io.DataEntry
+import com.github.netomi.bat.io.DataEntryWriter
 import com.github.netomi.bat.io.IndentingPrinter
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.BufferedInputStream
 import java.io.OutputStreamWriter
-import java.nio.file.Files
-import java.nio.file.Path
 import java.security.MessageDigest
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import kotlin.io.path.getLastModifiedTime
-import kotlin.io.path.readBytes
 
 class ClassDumpPrinter constructor(private val printHeader: Boolean = true) {
-    fun dumpClassFile(inputPath: Path, `is`: InputStream, os: OutputStream) {
-        val classFile = ClassFile.empty()
-        val reader    = ClassFileReader(`is`)
-        reader.visitClassFile(classFile)
+    fun dumpClassFile(entry: DataEntry, writer: DataEntryWriter) {
+        BufferedInputStream(entry.getInputStream()).use { `is` ->
+            `is`.mark(entry.size.toInt())
 
-        if (printHeader) {
-            val writer  = OutputStreamWriter(os)
-            val printer = IndentingPrinter(writer, 2)
+            val classFile = ClassFile.empty()
+            val reader    = ClassFileReader(`is`)
+            reader.visitClassFile(classFile)
 
-            printer.println("Classfile ${inputPath.toAbsolutePath()}")
-            printer.levelUp()
+            val os      = writer.createOutputStream(entry)
+            val printer = IndentingPrinter(OutputStreamWriter(os), 2)
 
-            val formatter = DateTimeFormatter.ofPattern("LLL d, yyyy").withZone(ZoneId.systemDefault())
-            val lastModified = inputPath.getLastModifiedTime().toInstant()
-            val fileSize = Files.size(inputPath)
-            printer.println("Last modified ${formatter.format(lastModified)}; size $fileSize bytes")
+            printer.use {
+                if (printHeader) {
+                    printer.println("Classfile ${entry.fullName}")
+                    printer.levelUp()
 
-            val sha256Checksum = MessageDigest.getInstance("SHA-256")!!
-            val checksum = sha256Checksum.digest(inputPath.readBytes()).joinToString(separator = "") { "%02x".format(it) }
-            printer.println("SHA-256 checksum $checksum")
+                    val formatter = DateTimeFormatter.ofPattern("LLL d, yyyy").withZone(ZoneId.systemDefault())
+                    val lastModified = entry.lastModifiedTime.toInstant()
+                    val fileSize     = entry.size
+                    printer.println("Last modified ${formatter.format(lastModified)}; size $fileSize bytes")
 
-            val sourceFile = classFile.sourceFile
-            if (sourceFile != null) {
-                printer.println("Compiled from \"$sourceFile\"")
+                    val sha256Checksum = MessageDigest.getInstance("SHA-256")!!
+                    `is`.reset()
+                    val checksum = sha256Checksum.digest(`is`.readBytes()).joinToString(separator = "") { "%02x".format(it) }
+                    printer.println("SHA-256 checksum $checksum")
+
+                    val sourceFile = classFile.sourceFile
+                    if (sourceFile != null) {
+                        printer.println("Compiled from \"$sourceFile\"")
+                    }
+
+                    printer.levelDown()
+                    printer.flush()
+                }
+
+                classFile.accept(ClassFilePrinter(os))
             }
-
-            printer.levelDown()
-            printer.flush()
         }
-
-        classFile.accept(ClassFilePrinter(os))
     }
 }

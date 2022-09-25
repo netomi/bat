@@ -32,6 +32,7 @@ internal object StringEscapers {
             Pair('\'',     "\\'"),
             Pair('\"',     "\\\""),
             Pair('\\',     "\\\\"),
+            Pair('\b',     "\\b"),
             Pair('\n',     "\\n"),
             Pair('\r',     "\\r"),
             Pair('\t',     "\\t"),

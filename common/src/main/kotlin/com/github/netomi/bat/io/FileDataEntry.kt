@@ -19,9 +19,8 @@ package com.github.netomi.bat.io
 import java.io.InputStream
 import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.inputStream
-import kotlin.io.path.pathString
-import kotlin.io.path.relativeTo
+import java.nio.file.attribute.FileTime
+import kotlin.io.path.*
 
 class FileDataEntry private constructor(private val baseDir:      Path,
                                         private val relativePath: Path): DataEntry {
@@ -30,7 +29,7 @@ class FileDataEntry private constructor(private val baseDir:      Path,
         get() = relativePath.pathString
 
     override val fullName: String
-        get() = path.pathString
+        get() = path.toAbsolutePath().normalize().pathString
 
     override val parent: DataEntry?
         get() = null
@@ -41,6 +40,12 @@ class FileDataEntry private constructor(private val baseDir:      Path,
     override fun getInputStream(): InputStream {
         return path.inputStream()
     }
+
+    override val lastModifiedTime: FileTime
+        get() = path.getLastModifiedTime()
+
+    override val size: Long
+        get() = path.fileSize()
 
     override fun toString(): String {
         return "FileDataEntry[name=$name]"
