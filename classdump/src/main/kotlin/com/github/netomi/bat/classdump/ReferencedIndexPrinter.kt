@@ -54,6 +54,7 @@ internal class ReferencedIndexPrinter constructor(private val printer: Indenting
     }
 
     override fun visitAnnotationElementValue(classFile: ClassFile, elementValue: AnnotationElementValue) {
+        printer.print("@")
         visitAnnotation(classFile, elementValue.annotation)
     }
 
