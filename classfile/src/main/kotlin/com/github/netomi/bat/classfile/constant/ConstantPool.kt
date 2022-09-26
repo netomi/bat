@@ -122,7 +122,7 @@ internal class ConstantPool
     }
 
     @Throws(IOException::class)
-    fun write(output: ClassDataOutput) {
+    internal fun write(output: ClassDataOutput) {
         val entries = constants.size
         output.writeShort(entries)
         val it: ListIterator<Constant?> = constants.listIterator(1)

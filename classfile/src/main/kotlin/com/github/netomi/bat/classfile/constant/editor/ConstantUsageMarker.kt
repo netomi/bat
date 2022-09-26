@@ -14,19 +14,22 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.io
+package com.github.netomi.bat.classfile.constant.editor
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
-import java.io.InputStream
+import com.github.netomi.bat.classfile.constant.Constant
 
-class ClassFileReader(private val `is`:           InputStream,
-                      private val skipAttributes: Boolean = false): ClassFileVisitor {
+internal class ConstantUsageMarker {
+    private val usageMap: MutableMap<Constant, Usage> = mutableMapOf()
 
-    private lateinit var input: ClassDataInput
-
-    override fun visitClassFile(classFile: ClassFile) {
-        input = ClassDataInput.of(`is`, classFile, skipAttributes)
-        classFile.read(input)
+    fun markUsed(item: Constant) {
+        usageMap[item] = Usage.USED
     }
+
+    fun isUsed(item: Constant): Boolean {
+        return usageMap[item] == Usage.USED
+    }
+}
+
+internal enum class Usage {
+    USED
 }

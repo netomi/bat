@@ -23,8 +23,11 @@ import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ListElementAccessor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
+import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.classfile.io.ClassDataOutput
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.classfile.visitor.FieldVisitor
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
@@ -38,16 +41,8 @@ import java.io.InputStream
 /**
  * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
  */
-class ClassFile
-    private constructor(version:                   Version             = Version.JAVA_8,
-                        accessFlags:               Int                 = 0,
-                        thisClassIndex:            Int                 = -1,
-                        superClassIndex:           Int                 = -1,
-                        internal var constantPool: ConstantPool        = ConstantPool.empty(),
-                        internal var _interfaces:  MutableList<Int>    = mutableListOfCapacity(0),
-                        internal var _fields:      MutableList<Field>  = mutableListOfCapacity(0),
-                        internal var _methods:     MutableList<Method> = mutableListOfCapacity(0),
-                        internal var attributeMap: AttributeMap        = AttributeMap.empty()) {
+open class ClassFile protected constructor(version:     Version = Version.JAVA_8,
+                                           accessFlags: Int     = 0) {
 
     var majorVersion = version.majorVersion
         internal set
@@ -71,11 +66,13 @@ class ClassFile
     var modifiers: Set<ClassModifier> = ClassModifier.setOf(accessFlags)
         private set
 
-    var thisClassIndex = thisClassIndex
+    var thisClassIndex = -1
         internal set
 
-    var superClassIndex = superClassIndex
+    var superClassIndex = -1
         internal set
+
+    internal var constantPool = ConstantPool.empty()
 
     val isInterface: Boolean
         get() = modifiers.contains(ClassModifier.INTERFACE)
@@ -92,6 +89,13 @@ class ClassFile
     val superClassName: JvmClassName?
         get() = if (superClassIndex > 0) getClassName(superClassIndex) else null
 
+    // interfaces
+
+    private var _interfaces: MutableList<Int> = mutableListOfCapacity(0)
+
+    val interfaceCount: Int
+        get() = _interfaces.size
+
     val interfaces: List<JvmClassName>
         get() {
             return if (_interfaces.isEmpty()) {
@@ -101,6 +105,10 @@ class ClassFile
             }
         }
 
+    // fields
+
+    private var _fields: MutableList<Field>  = mutableListOfCapacity(0)
+
     val fields: List<Field>
         get() = _fields
 
@@ -108,12 +116,20 @@ class ClassFile
         _fields.add(field)
     }
 
+    // methods
+
+    private var _methods: MutableList<Method> = mutableListOfCapacity(0)
+
     val methods: List<Method>
         get() = _methods
 
     internal fun addMethod(method: Method) {
         _methods.add(method)
     }
+
+    // attributes
+
+    internal var attributeMap = AttributeMap.empty()
 
     val attributes: Sequence<Attribute>
         get() = attributeMap
@@ -244,6 +260,10 @@ class ClassFile
             constantPool.referencedConstantsAccept(this, visitor)
         }
 
+        for ((index, _) in _interfaces.withIndex()) {
+            visitor.visitClassConstant(this, this, ListElementAccessor(_interfaces, index))
+        }
+
         for (field in fields) {
             field.referencedConstantsAccept(this, visitor)
         }
@@ -255,6 +275,67 @@ class ClassFile
         for (attribute in attributes) {
             attribute.referencedConstantsAccept(this, visitor)
         }
+    }
+
+    internal fun read(input: ClassDataInput) {
+        val magic = input.readInt()
+        require(magic == MAGIC) { "invalid magic bytes when trying to read a class file." }
+
+        minorVersion    = input.readUnsignedShort()
+        majorVersion    = input.readUnsignedShort()
+        constantPool.read(input)
+        accessFlags     = input.readUnsignedShort()
+        thisClassIndex  = input.readUnsignedShort()
+        superClassIndex = input.readUnsignedShort()
+
+        val interfacesCount = input.readUnsignedShort()
+        _interfaces = mutableListOfCapacity(interfacesCount)
+        for (i in 0 until interfacesCount) {
+            val idx = input.readUnsignedShort()
+            _interfaces.add(idx)
+        }
+
+        val fieldCount = input.readUnsignedShort()
+        _fields = mutableListOfCapacity(fieldCount)
+        for (i in 0 until fieldCount) {
+            addField(Field.readField(input))
+        }
+
+        val methodCount = input.readUnsignedShort()
+        _methods = mutableListOfCapacity(methodCount)
+        for (i in 0 until methodCount) {
+            _methods.add(Method.readMethod(input))
+        }
+
+        attributeMap = input.readAttributes()
+    }
+
+    internal fun write(output: ClassDataOutput) {
+        output.writeInt(MAGIC)
+
+        output.writeShort(minorVersion)
+        output.writeShort(majorVersion)
+        constantPool.write(output)
+        output.writeShort(accessFlags)
+        output.writeShort(thisClassIndex)
+        output.writeShort(superClassIndex)
+
+        output.writeShort(_interfaces.size)
+        for (index in _interfaces) {
+            output.writeShort(index)
+        }
+
+        output.writeShort(_fields.size)
+        for (field in _fields) {
+            field.write(output)
+        }
+
+        output.writeShort(_methods.size)
+        for (method in _methods) {
+            method.write(output)
+        }
+
+        attributeMap.write(output)
     }
 
     override fun toString(): String {
@@ -270,15 +351,10 @@ class ClassFile
             return ClassFile()
         }
 
-        fun of(version: Version): ClassFile {
-            return ClassFile(version)
-        }
-
         fun of(className: String, accessFlags: Int, superClassName: String? = null, version: Version = Version.JAVA_8): ClassFile {
-            val classFile            = ClassFile(version)
+            val classFile            = ClassFile(version, accessFlags)
             val constantPoolEditor   = ConstantPoolEditor.of(classFile)
             classFile.thisClassIndex = constantPoolEditor.addOrGetClassConstantIndex(className)
-            classFile.accessFlags    = accessFlags
 
             if (superClassName != null) {
                 classFile.superClassIndex = constantPoolEditor.addOrGetClassConstantIndex(superClassName)

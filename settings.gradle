@@ -9,4 +9,5 @@ include 'dexdump'
 include 'common'
 include 'jasm'
 include 'tinydvm'
+include 'shrinker'
 

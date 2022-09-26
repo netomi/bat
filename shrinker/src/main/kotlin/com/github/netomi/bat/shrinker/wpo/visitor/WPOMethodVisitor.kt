@@ -14,19 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.io
+package com.github.netomi.bat.shrinker.wpo.visitor
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
-import java.io.InputStream
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
 
-class ClassFileReader(private val `is`:           InputStream,
-                      private val skipAttributes: Boolean = false): ClassFileVisitor {
+fun interface WPOMethodVisitor {
+    fun visitAnyMethod(clazz: WPOClass, method: Method)
 
-    private lateinit var input: ClassDataInput
+    fun visitProgramMethod(clazz: WPOClass, method: Method) {
+        visitAnyMethod(clazz, method)
+    }
 
-    override fun visitClassFile(classFile: ClassFile) {
-        input = ClassDataInput.of(`is`, classFile, skipAttributes)
-        classFile.read(input)
+    fun visitLibraryMethod(clazz: WPOClass, method: Method) {
+        visitAnyMethod(clazz, method)
     }
 }

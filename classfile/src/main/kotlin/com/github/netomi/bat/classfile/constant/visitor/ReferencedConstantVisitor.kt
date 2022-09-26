@@ -111,6 +111,16 @@ internal class PropertyAccessor(private val property: KMutableProperty0<Int>): I
     }
 }
 
+class ListElementAccessor(private val list: MutableList<Int>, private val index: Int): IDAccessor {
+    override fun get(): Int {
+        return list[index]
+    }
+
+    override fun set(value: Int) {
+        list[index] = value
+    }
+}
+
 class ArrayElementAccessor(private val array: IntArray, private val index: Int): IDAccessor {
     override fun get(): Int {
         return array[index]

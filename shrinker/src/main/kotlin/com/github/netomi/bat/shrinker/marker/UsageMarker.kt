@@ -14,19 +14,7 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.io
+package com.github.netomi.bat.shrinker.marker
 
-import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.visitor.ClassFileVisitor
-import java.io.InputStream
-
-class ClassFileReader(private val `is`:           InputStream,
-                      private val skipAttributes: Boolean = false): ClassFileVisitor {
-
-    private lateinit var input: ClassDataInput
-
-    override fun visitClassFile(classFile: ClassFile) {
-        input = ClassDataInput.of(`is`, classFile, skipAttributes)
-        classFile.read(input)
-    }
+class UsageMarker {
 }

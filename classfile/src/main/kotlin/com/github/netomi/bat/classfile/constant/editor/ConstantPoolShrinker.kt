@@ -27,7 +27,6 @@ import com.github.netomi.bat.classfile.constant.ConstantPool
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.IDAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
-import com.github.netomi.bat.classfile.marker.UsageMarker
 import com.github.netomi.bat.classfile.instruction.ConstantInstruction
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
@@ -39,7 +38,7 @@ import com.github.netomi.bat.classfile.visitor.allMethods
 class ConstantPoolShrinker: ClassFileVisitor {
 
     override fun visitClassFile(classFile: ClassFile) {
-        val usageMarker    = UsageMarker()
+        val usageMarker    = ConstantUsageMarker()
         val constantMarker = ReferencedConstantsMarker(usageMarker)
         classFile.referencedConstantsAccept(false, constantMarker)
         classFile.accept(allMethods(allCode(allInstructions(InstructionConstantMarker(constantMarker)))))
@@ -49,8 +48,7 @@ class ConstantPoolShrinker: ClassFileVisitor {
 
         classFile.constantsAccept { _, oldIndex, constant ->
             if (usageMarker.isUsed(constant)) {
-                val newIndex      = shrunkConstantPool.addConstant(constant)
-                mapping[oldIndex] = newIndex
+                mapping[oldIndex] = shrunkConstantPool.addConstant(constant)
             }
         }
 
@@ -60,9 +58,9 @@ class ConstantPoolShrinker: ClassFileVisitor {
             // update the new constant indices in all items of the class file.
             classFile.referencedConstantsAccept(true) { _, owner, accessor ->
                 val constantIndex = accessor.get()
-                val newIndex = mapping[constantIndex]
+                val newIndex      = mapping[constantIndex]
                 if (newIndex < 0) {
-                    error("no mapping found for constant index '$constantIndex' referenced from '$owner")
+                    error("no mapping found for constant index '$constantIndex' referenced from '$owner'")
                 } else {
                     accessor.set(newIndex)
                 }
@@ -74,7 +72,7 @@ class ConstantPoolShrinker: ClassFileVisitor {
     }
 }
 
-private class ReferencedConstantsMarker constructor(val usageMarker: UsageMarker): ReferencedConstantVisitor, ConstantVisitor {
+private class ReferencedConstantsMarker constructor(val usageMarker: ConstantUsageMarker): ReferencedConstantVisitor, ConstantVisitor {
     override fun visitAnyConstant(classFile: ClassFile, owner: Any, accessor: IDAccessor) {
         val constantIndex = accessor.get()
         val constant = classFile.getConstant(constantIndex)

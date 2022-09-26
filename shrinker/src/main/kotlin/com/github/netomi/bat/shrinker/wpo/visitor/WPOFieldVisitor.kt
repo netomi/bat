@@ -14,20 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.marker
+package com.github.netomi.bat.shrinker.wpo.visitor
 
-class UsageMarker {
-    private val usageMap: MutableMap<Any, Usage> = mutableMapOf()
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
 
-    fun markUsed(item: Any) {
-        usageMap[item] = Usage.USED
+fun interface WPOFieldVisitor {
+    fun visitAnyField(clazz: WPOClass, field: Field)
+
+    fun visitProgramField(clazz: WPOClass, field: Field) {
+        visitAnyField(clazz, field)
     }
 
-    fun isUsed(item: Any): Boolean {
-        return usageMap[item] == Usage.USED
+    fun visitLibraryField(clazz: WPOClass, field: Field) {
+        visitAnyField(clazz, field)
     }
-}
-
-private enum class Usage {
-    USED
 }
