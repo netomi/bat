@@ -16,5 +16,24 @@
 
 package com.github.netomi.bat.shrinker.marker
 
+import java.util.IdentityHashMap
+
 class UsageMarker {
+    private val usageMap: IdentityHashMap<Any, Usage> = IdentityHashMap()
+
+    fun markAsUsed(item: Any) {
+        usageMap[item] = Usage.USED
+    }
+
+    fun isUsed(item: Any): Boolean {
+        return usageMap[item] == Usage.USED
+    }
+
+    fun isNotUsed(item: Any): Boolean {
+        return !isUsed(item)
+    }
+}
+
+internal enum class Usage {
+    USED
 }

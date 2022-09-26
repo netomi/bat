@@ -32,9 +32,9 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  */
 abstract class WPOClass: ClassFile() {
 
-    internal var superClass:       WPOClass?              = null
-    internal var interfaceClasses: MutableList<WPOClass?> = mutableListOfCapacity(0)
-    internal var subClasses:       MutableList<WPOClass>  = mutableListOfCapacity(0)
+    internal var superClass:       WPOClass?             = null
+    internal var interfaceClasses: MutableList<WPOClass> = mutableListOfCapacity(0)
+    internal var subClasses:       MutableList<WPOClass> = mutableListOfCapacity(0)
 
     internal fun addSubClass(clazz: WPOClass) {
         subClasses.add(clazz)

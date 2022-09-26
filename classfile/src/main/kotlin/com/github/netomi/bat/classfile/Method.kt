@@ -57,6 +57,11 @@ class Method private constructor(nameIndex:       Int = -1,
     val hasCode: Boolean
         get() = attributeMap.get<CodeAttribute>(AttributeType.CODE) != null
 
+    fun isInitializer(classFile: ClassFile): Boolean {
+        val methodName = getName(classFile)
+        return (methodName == "<init>" || methodName == "<clinit>")
+    }
+
     fun getExceptionClassNames(classFile: ClassFile): List<JvmClassName> {
         return attributeMap.get<ExceptionsAttribute>(AttributeType.EXCEPTIONS)?.getExceptionClassNames(classFile) ?: emptyList()
     }

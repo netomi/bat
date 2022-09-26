@@ -21,10 +21,10 @@ import com.github.netomi.bat.util.toHexStringWithPrefix
  * An enum to represent the mutually exclusive visibility flag.
  */
 enum class Visibility(val flagValue: Int) {
-    PUBLIC         (ACC_PUBLIC),
     PRIVATE        (ACC_PRIVATE),
+    PACKAGE_PRIVATE(0x0),
     PROTECTED      (ACC_PROTECTED),
-    PACKAGE_PRIVATE(0x0);
+    PUBLIC         (ACC_PUBLIC);
 
     companion object {
         fun of(accessFlags: Int): Visibility {

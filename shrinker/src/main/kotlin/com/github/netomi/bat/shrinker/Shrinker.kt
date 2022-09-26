@@ -19,6 +19,8 @@ package com.github.netomi.bat.shrinker
 import com.github.netomi.bat.io.PathInputSource
 import com.github.netomi.bat.io.filterDataEntriesBy
 import com.github.netomi.bat.io.unwrapArchives
+import com.github.netomi.bat.shrinker.marker.ClassUsageMarker
+import com.github.netomi.bat.shrinker.marker.UsageMarker
 import com.github.netomi.bat.shrinker.wpo.WPOContext
 import com.github.netomi.bat.shrinker.wpo.io.readLibraryClasses
 import com.github.netomi.bat.shrinker.wpo.io.readProgramClasses
@@ -48,6 +50,16 @@ fun main(args: Array<String>) {
 
     context.init()
 
-    val objectClass = context.getClass("java/lang/Object")
+    val usageMarker = UsageMarker()
+    context.libraryClassesAccept(ClassUsageMarker(usageMarker))
+
+    val clazz = context.getClass("test0007/Testa")
+
+    context.programClassesAccept(ClassShrinker(usageMarker))
+
+    for (method in clazz!!.methods) {
+        println("${method.getName(clazz)} = ${usageMarker.isUsed(method)}")
+    }
+
     println("done")
 }

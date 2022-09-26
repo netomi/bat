@@ -62,6 +62,10 @@ class ClassEditor private constructor(private val classFile: ClassFile): Attribu
         return MethodEditor.of(constantPoolEditor, method)
     }
 
+    fun removeMethod(method: Method) {
+        classFile.removeMethod(method)
+    }
+
     companion object {
         fun of(classFile: ClassFile): ClassEditor {
             return ClassEditor(classFile)

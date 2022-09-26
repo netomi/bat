@@ -127,6 +127,10 @@ open class ClassFile protected constructor(version:     Version = Version.JAVA_8
         _methods.add(method)
     }
 
+    internal fun removeMethod(method: Method) {
+        _methods.remove(method)
+    }
+
     // attributes
 
     internal var attributeMap = AttributeMap.empty()
