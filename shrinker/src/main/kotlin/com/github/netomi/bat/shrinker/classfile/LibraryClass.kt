@@ -14,12 +14,12 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.classfile
+package com.github.netomi.bat.shrinker.classfile
 
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOClassVisitor
+import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
 
-class LibraryClass: WPOClass() {
-    override fun accept(visitor: WPOClassVisitor) {
+class LibraryClass: AnalysisClass() {
+    override fun accept(visitor: AnalysisClassVisitor) {
         visitor.visitLibraryClass(this)
     }
 }

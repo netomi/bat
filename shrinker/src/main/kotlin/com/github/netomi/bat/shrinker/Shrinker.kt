@@ -19,18 +19,19 @@ package com.github.netomi.bat.shrinker
 import com.github.netomi.bat.io.PathInputSource
 import com.github.netomi.bat.io.filterDataEntriesBy
 import com.github.netomi.bat.io.unwrapArchives
+import com.github.netomi.bat.shrinker.editor.ClassShrinker
 import com.github.netomi.bat.shrinker.marker.ClassUsageMarker
 import com.github.netomi.bat.shrinker.marker.UsageMarker
-import com.github.netomi.bat.shrinker.wpo.WPOContext
-import com.github.netomi.bat.shrinker.wpo.io.readLibraryClasses
-import com.github.netomi.bat.shrinker.wpo.io.readProgramClasses
+import com.github.netomi.bat.shrinker.io.readLibraryClasses
+import com.github.netomi.bat.shrinker.io.readProgramClasses
+import com.github.netomi.bat.shrinker.util.AnalysisContext
 import com.github.netomi.bat.util.fileNameMatcher
 import java.nio.file.Path
 
 fun main(args: Array<String>) {
     val jmodPath = Path.of("/home/tn/.sdkman/candidates/java/current/jmods")
 
-    val context = WPOContext()
+    val context = AnalysisContext()
 
     val inputSource = PathInputSource.of(jmodPath)
     inputSource.pumpDataEntries(

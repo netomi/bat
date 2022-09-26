@@ -14,18 +14,16 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo
+package com.github.netomi.bat.shrinker.util
 
 import com.github.netomi.bat.classfile.util.ClassPool
-import com.github.netomi.bat.shrinker.wpo.classfile.LibraryClass
-import com.github.netomi.bat.shrinker.wpo.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
-import com.github.netomi.bat.shrinker.wpo.util.WPOClassCleaner
-import com.github.netomi.bat.shrinker.wpo.util.WPOClassInitializer
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOClassVisitor
+import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.shrinker.classfile.LibraryClass
+import com.github.netomi.bat.shrinker.classfile.ProgramClass
+import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
 import com.github.netomi.bat.util.JvmClassName
 
-class WPOContext {
+class AnalysisContext {
     private val programClassPool: ClassPool<ProgramClass> = ClassPool.empty()
     private val libraryClassPool: ClassPool<LibraryClass> = ClassPool.empty()
 
@@ -35,12 +33,12 @@ class WPOContext {
     val libraryClassCount: Int
         get() = libraryClassPool.size
 
-    fun getClass(internalClassName: String): WPOClass? {
+    fun getClass(internalClassName: String): AnalysisClass? {
         return programClassPool.getClass(internalClassName)
             ?: libraryClassPool.getClass(internalClassName)
     }
 
-    fun getClass(className: JvmClassName): WPOClass? {
+    fun getClass(className: JvmClassName): AnalysisClass? {
         val internalClassName = className.toInternalClassName()
         return getClass(internalClassName)
     }
@@ -53,26 +51,26 @@ class WPOContext {
         libraryClassPool.addClass(classFile)
     }
 
-    fun programClassesAccept(visitor: WPOClassVisitor) {
+    fun programClassesAccept(visitor: AnalysisClassVisitor) {
         programClassPool.classesAccept(visitor)
     }
 
-    fun libraryClassesAccept(visitor: WPOClassVisitor) {
+    fun libraryClassesAccept(visitor: AnalysisClassVisitor) {
         libraryClassPool.classesAccept(visitor)
     }
 
     fun init() {
-        val cleaner = WPOClassCleaner()
+        val cleaner = ClassCleaner()
         libraryClassPool.accept(cleaner)
         programClassPool.accept(cleaner)
 
-        val initializer = WPOClassInitializer(this)
+        val initializer = ClassInitializer(this)
         libraryClassPool.accept(initializer)
         programClassPool.accept(initializer)
     }
 }
 
-fun <T: WPOClass> ClassPool<T>.classesAccept(visitor: WPOClassVisitor) {
+fun <T: AnalysisClass> ClassPool<T>.classesAccept(visitor: AnalysisClassVisitor) {
     for (clazz in this) {
         clazz.accept(visitor)
     }

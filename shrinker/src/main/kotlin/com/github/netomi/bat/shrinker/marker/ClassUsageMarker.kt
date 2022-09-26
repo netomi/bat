@@ -18,16 +18,16 @@ package com.github.netomi.bat.shrinker.marker
 
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.Visibility
-import com.github.netomi.bat.shrinker.wpo.classfile.LibraryClass
-import com.github.netomi.bat.shrinker.wpo.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOClassVisitor
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOMethodVisitor
-import com.github.netomi.bat.shrinker.wpo.visitor.filterMethodsByNameAndDescriptor
+import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.shrinker.classfile.LibraryClass
+import com.github.netomi.bat.shrinker.classfile.ProgramClass
+import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
+import com.github.netomi.bat.shrinker.visitor.AnalysisMethodVisitor
+import com.github.netomi.bat.shrinker.visitor.filterMethodsByNameAndDescriptor
 
-class ClassUsageMarker constructor(private val marker: UsageMarker): WPOClassVisitor, WPOMethodVisitor {
+class ClassUsageMarker constructor(private val marker: UsageMarker): AnalysisClassVisitor, AnalysisMethodVisitor {
 
-    override fun visitAnyWPOClass(clazz: WPOClass) {}
+    override fun visitAnyWPOClass(clazz: AnalysisClass) {}
 
     override fun visitProgramClass(clazz: ProgramClass) {}
 
@@ -45,15 +45,15 @@ class ClassUsageMarker constructor(private val marker: UsageMarker): WPOClassVis
         }
     }
 
-    override fun visitAnyMethod(clazz: WPOClass, method: Method) {}
+    override fun visitAnyMethod(clazz: AnalysisClass, method: Method) {}
 
-    override fun visitProgramMethod(clazz: WPOClass, method: Method) {
+    override fun visitProgramMethod(clazz: AnalysisClass, method: Method) {
         if (!marker.isUsed(method)) {
             marker.markAsUsed(method)
         }
     }
 
-    override fun visitLibraryMethod(clazz: WPOClass, method: Method) {
+    override fun visitLibraryMethod(clazz: AnalysisClass, method: Method) {
         if (!marker.isUsed(method)) {
             marker.markAsUsed(method)
 
@@ -61,7 +61,7 @@ class ClassUsageMarker constructor(private val marker: UsageMarker): WPOClassVis
         }
     }
 
-    private fun markMethodHierarchy(clazz: WPOClass, method: Method) {
+    private fun markMethodHierarchy(clazz: AnalysisClass, method: Method) {
         if (!method.isInitializer(clazz) &&
             !method.isStatic             &&
              method.visibility >= Visibility.PACKAGE_PRIVATE) {
@@ -69,7 +69,8 @@ class ClassUsageMarker constructor(private val marker: UsageMarker): WPOClassVis
                 subClass.methodsAccept(
                     filterMethodsByNameAndDescriptor(method.getName(clazz),
                                                      method.getDescriptor(clazz),
-                    this))
+                    this)
+                )
             }
         }
     }

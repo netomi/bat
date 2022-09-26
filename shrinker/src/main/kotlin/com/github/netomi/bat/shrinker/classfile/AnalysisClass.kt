@@ -14,14 +14,14 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.classfile
+package com.github.netomi.bat.shrinker.classfile
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOClassVisitor
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOFieldVisitor
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOMethodVisitor
+import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
+import com.github.netomi.bat.shrinker.visitor.AnalysisFieldVisitor
+import com.github.netomi.bat.shrinker.visitor.AnalysisMethodVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 /**
@@ -30,32 +30,32 @@ import com.github.netomi.bat.util.mutableListOfCapacity
  * It is mainly used to distinguish between program and library classes and
  * to cache references for super / interface and subclasses.
  */
-abstract class WPOClass: ClassFile() {
+abstract class AnalysisClass: ClassFile() {
 
-    internal var superClass:       WPOClass?             = null
-    internal var interfaceClasses: MutableList<WPOClass> = mutableListOfCapacity(0)
-    internal var subClasses:       MutableList<WPOClass> = mutableListOfCapacity(0)
+    internal var superClass:       AnalysisClass?             = null
+    internal var interfaceClasses: MutableList<AnalysisClass> = mutableListOfCapacity(0)
+    internal var subClasses:       MutableList<AnalysisClass> = mutableListOfCapacity(0)
 
-    internal fun addSubClass(clazz: WPOClass) {
+    internal fun addSubClass(clazz: AnalysisClass) {
         subClasses.add(clazz)
     }
 
-    abstract fun accept(visitor: WPOClassVisitor)
+    abstract fun accept(visitor: AnalysisClassVisitor)
 
-    fun fieldsAccept(visitor: WPOFieldVisitor) {
+    fun fieldsAccept(visitor: AnalysisFieldVisitor) {
         for (field in fields) {
             field.accept(this, visitor)
         }
     }
 
-    fun methodsAccept(visitor: WPOMethodVisitor) {
+    fun methodsAccept(visitor: AnalysisMethodVisitor) {
         for (method in methods) {
             method.accept(this, visitor)
         }
     }
 }
 
-fun Field.accept(clazz: WPOClass, visitor: WPOFieldVisitor) {
+fun Field.accept(clazz: AnalysisClass, visitor: AnalysisFieldVisitor) {
     when (clazz) {
         is ProgramClass -> visitor.visitProgramField(clazz, this)
         is LibraryClass -> visitor.visitLibraryField(clazz, this)
@@ -63,7 +63,7 @@ fun Field.accept(clazz: WPOClass, visitor: WPOFieldVisitor) {
     }
 }
 
-fun Method.accept(clazz: WPOClass, visitor: WPOMethodVisitor) {
+fun Method.accept(clazz: AnalysisClass, visitor: AnalysisMethodVisitor) {
     when (clazz) {
         is ProgramClass -> visitor.visitProgramMethod(clazz, this)
         is LibraryClass -> visitor.visitLibraryMethod(clazz, this)

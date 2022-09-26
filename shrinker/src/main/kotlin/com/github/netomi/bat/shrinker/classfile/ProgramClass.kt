@@ -14,20 +14,12 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.visitor
+package com.github.netomi.bat.shrinker.classfile
 
-import com.github.netomi.bat.shrinker.wpo.classfile.LibraryClass
-import com.github.netomi.bat.shrinker.wpo.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
+import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
 
-fun interface WPOClassVisitor {
-    fun visitAnyWPOClass(clazz: WPOClass)
-
-    fun visitProgramClass(clazz: ProgramClass) {
-        visitAnyWPOClass(clazz)
-    }
-
-    fun visitLibraryClass(clazz: LibraryClass) {
-        visitAnyWPOClass(clazz)
+class ProgramClass: AnalysisClass() {
+    override fun accept(visitor: AnalysisClassVisitor) {
+        visitor.visitProgramClass(this)
     }
 }

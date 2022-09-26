@@ -14,19 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.visitor
+package com.github.netomi.bat.shrinker.visitor
 
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
+import com.github.netomi.bat.shrinker.classfile.AnalysisClass
 
-fun interface WPOMethodVisitor {
-    fun visitAnyMethod(clazz: WPOClass, method: Method)
+fun interface AnalysisMethodVisitor {
+    fun visitAnyMethod(clazz: AnalysisClass, method: Method)
 
-    fun visitProgramMethod(clazz: WPOClass, method: Method) {
+    fun visitProgramMethod(clazz: AnalysisClass, method: Method) {
         visitAnyMethod(clazz, method)
     }
 
-    fun visitLibraryMethod(clazz: WPOClass, method: Method) {
+    fun visitLibraryMethod(clazz: AnalysisClass, method: Method) {
         visitAnyMethod(clazz, method)
     }
 }

@@ -14,21 +14,21 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.visitor
+package com.github.netomi.bat.shrinker.visitor
 
 import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
-import com.github.netomi.bat.shrinker.wpo.classfile.accept
+import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.shrinker.classfile.accept
 
-fun filterMethodsByNameAndDescriptor(name: String, descriptor: String, visitor: WPOMethodVisitor): WPOMethodVisitor {
+fun filterMethodsByNameAndDescriptor(name: String, descriptor: String, visitor: AnalysisMethodVisitor): AnalysisMethodVisitor {
     return MethodFilter(name, descriptor, visitor)
 }
 
 private class MethodFilter constructor(val name:       String,
                                        val descriptor: String,
-                                       val visitor:    WPOMethodVisitor): WPOMethodVisitor {
+                                       val visitor: AnalysisMethodVisitor): AnalysisMethodVisitor {
 
-    override fun visitAnyMethod(clazz: WPOClass, method: Method) {
+    override fun visitAnyMethod(clazz: AnalysisClass, method: Method) {
         if (name       == method.getName(clazz) &&
             descriptor == method.getDescriptor(clazz)) {
             method.accept(clazz, visitor)

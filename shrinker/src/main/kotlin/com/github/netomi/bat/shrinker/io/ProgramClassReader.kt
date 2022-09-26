@@ -14,19 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.io
+package com.github.netomi.bat.shrinker.io
 
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.io.DataEntry
 import com.github.netomi.bat.io.DataEntryReader
-import com.github.netomi.bat.shrinker.wpo.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.wpo.WPOContext
+import com.github.netomi.bat.shrinker.classfile.ProgramClass
+import com.github.netomi.bat.shrinker.util.AnalysisContext
 
-fun readProgramClasses(context: WPOContext): DataEntryReader {
+fun readProgramClasses(context: AnalysisContext): DataEntryReader {
     return ProgramClassReader(context)
 }
 
-private class ProgramClassReader constructor(private val context: WPOContext): DataEntryReader {
+private class ProgramClassReader constructor(private val context: AnalysisContext): DataEntryReader {
 
     override fun read(entry: DataEntry) {
         entry.getInputStream().use { `is` ->

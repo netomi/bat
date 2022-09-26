@@ -14,21 +14,20 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.util
+package com.github.netomi.bat.shrinker.util
 
 import com.github.netomi.bat.classfile.util.ClassPool
 import com.github.netomi.bat.classfile.visitor.ClassPoolVisitor
-import com.github.netomi.bat.shrinker.wpo.classesAccept
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOClassVisitor
+import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
-internal class WPOClassCleaner: ClassPoolVisitor<WPOClass>, WPOClassVisitor {
-    override fun visitClassPool(classPool: ClassPool<out WPOClass>) {
+internal class ClassCleaner: ClassPoolVisitor<AnalysisClass>, AnalysisClassVisitor {
+    override fun visitClassPool(classPool: ClassPool<out AnalysisClass>) {
         classPool.classesAccept(this)
     }
 
-    override fun visitAnyWPOClass(clazz: WPOClass) {
+    override fun visitAnyWPOClass(clazz: AnalysisClass) {
         clazz.superClass       = null
         clazz.interfaceClasses = mutableListOfCapacity(clazz.interfaceCount)
         clazz.subClasses       = mutableListOfCapacity(0)

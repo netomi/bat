@@ -14,20 +14,20 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.io
+package com.github.netomi.bat.shrinker.io
 
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolShrinker
 import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.io.DataEntry
 import com.github.netomi.bat.io.DataEntryReader
-import com.github.netomi.bat.shrinker.wpo.classfile.LibraryClass
-import com.github.netomi.bat.shrinker.wpo.WPOContext
+import com.github.netomi.bat.shrinker.classfile.LibraryClass
+import com.github.netomi.bat.shrinker.util.AnalysisContext
 
-fun readLibraryClasses(context: WPOContext): DataEntryReader {
+fun readLibraryClasses(context: AnalysisContext): DataEntryReader {
     return LibraryClassReader(context)
 }
 
-private class LibraryClassReader constructor(private val context: WPOContext): DataEntryReader {
+private class LibraryClassReader constructor(private val context: AnalysisContext): DataEntryReader {
 
     private val constantPoolShrinker = ConstantPoolShrinker()
 

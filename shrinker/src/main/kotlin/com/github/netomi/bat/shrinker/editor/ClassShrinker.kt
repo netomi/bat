@@ -14,18 +14,18 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker
+package com.github.netomi.bat.shrinker.editor
 
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.editor.ClassEditor
+import com.github.netomi.bat.shrinker.classfile.AnalysisClass
 import com.github.netomi.bat.shrinker.marker.UsageMarker
-import com.github.netomi.bat.shrinker.wpo.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
-import com.github.netomi.bat.shrinker.wpo.visitor.WPOClassVisitor
+import com.github.netomi.bat.shrinker.classfile.ProgramClass
+import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
 
-class ClassShrinker constructor(private val usageMarker: UsageMarker): WPOClassVisitor {
+class ClassShrinker constructor(private val usageMarker: UsageMarker): AnalysisClassVisitor {
 
-    override fun visitAnyWPOClass(clazz: WPOClass) {}
+    override fun visitAnyWPOClass(clazz: AnalysisClass) {}
 
     override fun visitProgramClass(clazz: ProgramClass) {
         val methodsToRemove = mutableListOf<Method>()

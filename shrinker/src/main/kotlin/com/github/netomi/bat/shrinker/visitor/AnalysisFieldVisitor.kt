@@ -14,19 +14,19 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.wpo.visitor
+package com.github.netomi.bat.shrinker.visitor
 
 import com.github.netomi.bat.classfile.Field
-import com.github.netomi.bat.shrinker.wpo.classfile.WPOClass
+import com.github.netomi.bat.shrinker.classfile.AnalysisClass
 
-fun interface WPOFieldVisitor {
-    fun visitAnyField(clazz: WPOClass, field: Field)
+fun interface AnalysisFieldVisitor {
+    fun visitAnyField(clazz: AnalysisClass, field: Field)
 
-    fun visitProgramField(clazz: WPOClass, field: Field) {
+    fun visitProgramField(clazz: AnalysisClass, field: Field) {
         visitAnyField(clazz, field)
     }
 
-    fun visitLibraryField(clazz: WPOClass, field: Field) {
+    fun visitLibraryField(clazz: AnalysisClass, field: Field) {
         visitAnyField(clazz, field)
     }
 }
