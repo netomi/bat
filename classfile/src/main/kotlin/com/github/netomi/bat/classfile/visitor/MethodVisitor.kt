@@ -17,6 +17,16 @@ fun filterMethodsByName(nameExpression: String, visitor: MethodVisitor): MethodV
     }
 }
 
+fun filterMethodsByNameAndDescriptor(nameExpression: String, descriptor: String, visitor: MethodVisitor): MethodVisitor {
+    val nameMatcher = simpleNameMatcher(nameExpression)
+    return MethodVisitor { classFile, index, method ->
+        if (nameMatcher.matches(method.getName(classFile)) &&
+            descriptor == method.getDescriptor(classFile)) {
+            method.accept(classFile, index, visitor)
+        }
+    }
+}
+
 fun allCode(visitor: MethodAttributeVisitor): MethodVisitor {
     return MethodVisitor { classFile, _, method ->
         method.attributeMap.get<CodeAttribute>(AttributeType.CODE)?.accept(classFile, method, visitor)

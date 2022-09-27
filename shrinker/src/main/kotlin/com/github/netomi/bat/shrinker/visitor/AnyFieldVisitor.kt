@@ -16,10 +16,16 @@
 
 package com.github.netomi.bat.shrinker.visitor
 
-import com.github.netomi.bat.shrinker.classfile.AnyClass
-import com.github.netomi.bat.shrinker.classfile.AnyField
-import com.github.netomi.bat.shrinker.classfile.LibraryField
-import com.github.netomi.bat.shrinker.classfile.ProgramField
+import com.github.netomi.bat.classfile.visitor.FieldVisitor
+import com.github.netomi.bat.shrinker.classfile.*
+
+fun adaptFieldVisitor(visitor: AnyFieldVisitor): FieldVisitor {
+    return FieldVisitor { classfile, _, field ->
+        if (field is AnyField) {
+            field.accept(classfile as AnyClass, visitor)
+        }
+    }
+}
 
 fun interface AnyFieldVisitor {
     fun visitAnyField(clazz: AnyClass, field: AnyField)

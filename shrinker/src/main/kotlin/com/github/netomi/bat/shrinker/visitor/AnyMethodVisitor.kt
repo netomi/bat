@@ -16,10 +16,19 @@
 
 package com.github.netomi.bat.shrinker.visitor
 
+import com.github.netomi.bat.classfile.visitor.MethodVisitor
 import com.github.netomi.bat.shrinker.classfile.AnyClass
 import com.github.netomi.bat.shrinker.classfile.AnyMethod
 import com.github.netomi.bat.shrinker.classfile.LibraryMethod
 import com.github.netomi.bat.shrinker.classfile.ProgramMethod
+
+fun adaptMethodVisitor(visitor: AnyMethodVisitor): MethodVisitor {
+    return MethodVisitor { classfile, _, method ->
+        if (method is AnyMethod) {
+            method.accept(classfile as AnyClass, visitor)
+        }
+    }
+}
 
 fun interface AnyMethodVisitor {
     fun visitAnyMethod(clazz: AnyClass, method: AnyMethod)

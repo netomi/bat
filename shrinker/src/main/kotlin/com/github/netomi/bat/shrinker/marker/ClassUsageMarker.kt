@@ -17,10 +17,11 @@
 package com.github.netomi.bat.shrinker.marker
 
 import com.github.netomi.bat.classfile.Visibility
+import com.github.netomi.bat.classfile.visitor.filterMethodsByNameAndDescriptor
 import com.github.netomi.bat.shrinker.classfile.*
 import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
 import com.github.netomi.bat.shrinker.visitor.AnyMethodVisitor
-import com.github.netomi.bat.shrinker.visitor.filterMethodsByNameAndDescriptor
+import com.github.netomi.bat.shrinker.visitor.adaptMethodVisitor
 
 class ClassUsageMarker constructor(private val marker: UsageMarker): AnyClassVisitor, AnyMethodVisitor {
 
@@ -66,7 +67,7 @@ class ClassUsageMarker constructor(private val marker: UsageMarker): AnyClassVis
                 subClass.methodsAccept(
                     filterMethodsByNameAndDescriptor(method.getName(clazz),
                                                      method.getDescriptor(clazz),
-                    this)
+                    adaptMethodVisitor(this))
                 )
             }
         }
