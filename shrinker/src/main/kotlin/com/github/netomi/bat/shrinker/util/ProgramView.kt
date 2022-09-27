@@ -64,7 +64,7 @@ class ProgramView {
         libraryClassPool.accept(cleaner)
         programClassPool.accept(cleaner)
 
-        val initializer = ClassInitializer(this)
+        val initializer = ClassHierarchyInitializer(this)
         libraryClassPool.accept(initializer)
         programClassPool.accept(initializer)
     }

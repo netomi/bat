@@ -21,7 +21,9 @@ import com.github.netomi.bat.classfile.visitor.ClassPoolVisitor
 import com.github.netomi.bat.shrinker.classfile.AnyClass
 import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
 
-internal class ClassInitializer constructor(private val programView: ProgramView): ClassPoolVisitor<AnyClass>, AnyClassVisitor {
+internal class ClassHierarchyInitializer constructor(private val programView: ProgramView)
+    : ClassPoolVisitor<AnyClass>, AnyClassVisitor {
+
     override fun visitClassPool(classPool: ClassPool<out AnyClass>) {
         classPool.classesAccept(this)
     }
