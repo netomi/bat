@@ -16,17 +16,19 @@
 
 package com.github.netomi.bat.shrinker.visitor
 
-import com.github.netomi.bat.classfile.Method
-import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.shrinker.classfile.AnyClass
+import com.github.netomi.bat.shrinker.classfile.AnyMethod
+import com.github.netomi.bat.shrinker.classfile.LibraryMethod
+import com.github.netomi.bat.shrinker.classfile.ProgramMethod
 
-fun interface AnalysisMethodVisitor {
-    fun visitAnyMethod(clazz: AnalysisClass, method: Method)
+fun interface AnyMethodVisitor {
+    fun visitAnyMethod(clazz: AnyClass, method: AnyMethod)
 
-    fun visitProgramMethod(clazz: AnalysisClass, method: Method) {
+    fun visitProgramMethod(clazz: AnyClass, method: ProgramMethod) {
         visitAnyMethod(clazz, method)
     }
 
-    fun visitLibraryMethod(clazz: AnalysisClass, method: Method) {
+    fun visitLibraryMethod(clazz: AnyClass, method: LibraryMethod) {
         visitAnyMethod(clazz, method)
     }
 }

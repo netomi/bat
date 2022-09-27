@@ -20,13 +20,13 @@ import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.io.DataEntry
 import com.github.netomi.bat.io.DataEntryReader
 import com.github.netomi.bat.shrinker.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.util.AnalysisContext
+import com.github.netomi.bat.shrinker.util.ProgramView
 
-fun readProgramClasses(context: AnalysisContext): DataEntryReader {
-    return ProgramClassReader(context)
+fun readProgramClasses(programView: ProgramView): DataEntryReader {
+    return ProgramClassReader(programView)
 }
 
-private class ProgramClassReader constructor(private val context: AnalysisContext): DataEntryReader {
+private class ProgramClassReader constructor(private val programView: ProgramView): DataEntryReader {
 
     override fun read(entry: DataEntry) {
         entry.getInputStream().use { `is` ->
@@ -34,7 +34,7 @@ private class ProgramClassReader constructor(private val context: AnalysisContex
             val reader    = ClassFileReader(`is`, false)
             reader.visitClassFile(classFile)
 
-            context.addProgramClass(classFile)
+            programView.addProgramClass(classFile)
         }
     }
 }

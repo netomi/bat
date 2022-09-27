@@ -18,14 +18,14 @@ package com.github.netomi.bat.shrinker.editor
 
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.editor.ClassEditor
-import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.shrinker.classfile.AnyClass
 import com.github.netomi.bat.shrinker.marker.UsageMarker
 import com.github.netomi.bat.shrinker.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
+import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
 
-class ClassShrinker constructor(private val usageMarker: UsageMarker): AnalysisClassVisitor {
+class ClassShrinker constructor(private val usageMarker: UsageMarker): AnyClassVisitor {
 
-    override fun visitAnyWPOClass(clazz: AnalysisClass) {}
+    override fun visitAnyClass(clazz: AnyClass) {}
 
     override fun visitProgramClass(clazz: ProgramClass) {
         val methodsToRemove = mutableListOf<Method>()

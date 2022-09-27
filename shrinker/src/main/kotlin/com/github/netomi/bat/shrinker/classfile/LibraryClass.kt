@@ -16,10 +16,30 @@
 
 package com.github.netomi.bat.shrinker.classfile
 
-import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
+import com.github.netomi.bat.classfile.Field
+import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
 
-class LibraryClass: AnalysisClass() {
-    override fun accept(visitor: AnalysisClassVisitor) {
+class LibraryClass: AnyClass() {
+
+    @Suppress("UNCHECKED_CAST")
+    override val fields: List<LibraryField>
+        get() = super.fields as List<LibraryField>
+
+    @Suppress("UNCHECKED_CAST")
+    override val methods: List<LibraryMethod>
+        get() = super.methods as List<LibraryMethod>
+
+    override fun accept(visitor: AnyClassVisitor) {
         visitor.visitLibraryClass(this)
+    }
+
+    override fun readField(input: ClassDataInput): Field {
+        return LibraryField.read(input)
+    }
+
+    override fun readMethod(input: ClassDataInput): Method {
+        return LibraryMethod.read(input)
     }
 }

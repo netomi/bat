@@ -109,7 +109,7 @@ open class ClassFile protected constructor(version:     Version = Version.JAVA_8
 
     private var _fields: MutableList<Field>  = mutableListOfCapacity(0)
 
-    val fields: List<Field>
+    open val fields: List<Field>
         get() = _fields
 
     internal fun addField(field: Field) {
@@ -120,7 +120,7 @@ open class ClassFile protected constructor(version:     Version = Version.JAVA_8
 
     private var _methods: MutableList<Method> = mutableListOfCapacity(0)
 
-    val methods: List<Method>
+    open val methods: List<Method>
         get() = _methods
 
     internal fun addMethod(method: Method) {
@@ -302,16 +302,24 @@ open class ClassFile protected constructor(version:     Version = Version.JAVA_8
         val fieldCount = input.readUnsignedShort()
         _fields = mutableListOfCapacity(fieldCount)
         for (i in 0 until fieldCount) {
-            addField(Field.readField(input))
+            addField(readField(input))
         }
 
         val methodCount = input.readUnsignedShort()
         _methods = mutableListOfCapacity(methodCount)
         for (i in 0 until methodCount) {
-            _methods.add(Method.readMethod(input))
+            _methods.add(readMethod(input))
         }
 
         attributeMap = input.readAttributes()
+    }
+
+    protected open fun readField(input: ClassDataInput): Field {
+        return Field.read(input)
+    }
+
+    protected open fun readMethod(input: ClassDataInput): Method {
+        return Method.read(input)
     }
 
     internal fun write(output: ClassDataOutput) {

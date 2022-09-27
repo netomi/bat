@@ -86,14 +86,14 @@ abstract class Member protected constructor(nameIndex:                 Int      
     abstract fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor)
 
     @Throws(IOException::class)
-    internal fun read(input: ClassDataInput) {
+    fun read(input: ClassDataInput) {
         accessFlags     = input.readUnsignedShort()
         nameIndex       = input.readUnsignedShort()
         descriptorIndex = input.readUnsignedShort()
         attributeMap    = input.readAttributes()
     }
 
-    internal fun write(output: ClassDataOutput) {
+    fun write(output: ClassDataOutput) {
         output.writeShort(accessFlags)
         output.writeShort(nameIndex)
         output.writeShort(descriptorIndex)

@@ -16,18 +16,15 @@
 
 package com.github.netomi.bat.shrinker.marker
 
-import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.Visibility
-import com.github.netomi.bat.shrinker.classfile.AnalysisClass
-import com.github.netomi.bat.shrinker.classfile.LibraryClass
-import com.github.netomi.bat.shrinker.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
-import com.github.netomi.bat.shrinker.visitor.AnalysisMethodVisitor
+import com.github.netomi.bat.shrinker.classfile.*
+import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
+import com.github.netomi.bat.shrinker.visitor.AnyMethodVisitor
 import com.github.netomi.bat.shrinker.visitor.filterMethodsByNameAndDescriptor
 
-class ClassUsageMarker constructor(private val marker: UsageMarker): AnalysisClassVisitor, AnalysisMethodVisitor {
+class ClassUsageMarker constructor(private val marker: UsageMarker): AnyClassVisitor, AnyMethodVisitor {
 
-    override fun visitAnyWPOClass(clazz: AnalysisClass) {}
+    override fun visitAnyClass(clazz: AnyClass) {}
 
     override fun visitProgramClass(clazz: ProgramClass) {}
 
@@ -45,15 +42,15 @@ class ClassUsageMarker constructor(private val marker: UsageMarker): AnalysisCla
         }
     }
 
-    override fun visitAnyMethod(clazz: AnalysisClass, method: Method) {}
+    override fun visitAnyMethod(clazz: AnyClass, method: AnyMethod) {}
 
-    override fun visitProgramMethod(clazz: AnalysisClass, method: Method) {
+    override fun visitProgramMethod(clazz: AnyClass, method: ProgramMethod) {
         if (!marker.isUsed(method)) {
             marker.markAsUsed(method)
         }
     }
 
-    override fun visitLibraryMethod(clazz: AnalysisClass, method: Method) {
+    override fun visitLibraryMethod(clazz: AnyClass, method: LibraryMethod) {
         if (!marker.isUsed(method)) {
             marker.markAsUsed(method)
 
@@ -61,7 +58,7 @@ class ClassUsageMarker constructor(private val marker: UsageMarker): AnalysisCla
         }
     }
 
-    private fun markMethodHierarchy(clazz: AnalysisClass, method: Method) {
+    private fun markMethodHierarchy(clazz: AnyClass, method: AnyMethod) {
         if (!method.isInitializer(clazz) &&
             !method.isStatic             &&
              method.visibility >= Visibility.PACKAGE_PRIVATE) {

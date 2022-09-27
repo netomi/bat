@@ -18,24 +18,24 @@ package com.github.netomi.bat.shrinker.util
 
 import com.github.netomi.bat.classfile.util.ClassPool
 import com.github.netomi.bat.classfile.visitor.ClassPoolVisitor
-import com.github.netomi.bat.shrinker.classfile.AnalysisClass
-import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
+import com.github.netomi.bat.shrinker.classfile.AnyClass
+import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
 
-internal class ClassInitializer constructor(private val context: AnalysisContext): ClassPoolVisitor<AnalysisClass>, AnalysisClassVisitor {
-    override fun visitClassPool(classPool: ClassPool<out AnalysisClass>) {
+internal class ClassInitializer constructor(private val programView: ProgramView): ClassPoolVisitor<AnyClass>, AnyClassVisitor {
+    override fun visitClassPool(classPool: ClassPool<out AnyClass>) {
         classPool.classesAccept(this)
     }
 
-    override fun visitAnyWPOClass(clazz: AnalysisClass) {
+    override fun visitAnyClass(clazz: AnyClass) {
         val superClassName = clazz.superClassName
         if (superClassName != null) {
-            val superClass   = context.getClass(superClassName)
+            val superClass   = programView.getClass(superClassName)
             clazz.superClass = superClass
             superClass?.addSubClass(clazz)
         }
 
         for (interfaceClassName in clazz.interfaces) {
-            val interfaceClass = context.getClass(interfaceClassName)
+            val interfaceClass = programView.getClass(interfaceClassName)
             if (interfaceClass != null) {
                 clazz.interfaceClasses.add(interfaceClass)
                 interfaceClass.addSubClass(clazz)

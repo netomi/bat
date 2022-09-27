@@ -17,20 +17,18 @@
 package com.github.netomi.bat.shrinker.visitor
 
 import com.github.netomi.bat.shrinker.classfile.AnyClass
-import com.github.netomi.bat.shrinker.classfile.AnyMethod
+import com.github.netomi.bat.shrinker.classfile.AnyField
+import com.github.netomi.bat.shrinker.classfile.LibraryField
+import com.github.netomi.bat.shrinker.classfile.ProgramField
 
-fun filterMethodsByNameAndDescriptor(name: String, descriptor: String, visitor: AnyMethodVisitor): AnyMethodVisitor {
-    return MethodFilter(name, descriptor, visitor)
-}
+fun interface AnyFieldVisitor {
+    fun visitAnyField(clazz: AnyClass, field: AnyField)
 
-private class MethodFilter constructor(val name:       String,
-                                       val descriptor: String,
-                                       val visitor:    AnyMethodVisitor): AnyMethodVisitor {
+    fun visitProgramField(clazz: AnyClass, field: ProgramField) {
+        visitAnyField(clazz, field)
+    }
 
-    override fun visitAnyMethod(clazz: AnyClass, method: AnyMethod) {
-        if (name       == method.getName(clazz) &&
-            descriptor == method.getDescriptor(clazz)) {
-            method.accept(clazz, visitor)
-        }
+    fun visitLibraryField(clazz: AnyClass, field: LibraryField) {
+        visitAnyField(clazz, field)
     }
 }

@@ -14,19 +14,22 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.shrinker.visitor
+package com.github.netomi.bat.shrinker.classfile
 
-import com.github.netomi.bat.classfile.Field
-import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.classfile.io.ClassDataInput
+import com.github.netomi.bat.shrinker.visitor.AnyMethodVisitor
 
-fun interface AnalysisFieldVisitor {
-    fun visitAnyField(clazz: AnalysisClass, field: Field)
+class LibraryMethod: AnyMethod() {
 
-    fun visitProgramField(clazz: AnalysisClass, field: Field) {
-        visitAnyField(clazz, field)
+    override fun accept(clazz: AnyClass, visitor: AnyMethodVisitor) {
+        visitor.visitLibraryMethod(clazz, this)
     }
 
-    fun visitLibraryField(clazz: AnalysisClass, field: Field) {
-        visitAnyField(clazz, field)
+    companion object {
+        internal fun read(input: ClassDataInput): LibraryMethod {
+            val method = LibraryMethod()
+            method.read(input)
+            return method
+        }
     }
 }

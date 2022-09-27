@@ -20,7 +20,7 @@ import java.io.Closeable
 import java.io.DataOutputStream
 import java.io.OutputStream
 
-internal class ClassDataOutput private constructor(outputStream: OutputStream): Closeable {
+class ClassDataOutput private constructor(outputStream: OutputStream): Closeable {
 
     private val dataOutput = DataOutputStream(outputStream)
 

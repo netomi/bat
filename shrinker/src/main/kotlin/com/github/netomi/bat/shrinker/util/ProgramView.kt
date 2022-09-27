@@ -17,13 +17,13 @@
 package com.github.netomi.bat.shrinker.util
 
 import com.github.netomi.bat.classfile.util.ClassPool
-import com.github.netomi.bat.shrinker.classfile.AnalysisClass
+import com.github.netomi.bat.shrinker.classfile.AnyClass
 import com.github.netomi.bat.shrinker.classfile.LibraryClass
 import com.github.netomi.bat.shrinker.classfile.ProgramClass
-import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
+import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
 import com.github.netomi.bat.util.JvmClassName
 
-class AnalysisContext {
+class ProgramView {
     private val programClassPool: ClassPool<ProgramClass> = ClassPool.empty()
     private val libraryClassPool: ClassPool<LibraryClass> = ClassPool.empty()
 
@@ -33,12 +33,12 @@ class AnalysisContext {
     val libraryClassCount: Int
         get() = libraryClassPool.size
 
-    fun getClass(internalClassName: String): AnalysisClass? {
+    fun getClass(internalClassName: String): AnyClass? {
         return programClassPool.getClass(internalClassName)
             ?: libraryClassPool.getClass(internalClassName)
     }
 
-    fun getClass(className: JvmClassName): AnalysisClass? {
+    fun getClass(className: JvmClassName): AnyClass? {
         val internalClassName = className.toInternalClassName()
         return getClass(internalClassName)
     }
@@ -51,16 +51,16 @@ class AnalysisContext {
         libraryClassPool.addClass(classFile)
     }
 
-    fun programClassesAccept(visitor: AnalysisClassVisitor) {
+    fun programClassesAccept(visitor: AnyClassVisitor) {
         programClassPool.classesAccept(visitor)
     }
 
-    fun libraryClassesAccept(visitor: AnalysisClassVisitor) {
+    fun libraryClassesAccept(visitor: AnyClassVisitor) {
         libraryClassPool.classesAccept(visitor)
     }
 
     fun init() {
-        val cleaner = ClassCleaner()
+        val cleaner = ClassHierarchyCleaner()
         libraryClassPool.accept(cleaner)
         programClassPool.accept(cleaner)
 
@@ -70,7 +70,7 @@ class AnalysisContext {
     }
 }
 
-fun <T: AnalysisClass> ClassPool<T>.classesAccept(visitor: AnalysisClassVisitor) {
+fun <T: AnyClass> ClassPool<T>.classesAccept(visitor: AnyClassVisitor) {
     for (clazz in this) {
         clazz.accept(visitor)
     }

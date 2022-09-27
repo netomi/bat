@@ -18,16 +18,16 @@ package com.github.netomi.bat.shrinker.util
 
 import com.github.netomi.bat.classfile.util.ClassPool
 import com.github.netomi.bat.classfile.visitor.ClassPoolVisitor
-import com.github.netomi.bat.shrinker.classfile.AnalysisClass
-import com.github.netomi.bat.shrinker.visitor.AnalysisClassVisitor
+import com.github.netomi.bat.shrinker.classfile.AnyClass
+import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
-internal class ClassCleaner: ClassPoolVisitor<AnalysisClass>, AnalysisClassVisitor {
-    override fun visitClassPool(classPool: ClassPool<out AnalysisClass>) {
+internal class ClassHierarchyCleaner: ClassPoolVisitor<AnyClass>, AnyClassVisitor {
+    override fun visitClassPool(classPool: ClassPool<out AnyClass>) {
         classPool.classesAccept(this)
     }
 
-    override fun visitAnyWPOClass(clazz: AnalysisClass) {
+    override fun visitAnyClass(clazz: AnyClass) {
         clazz.superClass       = null
         clazz.interfaceClasses = mutableListOfCapacity(clazz.interfaceCount)
         clazz.subClasses       = mutableListOfCapacity(0)

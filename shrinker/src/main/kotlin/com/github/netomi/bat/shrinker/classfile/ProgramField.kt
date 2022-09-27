@@ -17,29 +17,20 @@
 package com.github.netomi.bat.shrinker.classfile
 
 import com.github.netomi.bat.classfile.Field
-import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.io.ClassDataInput
-import com.github.netomi.bat.shrinker.visitor.AnyClassVisitor
+import com.github.netomi.bat.shrinker.visitor.AnyFieldVisitor
 
-class ProgramClass: AnyClass() {
+class ProgramField: AnyField() {
 
-    @Suppress("UNCHECKED_CAST")
-    override val fields: List<ProgramField>
-        get() = super.fields as List<ProgramField>
-
-    @Suppress("UNCHECKED_CAST")
-    override val methods: List<ProgramMethod>
-        get() = super.methods as List<ProgramMethod>
-
-    override fun accept(visitor: AnyClassVisitor) {
-        visitor.visitProgramClass(this)
+    override fun accept(clazz: AnyClass, visitor: AnyFieldVisitor) {
+        visitor.visitProgramField(clazz, this)
     }
 
-    override fun readField(input: ClassDataInput): Field {
-        return ProgramField.read(input)
-    }
-
-    override fun readMethod(input: ClassDataInput): Method {
-        return ProgramMethod.read(input)
+    companion object {
+        internal fun read(input: ClassDataInput): Field {
+            val field = ProgramField()
+            field.read(input)
+            return field
+        }
     }
 }

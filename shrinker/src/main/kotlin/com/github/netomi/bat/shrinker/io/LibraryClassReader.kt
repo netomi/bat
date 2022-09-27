@@ -21,13 +21,13 @@ import com.github.netomi.bat.classfile.io.ClassFileReader
 import com.github.netomi.bat.io.DataEntry
 import com.github.netomi.bat.io.DataEntryReader
 import com.github.netomi.bat.shrinker.classfile.LibraryClass
-import com.github.netomi.bat.shrinker.util.AnalysisContext
+import com.github.netomi.bat.shrinker.util.ProgramView
 
-fun readLibraryClasses(context: AnalysisContext): DataEntryReader {
-    return LibraryClassReader(context)
+fun readLibraryClasses(programView: ProgramView): DataEntryReader {
+    return LibraryClassReader(programView)
 }
 
-private class LibraryClassReader constructor(private val context: AnalysisContext): DataEntryReader {
+private class LibraryClassReader constructor(private val programView: ProgramView): DataEntryReader {
 
     private val constantPoolShrinker = ConstantPoolShrinker()
 
@@ -38,7 +38,7 @@ private class LibraryClassReader constructor(private val context: AnalysisContex
             reader.visitClassFile(classFile)
 
             constantPoolShrinker.visitClassFile(classFile)
-            context.addLibraryClass(classFile)
+            programView.addLibraryClass(classFile)
         }
     }
 }

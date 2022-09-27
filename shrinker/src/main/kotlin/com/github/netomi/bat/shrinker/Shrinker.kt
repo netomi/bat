@@ -24,39 +24,39 @@ import com.github.netomi.bat.shrinker.marker.ClassUsageMarker
 import com.github.netomi.bat.shrinker.marker.UsageMarker
 import com.github.netomi.bat.shrinker.io.readLibraryClasses
 import com.github.netomi.bat.shrinker.io.readProgramClasses
-import com.github.netomi.bat.shrinker.util.AnalysisContext
+import com.github.netomi.bat.shrinker.util.ProgramView
 import com.github.netomi.bat.util.fileNameMatcher
 import java.nio.file.Path
 
 fun main(args: Array<String>) {
     val jmodPath = Path.of("/home/tn/.sdkman/candidates/java/current/jmods")
 
-    val context = AnalysisContext()
+    val programView = ProgramView()
 
     val inputSource = PathInputSource.of(jmodPath)
     inputSource.pumpDataEntries(
         unwrapArchives(
         filterDataEntriesBy(fileNameMatcher("java/**.class"),
-        readLibraryClasses(context))))
+        readLibraryClasses(programView))))
 
-    println("loaded ${context.libraryClassCount} library classes")
+    println("loaded ${programView.libraryClassCount} library classes")
 
     val programInputSource = PathInputSource.of("../tmp/shrinking/input.jar")
     programInputSource.pumpDataEntries(
         unwrapArchives(
         filterDataEntriesBy(fileNameMatcher("**.class"),
-        readProgramClasses(context))))
+        readProgramClasses(programView))))
 
-    println("loaded ${context.programClassCount} program classes")
+    println("loaded ${programView.programClassCount} program classes")
 
-    context.init()
+    programView.init()
 
     val usageMarker = UsageMarker()
-    context.libraryClassesAccept(ClassUsageMarker(usageMarker))
+    programView.libraryClassesAccept(ClassUsageMarker(usageMarker))
 
-    val clazz = context.getClass("test0007/Testa")
+    val clazz = programView.getClass("test0007/Testa")
 
-    context.programClassesAccept(ClassShrinker(usageMarker))
+    programView.programClassesAccept(ClassShrinker(usageMarker))
 
     for (method in clazz!!.methods) {
         println("${method.getName(clazz)} = ${usageMarker.isUsed(method)}")
