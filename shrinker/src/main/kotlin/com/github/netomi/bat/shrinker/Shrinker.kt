@@ -19,7 +19,6 @@ package com.github.netomi.bat.shrinker
 import com.github.netomi.bat.io.PathInputSource
 import com.github.netomi.bat.io.filterDataEntriesBy
 import com.github.netomi.bat.io.unwrapArchives
-import com.github.netomi.bat.shrinker.editor.ClassShrinker
 import com.github.netomi.bat.shrinker.marker.ClassUsageMarker
 import com.github.netomi.bat.shrinker.marker.UsageMarker
 import com.github.netomi.bat.shrinker.io.readLibraryClasses
@@ -53,14 +52,6 @@ fun main(args: Array<String>) {
 
     val usageMarker = UsageMarker()
     programView.libraryClassesAccept(ClassUsageMarker(usageMarker))
-
-    val clazz = programView.getClass("test0007/Testa")
-
-    programView.programClassesAccept(ClassShrinker(usageMarker))
-
-    for (method in clazz!!.methods) {
-        println("${method.getName(clazz)} = ${usageMarker.isUsed(method)}")
-    }
 
     println("done")
 }
