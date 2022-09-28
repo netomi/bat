@@ -70,7 +70,7 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
                 }
 
                 ElementType.SIGNATURE -> TODO("implement")
-                
+
                 else -> {}
             }
         }
@@ -153,6 +153,13 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
             attribute.attributesAccept(classFile, method, this)
         }
 
+        override fun visitLocalVariableTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
+            for (localVariableEntry in attribute) {
+                currentType = ElementType.FIELD_TYPE
+                localVariableEntry.descriptorConstantAccept(classFile, this)
+            }
+        }
+
         // StackMapFrameVisitor.
 
         override fun visitAnyFrame(classFile: ClassFile, frame: StackMapFrame) {
@@ -183,39 +190,39 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
         }
 
         override fun visitNameAndTypeConstant(classFile: ClassFile, index: Int, constant: NameAndTypeConstant) {
-            classFile.constantAccept(constant.descriptorIndex, this)
+            constant.descriptorConstantAccept(classFile, this)
         }
 
         override fun visitClassConstant(classFile: ClassFile, index: Int, constant: ClassConstant) {
             currentType = ElementType.CLASSNAME
-            classFile.constantAccept(constant.nameIndex, this)
+            constant.nameConstantAccept(classFile, this)
         }
 
         override fun visitFieldRefConstant(classFile: ClassFile, index: Int, constant: FieldrefConstant) {
             classFile.constantAccept(constant.classIndex, this)
             currentType = ElementType.FIELD_TYPE
-            classFile.constantAccept(constant.nameAndTypeIndex, this)
+            constant.nameAndTypeConstantAccept(classFile, this)
         }
 
         override fun visitMethodRefConstant(classFile: ClassFile, index: Int, constant: MethodrefConstant) {
             classFile.constantAccept(constant.classIndex, this)
             currentType = ElementType.METHOD_DESCRIPTOR
-            classFile.constantAccept(constant.nameAndTypeIndex, this)
+            constant.nameAndTypeConstantAccept(classFile, this)
         }
 
         override fun visitInterfaceMethodRefConstant(classFile: ClassFile, index: Int, constant: InterfaceMethodrefConstant) {
             classFile.constantAccept(constant.classIndex, this)
             currentType = ElementType.METHOD_DESCRIPTOR
-            classFile.constantAccept(constant.nameAndTypeIndex, this)
+            constant.nameAndTypeConstantAccept(classFile, this)
         }
 
         override fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
-            classFile.constantAccept(constant.referenceIndex, this)
+            constant.referenceAccept(classFile, this)
         }
 
         override fun visitMethodTypeConstant(classFile: ClassFile, index: Int, constant: MethodTypeConstant) {
             currentType = ElementType.METHOD_DESCRIPTOR
-            classFile.constantAccept(constant.descriptorIndex, this)
+            constant.descriptorConstantAccept(classFile, this)
         }
     }
 

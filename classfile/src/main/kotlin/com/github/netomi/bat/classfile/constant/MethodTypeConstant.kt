@@ -54,6 +54,10 @@ data class MethodTypeConstant private constructor(private var _descriptorIndex: 
         visitor.visitMethodTypeConstant(classFile, index, this)
     }
 
+    fun descriptorConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(descriptorIndex, visitor)
+    }
+
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         visitor.visitUtf8Constant(classFile, this, PropertyAccessor(::_descriptorIndex))
     }
