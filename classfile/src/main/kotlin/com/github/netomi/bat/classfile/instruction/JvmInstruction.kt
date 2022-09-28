@@ -51,7 +51,7 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
         writer.write(offset,     ((offsetValue  shr 24) and 0xff).toByte())
         writer.write(offset + 1, ((offsetValue ushr 16) and 0xff).toByte())
         writer.write(offset + 2, ((offsetValue ushr  8) and 0xff).toByte())
-        writer.write(offset + 1,  (offsetValue          and 0xff).toByte())
+        writer.write(offset + 3,  (offsetValue          and 0xff).toByte())
     }
 
     protected fun writeIndex(writer: InstructionWriter, offset: Int, index: Int) {
