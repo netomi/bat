@@ -40,11 +40,19 @@ import com.github.netomi.bat.util.asInternalClassName
 import com.github.netomi.bat.util.asJvmType
 
 /**
- * This [ClassFileVisitor] will rename all used constants that reference a classname
+ * This [ClassFileVisitor] will rename all *used* constants that reference a classname
  * using the given [Renamer]. The constant pool is shrunk after processing to ensure
- * that no constant is left dangling which might contain a classname.
+ * that no constant is left dangling which might contain a classname that should have
+ * been renamed but was not referenced from anywhere (e.g. import statements for constants
+ * seem to be left over by the compiler).
  *
- * TODO: rename classnames in signature, complete all attributes.
+ * A simpler approach would be to just search/replace any constant in the constant pool,
+ * but this approach is cleaner as the visitor knows exactly how to deconstruct and rebuild
+ * each constant value based on how it is being used.
+ *
+ * There some oddities about array classes referenced from some instructions
+ * (anewarray / multianewarray) and element values / signatures that are handled in a clean
+ * way with this approach.
  */
 class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
 
@@ -60,8 +68,7 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
         for ((elementType, constant) in collector.collectedConstants.values) {
             when (elementType) {
                 ElementType.CLASSNAME -> {
-                    val className = constant.value.asInternalClassName()
-                    constant.value = renamer.renameClassName(className).toInternalClassName()
+                    constant.value = renamer.renameClassName(constant.value.asInternalClassName()).toInternalClassName()
                 }
 
                 ElementType.FIELD_TYPE -> {
