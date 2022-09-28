@@ -26,17 +26,14 @@ import java.io.IOException
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.7">CONSTANT_Utf8_info Structure</a>
  */
-data class Utf8Constant private constructor(private var _value: String = ""): Constant() {
+data class Utf8Constant private constructor(var value: String = ""): Constant() {
 
     override val type: ConstantType
         get() = ConstantType.UTF8
 
-    val value: String
-        get() = _value
-
     @Throws(IOException::class)
     override fun readConstantInfo(input: ClassDataInput) {
-        _value = input.readUTF()
+        value = input.readUTF()
     }
 
     @Throws(IOException::class)

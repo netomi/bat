@@ -16,5 +16,17 @@
 
 package com.github.netomi.bat.util
 
-class Files {
+import java.nio.file.Path
+import kotlin.io.path.extension
+
+fun isClassFile(path: Path?): Boolean {
+    return path?.extension == "class"
+}
+
+fun isArchive(path: Path?): Boolean {
+    return when (path?.extension) {
+        "zip",
+        "jar" -> true
+        else  -> false
+    }
 }

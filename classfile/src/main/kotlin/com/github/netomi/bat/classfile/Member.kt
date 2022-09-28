@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile
 import com.github.netomi.bat.classfile.attribute.*
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.MemberAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -84,6 +85,10 @@ abstract class Member protected constructor(nameIndex:                 Int      
 
     abstract fun accept(classFile: ClassFile, index: Int, visitor: MemberVisitor)
     abstract fun attributesAccept(classFile: ClassFile, visitor: MemberAttributeVisitor)
+
+    fun descriptorConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(descriptorIndex, visitor)
+    }
 
     @Throws(IOException::class)
     fun read(input: ClassDataInput) {

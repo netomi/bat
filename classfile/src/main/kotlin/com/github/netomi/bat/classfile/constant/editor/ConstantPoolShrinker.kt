@@ -53,18 +53,21 @@ class ConstantPoolShrinker: ClassFileVisitor {
         }
 
         if (shrunkConstantPool.size != classFile.constantPoolSize) {
-            classFile.constantPool = shrunkConstantPool
 
             // update the new constant indices in all items of the class file.
-            classFile.referencedConstantsAccept(true) { _, owner, accessor ->
+            classFile.referencedConstantsAccept(true) { _, _, accessor ->
                 val constantIndex = accessor.get()
                 val newIndex      = mapping[constantIndex]
-                if (newIndex < 0) {
-                    error("no mapping found for constant index '$constantIndex' referenced from '$owner'")
-                } else {
+                // if no mapping is available, the constant is being shrunk,
+                // we can ignore for now.
+                if (newIndex != -1) {
                     accessor.set(newIndex)
                 }
             }
+
+            // assign the shrunk constant pool after having visited all referenced constants
+            // as during visiting the constants must be consistent (see MethodHandleConstant).
+            classFile.constantPool = shrunkConstantPool
 
             // update all code attributes by remapping any instruction referencing a constant pool entry.
             classFile.accept(allMethods(allCode(InstructionReMapper(mapping))))

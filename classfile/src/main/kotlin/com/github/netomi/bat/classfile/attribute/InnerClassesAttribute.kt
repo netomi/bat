@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.AccessFlagTarget
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.accessFlagsToSet
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -131,6 +132,14 @@ data class InnerClassEntry
         output.writeShort(outerClassIndex)
         output.writeShort(innerNameIndex)
         output.writeShort(innerClassAccessFlags)
+    }
+
+    fun innerClassConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(innerClassIndex, visitor)
+    }
+
+    fun outerClassConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(outerClassIndex, visitor)
     }
 
     fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {

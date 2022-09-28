@@ -76,11 +76,30 @@ open class JvmType protected constructor(val type: String) {
     val isPrimitiveType: Boolean
         get() = isPrimitiveType(type)
 
+    val isVoidType: Boolean
+        get() = type == VOID_TYPE
+
     val componentType: JvmType
         get() {
             check(isArrayType)
-            val dimension = type.takeWhile { ch -> ch == '[' }.count()
-            return type.substring(dimension).asJvmType()
+            return type.substring(arrayDimension).asJvmType()
+    }
+
+    val arrayDimension: Int
+        get() {
+            check(isArrayType)
+            return type.takeWhile { ch -> ch == '[' }.count()
+        }
+
+    fun toJvmClassName(): JvmClassName {
+        require(isReferenceType)
+        return if (isClassType) {
+            toInternalClassName().asInternalClassName()
+        } else if (isArrayType) {
+            type.asInternalClassName()
+        } else {
+            error("unexpected")
+        }
     }
 
     fun toInternalClassName(): String {
@@ -112,7 +131,7 @@ open class JvmType protected constructor(val type: String) {
                 DOUBLE_TYPE  -> "double"
                 BOOLEAN_TYPE -> "boolean"
                 VOID_TYPE    -> "void"
-                else -> type
+                else         -> type
             }
         }
     }
@@ -207,6 +226,10 @@ class JvmClassName private constructor(val className: String, val internal: Bool
         } else {
             "L${toInternalClassName()};"
         }
+    }
+
+    fun toJvmType(): JvmType {
+        return toInternalType().asJvmType()
     }
 
     override fun equals(other: Any?): Boolean {

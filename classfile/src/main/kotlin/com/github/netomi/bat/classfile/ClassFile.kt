@@ -235,9 +235,23 @@ open class ClassFile protected constructor(version:     Version = Version.JAVA_8
         constantPool.constantAccept(this, constantIndex, visitor)
     }
 
+    fun thisClassConstantAccept(visitor: ConstantVisitor) {
+        constantAccept(thisClassIndex, visitor)
+    }
+
+    fun superClassConstantAccept(visitor: ConstantVisitor) {
+        constantAccept(superClassIndex, visitor)
+    }
+
+    fun interfaceConstantsAccept(visitor: ConstantVisitor) {
+        for (interfaceConstantIndex in _interfaces) {
+            constantAccept(interfaceConstantIndex, visitor)
+        }
+    }
+
     fun membersAccept(visitor: MemberVisitor) {
         fieldsAccept(visitor)
-        membersAccept(visitor)
+        methodsAccept(visitor)
     }
 
     fun fieldsAccept(visitor: FieldVisitor) {

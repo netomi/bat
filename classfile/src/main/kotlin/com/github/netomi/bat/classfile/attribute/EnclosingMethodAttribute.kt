@@ -17,6 +17,7 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -78,6 +79,14 @@ data class EnclosingMethodAttribute
     override fun writeAttributeData(output: ClassDataOutput) {
         output.writeShort(classIndex)
         output.writeShort(methodIndex)
+    }
+
+    fun classConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(classIndex, visitor)
+    }
+
+    fun methodConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(methodIndex, visitor)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {

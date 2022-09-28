@@ -29,6 +29,8 @@ abstract class StackMapFrame protected constructor(val frameType: Int): ClassFil
 
     abstract val offsetDelta: Int
 
+    abstract val verificationTypes: List<VerificationType>
+
     internal open fun readData(input: ClassDataInput) {}
     internal open fun writeData(output: ClassDataOutput) {}
 
@@ -62,6 +64,9 @@ class SameFrame private constructor(frameType: Int): StackMapFrame(frameType) {
     override val offsetDelta: Int
         get() = frameType
 
+    override val verificationTypes: List<VerificationType>
+        get() = emptyList()
+
     override fun accept(classFile: ClassFile, visitor: StackMapFrameVisitor) {
         visitor.visitSameFrame(classFile, this)
     }
@@ -87,6 +92,9 @@ class ChopFrame private constructor(            frameType:    Int,
 
     val choppedVariables: Int
         get() = 251 - frameType
+
+    override val verificationTypes: List<VerificationType>
+        get() = emptyList()
 
     override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
@@ -118,6 +126,9 @@ class SameExtendedFrame private constructor(            frameType:    Int,
 
     override val offsetDelta: Int
         get() = _offsetDelta
+
+    override val verificationTypes: List<VerificationType>
+        get() = emptyList()
 
     override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
@@ -166,6 +177,9 @@ class AppendFrame private constructor(            frameType:    Int,
     override fun iterator(): Iterator<VerificationType> {
         return locals.iterator()
     }
+
+    override val verificationTypes: List<VerificationType>
+        get() = locals
 
     override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
@@ -216,6 +230,9 @@ class SameLocalsOneStackItemFrame private constructor(            frameType: Int
     val stackItem: VerificationType
         get() = _stack
 
+    override val verificationTypes: List<VerificationType>
+        get() = listOf(stackItem)
+
     override fun readData(input: ClassDataInput) {
         _stack = VerificationType.read(input)
     }
@@ -256,6 +273,9 @@ class SameLocalsOneStackItemExtendedFrame private constructor(            frameT
 
     val stackItem: VerificationType
         get() = _stack
+
+    override val verificationTypes: List<VerificationType>
+        get() = listOf(stackItem)
 
     override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
@@ -303,6 +323,9 @@ class FullFrame private constructor(            frameType:    Int,
 
     val stack: List<VerificationType>
         get() = _stack
+
+    override val verificationTypes: List<VerificationType>
+        get() = locals + stack
 
     override fun readData(input: ClassDataInput) {
         _offsetDelta = input.readUnsignedShort()
