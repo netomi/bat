@@ -39,7 +39,14 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 import java.io.InputStream
 
 /**
- * https://docs.oracle.com/javase/specs/jvms/se13/html/jvms-4.html#jvms-4.1
+ * A representation of a class file as described by the Java Virtual Machine Specification.
+ *
+ * By design, this class tries to capture the contents of the classfile structure as close as
+ * possible in order to build any kind of tool operating on such class files. Separate editor
+ * classes exist to make composition and editing of this class and its contained members more
+ * convenient.
+ *
+ * @see <a href=https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1>ClassFile structure</a>
  */
 open class ClassFile protected constructor(version:     Version = Version.JAVA_8,
                                            accessFlags: Int     = 0) {

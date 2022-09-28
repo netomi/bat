@@ -21,6 +21,9 @@ fun accessFlagsOf(visibility: Visibility, modifiers: Set<ClassModifier>): Int {
     return visibility.flagValue or modifiers.fold(0) { acc, m -> acc or m.flagValue }
 }
 
+/**
+ * An enum of allowed modifier values for a class.
+ */
 enum class ClassModifier(val flagValue: Int) {
     FINAL     (ACC_FINAL),
     SUPER     (ACC_SUPER),

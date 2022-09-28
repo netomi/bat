@@ -21,6 +21,9 @@ fun accessFlagsOf(visibility: Visibility, modifiers: Set<FieldModifier>): Int {
     return visibility.flagValue or modifiers.fold(0) { acc, m -> acc or m.flagValue }
 }
 
+/**
+ * An enum of allowed modifier values for a field.
+ */
 enum class FieldModifier(val flagValue: Int) {
     STATIC   (ACC_STATIC),
     FINAL    (ACC_FINAL),
