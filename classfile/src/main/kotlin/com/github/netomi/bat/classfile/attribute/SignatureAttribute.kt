@@ -23,6 +23,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.FieldAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -77,6 +78,10 @@ data class SignatureAttribute private constructor(override var attributeNameInde
 
     override fun accept(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, visitor: RecordComponentAttributeVisitor) {
         visitor.visitSignature(classFile, record, component, this)
+    }
+
+    fun signatureConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(signatureIndex, visitor)
     }
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {

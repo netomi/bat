@@ -21,7 +21,10 @@ import com.github.netomi.bat.classfile.Field
 import com.github.netomi.bat.classfile.Member
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.*
-import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.*
+import com.github.netomi.bat.classfile.attribute.annotation.Annotation
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
+import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
 import com.github.netomi.bat.classfile.attribute.preverification.*
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
@@ -69,7 +72,17 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
                     constant.value = renamer.renameMethodDescriptor(constant.value)
                 }
 
-                ElementType.SIGNATURE -> TODO("implement")
+                ElementType.CLASS_SIGNATURE -> {
+                    constant.value = renamer.renameClassSignature(constant.value)
+                }
+
+                ElementType.FIELD_SIGNATURE -> {
+                    constant.value = renamer.renameFieldSignature(constant.value)
+                }
+
+                ElementType.METHOD_SIGNATURE -> {
+                    constant.value = renamer.renameMethodSignature(constant.value)
+                }
 
                 else -> {}
             }
@@ -79,7 +92,8 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
     }
 
     private inner class ConstantCollector
-        : ClassFileVisitor, MemberVisitor, AttributeVisitor, InstructionVisitor, StackMapFrameVisitor, ConstantVisitor {
+        : ClassFileVisitor, MemberVisitor, AttributeVisitor, AnnotationVisitor, InstructionVisitor,
+          ElementValueVisitor, StackMapFrameVisitor, ConstantVisitor {
 
         val collectedConstants: MutableMap<Int, Pair<ElementType, Utf8Constant>> = mutableMapOf()
         var currentType: ElementType = ElementType.UNKNOWN
@@ -118,9 +132,16 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
         override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
 
         override fun visitAnyRuntimeAnnotations(classFile: ClassFile, attribute: RuntimeAnnotationsAttribute) {
-            for (annotation in attribute) {
-                currentType = ElementType.FIELD_TYPE
-                classFile.constantAccept(annotation.typeIndex, this)
+            attribute.annotationsAccept(classFile, this)
+        }
+
+        override fun visitAnyRuntimeTypeAnnotations(classFile: ClassFile, attribute: RuntimeTypeAnnotationsAttribute) {
+            attribute.typeAnnotationsAccept(classFile, this)
+        }
+
+        override fun visitRuntimeParameterAnnotations(classFile: ClassFile, method: Method, attribute: RuntimeParameterAnnotationsAttribute) {
+            for (parameterIndex in 0 until attribute.size) {
+                attribute.parameterAnnotationsAccept(classFile, parameterIndex, this)
             }
         }
 
@@ -133,6 +154,7 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
 
         override fun visitEnclosingMethod(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
             attribute.classConstantAccept(classFile, this)
+            currentType = ElementType.METHOD_DESCRIPTOR
             attribute.methodConstantAccept(classFile, this)
         }
 
@@ -141,6 +163,21 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
                 innerClassEntry.innerClassConstantAccept(classFile, this)
                 innerClassEntry.outerClassConstantAccept(classFile, this)
             }
+        }
+
+        override fun visitSignature(classFile: ClassFile, attribute: SignatureAttribute) {
+            currentType = ElementType.CLASS_SIGNATURE
+            attribute.signatureConstantAccept(classFile, this)
+        }
+
+        override fun visitSignature(classFile: ClassFile, field: Field, attribute: SignatureAttribute) {
+            currentType = ElementType.FIELD_SIGNATURE
+            attribute.signatureConstantAccept(classFile, this)
+        }
+
+        override fun visitSignature(classFile: ClassFile, method: Method, attribute: SignatureAttribute) {
+            currentType = ElementType.METHOD_SIGNATURE
+            attribute.signatureConstantAccept(classFile, this)
         }
 
         override fun visitStackMapTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {
@@ -158,6 +195,47 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
                 currentType = ElementType.FIELD_TYPE
                 localVariableEntry.descriptorConstantAccept(classFile, this)
             }
+        }
+
+        override fun visitLocalVariableTypeTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTypeTableAttribute) {
+            for (localVariableTypeEntry in attribute) {
+                currentType = ElementType.FIELD_SIGNATURE
+                localVariableTypeEntry.signatureConstantAccept(classFile, this)
+            }
+        }
+
+        override fun visitAnnotationDefault(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
+            attribute.elementValue.accept(classFile, this)
+        }
+
+        // AnnotationVisitor.
+
+        override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {
+            currentType = ElementType.FIELD_TYPE
+            annotation.typeConstantAccept(classFile, this)
+            annotation.elementValuesAccept(classFile, this)
+        }
+
+        // ElementValueVisitor.
+
+        override fun visitAnyElementValue(classFile: ClassFile, elementValue: ElementValue) {}
+
+        override fun visitAnnotationElementValue(classFile: ClassFile, elementValue: AnnotationElementValue) {
+            elementValue.annotation.accept(classFile, this)
+        }
+
+        override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
+            elementValue.elementValuesAccept(classFile, this)
+        }
+
+        override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
+            currentType = ElementType.FIELD_TYPE
+            elementValue.typeNameConstantAccept(classFile, this)
+        }
+
+        override fun visitClassElementValue(classFile: ClassFile, elementValue: ClassElementValue) {
+            currentType = ElementType.FIELD_TYPE
+            elementValue.classTypeConstantAccept(classFile, this)
         }
 
         // StackMapFrameVisitor.
@@ -216,6 +294,16 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
             constant.nameAndTypeConstantAccept(classFile, this)
         }
 
+        override fun visitInvokeDynamicConstant(classFile: ClassFile, index: Int, constant: InvokeDynamicConstant) {
+            currentType = ElementType.METHOD_DESCRIPTOR
+            constant.nameAndTypeConstantAccept(classFile, this)
+        }
+
+        override fun visitDynamicConstant(classFile: ClassFile, index: Int, constant: DynamicConstant) {
+            currentType = ElementType.FIELD_TYPE
+            constant.nameAndTypeConstantAccept(classFile, this)
+        }
+
         override fun visitMethodHandleConstant(classFile: ClassFile, index: Int, constant: MethodHandleConstant) {
             constant.referenceAccept(classFile, this)
         }
@@ -230,7 +318,9 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
         CLASSNAME,
         FIELD_TYPE,
         METHOD_DESCRIPTOR,
-        SIGNATURE,
+        CLASS_SIGNATURE,
+        FIELD_SIGNATURE,
+        METHOD_SIGNATURE,
         UNKNOWN
     }
 }

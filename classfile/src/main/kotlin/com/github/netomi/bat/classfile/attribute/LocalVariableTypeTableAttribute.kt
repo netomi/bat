@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.*
@@ -126,6 +127,10 @@ data class LocalVariableTypeEntry
         output.writeShort(nameIndex)
         output.writeShort(signatureIndex)
         output.writeShort(variableIndex)
+    }
+
+    fun signatureConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(signatureIndex, visitor)
     }
 
     fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {

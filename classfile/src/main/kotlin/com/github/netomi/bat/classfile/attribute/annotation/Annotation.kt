@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -81,6 +82,10 @@ open class Annotation
 
     open fun accept(classFile: ClassFile, visitor: AnnotationVisitor) {
         visitor.visitAnnotation(classFile, this)
+    }
+
+    fun typeConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(typeIndex, visitor)
     }
 
     fun elementValuesAccept(classFile: ClassFile, visitor: ElementValueVisitor) {

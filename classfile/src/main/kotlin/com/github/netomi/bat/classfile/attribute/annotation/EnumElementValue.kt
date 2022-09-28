@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute.annotation
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -63,6 +64,10 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
 
     override fun accept(classFile: ClassFile, visitor: ElementValueVisitor) {
         visitor.visitEnumElementValue(classFile, this)
+    }
+
+    fun typeNameConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(typeNameIndex, visitor)
     }
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {

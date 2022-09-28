@@ -42,6 +42,7 @@ interface SignatureVisitor {
 
     fun visitClassType(className: String) {}
     fun visitInnerClassType(className: String) {}
+    fun visitOuterClassTypeEnd(className: String) {}
     fun visitClassTypeEnd(className: String) {}
 
     fun visitTypeVariable(variableName: String) {}
@@ -54,7 +55,7 @@ interface SignatureVisitor {
     fun visitBoundedTypeArgument(wildcard: Char, typeArgumentIndex: Int) {}
 }
 
-private class SignatureParser private constructor(val signature: String) {
+class SignatureParser private constructor(val signature: String) {
 
     private var currentPosition = 0
 
@@ -201,7 +202,7 @@ private class SignatureParser private constructor(val signature: String) {
                                         visitor.visitClassType(className)
                                     }
                                 }
-                                visitor.visitClassTypeEnd(className)
+                                visitor.visitOuterClassTypeEnd(className)
                                 startPosition = currentPosition
                                 innerClass = true
                                 visited    = false
@@ -238,7 +239,6 @@ private class SignatureParser private constructor(val signature: String) {
                                         '>' -> {
                                             foundEnd = true
                                             visitor.visitTypeArgumentEnd()
-                                            visitor.visitClassTypeEnd(className)
                                             currentPosition++
                                         }
 

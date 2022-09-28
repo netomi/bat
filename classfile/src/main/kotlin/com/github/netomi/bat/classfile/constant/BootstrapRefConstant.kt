@@ -16,6 +16,7 @@
 package com.github.netomi.bat.classfile.constant
 
 import com.github.netomi.bat.classfile.ClassFile
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -57,6 +58,10 @@ abstract class BootstrapRefConstant(protected open var _bootstrapMethodAttrIndex
     override fun writeConstantInfo(output: ClassDataOutput) {
         output.writeShort(_bootstrapMethodAttrIndex)
         output.writeShort(_nameAndTypeIndex)
+    }
+
+    fun nameAndTypeConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(nameAndTypeIndex, visitor)
     }
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
