@@ -36,14 +36,24 @@ import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.util.asInternalClassName
 import com.github.netomi.bat.util.asJvmType
 
+/**
+ * This [ClassFileVisitor] will rename all used constants that reference a classname
+ * using the given [Renamer]. The constant pool is shrunk after processing to ensure
+ * that no constant is left dangling which might contain a classname.
+ *
+ * TODO: rename classnames in signature, complete all attributes.
+ */
 class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
 
     private val constantPoolShrinker = ConstantPoolShrinker()
 
     override fun visitClassFile(classFile: ClassFile) {
+        // we fist collect all used constants that might contain a classname
         val collector = ConstantCollector()
         collector.visitClassFile(classFile)
 
+        // now process all constants containing a classname and replace
+        // the names using the given Renamer.
         for ((elementType, constant) in collector.collectedConstants.values) {
             when (elementType) {
                 ElementType.CLASSNAME -> {
@@ -59,6 +69,8 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
                     constant.value = renamer.renameMethodDescriptor(constant.value)
                 }
 
+                ElementType.SIGNATURE -> TODO("implement")
+                
                 else -> {}
             }
         }
