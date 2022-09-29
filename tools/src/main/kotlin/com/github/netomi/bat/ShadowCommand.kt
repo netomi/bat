@@ -113,7 +113,7 @@ class ShadowCommand : Runnable {
 }
 
 class PatternRenamer constructor(private val transformPatterns: TransformPatterns): Renamer() {
-    override fun renameClass(className: JvmClassName): JvmClassName {
+    override fun renameClassName(className: JvmClassName): JvmClassName {
         return transformPatterns.replace(className.toInternalClassName()).second.asInternalClassName()
     }
 }

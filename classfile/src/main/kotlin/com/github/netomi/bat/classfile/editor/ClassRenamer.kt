@@ -68,7 +68,7 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
         for ((elementType, constant) in collector.collectedConstants.values) {
             when (elementType) {
                 ElementType.CLASSNAME -> {
-                    constant.value = renamer.renameClassName(constant.value.asInternalClassName()).toInternalClassName()
+                    constant.value = renamer.renameClassType(constant.value.asInternalClassName()).toInternalClassName()
                 }
 
                 ElementType.FIELD_TYPE -> {

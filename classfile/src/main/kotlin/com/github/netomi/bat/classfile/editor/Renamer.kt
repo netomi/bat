@@ -18,24 +18,34 @@ package com.github.netomi.bat.classfile.editor
 
 import com.github.netomi.bat.util.*
 
-open class Renamer {
+/**
+ * This class can be used in combination with [ClassRenamer] to rename classes and references to them
+ * in an easy manner. You just have to create your own implementation and override the [renameClassName]
+ * method and which will be called for each encountered classname while processing a
+ * [com.github.netomi.bat.classfile.ClassFile].
+ */
+abstract class Renamer {
 
-    open fun renameClass(className: JvmClassName): JvmClassName {
-        return className
-    }
+    /**
+     * This method will be called for each encountered classname inside a
+     * [com.github.netomi.bat.classfile.ClassFile].
+     *
+     * If the class should not be renamed, the input argument needs to be returned.
+     */
+    abstract fun renameClassName(className: JvmClassName): JvmClassName
 
-    internal fun renameClassName(className: JvmClassName): JvmClassName {
+    internal fun renameClassType(className: JvmClassName): JvmClassName {
         return if (className.isArrayClass) {
             renameArrayType(className.toJvmType()).toJvmClassName()
         } else {
-            renameClass(className)
+            renameClassName(className)
         }
     }
 
     internal fun renameFieldType(fieldType: JvmType): JvmType {
         return if (fieldType.isClassType) {
             val className = fieldType.toJvmClassName()
-            renameClass(className).toJvmType()
+            renameClassName(className).toJvmType()
         } else if (fieldType.isArrayType) {
             renameArrayType(fieldType)
         } else {
@@ -59,19 +69,19 @@ open class Renamer {
     }
 
     internal fun renameClassSignature(signature: String): String {
-        val signatureBuilder = SignatureBuilder(::renameClassName)
+        val signatureBuilder = SignatureBuilder(::renameClassType)
         SignatureParser.of(signature).parseClass(signatureBuilder)
         return signatureBuilder.result
     }
 
     internal fun renameFieldSignature(signature: String): String {
-        val signatureBuilder = SignatureBuilder(::renameClassName)
+        val signatureBuilder = SignatureBuilder(::renameClassType)
         SignatureParser.of(signature).parseType(signatureBuilder)
         return signatureBuilder.result
     }
 
     internal fun renameMethodSignature(signature: String): String {
-        val signatureBuilder = SignatureBuilder(::renameClassName)
+        val signatureBuilder = SignatureBuilder(::renameClassType)
         SignatureParser.of(signature).parseMethod(signatureBuilder)
         return signatureBuilder.result
     }
@@ -81,7 +91,7 @@ open class Renamer {
         return if (componentType.isClassType) {
             val arrayDimension     = arrayType.arrayDimension
             val componentClassName = componentType.toJvmClassName()
-            val renamedClassName   = renameClass(componentClassName)
+            val renamedClassName   = renameClassName(componentClassName)
 
             ("[".repeat(arrayDimension) + renamedClassName.toJvmType()).asJvmType()
         } else {
