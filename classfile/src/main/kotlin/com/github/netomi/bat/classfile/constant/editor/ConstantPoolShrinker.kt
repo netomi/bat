@@ -53,7 +53,6 @@ class ConstantPoolShrinker: ClassFileVisitor {
         }
 
         if (shrunkConstantPool.size != classFile.constantPoolSize) {
-
             // update the new constant indices in all items of the class file.
             classFile.referencedConstantsAccept(true) { _, _, accessor ->
                 val constantIndex = accessor.get()
@@ -79,14 +78,18 @@ private class ReferencedConstantsMarker constructor(val usageMarker: ConstantUsa
     override fun visitAnyConstant(classFile: ClassFile, owner: Any, accessor: IDAccessor) {
         val constantIndex = accessor.get()
         val constant = classFile.getConstant(constantIndex)
-        usageMarker.markUsed(constant)
-        // recursively mark referenced constants
-        constant.referencedConstantsAccept(classFile, this)
+        if (!usageMarker.isUsed(constant)) {
+            usageMarker.markUsed(constant)
+            // recursively mark referenced constants
+            constant.referencedConstantsAccept(classFile, this)
+        }
     }
 
     override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
-        usageMarker.markUsed(constant)
-        constant.referencedConstantsAccept(classFile, this)
+        if (!usageMarker.isUsed(constant)) {
+            usageMarker.markUsed(constant)
+            constant.referencedConstantsAccept(classFile, this)
+        }
     }
 }
 
