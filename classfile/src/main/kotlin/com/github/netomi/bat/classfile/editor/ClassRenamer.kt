@@ -63,39 +63,48 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
         val collector = ConstantCollector()
         collector.visitClassFile(classFile)
 
+        var replacedValues = 0
+
         // now process all constants containing a classname and replace
         // the names using the given Renamer.
         for ((elementType, constant) in collector.collectedConstants.values) {
-            when (elementType) {
+            val newValue = when (elementType) {
                 ElementType.CLASSNAME -> {
-                    constant.value = renamer.renameClassType(constant.value.asInternalClassName()).toInternalClassName()
+                    renamer.renameClassType(constant.value.asInternalClassName()).toInternalClassName()
                 }
 
                 ElementType.FIELD_TYPE -> {
-                    constant.value = renamer.renameFieldType(constant.value.asJvmType()).toString()
+                    renamer.renameFieldType(constant.value.asJvmType()).toString()
                 }
 
                 ElementType.METHOD_DESCRIPTOR -> {
-                    constant.value = renamer.renameMethodDescriptor(constant.value)
+                    renamer.renameMethodDescriptor(constant.value)
                 }
 
                 ElementType.CLASS_SIGNATURE -> {
-                    constant.value = renamer.renameClassSignature(constant.value)
+                    renamer.renameClassSignature(constant.value)
                 }
 
                 ElementType.FIELD_SIGNATURE -> {
-                    constant.value = renamer.renameFieldSignature(constant.value)
+                    renamer.renameFieldSignature(constant.value)
                 }
 
                 ElementType.METHOD_SIGNATURE -> {
-                    constant.value = renamer.renameMethodSignature(constant.value)
+                    renamer.renameMethodSignature(constant.value)
                 }
 
-                else -> {}
+                else -> constant.value
+            }
+
+            if (newValue != constant.value) {
+                replacedValues++
+                constant.value = newValue
             }
         }
 
-        constantPoolShrinker.visitClassFile(classFile)
+        if (replacedValues > 0) {
+            constantPoolShrinker.visitClassFile(classFile)
+        }
     }
 
     private inner class ConstantCollector
