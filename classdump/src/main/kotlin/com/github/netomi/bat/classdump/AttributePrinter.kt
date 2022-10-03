@@ -375,7 +375,7 @@ internal class AttributePrinter constructor(private val printer: IndentingPrinte
 
     override fun visitNestHost(classFile: ClassFile, attribute: NestHostAttribute) {
         printer.print("NestHost: class ")
-        classFile.constantAccept(attribute.hostClassIndex, constantPrinter)
+        classFile.constantAccept(attribute.nestHostClassIndex, constantPrinter)
         printer.println()
     }
 

@@ -19,6 +19,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -69,6 +70,12 @@ data class ExceptionsAttribute
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
         visitor.visitExceptions(classFile, method, this)
+    }
+
+    fun exceptionClassNameConstantsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        for (classIndex in exceptions) {
+            classFile.constantAccept(classIndex, visitor)
+        }
     }
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {

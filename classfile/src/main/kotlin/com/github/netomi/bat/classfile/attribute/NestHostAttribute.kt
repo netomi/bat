@@ -18,6 +18,7 @@ package com.github.netomi.bat.classfile.attribute
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -30,8 +31,8 @@ import com.github.netomi.bat.util.JvmClassName
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.28">NestHost Attribute</a>
  */
 data class NestHostAttribute
-    private constructor(override var attributeNameIndex: Int,
-                         private var _hostClassIndex:    Int = -1): Attribute(attributeNameIndex), AttachedToClass {
+    private constructor(override var attributeNameIndex:  Int,
+                         private var _nestHostClassIndex: Int = -1): Attribute(attributeNameIndex), AttachedToClass {
 
     override val type: AttributeType
         get() = AttributeType.NEST_HOST
@@ -39,28 +40,32 @@ data class NestHostAttribute
     override val dataSize: Int
         get() = 2
 
-    val hostClassIndex: Int
-        get() = _hostClassIndex
+    val nestHostClassIndex: Int
+        get() = _nestHostClassIndex
 
     fun getHostClass(classFile: ClassFile): JvmClassName {
-        return classFile.getClassName(hostClassIndex)
+        return classFile.getClassName(nestHostClassIndex)
     }
 
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        _hostClassIndex = input.readUnsignedShort()
+        _nestHostClassIndex = input.readUnsignedShort()
     }
 
     override fun writeAttributeData(output: ClassDataOutput) {
-        output.writeShort(hostClassIndex)
+        output.writeShort(nestHostClassIndex)
     }
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitNestHost(classFile, this)
     }
 
+    fun nestHostClassConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(nestHostClassIndex, visitor)
+    }
+
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
         super.referencedConstantsAccept(classFile, visitor)
-        visitor.visitClassConstant(classFile, this, PropertyAccessor(::_hostClassIndex))
+        visitor.visitClassConstant(classFile, this, PropertyAccessor(::_nestHostClassIndex))
     }
 
     companion object {

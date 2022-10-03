@@ -25,6 +25,9 @@ import com.github.netomi.bat.classfile.attribute.annotation.*
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.ElementValueVisitor
+import com.github.netomi.bat.classfile.attribute.module.ModuleAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModuleMainClassAttribute
+import com.github.netomi.bat.classfile.attribute.module.ModulePackagesAttribute
 import com.github.netomi.bat.classfile.attribute.preverification.*
 import com.github.netomi.bat.classfile.attribute.preverification.visitor.StackMapFrameVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.AttributeVisitor
@@ -70,7 +73,11 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
         for ((elementType, constant) in collector.collectedConstants.values) {
             val newValue = when (elementType) {
                 ElementType.CLASSNAME -> {
-                    renamer.renameClassType(constant.value.asInternalClassName()).toInternalClassName()
+                    renamer.renameClassInfo(constant.value.asInternalClassName()).toInternalClassName()
+                }
+
+                ElementType.PACKAGE_NAME -> {
+                    renamer.renamePackageName(constant.value)
                 }
 
                 ElementType.FIELD_TYPE -> {
@@ -196,14 +203,30 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
             attribute.signatureConstantAccept(classFile, this)
         }
 
+        override fun visitSignature(classFile: ClassFile, record: RecordAttribute, component: RecordComponent, attribute: SignatureAttribute) {
+            currentType = ElementType.FIELD_SIGNATURE
+            attribute.signatureConstantAccept(classFile, this)
+        }
+
         override fun visitStackMapTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: StackMapTableAttribute) {
             attribute.stackMapFramesAccept(classFile, this)
+        }
+
+        override fun visitExceptions(classFile: ClassFile, method: Method, attribute: ExceptionsAttribute) {
+            attribute.exceptionClassNameConstantsAccept(classFile, this)
         }
 
         override fun visitCode(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
             attribute.instructionsAccept(classFile, method, this)
 
             attribute.attributesAccept(classFile, method, this)
+        }
+
+        override fun visitRecord(classFile: ClassFile, attribute: RecordAttribute) {
+            for (component in attribute) {
+                component.descriptorConstantAccept(classFile, this)
+                component.attributesAccept(classFile, attribute, this)
+            }
         }
 
         override fun visitLocalVariableTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LocalVariableTableAttribute) {
@@ -222,6 +245,43 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
 
         override fun visitAnnotationDefault(classFile: ClassFile, method: Method, attribute: AnnotationDefaultAttribute) {
             attribute.elementValue.accept(classFile, this)
+        }
+
+        override fun visitNestHost(classFile: ClassFile, attribute: NestHostAttribute) {
+            attribute.nestHostClassConstantAccept(classFile, this)
+        }
+
+        override fun visitNestMembers(classFile: ClassFile, attribute: NestMembersAttribute) {
+            attribute.nestMemberConstantsAccept(classFile, this)
+        }
+
+        override fun visitPermittedSubclasses(classFile: ClassFile, attribute: PermittedSubclassesAttribute) {
+            attribute.permittedClassConstantsAccept(classFile, this)
+        }
+
+        override fun visitModule(classFile: ClassFile, attribute: ModuleAttribute) {
+            for (exportEntry in attribute.exports) {
+                exportEntry.exportedPackageConstantAccept(classFile, this)
+            }
+
+            for (opensEntry in attribute.opens) {
+                opensEntry.openedPackageConstantAccept(classFile, this)
+            }
+
+            attribute.uses.usedClassConstantsAccept(classFile, this)
+
+            for (providesEntry in attribute.provides) {
+                providesEntry.providedClassConstantAccept(classFile, this)
+                providesEntry.providesWithClassConstantsAccept(classFile, this)
+            }
+        }
+
+        override fun visitModuleMainClass(classFile: ClassFile, attribute: ModuleMainClassAttribute) {
+            attribute.mainClassConstantAccept(classFile, this)
+        }
+
+        override fun visitModulePackages(classFile: ClassFile, attribute: ModulePackagesAttribute) {
+            attribute.packageConstantsAccept(classFile, this)
         }
 
         // AnnotationVisitor.
@@ -292,6 +352,11 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
             constant.nameConstantAccept(classFile, this)
         }
 
+        override fun visitPackageConstant(classFile: ClassFile, index: Int, constant: PackageConstant) {
+            currentType = ElementType.PACKAGE_NAME
+            constant.nameConstantAccept(classFile, this)
+        }
+
         override fun visitFieldRefConstant(classFile: ClassFile, index: Int, constant: FieldrefConstant) {
             classFile.constantAccept(constant.classIndex, this)
             currentType = ElementType.FIELD_TYPE
@@ -332,6 +397,7 @@ class ClassRenamer constructor(private val renamer: Renamer): ClassFileVisitor {
 
     private enum class ElementType {
         CLASSNAME,
+        PACKAGE_NAME,
         FIELD_TYPE,
         METHOD_DESCRIPTOR,
         CLASS_SIGNATURE,

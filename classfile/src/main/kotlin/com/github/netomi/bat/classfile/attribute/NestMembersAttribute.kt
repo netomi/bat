@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ArrayElementAccessor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.io.ClassDataOutput
@@ -66,6 +67,12 @@ data class NestMembersAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitNestMembers(classFile, this)
+    }
+
+    fun nestMemberConstantsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        for (memberIndex in nestMemberClasses) {
+            classFile.constantAccept(memberIndex, visitor)
+        }
     }
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {

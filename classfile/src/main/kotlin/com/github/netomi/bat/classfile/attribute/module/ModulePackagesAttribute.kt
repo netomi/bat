@@ -71,7 +71,7 @@ data class ModulePackagesAttribute
         visitor.visitModulePackages(classFile, this)
     }
 
-    fun packagesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+    fun packageConstantsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (constantIndex in packages) {
             classFile.constantAccept(constantIndex, visitor)
         }

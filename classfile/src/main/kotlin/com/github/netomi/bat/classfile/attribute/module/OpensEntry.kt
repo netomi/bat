@@ -90,6 +90,10 @@ data class OpensEntry
         return Objects.hash(_openedPackageIndex, _flags, _opensToModules.contentHashCode())
     }
 
+    fun openedPackageConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(openedPackageIndex, visitor)
+    }
+
     fun opensToModulesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (constantIndex in _opensToModules) {
             classFile.constantAccept(constantIndex, visitor)

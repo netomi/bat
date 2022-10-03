@@ -43,7 +43,7 @@ data class UsesEntry
     }
 
     fun getUsedClassNames(classFile: ClassFile): List<JvmClassName> {
-        return _usedClasses.map { classFile.getClass(it).getClassName(classFile) }
+        return _usedClasses.map { classFile.getClassName(it) }
     }
 
     private fun read(input: ClassDataInput) {
@@ -65,7 +65,7 @@ data class UsesEntry
         return _usedClasses.contentHashCode()
     }
 
-    fun usedClassesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+    fun usedClassConstantsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (classIndex in _usedClasses) {
             classFile.constantAccept(classIndex, visitor)
         }

@@ -34,7 +34,26 @@ abstract class Renamer {
      */
     abstract fun renameClassName(className: JvmClassName): JvmClassName
 
-    internal fun renameClassType(className: JvmClassName): JvmClassName {
+    /**
+     * This method will be called for every encountered package name inside a
+     * [com.github.netomi.bat.classfile.ClassFile].
+     *
+     * The default implementation just calls [renameClassName], if you need special
+     * handling of package names, override the method accordingly.
+     *
+     * If the package should not be renamed, the input argument needs to be returned.
+     */
+    open fun renamePackageName(packageName: String): String {
+        return renameClassName(packageName.asInternalClassName()).toInternalClassName()
+    }
+
+    /**
+     * This method will be called to rename class names are encountered in Class_info
+     * constant structures. According to the JVM specification, such constants either
+     * contain a class name in binary form or an array type, e.g. java/io/InputStream
+     * or [Ljava/lang/String;
+     */
+    internal fun renameClassInfo(className: JvmClassName): JvmClassName {
         return if (className.isArrayClass) {
             renameArrayType(className.toJvmType()).toJvmClassName()
         } else {
@@ -69,19 +88,19 @@ abstract class Renamer {
     }
 
     internal fun renameClassSignature(signature: String): String {
-        val signatureBuilder = SignatureBuilder(::renameClassType)
+        val signatureBuilder = SignatureBuilder(::renameClassInfo)
         SignatureParser.of(signature).parseClass(signatureBuilder)
         return signatureBuilder.result
     }
 
     internal fun renameFieldSignature(signature: String): String {
-        val signatureBuilder = SignatureBuilder(::renameClassType)
+        val signatureBuilder = SignatureBuilder(::renameClassInfo)
         SignatureParser.of(signature).parseType(signatureBuilder)
         return signatureBuilder.result
     }
 
     internal fun renameMethodSignature(signature: String): String {
-        val signatureBuilder = SignatureBuilder(::renameClassType)
+        val signatureBuilder = SignatureBuilder(::renameClassInfo)
         SignatureParser.of(signature).parseMethod(signatureBuilder)
         return signatureBuilder.result
     }

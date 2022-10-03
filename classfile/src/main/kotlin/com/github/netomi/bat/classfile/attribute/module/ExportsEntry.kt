@@ -90,6 +90,10 @@ data class ExportsEntry
         return Objects.hash(_exportedPackageIndex, _flags, _exportedToModules.contentHashCode())
     }
 
+    fun exportedPackageConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(exportedPackageIndex, visitor)
+    }
+
     fun exportedToModulesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (constantIndex in _exportedToModules) {
             classFile.constantAccept(constantIndex, visitor)

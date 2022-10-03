@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.RecordComponentAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.*
@@ -120,6 +121,10 @@ data class RecordComponent
         for (attribute in _attributes.filterIsInstance(AttachedToRecordComponent::class.java)) {
             attribute.accept(classFile, record, this, visitor)
         }
+    }
+
+    fun descriptorConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(desciptorIndex, visitor)
     }
 
     fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {

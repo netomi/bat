@@ -78,7 +78,11 @@ data class ProvidesEntry
         return Objects.hash(_providedClassIndex, _providesWithClasses.contentHashCode())
     }
 
-    fun providesWithClassesAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+    fun providedClassConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(providedClassIndex, visitor)
+    }
+
+    fun providesWithClassConstantsAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         for (classIndex in _providesWithClasses) {
             classFile.constantAccept(classIndex, visitor)
         }

@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.attribute.AttachedToClass
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.visitor.ClassAttributeVisitor
+import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -59,6 +60,10 @@ data class ModuleMainClassAttribute
 
     override fun accept(classFile: ClassFile, visitor: ClassAttributeVisitor) {
         visitor.visitModuleMainClass(classFile, this)
+    }
+
+    fun mainClassConstantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
+        classFile.constantAccept(mainClassIndex, visitor)
     }
 
     override fun referencedConstantsAccept(classFile: ClassFile, visitor: ReferencedConstantVisitor) {
