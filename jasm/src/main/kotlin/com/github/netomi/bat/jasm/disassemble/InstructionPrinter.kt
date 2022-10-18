@@ -31,19 +31,20 @@ internal class InstructionPrinter constructor(private val printer:         Inden
     override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
 
     override fun visitAnySimpleInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {
-        printCommon(offset, instruction, true)
+        printCommon(offset, instruction, wide = false, appendNewLine = true)
     }
 
     override fun visitLiteralInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralInstruction) {
         if (instruction.valueIsImplicit) {
-            printer.println("%s".format(instruction.mnemonic))
+            printCommon(offset, instruction, wide = false, appendNewLine = true)
         } else {
-            printer.println("%-13s %d".format(instruction.mnemonic, instruction.value))
+            printCommon(offset, instruction, wide = false, appendNewLine = false)
+            printer.println(" %d".format(instruction.value))
         }
     }
 
     override fun visitAnyConstantInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ConstantInstruction) {
-        printCommon(offset, instruction, false)
+        printCommon(offset, instruction, wide = false, appendNewLine = false)
         printer.print(" ")
         instruction.constantAccept(classFile, constantPrinter)
         printer.println()
@@ -88,13 +89,11 @@ internal class InstructionPrinter constructor(private val printer:         Inden
     }
 
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
-        if (instruction.wide) {
-            printer.println("%s".format(JvmOpCode.WIDE.mnemonic))
-        }
         if (instruction.variableIsImplicit) {
-            printer.println("%s".format(instruction.mnemonic))
+            printCommon(offset, instruction, instruction.wide, true)
         } else {
-            printer.println("%-13s %d".format(instruction.mnemonic, instruction.variable))
+            printCommon(offset, instruction, instruction.wide, false)
+            printer.println(" %d".format(instruction.variable))
         }
     }
 
@@ -123,10 +122,16 @@ internal class InstructionPrinter constructor(private val printer:         Inden
         visitAnySwitchInstruction(classFile, method, code, offset, instruction)
     }
 
-    private fun printCommon(offset: Int, instruction: JvmInstruction, appendNewLine: Boolean) {
+    private fun printCommon(offset: Int, instruction: JvmInstruction, wide: Boolean = false, appendNewLine: Boolean = true) {
         printer.println()
         printDebugInfo(offset)
+
+        if (wide) {
+            printer.println(JvmOpCode.WIDE.mnemonic)
+        }
+
         printer.print(instruction.mnemonic)
+
         if (appendNewLine) {
             printer.println()
         }
