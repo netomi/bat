@@ -24,9 +24,10 @@ import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import java.util.*
 
-internal class InstructionPrinter constructor(private val printer:         IndentingPrinter,
-                                              private val constantPrinter: ConstantPrinter,
-                                              private val debugState:      Map<Int, List<String>>): InstructionVisitor {
+internal class InstructionPrinter constructor(private val printer:             IndentingPrinter,
+                                              private val constantPrinter:     ConstantPrinter,
+                                              private val branchTargetPrinter: BranchTargetPrinter,
+                                              private val debugState:          Map<Int, List<String>>): InstructionVisitor {
 
     override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
 
@@ -50,13 +51,6 @@ internal class InstructionPrinter constructor(private val printer:         Inden
         printer.println()
     }
 
-    override fun visitInterfaceMethodInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InterfaceMethodInstruction) {
-        val instructionData = "%d, %2d".format(instruction.constantIndex, instruction.argumentCount)
-        printer.print("%-13s #%-16s // ".format(instruction.mnemonic, instructionData))
-        instruction.constantAccept(classFile, constantPrinter)
-        printer.println()
-    }
-
     override fun visitInvokeDynamicInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InvokeDynamicInstruction) {
         printer.print("%-13s #%-18s // ".format(instruction.mnemonic, "${instruction.constantIndex},  0"))
         instruction.constantAccept(classFile, constantPrinter)
@@ -64,21 +58,26 @@ internal class InstructionPrinter constructor(private val printer:         Inden
     }
 
     override fun visitArrayClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayClassInstruction) {
-        if (instruction.dimensionIsImplicit) {
-            printer.print("%-13s #%-18d // ".format(instruction.mnemonic, instruction.constantIndex))
-        } else {
-            printer.print("%-13s #%-17s // ".format(instruction.mnemonic, "${instruction.constantIndex},  ${instruction.dimension}"))
-        }
+        printCommon(offset, instruction, wide = false, appendNewLine = false)
+        printer.print(" ")
         instruction.constantAccept(classFile, constantPrinter)
+
+        if (!instruction.dimensionIsImplicit) {
+            printer.print(", ${instruction.dimension}")
+        }
+
         printer.println()
     }
 
     override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
-        printer.println("%-13s %d".format(instruction.mnemonic, offset + instruction.branchOffset))
+        printCommon(offset, instruction, wide = false, appendNewLine = false)
+        printer.print(" ")
+        printer.println(branchTargetPrinter.formatBranchInstructionTarget(offset, instruction))
     }
 
     override fun visitArrayPrimitiveTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayPrimitiveTypeInstruction) {
-        printer.println("%-13s  %s".format(instruction.mnemonic, instruction.arrayType.toString().lowercase(Locale.getDefault())))
+        printCommon(offset, instruction, wide = false, appendNewLine = false)
+        printer.println(" %s".format(instruction.arrayType.toString().lowercase(Locale.getDefault())))
     }
 
     override fun visitLiteralVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralVariableInstruction) {
@@ -99,17 +98,18 @@ internal class InstructionPrinter constructor(private val printer:         Inden
 
     override fun visitAnySwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: SwitchInstruction) {
         for (pair in instruction) {
-            printer.println("%12d: %d".format(pair.match, pair.offset + offset))
+            printer.println("%12d -> %s".format(pair.match, branchTargetPrinter.formatLookupSwitchTarget(offset, pair.offset)))
         }
-        printer.println("%12s: %d".format("default", instruction.defaultOffset + offset))
+        printer.println("%12s -> %s".format("default", branchTargetPrinter.formatLookupSwitchTarget(offset, instruction.defaultOffset)))
         printer.levelDown()
-        printer.println("      }")
+        printer.println("}")
     }
 
     override fun visitLookupSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LookupSwitchInstruction) {
         val currPos = printer.currentPosition
 
-        printer.println("%-13s { // %d".format(instruction.mnemonic, instruction.size))
+        printCommon(offset, instruction, wide = false, appendNewLine = false)
+        printer.println(" {")
         printer.resetIndentation(currPos)
         visitAnySwitchInstruction(classFile, method, code, offset, instruction)
     }
@@ -125,6 +125,7 @@ internal class InstructionPrinter constructor(private val printer:         Inden
     private fun printCommon(offset: Int, instruction: JvmInstruction, wide: Boolean = false, appendNewLine: Boolean = true) {
         printer.println()
         printDebugInfo(offset)
+        printLabels(offset)
 
         if (wide) {
             printer.println(JvmOpCode.WIDE.mnemonic)
@@ -135,6 +136,10 @@ internal class InstructionPrinter constructor(private val printer:         Inden
         if (appendNewLine) {
             printer.println()
         }
+    }
+
+    private fun printLabels(offset: Int) {
+        branchTargetPrinter.printLabels(offset)
     }
 
     private fun printDebugInfo(offset: Int) {

@@ -62,6 +62,10 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
         printer.print("\"${constant.value.escapeAsJavaString()}\"")
     }
 
+    override fun visitClassConstant(classFile: ClassFile, index: Int, constant: ClassConstant) {
+        printer.print("${constant.getClassName(classFile)}")
+    }
+
     override fun visitFieldRefConstant(classFile: ClassFile, index: Int, constant: FieldrefConstant) {
         printer.print("${constant.getClassName(classFile)}->${constant.getMemberName(classFile)}:${constant.getDescriptor(classFile)}")
     }

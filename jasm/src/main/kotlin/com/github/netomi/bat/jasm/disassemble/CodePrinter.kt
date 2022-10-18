@@ -41,8 +41,12 @@ internal class CodePrinter constructor(private val printer:         IndentingPri
         // fill debug info
         attribute.attributesAccept(classFile, method, this)
 
+        // collect branch target / label infos.
+        val branchTargetPrinter = BranchTargetPrinter(printer)
+        attribute.instructionsAccept(classFile, method, branchTargetPrinter)
+
         // print instructions and debug info
-        attribute.instructionsAccept(classFile, method, InstructionPrinter(printer, constantPrinter, debugState))
+        attribute.instructionsAccept(classFile, method, InstructionPrinter(printer, constantPrinter, branchTargetPrinter, debugState))
     }
 
     // CodeAttributeVisitor.
