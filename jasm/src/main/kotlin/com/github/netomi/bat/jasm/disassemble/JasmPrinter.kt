@@ -139,6 +139,7 @@ class JasmPrinter constructor(writer: Writer = OutputStreamWriter(System.out))
         printer.levelUp()
         attributePrinter.reset()
         method.attributesAccept(classFile, attributePrinter)
+        method.attributesAccept(classFile, CodePrinter(printer, constantPrinter))
         printer.levelDown()
 
         printer.println(".end method")

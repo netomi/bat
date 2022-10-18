@@ -25,7 +25,7 @@ import com.github.netomi.bat.util.escapeAsJavaString
 internal class ConstantPrinter constructor(private val printer: IndentingPrinter): ConstantVisitor {
 
     override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 
     override fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
