@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.BranchInstruction
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.LookupSwitchInstruction
+import com.github.netomi.bat.classfile.instruction.TableSwitchInstruction
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import java.util.*
@@ -49,26 +50,11 @@ internal class BranchTargetPrinter(private val printer: IndentingPrinter) : Inst
         return ":${prefix}_${Integer.toHexString(target)}"
     }
 
-//
-//    fun formatPayloadInstructionTarget(offset: Int, instruction: PayloadInstruction<*>): String {
-//        val prefix = when (instruction.opCode) {
-//            DexOpCode.FILL_ARRAY_DATA -> "array"
-//            DexOpCode.PACKED_SWITCH   -> "pswitch_data"
-//            DexOpCode.SPARSE_SWITCH   -> "sswitch_data"
-//
-//            else -> throw RuntimeException("unexpected payload instruction $instruction")
-//        }
-//
-//        val target = offset + instruction.payloadOffset
-//        return ":${prefix}_${Integer.toHexString(target)}"
-//    }
-//
-//    fun formatPackedSwitchTarget(payloadOffset: Int, branchTarget: Int): String {
-//        val switchOffset = reversePayloadLookup[payloadOffset]!!
-//        val target = switchOffset + branchTarget
-//        return ":pswitch_" + Integer.toHexString(target)
-//    }
-//
+    fun formatTableSwitchTarget(offset: Int, branchTarget: Int): String {
+        val target = offset + branchTarget
+        return ":tswitch_" + Integer.toHexString(target)
+    }
+
     fun formatLookupSwitchTarget(offset: Int, branchTarget: Int): String {
         val target = offset + branchTarget
         return ":lswitch_" + Integer.toHexString(target)
@@ -91,27 +77,15 @@ internal class BranchTargetPrinter(private val printer: IndentingPrinter) : Inst
         addBranchInfo(defaultTarget, formatLookupSwitchTarget(offset, instruction.defaultOffset))
     }
 
-//    override fun visitAnyPayloadInstruction(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, instruction: PayloadInstruction<*>) {
-//        val target = offset + instruction.payloadOffset
-//        reversePayloadLookup[target] = offset
-//        addBranchInfo(target, formatPayloadInstructionTarget(offset, instruction))
-//    }
-//
-//    override fun visitPackedSwitchPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: PackedSwitchPayload) {
-//        for (branchTarget in payload.branchTargets) {
-//            val switchOffset = reversePayloadLookup[offset]!!
-//            val target = switchOffset + branchTarget
-//            addBranchInfo(target, formatPackedSwitchTarget(offset, branchTarget))
-//        }
-//    }
-//
-//    override fun visitSparseSwitchPayload(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, payload: SparseSwitchPayload) {
-//        for (branchTarget in payload.branchTargets) {
-//            val switchOffset = reversePayloadLookup[offset]!!
-//            val target = switchOffset + branchTarget
-//            addBranchInfo(target, formatSparseSwitchTarget(offset, branchTarget))
-//        }
-//    }
+    override fun visitTableSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: TableSwitchInstruction) {
+        for (pair in instruction) {
+            val target = offset + pair.offset
+            addBranchInfo(target, formatTableSwitchTarget(offset, pair.offset))
+        }
+
+        val defaultTarget = offset + instruction.defaultOffset
+        addBranchInfo(defaultTarget, formatTableSwitchTarget(offset, instruction.defaultOffset))
+    }
 
     private fun addBranchInfo(offset: Int, info: String) {
         val infos = branchInfos.computeIfAbsent(offset) { TreeSet() }

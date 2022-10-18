@@ -25,7 +25,7 @@ import com.github.netomi.bat.util.escapeAsJavaString
 internal class ConstantPrinter constructor(private val printer: IndentingPrinter): ConstantVisitor {
 
     override fun visitAnyConstant(classFile: ClassFile, index: Int, constant: Constant) {
-        //TODO("Not yet implemented")
+        TODO("Not yet implemented")
     }
 
     override fun visitIntegerConstant(classFile: ClassFile, index: Int, constant: IntegerConstant) {
@@ -76,5 +76,13 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
 
     override fun visitInterfaceMethodRefConstant(classFile: ClassFile, index: Int, constant: InterfaceMethodrefConstant) {
         printer.print("${constant.getClassName(classFile)}->${constant.getMemberName(classFile)}${constant.getDescriptor(classFile)}")
+    }
+
+    override fun visitInvokeDynamicConstant(classFile: ClassFile, index: Int, constant: InvokeDynamicConstant) {
+        val nameAndType = classFile.getNameAndType(constant.nameAndTypeIndex)
+        val name = nameAndType.getMemberName(classFile)
+        val type = nameAndType.getDescriptor(classFile)
+
+        printer.print("#${constant.bootstrapMethodAttrIndex}->${name}${type}")
     }
 }

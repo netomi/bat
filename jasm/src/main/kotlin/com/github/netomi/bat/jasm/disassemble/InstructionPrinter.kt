@@ -51,12 +51,6 @@ internal class InstructionPrinter constructor(private val printer:             I
         printer.println()
     }
 
-    override fun visitInvokeDynamicInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: InvokeDynamicInstruction) {
-        printer.print("%-13s #%-18s // ".format(instruction.mnemonic, "${instruction.constantIndex},  0"))
-        instruction.constantAccept(classFile, constantPrinter)
-        printer.println()
-    }
-
     override fun visitArrayClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayClassInstruction) {
         printCommon(offset, instruction, wide = false, appendNewLine = false)
         printer.print(" ")
@@ -81,10 +75,8 @@ internal class InstructionPrinter constructor(private val printer:             I
     }
 
     override fun visitLiteralVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralVariableInstruction) {
-        if (instruction.wide) {
-            printer.println("%s".format(JvmOpCode.WIDE.mnemonic))
-        }
-        printer.println("%-13s %d, %d".format(instruction.mnemonic, instruction.variable, instruction.value))
+        printCommon(offset, instruction, instruction.wide, false)
+        printer.println(" %d, %d".format(instruction.variable, instruction.value))
     }
 
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
@@ -97,10 +89,17 @@ internal class InstructionPrinter constructor(private val printer:             I
     }
 
     override fun visitAnySwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: SwitchInstruction) {
+        val formatBranchTarget =
+            if (instruction.opCode == JvmOpCode.TABLESWITCH) {
+                branchTargetPrinter::formatTableSwitchTarget
+            } else {
+                branchTargetPrinter::formatLookupSwitchTarget
+            }
+
         for (pair in instruction) {
-            printer.println("%12d -> %s".format(pair.match, branchTargetPrinter.formatLookupSwitchTarget(offset, pair.offset)))
+            printer.println("%12d -> %s".format(pair.match, formatBranchTarget(offset, pair.offset)))
         }
-        printer.println("%12s -> %s".format("default", branchTargetPrinter.formatLookupSwitchTarget(offset, instruction.defaultOffset)))
+        printer.println("%12s -> %s".format("default", formatBranchTarget(offset, instruction.defaultOffset)))
         printer.levelDown()
         printer.println("}")
     }
@@ -117,7 +116,8 @@ internal class InstructionPrinter constructor(private val printer:             I
     override fun visitTableSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: TableSwitchInstruction) {
         val currPos = printer.currentPosition
 
-        printer.println("%-13s { // %d to %d".format(instruction.mnemonic, instruction.lowValue, instruction.highValue))
+        printCommon(offset, instruction, wide = false, appendNewLine = false)
+        printer.println(" {")
         printer.resetIndentation(currPos)
         visitAnySwitchInstruction(classFile, method, code, offset, instruction)
     }
