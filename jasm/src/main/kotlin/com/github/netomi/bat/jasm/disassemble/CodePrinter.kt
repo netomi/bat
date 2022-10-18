@@ -42,8 +42,8 @@ internal class CodePrinter constructor(private val printer:         IndentingPri
         attribute.attributesAccept(classFile, method, this)
         for ((_, infos) in localVariableInfos) {
             for (localVariableInfo in infos) {
-                handleStartLocal(localVariableInfo)
-                handleEndLocal(localVariableInfo)
+                addStartLocalInfo(localVariableInfo)
+                addEndLocalInfo(localVariableInfo)
             }
         }
 
@@ -82,7 +82,17 @@ internal class CodePrinter constructor(private val printer:         IndentingPri
         localVariableInfo.updateSignature(signature)
     }
 
-    private fun handleStartLocal(localVariableInfo: LocalVariableInfo) {
+    override fun visitLineNumberTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
+        for (entry in attribute) {
+            addLineDebugInfo(entry.startPC, entry.lineNumber)
+        }
+    }
+
+    private fun addLineDebugInfo(offset: Int, lineNumber: Int) {
+        addDebugInfo(offset, ".line $lineNumber")
+    }
+
+    private fun addStartLocalInfo(localVariableInfo: LocalVariableInfo) {
         val info = buildString {
             append(".local ")
             append(localVariableInfo.variableIndex)
@@ -107,7 +117,7 @@ internal class CodePrinter constructor(private val printer:         IndentingPri
         addDebugInfo(localVariableInfo.startPC, info)
     }
 
-    private fun handleEndLocal(localVariableInfo: LocalVariableInfo) {
+    private fun addEndLocalInfo(localVariableInfo: LocalVariableInfo) {
         val info = buildString {
             append(".end local ")
             append(localVariableInfo.variableIndex)
@@ -130,16 +140,6 @@ internal class CodePrinter constructor(private val printer:         IndentingPri
         }
 
         addDebugInfo(localVariableInfo.startPC + localVariableInfo.length, info)
-    }
-
-    override fun visitLineNumberTable(classFile: ClassFile, method: Method, code: CodeAttribute, attribute: LineNumberTableAttribute) {
-        for (entry in attribute) {
-            addLineDebugInfo(entry.startPC, entry.lineNumber)
-        }
-    }
-
-    private fun addLineDebugInfo(offset: Int, lineNumber: Int) {
-        addDebugInfo(offset, ".line $lineNumber")
     }
 
     private fun addDebugInfo(offset: Int, info: String) {
