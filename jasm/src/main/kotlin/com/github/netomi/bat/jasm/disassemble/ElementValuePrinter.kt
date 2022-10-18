@@ -38,7 +38,15 @@ internal class ElementValuePrinter constructor(private val printer:         Inde
 
     override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {
         printer.print("{")
-        elementValue.elementValuesAccept(classFile, this.joinedByElementValueConsumer { _, _ -> printer.print(",") })
+
+        if (elementValue.size > 0) {
+            printer.println()
+            printer.levelUp()
+            elementValue.elementValuesAccept(classFile, this.joinedByElementValueConsumer { _, _ -> printer.println(",") })
+            printer.println()
+            printer.levelDown()
+        }
+
         printer.print("}")
     }
 

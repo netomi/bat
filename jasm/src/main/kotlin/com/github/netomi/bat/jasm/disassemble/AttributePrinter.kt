@@ -76,6 +76,22 @@ internal class AttributePrinter constructor(private val printer:         Indenti
         }
     }
 
+    override fun visitAnyRuntimeVisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
+        if (attribute.size > 0) {
+            annotationPrinter.visibility = AnnotationVisibility.RUNTIME
+            attribute.typeAnnotationsAccept(classFile, annotationPrinter)
+            printedAttributes = true
+        }
+    }
+
+    override fun visitAnyRuntimeInvisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
+        if (attribute.size > 0) {
+            annotationPrinter.visibility = AnnotationVisibility.BUILD
+            attribute.typeAnnotationsAccept(classFile, annotationPrinter)
+            printedAttributes = true
+        }
+    }
+
     // ClassAttributeVisitor.
 
     override fun visitSourceFile(classFile: ClassFile, attribute: SourceFileAttribute) {
@@ -115,9 +131,22 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     }
 
     override fun visitEnclosingMethod(classFile: ClassFile, attribute: EnclosingMethodAttribute) {
-        val methodData = "${attribute.getClassName(classFile)}->${attribute.getMethodName(classFile)}${attribute.getMethodDescriptor(classFile)}"
+        val methodData = buildString {
+            append(attribute.getClassName(classFile))
+
+            if (attribute.methodIndex > 0) {
+                append("->")
+                append(attribute.getMethodName(classFile))
+                append(attribute.getMethodDescriptor(classFile))
+            }
+        }
+
         printer.println(".enclosingmethod $methodData")
         printedAttributes = true
+    }
+
+    override fun visitBootstrapMethods(classFile: ClassFile, attribute: BootstrapMethodsAttribute) {
+        //TODO("implement")
     }
 
     override fun visitModule(classFile: ClassFile, attribute: ModuleAttribute) {

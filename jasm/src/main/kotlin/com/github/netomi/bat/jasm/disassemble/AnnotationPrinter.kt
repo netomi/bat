@@ -18,6 +18,7 @@ package com.github.netomi.bat.jasm.disassemble
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.attribute.annotation.Annotation
+import com.github.netomi.bat.classfile.attribute.annotation.TypeAnnotation
 import com.github.netomi.bat.classfile.attribute.annotation.visitor.AnnotationVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import java.util.*
@@ -27,19 +28,33 @@ internal class AnnotationPrinter constructor(private val printer:             In
 
     var visibility: AnnotationVisibility = AnnotationVisibility.RUNTIME
 
-    override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {}
+    override fun visitAnyAnnotation(classFile: ClassFile, annotation: Annotation) {
+        for (component in annotation) {
+            printer.print("${component.getName(classFile)} = ")
+            component.elementValue.accept(classFile, elementValuePrinter)
+            printer.println()
+        }
+    }
 
     override fun visitAnnotation(classFile: ClassFile, annotation: Annotation) {
         printer.println(".annotation ${visibility.toExternalString()} ${annotation.getType(classFile)}")
         if (annotation.size > 0) {
             printer.levelUp()
-            for (component in annotation) {
-                printer.print("${classFile.getString(component.nameIndex)} = ")
-                component.elementValue.accept(classFile, elementValuePrinter)
-                printer.println()
-            }
+            visitAnyAnnotation(classFile, annotation)
             printer.levelDown()
             printer.println(".end annotation")
+        }
+    }
+
+    override fun visitTypeAnnotation(classFile: ClassFile, typeAnnotation: TypeAnnotation) {
+        printer.println(".typeannotation ${visibility.toExternalString()} ${typeAnnotation.getType(classFile)}")
+
+        // TODO: print target and path
+        if (typeAnnotation.size > 0) {
+            printer.levelUp()
+            visitAnyAnnotation(classFile, typeAnnotation)
+            printer.levelDown()
+            printer.println(".end typeannotation")
         }
     }
 }
