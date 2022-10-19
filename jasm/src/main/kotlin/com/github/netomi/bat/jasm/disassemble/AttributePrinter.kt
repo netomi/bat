@@ -63,7 +63,7 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     override fun visitAnyRuntimeVisibleAnnotations(classFile: ClassFile, attribute: RuntimeVisibleAnnotationsAttribute) {
         if (attribute.size > 0) {
             annotationPrinter.visibility = AnnotationVisibility.RUNTIME
-            attribute.annotationsAccept(classFile, annotationPrinter)
+            attribute.annotationsAccept(classFile, annotationPrinter.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printedAttributes = true
         }
     }
@@ -71,7 +71,7 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     override fun visitAnyRuntimeInvisibleAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleAnnotationsAttribute) {
         if (attribute.size > 0) {
             annotationPrinter.visibility = AnnotationVisibility.BUILD
-            attribute.annotationsAccept(classFile, annotationPrinter)
+            attribute.annotationsAccept(classFile, annotationPrinter.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printedAttributes = true
         }
     }
@@ -79,7 +79,7 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     override fun visitAnyRuntimeVisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeVisibleTypeAnnotationsAttribute) {
         if (attribute.size > 0) {
             annotationPrinter.visibility = AnnotationVisibility.RUNTIME
-            attribute.typeAnnotationsAccept(classFile, annotationPrinter)
+            attribute.typeAnnotationsAccept(classFile, annotationPrinter.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printedAttributes = true
         }
     }
@@ -87,7 +87,7 @@ internal class AttributePrinter constructor(private val printer:         Indenti
     override fun visitAnyRuntimeInvisibleTypeAnnotations(classFile: ClassFile, attribute: RuntimeInvisibleTypeAnnotationsAttribute) {
         if (attribute.size > 0) {
             annotationPrinter.visibility = AnnotationVisibility.BUILD
-            attribute.typeAnnotationsAccept(classFile, annotationPrinter)
+            attribute.typeAnnotationsAccept(classFile, annotationPrinter.joinedByAnnotationConsumer { _, _ -> printer.println() })
             printedAttributes = true
         }
     }
@@ -245,7 +245,7 @@ internal class AttributePrinter constructor(private val printer:         Indenti
             if (attribute.getParameterAnnotationCount(parameterIndex) > 0) {
                 printer.println(".param %d    # %s".format(parameterIndex, parameterType))
                 printer.levelUp()
-                attribute.parameterAnnotationsAccept(classFile, parameterIndex, annotationPrinter)
+                attribute.parameterAnnotationsAccept(classFile, parameterIndex, annotationPrinter.joinedByAnnotationConsumer { _, _ -> printer.println() })
                 printer.levelDown()
                 printer.println(".end param")
             }
