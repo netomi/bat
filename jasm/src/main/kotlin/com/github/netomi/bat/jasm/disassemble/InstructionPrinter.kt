@@ -24,15 +24,16 @@ import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import java.util.*
 
-internal class InstructionPrinter constructor(private val printer:             IndentingPrinter,
-                                              private val constantPrinter:     ConstantPrinter,
-                                              private val branchTargetPrinter: BranchTargetPrinter,
-                                              private val debugState:          Map<Int, List<String>>): InstructionVisitor {
+internal class InstructionPrinter constructor(private val printer:         IndentingPrinter,
+                                              private val constantPrinter: ConstantPrinter,
+                                              private val labelPrinter:    LabelPrinter,
+                                              private val debugState:      Map<Int, List<String>>): InstructionVisitor {
 
     override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
 
     override fun visitAnySimpleInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {
         printCommon(offset, instruction, wide = false, appendNewLine = true)
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitLiteralInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralInstruction) {
@@ -42,6 +43,7 @@ internal class InstructionPrinter constructor(private val printer:             I
             printCommon(offset, instruction, wide = false, appendNewLine = false)
             printer.println(" %d".format(instruction.value))
         }
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitAnyConstantInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ConstantInstruction) {
@@ -49,6 +51,7 @@ internal class InstructionPrinter constructor(private val printer:             I
         printer.print(" ")
         instruction.constantAccept(classFile, constantPrinter)
         printer.println()
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitArrayClassInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayClassInstruction) {
@@ -61,22 +64,26 @@ internal class InstructionPrinter constructor(private val printer:             I
         }
 
         printer.println()
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
         printCommon(offset, instruction, wide = false, appendNewLine = false)
         printer.print(" ")
-        printer.println(branchTargetPrinter.formatBranchInstructionTarget(offset, instruction))
+        printer.println(labelPrinter.formatBranchInstructionTarget(offset, instruction))
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitArrayPrimitiveTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayPrimitiveTypeInstruction) {
         printCommon(offset, instruction, wide = false, appendNewLine = false)
         printer.println(" %s".format(instruction.arrayType.toString().lowercase(Locale.getDefault())))
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitLiteralVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LiteralVariableInstruction) {
         printCommon(offset, instruction, instruction.wide, false)
         printer.println(" %d, %d".format(instruction.variable, instruction.value))
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitVariableInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: VariableInstruction) {
@@ -86,14 +93,15 @@ internal class InstructionPrinter constructor(private val printer:             I
             printCommon(offset, instruction, instruction.wide, false)
             printer.println(" %d".format(instruction.variable))
         }
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitAnySwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: SwitchInstruction) {
         val formatBranchTarget =
             if (instruction.opCode == JvmOpCode.TABLESWITCH) {
-                branchTargetPrinter::formatTableSwitchTarget
+                labelPrinter::formatTableSwitchTarget
             } else {
-                branchTargetPrinter::formatLookupSwitchTarget
+                labelPrinter::formatLookupSwitchTarget
             }
 
         for (pair in instruction) {
@@ -111,6 +119,7 @@ internal class InstructionPrinter constructor(private val printer:             I
         printer.println(" {")
         printer.resetIndentation(currPos)
         visitAnySwitchInstruction(classFile, method, code, offset, instruction)
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     override fun visitTableSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: TableSwitchInstruction) {
@@ -120,12 +129,13 @@ internal class InstructionPrinter constructor(private val printer:             I
         printer.println(" {")
         printer.resetIndentation(currPos)
         visitAnySwitchInstruction(classFile, method, code, offset, instruction)
+        printEndLabels(offset + instruction.getLength(offset))
     }
 
     private fun printCommon(offset: Int, instruction: JvmInstruction, wide: Boolean = false, appendNewLine: Boolean = true) {
         printer.println()
         printDebugInfo(offset)
-        printLabels(offset)
+        printStartLabels(offset)
 
         if (wide) {
             printer.println(JvmOpCode.WIDE.mnemonic)
@@ -138,8 +148,12 @@ internal class InstructionPrinter constructor(private val printer:             I
         }
     }
 
-    private fun printLabels(offset: Int) {
-        branchTargetPrinter.printLabels(offset)
+    private fun printStartLabels(offset: Int) {
+        labelPrinter.printStartLabels(offset)
+    }
+
+    private fun printEndLabels(offset: Int) {
+        labelPrinter.printEndLabels(offset)
     }
 
     private fun printDebugInfo(offset: Int) {

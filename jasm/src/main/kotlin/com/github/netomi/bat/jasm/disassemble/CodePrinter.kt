@@ -47,12 +47,13 @@ internal class CodePrinter constructor(private val printer:         IndentingPri
             }
         }
 
-        // collect branch target / label infos.
-        val branchTargetPrinter = BranchTargetPrinter(printer)
-        attribute.instructionsAccept(classFile, method, branchTargetPrinter)
+        // collect branch target / label / exception infos.
+        val labelPrinter = LabelPrinter(printer)
+        attribute.exceptionsAccept(classFile, method, labelPrinter)
+        attribute.instructionsAccept(classFile, method, labelPrinter)
 
         // print instructions and debug info
-        attribute.instructionsAccept(classFile, method, InstructionPrinter(printer, constantPrinter, branchTargetPrinter, debugState))
+        attribute.instructionsAccept(classFile, method, InstructionPrinter(printer, constantPrinter, labelPrinter, debugState))
     }
 
     // CodeAttributeVisitor.
@@ -68,6 +69,8 @@ internal class CodePrinter constructor(private val printer:         IndentingPri
             addLocalVariable(entry.startPC, entry.length, entry.variableIndex, entry.getName(classFile), null, entry.getSignature(classFile))
         }
     }
+
+    // private methods.
 
     private fun addLocalVariable(startPC: Int, length: Int, registerNum: Int, name: String, descriptor: String?, signature: String?) {
         val infos = localVariableInfos.computeIfAbsent(startPC) { ArrayList() }
@@ -168,3 +171,4 @@ internal data class LocalVariableInfo
         }
     }
 }
+

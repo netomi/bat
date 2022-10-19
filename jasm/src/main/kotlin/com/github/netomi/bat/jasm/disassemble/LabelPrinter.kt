@@ -18,6 +18,8 @@ package com.github.netomi.bat.jasm.disassemble
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.attribute.ExceptionEntry
+import com.github.netomi.bat.classfile.attribute.visitor.ExceptionVisitor
 import com.github.netomi.bat.classfile.instruction.BranchInstruction
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.LookupSwitchInstruction
@@ -26,21 +28,21 @@ import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.io.IndentingPrinter
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashSet
 
-internal class BranchTargetPrinter(private val printer: IndentingPrinter) : InstructionVisitor {
+internal class LabelPrinter(private val printer: IndentingPrinter) : InstructionVisitor, ExceptionVisitor {
 
-    private val branchInfos: MutableMap<Int, MutableSet<String>> = HashMap()
+    private val startLabelInfos: MutableMap<Int, MutableSet<String>> = HashMap()
+    private val endLabelInfos:   MutableMap<Int, MutableSet<String>> = HashMap()
 
-    fun printLabels(offset: Int) {
-        val labels = branchInfos[offset]
+    fun printStartLabels(offset: Int) {
+        val labels = startLabelInfos[offset]
+        labels?.forEach { printer.println(it) }
+    }
 
-        // combine branch and try/catch labels and print them in a sorted manner.
-        val sortedLabels = TreeSet<String>()
-        if (labels != null) {
-            sortedLabels.addAll(labels)
-        }
-
-        sortedLabels.forEach { printer.println(it) }
+    fun printEndLabels(offset: Int) {
+        val labels = endLabelInfos[offset]
+        labels?.forEach { printer.println(it) }
     }
 
     fun formatBranchInstructionTarget(offset: Int, instruction: BranchInstruction): String {
@@ -60,35 +62,66 @@ internal class BranchTargetPrinter(private val printer: IndentingPrinter) : Inst
         return ":lswitch_" + Integer.toHexString(target)
     }
 
+    // InstructionVisitor.
+
     override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
 
     override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
         val target = offset + instruction.branchOffset
-        addBranchInfo(target, formatBranchInstructionTarget(offset, instruction))
+        addStartLabelInfo(target, formatBranchInstructionTarget(offset, instruction))
     }
 
     override fun visitLookupSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: LookupSwitchInstruction) {
         for (pair in instruction) {
             val target = offset + pair.offset
-            addBranchInfo(target, formatLookupSwitchTarget(offset, pair.offset))
+            addStartLabelInfo(target, formatLookupSwitchTarget(offset, pair.offset))
         }
 
         val defaultTarget = offset + instruction.defaultOffset
-        addBranchInfo(defaultTarget, formatLookupSwitchTarget(offset, instruction.defaultOffset))
+        addStartLabelInfo(defaultTarget, formatLookupSwitchTarget(offset, instruction.defaultOffset))
     }
 
     override fun visitTableSwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: TableSwitchInstruction) {
         for (pair in instruction) {
             val target = offset + pair.offset
-            addBranchInfo(target, formatTableSwitchTarget(offset, pair.offset))
+            addStartLabelInfo(target, formatTableSwitchTarget(offset, pair.offset))
         }
 
         val defaultTarget = offset + instruction.defaultOffset
-        addBranchInfo(defaultTarget, formatTableSwitchTarget(offset, instruction.defaultOffset))
+        addStartLabelInfo(defaultTarget, formatTableSwitchTarget(offset, instruction.defaultOffset))
     }
 
-    private fun addBranchInfo(offset: Int, info: String) {
-        val infos = branchInfos.computeIfAbsent(offset) { TreeSet() }
+    // ExceptionVisitor.
+
+    override fun visitException(classFile: ClassFile, method: Method, code: CodeAttribute, exception: ExceptionEntry) {
+        val startPC   = Integer.toHexString(exception.startPC)
+        val endPC     = Integer.toHexString(exception.endPC)
+        val handlerPC = Integer.toHexString(exception.handlerPC)
+
+        addStartLabelInfo(exception.startPC, ":try_start_$startPC")
+
+        if (exception.catchType == 0) {
+            addStartLabelInfo(exception.handlerPC, ":catchall_$handlerPC")
+        } else {
+            addStartLabelInfo(exception.handlerPC, ":catch_$handlerPC")
+        }
+
+        addEndLabelInfo(exception.endPC, ":try_end_$endPC")
+
+        if (exception.catchType == 0) {
+            addEndLabelInfo(exception.endPC, ".catchall {:try_start_$startPC .. :try_end_${endPC}} :catchall_${handlerPC}")
+        } else {
+            addEndLabelInfo(exception.endPC, ".catch ${exception.getCaughtExceptionClassName(classFile)} {:try_start_$startPC .. :try_end_${endPC}} :catchall_${handlerPC}")
+        }
+    }
+
+    private fun addStartLabelInfo(offset: Int, info: String) {
+        val infos = startLabelInfos.computeIfAbsent(offset) { TreeSet() }
+        infos.add(info)
+    }
+
+    private fun addEndLabelInfo(offset: Int, info: String) {
+        val infos = endLabelInfos.computeIfAbsent(offset) { LinkedHashSet() }
         infos.add(info)
     }
 }

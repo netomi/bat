@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.attribute
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.visitor.CodeAttributeVisitor
+import com.github.netomi.bat.classfile.attribute.visitor.ExceptionVisitor
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
@@ -102,6 +103,12 @@ data class CodeAttribute
     fun attributesAccept(classFile: ClassFile, method: Method, visitor: CodeAttributeVisitor) {
         for (attribute in attributes.filterIsInstance(AttachedToCodeAttribute::class.java)) {
             attribute.accept(classFile, method, this, visitor)
+        }
+    }
+
+    fun exceptionsAccept(classFile: ClassFile, method: Method, visitor: ExceptionVisitor) {
+        for (entry in exceptionTable) {
+            visitor.visitException(classFile, method, this, entry)
         }
     }
 
