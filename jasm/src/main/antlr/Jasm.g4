@@ -103,7 +103,7 @@ METHOD_FULL  : (FRAGMENT_OBJECT_TYPE | FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_MEMBER
 METHOD_PART  : FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
 METHOD_PROTO : FRAGMENT_METHOD_PROTO;
 
-FIELD_FULL : (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_FIELD_PART;
+FIELD_FULL : FRAGMENT_FULL_CLASS_NAME '->' FRAGMENT_FIELD_PART;
 FIELD_PART : FRAGMENT_FIELD_PART;
 ENUM_FULL  : FRAGMENT_OBJECT_TYPE '->' FRAGMENT_MEMBER_NAME;
 
@@ -161,8 +161,6 @@ ANN_VISIBLE
     | 'runtime'
     ;
 
-REGISTER: ('v'|'V'|'p'|'P') '0'..'9'+;
-
 DENUM         : '.enum';
 DPARAM        : '.param';
 DRESTARTLOCAL : '.restart local';
@@ -192,11 +190,13 @@ sSuper	   : '.super' name=CLASS_NAME;
 sInterface : '.implements' name=CLASS_NAME;
 sMethod
 	: '.method' sAccList methodObj=(METHOD_FULL|METHOD_PART)
-        ( sAttribute )*
+        ( sAttribute
+        | sInstruction
+        | sDirective )*
 	 '.end method';
 
 sField
-    : '.field' sAccList fieldObj=(FIELD_FULL|FIELD_PART) ('=' sBaseValue)?
+    : '.field' sAccList fieldObj=FIELD_PART ('=' sBaseValue)?
 	  (sAttribute* '.end field')?
 	;
 
@@ -245,3 +245,38 @@ sBaseValue
 	;
 
 sArrayValue: '{' sAnnotationValue? (',' sAnnotationValue)* '}';
+
+sInstruction
+    : fReturn
+    | fField
+    ;
+
+sDirective
+    : fStack
+    | fLocals
+    | fLine
+    | fStartlocal
+    | fEndlocal
+    ;
+
+fStack     : '.stack'  maxStack=INT;
+fLocals    : '.locals' maxLocals=INT;
+fLine      : '.line'   line=INT;
+fStartlocal: '.local'  variable=INT ',' name=STRING (':' descriptor=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE))? (',' signature=STRING)? ;
+fEndlocal  : '.end local' variable=INT;
+
+fReturn: op=
+    ( 'areturn'
+    | 'dreturn'
+    | 'freturn'
+    | 'ireturn'
+    | 'lreturn'
+    | 'return' )
+    ;
+
+fField: op=
+    ( 'getfield'
+    | 'getstatic'
+    | 'putfield'
+    | 'putstatic' ) fld=FIELD_FULL
+    ;
