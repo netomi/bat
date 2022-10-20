@@ -183,6 +183,7 @@ sAttribute
     : sSource
     | sSignature
     | sAnnotation
+    | sAnnotationDefault
     ;
 
 sBytecode  : '.bytecode' version=STRING;
@@ -205,6 +206,9 @@ sAnnotation
 	: '.annotation' visibility=ANN_VISIBLE type=OBJECT_TYPE
 	  ((sAnnotationKeyName '=' sAnnotationValue)* '.end annotation')?
 	;
+
+sAnnotationDefault
+    : '.annotationdefault' value=sBaseValue;
 
 sSubannotation
 	: '.subannotation' type=OBJECT_TYPE (sAnnotationKeyName '=' sAnnotationValue )* '.end subannotation' ;

@@ -17,7 +17,7 @@
 package com.github.netomi.bat.jasm.assemble
 
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
-import com.github.netomi.bat.jasm.parser.JasmParser
+import com.github.netomi.bat.jasm.parser.JasmParser.*
 import com.github.netomi.bat.jasm.parser.JasmParser.SBaseValueContext
 import org.antlr.v4.runtime.tree.TerminalNode
 
@@ -33,24 +33,24 @@ internal class ConstantAssembler constructor(private val constantPoolEditor: Con
         }
 
         return when (value.type) {
-            JasmParser.STRING  -> constantPoolEditor.addOrGetUtf8ConstantIndex(parseString(value.text))
-            JasmParser.BOOLEAN -> constantPoolEditor.addOrGetIntegerConstantIndex(("true" == value.text).toInt())
-            JasmParser.BYTE    -> constantPoolEditor.addOrGetIntegerConstantIndex(parseByte(value.text).toInt())
-            JasmParser.SHORT   -> constantPoolEditor.addOrGetIntegerConstantIndex(parseShort(value.text).toInt())
-            JasmParser.CHAR    -> constantPoolEditor.addOrGetIntegerConstantIndex(parseChar(value.text).code)
-            JasmParser.INT     -> constantPoolEditor.addOrGetIntegerConstantIndex(parseInt(value.text))
-            JasmParser.LONG    -> constantPoolEditor.addOrGetLongConstantIndex(parseLong(value.text))
+            STRING  -> constantPoolEditor.addOrGetUtf8ConstantIndex(parseString(value.text))
+            BOOLEAN -> constantPoolEditor.addOrGetIntegerConstantIndex(("true" == value.text).toInt())
+            BYTE    -> constantPoolEditor.addOrGetIntegerConstantIndex(parseByte(value.text).toInt())
+            SHORT   -> constantPoolEditor.addOrGetIntegerConstantIndex(parseShort(value.text).toInt())
+            CHAR    -> constantPoolEditor.addOrGetIntegerConstantIndex(parseChar(value.text).code)
+            INT     -> constantPoolEditor.addOrGetIntegerConstantIndex(parseInt(value.text))
+            LONG    -> constantPoolEditor.addOrGetLongConstantIndex(parseLong(value.text))
 
-            JasmParser.BASE_FLOAT,
-            JasmParser.FLOAT_INFINITY,
-            JasmParser.FLOAT_NAN -> constantPoolEditor.addOrGetFloatConstantIndex(parseFloat(value.text))
+            BASE_FLOAT,
+            FLOAT_INFINITY,
+            FLOAT_NAN -> constantPoolEditor.addOrGetFloatConstantIndex(parseFloat(value.text))
 
-            JasmParser.BASE_DOUBLE,
-            JasmParser.DOUBLE_INFINITY,
-            JasmParser.DOUBLE_NAN -> constantPoolEditor.addOrGetDoubleConstantIndex(parseDouble(value.text))
+            BASE_DOUBLE,
+            DOUBLE_INFINITY,
+            DOUBLE_NAN -> constantPoolEditor.addOrGetDoubleConstantIndex(parseDouble(value.text))
 
             else -> null
-        } ?: error("failure to parse constant base value")
+        } ?: error("failed to parse constant base value")
     }
 }
 

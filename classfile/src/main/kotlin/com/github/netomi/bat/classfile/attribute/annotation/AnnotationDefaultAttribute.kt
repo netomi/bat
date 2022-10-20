@@ -33,8 +33,8 @@ import java.io.IOException
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se18/html/jvms-4.html#jvms-4.7.22">AnnotationDefault Attribute</a>
  */
 data class AnnotationDefaultAttribute
-    private constructor(override var attributeNameIndex:  Int,
-                         private var _elementValue:       ElementValue = ElementValue.empty())
+    private constructor(override var attributeNameIndex: Int,
+                                 var elementValue:       ElementValue = ElementValue.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType
@@ -43,12 +43,9 @@ data class AnnotationDefaultAttribute
     override val dataSize: Int
         get() = elementValue.contentSize
 
-    val elementValue: ElementValue
-        get() = _elementValue
-
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        _elementValue = ElementValue.read(input)
+        elementValue = ElementValue.read(input)
     }
 
     @Throws(IOException::class)

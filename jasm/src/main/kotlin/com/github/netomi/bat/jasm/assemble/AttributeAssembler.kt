@@ -19,6 +19,7 @@ package com.github.netomi.bat.jasm.assemble
 import com.github.netomi.bat.classfile.attribute.AttributeType
 import com.github.netomi.bat.classfile.attribute.SignatureAttribute
 import com.github.netomi.bat.classfile.attribute.SourceFileAttribute
+import com.github.netomi.bat.classfile.attribute.annotation.AnnotationDefaultAttribute
 import com.github.netomi.bat.classfile.attribute.annotation.RuntimeAnnotationsAttribute
 import com.github.netomi.bat.classfile.editor.AttributeEditor
 import com.github.netomi.bat.jasm.disassemble.AnnotationVisibility
@@ -35,9 +36,10 @@ internal class AttributeAssembler constructor(private val attributeEditor: Attri
     fun parseAndAddAttribute(ctx: SAttributeContext) {
         val t = ctx.getChild(0) as ParserRuleContext
         when (t.ruleIndex) {
-            RULE_sSignature  -> return parseAndAddSignatureAttribute(t as SSignatureContext)
-            RULE_sSource     -> return parseAndAddSourceFileAttribute(t as SSourceContext)
-            RULE_sAnnotation -> return parseAndAddAnnotationAttribute(t as SAnnotationContext)
+            RULE_sSignature         -> return parseAndAddSignatureAttribute(t as SSignatureContext)
+            RULE_sSource            -> return parseAndAddSourceFileAttribute(t as SSourceContext)
+            RULE_sAnnotation        -> return parseAndAddAnnotationAttribute(t as SAnnotationContext)
+            RULE_sAnnotationDefault -> return parseAndAddAnnotationDefaultAttribute(t as SAnnotationDefaultContext)
 
             else -> {} // TODO: parserError(ctx, "failed to parse attribute")
         }
@@ -65,5 +67,12 @@ internal class AttributeAssembler constructor(private val attributeEditor: Attri
         val attribute: RuntimeAnnotationsAttribute = attributeEditor.addOrGetAttribute(attributeType)
         val annotation = annotationAssembler.parseAnnotation(ctx)
         attribute.addAnnotation(annotation)
+    }
+
+    private fun parseAndAddAnnotationDefaultAttribute(ctx: SAnnotationDefaultContext) {
+        val elementValue = elementValueAssembler.parseBaseValue(ctx.value)
+
+        val attribute: AnnotationDefaultAttribute = attributeEditor.addOrGetAttribute(AttributeType.ANNOTATION_DEFAULT)
+        attribute.elementValue = elementValue
     }
 }
