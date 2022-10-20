@@ -100,6 +100,12 @@ open class ClassFile protected constructor(version:     Version = Version.JAVA_8
 
     private var _interfaces: MutableList<Int> = mutableListOfCapacity(0)
 
+    internal fun addInterface(classIndex: Int) {
+        if (!_interfaces.contains(classIndex)) {
+            _interfaces.add(classIndex)
+        }
+    }
+
     val interfaceCount: Int
         get() = _interfaces.size
 

@@ -15,13 +15,12 @@
  */
 package com.github.netomi.bat
 
-import com.github.netomi.bat.io.DataEntry
-import com.github.netomi.bat.io.FileOutputStreamFactory
-import com.github.netomi.bat.io.PathInputSource
-import com.github.netomi.bat.io.filterDataEntriesBy
+import com.github.netomi.bat.classfile.io.ClassFileWriter
+import com.github.netomi.bat.io.*
 import com.github.netomi.bat.jasm.Assembler
 import com.github.netomi.bat.smali.SmaliAssembleException
 import com.github.netomi.bat.util.fileNameMatcher
+import com.github.netomi.bat.util.isArchive
 import picocli.CommandLine
 import java.io.PrintWriter
 import java.nio.file.Path
@@ -50,20 +49,39 @@ class JasmCommand : Runnable {
     private var verbose: Boolean = false
 
     override fun run() {
+        val dumpToArchive = isArchive(outputPath)
+
+        val writer =
+            if (dumpToArchive) {
+                ZipOutputSink.of(outputPath)
+            } else {
+                DirectoryOutputSink.of(outputPath)
+            }
+
         val startTime = System.nanoTime()
 
         val warningPrinter = if (verbose) PrintWriter(System.out, true) else PrintWriter(System.err, true)
 
-        val outputStreamFactory = FileOutputStreamFactory(outputPath, "class")
-        val assembler = Assembler(outputStreamFactory, lenientMode, warningPrinter)
-
-        var assembledClasses = 0
+        val assembler = Assembler(lenientMode, warningPrinter)
+        var assembledClassCount = 0
 
         val processJasmFile = { entry: DataEntry ->
             try {
                 entry.getInputStream().use {
                     printVerbose("  assembling file '${entry.name}'")
-                    assembledClasses += assembler.assemble(it, entry.name).size
+
+                    val assembledClasses = assembler.assemble(it, entry.name)
+                    assembledClassCount += assembledClasses.size
+
+                    for (clazz in assembledClasses) {
+                        val outputEntryName = clazz.className.toInternalClassName() + ".class"
+                        val outputEntry     = TransformedDataEntry.of(outputEntryName, entry)
+
+                        writer.createOutputStream(outputEntry).use { os ->
+                            val classFileWriter = ClassFileWriter(os)
+                            classFileWriter.visitClassFile(clazz)
+                        }
+                    }
                 }
             } catch (exception: SmaliAssembleException) {
                 warningPrinter.println("error: ${exception.message}")
@@ -71,16 +89,18 @@ class JasmCommand : Runnable {
             }
         }
 
-        inputFiles.forEach { inputPath ->
-            printVerbose("assembling path '${inputPath.name}' into path '${outputPath.name}' ...")
+        writer.use {
+            inputFiles.forEach { inputPath ->
+                printVerbose("assembling path '${inputPath.name}' into path '${outputPath.name}' ...")
 
-            val inputSource = PathInputSource.of(inputPath, true)
-            inputSource.pumpDataEntries(
-                filterDataEntriesBy(fileNameMatcher("**.jasm"),
-                processJasmFile))
+                val inputSource = PathInputSource.of(inputPath, true)
+                inputSource.pumpDataEntries(
+                    filterDataEntriesBy(fileNameMatcher("**.jasm"),
+                    processJasmFile))
+            }
         }
 
-        printVerbose("assembled $assembledClasses class(es).")
+        printVerbose("assembled $assembledClassCount class(es).")
 
         val endTime = System.nanoTime()
         printVerbose("done, took ${(endTime - startTime) / 1e6} ms.")

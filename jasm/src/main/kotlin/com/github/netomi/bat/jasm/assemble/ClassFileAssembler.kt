@@ -44,6 +44,10 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
         val classFile = ClassFile.of(className, accessFlags, superClassName, version)
         classEditor   = ClassEditor.of(classFile)
 
+        ctx.sInterface().forEach {
+            classEditor.addInterface(it.name.text)
+        }
+
         ctx.sField().forEach  { visitSField(it) }
         ctx.sMethod().forEach { visitSMethod(it) }
 

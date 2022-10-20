@@ -17,7 +17,6 @@
 package com.github.netomi.bat.jasm.assemble
 
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
-import com.github.netomi.bat.jasm.parser.JasmLexer
 import com.github.netomi.bat.jasm.parser.JasmParser
 import com.github.netomi.bat.jasm.parser.JasmParser.SBaseValueContext
 import org.antlr.v4.runtime.tree.TerminalNode
@@ -26,16 +25,11 @@ internal class ConstantAssembler constructor(private val constantPoolEditor: Con
 
     fun parseBaseValue(ctx: SBaseValueContext): Int {
         // a base value is usually only a single token, only exception: enum fields
-        val (value, isEnum) = if (ctx.childCount == 1) {
+        val value = if (ctx.childCount == 1) {
             val tn = ctx.getChild(0) as TerminalNode
-            Pair(tn.symbol, false)
+            tn.symbol
         } else {
-            // in case of an enum, the first child is the ".enum" fragment.
-            val first = (ctx.getChild(0) as TerminalNode).symbol
-            assert(first.type == JasmLexer.DENUM)
-
-            val tn = ctx.getChild(1) as TerminalNode
-            Pair(tn.symbol, true)
+            parserError(ctx, "unexpected constant base value")
         }
 
         return when (value.type) {
@@ -55,26 +49,8 @@ internal class ConstantAssembler constructor(private val constantPoolEditor: Con
             JasmParser.DOUBLE_INFINITY,
             JasmParser.DOUBLE_NAN -> constantPoolEditor.addOrGetDoubleConstantIndex(parseDouble(value.text))
 
-//            JasmLexer.METHOD_FULL -> {
-//                val (classType, methodName, parameterTypes, returnType) = parseMethodObject(value.text)
-//                val methodIndex = dexEditor.addOrGetMethodIDIndex(classType!!, methodName, parameterTypes, returnType)
-//                EncodedMethodValue.of(methodIndex)
-//            }
-//            JasmLexer.METHOD_PROTO -> {
-//                val (_, _, parameterTypes, returnType) = parseMethodObject(value.text)
-//                val protoIndex = dexEditor.addOrGetProtoIDIndex(parameterTypes, returnType)
-//                EncodedMethodTypeValue.of(protoIndex)
-//            }
-//            JasmLexer.FIELD_FULL -> {
-//                val (classType, fieldName, type) = parseFieldObject(value.text)
-//                val fieldIndex = dexEditor.addOrGetFieldIDIndex(classType!!, fieldName, type)
-//
-//                if (isEnum) EncodedEnumValue.of(fieldIndex) else EncodedFieldValue.of(fieldIndex)
-//            }
-//            JasmLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexEditor.addOrGetTypeIDIndex(value.text))
-//            JasmLexer.NULL ->          EncodedNullValue
             else -> null
-        } ?: error("failure to parse base value")
+        } ?: error("failure to parse constant base value")
     }
 }
 

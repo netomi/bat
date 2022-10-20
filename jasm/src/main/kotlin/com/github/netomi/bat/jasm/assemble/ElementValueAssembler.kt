@@ -19,6 +19,7 @@ package com.github.netomi.bat.jasm.assemble
 import com.github.netomi.bat.classfile.attribute.annotation.ConstElementValue
 import com.github.netomi.bat.classfile.attribute.annotation.ElementValue
 import com.github.netomi.bat.classfile.attribute.annotation.ElementValueType
+import com.github.netomi.bat.classfile.attribute.annotation.EnumElementValue
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.jasm.parser.JasmLexer
 import com.github.netomi.bat.jasm.parser.JasmParser.*
@@ -43,24 +44,22 @@ internal class ElementValueAssembler
             Pair(tn.symbol, true)
         }
 
-        val constantValueIndex = constantAssembler.parseBaseValue(ctx)
-
         return when (value.type) {
-            STRING ->        ConstElementValue.of(ElementValueType.STRING,  constantValueIndex)
-            BOOLEAN ->       ConstElementValue.of(ElementValueType.BOOLEAN, constantValueIndex)
-            BYTE ->          ConstElementValue.of(ElementValueType.BYTE,    constantValueIndex)
-            SHORT ->         ConstElementValue.of(ElementValueType.SHORT,   constantValueIndex)
-            CHAR ->          ConstElementValue.of(ElementValueType.CHAR,    constantValueIndex)
-            INT ->           ConstElementValue.of(ElementValueType.INT,     constantValueIndex)
-            LONG ->          ConstElementValue.of(ElementValueType.LONG,    constantValueIndex)
+            STRING ->        ConstElementValue.of(ElementValueType.STRING,  constantAssembler.parseBaseValue(ctx))
+            BOOLEAN ->       ConstElementValue.of(ElementValueType.BOOLEAN, constantAssembler.parseBaseValue(ctx))
+            BYTE ->          ConstElementValue.of(ElementValueType.BYTE,    constantAssembler.parseBaseValue(ctx))
+            SHORT ->         ConstElementValue.of(ElementValueType.SHORT,   constantAssembler.parseBaseValue(ctx))
+            CHAR ->          ConstElementValue.of(ElementValueType.CHAR,    constantAssembler.parseBaseValue(ctx))
+            INT ->           ConstElementValue.of(ElementValueType.INT,     constantAssembler.parseBaseValue(ctx))
+            LONG ->          ConstElementValue.of(ElementValueType.LONG,    constantAssembler.parseBaseValue(ctx))
 
             BASE_FLOAT,
             FLOAT_INFINITY,
-            FLOAT_NAN ->     ConstElementValue.of(ElementValueType.FLOAT,   constantValueIndex)
+            FLOAT_NAN ->     ConstElementValue.of(ElementValueType.FLOAT,   constantAssembler.parseBaseValue(ctx))
 
             BASE_DOUBLE,
             DOUBLE_INFINITY,
-            DOUBLE_NAN ->    ConstElementValue.of(ElementValueType.DOUBLE,  constantValueIndex)
+            DOUBLE_NAN ->    ConstElementValue.of(ElementValueType.DOUBLE,  constantAssembler.parseBaseValue(ctx))
 
 //            JasmLexer.METHOD_FULL -> {
 //                val (classType, methodName, parameterTypes, returnType) = parseMethodObject(value.text)
@@ -72,12 +71,15 @@ internal class ElementValueAssembler
 //                val protoIndex = dexEditor.addOrGetProtoIDIndex(parameterTypes, returnType)
 //                EncodedMethodTypeValue.of(protoIndex)
 //            }
-//            JasmLexer.FIELD_FULL -> {
-//                val (classType, fieldName, type) = parseFieldObject(value.text)
-//                val fieldIndex = dexEditor.addOrGetFieldIDIndex(classType!!, fieldName, type)
-//
-//                if (isEnum) EncodedEnumValue.of(fieldIndex) else EncodedFieldValue.of(fieldIndex)
-//            }
+
+            ENUM_FULL -> {
+                val (classType, fieldName) = parseEnumObject(value.text)
+                val typeNameIndex  = constantPoolEditor.addOrGetUtf8ConstantIndex(classType!!)
+                val constNameIndex = constantPoolEditor.addOrGetUtf8ConstantIndex(fieldName)
+
+                EnumElementValue.of(typeNameIndex, constNameIndex)
+            }
+
 //            JasmLexer.OBJECT_TYPE ->   EncodedTypeValue.of(dexEditor.addOrGetTypeIDIndex(value.text))
 //            JasmLexer.NULL ->          EncodedNullValue
             else -> null

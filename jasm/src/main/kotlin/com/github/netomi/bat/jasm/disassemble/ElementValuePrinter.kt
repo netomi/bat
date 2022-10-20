@@ -33,7 +33,7 @@ internal class ElementValuePrinter constructor(private val printer:         Inde
     }
 
     override fun visitEnumElementValue(classFile: ClassFile, elementValue: EnumElementValue) {
-        printer.print(".enum ${elementValue.getType(classFile)}.${elementValue.getConstName(classFile)}")
+        printer.print(".enum ${elementValue.getType(classFile)}->${elementValue.getConstName(classFile)}")
     }
 
     override fun visitArrayElementValue(classFile: ClassFile, elementValue: ArrayElementValue) {

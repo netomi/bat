@@ -80,6 +80,22 @@ internal fun parseFieldObject(text: String): FieldInfo {
     return FieldInfo(classType, name, type)
 }
 
+internal data class EnumInfo(val classType:String?, val name: String)
+
+internal fun parseEnumObject(text: String): EnumInfo {
+    val arrowIndex = text.indexOf("->")
+    val classType = if (arrowIndex != -1) {
+        text.substring(0, arrowIndex)
+    } else {
+        null
+    }
+
+    val startNameIndex = if (arrowIndex != -1) { arrowIndex + 2 } else { 0 }
+
+    val name = text.substring(startNameIndex)
+    return EnumInfo(classType, name)
+}
+
 internal data class MethodInfo(val classType: String?, val methodName: String, val parameterTypes: List<String>, val returnType: String)
 
 internal fun parseMethodObject(text: String): MethodInfo {

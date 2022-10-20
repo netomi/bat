@@ -79,5 +79,9 @@ data class EnumElementValue private constructor(private var _typeNameIndex:  Int
         internal fun empty(): EnumElementValue {
             return EnumElementValue()
         }
+
+        fun of(typeNameIndex: Int, constNameIndex: Int): EnumElementValue {
+            return EnumElementValue(typeNameIndex, constNameIndex)
+        }
     }
 }

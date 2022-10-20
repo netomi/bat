@@ -16,8 +16,6 @@
 package com.github.netomi.bat.jasm
 
 import com.github.netomi.bat.classfile.ClassFile
-import com.github.netomi.bat.classfile.io.ClassFileWriter
-import com.github.netomi.bat.io.OutputStreamFactory
 import com.github.netomi.bat.jasm.assemble.ClassFileAssembler
 import com.github.netomi.bat.jasm.parser.JasmLexer
 import com.github.netomi.bat.jasm.parser.JasmParser
@@ -27,9 +25,8 @@ import org.antlr.v4.runtime.misc.IntervalSet
 import java.io.InputStream
 import java.io.PrintWriter
 
-class Assembler(private val outputStreamFactory: OutputStreamFactory,
-                private val lenientMode:         Boolean      = false,
-                private val warningPrinter:      PrintWriter? = null) {
+class Assembler(private val lenientMode:    Boolean      = false,
+                private val warningPrinter: PrintWriter? = null) {
 
     fun assemble(inputStream: InputStream, name: String? = null): List<ClassFile> {
         val lexer       = JasmLexer(CharStreams.fromStream(inputStream))
@@ -41,13 +38,7 @@ class Assembler(private val outputStreamFactory: OutputStreamFactory,
         parser.errorHandler = ExceptionErrorStrategy()
 
         try {
-            val assembledClasses = ClassFileAssembler(lenientMode, warningPrinter).visit(parser.cFiles())
-            for (clazz in assembledClasses) {
-                val writer = ClassFileWriter(outputStreamFactory.createOutputStream(clazz.className.toInternalClassName()))
-                writer.visitClassFile(clazz)
-                writer.close()
-            }
-            return assembledClasses
+            return ClassFileAssembler(lenientMode, warningPrinter).visit(parser.cFiles())
         } catch (exception: RuntimeException) {
             if (name != null) {
                 throw JasmAssembleException("failed to assemble input from '$name': ${exception.message}", exception)

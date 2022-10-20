@@ -30,6 +30,11 @@ class ClassEditor private constructor(private val classFile: ClassFile): Attribu
     override val attributeMap: AttributeMap
         get() = classFile.attributeMap
 
+    fun addInterface(className: String) {
+        val classIndex = constantPoolEditor.addOrGetClassConstantIndex(className)
+        classFile.addInterface(classIndex)
+    }
+
     override fun addAttribute(attribute: Attribute) {
         classFile.addAttribute(attribute)
     }
