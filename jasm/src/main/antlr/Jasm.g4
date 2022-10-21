@@ -249,6 +249,8 @@ sArrayValue: '{' sAnnotationValue? (',' sAnnotationValue)* '}';
 sInstruction
     : fReturn
     | fField
+    | fVariable_implicit
+    | fVariable_explicit
     ;
 
 sDirective
@@ -279,4 +281,61 @@ fField: op=
     | 'getstatic'
     | 'putfield'
     | 'putstatic' ) fld=FIELD_FULL
+    ;
+
+fVariable_implicit: op=
+    ( 'aload_0'
+    | 'aload_1'
+    | 'aload_2'
+    | 'aload_3'
+    | 'astore_0'
+    | 'astore_1'
+    | 'astore_2'
+    | 'astore_3'
+    | 'dload_0'
+    | 'dload_1'
+    | 'dload_2'
+    | 'dload_3'
+    | 'dstore_0'
+    | 'dstore_1'
+    | 'dstore_2'
+    | 'dstore_3'
+    | 'fload_0'
+    | 'fload_1'
+    | 'fload_2'
+    | 'fload_3'
+    | 'fstore_0'
+    | 'fstore_1'
+    | 'fstore_2'
+    | 'fstore_3'
+    | 'iload_0'
+    | 'iload_1'
+    | 'iload_2'
+    | 'iload_3'
+    | 'istore_0'
+    | 'istore_1'
+    | 'istore_2'
+    | 'istore_3'
+    | 'lload_0'
+    | 'lload_1'
+    | 'lload_2'
+    | 'lload_3'
+    | 'lstore_0'
+    | 'lstore_1'
+    | 'lstore_2'
+    | 'lstore_3')
+    ;
+
+fVariable_explicit: op=
+    ( 'aload'
+    | 'astore'
+    | 'dload'
+    | 'dstore'
+    | 'fload'
+    | 'fstore'
+    | 'iload'
+    | 'istore'
+    | 'lload'
+    | 'lstore'
+    | 'ret' ) variable=INT
     ;
