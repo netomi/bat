@@ -83,6 +83,6 @@ internal class ConstantPrinter constructor(private val printer: IndentingPrinter
         val name = nameAndType.getMemberName(classFile)
         val type = nameAndType.getDescriptor(classFile)
 
-        printer.print("#${constant.bootstrapMethodAttrIndex}->${name}${type}")
+        printer.print("bootstrap_method_${constant.bootstrapMethodAttrIndex}@${name}${type}")
     }
 }

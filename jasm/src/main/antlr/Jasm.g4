@@ -94,14 +94,14 @@ fragment
 FRAGMENT_ID: (ESC_SEQ| ~('\\'|'\r'|'\n'|'\t'|' '|':'|'-'|'='|','|'{'|'}'|'('|')'|'+'|'"'|'\''|'#'|'/'|'.'|';'|'@'))+;
 
 fragment
-FRAGMENT_METHOD_PROTO: '(' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE)* ')' ('V' | FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
+FRAGMENT_METHOD_DESCRIPTOR: '(' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE)* ')' ('V' | FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
 fragment
 FRAGMENT_FIELD_PART: FRAGMENT_MEMBER_NAME ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
-METHOD_FULL  : (FRAGMENT_FULL_CLASS_NAME|ARRAY_TYPE) '->' FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
-METHOD_PART  : FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
-METHOD_PROTO : FRAGMENT_METHOD_PROTO;
+METHOD_FULL  : (FRAGMENT_FULL_CLASS_NAME|ARRAY_TYPE) '->' FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_DESCRIPTOR;
+METHOD_PART  : FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_DESCRIPTOR;
+METHOD_DESCRIPTOR : FRAGMENT_METHOD_DESCRIPTOR;
 
 FIELD_FULL : FRAGMENT_FULL_CLASS_NAME '->' FRAGMENT_FIELD_PART;
 FIELD_PART : FRAGMENT_FIELD_PART;
@@ -183,7 +183,9 @@ sAttribute
     | sAnnotation
     | sAnnotationDefault
     | sEnclosingMethod
+    | sDeprecated
     | sInnerClass
+    | sThrows
     ;
 
 sBytecode  : '.bytecode' version=STRING;
@@ -206,6 +208,8 @@ sField
 
 sSignature: '.signature' sig=STRING ;
 
+sDeprecated: '.deprecated' ;
+
 sAnnotation
 	: '.annotation' visibility=ANN_VISIBLE type=OBJECT_TYPE
 	  ((sAnnotationKeyName '=' sAnnotationValue)* '.end annotation')?
@@ -215,7 +219,10 @@ sAnnotationDefault
     : '.annotationdefault' value=sBaseValue ;
 
 sEnclosingMethod
-    : '.enclosingmethod' className=CLASS_NAME method=METHOD_PART? ;
+    : '.enclosingmethod' methodObj=(CLASS_NAME | METHOD_FULL) ;
+
+sThrows
+    : '.throws' className=CLASS_NAME ;
 
 sInnerClass
     : '.innerclass' sAccList innerClass=CLASS_NAME ('as' name=ID)? ('in' outerClass=CLASS_NAME)? ;
@@ -246,7 +253,7 @@ sBaseValue
 	| DOUBLE_INFINITY
 	| DOUBLE_NAN
 	| METHOD_FULL
-	| METHOD_PROTO
+	| METHOD_DESCRIPTOR
 	| CLASS_NAME
 	| OBJECT_TYPE
 	| ARRAY_TYPE
@@ -269,6 +276,7 @@ sInstruction
     | fMethodInstructions
     | fInterfaceMethodInstructions
     | fImplicitLiteralInstructions
+    | fExplicitLiteralInstruction
     | fClassInstructions
     | fStackInstructions
     | fLiteralConstantInstructions
@@ -278,6 +286,16 @@ sInstruction
     | fBranchInstructions
     | fArrayInstructions
     | fPrimitiveArrayInstructions
+    | fArrayClassInstructions
+    | fMultiArrayClassInstruction
+    | fLookupSwitch
+    | fTableSwitch
+    | fArithmeticInstructions
+    | fConversionInstructions
+    | fLiteralVariableInstructions
+    | fMonitorInstructions
+    | fCompareInstructions
+    | fInvokeDynamicInstructions
     ;
 
 sDirective
@@ -395,6 +413,11 @@ fImplicitLiteralInstructions: op=
     | 'lconst_1' )
     ;
 
+fExplicitLiteralInstruction: op=
+    ( 'bipush'
+    | 'sipush' ) value=INT
+    ;
+
 fClassInstructions: op=
     ( 'new'
     | 'checkcast'
@@ -465,3 +488,85 @@ fArrayInstructions: op=
     ;
 
 fPrimitiveArrayInstructions: op='newarray' type=('boolean' | 'char' | 'float' | 'double' | 'byte' | 'short' | 'int' | 'long');
+
+fArrayClassInstructions: op='anewarray' class=(CLASS_NAME | ARRAY_TYPE) ;
+
+fMultiArrayClassInstruction: op='multianewarray' class=(CLASS_NAME | ARRAY_TYPE) ',' dimension=INT ;
+
+fLookupSwitch: 'lookupswitch' '{' (match=(INT | 'default') '->' label=sLabel)* '}';
+
+fTableSwitch: 'tableswitch' '{' (match=(INT | 'default') '->' label=sLabel)* '}';
+
+fArithmeticInstructions: op=
+    ( 'dadd'
+    | 'ddiv'
+    | 'dmul'
+    | 'dneg'
+    | 'drem'
+    | 'dsub'
+    | 'fadd'
+    | 'fdiv'
+    | 'fmul'
+    | 'fneg'
+    | 'frem'
+    | 'fsub'
+    | 'iadd'
+    | 'iand'
+    | 'idiv'
+    | 'imul'
+    | 'ineg'
+    | 'ior'
+    | 'irem'
+    | 'ishl'
+    | 'ishr'
+    | 'isub'
+    | 'iushr'
+    | 'ixor'
+    | 'ladd'
+    | 'land'
+    | 'ldiv'
+    | 'lmul'
+    | 'lneg'
+    | 'lor'
+    | 'lrem'
+    | 'lshl'
+    | 'lshr'
+    | 'lsub'
+    | 'lushr'
+    | 'lxor' )
+    ;
+
+fConversionInstructions: op=
+    ( 'd2f'
+    | 'd2i'
+    | 'd2l'
+    | 'f2d'
+    | 'f2i'
+    | 'f2l'
+    | 'i2b'
+    | 'i2c'
+    | 'i2d'
+    | 'i2f'
+    | 'i2l'
+    | 'i2s'
+    | 'l2d'
+    | 'l2f'
+    | 'l2i' )
+    ;
+
+fLiteralVariableInstructions: op='iinc' variable=INT ',' value=INT ;
+
+fMonitorInstructions: op=
+    ( 'monitorenter'
+    | 'monitorexit' )
+    ;
+
+fCompareInstructions: op=
+    ( 'dcmpg'
+    | 'dcmpl'
+    | 'fcmpg'
+    | 'fcmpl'
+    | 'lcmp' )
+    ;
+
+fInvokeDynamicInstructions: op='invokedynamic' ID '@' method=METHOD_PART ;
