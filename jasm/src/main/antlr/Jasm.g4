@@ -99,7 +99,7 @@ FRAGMENT_METHOD_PROTO: '(' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PR
 fragment
 FRAGMENT_FIELD_PART: FRAGMENT_MEMBER_NAME ':' (FRAGMENT_OBJECT_TYPE|FRAGMENT_ARRAY_TYPE|FRAGMENT_PRIMITIVE_TYPE) ;
 
-METHOD_FULL  : (FRAGMENT_OBJECT_TYPE | FRAGMENT_ARRAY_TYPE) '->' FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
+METHOD_FULL  : (FRAGMENT_FULL_CLASS_NAME|ARRAY_TYPE) '->' FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
 METHOD_PART  : FRAGMENT_MEMBER_NAME FRAGMENT_METHOD_PROTO;
 METHOD_PROTO : FRAGMENT_METHOD_PROTO;
 
@@ -182,6 +182,8 @@ sAttribute
     | sSignature
     | sAnnotation
     | sAnnotationDefault
+    | sEnclosingMethod
+    | sInnerClass
     ;
 
 sBytecode  : '.bytecode' version=STRING;
@@ -189,18 +191,20 @@ sSource    : '.source' src=STRING;
 sSuper	   : '.super' name=CLASS_NAME;
 sInterface : '.implements' name=CLASS_NAME;
 sMethod
-	: '.method' sAccList methodObj=(METHOD_FULL|METHOD_PART)
+	: '.method' sAccList methodObj=METHOD_PART
         ( sAttribute
+        | sParameter
         | sInstruction
+        | sLabel
         | sDirective )*
-	 '.end method';
+	 '.end method' ;
 
 sField
     : '.field' sAccList fieldObj=FIELD_PART ('=' sBaseValue)?
 	  (sAttribute* '.end field')?
 	;
 
-sSignature: '.signature' sig=STRING;
+sSignature: '.signature' sig=STRING ;
 
 sAnnotation
 	: '.annotation' visibility=ANN_VISIBLE type=OBJECT_TYPE
@@ -208,7 +212,13 @@ sAnnotation
 	;
 
 sAnnotationDefault
-    : '.annotationdefault' value=sBaseValue;
+    : '.annotationdefault' value=sBaseValue ;
+
+sEnclosingMethod
+    : '.enclosingmethod' className=CLASS_NAME method=METHOD_PART? ;
+
+sInnerClass
+    : '.innerclass' sAccList innerClass=CLASS_NAME ('as' name=ID)? ('in' outerClass=CLASS_NAME)? ;
 
 sSubannotation
 	: '.subannotation' type=OBJECT_TYPE (sAnnotationKeyName '=' sAnnotationValue )* '.end subannotation' ;
@@ -237,6 +247,7 @@ sBaseValue
 	| DOUBLE_NAN
 	| METHOD_FULL
 	| METHOD_PROTO
+	| CLASS_NAME
 	| OBJECT_TYPE
 	| ARRAY_TYPE
 	| PRIMITIVE_TYPE
@@ -244,30 +255,49 @@ sBaseValue
 	| DENUM ENUM_FULL
 	;
 
-sArrayValue: '{' sAnnotationValue? (',' sAnnotationValue)* '}';
+sArrayValue: '{' sAnnotationValue? (',' sAnnotationValue)* '}' ;
+
+sParameter: param=DPARAM parameterIndex=INT (',' name=STRING)? (sAnnotation* '.end param')? ;
 
 sInstruction
-    : fReturn
-    | fField
-    | fVariable_implicit
-    | fVariable_explicit
+    : fCatch
+    | fCatchall
+    | fReturnInstructions
+    | fFieldInstructions
+    | fImplicitVariableInstructions
+    | fExplicitVariableInstructions
+    | fMethodInstructions
+    | fInterfaceMethodInstructions
+    | fImplicitLiteralInstructions
+    | fClassInstructions
+    | fStackInstructions
+    | fLiteralConstantInstructions
+    | fWideLiteralConstantInstructions
+    | fExceptionInstructions
+    | fNullReferenceInstructions
+    | fBranchInstructions
+    | fArrayInstructions
+    | fPrimitiveArrayInstructions
     ;
 
 sDirective
-    : fStack
-    | fLocals
+    : fMaxStack
+    | fMaxLocals
     | fLine
     | fStartlocal
     | fEndlocal
     ;
 
-fStack     : '.stack'  maxStack=INT;
-fLocals    : '.locals' maxLocals=INT;
+fMaxStack  : '.maxstack'  maxStack=INT;
+fMaxLocals : '.maxlocals' maxLocals=INT;
 fLine      : '.line'   line=INT;
 fStartlocal: '.local'  variable=INT ',' name=STRING (':' descriptor=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE))? (',' signature=STRING)? ;
 fEndlocal  : '.end local' variable=INT;
+sLabel     : ':' label=ID;
+fCatch     : '.catch' type=CLASS_NAME '{' start=sLabel '..' end=sLabel  '}' handle=sLabel ;
+fCatchall  : '.catchall' '{' start=sLabel '..' end=sLabel  '}' handle=sLabel ;
 
-fReturn: op=
+fReturnInstructions: op=
     ( 'areturn'
     | 'dreturn'
     | 'freturn'
@@ -276,14 +306,14 @@ fReturn: op=
     | 'return' )
     ;
 
-fField: op=
+fFieldInstructions: op=
     ( 'getfield'
     | 'getstatic'
     | 'putfield'
     | 'putstatic' ) fld=FIELD_FULL
     ;
 
-fVariable_implicit: op=
+fImplicitVariableInstructions: op=
     ( 'aload_0'
     | 'aload_1'
     | 'aload_2'
@@ -326,7 +356,7 @@ fVariable_implicit: op=
     | 'lstore_3')
     ;
 
-fVariable_explicit: op=
+fExplicitVariableInstructions: op=
     ( 'aload'
     | 'astore'
     | 'dload'
@@ -339,3 +369,99 @@ fVariable_explicit: op=
     | 'lstore'
     | 'ret' ) variable=INT
     ;
+
+fMethodInstructions: op=
+    ( 'invokespecial'
+    | 'invokestatic'
+    | 'invokevirtual' ) method=METHOD_FULL
+    ;
+
+fInterfaceMethodInstructions: op='invokeinterface' method=METHOD_FULL;
+
+fImplicitLiteralInstructions: op=
+    ( 'dconst_0'
+    | 'dconst_1'
+    | 'fconst_0'
+    | 'fconst_1'
+    | 'fconst_2'
+    | 'iconst_m1'
+    | 'iconst_0'
+    | 'iconst_1'
+    | 'iconst_2'
+    | 'iconst_3'
+    | 'iconst_4'
+    | 'iconst_5'
+    | 'lconst_0'
+    | 'lconst_1' )
+    ;
+
+fClassInstructions: op=
+    ( 'new'
+    | 'checkcast'
+    | 'instanceof' ) class=(CLASS_NAME|ARRAY_TYPE)
+    ;
+
+fStackInstructions: op=
+    ( 'dup'
+    | 'dup_x1'
+    | 'dup_x2'
+    | 'dup2'
+    | 'dup2_x1'
+    | 'dup2_x2'
+    | 'pop'
+    | 'pop2'
+    | 'swap' )
+    ;
+
+fLiteralConstantInstructions: op='ldc' value=sBaseValue;
+
+fWideLiteralConstantInstructions: op=
+    ( 'ldc_w'
+    | 'ldc2_w' ) value=sBaseValue
+    ;
+
+fExceptionInstructions: op='athrow';
+
+fNullReferenceInstructions: op='aconst_null';
+
+fBranchInstructions: op=
+    ( 'if_acmpeq'
+    | 'if_acmpne'
+    | 'if_icmpeq'
+    | 'if_icmpne'
+    | 'if_icmplt'
+    | 'if_icmpge'
+    | 'if_icmpgt'
+    | 'if_icmple'
+    | 'ifeq'
+    | 'ifne'
+    | 'iflt'
+    | 'ifge'
+    | 'ifgt'
+    | 'ifle'
+    | 'ifnonnull'
+    | 'ifnull'
+    | 'goto' ) label=sLabel
+    ;
+
+fArrayInstructions: op=
+    ( 'aaload'
+    | 'aastore'
+    | 'baload'
+    | 'bastore'
+    | 'caload'
+    | 'castore'
+    | 'daload'
+    | 'dastore'
+    | 'faload'
+    | 'fastore'
+    | 'iaload'
+    | 'iastore'
+    | 'laload'
+    | 'lastore'
+    | 'saload'
+    | 'sastore'
+    | 'arraylength' )
+    ;
+
+fPrimitiveArrayInstructions: op='newarray' type=('boolean' | 'char' | 'float' | 'double' | 'byte' | 'short' | 'int' | 'long');
