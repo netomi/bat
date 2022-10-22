@@ -23,7 +23,7 @@ import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeMap
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 
-class ClassEditor private constructor(private val classFile: ClassFile): AttributeEditor() {
+class ClassEditor private constructor(val classFile: ClassFile): AttributeEditor() {
 
     override val constantPoolEditor = ConstantPoolEditor.of(classFile)
 
@@ -64,7 +64,7 @@ class ClassEditor private constructor(private val classFile: ClassFile): Attribu
         val method = Method.of(nameIndex, accessFlags, descriptorIndex)
         classFile.addMethod(method)
 
-        return MethodEditor.of(constantPoolEditor, method)
+        return MethodEditor.of(this, method)
     }
 
     fun removeMethod(method: Method) {

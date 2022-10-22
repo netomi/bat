@@ -158,7 +158,7 @@ internal class ClassDefAssembler(private val dexEditor:      DexEditor,
         } else {
             if (ctx.sInstruction().isNotEmpty()) {
                 val methodDescriptor = method.getMethodID(dexFile).getFullExternalMethodSignature(dexFile)
-                val message = "abstract method '$methodDescriptor' containing code instructions"
+                val message = "abstract or native method '$methodDescriptor' containing code instructions"
                 if (lenientMode) {
                     warningPrinter?.println("warning: $message, skipping code")
                 } else {

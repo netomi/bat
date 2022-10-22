@@ -59,9 +59,13 @@ abstract class Member protected constructor(nameIndex:                 Int      
 
     abstract val isStatic: Boolean
 
+    val isPrivate: Boolean
+        get() = visibility == Visibility.PRIVATE
+
     val isDeprecated: Boolean
         get() = attributeMap.get<DeprecatedAttribute>(AttributeType.DEPRECATED) != null
 
+    // TODO: also check the modifier
     val isSynthetic: Boolean
         get() = attributeMap.get<SyntheticAttribute>(AttributeType.SYNTHETIC) != null
 

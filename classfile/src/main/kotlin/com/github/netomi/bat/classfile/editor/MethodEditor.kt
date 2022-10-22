@@ -19,9 +19,14 @@ package com.github.netomi.bat.classfile.editor
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.AttributeMap
+import com.github.netomi.bat.classfile.attribute.AttributeType
+import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 
-class MethodEditor private constructor(override val constantPoolEditor: ConstantPoolEditor, val method: Method): AttributeEditor() {
+class MethodEditor private constructor(private val classEditor: ClassEditor, val method: Method): AttributeEditor() {
+
+    override val constantPoolEditor: ConstantPoolEditor
+        get() = classEditor.constantPoolEditor
 
     override val attributeMap: AttributeMap
         get() = this.method.attributeMap
@@ -30,9 +35,14 @@ class MethodEditor private constructor(override val constantPoolEditor: Constant
         method.addAttribute(attribute)
     }
 
+    fun addCode(): CodeEditor {
+        val codeAttribute = addOrGetAttribute<CodeAttribute>(AttributeType.CODE)
+        return CodeEditor.of(classEditor, method, codeAttribute)
+    }
+
     companion object {
-        fun of(constantPoolEditor: ConstantPoolEditor, method: Method): MethodEditor {
-            return MethodEditor(constantPoolEditor, method)
+        fun of(classEditor: ClassEditor, method: Method): MethodEditor {
+            return MethodEditor(classEditor, method)
         }
     }
 }

@@ -30,6 +30,9 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
 
     private lateinit var classEditor: ClassEditor
 
+    private val classFile: ClassFile
+        get() = classEditor.classFile
+
     override fun aggregateResult(aggregate: List<ClassFile>?, nextResult: List<ClassFile>?): List<ClassFile> {
         return (aggregate ?: emptyList()) + (nextResult ?: emptyList())
     }
@@ -83,8 +86,25 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
         val methodEditor = classEditor.addMethod(name, accessFlags, parameterTypes, returnType)
-        val attributeAssembler = AttributeAssembler(methodEditor)
 
+        val method = methodEditor.method
+        if (!method.isAbstract && !method.isNative) {
+            val codeEditor    = methodEditor.addCode()
+            val codeAssembler = CodeAssembler(method, codeEditor, lenientMode)
+            codeAssembler.parseCode(ctx.sInstruction())
+        } else {
+            if (ctx.sInstruction().isNotEmpty()) {
+                val methodDescriptor = method.getFullExternalMethodSignature(classFile)
+                val message = "abstract or native method '$methodDescriptor' containing code instructions"
+                if (lenientMode) {
+                    warningPrinter?.println("warning: $message, skipping code")
+                } else {
+                    parserError(ctx, message)
+                }
+            }
+        }
+
+        val attributeAssembler = AttributeAssembler(methodEditor)
         ctx.sAttribute().forEach { attributeAssembler.parseAndAddAttribute(it) }
 
         return emptyList()

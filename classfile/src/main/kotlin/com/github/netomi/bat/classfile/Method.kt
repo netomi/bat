@@ -21,10 +21,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
 import com.github.netomi.bat.classfile.visitor.MemberVisitor
 import com.github.netomi.bat.classfile.visitor.MethodVisitor
-import com.github.netomi.bat.util.JvmClassName
-import com.github.netomi.bat.util.getArgumentSize
-import com.github.netomi.bat.util.parseDescriptorToJvmTypes
-import com.github.netomi.bat.util.toHexString
+import com.github.netomi.bat.util.*
 import java.io.IOException
 
 /**
@@ -51,8 +48,26 @@ open class Method protected constructor(nameIndex:       Int = -1,
         attributeMap.addAttribute(attribute)
     }
 
+    fun getFullExternalMethodSignature(classFile: ClassFile): String {
+        return buildString {
+            val (parameterTypes, returnType) = parseDescriptorToJvmTypes(getDescriptor(classFile))
+            append(returnType.toExternalType())
+            append(' ')
+            append(classFile.className.toExternalClassName())
+            append('.')
+            append(getName(classFile))
+            append(parameterTypes.joinToString(separator = ", ", prefix = "(", postfix = ")") { it.toExternalType() })
+        }
+    }
+
     override val isStatic: Boolean
         get() = modifiers.contains(MethodModifier.STATIC)
+
+    val isAbstract: Boolean
+        get() = modifiers.contains(MethodModifier.ABSTRACT)
+
+    val isNative: Boolean
+        get() = modifiers.contains(MethodModifier.NATIVE)
 
     val hasCode: Boolean
         get() = attributeMap.get<CodeAttribute>(AttributeType.CODE) != null
