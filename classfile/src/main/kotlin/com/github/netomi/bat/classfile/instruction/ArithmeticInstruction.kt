@@ -28,8 +28,12 @@ class ArithmeticInstruction private constructor(opCode: JvmOpCode): SimpleInstru
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): ArithmeticInstruction {
             return ArithmeticInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): ArithmeticInstruction {
+            return create(opCode)
         }
     }
 }

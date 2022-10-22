@@ -77,6 +77,30 @@ class ConstantPoolEditor private constructor(private val constantPool: ConstantP
         }
     }
 
+    fun addOrGetNameAndTypeConstantIndex(name: String, descriptor: String): Int {
+        val nameIndex       = addOrGetUtf8ConstantIndex(name)
+        val descriptorIndex = addOrGetUtf8ConstantIndex(descriptor)
+
+        val index = constantPool.getNameAndTypeConstantIndex(nameIndex, descriptorIndex)
+        return if (index == -1) {
+            constantPool.addConstant(NameAndTypeConstant.of(nameIndex, descriptorIndex))
+        } else {
+            index
+        }
+    }
+
+    fun addOrGetFieldRefConstantIndex(className: String, fieldName: String, descriptor: String): Int {
+        val classIndex       = addOrGetClassConstantIndex(className)
+        val nameAndTypeIndex = addOrGetNameAndTypeConstantIndex(fieldName, descriptor)
+
+        val index = constantPool.getFieldRefConstantIndex(classIndex, nameAndTypeIndex)
+        return if (index == -1) {
+            constantPool.addConstant(FieldrefConstant.of(classIndex, nameAndTypeIndex))
+        } else {
+            index
+        }
+    }
+
     companion object {
         fun of(classFile: ClassFile): ConstantPoolEditor {
             return ConstantPoolEditor(classFile.constantPool)

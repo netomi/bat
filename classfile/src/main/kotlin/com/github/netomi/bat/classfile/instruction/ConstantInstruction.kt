@@ -21,10 +21,17 @@ import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 
-abstract class ConstantInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+abstract class ConstantInstruction: JvmInstruction {
 
     var constantIndex: Int = 0
         internal set
+
+    protected constructor(opCode: JvmOpCode): super(opCode)
+
+    protected constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode) {
+        require(constantIndex > 0) { "constantIndex must be positive for instruction ${opCode.mnemonic}" }
+        this.constantIndex = constantIndex
+    }
 
     open fun getConstant(classFile: ClassFile): Constant {
         return classFile.getConstant(constantIndex)
@@ -41,5 +48,9 @@ abstract class ConstantInstruction protected constructor(opCode: JvmOpCode): Jvm
 
     fun constantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         classFile.constantAccept(constantIndex, visitor)
+    }
+
+    override fun toString(classFile: ClassFile): String {
+        return "%s %s".format(mnemonic, classFile.getConstant(constantIndex))
     }
 }

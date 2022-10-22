@@ -16,12 +16,20 @@
 
 package com.github.netomi.bat.classfile.editor
 
+import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 
 class CodeEditor private constructor(private val classEditor:   ClassEditor,
                                      private val method:        Method,
                                      private val codeAttribute: CodeAttribute) {
+
+    val classFile: ClassFile
+        get() = classEditor.classFile
+
+    val constantPoolEditor: ConstantPoolEditor
+        get() = classEditor.constantPoolEditor
 
     companion object {
         fun of(classEditor: ClassEditor, method: Method, codeAttribute: CodeAttribute): CodeEditor {

@@ -329,5 +329,9 @@ enum class JvmOpCode constructor(
         operator fun get(opcode: Byte): JvmOpCode {
             return opcodeArray[opcode.toInt() and 0xff] ?: throw IllegalArgumentException("unknown opcode '${toHexStringWithPrefix(opcode)}'")
         }
+
+        operator fun get(mnemonic: String): JvmOpCode {
+            return mnemonicToOpCodeMapping[mnemonic] ?: throw IllegalArgumentException("unknown mnemonic $mnemonic")
+        }
     }
 }

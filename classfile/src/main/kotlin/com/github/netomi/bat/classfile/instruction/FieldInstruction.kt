@@ -19,12 +19,14 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
-import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.FieldrefConstant
-import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class FieldInstruction private constructor(opCode: JvmOpCode): ConstantInstruction(opCode) {
+class FieldInstruction: ConstantInstruction {
+
+    private constructor(opCode: JvmOpCode): super(opCode)
+
+    private constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
     override fun getConstant(classFile: ClassFile): FieldrefConstant {
         return classFile.getFieldref(constantIndex)
@@ -35,8 +37,12 @@ class FieldInstruction private constructor(opCode: JvmOpCode): ConstantInstructi
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): FieldInstruction {
             return FieldInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int): FieldInstruction {
+            return FieldInstruction(opCode, constantIndex)
         }
     }
 }

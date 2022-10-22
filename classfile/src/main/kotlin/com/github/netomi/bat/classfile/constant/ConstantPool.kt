@@ -67,6 +67,28 @@ internal class ConstantPool
         return -1
     }
 
+    internal fun getNameAndTypeConstantIndex(nameIndex: Int, descriptorIndex: Int): Int {
+        for ((index, constant) in constants.withIndex()) {
+            if (constant is NameAndTypeConstant       &&
+                constant.nameIndex       == nameIndex &&
+                constant.descriptorIndex == descriptorIndex) {
+                return index
+            }
+        }
+        return -1
+    }
+
+    internal fun getFieldRefConstantIndex(classIndex: Int, nameAndTypeIndex: Int): Int {
+        for ((index, constant) in constants.withIndex()) {
+            if (constant is FieldrefConstant            &&
+                constant.classIndex       == classIndex &&
+                constant.nameAndTypeIndex == nameAndTypeIndex) {
+                return index
+            }
+        }
+        return -1
+    }
+
     internal fun getIntegerConstantIndex(value: Int): Int {
         for ((index, constant) in constants.withIndex()) {
             if (constant is IntegerConstant && constant.value == value) {

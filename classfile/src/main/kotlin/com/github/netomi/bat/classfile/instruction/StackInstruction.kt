@@ -28,8 +28,12 @@ class StackInstruction private constructor(opCode: JvmOpCode): SimpleInstruction
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): StackInstruction {
             return StackInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): StackInstruction {
+            return create(opCode)
         }
     }
 }

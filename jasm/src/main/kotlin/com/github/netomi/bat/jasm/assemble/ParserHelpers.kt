@@ -60,11 +60,11 @@ private fun fillParseContextText(node: ParseTree, list: MutableList<String>) {
     }
 }
 
-internal data class FieldInfo(val classType:String?, val name: String, val type: String)
+internal data class FieldInfo(val className:String?, val name: String, val type: String)
 
 internal fun parseFieldObject(text: String): FieldInfo {
     val arrowIndex = text.indexOf("->")
-    val classType = if (arrowIndex != -1) {
+    val className = if (arrowIndex != -1) {
         text.substring(0, arrowIndex)
     } else {
         null
@@ -77,7 +77,7 @@ internal fun parseFieldObject(text: String): FieldInfo {
     val name = text.substring(startNameIndex, colonIndex)
     val type = text.substring(colonIndex + 1)
 
-    return FieldInfo(classType, name, type)
+    return FieldInfo(className, name, type)
 }
 
 internal data class EnumInfo(val classType:String?, val name: String)

@@ -296,12 +296,12 @@ sInstruction
     | fMonitorInstructions
     | fCompareInstructions
     | fInvokeDynamicInstructions
+    | fLine
     ;
 
 sDirective
     : fMaxStack
     | fMaxLocals
-    | fLine
     | fStartlocal
     | fEndlocal
     ;
