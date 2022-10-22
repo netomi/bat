@@ -17,10 +17,7 @@
 package com.github.netomi.bat.jasm.assemble
 
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
-import com.github.netomi.bat.classfile.instruction.ArithmeticInstruction
-import com.github.netomi.bat.classfile.instruction.FieldInstruction
-import com.github.netomi.bat.classfile.instruction.JvmOpCode
-import com.github.netomi.bat.classfile.instruction.StackInstruction
+import com.github.netomi.bat.classfile.instruction.*
 import com.github.netomi.bat.jasm.parser.JasmParser.*
 
 internal class InstructionAssembler constructor(private val constantPoolEditor: ConstantPoolEditor) {
@@ -37,6 +34,22 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         val opcode   = JvmOpCode[mnemonic]
 
         return StackInstruction.of(opcode)
+    }
+
+    fun parseImplicitVariableInstructions(ctx: FImplicitVariableInstructionsContext): VariableInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return VariableInstruction.of(opcode)
+    }
+
+    fun parseExplicitVariableInstructions(ctx: FExplicitVariableInstructionsContext): VariableInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        val variable = ctx.variable.text.toInt()
+
+        return VariableInstruction.of(opcode, variable)
     }
 
     fun parseFieldInstructions(ctx: FFieldInstructionsContext): FieldInstruction {

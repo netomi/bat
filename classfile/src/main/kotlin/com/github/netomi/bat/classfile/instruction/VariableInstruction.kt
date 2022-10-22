@@ -22,13 +22,15 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-open class VariableInstruction protected constructor(opCode: JvmOpCode, wide: Boolean): JvmInstruction(opCode) {
+open class VariableInstruction protected constructor(opCode:   JvmOpCode,
+                                                     wide:     Boolean = false,
+                                                     variable: Int     = 0): JvmInstruction(opCode) {
 
-    var variable: Int = 0
+    var variable: Int = variable
         private set
 
     val variableIsImplicit: Boolean
-        get() = opCode.length == 1
+        get() = hasImplicitVariable(opCode)
 
     var wide: Boolean = wide
         private set
@@ -75,11 +77,34 @@ open class VariableInstruction protected constructor(opCode: JvmOpCode, wide: Bo
         visitor.visitVariableInstruction(classFile, method, code, offset, this)
     }
 
+    override fun toString(classFile: ClassFile): String {
+        return if (variableIsImplicit) {
+            mnemonic
+        } else {
+            "$mnemonic $variable"
+        }
+    }
+
     companion object {
         private val VARIABLE_REGEX = "\\w+_(\\d)".toRegex()
 
-        internal fun create(opCode: JvmOpCode, wide: Boolean = false): JvmInstruction {
+        private fun hasImplicitVariable(opCode: JvmOpCode): Boolean {
+            return opCode.length == 1
+        }
+
+        internal fun create(opCode: JvmOpCode, wide: Boolean = false): VariableInstruction {
             return VariableInstruction(opCode, wide)
+        }
+
+        fun of(opCode: JvmOpCode): VariableInstruction {
+            require(hasImplicitVariable(opCode))
+            return create(opCode, false)
+        }
+
+        fun of(opCode: JvmOpCode, variable: Int): VariableInstruction {
+            require(!hasImplicitVariable(opCode))
+            val wide = variable > 0xff
+            return VariableInstruction(opCode, wide, variable)
         }
     }
 }

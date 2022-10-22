@@ -41,10 +41,11 @@ internal class CodeAssembler constructor(private val method:      Method,
 //
 //                    }
 
-                    RULE_fArithmeticInstructions -> instructionAssembler.parseArithmeticInstructions(t as FArithmeticInstructionsContext)
-                    RULE_fStackInstructions      -> instructionAssembler.parseStackInstructions(t as FStackInstructionsContext)
-
-                    RULE_fFieldInstructions      -> instructionAssembler.parseFieldInstructions(t as FFieldInstructionsContext)
+                    RULE_fArithmeticInstructions       -> instructionAssembler.parseArithmeticInstructions(t as FArithmeticInstructionsContext)
+                    RULE_fStackInstructions            -> instructionAssembler.parseStackInstructions(t as FStackInstructionsContext)
+                    RULE_fImplicitVariableInstructions -> instructionAssembler.parseImplicitVariableInstructions(t as FImplicitVariableInstructionsContext)
+                    RULE_fExplicitVariableInstructions -> instructionAssembler.parseExplicitVariableInstructions(t as FExplicitVariableInstructionsContext)
+                    RULE_fFieldInstructions            -> instructionAssembler.parseFieldInstructions(t as FFieldInstructionsContext)
                     else -> null
                 }
 
