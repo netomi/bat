@@ -49,6 +49,9 @@ internal class ConstantAssembler constructor(private val constantPoolEditor: Con
             DOUBLE_INFINITY,
             DOUBLE_NAN -> constantPoolEditor.addOrGetDoubleConstantIndex(parseDouble(value.text))
 
+            ARRAY_TYPE,
+            CLASS_NAME -> constantPoolEditor.addOrGetClassConstantIndex(value.text)
+
             else -> null
         } ?: error("failed to parse constant base value")
     }

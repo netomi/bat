@@ -20,11 +20,18 @@ import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import java.util.*
 
-class ArrayPrimitiveTypeInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class ArrayPrimitiveTypeInstruction : JvmInstruction {
 
     var arrayType: ArrayType = ArrayType.INT
         private set
+
+    private constructor(opCode: JvmOpCode): super(opCode)
+
+    private constructor(opCode: JvmOpCode, arrayType: ArrayType): super(opCode) {
+        this.arrayType = arrayType
+    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         arrayType = ArrayType.of(instructions[offset + 1].toInt())
@@ -39,9 +46,21 @@ class ArrayPrimitiveTypeInstruction private constructor(opCode: JvmOpCode): JvmI
         visitor.visitArrayPrimitiveTypeInstruction(classFile, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return "$mnemonic ${arrayType.toString().lowercase(Locale.getDefault())}"
+    }
+
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): ArrayPrimitiveTypeInstruction {
             return ArrayPrimitiveTypeInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, arrayType: String): ArrayPrimitiveTypeInstruction {
+            return of(opCode, ArrayType.of(arrayType))
+        }
+
+        fun of(opCode: JvmOpCode, arrayType: ArrayType): ArrayPrimitiveTypeInstruction {
+            return ArrayPrimitiveTypeInstruction(opCode, arrayType)
         }
     }
 }
@@ -60,6 +79,17 @@ enum class ArrayType constructor(val value: Int) {
         fun of(value: Int): ArrayType {
             for (type in values()) {
                 if (type.value == value) {
+                    return type
+                }
+            }
+
+            error("unexpected array type value '$value'")
+        }
+
+        fun of(str: String): ArrayType {
+            val value = str.uppercase(Locale.getDefault())
+            for (type in values()) {
+                if (type.name == value) {
                     return type
                 }
             }

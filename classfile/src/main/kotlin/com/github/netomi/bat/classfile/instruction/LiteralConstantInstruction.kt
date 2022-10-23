@@ -23,7 +23,11 @@ import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class LiteralConstantInstruction private constructor(opCode: JvmOpCode): ConstantInstruction(opCode) {
+class LiteralConstantInstruction: ConstantInstruction {
+
+    private constructor(opCode: JvmOpCode): super(opCode)
+
+    private constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
     override fun read(instructions: ByteArray, offset: Int) {
         constantIndex = when (opCode) {
@@ -53,8 +57,12 @@ class LiteralConstantInstruction private constructor(opCode: JvmOpCode): Constan
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): LiteralConstantInstruction {
             return LiteralConstantInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int): LiteralConstantInstruction {
+            return LiteralConstantInstruction(opCode, constantIndex)
         }
     }
 }

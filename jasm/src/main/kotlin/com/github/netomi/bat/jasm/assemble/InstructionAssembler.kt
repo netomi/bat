@@ -24,6 +24,8 @@ import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 
 internal class InstructionAssembler constructor(private val constantPoolEditor: ConstantPoolEditor) {
 
+    private val constantAssembler = ConstantAssembler(constantPoolEditor)
+
     fun parseArithmeticInstructions(ctx: FArithmeticInstructionsContext): ArithmeticInstruction {
         val mnemonic = ctx.op.text
         val opcode   = JvmOpCode[mnemonic]
@@ -150,6 +152,15 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         return ClassInstruction.of(opCode, classConstantIndex)
     }
 
+    fun parsePrimitiveArrayInstructions(ctx: FPrimitiveArrayInstructionsContext): ArrayPrimitiveTypeInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val arrayType = ctx.type.text
+
+        return ArrayPrimitiveTypeInstruction.of(opCode, arrayType)
+    }
+
     fun parseArrayClassInstructions(ctx: FArrayClassInstructionsContext): ArrayClassInstruction {
         val mnemonic = ctx.op.text
         val opCode   = JvmOpCode[mnemonic]
@@ -177,6 +188,15 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
 
         val label = ctx.label.label.text
         return BranchInstruction.of(opCode, label)
+    }
+
+    fun parseLiteralConstantInstructions(ctx: FLiteralConstantInstructionsContext): LiteralConstantInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val constantIndex = constantAssembler.parseBaseValue(ctx.value)
+
+        return LiteralConstantInstruction.of(opCode, constantIndex)
     }
 
     fun parseImplicitLiteralInstructions(ctx: FImplicitLiteralInstructionsContext): LiteralInstruction {

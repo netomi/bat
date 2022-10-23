@@ -167,9 +167,9 @@ internal fun parseShort(value: String): Short {
 }
 
 internal fun parseFloat(value: String): Float {
-    return value.toFloat()
+    return value.removeSuffix("f").removeSuffix("F").toFloat()
 }
 
 internal fun parseDouble(value: String): Double {
-    return value.toDouble()
+    return value.removeSuffix("d").removeSuffix("D").toDouble()
 }
