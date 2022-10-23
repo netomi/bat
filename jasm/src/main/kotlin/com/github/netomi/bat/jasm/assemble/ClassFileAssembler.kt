@@ -82,10 +82,10 @@ internal class ClassFileAssembler(private val lenientMode:    Boolean      = fal
     }
 
     override fun visitSMethod(ctx: SMethodContext): List<ClassFile> {
-        val (_, name, parameterTypes, returnType) = parseMethodObject(ctx.methodObj.text)
+        val (_, name, descriptor) = parseSimpleMethodObject(ctx.methodObj.text)
         val accessFlags = parseAccessFlags(ctx.sAccList())
 
-        val methodEditor = classEditor.addMethod(name, accessFlags, parameterTypes, returnType)
+        val methodEditor = classEditor.addMethod(name, accessFlags, descriptor)
 
         val method = methodEditor.method
         if (!method.isAbstract && !method.isNative) {

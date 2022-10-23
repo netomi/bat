@@ -28,8 +28,12 @@ class ReturnInstruction private constructor(opCode: JvmOpCode): SimpleInstructio
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): ReturnInstruction {
             return ReturnInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): ReturnInstruction {
+            return create(opCode)
         }
     }
 }

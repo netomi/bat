@@ -28,8 +28,12 @@ class NullReferenceInstruction private constructor(opCode: JvmOpCode): SimpleIns
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): NullReferenceInstruction {
             return NullReferenceInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): NullReferenceInstruction {
+            return create(opCode)
         }
     }
 }

@@ -22,7 +22,11 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.constant.MethodrefConstant
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-open class MethodInstruction protected constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
+open class MethodInstruction: InvocationInstruction {
+
+    private constructor(opCode: JvmOpCode): super(opCode)
+
+    private constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
     override fun getConstant(classFile: ClassFile): MethodrefConstant {
         return classFile.getMethodref(constantIndex)
@@ -33,8 +37,12 @@ open class MethodInstruction protected constructor(opCode: JvmOpCode): Invocatio
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): MethodInstruction {
             return MethodInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int): MethodInstruction {
+            return MethodInstruction(opCode, constantIndex)
         }
     }
 }

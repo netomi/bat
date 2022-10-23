@@ -22,11 +22,22 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.toSignedHexString
 
-class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class BranchInstruction: JvmInstruction {
 
     var branchOffset: Int = 0
         private set
+
+    var branchLabel: String? = null
+        private set
+
+    private constructor(opCode: JvmOpCode): super(opCode)
+
+    private constructor(opCode: JvmOpCode, branchOffset: Int, branchLabel: String?): super(opCode) {
+        this.branchOffset = branchOffset
+        this.branchLabel  = branchLabel
+    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         branchOffset = when (opCode) {
@@ -64,9 +75,26 @@ class BranchInstruction private constructor(opCode: JvmOpCode): JvmInstruction(o
         visitor.visitBranchInstruction(classFile, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return if (branchLabel != null) {
+            super.toString() + " " + branchLabel
+        } else {
+            val offsetString = toSignedHexString(branchOffset, 4)
+            super.toString() + " " + offsetString
+        }
+    }
+
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
             return BranchInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, branchOffset: Int): BranchInstruction {
+            return BranchInstruction(opCode, branchOffset, null)
+        }
+
+        fun of(opCode: JvmOpCode, branchLabel: String): BranchInstruction {
+            return BranchInstruction(opCode, 0, branchLabel)
         }
     }
 }

@@ -42,10 +42,17 @@ internal class CodeAssembler constructor(private val method:      Method,
 //                    }
 
                     RULE_fArithmeticInstructions       -> instructionAssembler.parseArithmeticInstructions(t as FArithmeticInstructionsContext)
+                    RULE_fConversionInstructions       -> instructionAssembler.parseConversionInstructions(t as FConversionInstructionsContext)
                     RULE_fStackInstructions            -> instructionAssembler.parseStackInstructions(t as FStackInstructionsContext)
                     RULE_fImplicitVariableInstructions -> instructionAssembler.parseImplicitVariableInstructions(t as FImplicitVariableInstructionsContext)
                     RULE_fExplicitVariableInstructions -> instructionAssembler.parseExplicitVariableInstructions(t as FExplicitVariableInstructionsContext)
+                    RULE_fArrayInstructions            -> instructionAssembler.parseArrayInstructions(t as FArrayInstructionsContext)
+                    RULE_fExceptionInstructions        -> instructionAssembler.parseExceptionInstructions(t as FExceptionInstructionsContext)
+                    RULE_fNullReferenceInstructions    -> instructionAssembler.parseNullReferenceInstructions(t as FNullReferenceInstructionsContext)
+                    RULE_fReturnInstructions           -> instructionAssembler.parseReturnInstructions(t as FReturnInstructionsContext)
                     RULE_fFieldInstructions            -> instructionAssembler.parseFieldInstructions(t as FFieldInstructionsContext)
+                    RULE_fMethodInstructions           -> instructionAssembler.parseMethodInstructions(t as FMethodInstructionsContext)
+                    RULE_fBranchInstructions           -> instructionAssembler.parseBranchInstructions(t as FBranchInstructionsContext)
                     else -> null
                 }
 

@@ -29,6 +29,13 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         return ArithmeticInstruction.of(opcode)
     }
 
+    fun parseConversionInstructions(ctx: FConversionInstructionsContext): ConversionInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return ConversionInstruction.of(opcode)
+    }
+
     fun parseStackInstructions(ctx: FStackInstructionsContext): StackInstruction {
         val mnemonic = ctx.op.text
         val opcode   = JvmOpCode[mnemonic]
@@ -52,6 +59,34 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         return VariableInstruction.of(opcode, variable)
     }
 
+    fun parseArrayInstructions(ctx: FArrayInstructionsContext): ArrayInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return ArrayInstruction.of(opcode)
+    }
+
+    fun parseExceptionInstructions(ctx: FExceptionInstructionsContext): ExceptionInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return ExceptionInstruction.of(opcode)
+    }
+
+    fun parseNullReferenceInstructions(ctx: FNullReferenceInstructionsContext): NullReferenceInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return NullReferenceInstruction.of(opcode)
+    }
+
+    fun parseReturnInstructions(ctx: FReturnInstructionsContext): ReturnInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return ReturnInstruction.of(opcode)
+    }
+
     fun parseFieldInstructions(ctx: FFieldInstructionsContext): FieldInstruction {
         val mnemonic = ctx.op.text
         val opCode   = JvmOpCode[mnemonic]
@@ -61,5 +96,24 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
 
         val fieldRefConstantIndex = constantPoolEditor.addOrGetFieldRefConstantIndex(classType!!, fieldName, fieldType)
         return FieldInstruction.of(opCode, fieldRefConstantIndex)
+    }
+
+    fun parseMethodInstructions(ctx: FMethodInstructionsContext): MethodInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val method = ctx.method.text
+        val (className, methodName, descriptor) = parseSimpleMethodObject(method)
+
+        val methodRefConstantIndex = constantPoolEditor.addOrGetMethodRefConstantIndex(className!!, methodName, descriptor)
+        return MethodInstruction.of(opCode, methodRefConstantIndex)
+    }
+
+    fun parseBranchInstructions(ctx: FBranchInstructionsContext): BranchInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val label = ctx.label.label.text
+        return BranchInstruction.of(opCode, label)
     }
 }

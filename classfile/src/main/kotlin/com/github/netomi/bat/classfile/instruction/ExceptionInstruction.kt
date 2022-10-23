@@ -28,8 +28,12 @@ class ExceptionInstruction private constructor(opCode: JvmOpCode): SimpleInstruc
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): ExceptionInstruction {
             return ExceptionInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): ExceptionInstruction {
+            return create(opCode)
         }
     }
 }

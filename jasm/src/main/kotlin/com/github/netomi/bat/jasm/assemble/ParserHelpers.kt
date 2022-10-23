@@ -96,11 +96,24 @@ internal fun parseEnumObject(text: String): EnumInfo {
     return EnumInfo(classType, name)
 }
 
-internal data class MethodInfo(val classType: String?, val methodName: String, val parameterTypes: List<String>, val returnType: String)
+internal data class SimpleMethodInfo(val className: String?, val methodName: String, val descriptor: String)
 
-internal fun parseMethodObject(text: String): MethodInfo {
+internal data class ComplexMethodInfo(val className: String?, val methodName: String, val parameterTypes: List<String>, val returnType: String)
+
+internal fun parseSimpleMethodObject(text: String): SimpleMethodInfo {
+    val (className, methodName, parameterTypes, returnType) = parseComplexMethodObject(text)
+
+    val descriptor = buildString {
+        append(parameterTypes.joinToString(separator = "", prefix = "(", postfix = ")"))
+        append(returnType)
+    }
+
+    return SimpleMethodInfo(className, methodName, descriptor)
+}
+
+internal fun parseComplexMethodObject(text: String): ComplexMethodInfo {
     val arrowIndex = text.indexOf("->")
-    val classType = if (arrowIndex != -1) {
+    val className = if (arrowIndex != -1) {
         text.substring(0, arrowIndex)
     } else {
         null
@@ -116,7 +129,8 @@ internal fun parseMethodObject(text: String): MethodInfo {
     val parameters     = text.substring(parameterStartIndex + 1, parameterEndIndex)
     val parameterTypes = parseDescriptorParameters(parameters)
     val returnType     = text.substring(parameterEndIndex + 1)
-    return MethodInfo(classType, name, parameterTypes, returnType)
+
+    return ComplexMethodInfo(className, name, parameterTypes, returnType)
 }
 
 internal fun parseAccessFlags(sAccListContext: JasmParser.SAccListContext): Int {

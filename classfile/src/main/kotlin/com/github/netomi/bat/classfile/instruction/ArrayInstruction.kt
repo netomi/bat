@@ -28,8 +28,12 @@ class ArrayInstruction private constructor(opCode: JvmOpCode): SimpleInstruction
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): ArrayInstruction {
             return ArrayInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): ArrayInstruction {
+            return create(opCode)
         }
     }
 }

@@ -28,8 +28,12 @@ class ConversionInstruction private constructor(opCode: JvmOpCode): SimpleInstru
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): ConversionInstruction {
             return ConversionInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): ConversionInstruction {
+            return create(opCode)
         }
     }
 }
