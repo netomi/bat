@@ -28,8 +28,12 @@ class CompareInstruction private constructor(opCode: JvmOpCode): SimpleInstructi
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): CompareInstruction {
             return CompareInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): CompareInstruction {
+            return create(opCode)
         }
     }
 }

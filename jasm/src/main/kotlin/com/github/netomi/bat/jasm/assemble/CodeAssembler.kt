@@ -29,17 +29,21 @@ internal class CodeAssembler constructor(private val method:      Method,
 
     fun parseCode(iCtx: List<JasmParser.SInstructionContext>) {
 
+        println("assembling method $method")
         val instructionAssembler = InstructionAssembler(codeEditor.constantPoolEditor)
+
+        var codeOffset = 0
 
         iCtx.forEach { ctx ->
             try {
-                var codeOffset = 0
-
                 val t = ctx.getChild(0) as ParserRuleContext
                 val insn: JvmInstruction? = when (t.ruleIndex) {
-//                    RULE_sLabel -> {
-//
-//                    }
+                    RULE_sLabel -> {
+                        val c = t as SLabelContext
+                        val label = c.label.text
+                        //codeEditor.prependLabel(0, c.label.text)
+                        null
+                    }
 
                     RULE_fArithmeticInstructions       -> instructionAssembler.parseArithmeticInstructions(t as FArithmeticInstructionsContext)
                     RULE_fConversionInstructions       -> instructionAssembler.parseConversionInstructions(t as FConversionInstructionsContext)
@@ -50,15 +54,18 @@ internal class CodeAssembler constructor(private val method:      Method,
                     RULE_fExceptionInstructions        -> instructionAssembler.parseExceptionInstructions(t as FExceptionInstructionsContext)
                     RULE_fNullReferenceInstructions    -> instructionAssembler.parseNullReferenceInstructions(t as FNullReferenceInstructionsContext)
                     RULE_fReturnInstructions           -> instructionAssembler.parseReturnInstructions(t as FReturnInstructionsContext)
+                    RULE_fMonitorInstructions          -> instructionAssembler.parseMonitorInstructions(t as FMonitorInstructionsContext)
+                    RULE_fCompareInstructions          -> instructionAssembler.parseCompareInstructions(t as FCompareInstructionsContext)
                     RULE_fFieldInstructions            -> instructionAssembler.parseFieldInstructions(t as FFieldInstructionsContext)
                     RULE_fMethodInstructions           -> instructionAssembler.parseMethodInstructions(t as FMethodInstructionsContext)
+                    RULE_fClassInstructions            -> instructionAssembler.parseClassInstructions(t as FClassInstructionsContext)
                     RULE_fBranchInstructions           -> instructionAssembler.parseBranchInstructions(t as FBranchInstructionsContext)
                     else -> null
                 }
 
                 if (insn != null) {
-                    codeOffset += insn.getLength(codeOffset)
                     println("%04x: %s".format(codeOffset, insn.toString(codeEditor.classFile)))
+                    codeOffset += insn.getLength(codeOffset)
                 }
 
             } catch (exception: RuntimeException) {

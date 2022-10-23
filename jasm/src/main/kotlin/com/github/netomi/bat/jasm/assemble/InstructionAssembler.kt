@@ -87,6 +87,20 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         return ReturnInstruction.of(opcode)
     }
 
+    fun parseMonitorInstructions(ctx: FMonitorInstructionsContext): MonitorInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return MonitorInstruction.of(opcode)
+    }
+
+    fun parseCompareInstructions(ctx: FCompareInstructionsContext): CompareInstruction {
+        val mnemonic = ctx.op.text
+        val opcode   = JvmOpCode[mnemonic]
+
+        return CompareInstruction.of(opcode)
+    }
+
     fun parseFieldInstructions(ctx: FFieldInstructionsContext): FieldInstruction {
         val mnemonic = ctx.op.text
         val opCode   = JvmOpCode[mnemonic]
@@ -107,6 +121,16 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
 
         val methodRefConstantIndex = constantPoolEditor.addOrGetMethodRefConstantIndex(className!!, methodName, descriptor)
         return MethodInstruction.of(opCode, methodRefConstantIndex)
+    }
+
+    fun parseClassInstructions(ctx: FClassInstructionsContext): ClassInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val className = ctx.className.text
+
+        val classConstantIndex = constantPoolEditor.addOrGetClassConstantIndex(className)
+        return ClassInstruction.of(opCode, classConstantIndex)
     }
 
     fun parseBranchInstructions(ctx: FBranchInstructionsContext): BranchInstruction {

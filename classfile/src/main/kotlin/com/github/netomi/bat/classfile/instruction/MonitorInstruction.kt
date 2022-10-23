@@ -28,8 +28,12 @@ class MonitorInstruction private constructor(opCode: JvmOpCode): SimpleInstructi
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): MonitorInstruction {
             return MonitorInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): MonitorInstruction {
+            return create(opCode)
         }
     }
 }

@@ -197,7 +197,6 @@ sMethod
         ( sAttribute
         | sParameter
         | sInstruction
-        | sLabel
         | sDirective )*
 	 '.end method' ;
 
@@ -267,7 +266,8 @@ sArrayValue: '{' sAnnotationValue? (',' sAnnotationValue)* '}' ;
 sParameter: param=DPARAM parameterIndex=INT (',' name=STRING)? (sAnnotation* '.end param')? ;
 
 sInstruction
-    : fCatch
+    : sLabel
+    | fCatch
     | fCatchall
     | fReturnInstructions
     | fFieldInstructions
@@ -421,7 +421,7 @@ fExplicitLiteralInstruction: op=
 fClassInstructions: op=
     ( 'new'
     | 'checkcast'
-    | 'instanceof' ) class=(CLASS_NAME|ARRAY_TYPE)
+    | 'instanceof' ) className=(CLASS_NAME|ARRAY_TYPE)
     ;
 
 fStackInstructions: op=

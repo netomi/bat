@@ -23,7 +23,11 @@ import com.github.netomi.bat.classfile.constant.ClassConstant
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.JvmClassName
 
-open class ClassInstruction protected constructor(opCode: JvmOpCode): ConstantInstruction(opCode) {
+open class ClassInstruction: ConstantInstruction {
+
+    protected constructor(opCode: JvmOpCode): super(opCode)
+
+    protected constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
     override fun getConstant(classFile: ClassFile): ClassConstant {
         return classFile.getClass(constantIndex)
@@ -40,6 +44,10 @@ open class ClassInstruction protected constructor(opCode: JvmOpCode): ConstantIn
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
             return ClassInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int): ClassInstruction {
+            return ClassInstruction(opCode, constantIndex)
         }
     }
 }
