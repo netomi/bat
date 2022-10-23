@@ -161,4 +161,21 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         val label = ctx.label.label.text
         return BranchInstruction.of(opCode, label)
     }
+
+    fun parseImplicitLiteralInstructions(ctx: FImplicitLiteralInstructionsContext): LiteralInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        return LiteralInstruction.of(opCode)
+    }
+
+    fun parseExplicitLiteralInstructions(ctx: FExplicitLiteralInstructionContext): LiteralInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val value = ctx.value.text.toLong()
+
+        return LiteralInstruction.of(opCode, value)
+    }
+
 }

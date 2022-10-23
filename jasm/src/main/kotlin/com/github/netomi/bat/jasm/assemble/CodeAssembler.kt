@@ -45,6 +45,10 @@ internal class CodeAssembler constructor(private val method:      Method,
                         null
                     }
 
+                    RULE_fLine -> {
+                        null
+                    }
+
                     RULE_fArithmeticInstructions       -> instructionAssembler.parseArithmeticInstructions(t as FArithmeticInstructionsContext)
                     RULE_fConversionInstructions       -> instructionAssembler.parseConversionInstructions(t as FConversionInstructionsContext)
                     RULE_fStackInstructions            -> instructionAssembler.parseStackInstructions(t as FStackInstructionsContext)
@@ -62,7 +66,10 @@ internal class CodeAssembler constructor(private val method:      Method,
                     RULE_fArrayClassInstructions       -> instructionAssembler.parseArrayClassInstructions(t as FArrayClassInstructionsContext)
                     RULE_fMultiArrayClassInstruction   -> instructionAssembler.parseMultiArrayClassInstructions(t as FMultiArrayClassInstructionContext)
                     RULE_fBranchInstructions           -> instructionAssembler.parseBranchInstructions(t as FBranchInstructionsContext)
-                    else -> null
+                    RULE_fImplicitLiteralInstructions  -> instructionAssembler.parseImplicitLiteralInstructions(t as FImplicitLiteralInstructionsContext)
+                    RULE_fExplicitLiteralInstruction   -> instructionAssembler.parseExplicitLiteralInstructions(t as FExplicitLiteralInstructionContext)
+
+                    else -> null //TODO("implement ${t.ruleIndex}")
                 }
 
                 if (insn != null) {

@@ -50,6 +50,10 @@ abstract class ConstantInstruction: JvmInstruction {
         classFile.constantAccept(constantIndex, visitor)
     }
 
+    override fun toString(): String {
+        return "$mnemonic #$constantIndex"
+    }
+
     override fun toString(classFile: ClassFile): String {
         return "%s %s".format(mnemonic, classFile.getConstant(constantIndex))
     }

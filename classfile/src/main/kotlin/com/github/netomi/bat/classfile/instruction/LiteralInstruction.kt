@@ -23,13 +23,13 @@ import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
+class LiteralInstruction: JvmInstruction {
 
-    var value: Long = 0
+    var value: Long
         private set
 
     val valueIsImplicit: Boolean
-        get() = opCode.length == 1
+        get() = hasImplicitValue(opCode)
 
     val type: LiteralType = LiteralType.of(opCode.mnemonic.first())
 
@@ -51,14 +51,14 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(
             return Double.fromBits(value)
         }
 
-    override fun read(instructions: ByteArray, offset: Int) {
+    private constructor(opCode: JvmOpCode): super(opCode) {
         value = when (opCode) {
-            DCONST_0 -> 0.0.toBits()
-            DCONST_1 -> 1.0.toBits()
+            DCONST_0  -> 0.0.toBits()
+            DCONST_1  -> 1.0.toBits()
 
-            FCONST_0 -> 0.0f.toBits().toLong()
-            FCONST_1 -> 1.0f.toBits().toLong()
-            FCONST_2 -> 2.0f.toBits().toLong()
+            FCONST_0  -> 0.0f.toBits().toLong()
+            FCONST_1  -> 1.0f.toBits().toLong()
+            FCONST_2  -> 2.0f.toBits().toLong()
 
             ICONST_M1 -> -1
             ICONST_0  ->  0
@@ -68,13 +68,25 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(
             ICONST_4  ->  4
             ICONST_5  ->  5
 
-            LCONST_0 -> 0
-            LCONST_1 -> 1
+            LCONST_0  ->  0
+            LCONST_1  ->  1
 
-            BIPUSH -> instructions[offset + 1].toLong()
-            SIPUSH -> getLiteral(instructions[offset + 1], instructions[offset + 2]).toLong()
+            else -> 0
+        }
+    }
 
-            else   -> error("unexpected opCode '${opCode.mnemonic}'")
+    private constructor(opCode: JvmOpCode, value: Long): super(opCode) {
+        // TODO: add check if value is consistent with opcode
+        this.value = value
+    }
+
+    override fun read(instructions: ByteArray, offset: Int) {
+        if (!valueIsImplicit) {
+            value = when (opCode) {
+                BIPUSH -> instructions[offset + 1].toLong()
+                SIPUSH -> getLiteral(instructions[offset + 1], instructions[offset + 2]).toLong()
+                else   -> error("unexpected opCode '${opCode.mnemonic}'")
+            }
         }
     }
 
@@ -94,9 +106,35 @@ class LiteralInstruction private constructor(opCode: JvmOpCode): JvmInstruction(
         visitor.visitLiteralInstruction(classFile, method, code, offset, this)
     }
 
+    override fun toString(): String {
+        return if (valueIsImplicit) {
+            mnemonic
+        } else {
+            "$mnemonic $value"
+        }
+    }
+
+    override fun toString(classFile: ClassFile): String {
+        return toString()
+    }
+
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        private fun hasImplicitValue(opCode: JvmOpCode): Boolean {
+            return opCode.length == 1
+        }
+
+        internal fun create(opCode: JvmOpCode): LiteralInstruction {
             return LiteralInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode): LiteralInstruction {
+            require(hasImplicitValue(opCode))
+            return LiteralInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, value: Long): LiteralInstruction {
+            require(!hasImplicitValue(opCode))
+            return LiteralInstruction(opCode, value)
         }
     }
 }

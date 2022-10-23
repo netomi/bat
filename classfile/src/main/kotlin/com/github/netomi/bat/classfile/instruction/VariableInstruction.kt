@@ -22,18 +22,35 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-open class VariableInstruction protected constructor(opCode:   JvmOpCode,
-                                                     wide:     Boolean = false,
-                                                     variable: Int     = 0): JvmInstruction(opCode) {
+open class VariableInstruction: JvmInstruction {
 
-    var variable: Int = variable
+    var variable: Int
         private set
 
     val variableIsImplicit: Boolean
         get() = hasImplicitVariable(opCode)
 
-    var wide: Boolean = wide
+    var wide: Boolean
         private set
+
+    protected constructor(opCode: JvmOpCode,
+                          wide:   Boolean = false): super(opCode) {
+        this.variable =
+            if (hasImplicitVariable(opCode)) {
+                val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured
+                variableString.toInt()
+            } else {
+                -1
+            }
+
+        this.wide = wide
+    }
+
+    protected constructor(opCode:   JvmOpCode,
+                          variable: Int): super(opCode) {
+        this.variable = variable
+        this.wide     = variable > 0xff
+    }
 
     override fun getLength(offset: Int): Int {
         return if (wide) {
@@ -44,15 +61,12 @@ open class VariableInstruction protected constructor(opCode:   JvmOpCode,
     }
 
     override fun read(instructions: ByteArray, offset: Int) {
-        variable = if (!variableIsImplicit) {
-            if (wide) {
+        if (!variableIsImplicit) {
+            variable = if (wide) {
                 getIndex(instructions[offset + 2], instructions[offset + 3])
             } else {
                 instructions[offset + 1].toInt() and 0xff
             }
-        } else {
-            val (variableString) = VARIABLE_REGEX.find(mnemonic)!!.destructured
-            variableString.toInt()
         }
     }
 
@@ -77,12 +91,16 @@ open class VariableInstruction protected constructor(opCode:   JvmOpCode,
         visitor.visitVariableInstruction(classFile, method, code, offset, this)
     }
 
-    override fun toString(classFile: ClassFile): String {
+    override fun toString(): String {
         return if (variableIsImplicit) {
             mnemonic
         } else {
             "$mnemonic $variable"
         }
+    }
+
+    override fun toString(classFile: ClassFile): String {
+        return toString()
     }
 
     companion object {
@@ -103,8 +121,7 @@ open class VariableInstruction protected constructor(opCode:   JvmOpCode,
 
         fun of(opCode: JvmOpCode, variable: Int): VariableInstruction {
             require(!hasImplicitVariable(opCode))
-            val wide = variable > 0xff
-            return VariableInstruction(opCode, wide, variable)
+            return VariableInstruction(opCode, variable)
         }
     }
 }

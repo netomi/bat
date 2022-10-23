@@ -61,14 +61,12 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
 
     abstract fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor)
 
-    open fun toString(classFile: ClassFile): String {
-        return toString()
+    override fun toString(): String {
+        return mnemonic
     }
 
-    override fun toString(): String {
-        return buildString {
-            append(opCode.mnemonic)
-        }
+    open fun toString(classFile: ClassFile): String {
+        return toString()
     }
 
     companion object {

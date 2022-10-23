@@ -77,10 +77,10 @@ class BranchInstruction: JvmInstruction {
 
     override fun toString(): String {
         return if (branchLabel != null) {
-            super.toString() + " " + branchLabel
+            "$mnemonic $branchLabel"
         } else {
             val offsetString = toSignedHexString(branchOffset, 4)
-            super.toString() + " " + offsetString
+            "$mnemonic $offsetString"
         }
     }
 
