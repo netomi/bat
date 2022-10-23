@@ -19,6 +19,8 @@ package com.github.netomi.bat.jasm.assemble
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.instruction.*
 import com.github.netomi.bat.jasm.parser.JasmParser.*
+import com.github.netomi.bat.util.getArgumentSize
+import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 
 internal class InstructionAssembler constructor(private val constantPoolEditor: ConstantPoolEditor) {
 
@@ -121,6 +123,21 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
 
         val methodRefConstantIndex = constantPoolEditor.addOrGetMethodRefConstantIndex(className!!, methodName, descriptor)
         return MethodInstruction.of(opCode, methodRefConstantIndex)
+    }
+
+    fun parseInterfaceMethodInstructions(ctx: FInterfaceMethodInstructionsContext): InterfaceMethodInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val method = ctx.method.text
+        val (className, methodName, descriptor) = parseSimpleMethodObject(method)
+
+        val methodRefConstantIndex = constantPoolEditor.addOrGetInterfaceMethodRefConstantIndex(className!!, methodName, descriptor)
+
+        val (parameterTypes, _) = parseDescriptorToJvmTypes(descriptor)
+        val argumentCount = 1 + parameterTypes.getArgumentSize()
+
+        return InterfaceMethodInstruction.of(opCode, methodRefConstantIndex, argumentCount)
     }
 
     fun parseClassInstructions(ctx: FClassInstructionsContext): ClassInstruction {

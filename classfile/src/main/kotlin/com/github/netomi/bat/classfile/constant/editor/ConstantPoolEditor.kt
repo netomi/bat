@@ -113,6 +113,18 @@ class ConstantPoolEditor private constructor(private val constantPool: ConstantP
         }
     }
 
+    fun addOrGetInterfaceMethodRefConstantIndex(className: String, methodName: String, descriptor: String): Int {
+        val classIndex       = addOrGetClassConstantIndex(className)
+        val nameAndTypeIndex = addOrGetNameAndTypeConstantIndex(methodName, descriptor)
+
+        val index = constantPool.getInterfaceMethodRefConstantIndex(classIndex, nameAndTypeIndex)
+        return if (index == -1) {
+            constantPool.addConstant(InterfaceMethodrefConstant.of(classIndex, nameAndTypeIndex))
+        } else {
+            index
+        }
+    }
+
     companion object {
         fun of(classFile: ClassFile): ConstantPoolEditor {
             return ConstantPoolEditor(classFile.constantPool)

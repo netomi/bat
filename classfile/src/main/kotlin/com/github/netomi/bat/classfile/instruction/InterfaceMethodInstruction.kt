@@ -23,10 +23,18 @@ import com.github.netomi.bat.classfile.constant.InterfaceMethodrefConstant
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class InterfaceMethodInstruction private constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
+class InterfaceMethodInstruction: InvocationInstruction {
 
-    var argumentCount: Int = 0
+    var argumentCount: Int
         private set
+
+    private constructor(opCode: JvmOpCode): super(opCode) {
+        this.argumentCount = 0
+    }
+
+    private constructor(opCode: JvmOpCode, constantIndex: Int, argumentCount: Int): super(opCode, constantIndex) {
+        this.argumentCount = argumentCount
+    }
 
     override fun getConstant(classFile: ClassFile): InterfaceMethodrefConstant {
         return classFile.getInterfaceMethodref(constantIndex)
@@ -48,8 +56,12 @@ class InterfaceMethodInstruction private constructor(opCode: JvmOpCode): Invocat
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): InterfaceMethodInstruction {
             return InterfaceMethodInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int, argumentCount: Int): InterfaceMethodInstruction {
+            return InterfaceMethodInstruction(opCode, constantIndex, argumentCount)
         }
     }
 }
