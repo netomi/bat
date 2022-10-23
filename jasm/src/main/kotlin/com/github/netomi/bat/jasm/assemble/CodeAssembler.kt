@@ -59,6 +59,8 @@ internal class CodeAssembler constructor(private val method:      Method,
                     RULE_fFieldInstructions            -> instructionAssembler.parseFieldInstructions(t as FFieldInstructionsContext)
                     RULE_fMethodInstructions           -> instructionAssembler.parseMethodInstructions(t as FMethodInstructionsContext)
                     RULE_fClassInstructions            -> instructionAssembler.parseClassInstructions(t as FClassInstructionsContext)
+                    RULE_fArrayClassInstructions       -> instructionAssembler.parseArrayClassInstructions(t as FArrayClassInstructionsContext)
+                    RULE_fMultiArrayClassInstruction   -> instructionAssembler.parseMultiArrayClassInstructions(t as FMultiArrayClassInstructionContext)
                     RULE_fBranchInstructions           -> instructionAssembler.parseBranchInstructions(t as FBranchInstructionsContext)
                     else -> null
                 }

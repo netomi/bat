@@ -22,14 +22,21 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import java.awt.Dimension
 
-class ArrayClassInstruction private constructor(opCode: JvmOpCode): ClassInstruction(opCode) {
+class ArrayClassInstruction: ClassInstruction {
 
     var dimension: Int = 0
         private set
 
     val dimensionIsImplicit: Boolean
-        get() = opCode == ANEWARRAY
+        get() = hasImplicitDimension(opCode)
+
+    private constructor(opCode: JvmOpCode): super(opCode)
+
+    private constructor(opCode: JvmOpCode, constantIndex: Int, dimension: Int): super(opCode, constantIndex) {
+        this.dimension = dimension
+    }
 
     override fun read(instructions: ByteArray, offset: Int) {
         super.read(instructions, offset)
@@ -52,9 +59,30 @@ class ArrayClassInstruction private constructor(opCode: JvmOpCode): ClassInstruc
         visitor.visitArrayClassInstruction(classFile, method, code, offset, this)
     }
 
+    override fun toString(classFile: ClassFile): String {
+        return if (dimensionIsImplicit) {
+            super.toString(classFile)
+        } else {
+            super.toString(classFile) + ", $dimension"
+        }
+    }
+
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        private fun hasImplicitDimension(opCode: JvmOpCode): Boolean {
+            return opCode == ANEWARRAY
+        }
+
+        internal fun create(opCode: JvmOpCode): ArrayClassInstruction {
             return ArrayClassInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int): ArrayClassInstruction {
+            return ArrayClassInstruction(opCode, constantIndex, 1)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int, dimension: Int): ArrayClassInstruction {
+            require(!hasImplicitDimension(opCode)) { "instruction '$opCode' has an implicit dimension" }
+            return ArrayClassInstruction(opCode, constantIndex, dimension)
         }
     }
 }

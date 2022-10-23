@@ -133,6 +133,27 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         return ClassInstruction.of(opCode, classConstantIndex)
     }
 
+    fun parseArrayClassInstructions(ctx: FArrayClassInstructionsContext): ArrayClassInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val className = ctx.className.text
+
+        val classConstantIndex = constantPoolEditor.addOrGetClassConstantIndex(className)
+        return ArrayClassInstruction.of(opCode, classConstantIndex)
+    }
+
+    fun parseMultiArrayClassInstructions(ctx: FMultiArrayClassInstructionContext): ArrayClassInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val className = ctx.className.text
+        val dimension = ctx.dimension.text.toInt()
+
+        val classConstantIndex = constantPoolEditor.addOrGetClassConstantIndex(className)
+        return ArrayClassInstruction.of(opCode, classConstantIndex, dimension)
+    }
+
     fun parseBranchInstructions(ctx: FBranchInstructionsContext): BranchInstruction {
         val mnemonic = ctx.op.text
         val opCode   = JvmOpCode[mnemonic]

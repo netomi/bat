@@ -489,9 +489,9 @@ fArrayInstructions: op=
 
 fPrimitiveArrayInstructions: op='newarray' type=('boolean' | 'char' | 'float' | 'double' | 'byte' | 'short' | 'int' | 'long');
 
-fArrayClassInstructions: op='anewarray' class=(CLASS_NAME | ARRAY_TYPE) ;
+fArrayClassInstructions: op='anewarray' className=(CLASS_NAME | ARRAY_TYPE) ;
 
-fMultiArrayClassInstruction: op='multianewarray' class=(CLASS_NAME | ARRAY_TYPE) ',' dimension=INT ;
+fMultiArrayClassInstruction: op='multianewarray' className=(CLASS_NAME | ARRAY_TYPE) ',' dimension=INT ;
 
 fLookupSwitch: 'lookupswitch' '{' (match=(INT | 'default') '->' label=sLabel)* '}';
 
