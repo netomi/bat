@@ -44,6 +44,10 @@ data class LineNumberTableAttribute
     val size: Int
         get() = lineNumberTable.size
 
+    fun add(entry: LineNumberEntry) {
+        lineNumberTable.add(entry)
+    }
+
     operator fun get(index: Int): LineNumberEntry {
         return lineNumberTable[index]
     }
@@ -98,6 +102,10 @@ data class LineNumberEntry private constructor(private var _startPC:    Int = -1
             val element = LineNumberEntry()
             element.read(input)
             return element
+        }
+
+        fun of(startPC: Int, lineNumber: Int): LineNumberEntry {
+            return LineNumberEntry(startPC, lineNumber)
         }
     }
 }

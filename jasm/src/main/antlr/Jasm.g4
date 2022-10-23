@@ -297,19 +297,19 @@ sInstruction
     | fCompareInstructions
     | fInvokeDynamicInstructions
     | fLine
+    | fStartlocal
+    | fEndlocal
     ;
 
 sDirective
     : fMaxStack
     | fMaxLocals
-    | fStartlocal
-    | fEndlocal
     ;
 
 fMaxStack  : '.maxstack'  maxStack=INT;
 fMaxLocals : '.maxlocals' maxLocals=INT;
-fLine      : '.line'   line=INT;
-fStartlocal: '.local'  variable=INT ',' name=STRING (':' descriptor=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE))? (',' signature=STRING)? ;
+fLine      : '.line' line=INT;
+fStartlocal: '.local' variable=INT ',' name=STRING (':' descriptor=(PRIMITIVE_TYPE | OBJECT_TYPE | ARRAY_TYPE))? (',' signature=STRING)? ;
 fEndlocal  : '.end local' variable=INT;
 sLabel     : ':' label=ID;
 fCatch     : '.catch' type=CLASS_NAME '{' start=sLabel '..' end=sLabel  '}' handle=sLabel ;

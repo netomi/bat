@@ -44,14 +44,14 @@ data class CodeAttribute
                          private var _maxLocals:         Int                         = 0,
                         internal var _code:              ByteArray                   = ByteArray(0),
                          private var _exceptionTable:    MutableList<ExceptionEntry> = mutableListOfCapacity(0),
-                         private var _attributes:        AttributeMap                = AttributeMap.empty())
+                        internal var attributeMap:       AttributeMap                = AttributeMap.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {
 
     override val type: AttributeType
         get() = AttributeType.CODE
 
     override val dataSize: Int
-        get() = 8 + codeLength + exceptionTable.contentSize() + _attributes.contentSize
+        get() = 8 + codeLength + exceptionTable.contentSize() + attributeMap.contentSize
 
     val maxStack: Int
         get() = _maxStack
@@ -69,7 +69,12 @@ data class CodeAttribute
         get() = _exceptionTable
 
     val attributes: Sequence<Attribute>
-        get() = _attributes
+        get() = attributeMap
+
+    internal fun addAttribute(attribute: Attribute) {
+        require(attribute is AttachedToCodeAttribute) { "trying to add an attribute of type '${attribute.type}' to a code attribute"}
+        attributeMap.addAttribute(attribute)
+    }
 
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
@@ -81,7 +86,7 @@ data class CodeAttribute
         input.readFully(_code)
 
         _exceptionTable = input.readContentList(ExceptionEntry::read)
-        _attributes     = input.readAttributes()
+        attributeMap    = input.readAttributes()
     }
 
     @Throws(IOException::class)
@@ -93,7 +98,7 @@ data class CodeAttribute
         output.write(code)
 
         output.writeContentList(exceptionTable)
-        _attributes.write(output)
+        attributeMap.write(output)
     }
 
     override fun accept(classFile: ClassFile, method: Method, visitor: MethodAttributeVisitor) {
@@ -127,7 +132,7 @@ data class CodeAttribute
         for (entry in _exceptionTable) {
             entry.referencedConstantsAccept(classFile, visitor)
         }
-        for (attribute in _attributes) {
+        for (attribute in attributeMap) {
             attribute.referencedConstantsAccept(classFile, visitor)
         }
     }

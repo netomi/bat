@@ -18,18 +18,27 @@ package com.github.netomi.bat.classfile.editor
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.Attribute
+import com.github.netomi.bat.classfile.attribute.AttributeMap
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 
 class CodeEditor private constructor(private val classEditor:   ClassEditor,
                                      private val method:        Method,
-                                     private val codeAttribute: CodeAttribute) {
+                                     private val codeAttribute: CodeAttribute): AttributeEditor() {
 
     val classFile: ClassFile
         get() = classEditor.classFile
 
-    val constantPoolEditor: ConstantPoolEditor
+    override val constantPoolEditor: ConstantPoolEditor
         get() = classEditor.constantPoolEditor
+
+    override val attributeMap: AttributeMap
+        get() = this.codeAttribute.attributeMap
+
+    override fun addAttribute(attribute: Attribute) {
+        codeAttribute.addAttribute(attribute)
+    }
 
     companion object {
         fun of(classEditor: ClassEditor, method: Method, codeAttribute: CodeAttribute): CodeEditor {

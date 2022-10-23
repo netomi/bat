@@ -46,6 +46,10 @@ data class LocalVariableTableAttribute
     val size: Int
         get() = localVariableTable.size
 
+    fun add(entry: LocalVariableEntry) {
+        localVariableTable.add(entry)
+    }
+
     operator fun get(index: Int): LocalVariableEntry {
         return localVariableTable[index]
     }
@@ -143,6 +147,10 @@ data class LocalVariableEntry
             val element = LocalVariableEntry()
             element.read(input)
             return element
+        }
+
+        fun of(startPC: Int, length: Int, nameIndex: Int, descriptorIndex: Int, variable: Int): LocalVariableEntry {
+            return LocalVariableEntry(startPC, length, nameIndex, descriptorIndex, variable)
         }
     }
 }

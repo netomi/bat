@@ -19,7 +19,6 @@ package com.github.netomi.bat.jasm.assemble
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.editor.CodeEditor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
-import com.github.netomi.bat.jasm.parser.JasmParser
 import com.github.netomi.bat.jasm.parser.JasmParser.*
 import org.antlr.v4.runtime.ParserRuleContext
 
@@ -27,10 +26,9 @@ internal class CodeAssembler constructor(private val method:      Method,
                                          private val codeEditor:  CodeEditor,
                                          private val lenientMode: Boolean) {
 
-    fun parseCode(iCtx: List<JasmParser.SInstructionContext>) {
-
-        println("assembling method $method")
+    fun parseCode(iCtx: List<SInstructionContext>) {
         val instructionAssembler = InstructionAssembler(codeEditor.constantPoolEditor)
+        val debugStateComposer   = DebugStateComposer(codeEditor)
 
         var codeOffset = 0
 
@@ -46,6 +44,14 @@ internal class CodeAssembler constructor(private val method:      Method,
                     }
 
                     RULE_fLine -> {
+                        val c = t as FLineContext
+                        val lineNumber = parseLong(c.line.text).toInt()
+
+                        if (lineNumber < 0 && !lenientMode) {
+                            parserError(ctx, "negative line number")
+                        }
+
+                        debugStateComposer.addLineNumber(codeOffset, lineNumber)
                         null
                     }
 
@@ -56,6 +62,27 @@ internal class CodeAssembler constructor(private val method:      Method,
 
                     RULE_fCatchall -> {
                         instructionAssembler.parseCatchAllDirective(t as FCatchallContext)
+                        null
+                    }
+
+                    RULE_fStartlocal -> {
+                        val c = t as FStartlocalContext
+
+                        val variable = c.variable.text.toInt()
+
+                        val name       = c.name.text.removeSurrounding("\"")
+                        val descriptor = c.descriptor?.text
+                        val signature  = c.signature?.text?.removeSurrounding("\"")
+
+                        debugStateComposer.startLocalVariable(codeOffset, variable, name, descriptor, signature)
+                        null
+                    }
+
+                    RULE_fEndlocal -> {
+                        val c = t as FEndlocalContext
+                        val variable = c.variable.text.toInt()
+
+                        debugStateComposer.endLocalVariable(codeOffset, variable)
                         null
                     }
 
@@ -91,7 +118,6 @@ internal class CodeAssembler constructor(private val method:      Method,
                 }
 
                 if (insn != null) {
-                    println("%04x: %s".format(codeOffset, insn.toString(codeEditor.classFile)))
                     codeOffset += insn.getLength(codeOffset)
                 }
 
@@ -100,5 +126,6 @@ internal class CodeAssembler constructor(private val method:      Method,
             }
         }
 
+        debugStateComposer.finish(codeOffset)
     }
 }
