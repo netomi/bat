@@ -22,7 +22,7 @@ enum class JvmOpCode constructor(
             val value:    Int,
             val mnemonic: String,
             val length:   Int = 1,
-    private val supplier: InstructionSupplier) {
+    private val supplier: InstructionSupplier?) {
 
     // array instructions
 
@@ -305,10 +305,13 @@ enum class JvmOpCode constructor(
     ARRAYLENGTH    (0xbe, "arraylength",    1, { opCode, _ -> ArrayInstruction.create(opCode) }),
     NEWARRAY       (0xbc, "newarray",       2, { opCode, _ -> ArrayPrimitiveTypeInstruction.create(opCode) }),
 
-    WIDE           (0xc4, "wide", -1, { _, _ -> error("tried to explicitly create a wide instruction")});
+    WIDE           (0xc4, "wide", -1, { _, _ -> error("tried to explicitly create a wide instruction")}),
+
+    // for internal use only
+    INTERNAL_LABEL (0x100, "label", -1, null);
 
     fun createInstruction(wide: Boolean): JvmInstruction {
-        return supplier.create(this, wide)
+        return supplier?.create(this, wide) ?: throw RuntimeException("failed to create instruction for opcode $this")
     }
 
     private fun interface InstructionSupplier {

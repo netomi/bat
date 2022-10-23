@@ -17,6 +17,7 @@
 package com.github.netomi.bat.jasm.assemble
 
 import com.github.netomi.bat.classfile.Method
+import com.github.netomi.bat.classfile.attribute.ExceptionEntry
 import com.github.netomi.bat.classfile.editor.CodeEditor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.jasm.parser.JasmParser.*
@@ -30,6 +31,7 @@ internal class CodeAssembler constructor(private val method:      Method,
         val instructionAssembler = InstructionAssembler(codeEditor.constantPoolEditor)
         val debugStateComposer   = DebugStateComposer(codeEditor)
 
+        val exceptionEntries = mutableListOf<ExceptionEntry>()
         var codeOffset = 0
 
         iCtx.forEach { ctx ->
@@ -39,7 +41,7 @@ internal class CodeAssembler constructor(private val method:      Method,
                     RULE_sLabel -> {
                         val c = t as SLabelContext
                         val label = c.label.text
-                        //codeEditor.prependLabel(0, c.label.text)
+                        codeEditor.prependLabel(0, label)
                         null
                     }
 
@@ -56,12 +58,12 @@ internal class CodeAssembler constructor(private val method:      Method,
                     }
 
                     RULE_fCatch -> {
-                        instructionAssembler.parseCatchDirective(t as FCatchContext)
+                        exceptionEntries.add(instructionAssembler.parseCatchDirective(t as FCatchContext))
                         null
                     }
 
                     RULE_fCatchall -> {
-                        instructionAssembler.parseCatchAllDirective(t as FCatchallContext)
+                        exceptionEntries.add(instructionAssembler.parseCatchAllDirective(t as FCatchallContext))
                         null
                     }
 
@@ -119,12 +121,19 @@ internal class CodeAssembler constructor(private val method:      Method,
 
                 if (insn != null) {
                     codeOffset += insn.getLength(codeOffset)
+                    codeEditor.prependInstruction(0, insn)
                 }
 
             } catch (exception: RuntimeException) {
                 parserError(ctx, exception)
             }
         }
+
+        for (exceptionEntry in exceptionEntries) {
+            codeEditor.addExceptionEntry(exceptionEntry)
+        }
+
+        codeEditor.finishEditing()
 
         debugStateComposer.finish(codeOffset)
     }
