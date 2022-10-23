@@ -24,12 +24,11 @@ import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 class TableSwitchInstruction
-    private constructor(            opCode:           JvmOpCode,
-                                    defaultOffset:    Int                          = 0,
-                        private var _lowValue:        Int                          = 0,
-                        private var _highValue:       Int                          = 0,
-                                    matchOffsetPairs: MutableList<MatchOffsetPair> = mutableListOfCapacity(0))
-    : SwitchInstruction(opCode, defaultOffset, matchOffsetPairs) {
+    private constructor(opCode:           JvmOpCode,
+                        defaultOffset:    Int                          = 0,
+                        defaultLabel:     String?                      = null,
+                        matchOffsetPairs: MutableList<MatchOffsetPair> = mutableListOfCapacity(0))
+    : SwitchInstruction(opCode, defaultOffset, defaultLabel, matchOffsetPairs) {
 
     override fun getLength(offset: Int): Int {
         val padding = getPadding(offset + 1)
@@ -37,10 +36,10 @@ class TableSwitchInstruction
     }
 
     val lowValue: Int
-        get() = _lowValue
+        get() = matchOffsetPairs.first().match
 
     val highValue: Int
-        get() = _highValue
+        get() = matchOffsetPairs.last().match
 
     override fun read(instructions: ByteArray, offset: Int) {
         var currOffset = offset + 1
@@ -52,22 +51,22 @@ class TableSwitchInstruction
                       instructions[currOffset++],
                       instructions[currOffset++])
 
-        _lowValue =
+        val lowValue =
             getLiteral(instructions[currOffset++],
                        instructions[currOffset++],
                        instructions[currOffset++],
                        instructions[currOffset++])
 
-        _highValue =
+        val highValue =
             getLiteral(instructions[currOffset++],
                        instructions[currOffset++],
                        instructions[currOffset++],
                        instructions[currOffset++])
 
-        val numberOfPairs = _highValue - _lowValue + 1
+        val numberOfPairs = highValue - lowValue + 1
         matchOffsetPairs = mutableListOfCapacity(numberOfPairs)
 
-        var currentMatch = _lowValue
+        var currentMatch = lowValue
         for (i in 0 until numberOfPairs) {
             val offsetOfMatch =
                 getOffset(instructions[currOffset++],
@@ -108,6 +107,14 @@ class TableSwitchInstruction
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
             return TableSwitchInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, defaultOffset: Int, matchOffsetPairs: List<MatchOffsetPair>): TableSwitchInstruction {
+            return TableSwitchInstruction(opCode, defaultOffset, null, matchOffsetPairs.toMutableList())
+        }
+
+        fun of(opCode: JvmOpCode, defaultLabel: String, matchOffsetPairs: List<MatchOffsetPair>): TableSwitchInstruction {
+            return TableSwitchInstruction(opCode, -1, defaultLabel, matchOffsetPairs.toMutableList())
         }
     }
 }

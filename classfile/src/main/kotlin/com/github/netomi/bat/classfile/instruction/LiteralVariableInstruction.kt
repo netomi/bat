@@ -22,10 +22,16 @@ import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class LiteralVariableInstruction private constructor(opCode: JvmOpCode, wide: Boolean): VariableInstruction(opCode, wide) {
+class LiteralVariableInstruction: VariableInstruction {
 
     var value: Int = 0
         private set
+
+    private constructor(opCode: JvmOpCode, wide: Boolean): super(opCode, wide)
+
+    private constructor(opCode: JvmOpCode, variable: Int, value: Int): super(opCode, variable) {
+        this.value = value
+    }
 
     override fun getLength(offset: Int): Int {
         return if (wide) {
@@ -60,8 +66,12 @@ class LiteralVariableInstruction private constructor(opCode: JvmOpCode, wide: Bo
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode, wide: Boolean): JvmInstruction {
+        internal fun create(opCode: JvmOpCode, wide: Boolean): LiteralVariableInstruction {
             return LiteralVariableInstruction(opCode, wide)
+        }
+
+        fun of(opCode: JvmOpCode, variable: Int, value: Int): LiteralVariableInstruction {
+            return LiteralVariableInstruction(opCode, variable, value)
         }
     }
 }

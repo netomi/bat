@@ -155,10 +155,13 @@ data class CodeAttribute
     }
 }
 
-data class ExceptionEntry private constructor(private var _startPC:   Int = -1,
-                                              private var _endPC:     Int = -1,
-                                              private var _handlerPC: Int = -1,
-                                              private var _catchType: Int = -1): ClassFileContent() {
+data class ExceptionEntry private constructor(private var _startPC:      Int = -1,
+                                              private var _startLabel:   String? = null,
+                                              private var _endPC:        Int = -1,
+                                              private var _endLabel:     String? = null,
+                                              private var _handlerPC:    Int = -1,
+                                              private var _handlerLabel: String? = null,
+                                              private var _catchType:    Int = -1): ClassFileContent() {
 
     override val contentSize: Int
         get() = 8
@@ -204,6 +207,14 @@ data class ExceptionEntry private constructor(private var _startPC:   Int = -1,
             val element = ExceptionEntry()
             element.read(input)
             return element
+        }
+
+        fun of(startPC: Int, endPC: Int, handlerPC: Int, catchType: Int): ExceptionEntry {
+            return ExceptionEntry(startPC, null, endPC, null, handlerPC, null, catchType)
+        }
+
+        fun of(startLabel: String, endLabel: String, handlerLabel: String, catchType: Int = 0): ExceptionEntry {
+            return ExceptionEntry(-1, startLabel, -1, endLabel, -1, handlerLabel, catchType)
         }
     }
 }

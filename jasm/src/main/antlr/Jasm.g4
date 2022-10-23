@@ -493,9 +493,11 @@ fArrayClassInstructions: op='anewarray' className=(CLASS_NAME | ARRAY_TYPE) ;
 
 fMultiArrayClassInstruction: op='multianewarray' className=(CLASS_NAME | ARRAY_TYPE) ',' dimension=INT ;
 
-fLookupSwitch: 'lookupswitch' '{' (match=(INT | 'default') '->' label=sLabel)* '}';
+sSwitchKey: key=(INT | 'default') ;
 
-fTableSwitch: 'tableswitch' '{' (match=(INT | 'default') '->' label=sLabel)* '}';
+fLookupSwitch: op='lookupswitch' '{' (sSwitchKey '->' sLabel)* '}';
+
+fTableSwitch: op='tableswitch' '{' (sSwitchKey '->' sLabel)* '}';
 
 fArithmeticInstructions: op=
     ( 'dadd'

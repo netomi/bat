@@ -21,6 +21,7 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 abstract class SwitchInstruction
     protected constructor(              opCode:           JvmOpCode,
                           protected var _defaultOffset:   Int                          = 0,
+                          protected var _defaultLabel:    String?                      = null,
                           protected var matchOffsetPairs: MutableList<MatchOffsetPair> = mutableListOfCapacity(0)
     ): JvmInstruction(opCode), Sequence<MatchOffsetPair> {
 
@@ -43,4 +44,4 @@ abstract class SwitchInstruction
     }
 }
 
-data class MatchOffsetPair(val match: Int, val offset: Int)
+data class MatchOffsetPair(val match: Int, val offset: Int, val label: String? = null)

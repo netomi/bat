@@ -26,8 +26,9 @@ import com.github.netomi.bat.util.mutableListOfCapacity
 class LookupSwitchInstruction
     private constructor(opCode:           JvmOpCode,
                         defaultOffset:    Int                          = 0,
+                        defaultLabel:     String?                      = null,
                         matchOffsetPairs: MutableList<MatchOffsetPair> = mutableListOfCapacity(0))
-    : SwitchInstruction(opCode, defaultOffset, matchOffsetPairs) {
+    : SwitchInstruction(opCode, defaultOffset, defaultLabel, matchOffsetPairs) {
 
     override fun getLength(offset: Int): Int {
         val padding = getPadding(offset + 1)
@@ -97,6 +98,14 @@ class LookupSwitchInstruction
     companion object {
         internal fun create(opCode: JvmOpCode): JvmInstruction {
             return LookupSwitchInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, defaultOffset: Int, matchOffsetPairs: List<MatchOffsetPair>): LookupSwitchInstruction {
+            return LookupSwitchInstruction(opCode, defaultOffset, null, matchOffsetPairs.toMutableList())
+        }
+
+        fun of(opCode: JvmOpCode, defaultLabel: String, matchOffsetPairs: List<MatchOffsetPair>): LookupSwitchInstruction {
+            return LookupSwitchInstruction(opCode, -1, defaultLabel, matchOffsetPairs.toMutableList())
         }
     }
 }

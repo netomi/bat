@@ -16,6 +16,7 @@
 
 package com.github.netomi.bat.jasm.assemble
 
+import com.github.netomi.bat.classfile.attribute.ExceptionEntry
 import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.instruction.*
 import com.github.netomi.bat.jasm.parser.JasmParser.*
@@ -142,6 +143,25 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         return InterfaceMethodInstruction.of(opCode, methodRefConstantIndex, argumentCount)
     }
 
+    fun parseInvokeDynamicInstruction(ctx: FInvokeDynamicInstructionsContext): InvokeDynamicInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val bootstrapMethodId = ctx.ID().text
+        val underscoreIndex   = bootstrapMethodId.lastIndexOf('_')
+        if (underscoreIndex == -1) {
+            parserError(ctx, "failed to parse bootstrap method index '$bootstrapMethodId'")
+        }
+        val bootstrapMethodAttrIndex = bootstrapMethodId.substring(underscoreIndex + 1).toInt()
+
+        val method = ctx.method.text
+        val (_, methodName, descriptor) = parseSimpleMethodObject(method)
+
+        val invokeDynamicConstantIndex = constantPoolEditor.addOrGetInvokeDynamicConstantIndex(bootstrapMethodAttrIndex, methodName, descriptor)
+
+        return InvokeDynamicInstruction.of(opCode, invokeDynamicConstantIndex)
+    }
+
     fun parseClassInstructions(ctx: FClassInstructionsContext): ClassInstruction {
         val mnemonic = ctx.op.text
         val opCode   = JvmOpCode[mnemonic]
@@ -199,6 +219,25 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         return LiteralConstantInstruction.of(opCode, constantIndex)
     }
 
+    fun parseWideLiteralConstantInstructions(ctx: FWideLiteralConstantInstructionsContext): LiteralConstantInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val constantIndex = constantAssembler.parseBaseValue(ctx.value)
+
+        return LiteralConstantInstruction.of(opCode, constantIndex)
+    }
+
+    fun parseLiteralVariableInstructions(ctx: FLiteralVariableInstructionsContext): LiteralVariableInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val variable = ctx.variable.text.toInt()
+        val value    = ctx.value.text.toInt()
+
+        return LiteralVariableInstruction.of(opCode, variable, value)
+    }
+
     fun parseImplicitLiteralInstructions(ctx: FImplicitLiteralInstructionsContext): LiteralInstruction {
         val mnemonic = ctx.op.text
         val opCode   = JvmOpCode[mnemonic]
@@ -213,6 +252,67 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         val value = ctx.value.text.toLong()
 
         return LiteralInstruction.of(opCode, value)
+    }
+
+    fun parseLookupSwitchInstruction(ctx: FLookupSwitchContext): LookupSwitchInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val matchOffsetPairs = mutableListOf<MatchOffsetPair>()
+        var defaultLabel: String? = null
+
+        for (i in 0 until ctx.sSwitchKey().size) {
+            val key   = ctx.sSwitchKey(i).text
+            val label = ctx.sLabel(i).label.text
+
+            if (key != "default") {
+                matchOffsetPairs.add(MatchOffsetPair(key.toInt(), -1, label))
+            } else {
+                defaultLabel = label
+            }
+        }
+
+        return LookupSwitchInstruction.of(opCode, defaultLabel ?: parserError(ctx, "missing 'default' label"), matchOffsetPairs)
+    }
+
+    fun parseTableSwitchInstruction(ctx: FTableSwitchContext): TableSwitchInstruction {
+        val mnemonic = ctx.op.text
+        val opCode   = JvmOpCode[mnemonic]
+
+        val matchOffsetPairs = mutableListOf<MatchOffsetPair>()
+        var defaultLabel: String? = null
+
+        for (i in 0 until ctx.sSwitchKey().size) {
+            val key   = ctx.sSwitchKey(i).text
+            val label = ctx.sLabel(i).label.text
+
+            if (key != "default") {
+                matchOffsetPairs.add(MatchOffsetPair(key.toInt(), -1, label))
+            } else {
+                defaultLabel = label
+            }
+        }
+
+        return TableSwitchInstruction.of(opCode, defaultLabel ?: parserError(ctx, "missing 'default' label"), matchOffsetPairs)
+    }
+
+    fun parseCatchDirective(ctx: FCatchContext): ExceptionEntry {
+        val exceptionClass = ctx.type.text
+        val exceptionClassIndex = constantPoolEditor.addOrGetClassConstantIndex(exceptionClass)
+
+        val startLabel   = ctx.start.label.text
+        val endLabel     = ctx.end.label.text
+        val handlerLabel = ctx.handle.label.text
+
+        return ExceptionEntry.of(startLabel, endLabel, handlerLabel, exceptionClassIndex)
+    }
+
+    fun parseCatchAllDirective(ctx: FCatchallContext): ExceptionEntry {
+        val startLabel   = ctx.start.label.text
+        val endLabel     = ctx.end.label.text
+        val handlerLabel = ctx.handle.label.text
+
+        return ExceptionEntry.of(startLabel, endLabel, handlerLabel)
     }
 
 }

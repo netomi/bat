@@ -23,7 +23,11 @@ import com.github.netomi.bat.classfile.constant.InvokeDynamicConstant
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
-class InvokeDynamicInstruction private constructor(opCode: JvmOpCode): InvocationInstruction(opCode) {
+class InvokeDynamicInstruction : InvocationInstruction {
+
+    private constructor(opCode: JvmOpCode): super(opCode)
+
+    private constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
     override fun getConstant(classFile: ClassFile): InvokeDynamicConstant {
         return classFile.getInvokeDynamic(constantIndex)
@@ -40,8 +44,12 @@ class InvokeDynamicInstruction private constructor(opCode: JvmOpCode): Invocatio
     }
 
     companion object {
-        internal fun create(opCode: JvmOpCode): JvmInstruction {
+        internal fun create(opCode: JvmOpCode): InvokeDynamicInstruction {
             return InvokeDynamicInstruction(opCode)
+        }
+
+        fun of(opCode: JvmOpCode, constantIndex: Int): InvokeDynamicInstruction {
+            return InvokeDynamicInstruction(opCode, constantIndex)
         }
     }
 }

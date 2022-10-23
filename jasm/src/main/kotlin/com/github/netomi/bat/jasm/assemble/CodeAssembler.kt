@@ -49,30 +49,45 @@ internal class CodeAssembler constructor(private val method:      Method,
                         null
                     }
 
-                    RULE_fArithmeticInstructions       -> instructionAssembler.parseArithmeticInstructions(t as FArithmeticInstructionsContext)
-                    RULE_fConversionInstructions       -> instructionAssembler.parseConversionInstructions(t as FConversionInstructionsContext)
-                    RULE_fStackInstructions            -> instructionAssembler.parseStackInstructions(t as FStackInstructionsContext)
-                    RULE_fImplicitVariableInstructions -> instructionAssembler.parseImplicitVariableInstructions(t as FImplicitVariableInstructionsContext)
-                    RULE_fExplicitVariableInstructions -> instructionAssembler.parseExplicitVariableInstructions(t as FExplicitVariableInstructionsContext)
-                    RULE_fArrayInstructions            -> instructionAssembler.parseArrayInstructions(t as FArrayInstructionsContext)
-                    RULE_fExceptionInstructions        -> instructionAssembler.parseExceptionInstructions(t as FExceptionInstructionsContext)
-                    RULE_fNullReferenceInstructions    -> instructionAssembler.parseNullReferenceInstructions(t as FNullReferenceInstructionsContext)
-                    RULE_fReturnInstructions           -> instructionAssembler.parseReturnInstructions(t as FReturnInstructionsContext)
-                    RULE_fMonitorInstructions          -> instructionAssembler.parseMonitorInstructions(t as FMonitorInstructionsContext)
-                    RULE_fCompareInstructions          -> instructionAssembler.parseCompareInstructions(t as FCompareInstructionsContext)
-                    RULE_fFieldInstructions            -> instructionAssembler.parseFieldInstructions(t as FFieldInstructionsContext)
-                    RULE_fMethodInstructions           -> instructionAssembler.parseMethodInstructions(t as FMethodInstructionsContext)
-                    RULE_fInterfaceMethodInstructions  -> instructionAssembler.parseInterfaceMethodInstructions(t as FInterfaceMethodInstructionsContext)
-                    RULE_fClassInstructions            -> instructionAssembler.parseClassInstructions(t as FClassInstructionsContext)
-                    RULE_fPrimitiveArrayInstructions   -> instructionAssembler.parsePrimitiveArrayInstructions(t as FPrimitiveArrayInstructionsContext)
-                    RULE_fArrayClassInstructions       -> instructionAssembler.parseArrayClassInstructions(t as FArrayClassInstructionsContext)
-                    RULE_fMultiArrayClassInstruction   -> instructionAssembler.parseMultiArrayClassInstructions(t as FMultiArrayClassInstructionContext)
-                    RULE_fBranchInstructions           -> instructionAssembler.parseBranchInstructions(t as FBranchInstructionsContext)
-                    RULE_fLiteralConstantInstructions  -> instructionAssembler.parseLiteralConstantInstructions(t as FLiteralConstantInstructionsContext)
-                    RULE_fImplicitLiteralInstructions  -> instructionAssembler.parseImplicitLiteralInstructions(t as FImplicitLiteralInstructionsContext)
-                    RULE_fExplicitLiteralInstruction   -> instructionAssembler.parseExplicitLiteralInstructions(t as FExplicitLiteralInstructionContext)
+                    RULE_fCatch -> {
+                        instructionAssembler.parseCatchDirective(t as FCatchContext)
+                        null
+                    }
 
-                    else -> null //TODO("implement ${t.ruleIndex}")
+                    RULE_fCatchall -> {
+                        instructionAssembler.parseCatchAllDirective(t as FCatchallContext)
+                        null
+                    }
+
+                    RULE_fArithmeticInstructions          -> instructionAssembler.parseArithmeticInstructions(t as FArithmeticInstructionsContext)
+                    RULE_fConversionInstructions          -> instructionAssembler.parseConversionInstructions(t as FConversionInstructionsContext)
+                    RULE_fStackInstructions               -> instructionAssembler.parseStackInstructions(t as FStackInstructionsContext)
+                    RULE_fImplicitVariableInstructions    -> instructionAssembler.parseImplicitVariableInstructions(t as FImplicitVariableInstructionsContext)
+                    RULE_fExplicitVariableInstructions    -> instructionAssembler.parseExplicitVariableInstructions(t as FExplicitVariableInstructionsContext)
+                    RULE_fArrayInstructions               -> instructionAssembler.parseArrayInstructions(t as FArrayInstructionsContext)
+                    RULE_fExceptionInstructions           -> instructionAssembler.parseExceptionInstructions(t as FExceptionInstructionsContext)
+                    RULE_fNullReferenceInstructions       -> instructionAssembler.parseNullReferenceInstructions(t as FNullReferenceInstructionsContext)
+                    RULE_fReturnInstructions              -> instructionAssembler.parseReturnInstructions(t as FReturnInstructionsContext)
+                    RULE_fMonitorInstructions             -> instructionAssembler.parseMonitorInstructions(t as FMonitorInstructionsContext)
+                    RULE_fCompareInstructions             -> instructionAssembler.parseCompareInstructions(t as FCompareInstructionsContext)
+                    RULE_fFieldInstructions               -> instructionAssembler.parseFieldInstructions(t as FFieldInstructionsContext)
+                    RULE_fMethodInstructions              -> instructionAssembler.parseMethodInstructions(t as FMethodInstructionsContext)
+                    RULE_fInterfaceMethodInstructions     -> instructionAssembler.parseInterfaceMethodInstructions(t as FInterfaceMethodInstructionsContext)
+                    RULE_fInvokeDynamicInstructions       -> instructionAssembler.parseInvokeDynamicInstruction(t as FInvokeDynamicInstructionsContext)
+                    RULE_fClassInstructions               -> instructionAssembler.parseClassInstructions(t as FClassInstructionsContext)
+                    RULE_fPrimitiveArrayInstructions      -> instructionAssembler.parsePrimitiveArrayInstructions(t as FPrimitiveArrayInstructionsContext)
+                    RULE_fArrayClassInstructions          -> instructionAssembler.parseArrayClassInstructions(t as FArrayClassInstructionsContext)
+                    RULE_fMultiArrayClassInstruction      -> instructionAssembler.parseMultiArrayClassInstructions(t as FMultiArrayClassInstructionContext)
+                    RULE_fBranchInstructions              -> instructionAssembler.parseBranchInstructions(t as FBranchInstructionsContext)
+                    RULE_fLiteralConstantInstructions     -> instructionAssembler.parseLiteralConstantInstructions(t as FLiteralConstantInstructionsContext)
+                    RULE_fWideLiteralConstantInstructions -> instructionAssembler.parseWideLiteralConstantInstructions(t as FWideLiteralConstantInstructionsContext)
+                    RULE_fLiteralVariableInstructions     -> instructionAssembler.parseLiteralVariableInstructions(t as FLiteralVariableInstructionsContext)
+                    RULE_fImplicitLiteralInstructions     -> instructionAssembler.parseImplicitLiteralInstructions(t as FImplicitLiteralInstructionsContext)
+                    RULE_fExplicitLiteralInstruction      -> instructionAssembler.parseExplicitLiteralInstructions(t as FExplicitLiteralInstructionContext)
+                    RULE_fLookupSwitch                    -> instructionAssembler.parseLookupSwitchInstruction(t as FLookupSwitchContext)
+                    RULE_fTableSwitch                     -> instructionAssembler.parseTableSwitchInstruction(t as FTableSwitchContext)
+
+                    else -> TODO("implement ${t.ruleIndex}")
                 }
 
                 if (insn != null) {

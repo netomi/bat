@@ -125,6 +125,17 @@ class ConstantPoolEditor private constructor(private val constantPool: ConstantP
         }
     }
 
+    fun addOrGetInvokeDynamicConstantIndex(bootstrapMethodAttrIndex: Int, methodName: String, descriptor: String): Int {
+        val nameAndTypeIndex = addOrGetNameAndTypeConstantIndex(methodName, descriptor)
+
+        val index = constantPool.getInvokeDynamicConstantIndex(bootstrapMethodAttrIndex, nameAndTypeIndex)
+        return if (index == -1) {
+            constantPool.addConstant(InvokeDynamicConstant.of(bootstrapMethodAttrIndex, nameAndTypeIndex))
+        } else {
+            index
+        }
+    }
+
     companion object {
         fun of(classFile: ClassFile): ConstantPoolEditor {
             return ConstantPoolEditor(classFile.constantPool)

@@ -111,6 +111,17 @@ internal class ConstantPool
         return -1
     }
 
+    internal fun getInvokeDynamicConstantIndex(bootstrapMethodAttrIndex: Int, nameAndTypeIndex: Int): Int {
+        for ((index, constant) in constants.withIndex()) {
+            if (constant is InvokeDynamicConstant                             &&
+                constant.bootstrapMethodAttrIndex == bootstrapMethodAttrIndex &&
+                constant.nameAndTypeIndex == nameAndTypeIndex) {
+                return index
+            }
+        }
+        return -1
+    }
+
     internal fun getIntegerConstantIndex(value: Int): Int {
         for ((index, constant) in constants.withIndex()) {
             if (constant is IntegerConstant && constant.value == value) {
