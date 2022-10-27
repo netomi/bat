@@ -20,26 +20,30 @@ import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
+import com.github.netomi.bat.util.*
 import java.util.*
 
 class ArrayPrimitiveTypeInstruction : JvmInstruction {
 
-    var arrayType: ArrayType = ArrayType.INT
+    var primitiveType: PrimitiveType = PrimitiveType.INT
         private set
+
+    val arrayType: JvmType
+        get() = "[${primitiveType.type}".asJvmType()
 
     private constructor(opCode: JvmOpCode): super(opCode)
 
-    private constructor(opCode: JvmOpCode, arrayType: ArrayType): super(opCode) {
-        this.arrayType = arrayType
+    private constructor(opCode: JvmOpCode, primitiveType: PrimitiveType): super(opCode) {
+        this.primitiveType = primitiveType
     }
 
     override fun read(instructions: ByteArray, offset: Int) {
-        arrayType = ArrayType.of(instructions[offset + 1].toInt())
+        primitiveType = PrimitiveType.of(instructions[offset + 1].toInt())
     }
 
     override fun write(writer: InstructionWriter, offset: Int) {
         writer.write(offset, opCode.value.toByte())
-        writer.write(offset + 1, arrayType.value.toByte())
+        writer.write(offset + 1, primitiveType.value.toByte())
     }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
@@ -47,7 +51,7 @@ class ArrayPrimitiveTypeInstruction : JvmInstruction {
     }
 
     override fun toString(): String {
-        return "$mnemonic ${arrayType.toString().lowercase(Locale.getDefault())}"
+        return "$mnemonic ${primitiveType.toString().lowercase(Locale.getDefault())}"
     }
 
     companion object {
@@ -55,38 +59,38 @@ class ArrayPrimitiveTypeInstruction : JvmInstruction {
             return ArrayPrimitiveTypeInstruction(opCode)
         }
 
-        fun of(opCode: JvmOpCode, arrayType: String): ArrayPrimitiveTypeInstruction {
-            return of(opCode, ArrayType.of(arrayType))
+        fun of(opCode: JvmOpCode, primitiveType: String): ArrayPrimitiveTypeInstruction {
+            return of(opCode, PrimitiveType.of(primitiveType))
         }
 
-        fun of(opCode: JvmOpCode, arrayType: ArrayType): ArrayPrimitiveTypeInstruction {
-            return ArrayPrimitiveTypeInstruction(opCode, arrayType)
+        fun of(opCode: JvmOpCode, primitiveType: PrimitiveType): ArrayPrimitiveTypeInstruction {
+            return ArrayPrimitiveTypeInstruction(opCode, primitiveType)
         }
     }
 }
 
-enum class ArrayType constructor(val value: Int) {
-    BOOLEAN(T_BOOLEAN),
-    CHAR   (T_CHAR),
-    FLOAT  (T_FLOAT),
-    DOUBLE (T_DOUBLE),
-    BYTE   (T_BYTE),
-    SHORT  (T_SHORT),
-    INT    (T_INT),
-    LONG   (T_LONG);
+enum class PrimitiveType constructor(val value: Int, val type: String) {
+    BOOLEAN(T_BOOLEAN, BOOLEAN_TYPE),
+    CHAR   (T_CHAR,    CHAR_TYPE),
+    FLOAT  (T_FLOAT,   FLOAT_TYPE),
+    DOUBLE (T_DOUBLE,  DOUBLE_TYPE),
+    BYTE   (T_BYTE,    BYTE_TYPE),
+    SHORT  (T_SHORT,   SHORT_TYPE),
+    INT    (T_INT,     INT_TYPE),
+    LONG   (T_LONG,    LONG_TYPE);
 
     companion object {
-        fun of(value: Int): ArrayType {
+        fun of(value: Int): PrimitiveType {
             for (type in values()) {
                 if (type.value == value) {
                     return type
                 }
             }
 
-            error("unexpected array type value '$value'")
+            error("unexpected primitive type value '$value'")
         }
 
-        fun of(str: String): ArrayType {
+        fun of(str: String): PrimitiveType {
             val value = str.uppercase(Locale.getDefault())
             for (type in values()) {
                 if (type.name == value) {
@@ -94,7 +98,7 @@ enum class ArrayType constructor(val value: Int) {
                 }
             }
 
-            error("unexpected array type value '$value'")
+            error("unexpected primitive type value '$value'")
         }
     }
 }

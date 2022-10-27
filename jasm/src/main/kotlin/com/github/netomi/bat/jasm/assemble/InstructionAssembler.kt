@@ -176,9 +176,9 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
         val mnemonic = ctx.op.text
         val opCode   = JvmOpCode[mnemonic]
 
-        val arrayType = ctx.type.text
+        val primitiveType = ctx.type.text
 
-        return ArrayPrimitiveTypeInstruction.of(opCode, arrayType)
+        return ArrayPrimitiveTypeInstruction.of(opCode, primitiveType)
     }
 
     fun parseArrayClassInstructions(ctx: FArrayClassInstructionsContext): ArrayClassInstruction {
@@ -212,9 +212,14 @@ internal class InstructionAssembler constructor(private val constantPoolEditor: 
 
     fun parseLiteralConstantInstructions(ctx: FLiteralConstantInstructionsContext): LiteralConstantInstruction {
         val mnemonic = ctx.op.text
-        val opCode   = JvmOpCode[mnemonic]
+        var opCode   = JvmOpCode[mnemonic]
 
         val constantIndex = constantAssembler.parseBaseValue(ctx.value)
+
+        // TODO: make this clean by having a general mechanism for widening / shrinking instructions
+        if (opCode == JvmOpCode.LDC && constantIndex > 0xff) {
+            opCode = JvmOpCode.LDC_W
+        }
 
         return LiteralConstantInstruction.of(opCode, constantIndex)
     }

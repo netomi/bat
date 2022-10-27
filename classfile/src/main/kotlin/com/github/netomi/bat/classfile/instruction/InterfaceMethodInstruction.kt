@@ -36,6 +36,14 @@ class InterfaceMethodInstruction: InvocationInstruction {
         this.argumentCount = argumentCount
     }
 
+    fun getMethodName(classFile: ClassFile): String {
+        return getConstant(classFile).getMemberName(classFile)
+    }
+
+    fun getDescriptor(classFile: ClassFile): String {
+        return getConstant(classFile).getDescriptor(classFile)
+    }
+
     override fun getConstant(classFile: ClassFile): InterfaceMethodrefConstant {
         return classFile.getInterfaceMethodref(constantIndex)
     }

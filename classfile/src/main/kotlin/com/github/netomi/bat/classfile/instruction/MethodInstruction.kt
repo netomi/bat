@@ -28,6 +28,14 @@ open class MethodInstruction: InvocationInstruction {
 
     private constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
+    fun getMethodName(classFile: ClassFile): String {
+        return getConstant(classFile).getMemberName(classFile)
+    }
+
+    fun getDescriptor(classFile: ClassFile): String {
+        return getConstant(classFile).getDescriptor(classFile)
+    }
+
     override fun getConstant(classFile: ClassFile): MethodrefConstant {
         return classFile.getMethodref(constantIndex)
     }

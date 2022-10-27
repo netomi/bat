@@ -113,6 +113,8 @@ abstract class Renamer {
             val renamedClassName   = renameClassName(componentClassName)
 
             ("[".repeat(arrayDimension) + renamedClassName.toJvmType()).asJvmType()
+        } else if (componentType.isArrayType) {
+            ("[" + renameArrayType(componentType).type).asJvmType()
         } else {
             arrayType
         }

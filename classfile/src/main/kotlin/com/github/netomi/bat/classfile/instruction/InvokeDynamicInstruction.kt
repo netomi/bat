@@ -29,6 +29,14 @@ class InvokeDynamicInstruction : InvocationInstruction {
 
     private constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
+    fun getMethodName(classFile: ClassFile): String {
+        return getConstant(classFile).getMemberName(classFile)
+    }
+
+    fun getDescriptor(classFile: ClassFile): String {
+        return getConstant(classFile).getDescriptor(classFile)
+    }
+
     override fun getConstant(classFile: ClassFile): InvokeDynamicConstant {
         return classFile.getInvokeDynamic(constantIndex)
     }

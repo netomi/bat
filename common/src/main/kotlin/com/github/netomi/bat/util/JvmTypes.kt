@@ -82,7 +82,7 @@ open class JvmType protected constructor(val type: String) {
     val componentType: JvmType
         get() {
             check(isArrayType)
-            return type.substring(arrayDimension).asJvmType()
+            return type.substring(1).asJvmType()
     }
 
     val arrayDimension: Int

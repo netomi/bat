@@ -28,6 +28,14 @@ class FieldInstruction: ConstantInstruction {
 
     private constructor(opCode: JvmOpCode, constantIndex: Int): super(opCode, constantIndex)
 
+    fun getFieldName(classFile: ClassFile): String {
+        return getConstant(classFile).getMemberName(classFile)
+    }
+
+    fun getDescriptor(classFile: ClassFile): String {
+        return getConstant(classFile).getDescriptor(classFile)
+    }
+
     override fun getConstant(classFile: ClassFile): FieldrefConstant {
         return classFile.getFieldref(constantIndex)
     }
