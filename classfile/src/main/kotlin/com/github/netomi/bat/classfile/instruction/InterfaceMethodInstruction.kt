@@ -53,8 +53,8 @@ class InterfaceMethodInstruction: InvocationInstruction {
         argumentCount = instructions[offset + 3].toInt()
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
-        super.write(writer, offset)
+    override fun writeData(writer: InstructionWriter, offset: Int) {
+        super.writeData(writer, offset)
         writer.write(offset + 3, argumentCount.toByte())
         writer.write(offset + 4, 0x0)
     }

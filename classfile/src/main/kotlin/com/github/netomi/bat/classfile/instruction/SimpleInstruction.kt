@@ -17,11 +17,14 @@
 package com.github.netomi.bat.classfile.instruction
 
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 
 abstract class SimpleInstruction protected constructor(opCode: JvmOpCode): JvmInstruction(opCode) {
     override fun read(instructions: ByteArray, offset: Int) {}
 
-    override fun write(writer: InstructionWriter, offset: Int) {
+    override fun writeData(writer: InstructionWriter, offset: Int) {
         writer.write(offset, opCode.value.toByte())
     }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {}
 }

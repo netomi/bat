@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 class LiteralInstruction: JvmInstruction {
@@ -90,7 +91,7 @@ class LiteralInstruction: JvmInstruction {
         }
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
+    override fun writeData(writer: InstructionWriter, offset: Int) {
         writer.write(offset, opCode.value.toByte())
 
         if (!valueIsImplicit) {
@@ -101,6 +102,8 @@ class LiteralInstruction: JvmInstruction {
             }
         }
     }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {}
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
         visitor.visitLiteralInstruction(classFile, method, code, offset, this)

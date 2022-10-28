@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
@@ -32,7 +33,17 @@ abstract class JvmInstruction protected constructor(val opCode: JvmOpCode) {
     }
 
     abstract fun read(instructions: ByteArray, offset: Int)
-    abstract fun write(writer: InstructionWriter, offset: Int)
+
+    open fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap? = null) {
+        if (offsetMap != null) {
+            updateOffsets(offset, offsetMap)
+        }
+
+        writeData(writer, offset)
+    }
+
+    protected abstract fun writeData(writer: InstructionWriter, offset: Int)
+    protected abstract fun updateOffsets(offset: Int, offsetMap: OffsetMap)
 
     protected fun writeLiteral(writer: InstructionWriter, offset: Int, literal: Int) {
         writeOffset(writer, offset, literal)

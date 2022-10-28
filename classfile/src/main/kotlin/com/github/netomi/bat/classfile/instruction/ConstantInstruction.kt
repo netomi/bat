@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.constant.Constant
 import com.github.netomi.bat.classfile.constant.visitor.ConstantVisitor
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 
 abstract class ConstantInstruction: JvmInstruction {
 
@@ -41,10 +42,12 @@ abstract class ConstantInstruction: JvmInstruction {
         constantIndex = getIndex(instructions[offset + 1], instructions[offset + 2])
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
+    override fun writeData(writer: InstructionWriter, offset: Int) {
         writer.write(offset, opCode.value.toByte())
         writeIndex(writer, offset + 1, constantIndex)
     }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {}
 
     fun constantAccept(classFile: ClassFile, visitor: ConstantVisitor) {
         classFile.constantAccept(constantIndex, visitor)

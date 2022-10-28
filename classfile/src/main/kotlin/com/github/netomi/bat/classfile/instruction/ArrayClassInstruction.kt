@@ -48,8 +48,8 @@ class ArrayClassInstruction: ClassInstruction {
         }
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
-        super.write(writer, offset)
+    override fun writeData(writer: InstructionWriter, offset: Int) {
+        super.writeData(writer, offset)
         if (opCode == MULTIANEWARRAY) {
             writer.write(offset + 3, dimension.toByte())
         }

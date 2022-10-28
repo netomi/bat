@@ -21,6 +21,7 @@ import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.JvmOpCode.*
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.toSignedHexString
 
@@ -60,7 +61,7 @@ class BranchInstruction: JvmInstruction {
         }
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
+    override fun writeData(writer: InstructionWriter, offset: Int) {
         writer.write(offset, opCode.value.toByte())
 
         when (opCode) {
@@ -68,6 +69,14 @@ class BranchInstruction: JvmInstruction {
             GOTO_W -> writeOffsetWide(writer, offset + 1, branchOffset)
 
             else   -> writeOffset(writer, offset + 1, branchOffset)
+        }
+    }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
+        branchOffset = if (branchLabel != null) {
+            offsetMap.computeOffsetDiffToTargetLabel(offset, branchLabel!!)
+        } else {
+            offsetMap.computeOffsetDiffToTargetOffset(offset, branchOffset)
         }
     }
 

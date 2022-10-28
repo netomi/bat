@@ -20,6 +20,7 @@ import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 
 open class VariableInstruction: JvmInstruction {
@@ -70,7 +71,7 @@ open class VariableInstruction: JvmInstruction {
         }
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
+    override fun writeData(writer: InstructionWriter, offset: Int) {
         if (!variableIsImplicit) {
             var currOffset = offset
             if (wide) {
@@ -86,6 +87,8 @@ open class VariableInstruction: JvmInstruction {
             writer.write(offset, opCode.value.toByte())
         }
     }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {}
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
         visitor.visitVariableInstruction(classFile, method, code, offset, this)

@@ -26,6 +26,7 @@ import com.github.netomi.bat.classfile.constant.editor.ConstantPoolEditor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.editor.LabelInstruction
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 
 class CodeEditor private constructor(private val classEditor:   ClassEditor,
                                      private val method:        Method,
@@ -92,13 +93,36 @@ class CodeEditor private constructor(private val classEditor:   ClassEditor,
             return
         }
 
-        val instructions = collectInstructions()
-        val assembledInstructions = InstructionWriter.writeInstructions(instructions)
+        val instructionWriter = InstructionWriter()
+        val offsetMap         = OffsetMap(false)
 
-        codeAttribute._code = assembledInstructions
+        val writeInstructions = { instructions: List<JvmInstruction> ->
+            for (instruction in instructions) {
+                instruction.write(instructionWriter, instructionWriter.nextWriteOffset, offsetMap)
+            }
+        }
+
+        val instructions = collectInstructions(offsetMap)
+
+        // in the first iteration, collect label offsets and write instructions
+        // with potentially wrong offsets, which will be corrected in a second pass.
+        writeInstructions(instructions)
+
+        // fail when encountering missing labels / offsets as they should be present now.
+        offsetMap.failOnMissingKey = true
+
+        // if we encountered any labels, we need to fix instructions that reference them.
+        if (offsetMap.hasUpdates()) {
+            instructionWriter.reset()
+
+            // write all instructions / payloads again with fixed offsets.
+            writeInstructions(instructions)
+        }
+
+        codeAttribute._code = instructionWriter.getInstructionArray()
     }
 
-    private fun collectInstructions(): List<JvmInstruction> {
+    private fun collectInstructions(offsetMap: OffsetMap): List<JvmInstruction> {
         val instructions = mutableListOf<JvmInstruction>()
 
         if (codeAttribute.codeLength == 0) {

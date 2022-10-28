@@ -40,7 +40,7 @@ class LiteralConstantInstruction: ConstantInstruction {
         }
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
+    override fun writeData(writer: InstructionWriter, offset: Int) {
         writer.write(offset, opCode.value.toByte())
         when (opCode) {
             LDC    -> writer.write(offset + 1, constantIndex.toByte())

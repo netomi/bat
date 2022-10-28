@@ -31,11 +31,12 @@ import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.JAVA_LANG_STRING_TYPE
 import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.parseDescriptorToJvmTypes
+import kotlin.collections.ArrayDeque
 
 class Processor: MethodAttributeVisitor {
 
     private var evaluated = Array(0) { false }
-    private var status    = Array(0) { BasicBlockStatus.UNKNOWN }
+    private var status    = Array(0) { 0 }
 
     private var framesBefore: Array<Frame?> = Array(0) { null }
     private var framesAfter:  Array<Frame?> = Array(0) { null }
@@ -43,22 +44,42 @@ class Processor: MethodAttributeVisitor {
     private val blockAnalyser = BlockAnalyser()
     private val frameUpdater  = FrameUpdater()
 
+    private var processingQueue: ArrayDeque<Int> = ArrayDeque()
+
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
 
     override fun visitCode(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
         println("evaluating method ${method.getFullExternalMethodSignature(classFile)}: ")
 
         evaluated = Array(attribute.codeLength) { false }
-        status    = Array(attribute.codeLength) { BasicBlockStatus.UNKNOWN }
+        status    = Array(attribute.codeLength) { 0 }
 
         framesBefore = Array(attribute.codeLength) { null }
         framesAfter  = Array(attribute.codeLength) { null }
 
-        setupInitialFrame(classFile, method)
-        evaluateBasicBlock(classFile, method, attribute, 0)
+        processingQueue = ArrayDeque()
+
+        evaluateCode(classFile, method, attribute)
     }
 
-    private fun setupInitialFrame(classFile: ClassFile, method: Method) {
+    private fun evaluateCode(classFile: ClassFile, method: Method, code: CodeAttribute) {
+        val initialFrame = setupInitialFrame(classFile, method)
+
+        enqueueBasicBlock(0, initialFrame)
+
+        while (processingQueue.isNotEmpty()) {
+            val nextBlockOffset = processingQueue.removeLast()
+            evaluateBasicBlock(classFile, method, code, nextBlockOffset)
+        }
+    }
+
+    private fun enqueueBasicBlock(offset: Int, frame: Frame) {
+        setStatusFlag(offset, BLOCK_ENTRY)
+        framesBefore[offset] = frame
+        processingQueue.addLast(offset)
+    }
+
+    private fun setupInitialFrame(classFile: ClassFile, method: Method): Frame {
         val descriptor = method.getDescriptor(classFile)
         val (parameterTypes, _) = parseDescriptorToJvmTypes(descriptor)
 
@@ -80,8 +101,7 @@ class Processor: MethodAttributeVisitor {
             }
         }
         variables.addAll(parameterTypes.map { VerificationType.of(it) })
-
-        framesBefore[0] = Frame.of(variables)
+        return Frame.of(variables)
     }
 
     private fun evaluateBasicBlock(classFile: ClassFile, method: Method, attribute: CodeAttribute, offset: Int) {
@@ -95,11 +115,13 @@ class Processor: MethodAttributeVisitor {
 
             instruction.accept(classFile, method, attribute, currentOffset, frameUpdater)
 
-            println("$currentOffset: $instruction before: ${framesBefore[currentOffset]} after: ${framesAfter[currentOffset]}")
+            println("$currentOffset: $instruction")
+            println("    before: ${framesBefore[currentOffset]}")
+            println("    after: ${framesAfter[currentOffset]}")
 
             instruction.accept(classFile, method, attribute, currentOffset, blockAnalyser)
 
-            if (status[currentOffset] != BasicBlockStatus.BLOCK_END) {
+            if (!isFlagSet(currentOffset, BLOCK_EXIT)) {
                 val length     = instruction.getLength(offset)
                 val oldOffset  = currentOffset
                 currentOffset += length
@@ -144,6 +166,25 @@ class Processor: MethodAttributeVisitor {
                     frameAfter.push(v1)
                     frameAfter.push(v2)
                     frameAfter.push(v1)
+                }
+
+                DUP_X2 -> {
+                    val v1 = frameAfter.pop()
+                    if (v1.isCategory2) {
+                        val v2 = frameAfter.pop()
+
+                        frameAfter.push(v1)
+                        frameAfter.push(v2)
+                        frameAfter.push(v1)
+                    } else {
+                        val v2 = frameAfter.pop()
+                        val v3 = frameAfter.pop()
+
+                        frameAfter.push(v1)
+                        frameAfter.push(v3)
+                        frameAfter.push(v2)
+                        frameAfter.push(v1)
+                    }
                 }
 
                 DUP2_X1 -> {
@@ -492,6 +533,7 @@ class Processor: MethodAttributeVisitor {
             val frameAfter  = frameBefore!!.copy()
 
             when (instruction.opCode) {
+                F2I,
                 L2I,
                 D2I,
                 I2B,
@@ -513,6 +555,7 @@ class Processor: MethodAttributeVisitor {
                     frameAfter.push(DoubleType)
                 }
 
+                I2F,
                 D2F,
                 L2F -> {
                     frameAfter.pop()
@@ -570,6 +613,11 @@ class Processor: MethodAttributeVisitor {
                     frameAfter.push(IntegerType)
                 }
 
+                LNEG -> {
+                    frameAfter.pop()
+                    frameAfter.push(LongType)
+                }
+
                 DNEG -> {
                     frameAfter.pop()
                     frameAfter.push(DoubleType)
@@ -588,6 +636,14 @@ class Processor: MethodAttributeVisitor {
                 LSHR -> {
                     frameAfter.pop(2)
                     frameAfter.push(LongType)
+                }
+
+                FADD,
+                FSUB,
+                FMUL,
+                FDIV -> {
+                    frameAfter.pop(2)
+                    frameAfter.push(FloatType)
                 }
 
                 DSUB,
@@ -665,25 +721,66 @@ class Processor: MethodAttributeVisitor {
         override fun visitAnyInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: JvmInstruction) {}
 
         override fun visitAnySwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: SwitchInstruction) {
-            status[offset] = BasicBlockStatus.BLOCK_END
+            setStatusFlag(offset, BLOCK_EXIT)
         }
 
         override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
-            status[offset] = BasicBlockStatus.BLOCK_END
+            setStatusFlag(offset, BLOCK_EXIT)
+
+            val targetOffset = offset + instruction.branchOffset
+            val nextOffset   = offset + instruction.getLength(offset)
+
+            val frameAfter = framesAfter[offset]!!
+
+            when (instruction.opCode) {
+                GOTO,
+                GOTO_W -> {
+                    enqueueBasicBlock(targetOffset, frameAfter)
+                }
+
+                IFNE,
+                IFLE,
+                IFLT,
+                IFEQ,
+                IFGE,
+                IFGT,
+                IFNONNULL,
+                IFNULL,
+                IF_ACMPNE,
+                IF_ACMPEQ,
+                IF_ICMPNE,
+                IF_ICMPEQ,
+                IF_ICMPLT,
+                IF_ICMPGE,
+                IF_ICMPGT,
+                IF_ICMPLE -> {
+                    enqueueBasicBlock(targetOffset, frameAfter)
+                    enqueueBasicBlock(nextOffset, frameAfter)
+                }
+
+                else -> TODO("implement ${instruction.opCode}")
+            }
         }
 
         override fun visitExceptionInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ExceptionInstruction) {
-            status[offset] = BasicBlockStatus.BLOCK_END
+            setStatusFlag(offset, BLOCK_EXIT)
         }
 
         override fun visitReturnInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ReturnInstruction) {
-            status[offset] = BasicBlockStatus.BLOCK_END
+            setStatusFlag(offset, BLOCK_EXIT)
         }
     }
-}
 
-internal enum class BasicBlockStatus {
-    BLOCK_START,
-    BLOCK_END,
-    UNKNOWN
+    private fun setStatusFlag(offset: Int, flag: Int) {
+        status[offset] = status[offset] or flag
+    }
+
+    private fun isFlagSet(offset: Int, flag: Int): Boolean {
+        return (status[offset] and flag) != 0
+    }
+
+    companion object {
+        private const val BLOCK_ENTRY = 1 shl 1
+        private const val BLOCK_EXIT  = 1 shl 2
+    }
 }

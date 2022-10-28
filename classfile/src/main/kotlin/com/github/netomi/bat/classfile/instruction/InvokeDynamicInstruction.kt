@@ -41,8 +41,8 @@ class InvokeDynamicInstruction : InvocationInstruction {
         return classFile.getInvokeDynamic(constantIndex)
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
-        super.write(writer, offset)
+    override fun writeData(writer: InstructionWriter, offset: Int) {
+        super.writeData(writer, offset)
         writer.write(offset + 3, 0x0)
         writer.write(offset + 4, 0x0)
     }

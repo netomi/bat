@@ -16,6 +16,7 @@
 
 package com.github.netomi.bat.classfile.instruction
 
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 abstract class SwitchInstruction
@@ -42,6 +43,20 @@ abstract class SwitchInstruction
     protected fun getPadding(offset: Int): Int {
         return (4 - (offset % 4)) % 4
     }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
+        if (_defaultLabel != null) {
+            _defaultOffset = offsetMap.computeOffsetDiffToTargetLabel(offset, _defaultLabel!!)
+            for (matchOffsetPair in matchOffsetPairs) {
+                matchOffsetPair.offset = offsetMap.computeOffsetDiffToTargetLabel(offset, matchOffsetPair.label!!)
+            }
+        } else {
+            _defaultOffset = offsetMap.computeOffsetDiffToTargetOffset(offset, _defaultOffset)
+            for (matchOffsetPair in matchOffsetPairs) {
+                matchOffsetPair.offset = offsetMap.computeOffsetDiffToTargetOffset(offset, matchOffsetPair.offset)
+            }
+        }
+    }
 }
 
-data class MatchOffsetPair(val match: Int, val offset: Int, val label: String? = null)
+data class MatchOffsetPair(val match: Int, var offset: Int, val label: String? = null)

@@ -28,7 +28,17 @@ internal class LabelInstruction private constructor(private val label: String) :
     override fun read(instructions: ShortArray, offset: Int) {}
 
     override fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap?) {
-        offsetMap?.setLabel(label, offset)
+        if (offsetMap != null) {
+            updateOffsets(offset, offsetMap)
+        }
+    }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
+        offsetMap.setLabel(label, offset)
+    }
+
+    override fun writeData(): ShortArray {
+        error("should never be called")
     }
 
     override fun accept(dexFile: DexFile, classDef: ClassDef, method: EncodedMethod, code: Code, offset: Int, visitor: InstructionVisitor) {}

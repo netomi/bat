@@ -19,6 +19,7 @@ package com.github.netomi.bat.classfile.instruction
 import com.github.netomi.bat.classfile.*
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.util.*
 import java.util.*
@@ -41,10 +42,12 @@ class ArrayPrimitiveTypeInstruction : JvmInstruction {
         primitiveType = PrimitiveType.of(instructions[offset + 1].toInt())
     }
 
-    override fun write(writer: InstructionWriter, offset: Int) {
+    override fun writeData(writer: InstructionWriter, offset: Int) {
         writer.write(offset, opCode.value.toByte())
         writer.write(offset + 1, primitiveType.value.toByte())
     }
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {}
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {
         visitor.visitArrayPrimitiveTypeInstruction(classFile, method, code, offset, this)

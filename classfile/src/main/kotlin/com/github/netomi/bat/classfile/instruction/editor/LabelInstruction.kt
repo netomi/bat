@@ -26,11 +26,17 @@ internal class LabelInstruction private constructor(private val label: String) :
 
     override fun read(instructions: ByteArray, offset: Int) {}
 
-    override fun write(writer: InstructionWriter, offset: Int) {}
+    override fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap?) {
+        if (offsetMap != null) {
+            updateOffsets(offset, offsetMap)
+        }
+    }
 
-//    override fun write(writer: InstructionWriter, offset: Int, offsetMap: OffsetMap?) {
-//        offsetMap?.setLabel(label, offset)
-//    }
+    override fun writeData(writer: InstructionWriter, offset: Int) {}
+
+    override fun updateOffsets(offset: Int, offsetMap: OffsetMap) {
+        offsetMap.setLabel(label, offset)
+    }
 
     override fun accept(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, visitor: InstructionVisitor) {}
 
