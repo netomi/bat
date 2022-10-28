@@ -14,12 +14,13 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.eval
+package com.github.netomi.bat.classfile.verifier
 
 import com.github.netomi.bat.classfile.ClassFile
 import com.github.netomi.bat.classfile.Method
 import com.github.netomi.bat.classfile.attribute.Attribute
 import com.github.netomi.bat.classfile.attribute.CodeAttribute
+import com.github.netomi.bat.classfile.attribute.ExceptionEntry
 import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.constant.DoubleConstant
 import com.github.netomi.bat.classfile.constant.FloatConstant
@@ -33,7 +34,7 @@ import com.github.netomi.bat.util.asJvmType
 import com.github.netomi.bat.util.parseDescriptorToJvmTypes
 import kotlin.collections.ArrayDeque
 
-class Processor: MethodAttributeVisitor {
+class CodeAnalyzer private constructor(private val processors: List<FrameProcessor> = emptyList()): MethodAttributeVisitor {
 
     private var evaluated = Array(0) { false }
     private var status    = Array(0) { 0 }
@@ -44,12 +45,12 @@ class Processor: MethodAttributeVisitor {
     private val blockAnalyser = BlockAnalyser()
     private val frameUpdater  = FrameUpdater()
 
-    private var processingQueue: ArrayDeque<Int> = ArrayDeque()
+    private var processingQueue: ArrayDeque<Pair<Int, () -> Unit>> = ArrayDeque()
 
     override fun visitAnyAttribute(classFile: ClassFile, attribute: Attribute) {}
 
     override fun visitCode(classFile: ClassFile, method: Method, attribute: CodeAttribute) {
-        println("evaluating method ${method.getFullExternalMethodSignature(classFile)}: ")
+//        println("evaluating method ${method.getFullExternalMethodSignature(classFile)}: ")
 
         evaluated = Array(attribute.codeLength) { false }
         status    = Array(attribute.codeLength) { 0 }
@@ -65,49 +66,80 @@ class Processor: MethodAttributeVisitor {
     private fun evaluateCode(classFile: ClassFile, method: Method, code: CodeAttribute) {
         val initialFrame = setupInitialFrame(classFile, method)
 
+        for (exceptionEntry in code.exceptionTable.asReversed()) {
+            enqueueExceptionHandler(classFile, exceptionEntry)
+        }
+
         enqueueBasicBlock(0, initialFrame)
 
         while (processingQueue.isNotEmpty()) {
-            val nextBlockOffset = processingQueue.removeLast()
+            val (nextBlockOffset, setupFrame) = processingQueue.removeLast()
+            setupFrame()
             evaluateBasicBlock(classFile, method, code, nextBlockOffset)
         }
     }
 
+    private fun enqueueExceptionHandler(classFile: ClassFile, exceptionEntry: ExceptionEntry) {
+        val handlerPC = exceptionEntry.handlerPC
+
+        val setupFrame: () -> Unit = {
+//            println("setup frame for exception handler $exceptionEntry")
+            val frame = framesBefore[exceptionEntry.startPC]!!.copy()
+            frame.clearStack()
+
+            val exceptionType = if (exceptionEntry.catchType == 0) {
+                "Ljava/lang/Throwable;".asJvmType()
+            } else {
+                exceptionEntry.getCaughtExceptionClassName(classFile)!!.toJvmType()
+            }
+
+            frame.push(VerificationType.of(exceptionType))
+            framesBefore[handlerPC] = frame
+        }
+
+        setStatusFlag(handlerPC, BLOCK_ENTRY)
+        setStatusFlag(handlerPC, EXCEPTION_HANDLER)
+
+        processingQueue.addLast(Pair(handlerPC, setupFrame))
+    }
+
     private fun enqueueBasicBlock(offset: Int, frame: Frame) {
         setStatusFlag(offset, BLOCK_ENTRY)
-        framesBefore[offset] = frame
-        processingQueue.addLast(offset)
+        processingQueue.addLast(Pair(offset) { framesBefore[offset] = frame })
     }
 
     private fun setupInitialFrame(classFile: ClassFile, method: Method): Frame {
         val descriptor = method.getDescriptor(classFile)
         val (parameterTypes, _) = parseDescriptorToJvmTypes(descriptor)
 
-        val variables = mutableListOf<VerificationType>()
+        val frame = Frame.empty()
+
+        var variableIndex = 0
+
         if (!method.isStatic) {
+            val classType = classFile.className.toJvmType()
             if (method.getName(classFile) == "<init>") {
-                variables.add(UninitializedThisType.of(classFile.className.toJvmType()))
+                frame.store(variableIndex++, UninitializedThisType.of(classType))
             } else {
-                variables.add(VerificationType.of(classFile.className.toJvmType()))
+                frame.store(variableIndex++, UninitializedThisType.of(classType))
             }
         }
 
         for (parameterType in parameterTypes) {
             val verificationType = VerificationType.of(parameterType)
-            variables.add(verificationType)
-
+            frame.store(variableIndex++, verificationType)
             if (verificationType.isCategory2) {
-                variables.add(TopType)
+                variableIndex++
             }
         }
-        variables.addAll(parameterTypes.map { VerificationType.of(it) })
-        return Frame.of(variables)
+
+        return frame
     }
 
     private fun evaluateBasicBlock(classFile: ClassFile, method: Method, attribute: CodeAttribute, offset: Int) {
         var currentOffset = offset
 
-        println("starting block at offset $offset")
+//        println("starting block at offset $offset")
         while (!evaluated[currentOffset]) {
             evaluated[currentOffset] = true
 
@@ -115,9 +147,12 @@ class Processor: MethodAttributeVisitor {
 
             instruction.accept(classFile, method, attribute, currentOffset, frameUpdater)
 
-            println("$currentOffset: $instruction")
-            println("    before: ${framesBefore[currentOffset]}")
-            println("    after: ${framesAfter[currentOffset]}")
+            for (processor in processors) {
+                processor.handleInstruction(currentOffset, instruction, framesBefore[currentOffset]!!, framesAfter[currentOffset]!!)
+            }
+//            println("$currentOffset: $instruction")
+//            println("    before: ${framesBefore[currentOffset]}")
+//            println("    after: ${framesAfter[currentOffset]}")
 
             instruction.accept(classFile, method, attribute, currentOffset, blockAnalyser)
 
@@ -129,7 +164,7 @@ class Processor: MethodAttributeVisitor {
                 framesBefore[currentOffset] = framesAfter[oldOffset]
             }
         }
-        println("finished block")
+//        println("finished block")
     }
 
     inner class FrameUpdater: InstructionVisitor {
@@ -722,6 +757,16 @@ class Processor: MethodAttributeVisitor {
 
         override fun visitAnySwitchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: SwitchInstruction) {
             setStatusFlag(offset, BLOCK_EXIT)
+
+            val frameAfter = framesAfter[offset]!!
+
+            val defaultOffset = offset + instruction.defaultOffset
+            enqueueBasicBlock(defaultOffset, frameAfter)
+
+            for (matchOffsetPair in instruction) {
+                val targetOffset = offset + matchOffsetPair.offset
+                enqueueBasicBlock(targetOffset, frameAfter)
+            }
         }
 
         override fun visitBranchInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: BranchInstruction) {
@@ -738,27 +783,10 @@ class Processor: MethodAttributeVisitor {
                     enqueueBasicBlock(targetOffset, frameAfter)
                 }
 
-                IFNE,
-                IFLE,
-                IFLT,
-                IFEQ,
-                IFGE,
-                IFGT,
-                IFNONNULL,
-                IFNULL,
-                IF_ACMPNE,
-                IF_ACMPEQ,
-                IF_ICMPNE,
-                IF_ICMPEQ,
-                IF_ICMPLT,
-                IF_ICMPGE,
-                IF_ICMPGT,
-                IF_ICMPLE -> {
+                else -> {
                     enqueueBasicBlock(targetOffset, frameAfter)
                     enqueueBasicBlock(nextOffset, frameAfter)
                 }
-
-                else -> TODO("implement ${instruction.opCode}")
             }
         }
 
@@ -780,7 +808,12 @@ class Processor: MethodAttributeVisitor {
     }
 
     companion object {
-        private const val BLOCK_ENTRY = 1 shl 1
-        private const val BLOCK_EXIT  = 1 shl 2
+        private const val BLOCK_ENTRY       = 1 shl 1
+        private const val BLOCK_EXIT        = 1 shl 2
+        private const val EXCEPTION_HANDLER = 1 shl 3
+
+        fun of(vararg processors: FrameProcessor): CodeAnalyzer {
+            return CodeAnalyzer(processors.toList())
+        }
     }
 }

@@ -27,6 +27,7 @@ import com.github.netomi.bat.classfile.instruction.JvmInstruction
 import com.github.netomi.bat.classfile.instruction.editor.InstructionWriter
 import com.github.netomi.bat.classfile.instruction.editor.LabelInstruction
 import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
+import com.github.netomi.bat.classfile.verifier.CodeAnalyzer
 
 class CodeEditor private constructor(private val classEditor:   ClassEditor,
                                      private val method:        Method,
@@ -119,12 +120,19 @@ class CodeEditor private constructor(private val classEditor:   ClassEditor,
             writeInstructions(instructions)
         }
 
-        codeAttribute._code = instructionWriter.getInstructionArray()
+        codeAttribute.code = instructionWriter.getInstructionArray()
 
         // update the offsets of each exception entry based on the collected labels.
         codeAttribute.setExceptionTable(updateExceptionEntries(codeAttribute.exceptionTable, addedExceptionList, offsetMap))
 
-        // TODO: compute maxstack and maxlocals.
+        val stackSizeComputer         = StackSizeComputer()
+        val localVariableSizeComputer = LocalVariableSizeComputer()
+
+        val analyzer = CodeAnalyzer.of(stackSizeComputer, localVariableSizeComputer)
+        analyzer.visitCode(classFile, method, codeAttribute)
+
+        codeAttribute.maxStack  = stackSizeComputer.maxStackSize
+        codeAttribute.maxLocals = localVariableSizeComputer.localVariableSize
 
         modifications.clear()
         addedExceptionList.clear()
@@ -188,9 +196,9 @@ class CodeEditor private constructor(private val classEditor:   ClassEditor,
             }
         }
 
-        // TODO: remove duplicate exception entries.
+        // TODO: remove duplicate exception entries
+        //       and make sure they are in a proper order.
 
-        exceptionEntries.sortBy { it.startPC }
         return exceptionEntries
     }
 

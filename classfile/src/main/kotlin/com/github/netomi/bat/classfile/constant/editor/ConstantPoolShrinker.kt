@@ -115,7 +115,7 @@ private class InstructionReMapper constructor(private val mapping: IntArray): At
         val newLength = modifiedInstructions.size
 
         if (newLength == attribute.codeLength) {
-            attribute._code = modifiedInstructions
+            attribute.code = modifiedInstructions
         } else {
             error("remapped instructions have different size")
         }

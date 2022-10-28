@@ -14,12 +14,18 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.eval
+package com.github.netomi.bat.classfile.verifier
 
 import com.github.netomi.bat.util.mutableListOfCapacity
 
 class Frame private constructor(private val variables: MutableList<VerificationType?> = mutableListOfCapacity(0),
                                 private val stack:     MutableList<VerificationType>  = mutableListOfCapacity(0)) {
+
+    val stackSize: Int
+        get() = stack.fold(0) { agg, type -> agg + type.operandSize }
+
+    val variableSize: Int
+        get() = variables.size
 
     fun copy(): Frame {
         return Frame(variables.toMutableList(), stack.toMutableList())
@@ -49,18 +55,28 @@ class Frame private constructor(private val variables: MutableList<VerificationT
 
     fun load(variable: Int): VerificationType {
         val value = variables[variable]
-        check(value != null)
+        check(value != null && value !is TopType)
         return value
     }
 
     fun store(variable: Int, type: VerificationType) {
-        while (variable >= variables.size) {
-            variables.add(null)
-        }
+        val maxVariableIndex = if (type.isCategory2) variable + 1 else variable
+
+        ensureVariableCapacity(maxVariableIndex)
         variables[variable] = type
+
+        if (type.isCategory2) {
+            variables[variable + 1] = TopType
+        }
     }
 
-    fun referenceInitialized(reference: VerificationType) {
+    private fun ensureVariableCapacity(capacity: Int) {
+        while (capacity >= variables.size) {
+            variables.add(null)
+        }
+    }
+
+    internal fun referenceInitialized(reference: VerificationType) {
         require(reference is UninitializedType ||
                 reference is UninitializedThisType)
 
@@ -104,8 +120,8 @@ class Frame private constructor(private val variables: MutableList<VerificationT
     }
 
     companion object {
-        fun of(variables: List<VerificationType>): Frame {
-            return Frame(variables.toMutableList())
+        fun empty(): Frame {
+            return Frame()
         }
     }
 }

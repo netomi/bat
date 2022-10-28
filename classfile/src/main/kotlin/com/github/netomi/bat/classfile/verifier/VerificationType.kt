@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.github.netomi.bat.classfile.eval
+package com.github.netomi.bat.classfile.verifier
 
 import com.github.netomi.bat.util.*
 
@@ -22,6 +22,7 @@ abstract class VerificationType {
     abstract val name: String
 
     abstract val isCategory2: Boolean
+    abstract val operandSize: Int
 
     companion object {
         fun of(jvmType: JvmType): VerificationType {
@@ -51,7 +52,10 @@ object TopType: VerificationType() {
         get() = "top"
 
     override val isCategory2: Boolean
-        get() = false
+        get() = error("should never be called")
+
+    override val operandSize: Int
+        get() = error("should never be called")
 }
 
 object IntegerType: VerificationType() {
@@ -60,6 +64,9 @@ object IntegerType: VerificationType() {
 
     override val isCategory2: Boolean
         get() = false
+
+    override val operandSize: Int
+        get() = 1
 }
 
 object FloatType: VerificationType() {
@@ -68,6 +75,9 @@ object FloatType: VerificationType() {
 
     override val isCategory2: Boolean
         get() = false
+
+    override val operandSize: Int
+        get() = 1
 }
 
 object LongType: VerificationType() {
@@ -76,6 +86,9 @@ object LongType: VerificationType() {
 
     override val isCategory2: Boolean
         get() = true
+
+    override val operandSize: Int
+        get() = 2
 }
 
 object DoubleType: VerificationType() {
@@ -84,16 +97,22 @@ object DoubleType: VerificationType() {
 
     override val isCategory2: Boolean
         get() = true
+
+    override val operandSize: Int
+        get() = 2
 }
 
-abstract class ReferenceType constructor(protected val _classType: JvmType?): VerificationType()
+abstract class ReferenceType constructor(protected val _classType: JvmType?): VerificationType() {
+    override val isCategory2: Boolean
+        get() = false
+
+    override val operandSize: Int
+        get() = 1
+}
 
 class JavaReferenceType private constructor(classType: JvmType): ReferenceType(classType) {
     override val name: String
         get() = "class($classType)"
-
-    override val isCategory2: Boolean
-        get() = false
 
     val classType: JvmType
         get() = _classType!!
@@ -109,9 +128,6 @@ class UninitializedThisType private constructor(classType: JvmType): ReferenceTy
     override val name: String
         get() = "uninitializedThis($classType)"
 
-    override val isCategory2: Boolean
-        get() = false
-
     val classType: JvmType
         get() = _classType!!
 
@@ -126,9 +142,6 @@ class UninitializedType private constructor(classType: JvmType, val offset: Int)
     override val name: String
         get() = "uninitialized($classType, $offset)"
 
-    override val isCategory2: Boolean
-        get() = false
-
     val classType: JvmType
         get() = _classType!!
 
@@ -142,7 +155,4 @@ class UninitializedType private constructor(classType: JvmType, val offset: Int)
 object NullReference: ReferenceType(null) {
     override val name: String
         get() = "nullReference"
-
-    override val isCategory2: Boolean
-        get() = false
 }

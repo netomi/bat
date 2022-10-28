@@ -39,11 +39,8 @@ import java.util.*
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.3">Code Attribute</a>
  */
-data class CodeAttribute
+class CodeAttribute
     private constructor(override var attributeNameIndex: Int,
-                         private var _maxStack:          Int                         = 0,
-                         private var _maxLocals:         Int                         = 0,
-                        internal var _code:              ByteArray                   = ByteArray(0),
                          private var _exceptionTable:    MutableList<ExceptionEntry> = mutableListOfCapacity(0),
                         internal var attributeMap:       AttributeMap                = AttributeMap.empty())
     : Attribute(attributeNameIndex), AttachedToMethod {
@@ -54,17 +51,17 @@ data class CodeAttribute
     override val dataSize: Int
         get() = 8 + codeLength + exceptionTable.contentSize() + attributeMap.contentSize
 
-    val maxStack: Int
-        get() = _maxStack
+    var maxStack: Int = 0
+        internal set
 
-    val maxLocals: Int
-        get() = _maxLocals
+    var maxLocals: Int = 0
+        internal set
+
+    var code: ByteArray = ByteArray(0)
+        internal set
 
     val codeLength: Int
         get() = code.size
-
-    val code: ByteArray
-        get() = _code
 
     val exceptionTable: List<ExceptionEntry>
         get() = _exceptionTable
@@ -83,12 +80,12 @@ data class CodeAttribute
 
     @Throws(IOException::class)
     override fun readAttributeData(input: ClassDataInput, length: Int) {
-        _maxStack  = input.readUnsignedShort()
-        _maxLocals = input.readUnsignedShort()
+        maxStack  = input.readUnsignedShort()
+        maxLocals = input.readUnsignedShort()
 
         val codeLength = input.readInt()
-        _code = ByteArray(codeLength)
-        input.readFully(_code)
+        code = ByteArray(codeLength)
+        input.readFully(code)
 
         _exceptionTable = input.readContentList(ExceptionEntry::read)
         attributeMap    = input.readAttributes()

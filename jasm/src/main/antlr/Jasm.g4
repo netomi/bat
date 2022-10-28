@@ -196,8 +196,7 @@ sMethod
 	: '.method' sAccList methodObj=METHOD_PART
         ( sAttribute
         | sParameter
-        | sInstruction
-        | sDirective )*
+        | sInstruction )*
 	 '.end method' ;
 
 sField
@@ -299,10 +298,7 @@ sInstruction
     | fLine
     | fStartlocal
     | fEndlocal
-    ;
-
-sDirective
-    : fMaxStack
+    | fMaxStack
     | fMaxLocals
     ;
 
