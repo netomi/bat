@@ -120,6 +120,14 @@ class CodeEditor private constructor(private val classEditor:   ClassEditor,
         }
 
         codeAttribute._code = instructionWriter.getInstructionArray()
+
+        // update the offsets of each exception entry based on the collected labels.
+        codeAttribute.setExceptionTable(updateExceptionEntries(codeAttribute.exceptionTable, addedExceptionList, offsetMap))
+
+        // TODO: compute maxstack and maxlocals.
+
+        modifications.clear()
+        addedExceptionList.clear()
     }
 
     private fun collectInstructions(offsetMap: OffsetMap): List<JvmInstruction> {
@@ -162,6 +170,28 @@ class CodeEditor private constructor(private val classEditor:   ClassEditor,
         }
 
         return instructions
+    }
+
+    private fun updateExceptionEntries(existingEntries: List<ExceptionEntry>,
+                                       addedEntries:    MutableList<ExceptionEntry>,
+                                       offsetMap:       OffsetMap): List<ExceptionEntry> {
+
+        val exceptionEntries = (existingEntries + addedEntries).toMutableList()
+        if (exceptionEntries.isEmpty()) {
+            return arrayListOf()
+        }
+
+        // update the addresses for each Exception entry.
+        if (offsetMap.hasOffsetUpdates() || offsetMap.hasLabels()) {
+            for (entry in exceptionEntries) {
+                entry.updateOffsets(offsetMap)
+            }
+        }
+
+        // TODO: remove duplicate exception entries.
+
+        exceptionEntries.sortBy { it.startPC }
+        return exceptionEntries
     }
 
     companion object {

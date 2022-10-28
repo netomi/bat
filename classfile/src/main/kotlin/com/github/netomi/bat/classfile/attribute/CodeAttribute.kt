@@ -24,6 +24,7 @@ import com.github.netomi.bat.classfile.attribute.visitor.MethodAttributeVisitor
 import com.github.netomi.bat.classfile.constant.visitor.PropertyAccessor
 import com.github.netomi.bat.classfile.constant.visitor.ReferencedConstantVisitor
 import com.github.netomi.bat.classfile.instruction.JvmInstruction
+import com.github.netomi.bat.classfile.instruction.editor.OffsetMap
 import com.github.netomi.bat.classfile.instruction.visitor.InstructionVisitor
 import com.github.netomi.bat.classfile.io.*
 import com.github.netomi.bat.classfile.io.ClassDataInput
@@ -74,6 +75,10 @@ data class CodeAttribute
     internal fun addAttribute(attribute: Attribute) {
         require(attribute is AttachedToCodeAttribute) { "trying to add an attribute of type '${attribute.type}' to a code attribute"}
         attributeMap.addAttribute(attribute)
+    }
+
+    internal fun setExceptionTable(exceptionList: List<ExceptionEntry>) {
+        _exceptionTable = exceptionList.toMutableList()
     }
 
     @Throws(IOException::class)
@@ -150,7 +155,12 @@ data class CodeAttribute
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(attributeNameIndex, maxStack, maxLocals, code.contentHashCode(), exceptionTable, attributes)
+        return Objects.hash(attributeNameIndex,
+                            maxStack,
+                            maxLocals,
+                            code.contentHashCode(),
+                            exceptionTable,
+                            attributes)
     }
 
     companion object {
@@ -185,6 +195,21 @@ data class ExceptionEntry private constructor(private var _startPC:      Int = -
 
     fun getCaughtExceptionClassName(classFile: ClassFile): JvmClassName? {
         return if (catchType > 0) classFile.getClassName(catchType) else null
+    }
+
+    internal fun updateOffsets(offsetMap: OffsetMap) {
+        if (_startLabel != null) {
+            requireNotNull(_endLabel)
+            requireNotNull(_handlerLabel)
+
+            _startPC   = offsetMap.getOffset(_startLabel!!)
+            _endPC     = offsetMap.getOffset(_endLabel!!)
+            _handlerPC = offsetMap.getOffset(_handlerLabel!!)
+        } else {
+            _startPC   = offsetMap.getNewOffset(_startPC)
+            _endPC     = offsetMap.getNewOffset(_endPC)
+            _handlerPC = offsetMap.getNewOffset(_handlerPC)
+        }
     }
 
     private fun read(input: ClassDataInput) {
