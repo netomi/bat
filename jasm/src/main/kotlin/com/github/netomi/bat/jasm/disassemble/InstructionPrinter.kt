@@ -76,7 +76,7 @@ internal class InstructionPrinter constructor(private val printer:         Inden
 
     override fun visitArrayPrimitiveTypeInstruction(classFile: ClassFile, method: Method, code: CodeAttribute, offset: Int, instruction: ArrayPrimitiveTypeInstruction) {
         printCommon(offset, instruction, wide = false, appendNewLine = false)
-        printer.println(" %s".format(instruction.arrayType.toString().lowercase(Locale.getDefault())))
+        printer.println(" %s".format(instruction.primitiveType.toString().lowercase(Locale.getDefault())))
         printEndLabels(offset + instruction.getLength(offset))
     }
 

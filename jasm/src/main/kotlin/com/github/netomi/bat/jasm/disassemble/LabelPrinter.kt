@@ -111,7 +111,7 @@ internal class LabelPrinter(private val printer: IndentingPrinter) : Instruction
         if (exception.catchType == 0) {
             addEndLabelInfo(exception.endPC, ".catchall {:try_start_$startPC .. :try_end_${endPC}} :catchall_${handlerPC}")
         } else {
-            addEndLabelInfo(exception.endPC, ".catch ${exception.getCaughtExceptionClassName(classFile)} {:try_start_$startPC .. :try_end_${endPC}} :catchall_${handlerPC}")
+            addEndLabelInfo(exception.endPC, ".catch ${exception.getCaughtExceptionClassName(classFile)} {:try_start_$startPC .. :try_end_${endPC}} :catch_${handlerPC}")
         }
     }
 
